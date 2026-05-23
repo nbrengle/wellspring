@@ -1,0 +1,222 @@
+[
+  {
+    "term": "Accent",
+    "definition": "The flavor of an Effect. Indicates the source or properties of an Effect such as “by Flame,” or “by Shadow,” and may affect what defenses will protect against it."
+  },
+  {
+    "term": "Advantage",
+    "definition": "Lineage-related Perks that can be purchased by taking Lineage Challenges."
+  },
+  {
+    "term": "Advanced Class",
+    "definition": "This is a class into which you can put levels. They will always have certain prerequisites, which may be skills, character level, plot interactions, or even another certain Advanced Class. Abbreviated as “AC.”"
+  },
+  {
+    "term": "Armor",
+    "definition": "Armor can be physically represented (meaning that the player is wearing something that looks like actual armor) or summoned (created invisibly by a Power). Natural Armor is armor that is part of a creature's skin or hide and can be repaired with Healing. Armor acts just like Life Points except it must be mended, rather than healed."
+  },
+  {
+    "term": "Attune",
+    "definition": "Some potent magic items require Attunement and can then be used only by the character they are Attuned to. Characters by default can only Attune to three items."
+  },
+  {
+    "term": "Base Class",
+    "definition": "One of the Core Eight beginning Classes, a class is sort of like a profession. It determines a number of different statistics, such as Spike damage, what Powers and spell-progression a character has, what Proficiencies, and so forth."
+  },
+  {
+    "term": "Base Damage",
+    "definition": "The damage a character does when swinging a weapon without any temporary damage bonuses or detriments. In the vast majority of cases, this number is one, and is uncalled damage. However, some classes, powers, and abilities can alter this number."
+  },
+  {
+    "term": "Build Points",
+    "definition": "These are points that are earned by a character as they go up in level and can be spent to buy Advantages, Skills, or Perks."
+  },
+  {
+    "term": "Call",
+    "definition": "Calls are the out-of-game words used to communicate damage, Effects, durations, and so forth to the target of a game Effect. Calls are separate from the in-game Incantations, and have a defined structure."
+  },
+  {
+    "term": "Challenge",
+    "definition": "Lineage-specific Flaws, often costume related, that grant Lineage Build Points that can purchase Advantages."
+  },
+  {
+    "term": "Cantrip",
+    "definition": "Magical Powers possessed by spell-casting classes that do not require Spell-Slots, but otherwise follow the rules of Spellcasting."
+  },
+  {
+    "term": "Character Options",
+    "definition": "These are the various Perks and Flaws characters can take."
+  },
+  {
+    "term": "Casting Class",
+    "definition": "A Class that casts spells."
+  },
+  {
+    "term": "Conditions",
+    "definition": "States that a character can have such as Imprisoned or Dead."
+  },
+  {
+    "term": "Count",
+    "definition": "Durations are measured by Count. A Slow Count is a counting of seconds. A Quick Count is however fast the player can verbally (audibly) count to the number. Thus a Slow 5 is about 5 seconds, and a Quick 30 is also about 5 seconds."
+  },
+  {
+    "term": "Counter",
+    "definition": "A Power that is called immediately to negate an attack or other Power."
+  },
+  {
+    "term": "Dawn",
+    "definition": "The Long Rest time of 7am."
+  },
+  {
+    "term": "Dead",
+    "definition": "A dead character begins their “discorporation-count” which is a Slow 180. After this they discorporate, become a Spirit, pick up any unattended equipment and proceed to a Spirit River."
+  },
+  {
+    "term": "Death-count",
+    "definition": "A Slow 180 that starts when the character drops to 0 Life Points. At the end of the death-count the character is dead."
+  },
+  {
+    "term": "Delivery",
+    "definition": "The method by which an Effect can be applied to a target, such as by Packet, by weapon hit, etc. Packet, Touch, Weapon, Verbal, and Voice are the most common."
+  },
+  {
+    "term": "Dusk",
+    "definition": "The Long Rest time of 7pm."
+  },
+  {
+    "term": "Dying",
+    "definition": "When a character drops to 0 Life Points they are Dying. They can make noise, but not impart information. After a Slow 180 (their “death-count”) they will die. Dying characters are considered Helpless, and also gain the Qualifier “Dying.”"
+  },
+  {
+    "term": "Effects",
+    "definition": "These are the methods by which Conditions are applied, such as “Sleep” to make someone Slept. There are some Effects, such as Cure or Grant, that do more than just apply Conditions."
+  },
+  {
+    "term": "Flaw",
+    "definition": "This is a special hardship or obstacle that a character takes on. It grants additional Build Points that can be spent on Skills or Perks."
+  },
+  {
+    "term": "Focus",
+    "definition": "Focus is basically a silent Incantation. It is an amount of time that a character must concentrate on activating a Power. If a creature is attacked while focusing, the Power is ineffective and must be begun again."
+  },
+  {
+    "term": "Helpless",
+    "definition": "When a character is incapable or unwilling to defend themselves they are considered Helpless, and are subject to Touch spells by foes, and gain the Qualifier “Helpless.”"
+  },
+  {
+    "term": "Hold",
+    "definition": "If any participant calls out “Hold!” the entire game should come to a complete stop. No game actions (or even discussions) will take place while the issue is being handled."
+  },
+  {
+    "term": "Incantation",
+    "definition": "The Incantation for a Power is a series of words that must be spoken in order to activate that Power. In order to complete the incantation, the right foot must stay planted, one hand must be free, and the character must remain undisturbed."
+  },
+  {
+    "term": "Life Points",
+    "definition": "These represent how much damage a character can take before they start Dying."
+  },
+  {
+    "term": "Lineage",
+    "definition": "The character’s ancestry. The make-up, appearance, and roleplaying requirements of Lineages, called Challenges, are treated as Flaws (see below) that give Lineage Build Points that can be spent on Lineage-specific Perks called Advantages."
+  },
+  {
+    "term": "Long Rest",
+    "definition": "Applies each game day at 7am and 7pm. Long duration conditions will end, and Powers with a Refresh of Long will become available again."
+  },
+  {
+    "term": "Martial Class",
+    "definition": "A Class that doesn't cast spells (Generally uses Tiered Powers)."
+  },
+  {
+    "term": "Marshal",
+    "definition": "A member of Staff devoted to answering questions, giving descriptions, or otherwise adjudicating rules and imparting knowledge."
+  },
+  {
+    "term": "Materia",
+    "definition": "Materia are the special material components needed to cast many spells. It is what makes up spell-packets. Often, in-game, Packets are just called “Materia.\""
+  },
+  {
+    "term": "Paces",
+    "definition": "If a rules text references movement distance in \"paces\", it assumes that one \"pace\" is approximately 2 feet. Exact measurements are not required, but players should use their best judgment when taking steps to keep them at this average."
+  },
+  {
+    "term": "Packet",
+    "definition": "A Packet is a small, soft bundle, an inch or so in diameter and filled with birdseed, that is thrown at others and can be charged with power."
+  },
+  {
+    "term": "Perk",
+    "definition": "This is a special attribute. It may grant access to special Powers or other benefits. Perks usually cost Build Points to purchase."
+  },
+  {
+    "term": "Power",
+    "definition": "Powers are anything listed with a name, Incantation, Call, Effect, target, Accent, duration, Delivery, and Refresh, or anything specifically referenced as a Power (such as NPC abilities)."
+  },
+  {
+    "term": "Power Phrases",
+    "definition": "These are phrases that connote that information is already understood by the character hearing the phrase, even if it’s new to the player."
+  },
+  {
+    "term": "Power Words",
+    "definition": "Spoken words that are always out-of-game. If you hear these exact words used during the game, they will have a standard meaning, and some will have instructions that all players are expected to follow."
+  },
+  {
+    "term": "Prevented",
+    "definition": "A Power is Prevented if it is Countered, Resisted, or if “No Effect” is called. Many Powers are not expended if their effects are Prevented."
+  },
+  {
+    "term": "Proficiency",
+    "definition": "Being able to use a particular weapon, shield, or armor effectively."
+  },
+  {
+    "term": "Qualifier",
+    "definition": "A Qualifier is a special part of a call which limits an effect only to a certain kind of person. “10 by Flame to Undead” (italics indicate the Qualifier) would only damage those creatures that have the Undead trait."
+  },
+  {
+    "term": "Refresh",
+    "definition": "This is a term used to describe getting back access to a Power or spell-slot that has been exhausted. Many Powers refresh at the end of a Short Rest."
+  },
+  {
+    "term": "Repped Armor",
+    "definition": "Physical armor that is worn is often referred to as the represented or “repped” armor that a character is wearing. This is the total armor points that the character is awarded for the armor that is currently worn via the physical armor table."
+  },
+  {
+    "term": "Selective Immunity",
+    "definition": "This ability allows the recipient to have immunity to a source (such as an Accent), but at-will, the character may “turn off” this immunity on an Effect by Effect basis."
+  },
+  {
+    "term": "Short Rest",
+    "definition": "Any five minute rest that the character wishes to count as a Short Rest. This can be spent doing anything non-strenuous, up to slow walking. Fighting, combat, running, and heavy exertion or high emotion will disrupt a Short Rest. Completing a Long Rest will also complete a Short Rest."
+  },
+  {
+    "term": "Signature Item",
+    "definition": "An especially powerful attuned item. No character can be attuned to more than one Signature Item at a time and a Signature Item also takes up one of the character’s Attunement slots."
+  },
+  {
+    "term": "Skills",
+    "definition": "Skills are abilities, such as being able to use a sword, or being able to track. They are usually purchased with Build Points just like Perks."
+  },
+  {
+    "term": "Spells",
+    "definition": "Magical Powers possessed by spell-casting classes that require Spell-slots of the appropriate tier. These Powers follow the rules of Spellcasting."
+  },
+  {
+    "term": "Spell-slots",
+    "definition": "Spell-casting classes have a limited number of spells they can cast each day from each tier of spell. This number is represented by spell-slots."
+  },
+  {
+    "term": "Sphere",
+    "definition": "Spell-casters can cast Arcane or Divine spells. These are the two different standard spheres of magic."
+  },
+  {
+    "term": "Spike Damage",
+    "definition": "By default, all weapon hits do one point of damage, unless an audible Call is made. Characters have a certain number of attacks that do extra damage, called Spikes. A character’s Spike Damage is their Base Damage, plus one, plus any Spike Damage modifiers."
+  },
+  {
+    "term": "Tier",
+    "definition": "Powers are organized into three tiers. For martial Powers, these are Basic, Advanced, and Veteran. For spells, they are Novice, Adept, and Greater."
+  },
+  {
+    "term": "Wielding",
+    "definition": "A general term to denote that you are using an item that you are proficient in one or both hands, whatever is the standard legal way of using that item."
+  }
+]

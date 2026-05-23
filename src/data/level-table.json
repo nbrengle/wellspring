@@ -1,0 +1,86 @@
+[
+  {
+    "level": 4,
+    "xp": 0,
+    "bp": 9,
+    "lp": 3,
+    "spikes": 2
+  },
+  {
+    "level": 5,
+    "xp": 10,
+    "bp": 11,
+    "lp": 3,
+    "spikes": 2
+  },
+  {
+    "level": 6,
+    "xp": 21,
+    "bp": 13,
+    "lp": 4,
+    "spikes": 2
+  },
+  {
+    "level": 7,
+    "xp": 33,
+    "bp": 15,
+    "lp": 4,
+    "spikes": 3
+  },
+  {
+    "level": 8,
+    "xp": 46,
+    "bp": 17,
+    "lp": 4,
+    "spikes": 3
+  },
+  {
+    "level": 9,
+    "xp": 60,
+    "bp": 19,
+    "lp": 4,
+    "spikes": 3
+  },
+  {
+    "level": 10,
+    "xp": 75,
+    "bp": 21,
+    "lp": 4,
+    "spikes": 3
+  },
+  {
+    "level": 11,
+    "xp": 91,
+    "bp": 23,
+    "lp": 5,
+    "spikes": 3
+  },
+  {
+    "level": 12,
+    "xp": 108,
+    "bp": 25,
+    "lp": 5,
+    "spikes": 3
+  },
+  {
+    "level": 13,
+    "xp": 126,
+    "bp": 27,
+    "lp": 5,
+    "spikes": 3
+  },
+  {
+    "level": 14,
+    "xp": 145,
+    "bp": 29,
+    "lp": 5,
+    "spikes": 3
+  },
+  {
+    "level": 15,
+    "xp": 165,
+    "bp": 31,
+    "lp": 5,
+    "spikes": 4
+  }
+]

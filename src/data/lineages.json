@@ -1,0 +1,1721 @@
+[
+  {
+    "name": "Aewen",
+    "description": "While the Arcane touches all lineages, none are as profoundly imbued as the Aewen. Tapping into the deepest part of the Weave, the Aewen access the Arcane at a more fundamental level. This natural aptitude comes at a cost – the vast swaths of Arcane energy coursing through their veins cause the Aewen to age and mature more rapidly than the other lineages. Aewen rarely reach ages older than 30 - their lives are brief, radiant and impactful. Shorn Urbanite (Civilization: The Shorn) Wielders of complex arcane sigils that tattoo their spell constructs onto their skin and clothes, Shorn Urbanites are inheritors of the collective history of generations of spellwork designed to accomplish everything from land terraforming to laundry. Occasionally these spells go haywire due to inaccuracies seeping in from modifications and updates to the core structures that they depend upon, which requires the ever-vigilant work of the sharpest minds their generation has to offer to maintain. Accented Having absorbed strongly accented arcane power for long periods of time, the Accented have had their physiology shifted to wield their accented power and this energy emanates from their very being. Depending on the Accent, this can be a blessing or a curse.",
+    "costume": "Hard - The Aewen must have at least 2 [Repped] Challenges. If the character is Accented, one of these Challenges must be Elemental Expression (see below).",
+    "sublineages": [
+      {
+        "name": "Shorn Urbanite",
+        "note": "Civilization: The Shorn"
+      },
+      {
+        "name": "Accented",
+        "note": "Any Accent Except for Void/Divine"
+      }
+    ],
+    "challenges": [
+      {
+        "name": "Mana Lines",
+        "lbp": 2,
+        "required": false,
+        "repped": true,
+        "sublineage": "General",
+        "description": "The mana flows are so strong in the Aewen that they show through their skin. Brightly colored lines can be done in makeup on visible skin or patterned cloth."
+      },
+      {
+        "name": "Pointed Ears",
+        "lbp": 1,
+        "required": false,
+        "repped": true,
+        "sublineage": "General",
+        "description": "The gift of magic causes Aewen’s ears to grow into pointed tips."
+      },
+      {
+        "name": "Arcane Glow",
+        "lbp": 2,
+        "required": false,
+        "repped": true,
+        "sublineage": "General",
+        "description": "The Aewen glow with the blessings of the arcane. This can be repped by glitter on the face and skin or light prosthetics."
+      },
+      {
+        "name": "Deathbound",
+        "lbp": 7,
+        "required": false,
+        "repped": false,
+        "sublineage": "General",
+        "description": "The Aewen are inexorably drawn to death. The character immediately discorporates and takes Spirit Form upon dying."
+      },
+      {
+        "name": "Runic Lattice",
+        "lbp": 3,
+        "required": false,
+        "repped": true,
+        "sublineage": "Shorn Urbanite (Civilization: The Shorn)",
+        "description": "The Shorn inscribe their spells into sigils on their clothes and skin. A significant portion of cloth or skin shown should have runic patterns."
+      },
+      {
+        "name": "Focal Totem",
+        "lbp": 4,
+        "required": false,
+        "repped": true,
+        "sublineage": "Shorn Urbanite (Civilization: The Shorn)",
+        "description": "The Urbanite has a totem on their shoulder, an emblem of the Shorn’s community and great source of comfort. If this totem is Shattered or stolen, the Urbanite reduces their maximum Life Points by 1 until they remake or retrieve it."
+      },
+      {
+        "name": "Bugs in the Sigils",
+        "lbp": 2,
+        "required": false,
+        "repped": false,
+        "sublineage": "Shorn Urbanite (Civilization: The Shorn)",
+        "description": "When the Urbanite is involved, ritual affairs tend to have chaotic potential outcomes. They add a +2 to Dark Territory in rituals they participate in."
+      },
+      {
+        "name": "Neglected Conditioning",
+        "lbp": 3,
+        "required": false,
+        "repped": false,
+        "sublineage": "Shorn Urbanite (Civilization: The Shorn)",
+        "description": "The Urbanites tend to focus too much on their arcane craft to the detriment of their physical conditioning. Purchased Martial Skills cost 1 additional BP (not including Skills granted for free)."
+      },
+      {
+        "name": "Elemental Expression",
+        "lbp": 2,
+        "required": true,
+        "repped": true,
+        "sublineage": "Accented (Any Accent Except for Void/Divine)",
+        "description": "The character has a physical indicator of the Accent type the Accented wields. This could be drawn patterns of representations of the Accent, color associations in costuming and makeup, SFX or prosthetics. The player may choose any Accent from the core rules except for Void and Divine."
+      },
+      {
+        "name": "Power Shines through the Eyes",
+        "lbp": 3,
+        "required": false,
+        "repped": true,
+        "sublineage": "Accented (Any Accent Except for Void/Divine)",
+        "description": "The Accented has eyes matching their Accent, represented by contacts. For safety reasons, scleral contacts may not be used."
+      },
+      {
+        "name": "Like Attracts Like",
+        "lbp": 3,
+        "required": false,
+        "repped": false,
+        "sublineage": "Accented (Any Accent Except for Void/Divine)",
+        "description": "The Accented is Vulnerable to their chosen Accent. If this Challenge is purchased, the character may not purchase any additional Flaws that also make them Vulnerable to this accent (for example, a Force Accented character with Like attracts Like may not also take Fragile Bones)."
+      },
+      {
+        "name": "Accent Incompatibility",
+        "lbp": 7,
+        "required": false,
+        "repped": false,
+        "sublineage": "Accented (Any Accent Except for Void/Divine)",
+        "description": "The Accented’s natural elemental affinity causes them to reject healing not altered to their mana type. They are Immune to any Heal effects with an Accent other than their chosen Accent. (They can still receive unaccented healing.)"
+      }
+    ],
+    "advantages": [
+      {
+        "name": "Deep Reserves",
+        "lbp": 4,
+        "required": false,
+        "repped": false,
+        "sublineage": "General",
+        "description": "The potent reserves of the Aewen allow them to call on the Arcane more frequently than other lineages. The Aewen gains an additional spell-slot of their highest level spell-slot."
+      },
+      {
+        "name": "Arcane Aptitude",
+        "lbp": 4,
+        "required": false,
+        "repped": false,
+        "sublineage": "General",
+        "description": "The Aewen can learn even spells from other disciplines than theirs by their arcane intuition. The character chooses one Cantrip or Novice spell from any Base arcane spellcasting class and adds it to their Known Spells. If this spell is from a different Sphere than one the Aewen has access to, they may cast it with an equivalent Rank of spell-slot from a Sphere they do have access to. If this spell references an [Arcane Accent], the character chooses Acid, Flame, Ice, or Lightning as the Accent for this spell when purchasing this advantage."
+      },
+      {
+        "name": "Mystic Resilience",
+        "lbp": 6,
+        "required": false,
+        "repped": false,
+        "sublineage": "General",
+        "description": "The Aewen gain a natural resistance to magical effects. The character gains the Magical Resilience Perk as a Lineage Advantage from the Skills, Perks, and Flaws document."
+      },
+      {
+        "name": "Naturally Attuned",
+        "lbp": 10,
+        "required": false,
+        "repped": false,
+        "sublineage": "General",
+        "description": "The Aewen’s mana reserves are so deep that they can even manage to maintain attunement to two Signature Magic Items."
+      },
+      {
+        "name": "Sigil Shield",
+        "lbp": 7,
+        "required": false,
+        "repped": false,
+        "sublineage": "Shorn Urbanite (Civilization: The Shorn)",
+        "description": "The Urbanite has woven protective sigils into their skin. At the end of each Short Rest, they gain one Protect vs Melee Weapons."
+      },
+      {
+        "name": "Sigil Quickening",
+        "lbp": 6,
+        "required": false,
+        "repped": false,
+        "sublineage": "Shorn Urbanite (Civilization: The Shorn)",
+        "description": "The Urbanite has woven their most used spellwork into their clothes, allowing them to channel power to bypass the need to incant. The character designates a single Known Spell; they may spend a Spike to change the Incantation for that spell to “Sigilcast <Name of Spell>”. The designated Spell may be changed between events."
+      },
+      {
+        "name": "Master of Rites",
+        "lbp": 3,
+        "required": false,
+        "repped": false,
+        "sublineage": "Shorn Urbanite (Civilization: The Shorn)",
+        "description": "Once per event, the Urbanite may count as having one higher Rank in the Ritual Magic skill than they have purchased for the duration of one ritual. If the ritual fails, this Power is not expended. Additionally, they may raise or lower the Dark Territory by up to 2 when participating in a ritual."
+      },
+      {
+        "name": "Elemental Fortitude",
+        "lbp": 6,
+        "required": false,
+        "repped": false,
+        "sublineage": "Accented",
+        "description": "The Accented is used to being suffused with their element. They gain Resistance to their chosen element. When they have called “Resist” from this advantage a number of times equal to half their total character level (rounded down), the Resistance is removed until the character’s next long rest."
+      },
+      {
+        "name": "Elemental Strikes",
+        "lbp": 4,
+        "required": false,
+        "repped": false,
+        "sublineage": "Accented",
+        "description": "The Accented can call upon their internal reserves to empower their weapon attacks. They may spend a Spike to deliver their melee attacks with their chosen Accent until they complete a short rest."
+      },
+      {
+        "name": "Affinity Healing",
+        "lbp": 5,
+        "required": false,
+        "repped": false,
+        "sublineage": "Accented",
+        "description": "The Accented’s body is reinforced when they are infused with healing magic with their chosen Accent. When the Accented receives healing from their chosen Accent, they additionally gain 1 Barrier."
+      },
+      {
+        "name": "Elemental Party Trick",
+        "lbp": 1,
+        "required": false,
+        "repped": false,
+        "sublineage": "Accented",
+        "description": "The Accented can roleplay minor tricks and power from their chosen Accent to impress their friends and intimidate their foes. They may say “It Can Be Seen:” before a narration of them wielding and harnessing their Accent’s power."
+      }
+    ]
+  },
+  {
+    "name": "Chimera",
+    "description": "Created through intense spiritual rites, bred into a subset of the population, or genetically spliced, Chimera are humanoids that exhibit the traits of other species, typically to enhance survivability and take on positive evolutionary characteristics of other Fauna. Some Chimera appear to resemble a specific animal, where others exhibit a plethora of traits and features from across a variety of species.",
+    "costume": "Hard - The Chimera requires at least 2 [Repped] Challenges.",
+    "sublineages": [],
+    "challenges": [
+      {
+        "name": "Altered Skin",
+        "lbp": 4,
+        "required": false,
+        "repped": true,
+        "sublineage": "General",
+        "description": "The Chimera has an altered skin type covered with fur, scales, chitin or feathers. A significant portion of revealed skin should be displayed with this altered type."
+      },
+      {
+        "name": "Ears",
+        "lbp": 2,
+        "required": false,
+        "repped": true,
+        "sublineage": "General",
+        "description": "The Chimera has inhuman ears, represented by a headband, hat with ears, wig or ear prosthetics."
+      },
+      {
+        "name": "Fangs",
+        "lbp": 2,
+        "required": false,
+        "repped": true,
+        "sublineage": "General",
+        "description": "The Chimera has long fangs or sharp teeth, represented by tooth makeup or prosthetics."
+      },
+      {
+        "name": "Horns",
+        "lbp": 3,
+        "required": false,
+        "repped": true,
+        "sublineage": "General",
+        "description": "The Chimera has horns or antlers, represented by a headband/bandanna with horns attached or prosthetics."
+      },
+      {
+        "name": "Tail",
+        "lbp": 3,
+        "required": false,
+        "repped": true,
+        "sublineage": "General",
+        "description": "The Chimera has a tail, with the phys rep being at least 1 foot in length."
+      },
+      {
+        "name": "Wings",
+        "lbp": 3,
+        "required": false,
+        "repped": true,
+        "sublineage": "General",
+        "description": "The Chimera has wings that may or may not allow them to fly. These wings must be at least 12” x 12” with a maximum size of 36” x 36”."
+      },
+      {
+        "name": "Digitigrade legs",
+        "lbp": 5,
+        "required": false,
+        "repped": true,
+        "sublineage": "General",
+        "description": "The Chimera has legs that lend themselves to quadrupedal motion. This is represented by padding the legs in a traditional digitigrade or “backward bending” angle. Special care needs to be taken to ensure this physical representation does not impede movement as to make combat unsafe."
+      },
+      {
+        "name": "Eyes",
+        "lbp": 3,
+        "required": false,
+        "repped": true,
+        "sublineage": "General",
+        "description": "The Chimera has eyes that resemble their mixed species. These can"
+      },
+      {
+        "name": "Incompatible Vocal Cords",
+        "lbp": 6,
+        "required": false,
+        "repped": false,
+        "sublineage": "General",
+        "description": "The Chimera’s vocal chords no longer allow for human"
+      },
+      {
+        "name": "Prey Animal",
+        "lbp": 3,
+        "required": false,
+        "repped": false,
+        "sublineage": "General",
+        "description": "This Chimera’s animal aspect is dominated by that of a prey animal, and thus is Vulnerable to the Fear accent."
+      }
+    ],
+    "advantages": [
+      {
+        "name": "Flight",
+        "lbp": 4,
+        "required": false,
+        "repped": false,
+        "sublineage": "General",
+        "description": "The Chimera can use their wings to fly in short bursts."
+      },
+      {
+        "name": "Heightened Flight",
+        "lbp": 5,
+        "required": false,
+        "repped": false,
+        "sublineage": "General",
+        "description": "Increases the duration of the Flight Power to a slow 20."
+      },
+      {
+        "name": "Tough Hide",
+        "lbp": 5,
+        "required": false,
+        "repped": false,
+        "sublineage": "General",
+        "description": "The Chimera’s altered skin is sturdy, granting them three points of Natural Armor."
+      },
+      {
+        "name": "Armored Carapace",
+        "lbp": 7,
+        "required": false,
+        "repped": false,
+        "sublineage": "General",
+        "description": "The Chimera’s hide protects against even the sharpest blade. The natural armor granted by Tough Hide increases to 4."
+      },
+      {
+        "name": "Claws",
+        "lbp": 6,
+        "required": false,
+        "repped": false,
+        "sublineage": "General",
+        "description": "The Chimera may wield two Natural weapons of up to short (36”) length, and is considered proficient with both."
+      },
+      {
+        "name": "Shifting Form",
+        "lbp": 1,
+        "required": false,
+        "repped": false,
+        "sublineage": "General",
+        "description": "The Chimera can disguise their altered nature, removing all requirements for [Repped] challenges and disabling all Lineage Advantages. The change must be done out of combat during a Short Rest, and is usually done in private."
+      },
+      {
+        "name": "Keen Senses",
+        "lbp": 3,
+        "required": false,
+        "repped": false,
+        "sublineage": "General",
+        "description": "The Chimera’s animal aspects allow for exceptional perception. This"
+      },
+      {
+        "name": "Bestial Strength",
+        "lbp": 6,
+        "required": false,
+        "repped": false,
+        "sublineage": "General",
+        "description": "The Chimera’s animalistic attributes allow it to wield strength far surpassing an ordinary humanoid. The character gains a +1 bonus to their Spike damage. (Note that this bonus is subject to stacking rules - see the Stacking Effects section of the core rules.)"
+      }
+    ]
+  },
+  {
+    "name": "Forged",
+    "description": "Whether humanoids augmented with mechanical parts or sapient creatures made wholesale from technology, the Forged thrive in an existence in-between the artificial and real. Scholars debate whether full Constructs have an internal experience or if they are only perfectly mimicking sentience, which is a question only Construct’s self, if it exists, knows the answer to. Forged can be made from any number of materials, from treated wood woven with spellwork to metal facsimile with steam powered internals and even synthesized flesh over an alloy skeleton. They also can have a wide variety of expression and behavior, from stiff automata to fully conversant. Technarchist (Civilization: The Unified Technarchy) Members of a civilization elevated by an advanced general intelligence known as the Great Mind, Technarchist Augmented interface with their machine god via query feeds to offload mental processing. Biological expression varies across the augmented, with some only holding on to the barest veneer of their old biological forms and others appearing as fully humanoid with only a few jacks and exhaust ports visible from their internal implants. Construct Whether elaborate mechanical beings, ironwood strapped together with runes, or simplified biological recreations, constructs are humanoid-shaped automata made in the image of other lineages.",
+    "costume": "Hard - The Forged must have at least 2 [Repped] Challenges.",
+    "sublineages": [
+      {
+        "name": "Technarchist",
+        "note": "Civilization: The Unified Technarchy"
+      },
+      {
+        "name": "Construct",
+        "note": ""
+      }
+    ],
+    "challenges": [
+      {
+        "name": "Vulnerable Construction",
+        "lbp": 3,
+        "required": false,
+        "repped": false,
+        "sublineage": "General",
+        "description": "When an object wielded by the Forged is targeted by a Shatter, the Forged additionally takes a Wounding 5 Final effect."
+      },
+      {
+        "name": "Visible Wiring",
+        "lbp": 2,
+        "required": false,
+        "repped": true,
+        "sublineage": "General",
+        "description": "The Forged has exposed wiring or circuitry, represented by makeup or prosthetics. This wiring must make up at least three by one inch of space if on the face, and at least six by two inches of space if elsewhere."
+      },
+      {
+        "name": "Plating",
+        "lbp": 4,
+        "required": false,
+        "repped": true,
+        "sublineage": "General",
+        "description": "The Forged is partially composed of metal or wooden plating, represented by makeup or prosthetics on the face and visible skin. This must cover at least roughly 50% of the face, and 75% of visible skin."
+      },
+      {
+        "name": "Cyber Eye(s)",
+        "lbp": 3,
+        "required": false,
+        "repped": true,
+        "sublineage": "General",
+        "description": "The Forged has an augmented eye or eyes, represented by makeup, contacts, or prosthetics. For safety reasons Scleral Contacts are not allowed."
+      },
+      {
+        "name": "Hybrid Physiology",
+        "lbp": 4,
+        "required": false,
+        "repped": false,
+        "sublineage": "General",
+        "description": "The Forged’s body is difficult to heal due to its dual mechanical and organic nature. The Character gains the Torn Soul Flaw as a Lineage Challenge from the Base Skills, Perks, and Flaws document."
+      },
+      {
+        "name": "Uplink Jack",
+        "lbp": 3,
+        "required": false,
+        "repped": true,
+        "sublineage": "Technarchist (Civilization: The Unified Technarchy)",
+        "description": "A defining mark of a Technarchist is the auxiliary ports they use to connect to the Great Mind. Repped by two small auxiliary ports on the neck, this can be done as makeup, as a choker or adhered prosthetic."
+      },
+      {
+        "name": "Backdoor Vulnerability",
+        "lbp": 3,
+        "required": false,
+        "repped": false,
+        "sublineage": "Technarchist (Civilization: The Unified Technarchy)",
+        "description": "Years of open communication with the Great Mind and offsourcing thought processing has left a backdoor for mental influence. The character is Vulnerable to the Mind Accent."
+      },
+      {
+        "name": "Fragile Circuitry",
+        "lbp": 3,
+        "required": false,
+        "repped": false,
+        "sublineage": "Technarchist (Civilization: The Unified Technarchy)",
+        "description": "The Technarchist has highly conductive wiring in their body, making them Vulnerable to the Lightning Accent."
+      },
+      {
+        "name": "Soft Life",
+        "lbp": 3,
+        "required": false,
+        "repped": false,
+        "sublineage": "Technarchist (Civilization: The Unified Technarchy)",
+        "description": "The Technarchist has lived a life devoid of physical exertion and reduces their maximum Spikes by 1."
+      },
+      {
+        "name": "Computational Hallucination",
+        "lbp": 1,
+        "required": false,
+        "repped": false,
+        "sublineage": "Technarchist (Civilization: The Unified Technarchy)",
+        "description": "Every day, the player chooses one wrong thing for the Technarchist to believe that they cannot be convinced is wrong. If the character is shown the error of their belief, the correction does not last after the end of that conversation."
+      },
+      {
+        "name": "Voice Box",
+        "lbp": 5,
+        "required": false,
+        "repped": true,
+        "sublineage": "Construct",
+        "description": "The Construct’s player equips a voice changer that makes their spoken voice sound robotic or tinny."
+      },
+      {
+        "name": "Power Source",
+        "lbp": 4,
+        "required": false,
+        "repped": true,
+        "sublineage": "Construct",
+        "description": "The Construct has a minimum 1 foot long and 8 inches thick"
+      },
+      {
+        "name": "Imprinted",
+        "lbp": 4,
+        "required": false,
+        "repped": false,
+        "sublineage": "Construct",
+        "description": "The Construct must designate another player character as a “primary user” and will follow and support them.  When their primary user isn’t in line of sight, the Construct is under the Inherent Drained condition. If the primary user gives the Construct a specific command, they may be away from the primary user for up to five minutes without penalty in order to complete the command. The Construct may designate a new primary user after each short rest."
+      },
+      {
+        "name": "Literal Bias",
+        "lbp": 1,
+        "required": false,
+        "repped": false,
+        "sublineage": "Construct",
+        "description": "The Construct is unable to understand metaphor or hyperbole, and will interpret any stated phrase literally."
+      },
+      {
+        "name": "Zero-Harm Protocol",
+        "lbp": 5,
+        "required": false,
+        "repped": false,
+        "sublineage": "Construct",
+        "description": "The Construct is programmed not to harm any living creature, The character gains the Binding Oath of Peace Flaw as a Lineage Challenge from the Skills, Perks, and Flaws document."
+      }
+    ],
+    "advantages": [
+      {
+        "name": "Hardened Plating",
+        "lbp": 5,
+        "required": false,
+        "repped": false,
+        "sublineage": "General",
+        "description": "The Forged’s plating allows it to absorb more blows before breaking. Increase the Forged’s Physical Armor Points by 1."
+      },
+      {
+        "name": "Sturdy Construction",
+        "lbp": 3,
+        "required": false,
+        "repped": false,
+        "sublineage": "General",
+        "description": "This Forged was designed with resilience in mind. After each short rest, they gain a Protect vs Shatter."
+      },
+      {
+        "name": "Artificial Anatomy",
+        "lbp": 4,
+        "required": false,
+        "repped": false,
+        "sublineage": "General",
+        "description": "This Forged benefits from its inorganic systems. They gain Resistance to the Poison and Disease Accents. When they have called “Resist” from this advantage 3 times, the Resistance is removed until the character’s next long rest."
+      },
+      {
+        "name": "Analysis Module",
+        "lbp": 2,
+        "required": false,
+        "repped": false,
+        "sublineage": "General",
+        "description": "Forged have robust sensors for analysing their surroundings. They may passively read the inside of any item information card as if they had cast the Identify spell (note that this does not apply to Divine Relics)."
+      },
+      {
+        "name": "Mass Production",
+        "lbp": 5,
+        "required": false,
+        "repped": false,
+        "sublineage": "Technarchist (Civilization: The Unified Technarchy)",
+        "description": "Due to the Technarchist’s knowledge of mass production, once per event, they may count as one higher Rank in the Tinkering or Alchemy skill than they have purchased, for the duration of a single crafting process. If the process is interrupted or fails, this Power is not expended. Additionally, if the character has purchased ranks of either skill, all steps in a crafting process for that skill involving “turns of the hourglass” or repeated actions are halved (rounded up). This stacks with other sources of time reduction."
+      },
+      {
+        "name": "Crowdsourced",
+        "lbp": 8,
+        "required": false,
+        "repped": false,
+        "sublineage": "Technarchist (Civilization: The Unified Technarchy)",
+        "description": "Able to more readily learn skills due to the direct brain interface they possess, the Technarchist can learn any Martial, Medical or Crafting skill for one less BP, to a minimum cost of 1. (The discount does not apply to skills granted for free from other sources.)"
+      },
+      {
+        "name": "Read the Feed",
+        "lbp": 1,
+        "required": false,
+        "repped": false,
+        "sublineage": "Technarchist (Civilization: The Unified Technarchy)",
+        "description": "The Technarchist can query the Great Mind to ask for insight.  The character gains the Bits and Pieces Perk as a Lineage Advantage from the Skills, Perks, and Flaws document."
+      },
+      {
+        "name": "Quickhack",
+        "lbp": 4,
+        "required": false,
+        "repped": false,
+        "sublineage": "Technarchist (Civilization: The Unified Technarchy)",
+        "description": "The character gains the Quickhack Lineage power:"
+      },
+      {
+        "name": "Automatic Repair System",
+        "lbp": 8,
+        "required": false,
+        "repped": false,
+        "sublineage": "Construct",
+        "description": "The Construct has automatic systems in place to repair their physical form. Once per event, when the character has finished a death-count and should die, they will instead Heal 1 Life Point."
+      },
+      {
+        "name": "Resilient Auxiliary Systems",
+        "lbp": 4,
+        "required": false,
+        "repped": false,
+        "sublineage": "Construct",
+        "description": "Unlike organic creatures, the construct can continue to function after grievous injury. They gain the Deathgrip and Cold Dead Hands Perks as Lineage Advantages from the Skills, Perks, and Flaws document."
+      },
+      {
+        "name": "Self Destruct",
+        "lbp": 3,
+        "required": false,
+        "repped": false,
+        "sublineage": "Construct",
+        "description": "As a final option, the Construct may choose to take their enemies with them. They may overload and destroy their own power source to deliver a “By my Voice, Piercing 5 by Lightning”. The character then immediately dies, discorporates, and takes Spirit Form. If it was possible to come back after death, scholars agree that the Power Source would likely be reconstructed alongside their body upon resurrecting."
+      },
+      {
+        "name": "Vigilant Attendant",
+        "lbp": 2,
+        "required": false,
+        "repped": false,
+        "sublineage": "Construct",
+        "description": "The Construct may see to the needs of their imprinted user. They gain the Boon Bonds Perk as a Lineage Advantage from the Base Skills, Perks, and Flaws document. Unlike the base Perk, the designated characters for this version of Boon Bonds are whichever last three imprinted users the Construct has had."
+      }
+    ]
+  },
+  {
+    "name": "Human",
+    "description": "The common format of biological expression - humans are found across the Wellspring, and in almost all civilizations. Psionic Very rarely some humans develop brains capable of innately controlling and influencing the world around them. Their gifts, neither divine or arcanely inspired, often inspire fear and distrust from their kin. Aurosian (Civilization: Auros, the World of Seasons) A people who fought off the full might of the Void for almost a decade with the assistance of their Goddess, The Mother. Their hardy and resilient nature is due to having lived in a world with unpredictable seasons, and for having paid for their survival with sweat, tears, and blood.",
+    "costume": "Easy - Humans do not require any [Repped] Challenges.",
+    "sublineages": [
+      {
+        "name": "Psionic",
+        "note": ""
+      },
+      {
+        "name": "Aurosian",
+        "note": "Civilization: Auros, the World of Seasons"
+      }
+    ],
+    "challenges": [
+      {
+        "name": "Communal Debt",
+        "lbp": 2,
+        "required": false,
+        "repped": false,
+        "sublineage": "General",
+        "description": "The character owes a debt to their community that needs to be repaid. The character gains the Honor Debt Flaw from the Skills, Perks, and Flaws document as a Lineage Challenge. (Note that the details of this debt still require Staff approval.)"
+      },
+      {
+        "name": "Hotheaded",
+        "lbp": 4,
+        "required": false,
+        "repped": false,
+        "sublineage": "General",
+        "description": "This character’s emotions naturally run hot, and are susceptible to emotional manipulation. They take all Berserk and Charm effects as Final. This challenge cannot be purchased along with the Pliant flaw."
+      },
+      {
+        "name": "Mundane",
+        "lbp": 4,
+        "required": false,
+        "repped": false,
+        "sublineage": "General",
+        "description": "This character has no capacity for the arcane. They cannot take any class levels in spellcasting classes, and cannot purchase the Ritual Magic skill."
+      },
+      {
+        "name": "Utterly Mundane",
+        "lbp": 6,
+        "required": false,
+        "repped": false,
+        "sublineage": "General",
+        "description": "This character cannot even attune to the simplest of enchantments. They have no Attunement slots, and cannot gain additional slots from any source."
+      },
+      {
+        "name": "Squeamish",
+        "lbp": 4,
+        "required": false,
+        "repped": false,
+        "sublineage": "General",
+        "description": "This character cannot stand the sight of blood, and takes a Sleep Final whenever they see a Living ally enter the Dying state."
+      },
+      {
+        "name": "Born Follower",
+        "lbp": 3,
+        "required": false,
+        "repped": false,
+        "sublineage": "General",
+        "description": "Whenever issued a verbal command that could be reasonably carried out within 10 seconds, by someone they do not actively distrust, the character will follow the direction. If given conflicting orders, the character may choose which to follow."
+      },
+      {
+        "name": "Fear Resonance",
+        "lbp": 3,
+        "required": false,
+        "repped": false,
+        "sublineage": "Psionic",
+        "description": "The Psion’s mind is prone to linger on traumatic events. The character gains the Nightmares Flaw from the Skills, Perks, and Flaws document as a Lineage Challenge."
+      },
+      {
+        "name": "Leaky Bucket",
+        "lbp": 5,
+        "required": false,
+        "repped": false,
+        "sublineage": "Psionic",
+        "description": "The character’s psionic power needs outside support. The character must consume two Night Prizes each game, one by 7am each Saturday and Sunday morning. If they do not consume a Night Prize by then, they lose access to all psionic advantages until they consume one."
+      },
+      {
+        "name": "Mental Overload",
+        "lbp": 4,
+        "required": false,
+        "repped": false,
+        "sublineage": "Psionic",
+        "description": "The tax of using psionic abilities is great for the Psion. In addition to Spikes, psionic advantage abilities require sacrificing 1 Life Point to use. The character cannot use psionic abilities if they are at 1 Life Point."
+      },
+      {
+        "name": "Frail of Body",
+        "lbp": 8,
+        "required": false,
+        "repped": false,
+        "sublineage": "Psionic",
+        "description": "The Psion has forsaken all physical training in order to hone their mind.  The character cannot wield any weapons or shields, cannot wear physical armor, and cannot gain proficiency by any means."
+      },
+      {
+        "name": "Energy Vampire",
+        "lbp": 2,
+        "required": false,
+        "repped": false,
+        "sublineage": "Psionic",
+        "description": "Some psions must feed on the mental energy of others in order to recover their own. This character cannot gain the benefit of a short rest unless they are within touch range of another character who is emotionally agitated or physically active."
+      },
+      {
+        "name": "Hibernator",
+        "lbp": 3,
+        "required": false,
+        "repped": false,
+        "sublineage": "Aurosian (Civilization: Auros, the World of Seasons)",
+        "description": "Sleeping through long winters has given the Aurosian a penchant for sleeping in. Short Rests take an additional minute."
+      },
+      {
+        "name": "Haggard",
+        "lbp": 4,
+        "required": false,
+        "repped": false,
+        "sublineage": "Aurosian (Civilization: Auros, the World of Seasons)",
+        "description": "The Aurosian’s time in the Void has left them fragile and scarred. The Character gains the Torn Soul Flaw as a Lineage Challenge from the Skills, Perks, and Flaws document."
+      },
+      {
+        "name": "Fight or Flight",
+        "lbp": 4,
+        "required": false,
+        "repped": false,
+        "sublineage": "Aurosian (Civilization: Auros, the World of Seasons)",
+        "description": "When affected by the Void, the Aurosian enters a fugue state, where they do all they can to survive. Whenever the character takes Damage or an Effect with the Void Accent, they also take a Quick Berserk or a Quick Repel at their discretion."
+      },
+      {
+        "name": "Nervous Fidgeting",
+        "lbp": 1,
+        "required": false,
+        "repped": false,
+        "sublineage": "Aurosian (Civilization: Auros, the World of Seasons)",
+        "description": "The long war against the Void, and the constant fight for survival, has left the Aurosian prone to nervous fidgeting. As a result, the precise art of ritual magic tends to lead to unpredictable results. Increase Dark Territory by 1 for any ritual the Aurosian participates in."
+      }
+    ],
+    "advantages": [
+      {
+        "name": "Rallying Cry",
+        "lbp": 4,
+        "required": false,
+        "repped": false,
+        "sublineage": "General",
+        "description": "The character gains the Rallying Cry Power:"
+      },
+      {
+        "name": "Heart Full of Greed",
+        "lbp": 3,
+        "required": false,
+        "repped": false,
+        "sublineage": "General",
+        "description": "Avarice lies in the heart of many humans. The character gains the Greedy Soul Perk as a Lineage Advantage from the Skills, Perks, and Flaws document."
+      },
+      {
+        "name": "Environmental Mastery",
+        "lbp": 4,
+        "required": false,
+        "repped": false,
+        "sublineage": "General",
+        "description": "Humans are excellent at molding their environment to suit their needs. The character gains a 1 BP discount on Gathering skills. (If a Gathering skill is granted for free from another source, the character is refunded 1 BP.)"
+      },
+      {
+        "name": "Heirloom",
+        "lbp": 2,
+        "required": false,
+        "repped": false,
+        "sublineage": "General",
+        "description": "Humans are fond of passing objects down to their descendants - this human has an object that sentimentality keeps in their grasp. The character gains the Ancestral Relic Perk as a Lineage Advantage from the Skills, Perks, and Flaws document."
+      },
+      {
+        "name": "Telepathy",
+        "lbp": 3,
+        "required": false,
+        "repped": false,
+        "sublineage": "Psionic",
+        "description": "The Psion is able to read surface level thoughts and communicate directly to other’s minds. The character may spend a Spike to verbally deliver “Subtle Discern by Mind: What are you thinking right now?” or “Subtle Instruction: You hear this in your head: [sentence under 15 words]”"
+      },
+      {
+        "name": "Telekinesis",
+        "lbp": 6,
+        "required": false,
+        "repped": false,
+        "sublineage": "Psionic",
+        "description": "The character gains the Telekinesis Power:"
+      },
+      {
+        "name": "Mental Bastion",
+        "lbp": 4,
+        "required": false,
+        "repped": false,
+        "sublineage": "Psionic",
+        "description": "Due to their prodigious mental wards, the Psion has Resistance to Mind Accent. When they have called “Resist” from this advantage a number of times equal to their total character level, the Resistance is removed until the character’s next long rest."
+      },
+      {
+        "name": "Psionic Cantrip",
+        "lbp": 5,
+        "required": false,
+        "repped": false,
+        "sublineage": "Psionic",
+        "description": "The Psion’s mastery over reality has managed to mimic the structure of arcane and divine cantrips. The character learns an Arcane or Divine Cantrip of their choice without fulfilling any other prerequisites. In order to cast the spell, the character must spend a Spike, and the incant is replaced with “Psionic <spell name>” before the cantrip’s call. If the spell references an [Arcane Accent], the character chooses Acid, Flame, Ice, or Lightning as the Accent for the spell when purchasing this advantage. If the spell references a [Devotion Accent], the character chooses one Accent from the Devotion Accents list for the spell when purchasing this advantage."
+      },
+      {
+        "name": "Ward Against the Void",
+        "lbp": 4,
+        "required": false,
+        "repped": false,
+        "sublineage": "Aurosian (Civilization: Auros, the World of Seasons)",
+        "description": "The time this Aurosian spent fighting the Void has given them Resistance against the Void accent. When they have called “Resist” from this advantage a number of times equal to their maximum Life Points, the Resistance is removed until the character’s next long rest."
+      },
+      {
+        "name": "Adaptive Physiology",
+        "lbp": 6,
+        "required": false,
+        "repped": false,
+        "sublineage": "Aurosian (Civilization: Auros, the World of Seasons)",
+        "description": "The Aurosian’s body is well attuned to harsh climates. They are Resistant to the Flame and Ice Accents. When they have called “Resist” from this advantage a number of times equal to half their character level (rounded down), both Resistances are removed until the character’s next long rest."
+      },
+      {
+        "name": "Natural Affinity",
+        "lbp": 4,
+        "required": false,
+        "repped": false,
+        "sublineage": "Aurosian (Civilization: Auros, the World of Seasons)",
+        "description": "Aurosians have deep ties to nature. The Aurosian may learn one Divine Cantrip from the Basic Druid Class without fulfilling any other prerequisites."
+      },
+      {
+        "name": "Won’t Stay Dead",
+        "lbp": 3,
+        "required": false,
+        "repped": false,
+        "sublineage": "Aurosian (Civilization: Auros, the World of Seasons)",
+        "description": "The tenacity of the Aurosians in reaching the Wellspring is legendary. This character gains the Carnal Creature, Holding On and Will To Live Perks from the Skills, Perks, and Flaws document as Lineage Advantages."
+      }
+    ]
+  },
+  {
+    "name": "Lost",
+    "description": "All civilizations have had close contact with the Void since the Wellspring appeared. All have lost lives to the constant threat that the Void presents, and many have died. Rarely, those lost will return to us either by divine intervention or tenacity of mind and spirit. The Lost now must contend with a great hunger that threatens to overwhelm them at any moment. Lost can resemble any lineage, however they only have access to the Lost lineage challenges and advantages. Intervened When Divine Beings have a vested interest in a mortal lost to the Void, they may use their influence to pull the Lost back into their embrace. Those rescued in this fashion have markings of the divine upon their flesh as well as a deep debt and connection to the Divine Being that rescued them. In some cases, the Divine Being that the Intervened worships and the Divine Being that rescued them are two separate entities - and this fact has inspired many soap operas in The Traveling Star. Fractured Sometimes pieces of those Lost band together and assemble themselves into a new humanoid, with multiple minds sharing the same cobbled together body. These Fractured often have amnesia, with slight pieces of their past coming to light in situations that remind them of the selves they used to be.",
+    "costume": "Hard - The Lost require at least 2 [Repped] Challenges, one of which must be Scarred by the Void.",
+    "sublineages": [
+      {
+        "name": "Intervened",
+        "note": ""
+      },
+      {
+        "name": "Fractured",
+        "note": ""
+      }
+    ],
+    "challenges": [
+      {
+        "name": "Born of the Void",
+        "lbp": 0,
+        "required": true,
+        "repped": false,
+        "sublineage": "General",
+        "description": "All Lost have the inherent Voidborn Type in addition to the Living Type."
+      },
+      {
+        "name": "Scarred by the Void",
+        "lbp": 3,
+        "required": true,
+        "repped": true,
+        "sublineage": "General",
+        "description": "The character has some indication of being touched by the Void with dark blue markings. This could be dark blue veins, a streak of dark blue in the hair or other manifestations."
+      },
+      {
+        "name": "Lost Life",
+        "lbp": null,
+        "required": false,
+        "repped": true,
+        "sublineage": "General",
+        "description": "The Lost retains the appearance of who they were before. They may choose a physical [Repped] challenge from a single specific Lineage and earn that amount of Lineage Build Points for Lost Life instead."
+      },
+      {
+        "name": "Visions of Stars",
+        "lbp": 3,
+        "required": false,
+        "repped": true,
+        "sublineage": "General",
+        "description": "The Lost’s eyes reflect the Void, represented by black, white, or dark blue contacts.  Scleral contacts are not allowed for safety reasons."
+      },
+      {
+        "name": "Limited Stores",
+        "lbp": 2,
+        "required": false,
+        "repped": false,
+        "sublineage": "General",
+        "description": "This Lost has a difficult time keeping their physical form going, and is Vulnerable to the Drain Effect."
+      },
+      {
+        "name": "Acquired Taste",
+        "lbp": 3,
+        "required": false,
+        "repped": false,
+        "sublineage": "General",
+        "description": "The Lost can no longer gain sustenance from normal food alone, and needs to feed off of the essence of other living creatures daily. The Lost begins the event fed, and at 7am if they have not fed since the previous 7am, they are Slowed until they feed. This Challenge must be taken in conjunction with the Consume Vitality Advantage. Alternatively, the Lost may avoid this penalty by feeding from a willing target who chooses to reduce their maximum Life Points by 1 until their next Long Rest."
+      },
+      {
+        "name": "Reborn",
+        "lbp": 0,
+        "required": true,
+        "repped": false,
+        "sublineage": "Intervened",
+        "description": "All Intervened, in addition to having the inherent Voidborn type, also have the inherent Exalted type."
+      },
+      {
+        "name": "Divine Tenet",
+        "lbp": 3,
+        "required": false,
+        "repped": true,
+        "sublineage": "Intervened",
+        "description": "Etched into the skin of the Intervened is a Tenet of their savior. They must obey the tenet to the best of their ability. If they find they have failed in this tenet, they immediately take a Death Final."
+      },
+      {
+        "name": "Divine Brand",
+        "lbp": 2,
+        "required": false,
+        "repped": true,
+        "sublineage": "Intervened",
+        "description": "In addition to their Lost markings, the sigil of the Divine Being that rescued them is branded onto their skin. (Example sigils can be found here.)"
+      },
+      {
+        "name": "Ragdoll",
+        "lbp": 5,
+        "required": false,
+        "repped": false,
+        "sublineage": "Intervened",
+        "description": "Being pulled out of the Void has given the Intervened the reflex to relax when grabbed. They are Vulnerable to the Root and Imprison effects."
+      },
+      {
+        "name": "Something to Prove",
+        "lbp": 2,
+        "required": false,
+        "repped": false,
+        "sublineage": "Intervened",
+        "description": "The Intervened feels a strong need to prove that they deserved to be rescued from the Void. They gain the Truthbound flaw as a Lineage Challenge from the Skills, Perks, and Flaws document."
+      },
+      {
+        "name": "Additional Lost Life",
+        "lbp": null,
+        "required": false,
+        "repped": true,
+        "sublineage": "Fractured",
+        "description": "The Fractured has the shared appearance of multiple lineages. They may choose an additional physical [Repped] challenge from a different Lineage and earn that amount of Advantage points for Additional Lost Life instead."
+      },
+      {
+        "name": "Void-filled Gaps",
+        "lbp": 4,
+        "required": false,
+        "repped": true,
+        "sublineage": "Fractured",
+        "description": "A full body was no longer available, and so gaps exist in the physical form of the Fractured, filled in by void. This can be represented by painted skin, makeup, or patterned sleeves, for example."
+      },
+      {
+        "name": "Fragile Form",
+        "lbp": 5,
+        "required": false,
+        "repped": false,
+        "sublineage": "Fractured",
+        "description": "The Fractured is barely holding onto their physical form, and has 1 fewer maximum Life Point. This challenge cannot be taken if the character already has 1 maximum Life Point."
+      },
+      {
+        "name": "Unstable Form[",
+        "lbp": 7,
+        "required": false,
+        "repped": true,
+        "sublineage": "Fractured",
+        "description": "This Fractured constantly needs to add new pieces to themselves in order to maintain their corporeal form. This challenge must be taken with the Consume Vitality Advantage. The Fractured must add RP to Consume Vitality adding a piece of the target to themselves, which they must represent by the beginning of the following game. Additionally, they must consume at least one creature each game."
+      }
+    ],
+    "advantages": [
+      {
+        "name": "Consume Vitality",
+        "lbp": 3,
+        "required": false,
+        "repped": false,
+        "sublineage": "General",
+        "description": "The Lost can consume the life force of any helpless target."
+      },
+      {
+        "name": "Creature of Void",
+        "lbp": 4,
+        "required": false,
+        "repped": false,
+        "sublineage": "General",
+        "description": "The Lost can exist in areas of crushing Void. They are Immune to periodic damage and Environmental Effect calls in such areas. If in areas of crushing Void for longer than a day, additional requirements will be added to maintain their health."
+      },
+      {
+        "name": "Void Strikes",
+        "lbp": 4,
+        "required": false,
+        "repped": false,
+        "sublineage": "General",
+        "description": "The Lost may add the Void Accent to any base melee delivered damage. This may not be used in conjunction with other effects that increase damage besides passive increases."
+      },
+      {
+        "name": "Void Resistance",
+        "lbp": 6,
+        "required": false,
+        "repped": false,
+        "sublineage": "General",
+        "description": "The Lost has Resistance to the Void accent. When they have called “Resist” from this advantage a number of times equal to their Character Level, the Resistance is removed until the character’s next long rest."
+      },
+      {
+        "name": "Power from the Gods",
+        "lbp": 8,
+        "required": false,
+        "repped": false,
+        "sublineage": "Intervened",
+        "description": "The character chooses a Divine Domain granted by the Divine Being who intervened for them. They may purchase abilities from that Domain. This allows the character to exceed the normal maximum for Divine Domains."
+      },
+      {
+        "name": "Divine Armaments",
+        "lbp": 3,
+        "required": false,
+        "repped": false,
+        "sublineage": "Intervened",
+        "description": "The Intervened’s connection to their Divine Being grants them the ability to add the Divine Accent to a weapon strike, Spell, or Power by expending a Spike."
+      },
+      {
+        "name": "Close Connection",
+        "lbp": 4,
+        "required": false,
+        "repped": false,
+        "sublineage": "Intervened",
+        "description": "The Intervened gains the Patron perk as a Lineage Advantage from the Skills, Perks, and Flaws document. Their Patron must be the Divine Being that intervened for them."
+      },
+      {
+        "name": "Divine Magic",
+        "lbp": 4,
+        "required": false,
+        "repped": false,
+        "sublineage": "Intervened",
+        "description": "The Intervened learns one Cantrip from any basic Divine spellcasting class without fulfilling any other prerequisites. If the spell references a [Devotion Accent] and the character has no Devotion, they may choose one Devotion Accent from a divine domain associated with the Divine Being that intervened for the character, at the time of purchasing this advantage."
+      },
+      {
+        "name": "Wisdom of Many",
+        "lbp": 1,
+        "required": false,
+        "repped": false,
+        "sublineage": "Fractured",
+        "description": "Once per event, the Fractured may gain the benefits of a Lore skill they do not have, representing one of their fractured selves having the knowledge surface. Additionally, the first three Lore skills the character purchases are discounted by 1 BP. (If one of their first three Lore skills is granted for free from another source, the character is refunded 1 BP.)"
+      },
+      {
+        "name": "Ride the Tide of the Mind",
+        "lbp": 4,
+        "required": false,
+        "repped": false,
+        "sublineage": "Fractured",
+        "description": "At the end of each short rest, the Fractured gains a Protect vs their choice of Berserk, Charm, or Dominate, chosen when gained."
+      },
+      {
+        "name": "Ambidextrous",
+        "lbp": 6,
+        "required": false,
+        "repped": false,
+        "sublineage": "Fractured",
+        "description": "The fractured has both right handed and left handed selves, and gains the Basic Weapons, Short Weapons and Two Weapon Style Skills from the Skills, Perks, and Flaws document as a Lineage Advantage."
+      },
+      {
+        "name": "Pick and Choose",
+        "lbp": null,
+        "required": false,
+        "repped": false,
+        "sublineage": "Fractured",
+        "description": "The Fractured has the best parts of their composite creatures, and may purchase one Lineage Advantage from another Lineage. The Fractured must still qualify for any prerequisites of the chosen Advantage."
+      }
+    ]
+  },
+  {
+    "name": "Oaksworn",
+    "description": "Creatures touched by nature or nature spirits made manifest, the Oaksworn are highly in tune with the needs of the Flora and Land. The Oaksworn are staunch defenders of the natural cycles of growth and decay and detest creatures that attempt to escape this cycle. Some civilizations venerate Oaksworn as representatives of Divine Beings and natural forces, following their leadership in order to better join with nature. In others where nature holds less sway in the civilization’s zeitgeist, Oaksworn are appointed and created in secret and attempt to subvert those in power to preserve what they can of the natural order. Astari (Civilization: The Astari) Worshippers of a deific figure of nature, the Oak Father, Astari Oaksworn guide their people to lead lives of harmony with their surroundings, a task necessitated by their long lives spent riding on the back of the Star Ray, Ash’Haie, covered in a closed natural system. Now at the wellspring, the Astari guard the Oak Father and his lands while his Star Rays make their way home. Dryad Animated spirits of trees, plants and flowers, Dryads closely resemble humanoids covered by pieces of their plant selves. Some Dryads are bound to the physical plant they originated from, where others may be able to anchor themselves to similar plants or travel free from their roots altogether.",
+    "costume": "Medium - The Oaksworn must have at least 1 [Repped] Challenge.",
+    "sublineages": [
+      {
+        "name": "Astari",
+        "note": "Civilization: The Astari"
+      },
+      {
+        "name": "Dryad",
+        "note": ""
+      }
+    ],
+    "challenges": [
+      {
+        "name": "Symbiotic Growths",
+        "lbp": 2,
+        "required": false,
+        "repped": true,
+        "sublineage": "General",
+        "description": "The Oaksworn has allowed a piece of nature to grow upon their person in the form of vine and flower growths. This can be repped by flowers woven into hair, vines wrapped around skin/props, or makeup."
+      },
+      {
+        "name": "Metal Ban",
+        "lbp": 2,
+        "required": false,
+        "repped": false,
+        "sublineage": "General",
+        "description": "The Oaksworn cannot wield metal. The Character gains the Mild Allergy: Iron Flaw as a Lineage Challenge from the Skills, Perks, and Flaws document."
+      },
+      {
+        "name": "Agoraphilic",
+        "lbp": 3,
+        "required": false,
+        "repped": false,
+        "sublineage": "General",
+        "description": "The Oaksworn feels more at ease outdoors than in. They may only take short rests while outside."
+      },
+      {
+        "name": "Grovebound",
+        "lbp": 5,
+        "required": false,
+        "repped": false,
+        "sublineage": "General",
+        "description": "The Oaksworn is anchored to the wild places of the world. If the character is slain and begins their discorporation-count, they can only be Revived within a Druid Grove."
+      },
+      {
+        "name": "Mark of Ash’haie",
+        "lbp": 1,
+        "required": false,
+        "repped": true,
+        "sublineage": "Astari (Civilization: The Astari)",
+        "description": "The Astari is marked by their protector and guide through the sea of stars, Ash’haie, and has star-like freckles upon their cheeks or brow."
+      },
+      {
+        "name": "Mantle of the Great Ray",
+        "lbp": 2,
+        "required": false,
+        "repped": true,
+        "sublineage": "Astari (Civilization: The Astari)",
+        "description": "The Astari imitates the Great Rays in their clothing, wearing long cloth tails and wide cloaks. If ever caught without their accoutrements, they become Drained due to shame until they are re-adorned."
+      },
+      {
+        "name": "Oath of Nature’s Protection",
+        "lbp": 3,
+        "required": false,
+        "repped": false,
+        "sublineage": "Astari (Civilization: The Astari)",
+        "description": "The Astari swear to protect the woods for the Oak Father. They must:"
+      },
+      {
+        "name": "Weakened Immune System",
+        "lbp": 3,
+        "required": false,
+        "repped": false,
+        "sublineage": "Astari (Civilization: The Astari)",
+        "description": "The Astari’s time in the sky did not give them a robust exposure to germs. The character is Vulnerable to the Disease Accent."
+      },
+      {
+        "name": "Chlorophyll Veins",
+        "lbp": 4,
+        "required": false,
+        "repped": true,
+        "sublineage": "Dryad",
+        "description": "The Dryad’s skin is green from the chlorophyll pumping through their veins. This can either be represented by obvious green veins on every part of the body with exposed skin, green highlights, green skin paint or coverings, or all of the above."
+      },
+      {
+        "name": "Oakskin",
+        "lbp": 4,
+        "required": false,
+        "repped": true,
+        "sublineage": "Dryad",
+        "description": "The Dryad has closer physical ties to their origins than others and has skin growths made of wood. This can be repped by patterned cloth, makeup or prosthetics. These markings must roughly cover at least 50% of the face, and 75% of any other exposed skin."
+      },
+      {
+        "name": "Tinderbox",
+        "lbp": 3,
+        "required": false,
+        "repped": false,
+        "sublineage": "Dryad",
+        "description": "Being made mostly of plant matter has its downsides. The Dryad is easy to set ablaze and is Vulnerable to the Flame accent."
+      },
+      {
+        "name": "One With Nature",
+        "lbp": 1,
+        "required": false,
+        "repped": false,
+        "sublineage": "Dryad",
+        "description": "Formed of the very earth where other Lineages stand, build, and mine, Oaksworn have a unique connection to the world that few others will ever understand. This Character is deeply connected to the natural world, and gains the [Plant] and [Animal] Types. This could have an additional number of effects on the character at plot discretion."
+      }
+    ],
+    "advantages": [
+      {
+        "name": "Natural Locus of Power",
+        "lbp": 2,
+        "required": false,
+        "repped": false,
+        "sublineage": "General",
+        "description": "The Oaksworn counts as a tree and the Plant type for the purposes of Spells and Powers."
+      },
+      {
+        "name": "Natural Knowledge",
+        "lbp": 8,
+        "required": false,
+        "repped": false,
+        "sublineage": "General",
+        "description": "The Oaksworn is exceedingly proficient at gathering from the natural land. They are considered to have one higher Rank in the Forage skill than they have purchased. If the character has purchased the Forage III skill, they may gather an additional 7 Bloom and 3 Night Prizes per event."
+      },
+      {
+        "name": "Vines",
+        "lbp": 3,
+        "required": false,
+        "repped": false,
+        "sublineage": "General",
+        "description": "Once per short rest, the Dryad may use the Vines Lineage Power:"
+      },
+      {
+        "name": "Nature’s Bite",
+        "lbp": 1,
+        "required": false,
+        "repped": false,
+        "sublineage": "General",
+        "description": "The Oaksworn’s knowledge of nature allows them to safely use poisons.  The character gains the Poisoner Skill from the Skills, Perks, and Flaws document as a Lineage Advantage."
+      },
+      {
+        "name": "Shine Bright",
+        "lbp": 5,
+        "required": false,
+        "repped": false,
+        "sublineage": "Astari (Civilization: The Astari)",
+        "description": "Blessed with the burning vibrancy of the stars, the Astari gains an additional 1 maximum Life Point."
+      },
+      {
+        "name": "Oak Father’s Aegis",
+        "lbp": 4,
+        "required": false,
+        "repped": false,
+        "sublineage": "Astari (Civilization: The Astari)",
+        "description": "The Oak Father looks after all of his children; the Astari is blessed with the ability to move unseen when necessary. Once per long rest, they gain the use of a Short Obfuscate."
+      },
+      {
+        "name": "Shepherd of Life",
+        "lbp": 5,
+        "required": false,
+        "repped": false,
+        "sublineage": "Astari (Civilization: The Astari)",
+        "description": "The Astari value all life and are loath to see it go. The character gains the Generous Soul Perk as a Lineage Advantage from the Skills, Perks, and Flaws document."
+      },
+      {
+        "name": "Natural Healer",
+        "lbp": 3,
+        "required": false,
+        "repped": false,
+        "sublineage": "Astari (Civilization: The Astari)",
+        "description": "The Astari uses their connection to the Oak Father to ease the maladies of those around them. The character can spend two Spikes to deliver a Cure effect to a character other than themselves."
+      },
+      {
+        "name": "Hardened Flesh",
+        "lbp": 4,
+        "required": false,
+        "repped": false,
+        "sublineage": "Dryad",
+        "description": "The Dryad’s wooden skin growths aid them in deflecting the claws and blades of foes. They gain 2 Natural Armor."
+      },
+      {
+        "name": "Enhanced Hardened Flesh",
+        "lbp": 6,
+        "required": false,
+        "repped": false,
+        "sublineage": "Dryad",
+        "description": "The natural armor granted by Hardened Flesh increases to 3."
+      },
+      {
+        "name": "Strength from Sunlight",
+        "lbp": 3,
+        "required": false,
+        "repped": false,
+        "sublineage": "Dryad",
+        "description": "The character gains a Life Tap Pool of 1. This pool can be restored by planting their feet in earth and absorbing sunlight for a Quick 100. See the Druid Life Tap cantrip in the Base Classes document for more information on how to use Life Tap. If the character has an existing Life Tap pool, only one point of Life Tap can be recovered this way and it should be tracked separately."
+      },
+      {
+        "name": "Decompose",
+        "lbp": 1,
+        "required": false,
+        "repped": false,
+        "sublineage": "Dryad",
+        "description": "The Dryad may assist in returning dead bodies to the cycle of decomposition."
+      }
+    ]
+  },
+  {
+    "name": "Ogrim",
+    "description": "An evolutionary byproduct of humanoids surviving through prolonged periods of war and violence, the Ogrim have adapted to healing rapidly from injury, recovering from what many considered to be unsurvivable. The Ogrim’s bodies are warped by these repeated injuries, causing robust systems of scars as well as pronounced bulky features from broken and misshapen bones. This adaptation also allows the Ogrim to put on muscle much easier than other lineages, leading to, on average, a bulkier physique. Shorn Wilder (Civilization: The Shorn) A long standing Warrior society that fought over the most habitable bits of land on their small world, Shorn Wilders have a cultural honor for life and only kill other humanoids when absolutely forced to. Prior to the Shorn throwing off the yoke of their gods, the Wilders worshipped two major Divine Beings: the god of Polyamory and Familial Bonds, and the god of Wrath and Mercy. These cultural influences can still be found in their mannerisms and values, even if the gods that embodied those aspects are now dead. Boneling Bonelings are Ogrim that have overactive bone production, which causes bone spurs to erupt and pierce their skin, providing natural armor and weaponry. This adaptation is incredibly painful and often leads to an irascible population that bonds together over their shared pain. Once annually, Bonelings undergo a process called the Renewal, where they ritually shed all of their external bones and regrow an entire fresh set stronger than before.",
+    "costume": "Hard - The Ogrim must have at least 2 [Repped] Challenges.",
+    "sublineages": [
+      {
+        "name": "Shorn Wilder",
+        "note": "Civilization: The Shorn"
+      },
+      {
+        "name": "Boneling",
+        "note": ""
+      }
+    ],
+    "challenges": [
+      {
+        "name": "Scarring",
+        "lbp": 4,
+        "required": false,
+        "repped": true,
+        "sublineage": "General",
+        "description": "The Ogrim’s player should wear makeup or prosthetic scars covering considerable portions of visible skin."
+      },
+      {
+        "name": "Thick Jaw",
+        "lbp": 3,
+        "required": false,
+        "repped": true,
+        "sublineage": "General",
+        "description": "Multiple breaks to the jaw have caused the Ogrim to have either protrusions of bone or thick scar tissue resulting in a pronounced jaw. This can be repped with prosthetic bones jutting from the chin / jaw, a prosthetic padding or a lower face mask."
+      },
+      {
+        "name": "Never Back Down",
+        "lbp": 3,
+        "required": false,
+        "repped": false,
+        "sublineage": "General",
+        "description": "The Ogrim will never refuse a physical challenge issued to them. They are Vulnerable to all Provoke effects and will take a Short Drain Effect if they ever ignore a request to fight or physical challenge made of them."
+      },
+      {
+        "name": "Claws",
+        "lbp": 2,
+        "required": false,
+        "repped": true,
+        "sublineage": "General",
+        "description": "The Ogrim often wield their nails as natural weapons. This can be repped as bone white nail polish or nail/claw prosthetics."
+      },
+      {
+        "name": "Honorable Warrior",
+        "lbp": 2,
+        "required": false,
+        "repped": false,
+        "sublineage": "Shorn Wilder (Civilization: The Shorn)",
+        "description": "The Wilder’s cultural roots reinforce the norms that warriors must conduct themselves with honor.  The Character gains the Binding Oath of Honor Flaw as a Lineage Challenge from the Skills, Perks, and Flaws document."
+      },
+      {
+        "name": "Tribal Marks",
+        "lbp": 4,
+        "required": false,
+        "repped": true,
+        "sublineage": "Shorn Wilder (Civilization: The Shorn)",
+        "description": "The Wilder either has patterned ritual scarring or tattoos that pictographically portray tales of their conquests and achievements."
+      },
+      {
+        "name": "Restless",
+        "lbp": 1,
+        "required": false,
+        "repped": false,
+        "sublineage": "Shorn Wilder (Civilization: The Shorn)",
+        "description": "Wilders prefer to be out and moving to staying inside all day. The character gains the Indoor Discomfort flaw as a Lineage Challenge from the Skills, Perks, and Flaws document."
+      },
+      {
+        "name": "Divine Distrust",
+        "lbp": 7,
+        "required": false,
+        "repped": false,
+        "sublineage": "Shorn Wilder (Civilization: The Shorn)",
+        "description": "The Wilders have suffered long at the hands of divinity. They can receive no positive effects from the Divine Accent and are vulnerable to the Divine Accent. If this challenge is taken, the character cannot take the Divine Vulnerability flaw."
+      },
+      {
+        "name": "Rib Protrusions",
+        "lbp": 4,
+        "required": false,
+        "repped": true,
+        "sublineage": "Boneling",
+        "description": "The Boneling’s ribs poke out of their torso. This can be repped as rib patterned cloth, or bone props attached into the torso, or on a vest worn over the torso."
+      },
+      {
+        "name": "Joint Spurs",
+        "lbp": 4,
+        "required": false,
+        "repped": true,
+        "sublineage": "Boneling",
+        "description": "The Boneling’s elbows, knees, shoulders or knuckles end in protruding bones. We recommend rounded/soft protrusions for safety, and care should be taken that the physical representations do not significantly impede movement."
+      },
+      {
+        "name": "Brittle Bones",
+        "lbp": 3,
+        "required": false,
+        "repped": false,
+        "sublineage": "Boneling",
+        "description": "When the Boneling or an object they are holding takes a Shatter Effect, the reverberations shake into their bones. They also take a Quick Disable to one of their limbs."
+      },
+      {
+        "name": "Bone Dreams",
+        "lbp": 3,
+        "required": false,
+        "repped": false,
+        "sublineage": "Boneling",
+        "description": "The Boneling has nightmares about running out of bones and their bones all falling out. The character gains the Nightmares Flaw as a Lineage Challenge from the Skills, Perks, and Flaws document."
+      }
+    ],
+    "advantages": [
+      {
+        "name": "Regeneration",
+        "lbp": 5,
+        "required": false,
+        "repped": false,
+        "sublineage": "General",
+        "description": "Ogrim heal from any wound. The character gains the Regenerate Power:"
+      },
+      {
+        "name": "Undeniable Fortitude",
+        "lbp": 7,
+        "required": false,
+        "repped": false,
+        "sublineage": "General",
+        "description": "Ogrim can survive even the most hideous of blows. At the end of each short rest, the character gains a Protect vs any attack that would bring them to 0 Life Points or kill them."
+      },
+      {
+        "name": "Battlefield Vulture",
+        "lbp": 4,
+        "required": false,
+        "repped": false,
+        "sublineage": "General",
+        "description": "The Ogrim are used to their weapons giving out before them and having to make do on the battlefield. They are considered to have one higher Rank in the Scavenge skill than they have purchased. If the character has purchased Scavenge III, they can Scavenge with no RP timer."
+      },
+      {
+        "name": "Rapid Muscle Growth",
+        "lbp": 5,
+        "required": false,
+        "repped": false,
+        "sublineage": "General",
+        "description": "Healing quickly helps build strength. The Ogrim gains an additional maximum Spike."
+      },
+      {
+        "name": "Call To Honor",
+        "lbp": 5,
+        "required": false,
+        "repped": false,
+        "sublineage": "Shorn Wilder (Civilization: The Shorn)",
+        "description": "The Wilder compels others to fight in honorable 1-on-1 duels on the battlefield. They gain the Harry Basic Power from Fighter."
+      },
+      {
+        "name": "Assess Your Foes",
+        "lbp": 2,
+        "required": false,
+        "repped": false,
+        "sublineage": "Shorn Wilder (Civilization: The Shorn)",
+        "description": "While out of combat, the Wilder may use the Assess Your Foes Power below:"
+      },
+      {
+        "name": "Great Endurance",
+        "lbp": 7,
+        "required": false,
+        "repped": false,
+        "sublineage": "Shorn Wilder (Civilization: The Shorn)",
+        "description": "Used to gruelling long warfare, once per long rest the Wilder can either Refresh 3 Spikes, or Refresh any Short or Long Rest martial Power that does not deliver the Refresh effect. The call is either “Refresh 3 Spikes to Self” or “Refresh [Name of Power] to Self.”"
+      },
+      {
+        "name": "Bind Oath",
+        "lbp": 1,
+        "required": false,
+        "repped": false,
+        "sublineage": "Shorn Wilder (Civilization: The Shorn)",
+        "description": "The Shorn Wilders can swear oaths on their word and bond in a way that is obvious to all that they intend to honor it."
+      },
+      {
+        "name": "Bone Claws",
+        "lbp": 6,
+        "required": false,
+        "repped": false,
+        "sublineage": "Boneling",
+        "description": "The Boneling may wield two Natural weapons of up to short (36”) length, and is considered proficient with both."
+      },
+      {
+        "name": "Thorns",
+        "lbp": 3,
+        "required": false,
+        "repped": false,
+        "sublineage": "Boneling",
+        "description": "The Boneling’s protrusions can cause harm to their attackers. Once per short rest, after losing Life Points to an enemy attack or power, the Boneling may make their next weapon attack with the call \"Piercing 2.\""
+      },
+      {
+        "name": "Used to It",
+        "lbp": 4,
+        "required": false,
+        "repped": false,
+        "sublineage": "Boneling",
+        "description": "The Boneling is no stranger to pain, and gains Resistance to the Agony Accent. When they have called “Resist” from this advantage a number of times equal to half their total character level (rounded down), the Resistance is removed until the character’s next long rest."
+      },
+      {
+        "name": "Bone to Pick",
+        "lbp": 5,
+        "required": false,
+        "repped": false,
+        "sublineage": "Boneling",
+        "description": "By growing bone directly into a lock, the Boneling can force it to open. The Boneling gains the Basic Locks Skill from the Skills, Perks, and Flaws document as a Lineage Advantage."
+      }
+    ]
+  },
+  {
+    "name": "Underkin",
+    "description": "Long amounts of time away from the sun causes some humanoids to develop adaptations for living in the dark. This can happen when a group migrates underground for multiple generations or if someone with arcane potential is kept in dark captivity for long periods of time. After developing these adaptations to living in the dark catacombs of the earth, the Underkin have a difficult time operating above ground due to the harsh light, and must wear eye protection at all times. Underkin, on average, live to an age of 90, with some making it to a little over a quarter into their second century. People of Silver (Civilization: Streams in Silver) Stocky and muscular from their massive amounts of underground mining, the People of Silver have resistance to acid from their long war against the insectoid Krushkar. Additionally, their blood naturally contains high levels of precious metals causing their wounds to heal and scar in silver. They hear the call of the Song in Iron, which inspires their smiths to create works on par with Divine Relics. Stonewalker Another manifested adaptation to underground existence are Stonewalkers, Underkin that have transitioned into hybrid organic and mineral-based lifeforms. They gain their nutrients from raw or processed metal and stone as well as plant and flesh matter. The longer a Stonewalker lives, the more rock-like they become and the slower they move, eventually transitioning into statues. Ossification often begins at 50, with major mobility issues setting in around 90, though depending on the amount of rocks in their diet, Stonewalkers can be further along in this process much earlier. Stonewalkers are capable of piercing and moving through even the hardest stone with their bare hands.",
+    "costume": "Hard - The Underkin must have at least 2 [Repped] Challenges.",
+    "sublineages": [
+      {
+        "name": "People of Silver",
+        "note": "Civilization: Streams in Silver"
+      },
+      {
+        "name": "Stonewalker",
+        "note": ""
+      }
+    ],
+    "challenges": [
+      {
+        "name": "Sun-deprived",
+        "lbp": 5,
+        "required": false,
+        "repped": true,
+        "sublineage": "General",
+        "description": "Long time spent away from the sun has seeped the color from these individuals. The character must dress in grayscale with white or black hair, and their skin should be highlighted ashy white and gray. (Note: full coverage face or body paint may not be used.)"
+      },
+      {
+        "name": "Sensitive Eyes",
+        "lbp": 2,
+        "required": false,
+        "repped": true,
+        "sublineage": "General",
+        "description": "The Underkin’s eyes are sensitive to direct sun. They must wear dark glasses or other eye coverings when in direct sunlight."
+      },
+      {
+        "name": "Ruby Eyes See the Prize",
+        "lbp": 3,
+        "required": false,
+        "repped": true,
+        "sublineage": "General",
+        "description": "The Underkin have developed sensitive red eyes for seeing underground. The player should wear red contact lenses. For safety reasons, scleral contacts may not be used."
+      },
+      {
+        "name": "Radiant Vulnerability",
+        "lbp": 3,
+        "required": false,
+        "repped": false,
+        "sublineage": "General",
+        "description": "Time underground has given the Underkin a vulnerability to the sun. They are Vulnerable to the Radiant Accent."
+      },
+      {
+        "name": "Claustrophilic",
+        "lbp": 2,
+        "required": false,
+        "repped": false,
+        "sublineage": "General",
+        "description": "The Underkin only feels comfortable away from the sky. They can only take short rests while indoors."
+      },
+      {
+        "name": "Silver Veins",
+        "lbp": 2,
+        "required": false,
+        "repped": true,
+        "sublineage": "People of Silver (Civilization: Streams in Silver)",
+        "description": "Patterns of silver weave through the skin of the People of Silver. This can be done with makeup or patterned cloth."
+      },
+      {
+        "name": "Silver Haired",
+        "lbp": 3,
+        "required": false,
+        "repped": true,
+        "sublineage": "People of Silver (Civilization: Streams in Silver)",
+        "description": "The Silverite is blessed by the Song and has grey or silver hair. This can be repped by a wig, hair dye or natural color."
+      },
+      {
+        "name": "Acid-Splashed",
+        "lbp": 3,
+        "required": false,
+        "repped": true,
+        "sublineage": "People of Silver (Civilization: Streams in Silver)",
+        "description": "The Silverite has a patch of facial skin that was discolored due to a run in with the Krushkar."
+      },
+      {
+        "name": "Drawn to Song",
+        "lbp": 2,
+        "required": false,
+        "repped": false,
+        "sublineage": "People of Silver (Civilization: Streams in Silver)",
+        "description": "The People of Silver are attuned to hearing the Song in Iron, and have a healthy respect for oral music. They will stop whatever they are doing to listen to any song they hear and will never attack a singer."
+      },
+      {
+        "name": "Stoneskin",
+        "lbp": 4,
+        "required": false,
+        "repped": true,
+        "sublineage": "Stonewalker",
+        "description": "The Stonewalker has growths of rock from the buildup of minerals in their system. This can be done with makeup or prosthetics on exposed skin."
+      },
+      {
+        "name": "Favored Gem",
+        "lbp": 1,
+        "required": false,
+        "repped": true,
+        "sublineage": "Stonewalker",
+        "description": "The Stonewalker has a specific type of gemstone with personal significance to them. This gemstone must be represented in prominent jewelry or accessories. (Real precious gems are not required for the rep.)"
+      },
+      {
+        "name": "Mineral Nourishment",
+        "lbp": 6,
+        "required": false,
+        "repped": false,
+        "sublineage": "Stonewalker",
+        "description": "The Stonewalker must consume one mined Resource (Ingot or Rare Mineral) per game day, and suffer -1 to their maximum Life Points from 7am until they feed each day."
+      },
+      {
+        "name": "Way of Stone",
+        "lbp": 6,
+        "required": false,
+        "repped": false,
+        "sublineage": "Stonewalker",
+        "description": "The Stonewalker has ingested enough minerals where they have started to transition into a statue. They are Inherently Slowed."
+      },
+      {
+        "name": "From Rock to Rubble to Pebble",
+        "lbp": 3,
+        "required": false,
+        "repped": false,
+        "sublineage": "Stonewalker",
+        "description": "The Stonewalker’s inorganic parts make them vulnerable to effects designed to disrupt them. If they or an object they are holding are targeted with a Shatter, they also take “Wounding 5”."
+      }
+    ],
+    "advantages": [
+      {
+        "name": "Secrets of Stone",
+        "lbp": 5,
+        "required": false,
+        "repped": false,
+        "sublineage": "General",
+        "description": "The Underkin have an aptitude for mining the secrets of the earth. They are considered to have one higher Rank in the Prospect skill than they have purchased. If the character has purchased the Prospect III skill, once per long rest they may either re-draw from a mining deck after seeing the result, OR ignore a mining hazard card."
+      },
+      {
+        "name": "Darksight",
+        "lbp": 2,
+        "required": false,
+        "repped": false,
+        "sublineage": "General",
+        "description": "The Underkin have the keenest of senses in darkness, and may use the Darksight Power once per short rest:"
+      },
+      {
+        "name": "Structural Awareness",
+        "lbp": 4,
+        "required": false,
+        "repped": false,
+        "sublineage": "General",
+        "description": "Underkin are uniquely attuned with their surroundings for potential pitfalls and traps. They are Granted a Protect vs Trap effects at the end of each Short Rest."
+      },
+      {
+        "name": "One with Shadows",
+        "lbp": 3,
+        "required": false,
+        "repped": false,
+        "sublineage": "General",
+        "description": "Once per Long Rest while in darkness, the Underkin may Grant Insubstantial to Self, walk back to an area they consider their home, and then Cure Insubstantial to Self."
+      },
+      {
+        "name": "Resistant to Acid",
+        "lbp": 4,
+        "required": false,
+        "repped": false,
+        "sublineage": "People of Silver (Civilization: Streams in Silver)",
+        "description": "Time spent fighting the Krushkar made the People of Silver hardy against their main weapon, acid spit. They are Resistant to the Acid Accent. They may use this resistance a number of times equal to their character level, divided by two (rounding up) per long rest."
+      },
+      {
+        "name": "Blood Money",
+        "lbp": 2,
+        "required": false,
+        "repped": false,
+        "sublineage": "People of Silver (Civilization: Streams in Silver)",
+        "description": "The People of Silver can sell the precious metal in their blood. Once per event at check in, they can choose to reduce their maximum Life Points by 1 for the rest of the event to receive 3 Wealth."
+      },
+      {
+        "name": "Chorus of the Song",
+        "lbp": 3,
+        "required": false,
+        "repped": false,
+        "sublineage": "People of Silver (Civilization: Streams in Silver)",
+        "description": "The People of Silver cannot have their song taken from them. They have Inherent Resistance to the Silence effect."
+      },
+      {
+        "name": "Iron Touch",
+        "lbp": 3,
+        "required": false,
+        "repped": false,
+        "sublineage": "People of Silver (Civilization: Streams in Silver)",
+        "description": "The Song in Iron grants the inherent ability to repair broken works of metal. The character gains the Mystic Armorer Perk as a Lineage Advantage from the Skills, Perks, and Flaws document."
+      },
+      {
+        "name": "Smiths of Legend",
+        "lbp": 8,
+        "required": false,
+        "repped": false,
+        "sublineage": "People of Silver (Civilization: Streams in Silver)",
+        "description": "The Song in Iron allows the People of Silver to craft superlative works of craftsmanship. They gain the Mastercrafter skill as a Lineage Advantage from the Skills, Perks, and Flaws document without fulfilling any other prerequisites."
+      },
+      {
+        "name": "Stoneshaper",
+        "lbp": 3,
+        "required": false,
+        "repped": false,
+        "sublineage": "Stonewalker",
+        "description": "In specific modules that take place underground or in tunnels, the Stonewalker may Shatter at will natural structures or blockages that were designated by Staff, and safely bypass them with their allies."
+      },
+      {
+        "name": "Cavern Fortress",
+        "lbp": 5,
+        "required": false,
+        "repped": false,
+        "sublineage": "Stonewalker",
+        "description": "The Stonewalkers create robust and cozy spaces underground with their stoneshaping. The character gains the Hearth, Bolt Hole and Expanded Hearth Perks as Lineage Advantages from the Skills, Perks, and Flaws document."
+      },
+      {
+        "name": "Strike like a Boulder",
+        "lbp": 6,
+        "required": false,
+        "repped": false,
+        "sublineage": "Stonewalker",
+        "description": "The Stonewalker has more mass behind their hits than other Lineages, and gain a +1 bonus to Spike Damage. (Note that this bonus is subject to stacking rules - see the Stacking Effects section of the core rules.)"
+      },
+      {
+        "name": "Juggernaut",
+        "lbp": 2,
+        "required": false,
+        "repped": false,
+        "sublineage": "Stonewalker",
+        "description": "The Stonewalker’s mineral physique has slowed them down, but also made them a force unstoppable. They have Inherent Resistance to Root and Repel effects."
+      }
+    ]
+  }
+]

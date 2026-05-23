@@ -1,0 +1,154 @@
+[
+  {
+    "name": "Honor Debt",
+    "bp": "1 or 2",
+    "ranks": null,
+    "prereq": null,
+    "category": "Personal",
+    "description": "Has a debt that must be repaid."
+  },
+  {
+    "name": "Indoor Discomfort",
+    "bp": 1,
+    "ranks": null,
+    "prereq": null,
+    "category": "Personal",
+    "description": "-1 Spike and Power damage while inside."
+  },
+  {
+    "name": "Nightmares",
+    "bp": 3,
+    "ranks": null,
+    "prereq": null,
+    "category": "Personal",
+    "description": "Has penalties after an in-game event causes nightmares."
+  },
+  {
+    "name": "Pliant",
+    "bp": 2,
+    "ranks": null,
+    "prereq": null,
+    "category": "Personal",
+    "description": "Vulnerability to Charm effects."
+  },
+  {
+    "name": "Outdoor Discomfort",
+    "bp": 3,
+    "ranks": null,
+    "prereq": null,
+    "category": "Personal",
+    "description": "-1 Spike and Power damage while outdoors."
+  },
+  {
+    "name": "Fragile Bones",
+    "bp": 3,
+    "ranks": null,
+    "prereq": null,
+    "category": "Physical",
+    "description": "Treats Effects with Force Accent as Final."
+  },
+  {
+    "name": "Dies Alone",
+    "bp": 2,
+    "ranks": null,
+    "prereq": null,
+    "category": "Physical",
+    "description": "Unconscious and cannot call out when dying."
+  },
+  {
+    "name": "Divine Vulnerability",
+    "bp": 3,
+    "ranks": null,
+    "prereq": null,
+    "category": "Physical",
+    "description": "Treats Effects with Divine Accent as Final."
+  },
+  {
+    "name": "Mild Allergy",
+    "bp": "1 or 2",
+    "ranks": null,
+    "prereq": null,
+    "category": "Physical",
+    "description": "Minor allergy to gold, silver, iron, magic or other substances. Cannot rest or heal efficiently while in contact."
+  },
+  {
+    "name": "Severe Allergy",
+    "bp": "2 or 3",
+    "ranks": null,
+    "prereq": null,
+    "category": "Physical",
+    "description": "Severe allergy to gold, silver, iron, magic or other substances. Suffers severe pain and Drained while in contact."
+  },
+  {
+    "name": "Shunned Soul",
+    "bp": 1,
+    "ranks": null,
+    "prereq": null,
+    "category": "Spiritual",
+    "description": "While on Consecrated Ground, cannot benefit from Short Rests."
+  },
+  {
+    "name": "Disquieting Aura",
+    "bp": 1,
+    "ranks": null,
+    "prereq": null,
+    "category": "Spiritual",
+    "description": "Cannot Cure Berserk, Charmed, or Repelled Conditions."
+  },
+  {
+    "name": "Torn Soul",
+    "bp": 4,
+    "ranks": null,
+    "prereq": null,
+    "category": "Spiritual",
+    "description": "Only ever heals 1 point from any source of Healing."
+  },
+  {
+    "name": "Truthbound",
+    "bp": 2,
+    "ranks": null,
+    "prereq": null,
+    "category": "Spiritual",
+    "description": "Cannot speak lies nor deceive others. Takes Final Damage if they speak a lie."
+  },
+  {
+    "name": "Binding Oath of Charity",
+    "bp": 5,
+    "ranks": null,
+    "prereq": null,
+    "category": "Spiritual",
+    "description": "Swears Oath to protect and champion the poor and oppressed. Cannot keep goods other than for survival."
+  },
+  {
+    "name": "Binding Oath of Chastity",
+    "bp": 1,
+    "ranks": null,
+    "prereq": null,
+    "category": "Spiritual",
+    "description": "Swears Oath to not have sexual or romantic relationships with others."
+  },
+  {
+    "name": "Binding Oath of Civility",
+    "bp": 2,
+    "ranks": null,
+    "prereq": null,
+    "category": "Spiritual",
+    "description": "Swears Oath to treat others with respect and civility."
+  },
+  {
+    "name": "Binding Oath of Honor",
+    "bp": 2,
+    "ranks": null,
+    "prereq": null,
+    "category": "Spiritual",
+    "description": "Swears Oath to be fair in your dealings, to not cheat, and to be honorable in your actions."
+  },
+  {
+    "name": "Binding Oath of Peace",
+    "bp": 5,
+    "ranks": null,
+    "prereq": null,
+    "category": "Spiritual",
+    "description": "Swears Oath to not end life, to prevent other lives from being ended and to only fight in self-defense."
+  }
+]

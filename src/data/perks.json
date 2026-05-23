@@ -1,0 +1,506 @@
+[
+  {
+    "name": "Generous Soul",
+    "cost": 5,
+    "ranks": null,
+    "prereq": null,
+    "category": "Mystical",
+    "description": "Once per Long Rest can Revive by Divine but takes damage."
+  },
+  {
+    "name": "Greedy Soul",
+    "cost": 3,
+    "ranks": null,
+    "prereq": null,
+    "category": "Mystical",
+    "description": "Character can attune four magical items at a time, instead of just three."
+  },
+  {
+    "name": "Magical Resilience",
+    "cost": 6,
+    "ranks": null,
+    "prereq": null,
+    "category": "Mystical",
+    "description": "After Short Rest, gains Counter vs. Packets."
+  },
+  {
+    "name": "Mystic Armorer",
+    "cost": 3,
+    "ranks": 3,
+    "prereq": "Basic Arcane, Basic Faith, or Apprentice Enchanting",
+    "category": "Mystical",
+    "description": "Can Mend Physical Armor to Full in a Q100."
+  },
+  {
+    "name": "Mystic Smith",
+    "cost": 5,
+    "ranks": null,
+    "prereq": "Mystic Armorer",
+    "category": "Mystical",
+    "description": "Can Mend 2 points of another character’s armor."
+  },
+  {
+    "name": "Master Mystic Smith",
+    "cost": 3,
+    "ranks": null,
+    "prereq": "Mystic Smith",
+    "category": "Mystical",
+    "description": "When Mending Armor, increases Armor Mending by +1."
+  },
+  {
+    "name": "Soothing Touch",
+    "cost": 1,
+    "ranks": null,
+    "prereq": null,
+    "category": "Mystical",
+    "description": "At will can Cure Fear on Q100."
+  },
+  {
+    "name": "Agility",
+    "cost": 2,
+    "ranks": null,
+    "prereq": null,
+    "category": "Physical",
+    "description": "Gains advantage on physical feats of agility."
+  },
+  {
+    "name": "Bloody Minded",
+    "cost": 3,
+    "ranks": null,
+    "prereq": null,
+    "category": "Physical",
+    "description": "Character can resist a number of Charm Effects equal to their level."
+  },
+  {
+    "name": "Carnal Creature",
+    "cost": 1,
+    "ranks": null,
+    "prereq": null,
+    "category": "Physical",
+    "description": "Character may choose to hold off taking Spirit Form until they have been dead for a Slow 300."
+  },
+  {
+    "name": "Cold Dead Hands",
+    "cost": 3,
+    "ranks": null,
+    "prereq": null,
+    "category": "Physical",
+    "description": "Weapons cannot be taken when Slept, Dying or Dead."
+  },
+  {
+    "name": "Deathgrip",
+    "cost": 1,
+    "ranks": null,
+    "prereq": null,
+    "category": "Physical",
+    "description": "While Dying, can crawl and hold objects."
+  },
+  {
+    "name": "Elemental Affinity",
+    "cost": 4,
+    "ranks": 2,
+    "prereq": null,
+    "category": "Physical",
+    "description": "Attune to an element. Gain Resistance to that Element and Final to the opposite."
+  },
+  {
+    "name": "Hard to Kill",
+    "cost": 1,
+    "ranks": null,
+    "prereq": null,
+    "category": "Physical",
+    "description": "Slow 300 rather than 180 while Dying."
+  },
+  {
+    "name": "Holding On",
+    "cost": 1,
+    "ranks": null,
+    "prereq": null,
+    "category": "Physical",
+    "description": "After Deathblow, it takes 30 seconds to die."
+  },
+  {
+    "name": "Iron Stomach",
+    "cost": 2,
+    "ranks": null,
+    "prereq": null,
+    "category": "Physical",
+    "description": "Once per Long Rest, Counter an ingested Poison."
+  },
+  {
+    "name": "Quick Healing",
+    "cost": 3,
+    "ranks": null,
+    "prereq": null,
+    "category": "Physical",
+    "description": "Heals 1 Life Point after each Short Rest."
+  },
+  {
+    "name": "Toughness",
+    "cost": 5,
+    "ranks": null,
+    "prereq": null,
+    "category": "Physical",
+    "description": "Adds +1 Life Point to max."
+  },
+  {
+    "name": "Unkillable",
+    "cost": 4,
+    "ranks": null,
+    "prereq": "Holding On",
+    "category": "Physical",
+    "description": "Once per Long Rest, instead of Dying, stabilizes at zero Life Points."
+  },
+  {
+    "name": "Will to Live",
+    "cost": 1,
+    "ranks": null,
+    "prereq": null,
+    "category": "Physical",
+    "description": "Converts a Death Effect to Final Damage once per Event."
+  },
+  {
+    "name": "Patron",
+    "cost": 4,
+    "ranks": null,
+    "prereq": null,
+    "category": "Patron",
+    "description": "Gains a personal divine patron."
+  },
+  {
+    "name": "Gift of Hateful Retribution",
+    "cost": "Var",
+    "ranks": null,
+    "prereq": "Patron",
+    "category": "Patron",
+    "description": "Causes damage to those that attempt to Deathblow or kill an individual."
+  },
+  {
+    "name": "Gift of Healing",
+    "cost": 2,
+    "ranks": null,
+    "prereq": "Patron",
+    "category": "Patron",
+    "description": "Can focus for Q100 to heal themselves or another to full Life Points."
+  },
+  {
+    "name": "Gift of Rebirth",
+    "cost": 3,
+    "ranks": null,
+    "prereq": "Patron",
+    "category": "Patron",
+    "description": "Instead of dissipating, one self-only Revive ever."
+  },
+  {
+    "name": "Gift of Recognition",
+    "cost": 1,
+    "ranks": null,
+    "prereq": "Patron",
+    "category": "Patron",
+    "description": "Can sense who else is sworn to the same Patron."
+  },
+  {
+    "name": "Gift of Unbreakable Flesh",
+    "cost": "Var",
+    "ranks": null,
+    "prereq": "Patron",
+    "category": "Patron",
+    "description": "Gains Natural Armor from Patron."
+  },
+  {
+    "name": "Ultimate Gift",
+    "cost": 1,
+    "ranks": null,
+    "prereq": "Patron",
+    "category": "Patron",
+    "description": "Go to the River to Revive and Heal others."
+  },
+  {
+    "name": "Ancestral Relic",
+    "cost": 2,
+    "ranks": null,
+    "prereq": null,
+    "category": "Social/Background",
+    "description": "Choose one item that is important to the character which won’t be dropped involuntarily."
+  },
+  {
+    "name": "Ancestral Weapon",
+    "cost": 4,
+    "ranks": null,
+    "prereq": "Ancestral Relic",
+    "category": "Social/Background",
+    "description": "Chosen weapon cannot be taken from the character."
+  },
+  {
+    "name": "Bits and Pieces",
+    "cost": 1,
+    "ranks": null,
+    "prereq": null,
+    "category": "Social/Background",
+    "description": "Once per Long Rest, acts as if they had a Rank of Lore."
+  },
+  {
+    "name": "Boon Bonds",
+    "cost": 2,
+    "ranks": null,
+    "prereq": null,
+    "category": "Social/Background",
+    "description": "Chooses a group of people that character can diagnose, heal and Cure Effects once per Long Rest."
+  },
+  {
+    "name": "Contact",
+    "cost": 2,
+    "ranks": null,
+    "prereq": null,
+    "category": "Social/Background",
+    "description": "Character can get Lore from an off-stage contact during games for a cost."
+  },
+  {
+    "name": "Connections",
+    "cost": 2,
+    "ranks": null,
+    "prereq": null,
+    "category": "Social/Background",
+    "description": "Character has connections to powerful allies that they can call on."
+  },
+  {
+    "name": "Draconic Heritage",
+    "cost": 2,
+    "ranks": null,
+    "prereq": null,
+    "category": "Social/Background",
+    "description": "Has dragon ancestors that give advantages based on level."
+  },
+  {
+    "name": "Famous",
+    "cost": 3,
+    "ranks": null,
+    "prereq": "Minor Fame",
+    "category": "Social/Background",
+    "description": "The character is known for famous deeds across the land."
+  },
+  {
+    "name": "Heartbond",
+    "cost": 3,
+    "ranks": null,
+    "prereq": null,
+    "category": "Social/Background",
+    "description": "Gains Perks to a single creature bound by love."
+  },
+  {
+    "name": "Income",
+    "cost": 3,
+    "ranks": null,
+    "prereq": null,
+    "category": "Social/Background",
+    "description": "Gains 10 Wealth at the beginning of every game."
+  },
+  {
+    "name": "Inheritance",
+    "cost": 4,
+    "ranks": null,
+    "prereq": null,
+    "category": "Social/Background",
+    "description": "Gains a one-time sum of money: 100 Wealth."
+  },
+  {
+    "name": "Manse",
+    "cost": 3,
+    "ranks": null,
+    "prereq": null,
+    "category": "Social/Background",
+    "description": "Owns a house where a character may draw funds from goods produced once per Event."
+  },
+  {
+    "name": "Minor Fame",
+    "cost": 1,
+    "ranks": null,
+    "prereq": null,
+    "category": "Social/Background",
+    "description": "The Character is known for one famous deed in their past."
+  },
+  {
+    "name": "Title",
+    "cost": 4,
+    "ranks": null,
+    "prereq": null,
+    "category": "Social/Background",
+    "description": "The Character gains a title and benefits that come from that title."
+  },
+  {
+    "name": "Sharp Mind",
+    "cost": 3,
+    "ranks": null,
+    "prereq": null,
+    "category": "Social/Background",
+    "description": "Library Use Skill is free and Lore ranks cost 1 point less."
+  },
+  {
+    "name": "Strong Bloodline",
+    "cost": 3,
+    "ranks": null,
+    "prereq": null,
+    "category": "Social/Background",
+    "description": "Gain 3 Additional LBP for Lineage Advantages."
+  },
+  {
+    "name": "Fortunate Finder",
+    "cost": 3,
+    "ranks": 2,
+    "prereq": null,
+    "category": "Supernatural",
+    "description": "Once per Long Rest per Purchase, ignore a negative effect from Forage, Scavenge or Prospect."
+  },
+  {
+    "name": "Insight",
+    "cost": 3,
+    "ranks": 2,
+    "prereq": null,
+    "category": "Supernatural",
+    "description": "Once per Long Rest per Purchase the character can ask for help on a riddle or puzzle."
+  },
+  {
+    "name": "Medium",
+    "cost": 5,
+    "ranks": null,
+    "prereq": null,
+    "category": "Supernatural",
+    "description": "The character has some ability to summon and speak with Spirits."
+  },
+  {
+    "name": "Othersleep",
+    "cost": 1,
+    "ranks": null,
+    "prereq": null,
+    "category": "Supernatural",
+    "description": "The character disappears when asleep and cannot be attacked during this time."
+  },
+  {
+    "name": "Sight",
+    "cost": 3,
+    "ranks": null,
+    "prereq": null,
+    "category": "Supernatural",
+    "description": "The character gains the ability to see objects that are normally invisible."
+  },
+  {
+    "name": "Sight Beyond Sight",
+    "cost": 3,
+    "ranks": null,
+    "prereq": "Sight",
+    "category": "Supernatural",
+    "description": "The character gains the ability to gain insight on objects normally invisible."
+  },
+  {
+    "name": "Sensitive",
+    "cost": 3,
+    "ranks": null,
+    "prereq": "Sight Beyond Sight",
+    "category": "Supernatural",
+    "description": "The character has the ability to gain insight that normally is not possible."
+  },
+  {
+    "name": "Soothsayer",
+    "cost": 3,
+    "ranks": null,
+    "prereq": null,
+    "category": "Supernatural",
+    "description": "By performing a ceremony, the player may ask a question to plot."
+  },
+  {
+    "name": "Strong Spirit",
+    "cost": 3,
+    "ranks": null,
+    "prereq": null,
+    "category": "Supernatural",
+    "description": "While a Spirit, the character has options to interact with the mortal world."
+  },
+  {
+    "name": "Hearth",
+    "cost": 1,
+    "ranks": null,
+    "prereq": null,
+    "category": "Hearth",
+    "description": "Creates a special room that allows for Hearth Perks."
+  },
+  {
+    "name": "Arcane Hearth",
+    "cost": 5,
+    "ranks": null,
+    "prereq": "Hearth",
+    "category": "Hearth",
+    "description": "Allows a Hearth to function as an Arcane Locus."
+  },
+  {
+    "name": "Bolt Hole",
+    "cost": 3,
+    "ranks": null,
+    "prereq": null,
+    "category": "Hearth",
+    "description": "Once per Long Rest, allows a character to go Insubstantial from the Hearth."
+  },
+  {
+    "name": "Consecrated Hearth",
+    "cost": 5,
+    "ranks": null,
+    "prereq": "Hearth",
+    "category": "Hearth",
+    "description": "The Hearth becomes Consecrated Ground until the end of the Event."
+  },
+  {
+    "name": "Expanded Hearth",
+    "cost": 1,
+    "ranks": null,
+    "prereq": "Hearth",
+    "category": "Hearth",
+    "description": "Hearth can be used by five additional people."
+  },
+  {
+    "name": "Arcane/Divine Orchestra",
+    "cost": 1,
+    "ranks": null,
+    "prereq": null,
+    "category": "Hearth",
+    "description": "Allows the character to play soft music within their Hearth."
+  },
+  {
+    "name": "Peaceful Hearth",
+    "cost": 3,
+    "ranks": null,
+    "prereq": null,
+    "category": "Hearth",
+    "description": "While taking a Short Rest in your Hearth, gain a Protect against Fear.."
+  },
+  {
+    "name": "Protected Hearth",
+    "cost": 2,
+    "ranks": null,
+    "prereq": null,
+    "category": "Hearth",
+    "description": "While inside their Hearth, a character may recharge a spike with a Q100 at-will."
+  },
+  {
+    "name": "Restful Home",
+    "cost": 3,
+    "ranks": null,
+    "prereq": null,
+    "category": "Hearth",
+    "description": "While taking a long rest within their Hearth, a character will heal to full. Will not die when resting and Tainted in their hearth."
+  },
+  {
+    "name": "Lucent Hearth",
+    "cost": 3,
+    "ranks": null,
+    "prereq": "Consecrated Hearth",
+    "category": "Hearth",
+    "description": "Rituals in the Hearth have reduced Dark Territory"
+  },
+  {
+    "name": "Experimental Hearth",
+    "cost": 3,
+    "ranks": null,
+    "prereq": "Arcane Hearth",
+    "category": "Hearth",
+    "description": "Rituals in the Hearth have reduced Dark Territory"
+  }
+]

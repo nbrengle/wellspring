@@ -1,0 +1,842 @@
+[
+  {
+    "name": "Basic Martial Weapons",
+    "cost": 1,
+    "prereq": "None",
+    "ranks": null,
+    "category": "Martial",
+    "description": "The character has proficiency with all Hand Weapons (16”-22”) and Staves (fully padded, 36”-72”, two handed.)"
+  },
+  {
+    "name": "Short Weapons",
+    "cost": 3,
+    "prereq": "Basic Martial Weapons",
+    "ranks": null,
+    "category": "Martial",
+    "description": "The character has proficiency with Short Weapons (22”- 36”)"
+  },
+  {
+    "name": "Long Weapons",
+    "cost": 7,
+    "prereq": "Short Weapons",
+    "ranks": null,
+    "category": "Martial",
+    "description": "The character has proficiency with Long Weapons (36”- 48”)"
+  },
+  {
+    "name": "Great Weapons",
+    "cost": 5,
+    "prereq": "Basic Martial Weapons",
+    "ranks": null,
+    "category": "Martial",
+    "description": "The character has proficiency with Great Weapons (48”- 90”). When a character uses a great weapon to perform a Spike, the wielder may choose to either do 1 additional point of base damage, on call “Quick Disable Leg” on a swing. You may block attacks with it wielded in one hand but to deal damage or Effects with the Great Weapon it must be wielded in two hands."
+  },
+  {
+    "name": "Projectile Weapons",
+    "cost": 3,
+    "prereq": "Basic Martial Weapons",
+    "ranks": null,
+    "category": "Martial",
+    "description": "The character has proficiency with Bows and Crossbows. By aiming (Focusing) for a Quick 10 with their projectile weapon, the character can add their Spike damage without expending a Spike. If the character moves their right foot, or lowers their draw, the aiming will have to be done again to get the benefit. The character may not expend a Spike to further enhance their damage. By default, bows and crossbows take any damaging attack as a Shatter Effect."
+  },
+  {
+    "name": "Thrown Weapons",
+    "cost": 3,
+    "prereq": "Basic Martial Weapons",
+    "ranks": null,
+    "category": "Martial",
+    "description": "The character has proficiency with Thrown Weapons."
+  },
+  {
+    "name": "Basic Shields",
+    "cost": 4,
+    "prereq": "None",
+    "ranks": null,
+    "category": "Martial",
+    "description": "The character has proficiency with Bucklers (38” perimeter max) and Small Shields (63” perimeter max)."
+  },
+  {
+    "name": "Advanced Shields",
+    "cost": 2,
+    "prereq": "Basic Shields",
+    "ranks": null,
+    "category": "Martial",
+    "description": "The character has proficiency with Medium (94” perimeter max) and Large shields (106” perimeter max)."
+  },
+  {
+    "name": "Great Shields",
+    "cost": 2,
+    "prereq": "Advanced Shields",
+    "ranks": null,
+    "category": "Martial",
+    "description": "The character has proficiency with Great Shields (125” perimeter max)."
+  },
+  {
+    "name": "Shield Expertise",
+    "cost": 5,
+    "prereq": "Basic Shields",
+    "ranks": null,
+    "category": "Martial",
+    "description": "The character can Counter one weapon attack that hits their shield. They should call “Counter, Shield Expertise” when they use the Counter. This will refresh after the character completes a Short Rest."
+  },
+  {
+    "name": "Basic Armor",
+    "cost": 2,
+    "prereq": "None",
+    "ranks": null,
+    "category": "Martial",
+    "description": "The character can benefit from up to two Armor Points of repped armor. Their total armor can still be altered by character Skills and Powers, which may increase their armor above this repped armor maximum."
+  },
+  {
+    "name": "Light Armor",
+    "cost": 3,
+    "prereq": "Basic Armor",
+    "ranks": null,
+    "category": "Martial",
+    "description": "The character can benefit from up to four Armor Points of repped armor. Their total armor can still be altered by character Skills and Powers, which may increase their armor above this repped armor maximum."
+  },
+  {
+    "name": "Medium Armor",
+    "cost": 4,
+    "prereq": "Light Armor",
+    "ranks": null,
+    "category": "Martial",
+    "description": "The character can benefit from up to six Armor Points of repped armor. Their total armor can still be altered by character Skills and Powers, which may increase their armor above this repped armor maximum."
+  },
+  {
+    "name": "Heavy Armor",
+    "cost": 3,
+    "prereq": "Medium Armor",
+    "ranks": null,
+    "category": "Martial",
+    "description": "The character can benefit from up to eight Armor Points of repped armor. Their total armor can still be altered by character Skills and Powers, which may increase their armor above this repped armor maximum."
+  },
+  {
+    "name": "Ironclad Armor",
+    "cost": 2,
+    "prereq": "Heavy Armor",
+    "ranks": null,
+    "category": "Martial",
+    "description": "The character can benefit from up to eleven Armor Points of repped armor. Their total armor can still be altered by character Skills and Powers, which may increase their armor above this repped armor maximum."
+  },
+  {
+    "name": "Armor Expertise",
+    "cost": 6,
+    "prereq": "At least one Armor Proficiency",
+    "ranks": null,
+    "category": "Martial",
+    "description": "Whenever the character is wearing any amount of physical armor, even if the armor has a value of 0, she gains one additional point to her physical Base Maximum Armor Points."
+  },
+  {
+    "name": "Two Weapon Style",
+    "cost": 2,
+    "prereq": "Short Weapons",
+    "ranks": null,
+    "category": "Martial",
+    "description": "The character can wield a melee weapon in each hand and not lose proficiency (due to wielding multiple weapons). Only one of the two weapons can be over 36” long and neither can be longer than 48”."
+  },
+  {
+    "name": "Advanced Two Weapon Style",
+    "cost": 2,
+    "prereq": "Two Weapon Style",
+    "ranks": null,
+    "category": "Martial",
+    "description": "The character can wield a melee weapon in each hand and not lose proficiency (due to wielding multiple weapons). The weapons may be up to 48” in length."
+  },
+  {
+    "name": "Advanced Great Weapon Style",
+    "cost": 1,
+    "prereq": "Great Weapon",
+    "ranks": null,
+    "category": "Martial",
+    "description": "The character has trained significantly with Great Weapons and can perform feats of strength otherwise impossible for others. They may hold a second weapon in the same hand as a Great Weapon without impeding the effectiveness of the Great Weapon. Although the effectiveness of the Great Weapon is unaffected, the second weapon cannot be used to do damage or block attacks (it is not wielded) if it is held in the same hand as the great weapon. For Example: A character could have a throwing knife or backup short weapon tucked in a hand holding a polearm, and the polearm would still be usable and would be able to do Spikes, use powers, etc, if both hands are on the polearm. Additionally, if the character has the Two Weapon Style or Advanced Two Weapon Style skill, the character may block one-handed with a Great Weapon and still attack with a weapon in another hand, if they would normally be proficient with that weapon, and if the weapon meets the length requirements of the purchased Two Weapon Style skill."
+  },
+  {
+    "name": "Weapon Specialization",
+    "cost": 4,
+    "prereq": "Basic Martial Weapons",
+    "ranks": null,
+    "category": "Martial",
+    "description": "The character must choose from the following list: Daggers, Swords, Maces, Axes, Projectile Weapons, Thrown Weapons, Staves, or Polearms. After each Short Rest, the character gains one additional Spike that can only be used while the character is wielding a weapon of that type (although the actual attack need not come from that weapon). A character may only have Weapon Specialization with one weapon type."
+  },
+  {
+    "name": "Axecraft",
+    "cost": 4,
+    "prereq": "Short Weapons, Weapon Specialization (Axes), 2 levels in Martial Classes",
+    "ranks": null,
+    "category": "Martial",
+    "description": "An axe is a special short weapon (22\"-36\") or great weapon (48\"+) that must have an obvious \"bladed head.\" The character has a special skill with an axe to sunder shields. Each time the axe strikes a shield, the character can expend a Spike to call ‘Wounding X’ where X is their base damage. If using a great weapon that’s an axe, you may instead refresh one Spike whenever you Destroy or Shatter a shield and the effect is not Prevented."
+  },
+  {
+    "name": "Hooked Head",
+    "cost": 4,
+    "prereq": "Axecraft, 5 levels in Martial Classes",
+    "ranks": null,
+    "category": "Martial",
+    "description": "The character has a special skill with an axe. When the axe strikes a held weapon or shield, the character may expend a Spike to \"Disarm [Item]\" where the item named must be the weapon or shield that was hit."
+  },
+  {
+    "name": "Chopper",
+    "cost": 4,
+    "prereq": "Hooked Head, 10 levels in Martial Classes",
+    "ranks": null,
+    "category": "Martial",
+    "description": "The character has a special skill with an axe and does +1 Base Damage when they expend a Spike on a Basic Spike attack with an axe. If they do, the attack gains the Force Accent (which cannot be changed)."
+  },
+  {
+    "name": "Bowcraft",
+    "cost": 4,
+    "prereq": "Projectile Weapons, Weapon Specialization (Projectile Weapons), 2 levels in a Martial Classes",
+    "ranks": null,
+    "category": "Martial",
+    "description": "Each time the Character strikes a shield with a projectile weapon, the character can expend a Spike to call “Shatter” on a shield."
+  },
+  {
+    "name": "Quick Shot",
+    "cost": 4,
+    "prereq": "Bowcraft, 5 levels in Martial Classes",
+    "ranks": null,
+    "category": "Martial",
+    "description": "The character may do their Spike Damage with bows, without any aim time a number of times per Short Rest equal to their Maximum Spikes."
+  },
+  {
+    "name": "Bowmaster",
+    "cost": 4,
+    "prereq": "Quick Shot, 10 levels in Martial Classes",
+    "ranks": null,
+    "category": "Martial",
+    "description": "When the character spends a Quick 10 aiming with a projectile weapon, they may choose to do one of the following: * Add one to their Base Damage for that shot. * Expend a Spike to deliver a Disable Effect. This is called as “Disable [Limb]” where the limb called must be the one struck by the projectile. In the case of held objects, the limb holding the object must be called. Torso hits will allow the character to call any limb they wish."
+  },
+  {
+    "name": "Daggercraft",
+    "cost": 4,
+    "prereq": "Weapon Specialization (Daggers), 2 levels in Martial Classes",
+    "ranks": null,
+    "category": "Martial",
+    "description": "When only using one or two bladed hand weapons (each under 22\") you find it easier to deal critical damage. While using daggers only, you have +1 Base Maximum Spikes for attacks with daggers. This bonus to Maximum Spikes is a Base change, and does not interact with the stacking rules for Maximum Spikes."
+  },
+  {
+    "name": "Parrying Dagger",
+    "cost": 4,
+    "prereq": "Dagger Craft, 5 levels in Martial Classes",
+    "ranks": null,
+    "category": "Martial",
+    "description": "When only using one or two bladed hand weapons (each under 22\"), the character may Counter any melee weapon attack that hits the character if they can see the source of the attack, by calling \"Counter, Parry\" once per Short Rest."
+  },
+  {
+    "name": "Flurry of Cuts",
+    "cost": 4,
+    "prereq": "Parrying Dagger, 10 levels in Martial Classes",
+    "ranks": null,
+    "category": "Martial",
+    "description": "When only using one or two bladed hand weapons (each under 22\"), they may spend a Spike to do an attack that does “Piercing 1 by Force.” This attack can’t be modified other than changing its accent. In addition, whenever the character Counters an attack that hits their hand weapons they may regain a Spike."
+  },
+  {
+    "name": "Macecraft",
+    "cost": 4,
+    "prereq": "Short Weapons, Weapon Specialization (Maces), 2 levels in Martial Classes",
+    "ranks": null,
+    "category": "Martial",
+    "description": "The character has a special skill with a mace and can use it to cause damage through shields. A mace is a special short weapon (22\"-36\") or great weapon (48”+) that must have an obvious \"head\" and must have its center of balance closer to the head than the pommel. The character is skilled with a mace and can use it to crush through shields to damage their enemies. Each time the mace is blocked by a shield, the character may expend a Spike to add Wounding to that attack with a mace."
+  },
+  {
+    "name": "Toppling Blows",
+    "cost": 4,
+    "prereq": "Macecraft, 5 levels in Martial Classes",
+    "ranks": null,
+    "category": "Martial",
+    "description": "The character has a notable skill with a mace and can use it to knock foes off balance. Each time the mace strikes a target they may expend a Spike to call \"Quick Slow.\""
+  },
+  {
+    "name": "Denting Blows",
+    "cost": 4,
+    "prereq": "Toppling Blows, 10 levels in Martial Classes",
+    "ranks": null,
+    "category": "Martial",
+    "description": "The character has a special skill with a mace and can use it to rend Armor. If you are confident you landed a regular melee hit on the target, you can expend a Spike and call \"Shatter Armor by Force\" on your next swing which must be against the same target."
+  },
+  {
+    "name": "Polearmcraft",
+    "cost": 4,
+    "prereq": "Great Weapons, Weapon Specialization (Polearms, Swords, Axes, or Maces), 2 levels in Martial Classes",
+    "ranks": null,
+    "category": "Martial",
+    "description": "When wielding a polearm (A great weapon with an overall length of 61\"-90\") in two hands you may spend a Spike to Counter any Disarm Effect that targets the polearm by calling \"Counter, Polearmcraft.\""
+  },
+  {
+    "name": "Sweeping Strike",
+    "cost": 4,
+    "prereq": "Polearmcraft, 5 levels in Martial Classes",
+    "ranks": null,
+    "category": "Martial",
+    "description": "When wielding a polearm in two hands using it to make an attack, if they miss or the Power is prevented, they may immediately (before making any other attacks or using other Powers) use the same Power with a second swing without expending additional uses. The second attempt must have a different target. If the retry misses or is prevented, the Power is expended."
+  },
+  {
+    "name": "Holding Back the Tide",
+    "cost": 4,
+    "prereq": "Sweeping Strike, 10 levels in Martial Classes",
+    "ranks": null,
+    "category": "Martial",
+    "description": "When wielding a polearm in two hands you may spend a Spike to make an attack that is “Short Repel By Force.”"
+  },
+  {
+    "name": "Thrown Weaponcraft",
+    "cost": 4,
+    "prereq": "Thrown Weapons, Weapon Specialization (Thrown Weapons), 2 levels in Martial Classes",
+    "ranks": null,
+    "category": "Martial",
+    "description": "When using a Thrown Weapon, the character may spend a Spike to call \"Quick Repel by Agony.\" If this Power misses they may immediately throw an additional weapon with the same call. Note, if the second one also misses, it can't be used again without expending another Spike."
+  },
+  {
+    "name": "Shattering Toss",
+    "cost": 4,
+    "prereq": "Thrown Weaponcraft, 5 levels in Martial Classes",
+    "ranks": null,
+    "category": "Martial",
+    "description": "Once per Short Rest, when using a Thrown Weapon the character may use a Spike to call \"Shatter [Item] by Force\" as their weapon tears apart any item held by the character hit or a door if it hits a door."
+  },
+  {
+    "name": "Jester’s Lethality",
+    "cost": 4,
+    "prereq": "Shattering Toss, 10 levels in Martial Classes",
+    "ranks": null,
+    "category": "Martial",
+    "description": "When using a Thrown Weapon the character can aim for a Quick 10 to gain +1 Base Damage to the attack. This bonus may only be added once per attack."
+  },
+  {
+    "name": "Weapon Mastery",
+    "cost": 6,
+    "prereq": "Weapon Specialization, 10 class-levels in martial classes",
+    "ranks": null,
+    "category": "Martial",
+    "description": "When using the weapon with which the character has Weapon Specialization, the character’s base Spike damage rises by +1."
+  },
+  {
+    "name": "Bladechannel",
+    "cost": 3,
+    "prereq": "Weapon Specialization (any), one Adept spell-slot",
+    "ranks": null,
+    "category": "Martial",
+    "description": "Whenever the character casts a spell or cantrip with the Packet or Verbal delivery, they may modify the spell to have the Weapon delivery through the weapon they are specialized in instead."
+  },
+  {
+    "name": "Extensive Combat Training - Basic",
+    "cost": 4,
+    "prereq": "One level in a non-casting class",
+    "ranks": 2,
+    "category": "Martial",
+    "description": "The character may choose an additional Basic Tier Power from a non-casting class that they have levels in. The Power cannot be one the character already has. This is just like an additional Tier Power from the class. The Power must be of a Tier they could normally take without using Agile Learner."
+  },
+  {
+    "name": "Extensive Combat Training - Advanced",
+    "cost": 5,
+    "prereq": "One level in a non-casting class",
+    "ranks": 2,
+    "category": "Martial",
+    "description": "The character may choose an additional Adept Tier Power from a non-casting class that they have levels in. The Power cannot be one the character already has. This is just like an additional Tier Power from the class. The Power must be of a Tier they could normally take without using Agile Learner."
+  },
+  {
+    "name": "Extensive Combat Training - Veteran",
+    "cost": 6,
+    "prereq": "One level in a non-casting class",
+    "ranks": 1,
+    "category": "Martial",
+    "description": "The character may choose an additional Veteran Tier Power from a non-casting class that they have levels in. The Power cannot be one the character already has. This is just like an additional Tier Power from the class. The Power must be of a Tier they could normally take without using Agile Learner."
+  },
+  {
+    "name": "Extensive Training",
+    "cost": 6,
+    "prereq": "One level in a non-casting class",
+    "ranks": 2,
+    "category": "Martial",
+    "description": "The character may choose an additional Utility Power from a non-casting class that they have levels in. This is just like an additional Utility Power from the class."
+  },
+  {
+    "name": "Agile Learner",
+    "cost": 3,
+    "prereq": "6th character-level, class-levels in at least two Base Classes",
+    "ranks": 3,
+    "category": "Martial",
+    "description": "The character can trade out one first-tier Power for a second-tier Power from the same class or can lose access to a first-tier Spell-Slot and gain access to a second-tier Spell-Slot from the same class. If a Spell-Slot is switched out, a Known Spell from the spellbook can be similarly switched from first- to second-tier. A second rank of this skill can be taken at 8th character-level, and a third rank can be taken at 10th character-level."
+  },
+  {
+    "name": "Basic Arcane",
+    "cost": 4,
+    "prereq": "None",
+    "ranks": null,
+    "category": "Magic",
+    "description": "The character learns how to record Arcane spells into a spellbook and cast spells. They will know one Spell, or however many are listed in their Arcane spellcasting class, whichever is more. If the character has levels in an Arcane spell-casting class, these spells must all be spells from one of those classes. If the character has no spell-casting class, they may choose from any Base Class’s spell list. This skill confers no actual Spell-Slots."
+  },
+  {
+    "name": "Basic Faith",
+    "cost": 4,
+    "prereq": "None",
+    "ranks": null,
+    "category": "Magic",
+    "description": "The character learns how to record Divine spells into a spellbook. They will know one Spell, or however many are listed in their Divine spellcasting class, whichever is more. If the character has levels in a Divine spell-casting class, these spells must all be spells from one of those classes. If the character has no spell-casting class, they may choose from any Base Class’s spell list. This skill confers no actual spell-slots."
+  },
+  {
+    "name": "Concurrent Meditation",
+    "cost": 3,
+    "prereq": "One Novice Arcane Spell-Slot and One Novice Divine Spell-Slot",
+    "ranks": null,
+    "category": "Magic",
+    "description": "The character has learned how to pair the meditative cycles of arcane re-attunement and the prayers of divine refreshment. When the character would use a Long Rest Power that refreshes their spell slots (ex: Arcane Study, Refreshing Prayer, etc.) they may refresh both Arcane and Divine spell slots with the same Short Rest, allowing the character to expend both refreshing Powers at the same time."
+  },
+  {
+    "name": "Worship",
+    "cost": 1,
+    "prereq": "None",
+    "ranks": null,
+    "category": "Magic",
+    "description": "The character may choose a Devotion and gain access to the abilities found in up to two of their Divine Domains. If a character does not purchase this Skill, they may still follow a Devotion without purchasing Divine Domain Powers. See:"
+  },
+  {
+    "name": "Divine Favor (Unlimited)",
+    "cost": 2,
+    "prereq": "Worship",
+    "ranks": null,
+    "category": "Magic",
+    "description": "The character may channel divine favor through their martial prowess. Once per Short Rest, they may add the Divine Accent to any one basic Spike weapon attack or replace the Accent of a Martial Power (Basic, Advanced, etc) or basic attack that has an Accent already to the Divine Accent."
+  },
+  {
+    "name": "Divine Focus",
+    "cost": 2,
+    "prereq": "Worship",
+    "ranks": null,
+    "category": "Magic",
+    "description": "Whenever this character uses an attack or Power with the Divine Accent, they may substitute that Accent for their associated Devotion Accent. This is an at-will ability."
+  },
+  {
+    "name": "Extended Capacity - Novice",
+    "cost": 3,
+    "prereq": "Basic Arcane or Basic Faith",
+    "ranks": 4,
+    "category": "Magic",
+    "description": "The character chooses one Sphere of magic and gains one additional Novice spell-slot in that Sphere and can use it to cast a Known spell."
+  },
+  {
+    "name": "Extended Capacity - Adept",
+    "cost": 4,
+    "prereq": "One Adept spell-slot",
+    "ranks": 4,
+    "category": "Magic",
+    "description": "The character chooses one Sphere of magic they have an Adept Spell slot for and gains one additional Adept Spell-Slot in that Sphere and can use it to cast a Known spell."
+  },
+  {
+    "name": "Extended Capacity - Greater",
+    "cost": 6,
+    "prereq": "One Greater spell-slot",
+    "ranks": 3,
+    "category": "Magic",
+    "description": "The character chooses one Sphere of magic they have a Greater Spell slot for and gains one additional Greater Spell-Slot in that Sphere and can use it to cast a Known spell."
+  },
+  {
+    "name": "Additional Cantrip",
+    "cost": 6,
+    "prereq": "Basic Arcane or Basic Faith",
+    "ranks": 4,
+    "category": "Magic",
+    "description": "The character can choose one additional Cantrip from their class’ Cantrip spell-list. If the character does not have a class spell-list, they may pick any Base Class Cantrip but the Cantrip must be from the same Sphere (Arcane or Divine) as the prerequisite that qualifies them for this skill."
+  },
+  {
+    "name": "Advanced Recharge",
+    "cost": 2,
+    "prereq": "Basic Arcane or Basic Faith",
+    "ranks": 4,
+    "category": "Magic",
+    "description": "The character is adept at tapping into their power source. Once per Event, when the character Refreshes Spell-Slots at a special location (Arcane Locus for Mage etc.) rather than add three temporary Novice Spell-Slots, the character can add one temporary Spell-Slot from their highest Tier."
+  },
+  {
+    "name": "Spell-Scholar",
+    "cost": 4,
+    "prereq": "Basic Arcane or Basic Faith",
+    "ranks": 12,
+    "category": "Magic",
+    "description": "The character chooses one spell-casting class in which they have at least 1 Known Spell, and adds 1 to the number of Known Spells that they have access to in that class."
+  },
+  {
+    "name": "Bookcaster (Unlimited)",
+    "cost": 1,
+    "prereq": "Basic Arcane Skill or Basic Faith",
+    "ranks": null,
+    "category": "Magic",
+    "description": "Upon purchasing this skill, the player selects one spell from any spell list they have access to through their classes, of a Tier they would normally be able to access. The character may cast this spell when they are out of combat by expending a spell-slot and reading the incantation a full five times, or actively studying their spell book for a full minute, while satisfying all the normal requirements of the spell. Additionally, once per event, the character may deposit one Hide and one Bloom into an ashbin and spend 10 minutes writing in their spell book to exchange one spell from their book for another from a list they have access to."
+  },
+  {
+    "name": "Bookcasting Expertise",
+    "cost": 3,
+    "prereq": "Bookcaster, 6 levels in any one spell-casting class.",
+    "ranks": 4,
+    "category": "Magic",
+    "description": "Once per Long Rest, the caster can bookcast one Spell without using up a Spell-Slot of any kind."
+  },
+  {
+    "name": "Peacecaster",
+    "cost": 3,
+    "prereq": "One Novice-level spell-slot",
+    "ranks": null,
+    "category": "Magic",
+    "description": "Whenever the caster casts a Spell (not Cantrip) with the Heal, Cure, or Revive Effects, they add 1 point per tier of the Spell  into their Healing Touch or Life Tap Pools.  If the Spell was a Druid Spell, it adds to Life Tap.  If the Spell was a Cleric Spell, it adds to Healing Touch.  If the Spell came from some other source, it can add to either Pool."
+  },
+  {
+    "name": "Advanced Peacecasting",
+    "cost": 5,
+    "prereq": "Peacecaster, one Greater-level spell-slot",
+    "ranks": null,
+    "category": "Magic",
+    "description": "The caster can heal one additional point with all Healing Spells and Healing Cantrips they cast. If the Spell or Cantrip heals multiple targets or charges multiple Packets, all of them are given the extra healing."
+  },
+  {
+    "name": "Warcaster",
+    "cost": 5,
+    "prereq": "One Novice-level spell-slot",
+    "ranks": null,
+    "category": "Magic",
+    "description": "The caster can add one additional point to all damaging Weapon or Packet Spells (not Cantrips) they cast. This damage does not apply to Spells that generate unlimited charges."
+  },
+  {
+    "name": "Advanced Warcasting",
+    "cost": 5,
+    "prereq": "Warcaster, one Greater-level spell-slot",
+    "ranks": null,
+    "category": "Magic",
+    "description": "The caster can add one damage to all damaging Cantrips that they cast. If the Cantrip grants multiple charges then this skill will only increase the damage of one charge, no matter how it is delivered."
+  },
+  {
+    "name": "Spell Storing",
+    "cost": 3,
+    "prereq": "Basic Faith or Basic Arcane, 10 levels in a single casting class.",
+    "ranks": null,
+    "category": "Magic",
+    "description": "When the character has multiple charged spell-packets, they may Soulhold one of them, by holding the Packet to their Chest and Focusing for a Quick Count of 30.  That spell-packet’s effect is then held within them and can be produced again to charge a spell-packet or be used as a Touch Spell by repeating the Incantation for the original Spell.  This will expend the charge (as the charge would have been expended normally) but will not expend a Spell-Slot (as that has, presumably, already been expended).   Note that if the character is Soulholding a charge, they cannot also Soulhold Essences.  If the character wishes to get rid of the charge without using it, they can do that with the Cancel Cantrip."
+  },
+  {
+    "name": "Ritual Crafting",
+    "cost": 3,
+    "prereq": "Journeyman Ritual Magic",
+    "ranks": null,
+    "category": "Magic",
+    "description": "As handy as on-the-fly spell casting is, many of those that call upon greater forces recognize that much of the true power of the world rests in the hands of careful and considered rites and rituals. While many know the tried and true ritual methods, scarce few have the knowledge required to make these rituals themselves. A character with the Journeyman Ritual Magic skill has the ability to propose rituals to staff to be performed during the game, once per game/between-game period. Submissions must be done through the Player Outbox. These rituals must be at a power scale and cost similar to the existing rituals in the game, and must have similar pre-requisites, but can be tailored to specific use cases and goals. Staff will propose alterations as needed, as well as additional heavy one-time costs associated with the ritual. Depending on the ritual and its intended scope, rituals will either be approved as single-use one time rituals, or as a general use ritual. If it is approved as a general use ritual, the ritual will be added to the standard suite of rituals the game has access to. Submitting a potential ritual does not guarantee its approval."
+  },
+  {
+    "name": "Lore [Area of Lore] (Unlimited)",
+    "cost": 2,
+    "prereq": "None",
+    "ranks": null,
+    "category": "Scholar",
+    "description": "The character has learned about a specific area of study, with each area of study considered a separate skill. Lore confers a level of knowledge that is both deep and detailed, although not quite encyclopedic, and represents a long commitment to education on the topic. Mechanically, Lore skills will often appear as requirements on blue cards, or be prompted by a Marshal during modules when relevant. The following is a list of suggested areas of study. Players should feel free to choose ones not in this list as long as they are appropriate to the setting. The more granular the area of knowledge, the more in-depth the knowledge is likely to be, though it will be in turn less likely to come up in game. Arcane Lore: Magic and its uses, magical tools and applications, and magical constructs. Historical Lore: Major events, dates, interactions of events and casualties, historical figures. Nature Lore: Animals and their habits, woodcraft, myths and legends about the natural world, plants and their uses. This also includes creatures and monsters that are native to the region. Noble Lore: Etiquette, titles, traditions and customs, noble names and families, history of ruling families, especially the Great Houses. Religious Lore: Divine Beings and their domains, afterlife beliefs, Devotion traditions, cultural attitudes towards Divine Beings. Ritual Lore: Details about past ritual sites, determining ritual means to solving problems, etc. Shadow Lore: Underworld and underworld etiquette, power players, customs and mores, connections, illicit substances and their uses, cons and crimes."
+  },
+  {
+    "name": "Library Use",
+    "cost": 1,
+    "prereq": "None",
+    "ranks": null,
+    "category": "Scholar",
+    "description": "The character knows their way around a library and can find tomes, discover ancient texts, and generally learn things that are unavailable to the normal folk. If a Library exists in-game, the character may spend a community shift researching any one question and will get an answer from Staff."
+  },
+  {
+    "name": "Research",
+    "cost": 4,
+    "prereq": "Lore (any)",
+    "ranks": null,
+    "category": "Scholar",
+    "description": "Despite the long endless wars all inhabitants of The Wellspring have been exposed to, those dedicated to the pursuit of knowledge still exist. While the ability to regurgitate facts is somewhat common among learned circles, the ability to truly compile and analyze - sift through and understand - is exceptionally more rare. A character with Research may, once per event, submit a request looking into a specific topic. This submission can be done during game using the Player Outbox, or between games - but is limited to one per game attended. The submission should include what they are researching, why they are researching it, and any supporting knowledge, skills, items, or access they have that can support this research. The player will receive back additional information related to the topic depending on their level of support. Research submissions sent between games must be sent two weeks prior to the pre-registration deadline of the next game. Note - this will often yield results at a lower level of depth than Divine Symposium, but research can often be used to enhance the results of Divine Symposium. This skill is experimental, and is subject to change - please be considerate of staff’s time and resources."
+  },
+  {
+    "name": "Basic Medicine",
+    "cost": 2,
+    "prereq": "None",
+    "ranks": null,
+    "category": "Medical",
+    "description": "The character has some basic understanding of the way living creatures work and has some minor skill in the healing arts. By spending a Quick 100 tending to an individual, that individual, if dying, will become stable. The character’s death-count will not stop or pause while being tended to, so the target may die during the count. The character using this skill should role-play checking and binding wounds, and overall treating the character (please remember not to touch other players without explicit previous consent). The character using Basic Medicine may use any of the following at-will delivered by Touch: * “Discern: Are you currently at max Life Points?” * “Discern: Are you Dying?” * “Discern: Are you Dead?”"
+  },
+  {
+    "name": "Diagnose",
+    "cost": 1,
+    "prereq": "Basic Medicine",
+    "ranks": null,
+    "category": "Medical",
+    "description": "With only a glance, the trained character can tell the extent of someone’s wounds. At-will the character can give a person a quick look over while within Touch range and then ask: * Discern: What non-Inherent Conditions do you have currently? * Discern: How many Life Points are you down? * Discern: Are you sick? * Discern: Are you diseased? * Discern: Are you Living? * Discern: Did you take damage that was from a sharp instrument? * Discern: Did you take damage from a blunt instrument? * Discern to Corpse: Are you 5th level or lower?"
+  },
+  {
+    "name": "Advanced Medicine",
+    "cost": 4,
+    "prereq": "Basic Medicine",
+    "ranks": null,
+    "category": "Medical",
+    "description": "The character has a number of techniques at their disposal to help those around them. The character can perform any of the following actions by spending a Slow 60 out of combat tending to another (these cannot be performed on the character themself). These can be done as part of a Short Rest. * Cure Disabled [one limb] * Cure Weakened * Cure Slept"
+  },
+  {
+    "name": "Combat Medic",
+    "cost": 1,
+    "prereq": "Basic Medicine, Diagnose",
+    "ranks": null,
+    "category": "Medical",
+    "description": "Those trained in combat situations to help others have a few benefits. First, they need only have one hand free to pick up a Helpless, Dying. or Unconscious person, and can move at a jog while carrying a person. In addition, they require only a Quick 30 to stabilize another character when using Basic Medicine."
+  },
+  {
+    "name": "Chronic Hobbyist [Specific Profession]",
+    "cost": 2,
+    "prereq": "Profession - [Any]",
+    "ranks": 3,
+    "category": "Trade",
+    "description": "The character has functional knowledge in a profession. The character can perform all normal functions of the chosen profession and they will show solid knowledge related to it. Most tasks associated with that profession can be performed without aid or supervision. The character can choose one Profession-related Discern question and can ask it at-will (such as “Discern by Mind: Which civilization built this artifact?” for a Builder). This question should be approved by Staff (between games) and at Staff discretion, the question may be allowed to have the Subtle Modifier. The Accent is always “by Mind.”"
+  },
+  {
+    "name": "Profession - Apprentice [Specific Profession]",
+    "cost": 1,
+    "prereq": "None",
+    "ranks": null,
+    "category": "Trade",
+    "description": "The character has some basic knowledge in a profession and can generally perform in that profession on basic tasks without journeyman or master supervision. More complex tasks may require guidance. The character can perform the basic functions of the chosen profession and will have corollary knowledge of lore and procedures related to it. The character earns some basic income from their profession, represented by earning 3 Wealth at the beginning of each game."
+  },
+  {
+    "name": "Profession - Journeyman [Specific Profession]",
+    "cost": 2,
+    "prereq": "Profession - Apprentice in the chosen area.",
+    "ranks": null,
+    "category": "Trade",
+    "description": "The character has functional knowledge in a profession. The character can perform all normal functions of the chosen profession and they will show solid knowledge related to it. Most tasks associated with that profession can be performed without aid or supervision. The character earns income as a member of the profession, represented by earning 5 Wealth at the beginning of each game, in addition to what they earn from their Apprentice skill. In addition, the character can choose one Profession-related Discern question and can ask it at-will (such as “Discern by Mind: Which civilization built this?” for a mason). This question should be approved by Staff (between games) and at Staff discretion, the question may be allowed to have the Subtle Modifier. The Accent is always “by Mind.”"
+  },
+  {
+    "name": "Profession - Master [Specific Profession]",
+    "cost": 3,
+    "prereq": "Profession - Journeyman in the chosen area.",
+    "ranks": null,
+    "category": "Trade",
+    "description": "The character has mastered their chosen profession. They can perform the most complicated tasks and have a deep knowledge of lore associated with that mastery. The character’s mastery earns income represented by earning 8 Wealth at the beginning of each game, in addition to what they earn from their Apprentice and Journeyman skills. In addition, the character can choose one additional Profession-related Discern question and can ask it at-will (such as “Discern by Mind: Does this stone wall seem to be moveable?” for a mason). This question should be approved by Staff (between games) and at Staff discretion, the question may be allowed to have the Subtle Modifier. The Accent is always “by Mind.” Suggested Professions: Soldier, Hunter, Sailor, Wagoneer, Factor, Mercenary, Builder, Fisher, Scribe, Herbalist, Undertaker, Executioner, Merchant, Charlatan, Chirurgeon, Teacher, Magistrate, and other Professions with Staff approval."
+  },
+  {
+    "name": "Tracking",
+    "cost": 4,
+    "prereq": "None",
+    "ranks": null,
+    "category": "Trade",
+    "description": "A character with the Tracking skill can follow a trail. Tracking trails will be marked with green flags marked with a white circle (called a “Halo”), and these flags must be ignored by anyone without tracking, just as all players ignore anything marked with the Halo marker. If there is a card attached to a green flag with a Halo (a tracking flag), or if there is information on the back of the flag, a Tracker can read that information, which will usually give clues about the creatures leaving the tracks."
+  },
+  {
+    "name": "Hustle",
+    "cost": 4,
+    "prereq": "None",
+    "ranks": null,
+    "category": "Trade",
+    "description": "Almost all can go about their daily tasks - but few have the internal processes, drive, and motivational elbow grease to truly get things done. A character with Hustle is entitled to submitting one background action between events, and is entitled to a response from staff. The bodies of these background actions should not be longer than 250 words. These submissions should include what the character is doing, context as to why and what they hope to achieve, as well as supporting information, resources, items, or contacts they have. Note - Hustle does not guarantee that these actions will be successful, only that they will be considered and responded to by staff in a way that is appropriate for the support/actions taken. Submissions must be sent at least two weeks prior to the pre-registration deadline."
+  },
+  {
+    "name": "Basic Locks",
+    "cost": 5,
+    "prereq": "None",
+    "ranks": null,
+    "category": "Thieving",
+    "description": "The character can attempt to pick mundane locks (see the Traps and Locks section of the Core Rules). Without this skill, characters will always fail to pick locks of all kinds. Generally, a character must carry their own physrepped lockpicks."
+  },
+  {
+    "name": "Basic Traps",
+    "cost": 5,
+    "prereq": "None",
+    "ranks": null,
+    "category": "Thieving",
+    "description": "This skill allows a character to attempt to disarm traps (see the Traps and Locks section of the Core Rules). Without this skill any attempt to manipulate a trap, including moving it, cutting wires, or anything else (other than simply avoiding it) will set the trap off, even if the trigger is not activated. The character with this skill may use props at hand, tools, or in-game items to stop the trap from going off. If the trap does go off, making its noise or performing whatever action indicates that it has been sprung, then the trap has gone off normally. There is no default prohibition about what can be done to the trap (i.e. wires can be cut, mechanisms jammed, etc.). However, the trap prop itself should not be damaged. In addition, this Skill allows the character to read the front of a Trap card, if it is able to be seen without moving it. This will generally reveal the trigger conditions for the trap, and may even automatically disable the trap."
+  },
+  {
+    "name": "Advanced Traps",
+    "cost": 4,
+    "prereq": "Basic Traps",
+    "ranks": null,
+    "category": "Thieving",
+    "description": "This skill allows a character three specific benefits. First, when disarming a Trap (Latch or Triggered), they may be able to keep the trap card if they disarm the Trap successfully (Staff Discretion). Second, characters that have unused Latch or Trigger traps may set them. The exact details of the set trap must be noted with the trap itself, and the original description card of the trap mechanism must be included. Third, they may, once per Long Rest when able to see a Trap Card call “Subtle Discern: What are the effects of that Trap?” and may walk over and examine both sides of the Trap card, reading it to themselves. They are not in any way protected during this time."
+  },
+  {
+    "name": "Fence",
+    "cost": 3,
+    "prereq": "None",
+    "ranks": null,
+    "category": "Thieving",
+    "description": "The character can turn in treasure and resources to Staff overnight, or between games, and sell them. Basic or Uncommon Resources will return 1 Wealth each. Crafted items will return either half the value of the components (chosen by staff), or 1 Wealth for Apprentice-level recipes, 2 for Journeyman-level recipes, or 3 for Greater-level recipes, whichever is higher. Recipes that produce multiple doses will be marked down appropriately for the number of doses being Fenced, and values of less than 1 Wealth will be rounded down to zero. Items with a duration will be discounted based on the remaining duration. Items that do not fall under the Crafting system will have their return determined by Staff."
+  },
+  {
+    "name": "Poisoner",
+    "cost": 1,
+    "prereq": "None",
+    "ranks": null,
+    "category": "Thieving",
+    "description": "This skill allows the character to apply poisons to weapons or other implements. Similarly, the poisoner can add poison cards to non-clear drinks. Without this skill, a character attempting to apply poison to a drink or to an implement will also take the effects of the poison. Should the character later learn Apprentice Alchemy, the cost of that skill is reduced by one."
+  },
+  {
+    "name": "Forage I",
+    "cost": 3,
+    "prereq": "None",
+    "ranks": null,
+    "category": "Gathering",
+    "description": "The character can forage Bloom and Night Prizes from the wilderness. Bloom are usually represented by a small bundle of herbs tied with yellow twine or ribbon. Night Prizes are usually represented by small mushrooms tied with blue yarn or ribbon, and may be bioluminescent. Bloom and Night Prizes may be laying on the ground individually, or may be part of a “patch” indicated either by some kind of container or an associated information card. A Forager should only take 1 from a patch per Event per rank of Forage, unless there are instructions nearby to do otherwise. Anyone can see Bloom, Night Prizes and associated patches, but only those with the Forage skill can collect it (or do anything with it). In order to collect it, you must use a sickle or small bladed tool and roleplay for a Quick 30, slowly collecting up the bundle of Bloom or Night Prizes. The character can Forage up to 15 Bloom and 7 Night Prizes per Event. In addition, certain resources are gated behind each rank of this skill, allowing those with greater proficiency to gather more difficult to obtain resources."
+  },
+  {
+    "name": "Forage II",
+    "cost": 3,
+    "prereq": "Forage I",
+    "ranks": null,
+    "category": "Gathering",
+    "description": "The character can Forage up to 30 Bloom and 14 Night Prizes per Event. In addition, certain resources are gated behind each rank of this skill, allowing those with greater proficiency to gather more difficult to obtain resources."
+  },
+  {
+    "name": "Forage III",
+    "cost": 3,
+    "prereq": "Forage II, Character Level 10",
+    "ranks": null,
+    "category": "Gathering",
+    "description": "The character can Forage up to 45 Bloom and 21 Night Prizes per Event. In addition, certain resources are gated behind each rank of this skill, allowing those with greater proficiency to gather more difficult to obtain resources. Notably, Golden Blossom Seed for example may only be Foraged by rank 3 Foraging."
+  },
+  {
+    "name": "Scavenge I",
+    "cost": 3,
+    "prereq": "None",
+    "ranks": null,
+    "category": "Gathering",
+    "description": "The character can scavenge Hide, Harvest, and Raw Scale from all manner of creatures. For animals this may represent skinning them while for humanoids it might represent breaking down their gear for parts. A character with this skill can use a knife or other sharp tool (not a sword or any weapon of Hand size or larger) to roleplay skinning, scavenging, and harvesting parts from the target for a Quick 100 and will let the portrayer know they are using Scavenging and what rank. The call for this is “Instruction: Give me your Scavenging Token, Rank 1.” The NPC will turn over their Rank 1 Scavenging Token if they possess one. Occasionally, some side effects can occur, happening more often with higher value Scavenging Tokens: the Scavenger may be burned by acidic blood, or catch a disease, or be poisoned by exploding stomach gasses. The portrayer of the creature will Call these negative effects. The Scavenger will take the tokens at their convenience to Player Logistics and provide it to draw from a deck that corresponds to the Rank of token they turn in. Tokens should not be given to other Scavengers to turn in, you must turn in your own tokens. The card the Scavenger draws from the deck will provide them a yield based on the ranks of Scavenger they possess (I, II, or III). Once they have determined the total yield of all their tokens they will receive those reps from Player Logistics."
+  },
+  {
+    "name": "Scavenge II",
+    "cost": 3,
+    "prereq": "Scavenging I",
+    "ranks": null,
+    "category": "Gathering",
+    "description": "The call for Scavenging changes to “Instruction: Give me your Scavenging Tokens, up to Rank 2.” Additionally, the time it takes to Scavenge them is reduced to a Quick 50 plus the time it takes you to receive the token from the portrayer. Yields from the Scavenging decks will also be improved."
+  },
+  {
+    "name": "Scavenge III",
+    "cost": 3,
+    "prereq": "Scavenging II, Requires Level 10",
+    "ranks": null,
+    "category": "Gathering",
+    "description": "The call for Scavenging changes to “Instruction: Give me your Scavenging Tokens, up to Rank 3.” Additionally, the time it takes to Scavenge them is reduced to a Quick 30 plus the time it takes you to receive the token from the portrayer. Yields from the Scavenging decks will also be improved."
+  },
+  {
+    "name": "Prospect I",
+    "cost": 3,
+    "prereq": "None",
+    "ranks": null,
+    "category": "Gathering",
+    "description": "The character can prospect for Rare Minerals or metal Ingots from the wilderness. Characters may discover mines that can be used to prospect for Ingots, or deposits where Rare Minerals can be collected. At either a mine or a deposit, the character should read the information card (and only characters with this skill can read the information card) at each location for specific information. Normally, the information card will require the Prospector to draw from a “mining deck” which will inform the Prospector of the result of the mining session. By default, the character actively roleplays for a Slow 180 in order to gain anything from it. Roleplaying requires the use of a mining hammer, which if broken as part of prospecting requires repairs before the Prospector may continue. Multiple characters can use the mine or deposit at the same time. After the required duration, the character will follow the instructions on the information card, usually drawing from the mining deck and gaining resources or taking an effect or damage that corresponds to the level of Prospecting the character possesses. Some of these cards may indicate something bad happening to the character like a rockslide or inhaling poisonous fumes. In these cases the effect will also be written on the card. The character may prospect at each mine or deposit once per Long Rest. For Example: Roger finds one deposit, and knows the location of two mines. After a Long Rest, he makes a circuit, stopping at the deposits and mines, spending three minutes at each, to prospect. At each one he receives a number of metal Ingots (mine) or Minerals (deposit), but can’t find any Mithril Ore since he doesn’t have Prospect III. He can’t get anything more from any of those three locations until after the next Long Rest. After the Long Rest, he then can prospect again at each location."
+  },
+  {
+    "name": "Prospect II",
+    "cost": 3,
+    "prereq": "Prospect I",
+    "ranks": null,
+    "category": "Gathering",
+    "description": "Higher ranks of prospecting are more likely to yield Rare Minerals."
+  },
+  {
+    "name": "Prospect III",
+    "cost": 3,
+    "prereq": "Prospect II, Character Level 10",
+    "ranks": null,
+    "category": "Gathering",
+    "description": "Higher ranks of prospecting are more likely to yield Rare Minerals. Additionally, Mithril Ore will only be obtainable by characters with Rank 3 Prospecting."
+  },
+  {
+    "name": "Apprentice Alchemy",
+    "cost": 3,
+    "prereq": "None",
+    "ranks": null,
+    "category": "Crafting",
+    "description": "The character can craft potions, poisons, drugs and other alchemical items of basic difficulty. These can include healing potions, mana potions, and alcohol. The character can also safely poison objects. Without this skill, a character attempting to apply poison to an item will also take the effects of the poison."
+  },
+  {
+    "name": "Journeyman Alchemy",
+    "cost": 4,
+    "prereq": "Apprentice Alchemy, 4th level character",
+    "ranks": null,
+    "category": "Crafting",
+    "description": "The character can craft potions, poisons, drugs and other alchemical items of intermediate difficulty."
+  },
+  {
+    "name": "Greater Alchemy",
+    "cost": 5,
+    "prereq": "Journeyman Alchemy, 10th level character",
+    "ranks": null,
+    "category": "Crafting",
+    "description": "The character can craft potions, poisons, drugs and other alchemical items of third-tier difficulty."
+  },
+  {
+    "name": "Apprentice Tinkering",
+    "cost": 3,
+    "prereq": "None",
+    "ranks": null,
+    "category": "Crafting",
+    "description": "The character can craft Apprentice tier engineering and tinkering items. These can include armor patch kits, basic items such as swords, and other engineered items."
+  },
+  {
+    "name": "Journeyman Tinkering",
+    "cost": 4,
+    "prereq": "Apprentice Tinkering, 4th level character",
+    "ranks": null,
+    "category": "Crafting",
+    "description": "The character can craft Journeyman tier engineering and tinkering items."
+  },
+  {
+    "name": "Greater Tinkering",
+    "cost": 5,
+    "prereq": "Journeyman Tinkering, 10th level character",
+    "ranks": null,
+    "category": "Crafting",
+    "description": "The character can craft Greater tier engineering and tinkering items."
+  },
+  {
+    "name": "Apprentice Enchanting",
+    "cost": 3,
+    "prereq": "None",
+    "ranks": null,
+    "category": "Crafting",
+    "description": "The character can pull Essences from the Reality Tear and enchant basic items for a period of time. These can give extra armor or more miraculous effects."
+  },
+  {
+    "name": "Journeyman Enchanting",
+    "cost": 4,
+    "prereq": "Apprentice Enchanting, 4th level character",
+    "ranks": null,
+    "category": "Crafting",
+    "description": "The character can pull multiple pieces of Essence from the Reality Tear and enchant more advanced items for a period of time."
+  },
+  {
+    "name": "Greater Enchanting",
+    "cost": 5,
+    "prereq": "Journeyman Enchanting, 10th level character",
+    "ranks": null,
+    "category": "Crafting",
+    "description": "The character can pull multiple pieces of Essence from the Reality Tear and enchant even more advanced items."
+  },
+  {
+    "name": "Apprentice Ritual Magic",
+    "cost": 1,
+    "prereq": "None",
+    "ranks": null,
+    "category": "Crafting",
+    "description": "The character can perform any Apprentice rituals. To learn how to cast a ritual, see the Rituals document. Additionally allows a character to read and learn a ritual of Apprentice level if found during play."
+  },
+  {
+    "name": "Journeyman Ritual Magic",
+    "cost": 2,
+    "prereq": "Apprentice Ritual Magic skill, 4th level character",
+    "ranks": null,
+    "category": "Crafting",
+    "description": "The character can perform any Journeyman rituals. To learn how to cast a ritual, see the Rituals document. Additionally allows a character to read and learn a ritual of Journeyman level if found during play."
+  },
+  {
+    "name": "Greater Ritual Magic",
+    "cost": 3,
+    "prereq": "Journeyman Ritual Magic, 10th level character",
+    "ranks": null,
+    "category": "Crafting",
+    "description": "The character can perform any Greater rituals. To learn how to cast a ritual, see the Rituals document. Additionally allows a character to read and learn a ritual of Greater level if found during play."
+  },
+  {
+    "name": "Mastercrafter",
+    "cost": 4,
+    "prereq": "Greater rank of one Crafting Skill and Profession - Apprentice.",
+    "ranks": null,
+    "category": "Crafting",
+    "description": "Once ever, the crafter may create an item that they can submit to Staff for a master craft. A mastercrafted item has additional effects and powers, and is often the pinnacle of a crafter’s career. Often completing this master craft will require additional steps, special locations, and special materials. If the Mastercrafted item falls into a category of item for which the character has Profession skill (such as Tinkering a sword and having Profession - Weaponsmith), the chances of good or multiple boons will be increased. Exceptional, immersive items (items submitted for a boon along with a physical prop of high production value) that are submitted have a chance of gaining more powerful boons than others. The build points spent on this skill may never be refunded once the item is created. Character Options There are a number of things that define a person, and most of those things are not skills, or professions, or weapon choices. In this section you will find Perks and Flaws. Perks are generally things that will add to the power or diversity of a character, and cost Build Points to buy. Flaws are generally things that will make life harder, and may give extra Build Points. A character can gain up to 5 Build Points for taking the below flaws. These Build Points can be spent on Perks, Skills, or Divine Domain Powers."
+  }
+]
