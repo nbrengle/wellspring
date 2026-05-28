@@ -1,0 +1,329 @@
+[
+  {
+    "name": "Berserk",
+    "variants": [],
+    "description": "Causes the Berserk Condition.",
+    "causesCondition": "Berserk"
+  },
+  {
+    "name": "Charm",
+    "variants": [],
+    "description": "Causes the Charmed Condition.",
+    "causesCondition": "Charmed"
+  },
+  {
+    "name": "Cure",
+    "variants": [
+      {
+        "form": "Cure [Condition or Accent]",
+        "description": "Removes the stated Condition, or if an Accent was called, all Conditions that were caused by that Accent. Note: Cure cannot be used on Inherent conditions (see the Modifiers section for more info)."
+      }
+    ],
+    "description": "Removes the stated Condition, or if an Accent was called, all Conditions that were caused by that Accent. Note: Cure cannot be used on Inherent conditions (see the Modifiers section for more info)."
+  },
+  {
+    "name": "Death",
+    "variants": [],
+    "description": "Cause the target to die."
+  },
+  {
+    "name": "Disable",
+    "variants": [
+      {
+        "form": "Disable [Limb]",
+        "description": "Causes the Disabled Condition to one limb. If no limb is specified, this is whichever limb is struck by the attack. If no limb is specified and the attack does not strike a limb, the target of the attack can choose which limb is Disabled."
+      }
+    ],
+    "description": "Causes the Disabled Condition to one limb. If no limb is specified, this is whichever limb is struck by the attack. If no limb is specified and the attack does not strike a limb, the target of the attack can choose which limb is Disabled.",
+    "causesCondition": "Disabled"
+  },
+  {
+    "name": "Disarm",
+    "variants": [
+      {
+        "form": "Disarm [Equipment/Limb]",
+        "description": "A \"Disarm\" call requires naming a hand-held item or a limb. The specified item, or one held by that limb, must be dropped. If a shield is named (or worn on the limb), the arm must extend straight down to allow the shield to fall. Unless a duration is specified, Disarm is instantaneous, and the item can be picked up immediately. Any stated duration dictates how long the item remains inaccessible."
+      }
+    ],
+    "description": "A \"Disarm\" call requires naming a hand-held item or a limb. The specified item, or one held by that limb, must be dropped. If a shield is named (or worn on the limb), the arm must extend straight down to allow the shield to fall. Unless a duration is specified, Disarm is instantaneous, and the item can be picked up immediately. Any stated duration dictates how long the item remains inaccessible."
+  },
+  {
+    "name": "Discern",
+    "variants": [
+      {
+        "form": "Discern [Information]",
+        "description": "The target must answer the question given in the Call. The Call and response are out of game and the response must be truthful (unless a Power allows otherwise). Unless the Subtle modifier is used, the contents of the question are understood by observers, but the response should be ignored (i.e. the player must act as if she has not heard the answer to the Discern)."
+      }
+    ],
+    "description": "The target must answer the question given in the Call. The Call and response are out of game and the response must be truthful (unless a Power allows otherwise). Unless the Subtle modifier is used, the contents of the question are understood by observers, but the response should be ignored (i.e. the player must act as if she has not heard the answer to the Discern)."
+  },
+  {
+    "name": "Dispel",
+    "variants": [
+      {
+        "form": "Dispel [Condition, Accent, or Description]",
+        "description": "Dispel is a more powerful form of Cure. It can be used to remove Conditions, anything that came from a specific Accent, anything Granted by another Power, or other specific things that are noted in the Call. In general, Dispel is used to remove Conditions without the character’s consent. Note: Dispel cannot be used on Inherent conditions (see the Modifiers section for more info)."
+      }
+    ],
+    "description": "Dispel is a more powerful form of Cure. It can be used to remove Conditions, anything that came from a specific Accent, anything Granted by another Power, or other specific things that are noted in the Call. In general, Dispel is used to remove Conditions without the character’s consent. Note: Dispel cannot be used on Inherent conditions (see the Modifiers section for more info)."
+  },
+  {
+    "name": "Dominate",
+    "variants": [],
+    "description": "Causes the Dominated Condition.",
+    "causesCondition": "Dominated"
+  },
+  {
+    "name": "Drain",
+    "variants": [],
+    "description": "Causes the Drained Condition.",
+    "causesCondition": "Drained"
+  },
+  {
+    "name": "Expose",
+    "variants": [],
+    "description": "An Expose Call usually uses a Voice Delivery and includes a Qualifier, such as “By My Voice to Clerics, Expose.” Any character that qualifies must respond to the Call with a verbal response that reveals her location, such as “Here.” The verbal response is an out-of-game abstraction for the target becoming perceivable in-game. (Note: if you are hiding and do not qualify, you can stay silent rather than saying “No Effect”.)"
+  },
+  {
+    "name": "Grant",
+    "variants": [
+      {
+        "form": "Grant [Number] Barrier",
+        "description": "This gives the target additional Armor Points. These Armor Points cannot be Mended."
+      },
+      {
+        "form": "Grant [Number] [Type] Armor",
+        "description": "Gives the target a number of Armor Points. These Armor Points can be Mended. This will not add to existing armor, but will only replace it."
+      },
+      {
+        "form": "Grant Plus [Number] Armor",
+        "description": "Adds a number of Armor Points to the target’s current and maximum Armor Points. This can only be used on a target with existing armor (either physical, natural, or summoned)."
+      },
+      {
+        "form": "Grant [Number] Spikes",
+        "description": "Gives the target a number of additional Spikes. These Spikes can be refreshed unless otherwise stated."
+      },
+      {
+        "form": "Grant Plus [Number] Spike Damage",
+        "description": "Adds to the damage that the target deals when spending a Spike."
+      },
+      {
+        "form": "Grant Plus [Number] Damage",
+        "description": "Adds to the constant damage that the target does. (This is very rare.) The target’s attack must already have a base damage value in order to increase it."
+      },
+      {
+        "form": "Grant [Accent]",
+        "description": "Gives the target the ability to change or add the Accent for all Effects and Damage the target does. Note: Accents granted in this way can replace the normal Accent of the Power."
+      },
+      {
+        "form": "Grant [Condition] or [Type]",
+        "description": "The Grant Effect can be used to give Conditions or Types directly. Grant Melee Immunity, Grant Undead are examples of this."
+      },
+      {
+        "form": "Grant [Number] Dark Territory",
+        "description": "Adds the number indicated to the Dark Territory for all Rituals cast by the target for the duration. This can be negative, in which case the number would be subtracted instead."
+      },
+      {
+        "form": "Grant Plus [X] Maximum Life Points",
+        "description": "Adds to the current and maximum Life Points of the target. These points can be healed as normal."
+      },
+      {
+        "form": "Grant [Other]",
+        "description": "Grant can be used in a number of other ways at staff discretion, but will always be communicated as clearly as possible."
+      }
+    ],
+    "description": "Using the Grant Effect applies one of the following Conditions. By default, these Conditions are considered a Bonus, and subject to Stacking (see the Stacking Effects section)."
+  },
+  {
+    "name": "Grant Protect",
+    "variants": [
+      {
+        "form": "Grant Protect Vs. [Accent, Effect, Delivery, Damage, or Description]",
+        "description": "This gives the target one “Protect” against the listed type given. (See the Defense Calls sections for more information.)"
+      }
+    ],
+    "description": "This gives the target one “Protect” against the listed type given. (See the Defense Calls sections for more information.)"
+  },
+  {
+    "name": "Grant Power",
+    "variants": [
+      {
+        "form": "Grant Power [Description/Power Name]",
+        "description": "This gives the target character some ability which is too complex to be handled by Imbue. This always requires a full explanation of what is being given, and in general is limited to out of combat Powers."
+      }
+    ],
+    "description": "This gives the target character some ability which is too complex to be handled by Imbue. This always requires a full explanation of what is being given, and in general is limited to out of combat Powers."
+  },
+  {
+    "name": "Heal",
+    "variants": [
+      {
+        "form": "Heal [Number] or [to Full]",
+        "description": "Restores the number of Life Points stated, up to the target’s maximum. “Heal to Full” or “Heal to Full Life Points” sets the creature’s Life Points to their maximum and will fully Mend natural armor."
+      }
+    ],
+    "description": "Restores the number of Life Points stated, up to the target’s maximum. “Heal to Full” or “Heal to Full Life Points” sets the creature’s Life Points to their maximum and will fully Mend natural armor."
+  },
+  {
+    "name": "Imbue",
+    "variants": [
+      {
+        "form": "Imbue [Delivery] with [Call]",
+        "description": "Imbue is used to give one use of a Power to another individual. Imbued Effects can have a Duration, but the Imbue Call itself cannot be given Accents or Modifiers. Example: “Short Imbue Weapon with Wounding 5 by Flame” would allow the target to call “Wounding 5 by Flame” once with their weapon, any time before their next short rest."
+      }
+    ],
+    "description": "Imbue is used to give one use of a Power to another individual. Imbued Effects can have a Duration, but the Imbue Call itself cannot be given Accents or Modifiers. Example: “Short Imbue Weapon with Wounding 5 by Flame” would allow the target to call “Wounding 5 by Flame” once with their weapon, any time before their next short rest."
+  },
+  {
+    "name": "Imprison",
+    "variants": [],
+    "description": "Causes the Imprisoned Condition.",
+    "causesCondition": "Imprisoned"
+  },
+  {
+    "name": "Intoxicate",
+    "variants": [],
+    "description": "Causes the Intoxicated Condition.",
+    "causesCondition": "Intoxicated"
+  },
+  {
+    "name": "Mend",
+    "variants": [
+      {
+        "form": "Mend [Number] or [to Full]",
+        "description": "Restores the number of Armor Points stated, up to the target’s maximum. “Mend to Full”' sets the target’s Armor Points to their maximum. Mend does not work on Shattered armor or items, which must be Rebuilt instead."
+      }
+    ],
+    "description": "Restores the number of Armor Points stated, up to the target’s maximum. “Mend to Full”' sets the target’s Armor Points to their maximum. Mend does not work on Shattered armor or items, which must be Rebuilt instead."
+  },
+  {
+    "name": "Obey",
+    "variants": [
+      {
+        "form": "Obey [Command]",
+        "description": "Obey [Command] - Causes the Obedient Condition. (Note: This will not cause any physical or romantic roleplay that is not consented to by both or all involved characters.)"
+      }
+    ],
+    "description": "Obey [Command] - Causes the Obedient Condition. (Note: This will not cause any physical or romantic roleplay that is not consented to by both or all involved characters.)",
+    "causesCondition": "Obedient"
+  },
+  {
+    "name": "Obfuscate",
+    "variants": [
+      {
+        "form": "Obfuscate [Discern/Expose]",
+        "description": "Causes the Obfuscated Condition."
+      }
+    ],
+    "description": "Causes the Obfuscated Condition.",
+    "causesCondition": "Obfuscated"
+  },
+  {
+    "name": "Piercing",
+    "variants": [
+      {
+        "form": "Piercing [Number]",
+        "description": "Piercing damage bypasses any Armor Points (including Barrier) and directly harms Life Points. Note that Piercing is considered both an Effect and damage."
+      }
+    ],
+    "description": "Piercing damage bypasses any Armor Points (including Barrier) and directly harms Life Points. Note that Piercing is considered both an Effect and damage."
+  },
+  {
+    "name": "Provoke",
+    "variants": [],
+    "description": "Causes the Provoked condition.",
+    "causesCondition": "Provoked"
+  },
+  {
+    "name": "Rebuild",
+    "variants": [
+      {
+        "form": "Rebuild [Item]",
+        "description": "Makes a Shattered or broken item usable again. A suit of armor will be returned to 1 Armor Point. A weapon will be returned to full functionality. Single use, “consumable” items, such as potions and scrolls, cannot be Rebuilt if they are Shattered."
+      }
+    ],
+    "description": "Makes a Shattered or broken item usable again. A suit of armor will be returned to 1 Armor Point. A weapon will be returned to full functionality. Single use, “consumable” items, such as potions and scrolls, cannot be Rebuilt if they are Shattered."
+  },
+  {
+    "name": "Refresh",
+    "variants": [
+      {
+        "form": "Refresh [Power, Spell-Slot, or Description of Power]",
+        "description": "By use of this Effect, a Power that has been expended can be recharged as if it had not been used. The individual Power will give the limitations of what kind of Power can be recharged. Note: The Refresh effect cannot be used on Powers that also give the Refresh effect."
+      }
+    ],
+    "description": "By use of this Effect, a Power that has been expended can be recharged as if it had not been used. The individual Power will give the limitations of what kind of Power can be recharged. Note: The Refresh effect cannot be used on Powers that also give the Refresh effect."
+  },
+  {
+    "name": "Repel",
+    "variants": [],
+    "description": "Causes the Repelled Condition.",
+    "causesCondition": "Repelled"
+  },
+  {
+    "name": "Revive",
+    "variants": [],
+    "description": "If dead, the recipient of a Revive will be alive with one Life Point. If used on an Undead, it will cause the creature to immediately discorporate and take Spirit Form."
+  },
+  {
+    "name": "Root",
+    "variants": [],
+    "description": "Causes the Rooted Condition.",
+    "causesCondition": "Rooted"
+  },
+  {
+    "name": "Shatter",
+    "variants": [
+      {
+        "form": "Shatter [Item]",
+        "description": "Breaks the item specified in the Call, making it unusable until Rebuilt. If armor (of any type) is Shattered, even just a single piece (such as a bracer), the whole suit of armor is reduced to zero Armor Points and cannot be Mended until Rebuilt. A Shattered weapon is broken and cannot be used to do damage or block, until Rebuilt."
+      }
+    ],
+    "description": "Breaks the item specified in the Call, making it unusable until Rebuilt. If armor (of any type) is Shattered, even just a single piece (such as a bracer), the whole suit of armor is reduced to zero Armor Points and cannot be Mended until Rebuilt. A Shattered weapon is broken and cannot be used to do damage or block, until Rebuilt."
+  },
+  {
+    "name": "Silence",
+    "variants": [],
+    "description": "Causes the Silenced Condition.",
+    "causesCondition": "Silenced"
+  },
+  {
+    "name": "Sleep",
+    "variants": [],
+    "description": "Causes the Slept Condition.",
+    "causesCondition": "Slept"
+  },
+  {
+    "name": "Slow",
+    "variants": [],
+    "description": "Causes the Slowed Condition.",
+    "causesCondition": "Slowed"
+  },
+  {
+    "name": "Stabilize",
+    "variants": [],
+    "description": "Causes a Dying target to pause their death-count until they take additional damage. After 5 minutes of being Stabilized, the target may heal 1 Life Point. Note: the target is still considered to be Dying while Stabilized."
+  },
+  {
+    "name": "Taint",
+    "variants": [],
+    "description": "Causes the Tainted Condition.",
+    "causesCondition": "Tainted"
+  },
+  {
+    "name": "Weakness",
+    "variants": [],
+    "description": "Causes the Weakened Condition.",
+    "causesCondition": "Weakened"
+  },
+  {
+    "name": "Wounding",
+    "variants": [
+      {
+        "form": "Wounding [Number]",
+        "description": "Causes the damage call to be unblockable by weapons and shields, resolving like an Effect call rather than a damage call."
+      }
+    ],
+    "description": "Causes the damage call to be unblockable by weapons and shields, resolving like an Effect call rather than a damage call."
+  }
+]

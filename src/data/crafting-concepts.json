@@ -1,0 +1,164 @@
+[
+  {
+    "name": "The Hermetic Laboratory",
+    "discipline": "Alchemy",
+    "description": "There will be a designated game space set up as a Hermetic Laboratory. This is where characters will craft all of their alchemy items. The items that will be there and used in different recipes are the following:",
+    "tools": [
+      "Large flasks/beakers/glassware to perform tests in",
+      "Small vials for final products",
+      "Antique Scale",
+      "Mortar and Pestle",
+      "Hourglass (1 minute)",
+      "Small Flame of some sort, candle or otherwise",
+      "Retort",
+      "Simple Knife for cutting",
+      "Cutting Board",
+      "Gloves",
+      "Tongs (for holding vials over heat)",
+      "Ashbin",
+      "Simple Salts (with an OOG bag for refilling nearby)",
+      "Alchemical Suspension (with an OOG container for refilling nearby)",
+      "Water (with an OOG container for refilling nearby)",
+      "Eye dropper"
+    ]
+  },
+  {
+    "name": "Corrupted Alchemy",
+    "discipline": "Alchemy",
+    "description": "Some methods of alchemical creation tap into less than savory aspects of the world, leading down darker paths. These recipes, whether Tainted by poisonous ingredients or incorporating more vile elements, Corrupted Alchemy offer unparalleled power, with a superlative cost."
+  },
+  {
+    "name": "Effects of Corrupted Alchemy",
+    "discipline": "Alchemy",
+    "description": "After using a substance that is created by Corrupted Alchemy, after completing their next Long Rest, it will cause the character to be Inherently Weakened and reduce all sources of Healing to 1 point until cured. Should the next Long Rest be the following event, the character will begin their next event with these effects. The Journeyman Alchemy recipe “Absolution” can cure this effect, though this comes with drawbacks."
+  },
+  {
+    "name": "Mana Sickness",
+    "discipline": "Alchemy",
+    "description": "A character with Mana Sickness will feel slightly nauseous every time they cast a spell. Every time the character should get Mana Sickness while they already have it, the sickness gets worse. A character who uses a substance that would give Mana Sickness who already has it, will start taking a Quick Drain Effect whenever they cast a spell. The duration of this is cumulative, so if they took a second substance that caused Mana Sickness while they already had it, every spell would cause a Drain Effect for a Quick 200. A character recovers from Mana Sickness after a Long Rest."
+  },
+  {
+    "name": "Essences",
+    "discipline": "Enchanting",
+    "description": "The most important materials for the enchanter are Essences - physical manifestations of the core building blocks of the universe. These Essences can either be immediately used (in Enchanting or other crafting skills) or may be stored for longer periods in Essence Infusions (see Alchemy). There are five types of known essences:",
+    "tools": [
+      "Weave - raw magic, volatile and awe inspiring.",
+      "Energy - electricity, heat, and dissolution.",
+      "Thought - mental energy, will, and attention.",
+      "Life - representation of life everlasting.",
+      "Spirit - the consistency of sentience after life."
+    ]
+  },
+  {
+    "name": "Drawing",
+    "discipline": "Enchanting",
+    "description": "The act of pulling the building blocks of Essence through the Reality Tear is called Drawing. Although no one can Draw without using an Enchanting Formulae to do so, all the Formulae that allow a character to pull Essences from a Reality Tear work in the following way: The character should reach into the Reality Tear, doing at least one manual stir to help push through the settling reality. Each Essence has a different feel, an energy signature that can be read by those who are sensitive to it. By feeling the faces of each block, the character may try to locate the Essence they are seeking. The Essence should be pulled out of the Reality Tear, and only then can it be visually inspected. The color of the markings on the Essence Block will give an easy way to determine which Essence has been drawn. A reference key for feeling the faces of each block can be found here:"
+  },
+  {
+    "name": "Soulholding",
+    "discipline": "Enchanting",
+    "description": "Once they know which Essence they have Drawn, the enchanter should replace the Block in the Reality Tear. The power of the Essence is now held deep within them, called soulholding, to be used quickly or stored for later. If the character leaves the Enchanting Forge, all soulheld Essences immediately lose their structure and fade to nothing. Death in and of itself does not release the Essences, but if the character discorporates and leaves the Enchanting Forge, the resources are lost. The Essence may be used in a Formulae, or preserved in an Essence Infusion (Alchemy), allowing it to survive outside the Enchanting Forge and to be used by others."
+  },
+  {
+    "name": "Unravelling Essence",
+    "discipline": "Enchanting",
+    "description": "Deep within Reality Tears exist Unraveling Essences. Unraveling Essences cannot be soulheld, and there are no known methods of storing them in Infusions. They will, however, kill you - horribly. If you draw an Unravelling Essence, marked with black paint, then you take a “Death Final” effect."
+  },
+  {
+    "name": "Formula Types",
+    "discipline": "Enchanting",
+    "description": "The most common types of Formulae are Enchant, Empower, Scribe, and Draw. An Enchanting Formulae imbues an item with an Essence. An Empower type Formulae strengthens the power of an existing magical effect or object using a variety of resources. A Draw type Formulae is how the Enchanter retrieves Essences from the Reality Tear. A Scribe type Formulae uses powerful magical inks to scribe scrolls and tomes."
+  },
+  {
+    "name": "Measuring Time & Chants",
+    "discipline": "Enchanting",
+    "description": "There are three chants used to both keep time and focus energy while enchanting. These are used in conjunction with a ring of wood, stone, or similar material, with ten notches, sigils, or other carvings. Traditionally in order to keep time, the chant would be recited and each time it was finished, the Enchanter would move their hand down the ring, continuing the chant again."
+  },
+  {
+    "name": "The Chant of Sacrifice",
+    "discipline": "Enchanting",
+    "description": "“Ashes, ashes, smoke at night, grant us sacrificial light.”"
+  },
+  {
+    "name": "The Chant of Empowerment",
+    "discipline": "Enchanting",
+    "description": "\"Force of being now ignite; rally to your inner light.\""
+  },
+  {
+    "name": "The Chant of Assignment",
+    "discipline": "Enchanting",
+    "description": "\"In this time and in this hour, inward I imbue my power.”"
+  },
+  {
+    "name": "Primal Script",
+    "discipline": "Enchanting",
+    "description": "Known to invoke great power, the Primal Script is a rarely used, but very powerful set of characters that imbues the objects they are inscribed upon with magical power. The process of inscription, along with the ritualistic actions performed are well known, but the actual reasons as to why the script is necessary, or from whence it derives its power are unclear. The commonly known sigils are presented here for reference:"
+  },
+  {
+    "name": "Attunement",
+    "discipline": "Enchanting",
+    "description": "Many Enchanted items need attunement or cause attunement. Attunement is to the Item, not the Enchantment. If these Enchantments are put on an item that is already Attuned, the Attunement will remain as it is, to the same person it was Attuned to, and will not require additional Attunement or take up additional Attunement slots."
+  },
+  {
+    "name": "The Enchanting Forge",
+    "discipline": "Enchanting",
+    "description": "In each game, there will be a designated game space setup as an Enchanting Forge. This is where characters will craft their enchantments. The Enchanting Forge has five key components: The Reality Tear is where the enchanter Draws power from the Enchanting Forge. The Circle of Sacrifice is where the enchanter normally sacrifices resources to power their enchantments. The Circle of Assignment is where the enchanter takes soulheld energy and places it into objects. The Circle of Empowerment is where the enchanter empowers objects with powerful energies. The Rune Circle is where enchanters use the Primal Script to scribe powerful enchantments and scrolls. The items that will be there and used in different formulae are the following:",
+    "tools": [
+      "The Reality Tear",
+      "5 Essences (one of each type), 1 Unravelling Essence",
+      "3 Circles around the Tear itself",
+      "A piece of each of these materials to match the Essences.",
+      "Glass",
+      "Materia",
+      "Quartz",
+      "Silver",
+      "Wood",
+      "Crystals",
+      "Resonance Fork",
+      "Bell",
+      "Foci to represent the elements",
+      "Candles - Fire",
+      "Sand - Earth",
+      "Basin of Water - Water",
+      "Breath - Air",
+      "Quills",
+      "Real Quills",
+      "Calligraphy Pens",
+      "Heat Source",
+      "Paper (different types)",
+      "Inks (different types)"
+    ]
+  },
+  {
+    "name": "Summoned Armor Repair",
+    "discipline": "Enchanting",
+    "description": "All enchanters have the ability to realign summoned armor. This has to be done at the Circle of Empowerment within the Enchanting Forge using Realign Summoned Armor. Realign Summoned Armor [Apprentice Enchanting Formula]"
+  },
+  {
+    "name": "The Tinker's Workshop",
+    "discipline": "Tinkering",
+    "description": "There will be a designated game space set up as a Tinker's Workshop. This is where characters will craft all of their Tinkered items. The items that will be there and used in different schematics are the following:",
+    "tools": [
+      "Anvil - Used to shape hot metal",
+      "Awl - Used to punch holes",
+      "Bellows - For stoking the Forge",
+      "Bucket of Water - To quench metal",
+      "Buffing Cloth - To shine or clean materials",
+      "Crucible - For holding molten metal",
+      "Forge - For heating up metal objects",
+      "Hammer - For beating objects into shape",
+      "Hourglass (any description of a “turn” signifies one turn of the hourglass, or 1 minute)",
+      "Leather Gloves - To prevent burns",
+      "Knife - For cutting",
+      "Oil - To lubricate items",
+      "Small Tools - For intricate work such as screwdrivers, picks, wrenches",
+      "Tongs - For holding hot or heating metal",
+      "Whetstone - For sharpening edges"
+    ]
+  },
+  {
+    "name": "Armor Repair",
+    "discipline": "Tinkering",
+    "description": "All tinkers have the ability to instruct others in how to fix their armor. This has to be done at the Tinker's Workshop using Supervise Armor Mending. Supervise Physical Armor Mending [Apprentice Tinkering Schematic]"
+  }
+]

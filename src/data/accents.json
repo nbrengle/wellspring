@@ -1,0 +1,77 @@
+[
+  {
+    "name": "Agony",
+    "elemental": false,
+    "description": "Wracking pain and physical torment."
+  },
+  {
+    "name": "Acid",
+    "elemental": true,
+    "description": "Caustic substances that burn chemically, eating away at flesh and bone."
+  },
+  {
+    "name": "Disease",
+    "elemental": false,
+    "description": "Plague, rot, and decay: all detrimental to the living."
+  },
+  {
+    "name": "Divine",
+    "elemental": false,
+    "description": "Associated with direct expressions of the divine: the outpouring of the raw energies of reality’s undercurrent. It is often asked “what does the divine feel like?” - but all those who have witnessed it never forget."
+  },
+  {
+    "name": "Fear",
+    "elemental": false,
+    "description": "Even the most formidable warrior is subject to fear, hesitation, and doubt."
+  },
+  {
+    "name": "Flame",
+    "elemental": true,
+    "description": "Searing heat and crackling blasts of fire to burn and incinerate."
+  },
+  {
+    "name": "Force",
+    "elemental": false,
+    "description": "Physical power generated magically or otherwise. These effects can be invisible to the eye, but more often felt as a thrumming in the air."
+  },
+  {
+    "name": "Ice",
+    "elemental": true,
+    "description": "Just as often extreme cold as actual shards of deadly ice."
+  },
+  {
+    "name": "Life",
+    "elemental": false,
+    "description": "The vibrant energy of life itself."
+  },
+  {
+    "name": "Lightning",
+    "elemental": true,
+    "description": "Blue-white bolts of electricity that crackle through the air, leaving the scent of ozone."
+  },
+  {
+    "name": "Mind",
+    "elemental": false,
+    "description": "Represents mental or psionic power, or sometimes sheer willpower."
+  },
+  {
+    "name": "Poison",
+    "elemental": false,
+    "description": "Venoms, gasses and toxins, whether natural or manufactured."
+  },
+  {
+    "name": "Radiant",
+    "elemental": false,
+    "description": "Brilliant blinding light."
+  },
+  {
+    "name": "Shadow",
+    "elemental": false,
+    "description": "Crushing blinding darkness."
+  },
+  {
+    "name": "Void",
+    "elemental": false,
+    "description": "Suffocating nothingness: usually from the creatures of the Void."
+  }
+]

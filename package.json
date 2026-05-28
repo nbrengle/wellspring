@@ -7,7 +7,10 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "parse": "node scripts/parse-megadoc.js"
+    "parse": "node scripts/parse-megadoc.js",
+    "link": "node scripts/link-refs.js",
+    "link:audit": "node scripts/link-audit.js",
+    "doc:feedback": "node scripts/doc-feedback.js"
   },
   "dependencies": {
     "react": "^19.2.6",

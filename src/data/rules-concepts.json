@@ -1,0 +1,142 @@
+[
+  {
+    "name": "Character Submission Form",
+    "section": "Character Creation",
+    "description": "Note: By default, player characters are from Auros. Making characters from other locations is possible, but requires that you read the disclaimer in “The Main Camera of the Story” section of the Setting doc. Feel free to reach out to staff for any clarification on this. Your character is ready to play!"
+  },
+  {
+    "name": "Retraining",
+    "section": "Advancement",
+    "description": "Each time you advance a level in a Class, you may also choose one of the following: * Remove a Tiered Power your character currently has and gain a new Tiered Power of the same Tier in the Class you are leveling into. * Remove a Known Spell and replace it with a spell from the Class you are leveling into. * Remove a Cantrip or Utility Power and choose another (of either) in the Class you are leveling into. Tiered Power, Utility Power, and Cantrip alterations must remain within the limits set from the character’s Base Class Progression Table."
+  },
+  {
+    "name": "Building a New Character After Permadeath",
+    "section": "Advanced Classes",
+    "description": "If your character permanently dies (or if you choose to permanently retire them) after the three-game free rebuild period, the following mechanics will apply to your next character: * They will retain all previously accrued Experience Points and Build Points. * They will not retain any in-character knowledge or possessions from the previous character. * If a Legacy Item has been awarded, a new Legacy Item for the new character will be created (see  for more details)."
+  },
+  {
+    "name": "No Tests of Strength",
+    "section": "Combat Rules",
+    "description": "After each swing hits a valid target or is blocked, then you should pull your weapon away to begin a new swing. If your swing is blocked, you may not continue physically pushing against the player with your weapon. You are also not allowed to physically pin or trap an opponent’s weapon."
+  },
+  {
+    "name": "Physical Contact",
+    "section": "Combat Rules",
+    "description": "In combat, you may only tag other players with a weapon or packet. If you use a Power with the range “Touch” on a willing or Helpless target, you may physically tag players on the shoulder. Out of combat, you may only touch other players if you have express OOG permission. It is your responsibility to gauge your proximity to others and ensure you do not collide with players in combat."
+  },
+  {
+    "name": "Speed of Combat",
+    "section": "Combat Rules",
+    "description": "When making uncalled swings or swings for numerical damage in melee, players must pull back at least 45 degrees and change the targeted location between each swing. In addition, when delivering a Called Effect (i.e. not just damage), players should allow a “beat” of time between each attack that lands on their target, in order for the defender to call a defense. Attackers should calibrate their Call speed to how quickly their attacks are acknowledged, so that the defender can process the attacks correctly. Conversely, defenders, as a courtesy, should ensure each attack that lands is acknowledged, either with a defense call, roleplaying the impact or effect, or saying “got it.” Additionally, if a player is moving and takes an attack, they may only continue moving if they immediately resolve the attack."
+  },
+  {
+    "name": "Weapon Safety",
+    "section": "Combat Rules",
+    "description": "All melee weapons, ranged weapons, and shields brought to the game must be approved by a Safety Marshal before use. See the Weapon Construction document for more details on approved weapons. Weapons should not be used to thrust."
+  },
+  {
+    "name": "Valid Hits",
+    "section": "Combat Rules",
+    "description": "A melee hit is considered valid if it lands solidly on the target as part of its initial swing. Once a hit has been blocked, angling the weapon to contact the target before pulling back is not valid. Hands holding melee weapons are not valid targets, and garb outside of the player’s silhouette (such as a flowing cloak) also does not count. Weapon attacks should never be aimed at the head, neck, or groin and any accidental hits to those locations are not valid."
+  },
+  {
+    "name": "Blocking Hits",
+    "section": "Combat Rules",
+    "description": "Weapons and shields can block any attack that starts with a number, i.e. a damaging attack with no additional Effects such as Wounding or Piercing. This applies to any physically delivered attack, whether via a melee weapon, projectile, or packet. Uncalled damage swings can also be blocked. Any attack that starts with a word, i.e. an Effect or Wounding/Piercing damage, cannot be blocked - if the attack lands anywhere on the target or their equipment, they must resolve the attack."
+  },
+  {
+    "name": "Proficiency",
+    "section": "Combat Rules",
+    "description": "Characters can only use weapons or shields in combat that they have proficiency with. Proficiencies are Skills that can be purchased or gained through taking Class levels. If a character attempts to use a weapon that they are not proficient with, they cannot deal damage or block with it, and incoming attacks go through the weapon or shield as if it hit their limb."
+  },
+  {
+    "name": "Natural Weapons",
+    "section": "Combat Rules",
+    "description": "A character using claws, tentacles, or other natural weapons will be represented using red weapons, or weapons with prominent red markings. Natural weapons cannot be dropped, looted, or Disarmed. If a natural weapon takes a Disarm effect, it is Altered to a Disable effect. If it is Shattered, it is no longer usable and hits to that weapon are considered to have landed on the limb. Shields can also be marked as “natural” and follow the same rules."
+  },
+  {
+    "name": "Short Rests",
+    "section": "Rests",
+    "description": "A character completes a short rest when they have spent 5 minutes out of combat, not actively Dying, and having used no Powers. A character who completes a short rest refreshes their Spikes up to their maximum. Short duration conditions will end, and Powers with a Refresh of Short Rest will become available again."
+  },
+  {
+    "name": "Long Rests",
+    "section": "Rests",
+    "description": "A character completes a long rest at 7am and 7pm each in-game day. Long duration conditions will end, and Powers with a Refresh of Long Rest will become available again. Completing a Long Rest also counts as completing a Short Rest."
+  },
+  {
+    "name": "Power Requirements",
+    "section": "Powers",
+    "description": "Some Powers have specific conditions or requirements in order to be used or Refreshed. The common keywords referenced in Power requirements are the following:"
+  },
+  {
+    "name": "Focus",
+    "section": "Powers",
+    "description": "If an action requires a Focus count to complete, the character must spend the count silently concentrating or meditating, and cannot move or take any other actions during the Focus count. If a Focus count is interrupted by resolving damage or Effects, the Focus count must be restarted from the beginning."
+  },
+  {
+    "name": "Sacrifice",
+    "section": "Powers",
+    "description": "If a Power requires a character to “sacrifice” a resource (usually Life Points), the Power cannot be used unless the character has that resource available to spend, and the character cannot apply any defenses to the sacrifice (including Immunity)."
+  },
+  {
+    "name": "Attunement",
+    "section": "Items",
+    "description": "Magic items may require Attunement (often via a ritual) to use their magic. New items may have unique attunement instructions. By default, a character can attune to a maximum of three magic items at once. Un-attuning any number of items is possible during a Long Rest."
+  },
+  {
+    "name": "Signature Items",
+    "section": "Items",
+    "description": "Some very powerful Magic Items are listed as Signature Items. These are always items that require Attunement to use, and no character can have more than one Signature Item Attuned to themself at any one time by normal means."
+  },
+  {
+    "name": "Divine Relics",
+    "section": "Items",
+    "description": "This is a special, mysterious category of magic items that are associated with a Devotion or Divine Being. These items cannot be Identified with standard magic, and typically have very specific limitations on who can use or wield them."
+  },
+  {
+    "name": "Locks",
+    "section": "Core Rules - Miscellaneous",
+    "description": "Locks, whether provided by staff or by players, should be physrepped by simple “diary” or luggage locks, and attached to the relevant latch but not actually keeping it closed (in case someone needs to access the inside OOG). They must be physically picked before the character can open the latch in-game, but the actual difficulty is intended to be low for anyone who has the in-game skill. The Shatter effect will bypass a lock, but will set off any associated Latch Traps. All locks will have an associated “Trap” card, even if the lock is not trapped. If a lockpicking attempt begins and fails (i.e. the lockpicker takes damage, or uses another power), the person failing it should open the card and read the effect of the trap."
+  },
+  {
+    "name": "Traps",
+    "section": "Core Rules - Miscellaneous",
+    "description": "In-game traps will have a physrepped triggering object, along with an Information Card describing its effects. By default, a character may not physically interact with a trap physrep in any way without setting it off. When the trap goes off, everyone nearby should stop until the card on the trap is read, describing the area and the effect of the trap. If a Marshal is present, they will read the information card aloud, but if not, the nearest player should move to read the card and then return to where they started."
+  },
+  {
+    "name": "Trap Information Cards",
+    "section": "Core Rules - Miscellaneous",
+    "description": "All Traps and any locks need a trap information card to go with them. It can be of any size but needs to be able to be viewable from about ten feet, although not necessarily obvious until after the trap has been activated. On the outside it should have the word “Trap” and a description of the kind of thing that sets it off (“opening the door”). On the inside or back of the information card, should be all the details of the trap. These details will include who is affected by the trap, what it does, any Effects, etc. If a trap is set in a container no larger than 3 feet in any dimension, by default, setting it off will apply a Shatter Effect to everything inside the area regardless of the other Effect(s) of the trap. Generally, this means that Wealth, items, paper, and everything else inside will be destroyed and cannot be taken from the box. After a trap is set off, the card will also have information as to what should be done with the card. Often, it should be discarded (taken to the Ashbin), but other times it will need to be put back in place."
+  },
+  {
+    "name": "Disarming Traps",
+    "section": "Core Rules - Miscellaneous",
+    "description": "If the character interacting with the object has the Basic Traps Skill, they may attempt to disarm the Trap per the Skill. Characters with the Advanced Traps Skill may keep the Trap Card, if they are successful at disarming it. A trigger trap may be disarmed by any means which does not permanently damage the trap prop. Permanent damage means treating the trap in such a way that a Marshal cannot fix the damage within ten minutes or needs a tool. For Example: popping a battery clip off a battery, untying a trip line, or carefully unsetting a mousetrap (so that it does not snap shut) can all represent the disarming of the trap. Conversely, a trap cannot require specific tools to disarm (If the only way to prevent a trap from making a noise requires a screwdriver to open the battery compartment, that trap isn’t valid)."
+  },
+  {
+    "name": "Green",
+    "section": "Nighttime Content",
+    "description": "This Consent Status is marked with a Green door hanger, indicating that the cabin is open to nighttime NPC encounters of all types, from peaceful roleplay encounters, up to violent, combat-based, or strongly emotionally-engaging content. This is the default state of all player cabins, and a lack of a colored door hanger will be interpreted as “Green.”"
+  },
+  {
+    "name": "Yellow",
+    "section": "Nighttime Content",
+    "description": "This Consent Status is marked with a Yellow door hanger, indicating that the cabin is open to nighttime NPC encounters of limited types, including peaceful roleplay encounters, messengers, or invitations to more strenuous encounters outside the cabin, such as module hooks, which may include combat, or other more strenuous content elsewhere."
+  },
+  {
+    "name": "Red",
+    "section": "Nighttime Content",
+    "description": "This Consent Status is marked with a Red door hanger, indicating that the cabin is closed to nighttime NPC encounters of all types. Plot and wandering encounters will consider the residence off limits, and will not engage with the cabin directly. Note that using the Red marker does not exempt residing players from the consequences of in-game actions."
+  },
+  {
+    "name": "Blue",
+    "section": "Nighttime Content",
+    "description": "This Consent Status is marked with a Blue door hanger, and some form of moderate light source, indicating that the cabin is closed to NPC encounters of all types due to medical necessity. This exemption from content extends into the daytime, and is considered active 24 hours a day. The residents of the cabin should notify Staff that they intend to use the Blue hanger in pre-registration when possible, to allow adjustments in sleeping accommodations to avoid interactions and disruptions to the game and the needs of the residents. Plot and wandering encounters will consider the residence off limits, and will not engage with the cabin unless specifically requested to do so by the residents."
+  },
+  {
+    "name": "Tents",
+    "section": "Nighttime Content",
+    "description": "If players are inside tents and it is unsafe for combat NPCs to engage them, they will approach within melee distance and announce that the tent is under attack, and collect the names of each character inside the tent. Each player inside the tent should respond with one of the following: “Responding” - the players intend to move to a safe location to continue playing out the scenario. They have a few minutes to quietly put on essential costuming or makeup, but should be considered “paused” and not use this time to use any Powers or call for help. “Remaining Within” - Once the responding players have left the tent and combat has begun, any characters staying inside the tent in-game will have a Slow 100 before they become valid targets of attacking NPCs. For NPCs to attack characters remaining within, they may call any damage or Effects they have as Verbal delivery. \"Staff Discretion\" - Staff will describe what happens to all involved without playing it out, including mechanics and statuses. This affords the least control to the Players, as should be used as a last resort. Note that tents are still subject to Nighttime Content consent policies above, and tent doors can be marked in the same way."
+  }
+]

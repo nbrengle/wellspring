@@ -1,0 +1,42 @@
+[
+  {
+    "name": "Animal",
+    "variants": [],
+    "description": "Non-sapient living creatures that typically live in natural areas."
+  },
+  {
+    "name": "Construct",
+    "variants": [],
+    "description": "Constructed from non-organic matter, constructs possess a wide range of sentience - some are unthinking autonomous creatures devoid of the spark of life while others are highly intelligent beings of stone, wood, or metal."
+  },
+  {
+    "name": "Exalted",
+    "variants": [],
+    "description": "Creatures or people directly manifested by the raw power of divine energies."
+  },
+  {
+    "name": "Living",
+    "variants": [],
+    "description": "These creatures generally breathe, need to eat and sleep and experience mortality."
+  },
+  {
+    "name": "Plant",
+    "variants": [],
+    "description": "Living creatures that grow in the earth or in water, and generally have roots, leaves, or seeds."
+  },
+  {
+    "name": "Spirit",
+    "variants": [],
+    "description": "A creature that has the Spirit Type is Inherently Insubstantial. Represents souls without corporeal form."
+  },
+  {
+    "name": "Undead",
+    "variants": [],
+    "description": "The dead risen again, devoid of the full essence of life that once made them living. Typically requires some form of power keeping them in this state - the secrets of undeath are poorly understood by most."
+  },
+  {
+    "name": "Voidborn",
+    "variants": [],
+    "description": "Creatures inhabiting the void are known to many, but understood by few. Often barely sentient, but possessing a strength that chills the living, these creatures plague many lands across the Wellspring. The Lost Lineage counts as both Voidborn and Living types."
+  }
+]

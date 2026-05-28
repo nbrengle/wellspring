@@ -1,0 +1,27 @@
+[
+  {
+    "name": "Calculating Physical Armor Points",
+    "section": "Armor Points",
+    "description": "First, determine the types of armor you are wearing. Armor phys-reps can either use real or simulated materials, but should reasonably resemble the type being simulated. Armor must be approved by an Armor Marshal when being brought into game. Quilted - Thick padded or reinforced cloth armor. Worth 2 points. Leather - Armor made of hardened leather or hide. Worth 4 points. Chainmail - Armor made of metallic rings. Worth 6 points. Brigandine/Scale/Lamellar - Overlapping plates, sometimes between layers of leather. Worth 8 points. Plate Mail - Armor made of rigid metallic plates, shaped to the body. Worth 10 points. Next, determine which body locations have the type of armor you are wearing. The ten locations are: Neck (Note: a helmet may also be used to count for the \"Neck\" location.) Shoulders Upper Torso Lower Torso Back Sides Upper Arms Lower Arms Upper Legs"
+  },
+  {
+    "name": "Lower Legs",
+    "section": "Armor Points",
+    "description": "Lastly, each armor piece that is particularly high quality or well crafted can be awarded a bonus point by an Armor Marshal for each location it covers. Add the point values of all locations together, divide by 10, and round to the nearest whole number. This number is your total calculated Armor Points. This system allows mixing and matching of different types of physical armor for an averaged total, if desired."
+  },
+  {
+    "name": "Natural Armor",
+    "section": "Armor Points",
+    "description": "Natural armor can be granted from Powers, Advantages, or Perks. Like physical armor, it also grants Armor Points, and can be Shattered or Rebuilt. Unlike physical armor, natural armor can be restored both by the Mend effect and by the Heal effect. Note that different types of armor cannot be stacked on the same character."
+  },
+  {
+    "name": "Summoned Armor",
+    "section": "Armor Points",
+    "description": "Summoned armor is created by Powers, Spells, or other abilities. Like physical armor, it also grants Armor Points, and can be Shattered or Rebuilt. Unlike physical armor, summoned armor can only be restored by Mend or Rebuild effects from spells and Powers, or by an Enchanter at an Enchanting Forge. The Dispel effect will remove Summoned Armor entirely. Note that different types of armor cannot be stacked on the same character."
+  },
+  {
+    "name": "Barrier",
+    "section": "Armor Points",
+    "description": "Barrier is a type of temporary Armor Points that can be granted by Powers or Effects. These points are subtracted first by damage and cannot be Mended."
+  }
+]

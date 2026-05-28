@@ -1,0 +1,42 @@
+[
+  {
+    "name": "Self-Diagnosis",
+    "section": "Death and Dying",
+    "description": "Each character is aware of their current Life Point and Armor Point value, but should try not to communicate with numbers in-character. A character is also aware of any Conditions they are currently under, except for Charm (you never believe you are Charmed)."
+  },
+  {
+    "name": "Dying",
+    "section": "Death and Dying",
+    "description": "When a character reaches 0 Life Points, they enter the Dying state and are Helpless. They should (safely) lower themselves to the ground and drop any items held in their hands. Dying characters cannot move by default, cannot take in-game actions, and cannot communicate other than roleplaying bleeding out and calling for help. Dying characters also begin their “death count”, and will become Dead in a Slow 180."
+  },
+  {
+    "name": "Stabilized",
+    "section": "Death and Dying",
+    "description": "If a character takes a Stabilize effect, they will pause their death count until they take additional damage. After 5 minutes of being Stabilized, they will restore 1 Life Point and exit the Dying state."
+  },
+  {
+    "name": "Deathblows",
+    "section": "Death and Dying",
+    "description": "Any character can use a deathblow on a Dying or Helpless target. To do so, the character should pantomime taking an obvious killing action, which should take 3-5 seconds, and then call “Deathblow.” A completed deathblow reduces that character’s death count to a Slow 10. Any character who willingly allows a deathblow to happen to them (i.e. a character playing dead) will still be affected, even if they were not actually Helpless."
+  },
+  {
+    "name": "Dead",
+    "section": "Death and Dying",
+    "description": "Once a character completes their Death Count, they become Dead and can only be healed by a Revive effect. All Conditions and the durations of active Powers end. Dead characters begin their “discorporation count”, and will discorporate and become a Spirit in a Slow 180."
+  },
+  {
+    "name": "Spirit",
+    "section": "Death and Dying",
+    "description": "A character who discorporates after death enters Spirit Form and should put on an orange headband or glowstick. A character in Spirit Form should pick up any of their equipment not being actively held by someone else and walk slowly toward the Spirit River (an in-game location designated by staff). By default, Spirits cannot communicate (or even make eye contact) with the living, and are not affected by any Powers or abilities without the Qualifier “to Spirit”."
+  },
+  {
+    "name": "Passing through the River",
+    "section": "Death and Dying",
+    "description": "Upon arrival at the Spirit River, the player should read the blue card and follow the instructions to signal a staff member, who will guide them through what happens next. What happens when a spirit crosses into the Spirit River is unknown - normally when a soul leaves the body for sufficient time, they are largely unrecoverable, but more will be discovered in time."
+  },
+  {
+    "name": "Resurrection",
+    "section": "Death and Dying",
+    "description": "While a soul returning from the Spirit River is incredibly rare, if it did it would look something like this: When leaving the River, the character will forget the past hour of their life up to their death and discorporation, though there may be lingering emotions out of context. The character in Spirit Form should walk to a location near town where they feel the safest. They will remain there for a Focus Slow 300 as they return to life. At the end of the count, the character will be alive at 1 Life Point."
+  }
+]

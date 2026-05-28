@@ -1,0 +1,37 @@
+[
+  {
+    "name": "Weapon Delivery",
+    "section": "Delivery",
+    "description": "The Call is delivered through a strike with a weapon. By default, this includes melee, ranged, and thrown weapons, though individual Powers may restrict this further. This delivery is not included in the actual Call."
+  },
+  {
+    "name": "Packet Delivery",
+    "section": "Delivery",
+    "description": "The Call is delivered by throwing a cloth packet, which is called “materia” in-game. Any Spell that is listed as Packet Delivery can also be delivered as Touch, as long as the target is willing or Helpless. This delivery is not included in the actual Call."
+  },
+  {
+    "name": "Touch Delivery",
+    "section": "Delivery",
+    "description": "The Call is delivered by reaching a hand to within 6” of the target, who must be willing or Helpless. Please note that physical touch outside of a tag on the shoulder requires OOG consent in advance. This delivery is not included in the actual Call."
+  },
+  {
+    "name": "Verbal Delivery",
+    "section": "Delivery",
+    "description": "The Call is delivered by the user verbally indicating their target, either by calling their in-game or out-of-game name, or giving a description of the target. The target then resolves the Call. Examples: “Cora, 2 Ice!” “Saffi, Heal 1 by Flame!” “You in the red dress, Short Sleep by Poison!”"
+  },
+  {
+    "name": "“By My Voice” Delivery",
+    "section": "Delivery",
+    "description": "The Call is delivered to everyone within range of hearing the Call, not including the user. If the Call also has a Qualifier, it should be moved to immediately after “By My Voice” so that the appropriate targets are aware. Examples: “By My Voice, 5 Flame!” “By My Voice to Undead, Expose by Radiant!”"
+  },
+  {
+    "name": "“In This Room” Delivery",
+    "section": "Delivery",
+    "description": "The Call is delivered to everyone physically present inside the designated area."
+  },
+  {
+    "name": "Roleplay Delivery",
+    "section": "Delivery",
+    "description": "The Call is delivered through a roleplayed action, such as teaching another character, or acting out item repair. This delivery is not included in the actual Call."
+  }
+]

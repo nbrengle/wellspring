@@ -1,0 +1,32 @@
+[
+  {
+    "name": "Environmental",
+    "variants": [],
+    "description": "This modifier is added to the beginning of a Call to show that the effect is coming from the location that the characters are in, rather than from a specific target. Any Calls with the Environment modifier will not wear off and cannot be Cured until the characters leave that location. These effects can still be defended against as normal."
+  },
+  {
+    "name": "Final",
+    "variants": [],
+    "description": "This modifier is added to the end of a Call. Final effects cannot be Countered, Protected, or Resisted. The only defense calls that work against Final effects are “Immune” and “Altered.”"
+  },
+  {
+    "name": "Inherent",
+    "variants": [],
+    "description": "This modifier applies to Conditions. If a Condition is Inherent, it cannot be Cured or removed by any means, as it is an innate property of the target."
+  },
+  {
+    "name": "Obvious",
+    "variants": [],
+    "description": "This modifier is added to the beginning of a Call to signal that it is extremely noticeable to anyone who can hear the Call."
+  },
+  {
+    "name": "Self",
+    "variants": [],
+    "description": "If it is ambiguous who is being targeted by a Call, the user can add “to Self” as a Qualifier to make it clear that they are targeting themselves."
+  },
+  {
+    "name": "Subtle",
+    "variants": [],
+    "description": "This modifier is added to the beginning of a Call to signal that it cannot be perceived by characters in-game."
+  }
+]

@@ -1,0 +1,52 @@
+[
+  {
+    "name": "Bloom",
+    "tier": "Basic",
+    "description": "Usually a small bundle of organic flora such as herbs or flowers. Obtained through the Forage skill. Usually represented by a small bundle of herbs tied with yellow twine or ribbon."
+  },
+  {
+    "name": "Hide",
+    "tier": "Basic",
+    "description": "Hide can be carved with skill off of an animal caught in a trap, or hunted from around the wilderness. Hide is obtained through the Scavenging skill. Usually represented by a small scrap of leather about 2\" x 2.\""
+  },
+  {
+    "name": "Ingots",
+    "tier": "Basic",
+    "description": "These are metal nuggets scrounged from old ruins, panned from rivers, or perhaps chipped out of the living rock inside small pit mines. Colloquially, all these sources are simply referred to as ‘Mines’. Mines can have a number of dangers associated with them, but can also be very profitable. Ingots are Gathered through the Prospect skill. Usually represented by a rough metallic nugget."
+  },
+  {
+    "name": "Night Prizes",
+    "tier": "Uncommon",
+    "description": "Small fungi, often bioluminescent. When foraged, Night Prizes may occasionally have a card attached that can grant additional effects which may be positive or negative. Obtained through the Forage skill. Usually represented by small mushrooms tied with blue yarn or ribbon."
+  },
+  {
+    "name": "Harvest",
+    "tier": "Uncommon",
+    "description": "Harvest is the fangs, teeth, bones, and offal of creatures. These gruesome and often magical anatomical parts are obtained by Scavenging monsters. Gathering Harvest can sometimes have negative effects, such as disease, poisoning, and more. Harvest is obtained through the Scavenging skill. Usually represented by fangs, teeth, or bones."
+  },
+  {
+    "name": "Rare Minerals",
+    "tier": "Uncommon",
+    "description": "Collected from deposits around the countryside, Rare Minerals might be sulfur, salts, or other similar materials. Rare Minerals are often associated with more significant danger than other Resources. Rare Minerals are Gathered through the Prospect skill. Usually represented by small vials of salts or crystals."
+  },
+  {
+    "name": "Golden Blossom",
+    "tier": "Advanced",
+    "description": "Golden Blossoms are usually obtained by growing them in a Lifepot (created with Tinkering), a special vessel imbued with life energy. It takes an extended period of growth from Golden Blossom Seeds to create a Golden Blossom flower using a Lifepot. See more on Lifepots in the Tinkering section."
+  },
+  {
+    "name": "Raw Scale",
+    "tier": "Advanced",
+    "description": "Raw Scales are obtained oftentimes by hunting down and defeating powerful and dangerous beings from the land. Once the Raw Scale is obtained, it must be refined using an Alchemical Process called Cure Raw Scale."
+  },
+  {
+    "name": "Mithril Bar",
+    "tier": "Advanced",
+    "description": "Requiring eight pieces of Raw Mithril Ore (which is very rarely obtained through Prospecting), it needs to be refined at a Tinker's Workshop through a process called Smelt Mithril Ore."
+  },
+  {
+    "name": "Enchanted Hyperium",
+    "tier": "Advanced",
+    "description": "Enchanted Hyperium is a constructed resource, with a number of processes to refine and craft it. The final result is a silvery-white powder after having been alchemically purified from the raw ore, subjected to high heat by tinkering, and then magically enchanted."
+  }
+]

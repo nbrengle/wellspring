@@ -1,0 +1,32 @@
+[
+  {
+    "name": "Instantaneous",
+    "section": "Duration",
+    "description": "These Calls happen immediately and do not wear off. This can include damage, healing, and Shattering items."
+  },
+  {
+    "name": "“Quick X” Count",
+    "section": "Duration",
+    "description": "The word “Quick” followed by a number means that the duration is as long as it takes for the affected player to count to that number under their breath. If “Quick” is in a call without a number, the default count is 100. If a Quick count is interrupted, or a player pauses a Quick count to take a different action, the player may resume the count at the previous number rather than having to start over."
+  },
+  {
+    "name": "“Slow X” Count",
+    "section": "Duration",
+    "description": "The word “Slow” followed by a number means that the duration is X number of seconds. Players should make a good faith attempt to silently count at the rate of seconds, not slower or faster. Slow counts are passive unless otherwise stated (the time will pass even if the character is incapacitated). Optionally, a player who needs to make a Quick count may instead perform an active Slow count equal to the Quick count value divided by 3. This count must still follow all mechanical properties of a Quick count (i.e. it must be done actively and verbally)."
+  },
+  {
+    "name": "Short",
+    "section": "Duration",
+    "description": "These Calls will last until the target takes a Short Rest. (See the Rests section for more information.)"
+  },
+  {
+    "name": "Long",
+    "section": "Duration",
+    "description": "These Calls will last until the target takes a Long Rest. (See the Rests section for more information.)"
+  },
+  {
+    "name": "Permanent",
+    "section": "Duration",
+    "description": "When a Call is made without a Duration keyword and is not an Instantaneous effect, it is assumed to be Permanent. Permanent duration lasts until either the end of the event or until the effect is removed with another Call."
+  }
+]

@@ -27,6 +27,20 @@ function findIdx(pattern, after = 0) {
   return lines.findIndex((l, i) => i >= after && pattern.test(l.trim()));
 }
 
+// Two nested TOCs the parser needs to skip past, named for the structural
+// intent rather than the specific line numbers they hide. The body sections we
+// want all sit past one of these:
+//   - PAST_DOC_TOC: past the 140-line doc-summary table at the top of the doc.
+//   - PAST_CORE_RULES_TOC: past the Core Rules' own nested TOC (~lines 519-583),
+//     where Effects/Conditions/Types/Level Progression Table also appear as
+//     bare title-only entries before their real body sections.
+const PAST_DOC_TOC = 200;
+const PAST_CORE_RULES_TOC = 600;
+
+function findBodyHeader(pattern, after = PAST_DOC_TOC) {
+  return lines.findIndex((l, i) => i >= after && pattern.test(l.trim()));
+}
+
 // ─── POWER BLOCK PARSER ───────────────────────────────────────────────────────
 
 const TIER_PATTERN = /\[(Utility|Basic|Advanced|Veteran|Cantrip|Novice|Adept|Greater|Innate|Class|Form|Right Hand)\]/;
@@ -244,7 +258,7 @@ function parseProgressionTable(classStartIdx) {
 // ─── PARSE ALL CLASSES ────────────────────────────────────────────────────────
 
 console.log('\nParsing class powers...');
-const allClassData = {};
+const allClassData = [];
 
 for (const cls of CLASSES) {
   const classIdx = findIdx(new RegExp(`^${cls}: Base Class$`));
@@ -300,7 +314,7 @@ for (const cls of CLASSES) {
     return spells;
   };
 
-  allClassData[cls] = {
+  allClassData.push({
     name: cls,
     type: ['Cleric', 'Druid', 'Mage', 'Sourcerer'].includes(cls) ? 'Spellcaster' : 'Martial',
     description: descLines.join(' '),
@@ -318,7 +332,7 @@ for (const cls of CLASSES) {
     noviceSpells:  spell('Novice'),
     adeptSpells:   spell('Adept'),
     greaterSpells: spell('Greater'),
-  };
+  });
 }
 
 write('classes.json', allClassData);
@@ -332,7 +346,7 @@ function parseSkills() {
   // Start at "Skill Descriptions" so the leading "Martial Skills" category header
   // is included (the old "Basic Martial Weapons" anchor skipped past it). End at
   // the Perks/Flaws section.
-  const startIdx = findIdx(/^Skill Descriptions$/, 11000);
+  const startIdx = findBodyHeader(/^Skill Descriptions$/);
   const endIdx = findIdx(/^(Perks( List)?$|Flaws( List)?$|Devotions)/, startIdx);
   const section = lines.slice(startIdx + 1, endIdx);
 
@@ -485,7 +499,7 @@ write('flaws.json', flaws);
 console.log('\nParsing devotions...');
 
 function parseDevotions() {
-  const startIdx = findIdx(/^Devotions & Divine Beings$/, 13000);
+  const startIdx = findBodyHeader(/^Devotions & Divine Beings$/);
   if (startIdx === -1) return [];
   const endIdx = findIdx(/^Divine Domains$/, startIdx + 1);
   const section = lines.slice(startIdx, endIdx === -1 ? lines.length : endIdx);
@@ -621,7 +635,7 @@ function parseDomainPowerBlock(blockLines) {
 }
 
 function parseDivineDomains() {
-  const startIdx = findIdx(/^Divine Domains$/, 13000);
+  const startIdx = findBodyHeader(/^Divine Domains$/);
   if (startIdx === -1) return { domains: [], accents: {} };
   // Powers end at the Economy section ("Wellspring Economy Overview").
   const endIdx = findIdx(/^Wellspring Economy Overview$/, startIdx);
@@ -813,7 +827,9 @@ write('lineages.json', parseLineages());
 console.log('\nParsing level table...');
 
 function parseLevelTable() {
-  const start = findIdx(/^Level Progression Table$/, 600);
+  // "Level Progression Table" appears in the Core Rules nested TOC before the
+  // actual body table; skip past that.
+  const start = findBodyHeader(/^Level Progression Table$/, PAST_CORE_RULES_TOC);
   if (start === -1) return [];
   const nums = [];
   for (let i = start + 1; i < start + 120; i++) {
@@ -863,7 +879,7 @@ const FIELD_KEY = {
 };
 
 function parseCraftingRecipes() {
-  const startIdx = findIdx(/^Apprentice Alchemy Recipes$/, 14400);
+  const startIdx = findBodyHeader(/^Apprentice Alchemy Recipes$/);
   const endIdx = findIdx(/^Rituals$/, startIdx);
   const section = lines.slice(startIdx, endIdx === -1 ? lines.length : endIdx);
 
@@ -936,7 +952,7 @@ function parseCraftingRecipes() {
   });
 }
 
-write('crafting.json', parseCraftingRecipes());
+write('crafting-recipes.json', parseCraftingRecipes());
 
 // ─── RITUALS ──────────────────────────────────────────────────────────────────
 // The ritual list (after the Dark Territory rules preamble) is uniform: a header
@@ -1000,7 +1016,7 @@ function parseFieldBlocks(section, headerRe, fieldRe, keyMap, baseFields, stopRe
 }
 
 function parseRituals() {
-  const startIdx = findIdx(/^Apprentice Rituals$/, 16000);
+  const startIdx = findBodyHeader(/^Apprentice Rituals$/);
   const endIdx = lines.findIndex((l, i) => i > findIdx(/^Greater Rituals$/, startIdx) && /^________________$/.test(l.trim()));
   const section = lines.slice(startIdx, endIdx === -1 ? lines.length : endIdx);
 
@@ -1014,7 +1030,7 @@ function parseRituals() {
   }), stopRe);
 }
 
-write('rituals.json', parseRituals());
+write('ritual-recipes.json', parseRituals());
 
 // ─── CORE RULES ───────────────────────────────────────────────────────────────
 // The Core Rules doc is prose under nested headers. Its own Table of Contents
@@ -1047,8 +1063,10 @@ function parseCoreRules() {
   // an upcoming TOC title (searched within a small look-ahead window). This
   // rejects body lines that coincidentally equal a title out of order — e.g. a
   // "Spikes" column header inside the Level Progression Table, which would
-  // otherwise be mistaken for the much-later "Spikes" section.
+  // otherwise be mistaken for the much-later "Spikes" section. We also record
+  // the source line range per section so a sub-concept walker can find them.
   const sections = [];
+  const promotedToSection = new Set(); // TOC entries that became top-level sections
   let cur = null;
   let tp = 0; // pointer into toc
   for (let i = bodyStart; i < glossIdx; i++) {
@@ -1060,14 +1078,28 @@ function parseCoreRules() {
       if (toc[k] === t) { matchAt = k; break; }
     }
     if (matchAt !== -1) {
-      if (cur) sections.push(cur);
-      cur = { heading: t, content: '' };
+      if (cur) { cur.endLine = i - 1; sections.push(cur); }
+      cur = { heading: t, content: '', startLine: i, endLine: glossIdx - 1 };
+      promotedToSection.add(t);
       tp = matchAt + 1;
     } else if (cur) {
       cur.content += (cur.content ? ' ' : '') + t;
     }
   }
   if (cur) sections.push(cur);
+
+  // Second pass: any TOC entry not promoted to a top-level section is a child
+  // of the nearest preceding promoted entry. This derives the parent→children
+  // map from the doc structure rather than hardcoding it.
+  const tocChildren = {};
+  let lastParent = null;
+  for (const entry of toc) {
+    if (promotedToSection.has(entry)) {
+      lastParent = entry;
+    } else if (lastParent) {
+      (tocChildren[lastParent] ??= []).push(entry);
+    }
+  }
 
   // (2) Glossary: "Term: definition" lines.
   const glossary = [];
@@ -1082,11 +1114,467 @@ function parseCoreRules() {
     }
   }
 
-  return { sections, glossary };
+  return { sections, glossary, tocChildren };
 }
 
 const coreRules = parseCoreRules();
 write('core-rules.json', coreRules.sections);
 write('glossary.json', coreRules.glossary);
+console.log('\nDerived TOC parent→children:');
+for (const [parent, children] of Object.entries(coreRules.tocChildren)) {
+  console.log(' ', parent, '->', children);
+}
+
+// ─── EFFECTS / CONDITIONS / TYPES ─────────────────────────────────────────────
+// The Core Rules Effects, Conditions, and Types sections are keyword lists in the
+// source: "Keyword\nDefinition…" separated by blank lines. These keywords (Wounding,
+// Slept, Discern, Berserk, …) are the dense mechanical vocabulary referenced all
+// over skill/power text, so we extract them as first-class entities to link against.
+// A keyword may carry a bracketed parameter, e.g. "Discern [Information]" — the
+// entity name is the stem ("Discern"); the bracket is kept as `param`.
+
+console.log('\nParsing effects / conditions / types...');
+
+function parseKeywordList(headerRe, endRe) {
+  // Effects/Conditions/Types also appear as bare entries in the Core Rules
+  // nested TOC, so we need to skip past that to reach the keyword-list body.
+  const start = findBodyHeader(headerRe, PAST_CORE_RULES_TOC);
+  if (start === -1) return [];
+  const end = findIdx(endRe, start + 1);
+  // Skip the intro sentence ("The following is a list of…").
+  const body = lines.slice(start + 1, end === -1 ? start + 400 : end);
+
+  const entries = [];
+  let i = 0;
+  // Advance past the intro line(s) to the first blank-separated block.
+  while (i < body.length && body[i].trim() && !/^[A-Z]/.test(body[i].trim())) i++;
+
+  // The canonical entity name is the leading keyword stem before any bracketed
+  // parameter (so "Grant [Number] Barrier" and "Grant [Accent]" both belong to
+  // "Grant"; "Vulnerable to" -> "Vulnerable"). The full source form is kept as a
+  // variant. Variants of the same stem are merged into one entity.
+  // A keyword line is short, starts with a capital or "[", and has no sentence
+  // punctuation. Definition lines are prose. We use this to start a new entry
+  // even when the source omits the blank-line separator between two entries
+  // (e.g. Insubstantial's multi-line def runs straight into "Obedient").
+  const isKeywordLine = (t) =>
+    t && t.length <= 45 && /^[A-Z[]/.test(t) && !/[.!?:),]$/.test(t) && !/^The\s/.test(t);
+
+  const byName = new Map();
+  while (i < body.length) {
+    while (i < body.length && !body[i].trim()) i++;
+    if (i >= body.length) break;
+    const keyword = body[i].trim();
+    i++;
+    // Definition: following non-blank lines until a blank OR the next keyword.
+    const def = [];
+    while (i < body.length && body[i].trim() && !isKeywordLine(body[i].trim())) { def.push(body[i].trim()); i++; }
+    if (!def.length) continue;
+
+    // Stem = the keyword without bracketed parameters (leading or inline) and
+    // trailing connective words. "Grant [Number] Barrier" -> "Grant";
+    // "[Kind] Immunity" -> "Immunity"; "Vulnerable to" -> "Vulnerable".
+    const stem = keyword
+      .replace(/^\[[^\]]+\]\s*/, '')   // drop a leading [param]
+      .replace(/\s*\[.*$/, '')          // drop from the first inline [param] on
+      .replace(/\s+(to|or|vs\.?|Plus)\s*$/i, '')
+      .trim() || keyword;
+
+    if (!byName.has(stem)) {
+      byName.set(stem, { name: stem, variants: [], description: def.join(' ') });
+    }
+    const entry = byName.get(stem);
+    // Record the full source form when it differs from the bare stem.
+    if (keyword !== stem) entry.variants.push({ form: keyword, description: def.join(' ') });
+  }
+
+  // Derive the effect→condition relationship the doc states in each definition
+  // ("Causes the Charmed Condition"). This makes the edge rebuildable from the
+  // source rather than hand-encoded downstream.
+  for (const entry of byName.values()) {
+    const m = entry.description.match(/(?:causes?|applies|grants?|inflicts?) the (\w[\w '-]*?) condition/i);
+    if (m) entry.causesCondition = m[1].trim();
+  }
+
+  return [...byName.values()];
+}
+
+// The intro sentence ends with a period so the keyword-walk skips it; the first
+// real keyword (e.g. "Berserk") begins the list.
+write('effects.json', parseKeywordList(/^Effects$/, /^Stacking Effects$/));
+write('conditions.json', parseKeywordList(/^Conditions$/, /^Types$/));
+write('types.json', parseKeywordList(/^Types$/, /^Items$/));
+
+// ─── CRAFTING RESOURCES ──────────────────────────────────────────────────────
+// Source format: "Name (Tier)\nDescription" pairs in the Crafting Resources
+// List section. Tier is Basic / Uncommon / Advanced. The list ends at "Named
+// Resources".
+
+console.log('\nParsing crafting resources...');
+
+function parseResources() {
+  const start = findBodyHeader(/^Crafting Resources List$/, PAST_CORE_RULES_TOC);
+  if (start === -1) return [];
+  const end = findIdx(/^Named Resources$/, start + 1);
+  const body = lines.slice(start + 1, end === -1 ? start + 50 : end);
+
+  const out = [];
+  for (let i = 0; i < body.length; i++) {
+    const t = body[i].trim();
+    if (!t) continue;
+    const m = t.match(/^(.+?)\s*\((Basic|Uncommon|Advanced)\)\s*$/);
+    if (!m) continue;
+    // Description: next non-blank line(s) until blank or next keyword line.
+    const def = [];
+    let j = i + 1;
+    while (j < body.length && body[j].trim() && !/\((Basic|Uncommon|Advanced)\)$/.test(body[j].trim())) {
+      def.push(body[j].trim());
+      j++;
+    }
+    out.push({ name: m[1].trim(), tier: m[2], description: def.join(' ') });
+    i = j - 1;
+  }
+  return out;
+}
+
+write('resources.json', parseResources());
+
+// ─── ACCENTS ─────────────────────────────────────────────────────────────────
+// 15 accents in the Core Rules Accent section. Each line: "Name [Elemental] - desc.
+// The list starts after "The known Accents that exist in Wellspring are:" and
+// ends at "Defense Calls".
+
+console.log('\nParsing accents...');
+
+function parseAccents() {
+  const intro = findIdx(/^The known Accents that exist in Wellspring are:/);
+  if (intro === -1) return [];
+  const end = findIdx(/^Defense Calls$/, intro + 1);
+  const out = [];
+  for (let i = intro + 1; i < end; i++) {
+    const t = lines[i].trim();
+    if (!t) continue;
+    // "Acid [Elemental] - Caustic substances..." or "Force - Physical power..."
+    const m = t.match(/^(.+?)(?:\s*(\[Elemental\]))?\s*-\s*(.+)$/);
+    if (!m) continue;
+    out.push({
+      name: m[1].trim(),
+      elemental: !!m[2],
+      description: m[3].trim(),
+    });
+  }
+  return out;
+}
+
+write('accents.json', parseAccents());
+
+// ─── DEFENSE CALLS & MODIFIERS ───────────────────────────────────────────────
+// Same keyword-list pattern as Effects/Conditions/Types (Name\nDefinition).
+
+console.log('\nParsing defense calls / modifiers...');
+write('defense-calls.json', parseKeywordList(/^Defense Calls$/, /^Modifiers$/));
+write('modifiers.json', parseKeywordList(/^Modifiers$/, /^Combat Rules$/));
+
+// ─── CRAFTING CONCEPTS ───────────────────────────────────────────────────────
+// Each crafting discipline (Alchemy / Enchanting / Tinkering) has a cluster of
+// structural sub-sections defined between the discipline header and its first
+// recipe list (e.g. "The Hermetic Laboratory" / "Corrupted Alchemy" /
+// "Mana Sickness" under Alchemy; "Essences" / "Drawing" / "Unravelling Essence"
+// / "The Enchanting Forge" under Enchanting). These read as terms in body text
+// but only get described in the prose. Extract them as discrete entities so
+// references resolve.
+//
+// Each entry: { name, discipline, description, tools? (when an equipment list
+// follows) }. Filters out recipe field-label sub-sections (Application/Quaff/
+// Topical/Ingest/Component) which are already captured per-recipe.
+
+console.log('\nParsing crafting concepts...');
+
+const RECIPE_FIELD_LABELS = new Set([
+  'Application', 'Quaff', 'Topical', 'Ingest', 'Component',
+  'Crafting Materials', 'Uses Per Batch', 'Expiration', 'Crafting Process',
+  'Description', 'Effect', 'Recipes/Formulae/Schematics', 'Introduction',
+  'Turn of the Hourglass', 'Item Cards', 'Ashbin', 'Dark Territory',
+  'Crafting Resources List', 'Named Resources',
+  // Per-discipline parent headers
+  'Alchemy', 'Enchanting', 'Tinkering',
+]);
+
+function parseCraftingConcepts() {
+  const out = [];
+  // Each discipline's concept-sub-sections live between its body header and the
+  // start of its first recipe list. The discipline headers also appear in the
+  // Crafting table-of-contents (~lines 14412-14415), so we chain searches: find
+  // each discipline's body header by walking forward from the *previous*
+  // discipline's recipe list (or from "Named Resources" for the first).
+  const disciplines = [
+    { name: 'Alchemy', start: /^Alchemy$/, end: /^Apprentice Alchemy Recipes$/, after: /^Named Resources$/ },
+    { name: 'Enchanting', start: /^Enchanting$/, end: /^Apprentice Enchanting Formulae$/, after: /^Apprentice Alchemy Recipes$/ },
+    { name: 'Tinkering', start: /^Tinkering$/, end: /^Apprentice Tinkering Schematics$/, after: /^Apprentice Enchanting Formulae$/ },
+  ];
+
+  const isHeader = (t) => t && t.length <= 50 && !/[.!?:),]\s*$/.test(t) && !/^\*/.test(t) && !/^[a-z]/.test(t) && !/[\[\]]/.test(t);
+
+  for (const d of disciplines) {
+    const afterIdx = findIdx(d.after, PAST_CORE_RULES_TOC);
+    if (afterIdx === -1) continue;
+    const s = findIdx(d.start, afterIdx + 1);
+    if (s === -1) continue;
+    const e = findIdx(d.end, s + 1);
+    if (e === -1) continue;
+
+    for (let i = s + 1; i < e; i++) {
+      const t = lines[i].trim();
+      if (!isHeader(t) || RECIPE_FIELD_LABELS.has(t)) continue;
+      // Look at the next non-blank line — must be prose (long sentence), not a
+      // bullet or another header. That distinguishes real concept-sections from
+      // mis-classified lines.
+      let j = i + 1;
+      while (j < e && !lines[j].trim()) j++;
+      if (j >= e) continue;
+      const nextLine = lines[j].trim();
+      if (nextLine.length < 30 || /^\*/.test(nextLine) || isHeader(nextLine) && !RECIPE_FIELD_LABELS.has(nextLine)) continue;
+
+      // Capture description (prose lines) and any bullet list that follows.
+      const descLines = [];
+      const tools = [];
+      let k = j;
+      while (k < e) {
+        const line = lines[k].trim();
+        if (!line) { k++; continue; }
+        if (/^\*/.test(line)) {
+          tools.push(line.replace(/^\*\s*/, '').trim());
+          k++; continue;
+        }
+        // Stop if we hit the next header.
+        if (isHeader(line) && !RECIPE_FIELD_LABELS.has(line)) break;
+        descLines.push(line);
+        k++;
+      }
+      const concept = {
+        name: t,
+        discipline: d.name,
+        description: descLines.join(' '),
+      };
+      if (tools.length) concept.tools = tools;
+      out.push(concept);
+      i = k - 1;
+    }
+  }
+  return out;
+}
+
+write('crafting-concepts.json', parseCraftingConcepts());
+
+// ─── RITUAL CONCEPTS ─────────────────────────────────────────────────────────
+// The Rituals body (before the ritual list itself) defines roles (Ritualists,
+// Primary/Secondary Ritualist, Participant), the Dark Territory process
+// (Beginning the Ritual, Ritual Points, Potential Success, The Deck and its
+// suits), and other structural concepts (Arcane Matrix, Consecrated/Desecrated
+// locations). These are referenced throughout ritual descriptions; extract
+// them so the links resolve.
+
+console.log('\nParsing ritual concepts...');
+
+// Field labels that are part of a per-ritual definition (already captured via
+// rituals.json), not standalone concepts.
+const RITUAL_FIELD_LABELS = new Set([
+  'Expiration', 'Target', 'Required Components', 'Tools Used',
+  'Other Requirements', 'Location', 'Effect', 'Ritual Process',
+  'Dark Territory', 'Dark Territory Suit', 'Dark Territory Marshal Required',
+]);
+
+function parseRitualConcepts() {
+  const start = findIdx(/^Rituals$/, PAST_CORE_RULES_TOC);
+  if (start === -1) return [];
+  const end = findIdx(/^Apprentice Rituals$/, start + 1);
+  if (end === -1) return [];
+
+  const isHeader = (t) => t && t.length <= 50 && !/[.!?:),]\s*$/.test(t) && !/^\*/.test(t) && !/^[a-z]/.test(t) && !/[\[\]]/.test(t);
+
+  const out = [];
+  for (let i = start + 1; i < end; i++) {
+    const t = lines[i].trim();
+    if (!isHeader(t) || RITUAL_FIELD_LABELS.has(t)) continue;
+    let j = i + 1;
+    while (j < end && !lines[j].trim()) j++;
+    if (j >= end) continue;
+    const nextLine = lines[j].trim();
+    if (nextLine.length < 30 || /^\*/.test(nextLine)) continue;
+    if (isHeader(nextLine) && !RITUAL_FIELD_LABELS.has(nextLine)) continue;
+
+    const descLines = [];
+    const bullets = [];
+    let k = j;
+    while (k < end) {
+      const line = lines[k].trim();
+      if (!line) { k++; continue; }
+      if (/^\*/.test(line)) {
+        bullets.push(line.replace(/^\*\s*/, '').trim());
+        k++; continue;
+      }
+      if (isHeader(line) && !RITUAL_FIELD_LABELS.has(line)) break;
+      descLines.push(line);
+      k++;
+    }
+    const concept = { name: t, description: descLines.join(' ') };
+    if (bullets.length) concept.bullets = bullets;
+    out.push(concept);
+    i = k - 1;
+  }
+  return out;
+}
+
+write('ritual-concepts.json', parseRitualConcepts());
+
+// ─── CORE RULES SUB-CONCEPTS ─────────────────────────────────────────────────
+// Each Core Rules top-level section has nested sub-headers (Header\nProse) that
+// the original parseCoreRules flattened into one prose blob per section. Carve
+// them out as discrete entities so they can participate in the linker graph.
+// Sections already carved out (Effects, Conditions, Types, Modifiers, Defense
+// Calls, Accent, Glossary) are skipped. Policy/etiquette sections are skipped.
+// The remaining sub-concepts route to typed files (deliveries.json, durations.json,
+// etc.) where they form a coherent cluster, or to rules-concepts.json otherwise.
+
+console.log('\nParsing core rules sub-concepts...');
+
+// Section title -> target entity type. Sections not in this map send their
+// sub-concepts to rules-concepts.json. SKIP suppresses extraction entirely.
+//
+// Some sections in the doc TOC are *themselves* sub-concepts of an earlier
+// parent section (the TOC happens to be flat, but the doc semantically groups
+// them). For those, we route the whole section's body — heading + prose —
+// directly into the parent's typed bucket via the AS_SELF marker, so e.g.
+// "Hold!"/Caution/Clarify each become power-words entities.
+const SECTION_TO_TYPE = {
+  // Already carved out as their own entity files; skip to avoid duplication.
+  'Effects': 'SKIP', 'Conditions': 'SKIP', 'Types': 'SKIP',
+  'Modifiers': 'SKIP', 'Defense Calls': 'SKIP', 'Accent': 'SKIP',
+  // Policy / etiquette — not navigable game mechanics; skip.
+  'Code of Conduct': 'SKIP', 'Consent and Calibration': 'SKIP',
+  'Combat Etiquette': 'SKIP', 'Roleplay Etiquette': 'SKIP',
+  // New typed clusters whose own bodies have sub-headers worth extracting.
+  'Delivery': 'deliveries',
+  'Duration': 'durations',
+  'Death and Dying': 'death-states',
+  'Armor Points': 'armor-types',
+  'Object and Location Markers': 'markers',
+  'Spellcasting': 'spellcasting-concepts',
+};
+
+// Parent sections that have TOC-sibling children. The walker enters the parent's
+// context when it sees the parent heading; subsequent sections become AS_SELF
+// children of that parent (routed whole to the parent's type bucket) until
+// either another parent appears or we hit a non-child (e.g. "Object and
+// Location Markers" terminates "Game Markers and Signals" children). This
+// position-based grouping correctly handles duplicate child names like
+// "Clarify" appearing under both Power Words and Game Markers.
+const AS_SELF_PARENTS = new Map([
+  ['Power Words and Power Phrases', {
+    type: 'power-words',
+    children: new Set(['“Hold!”', 'Caution', 'Clarify', 'Instruction',
+      'It Has Been Told…', 'It Can Be Seen…', 'It Can Be Believed…',
+      '“What Would Your Mother Say?”', '“Prepare for Action”']),
+  }],
+  ['Game Markers and Signals', {
+    type: 'game-markers',
+    children: new Set(['Out-of-Game', 'Non-Combatant', 'Clarify', 'Lookdown',
+      'OK Check', 'Spirit Form']),
+  }],
+]);
+
+// Sub-header detection inside a section's source range: short, title-case, no
+// terminal punctuation, no brackets, followed by prose. Matches both bare names
+// ("Berserk") and quoted phrases ("“Hold!”").
+function isSubHeader(t, nextLine) {
+  if (!t || t.length > 50) return false;
+  if (/[.!?,):]\s*$/.test(t)) return false;
+  if (/^\*/.test(t) || /[\[\]]/.test(t)) return false;
+  if (/^[a-z0-9]/.test(t)) return false;
+  return nextLine && nextLine.length > 30 && !/^\*/.test(nextLine);
+}
+
+function parseSubConcepts(sections) {
+  // bucketsByType: { 'rules-concepts': [...], 'deliveries': [...], ... }
+  const bucketsByType = {};
+  const push = (type, entry) => { (bucketsByType[type] ??= []).push(entry); };
+  // Track which AS_SELF parent we're currently inside (so duplicate child
+  // names like "Clarify" route to the right type based on position).
+  let asSelfParent = null;
+
+  for (let s = 0; s < sections.length; s++) {
+    const section = sections[s];
+
+    // Entering an AS_SELF parent? Set the context (and also extract its body as
+    // an introductory entry into the parent's bucket).
+    if (AS_SELF_PARENTS.has(section.heading)) {
+      asSelfParent = AS_SELF_PARENTS.get(section.heading);
+      if (section.content.trim()) {
+        push(asSelfParent.type, { name: section.heading, section: section.heading, description: section.content });
+      }
+      continue;
+    }
+    // Inside an AS_SELF parent and this section is one of its children?
+    if (asSelfParent && asSelfParent.children.has(section.heading)) {
+      push(asSelfParent.type, {
+        name: section.heading.replace(/^[“"]+|[”"]+$/g, '').trim(),
+        section: section.heading,
+        description: section.content,
+      });
+      continue;
+    }
+    // Any other section ends the AS_SELF parent context.
+    asSelfParent = null;
+
+    const target = SECTION_TO_TYPE[section.heading];
+    if (target === 'SKIP') continue;
+    const bucket = target || 'rules-concepts';
+
+    // Walk the source range for this section. Use the *next* section's start
+    // line as the exclusive end so a sub-concept whose body falls in the gap
+    // immediately before the next top-level section (e.g. Roleplay Delivery is
+    // the last sub-header in Delivery, and its body line is one before the
+    // Duration section starts) is still captured.
+    const sectionEnd = sections[s + 1]?.startLine ?? (section.endLine + 1);
+    let i = section.startLine + 1;
+    while (i < sectionEnd) {
+      const t = lines[i].trim();
+      if (!t) { i++; continue; }
+      // Skip any nested header that IS the section heading itself (e.g. "Effects"
+      // section header repeating inside).
+      if (t === section.heading) { i++; continue; }
+      let nextI = i + 1;
+      while (nextI < sectionEnd && !lines[nextI].trim()) nextI++;
+      const nextLine = lines[nextI]?.trim() || '';
+      if (!isSubHeader(t, nextLine)) { i++; continue; }
+      // Capture sub-concept body: lines until the next sub-header or end.
+      const descLines = [];
+      let j = nextI;
+      while (j < sectionEnd) {
+        const lt = lines[j].trim();
+        if (!lt) { j++; continue; }
+        let nj = j + 1;
+        while (nj < sectionEnd && !lines[nj].trim()) nj++;
+        const nl = lines[nj]?.trim() || '';
+        if (isSubHeader(lt, nl) && lt !== section.heading) break;
+        descLines.push(lt);
+        j++;
+      }
+      push(bucket, {
+        name: t,
+        section: section.heading,
+        description: descLines.join(' '),
+      });
+      i = j;
+    }
+  }
+  return bucketsByType;
+}
+
+const subConcepts = parseSubConcepts(coreRules.sections);
+// Write each typed bucket to its own file. Order is fixed so reruns are stable.
+for (const [type, entries] of Object.entries(subConcepts).sort(([a], [b]) => a.localeCompare(b))) {
+  write(`${type}.json`, entries);
+}
 
 console.log('\nDone.');

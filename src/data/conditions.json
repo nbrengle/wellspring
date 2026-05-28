@@ -1,0 +1,127 @@
+[
+  {
+    "name": "Berserk",
+    "variants": [],
+    "description": "The target becomes Immune to Charm, Dominate, Obey, and Provoke. They will attack the nearest creature, regardless of ally or enemy. They cannot activate Powers or use Deathblow. If there are no creatures to attack, or if the target has no means of attack, they will pass out and become Slept for a Quick 100. Berserk will end automatically if the target drops to 0 Life Points or becomes Slept."
+  },
+  {
+    "name": "Charmed",
+    "variants": [],
+    "description": "The target will treat the source of the Charm as a trusted ally and will defend them to the best of their ability (including using Powers and skills). The target will not be aware of the Charm until after the condition ends. If the source of the Charm attacks the target, the condition ends immediately. One target can be Charmed from multiple sources at once. Note: This will not cause any physical or romantic roleplay that is not consented to by both or all involved players."
+  },
+  {
+    "name": "Disabled",
+    "variants": [],
+    "description": "The disabled limb becomes unusable. Any held items must be dropped, and any attached weapons or shields will take hits as if they hit the limb. A disabled leg cannot support weight, though the target can manage to hobble while dragging the leg. All disabled Conditions are removed by a single “Cure Disabled” Effect."
+  },
+  {
+    "name": "Dominated",
+    "variants": [],
+    "description": "The target must immediately cease all hostility towards the source of the Dominate and will follow any instructions they are given, in the spirit they are given. The target may refuse directly suicidal commands. If a creature becomes dominated by a second source, it will override and Cure the previous source (unless it is Inherent). The target will not be aware that they are dominated until after the condition ends. Note: This will not cause any physical or romantic roleplay that is not consented to by all involved players."
+  },
+  {
+    "name": "Drained",
+    "variants": [],
+    "description": "The target cannot do damage, activate items, or activate Powers. They can still use Skills, block, parry and call defenses that were previously activated. This does not affect already charged packets, passive Powers, or passive effects from items."
+  },
+  {
+    "name": "Flying",
+    "variants": [],
+    "description": "A flying character cannot be targeted with melee attacks except from other flying characters (call “No Effect, Flying”), and also cannot deliver melee attacks except to other flying characters, until the condition ends. The flying condition may allow safe passage over gaps and obstacles, at the discretion of the Marshal. Characters will demonstrate flying with one hand (in a closed fist) or weapon pointed straight up."
+  },
+  {
+    "name": "Immunity",
+    "variants": [
+      {
+        "form": "[Kind] Immunity",
+        "description": "The target will call “Immune” instead of taking the effect/damage, including the Final modifier. Immunity may be granted to equipment, limbs (or even parts of limbs), or entire creatures. There is no limit to the number of immunities a character can have. An immunity can be against damage, Accents, Effects, Conditions, Types, or Deliveries. Type immunity works against being Granted that Type, not against creatures of that Type. Damage immunity does not include Wounding or Piercing."
+      }
+    ],
+    "description": "The target will call “Immune” instead of taking the effect/damage, including the Final modifier. Immunity may be granted to equipment, limbs (or even parts of limbs), or entire creatures. There is no limit to the number of immunities a character can have. An immunity can be against damage, Accents, Effects, Conditions, Types, or Deliveries. Type immunity works against being Granted that Type, not against creatures of that Type. Damage immunity does not include Wounding or Piercing."
+  },
+  {
+    "name": "Imprisoned",
+    "variants": [],
+    "description": "The target cannot move or make noise, and has immunity to all damage and Effects, except those that would remove the imprisoned Condition or have the “to Imprisoned” Qualifier. Characters under the imprisoned condition may optionally demonstrate this by crossing both arms or weapons across their chest. As with all immunity, the player must respond with “No Effect, Imprisoned” when relevant. An imprisoned character is considered Helpless against anything that can affect them during the condition."
+  },
+  {
+    "name": "Intoxicated",
+    "variants": [],
+    "description": "The target is under an inebriating effect, ranging from disorientation to hallucinations, depending on the source (like alcohol or Nyte Tea). The player may roleplay these effects based on the source's description, but this is optional and only enforced to the player's comfort level. A Short Rest always removes the Intoxicated condition."
+  },
+  {
+    "name": "Insubstantial",
+    "variants": [],
+    "description": "The target appears slightly see-through and gains immunity to attacks, damage, and Powers not specifically targeting Insubstantial (except traps). Their carried items (excluding creatures) also become Insubstantial but revert if dropped. Insubstantial creatures cannot intentionally interact with physical objects (doors, traps, etc.). If they trigger physical traps, they suffer the consequences. They can use non-physical Skills and Powers targeting Insubstantial creatures on themselves. They cannot attack others unless using a Power specifically targeting non-Insubstantial (\"to Substantial\" or “to Corporeal”). While they can't be physically blocked or block others, they also cannot pass through solid objects, and solid attacks stop upon hitting them. Players of Insubstantial creatures should avoid obstructing physical creatures, and vice versa. Insubstantial creatures can Cure or Dispel Insubstantial on themselves without needing the “to Insubstantial” Qualifier. Players must verbally announce \"Insubstantial\" when others inspect, interact closely, or attack them. In combat, this should be loud. Optionally, they may instead use the hand signal of one hand or weapon bent parallel in front of the face (ie “vampire cape”). Ineffective attacks should be met with \"No Effect, Insubstantial.\""
+  },
+  {
+    "name": "Obedient",
+    "variants": [],
+    "description": "The target will attempt to follow the command given with the Effect. By default, the character will follow the command until it is complete or until the duration ends, whichever comes first. A character can have multiple obedient Conditions in effect at once, each one for a separate Obey Effect and command. If the obedient Condition is Cured or Dispelled, all instances of obedient will be removed from the target. Note: This will not cause any physical or romantic roleplay that is not consented to by both or all involved characters."
+  },
+  {
+    "name": "Obfuscated",
+    "variants": [],
+    "description": "While under the effects of Obfuscate, the player may lie to or ignore one Discern and/or Expose call that targets them. By default, the Obfuscated Condition ends after it is used on one Discern or Expose Effect. Some Obfuscate Powers require a specific response, but otherwise, the player may answer however they wish. Obfuscated does not work against the Final modifier."
+  },
+  {
+    "name": "Provoked",
+    "variants": [],
+    "description": "The provoked target cannot use offensive Calls against anyone but the source of the Provoke for the duration. (Note that this does not include uncalled damage.) If anyone other than the source of the Provoke attacks the target, the target can also use offensive Calls against that attacker from then on."
+  },
+  {
+    "name": "Repelled",
+    "variants": [],
+    "description": "A creature that is Repelled must move back outside melee range, and cannot attack the source of the Repel. Once out of range the target cannot voluntarily come within melee range of the source, but need not retreat or move if the source of the Repelled Condition moves towards them (though the target still may not attack the source). If a repelled character is attacked by the source of the Repel, the Condition ends immediately for that character. A Short Rest always ends a Repelled Condition."
+  },
+  {
+    "name": "Resistance",
+    "variants": [
+      {
+        "form": "[Kind] Resistance",
+        "description": "The target takes one point of damage instead of the Effect or damage they have resistance to and will call “Resist” in response. Resistance does not work against Final Calls or passive sources. Note: Unless the target has Selective Resistance, they cannot choose to take an Effect they are Resistant to."
+      }
+    ],
+    "description": "The target takes one point of damage instead of the Effect or damage they have resistance to and will call “Resist” in response. Resistance does not work against Final Calls or passive sources. Note: Unless the target has Selective Resistance, they cannot choose to take an Effect they are Resistant to."
+  },
+  {
+    "name": "Rooted",
+    "variants": [],
+    "description": "The target may not move their dominant foot except to pivot. When the Condition begins, the target should immediately and safely come to a full stop and plant the foot."
+  },
+  {
+    "name": "Silenced",
+    "variants": [],
+    "description": "A Silenced creature cannot speak or make any voluntary vocal or oral noise. Note that this does not stop the player from making out-of-game Calls, including Voice and Verbal Delivery Powers."
+  },
+  {
+    "name": "Slept",
+    "variants": [],
+    "description": "The target cannot move or speak and must fall to the ground (or take a knee if it is unsafe to fall down). They are unaware of anything happening around them and should roleplay being asleep, taking no voluntary actions. A slept character is considered Helpless."
+  },
+  {
+    "name": "Slowed",
+    "variants": [],
+    "description": "The target may not run. One foot must always be on the ground if the character is going somewhere."
+  },
+  {
+    "name": "Tainted",
+    "variants": [],
+    "description": "The target cannot gain Life Points. In addition, if the target has this Condition at the end of a Short Rest, they immediately die. (This includes if the duration of the Taint is Short - it will still kill the target before wearing off.)"
+  },
+  {
+    "name": "Vulnerable",
+    "variants": [
+      {
+        "form": "Vulnerable to [Kind]",
+        "description": "The target will take all damage or Effects from the specified Vulnerability as Final."
+      }
+    ],
+    "description": "The target will take all damage or Effects from the specified Vulnerability as Final."
+  },
+  {
+    "name": "Weakened",
+    "variants": [],
+    "description": "The Weakened target can’t do more than one point of damage. There may be additional in-game effects such as being unable to move in-game heavy objects."
+  }
+]

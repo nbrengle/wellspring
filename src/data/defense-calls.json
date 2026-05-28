@@ -1,0 +1,37 @@
+[
+  {
+    "name": "Counter",
+    "variants": [],
+    "description": "If actively using a Power that negates the effect of a Call, the target will say “Counter,” followed by the name of the Power being used. (Note: if the name of the Power is long, you are allowed to abbreviate it for ease of play. For example, instead of “Counter, Scales of the Serpent”, it is OK to say “Counter, Scales.”)"
+  },
+  {
+    "name": "Protect",
+    "variants": [],
+    "description": "Some Powers grant a “Protect” vs a specific Effect, damage, Accent, or Delivery (examples: Protect vs Sleep, Protect vs Packets, Protect vs Flame). Once active on the target, these Protects can be used as a Counter, but the Call is “Protect!” instead. Note that this is a “smart” defense and the target can choose not to activate it until they wish to. Only 3 Protects can be active on one target at a time."
+  },
+  {
+    "name": "Resist",
+    "variants": [],
+    "description": "The call “Resist” means that the target took 1 point of damage instead of the original Call. Resistance is generally a condition, meaning that the “Resist” call can be used repeatedly for the duration. Unless this is a Selective Resistance, the target cannot choose to take the Call they are Resistant to."
+  },
+  {
+    "name": "Altered",
+    "variants": [],
+    "description": "The call of “Altered to <new result>” means that the target changed the incoming Call into a different result. Note: Altered can be used against Calls with the Final modifier."
+  },
+  {
+    "name": "Reduced",
+    "variants": [],
+    "description": "The “Reduced” call means the target took less damage or a shorter duration than the original effect."
+  },
+  {
+    "name": "Immune",
+    "variants": [],
+    "description": "The call of “Immune” means that the target will not take that particular effect, damage, Accent, Effect, Condition, or Delivery, defined by the Immunity that the target has. Unless this is a Selective Immunity, the target cannot choose to take a Call that they are Immune to."
+  },
+  {
+    "name": "No Effect",
+    "variants": [],
+    "description": "If an incoming effect does not work on the target for any other reason, the target should call “No Effect” followed by the reason. Example: a character in Spirit Form would call “No Effect, Spirit” to any Power used on them that does not use the “to Spirit” modifier."
+  }
+]

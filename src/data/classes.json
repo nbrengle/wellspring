@@ -1,5 +1,5 @@
-{
-  "Artisan": {
+[
+  {
     "name": "Artisan",
     "type": "Martial",
     "description": "Crafting & Support Martial Class It is difficult to simply define an Artisan. Certainly many are actual makers of art, such as painters and sculptors, while others are Artisans in a more “craftsperson” sense, building mechanical devices, exploring the dark corners of alchemy, or mastering the creation of magical objects. These examples only begin to encompass the kinds of arts available though. Chefs, chocolatiers, draftspersons, and masters of engineering all fall under the wide umbrella that are Artisans. Mad scientists, dedicated scholars, and weird mystics, these characters are unified by their love of what they do and their ability to create. Some create knowledge, others exquisite artwork. Those who become Champion Artisans are true masters of their art and generally the best crafters in the world.",
@@ -1622,7 +1622,7 @@
     "adeptSpells": [],
     "greaterSpells": []
   },
-  "Cleric": {
+  {
     "name": "Cleric",
     "type": "Spellcaster",
     "description": "Divine Spell-Casting Class Clerics are the backbone of any standing force lucky enough to have one. They give strong support with their enchantment magic and keep the team alive with their healing skill. They have some small offensive ability as well. These characters come in many forms, from the followers of the Dancer, who distribute death, to those who follow the path of pacifism and light. Regardless, the Clerics are a powerful addition to any force. The Cleric comes from a tradition of Divine Being-worshiping magic-users, whose granted abilities could heal the hurt, harm the living, and even raise the dead. Every Cleric should choose a Devotion that they give fealty and worship to, and from whom they are granted favors and power. The Cleric is a Divine spell-caster. The Cleric should choose a special symbol that is their caster-sigil and mark their spellbook and packets with it.",
@@ -2709,7 +2709,7 @@
     ],
     "greaterSpells": []
   },
-  "Druid": {
+  {
     "name": "Druid",
     "type": "Spellcaster",
     "description": "Divine Spell-Casting Class The Druid is a formidable warrior, summoning magic found deep within the wilds of nature; weaving spells to enhance their weapons, or unleashing claws as the need arises. In addition, Druids are able to communicate with the animals and plants that inhabit the area. Through these interactions, they might track their quarry by relying on the many eyes and ears of the forests, or learn of imminent attacks upon the lands they call home. Druids place nature at the center of their beliefs, drawing their spells and abilities from a mystical bond with the earth itself. Most druids worship the umbrella Devotion of nature itself (see Druidism), although it has been known that some druids worship other Divine Beings, and use their connection with the natural world as a method of prayer in and of itself. Fiercely protective of the lands they have chosen to protect, few can withstand the fury of an enraged Druid: fearsome claws, vines that bind and tear, and elemental blasts of fire and ice make the Druid a force to be reckoned with.",
@@ -3936,7 +3936,7 @@
     ],
     "greaterSpells": []
   },
-  "Fighter": {
+  {
     "name": "Fighter",
     "type": "Martial",
     "description": "Martial Class There are those that choose the path of battle; some are heroes, others are thugs, but all who choose this path live and die by the sword. The Fighter is one such. They are an expert with weapons and in battle, and their skills are specifically tailored to fighting. Of all the paths available to an adventurer, Fighter is the broadest. Whether one is a street-rat who has earned their way by murder and robbery or a valiant warrior serving the causes of justice and light, one can easily fit into the role of the Fighter. For skill in battle and deadly effectiveness, the Fighter is ultimate. Throughout history there have been hundreds of thousands of fighters. They are the soldiers that stand on the front lines and in the War Councils of every war since the dawn of mortalkind. Fighters in and of themselves come in all different shapes and sizes, and Fighters can be found in almost any kind of garb. Most feel most comfortable in armor and with a weapon or three by their side, but some prefer agility and speed to heavy armor and protection. Practical clothing, loose and easy to fight in, is always advisable.",
@@ -5144,7 +5144,7 @@
     "adeptSpells": [],
     "greaterSpells": []
   },
-  "Mage": {
+  {
     "name": "Mage",
     "type": "Spellcaster",
     "description": "Utility & Arcane Spell-Casting Class The Mage is truly a power to be reckoned with. Their offensive magic is effective and lethal and their defensive magic is some of the most potent available. There are few classes that compare to a high level Mage and Mages always command both fear and respect from their adversaries. They are the disciples of power. Compared to their Sourcerer cousins, Mages command the arcane powers through dedication, study, and control. The Mage is a strong addition to any team. Mages have a number of enchantments and spells that can help add to a team's strength and effectiveness. The Mage's power trade-off is tightly restricted weaponry and light armor in return for particularly potent defensive magic. They tend to be back-line combatants, as their abilities rarely allow them the capability to stand up to well-armed and armored warrior classes. With the right warrior back-up though, the Mage can become a truly devastating force. The Mage is an Arcane spell-caster. The Mage should choose a special symbol that is their caster-sigil and mark their spellbook and Materia with it.",
@@ -6227,7 +6227,7 @@
     ],
     "greaterSpells": []
   },
-  "Rogue": {
+  {
     "name": "Rogue",
     "type": "Martial",
     "description": "Martial Class Rogues are often seen as thieves or burglars, but this is not the real essence of the Rogue. A Rogue is an agile warrior, whose expertise with the throwing dagger is unrivaled. It is true that many Rogues are attracted to the less legal side of life, and it is true that most prefer a good ambush from behind than a face-to-face sword fight, but Rogues are not always this way. There are a few that rely on their speed and cunning to simply out-fight their opponents. The Rogue is great at supporting fire, and what they lack in armor and brute force, they make up for in speed, cunning and deadly skill. The Rogue of Wellspring brings in heavy supporting fire. There are few things more worrisome than a Rogue with their daggers. They tend to snipe from a distance, only engaging in combat when they know that they can get in killing blows while using their dodging abilities to remain unharmed. Rogues also have great ability with locks, traps and poisons, and make a worthy addition to a team.",
@@ -7396,7 +7396,7 @@
     "adeptSpells": [],
     "greaterSpells": []
   },
-  "Socialite": {
+  {
     "name": "Socialite",
     "type": "Martial",
     "description": "Information & Leadership Martial Class Found in the great courts of the lands, in every bar or pub, and shadowy dens where information is the only currency, the Socialite dwells… trading on words, gestures, and emotions. These manipulators of the spoken tongue garner aid from the willing and otherwise through subtle inflections, outright slander, and traitorous misdirection. As masters of words both subtle and overt, these cunning manipulators can dissuade attackers, subdue the vengeful, and entice the stalwart. While wealth and power are appealing to most, they are merely tools to the Socialite; chips in a high stakes game where the greatest rewards are even greater heights of power, prestige, and realized ambitions. Furthermore, the Socialite is the pinnacle of subtle discernment and information gathering. They are often found sussing out facts and truths from simple conversations - frequently without their quarry’s notice. Using guile and a keen mind, the Socialite may separate fact from fiction, gain insight into another's motives, and even force another to act as the Socialite’s pawn for a time. In addition, many Socialites leverage their resources into hiring a Bodyguard; a specific bonded individual whom they are able to empower in key moments. These bodyguards are never to be trifled with. After all, as the Socialite grows in ability, so do their protectors… often in subtle ways that only become apparent when they decide to play their hand.",
@@ -8819,7 +8819,7 @@
     "adeptSpells": [],
     "greaterSpells": []
   },
-  "Sourcerer": {
+  {
     "name": "Sourcerer",
     "type": "Spellcaster",
     "description": "Alpha Striker & Arcane Spell-Casting Class Arcane magic, at its core, is the practice of controlling the ebb and flow of arcane energies that flow under the current of everyday reality. Mages do this through careful ritual and practice, finding common methods of containment, and then spending their life perfecting this control. Sourcerers on the other hand ride these wild waves and amplify their effects to produce their magic. Sometimes this connection to the wave of magic is given by a brush with an otherworldly entity that leaves them forever changed. More often than not, a Sourcerer is barely containing the forces they call upon, with predictable effects on their personalities and outlook on life. While the life expectancy of a Sourcerer is almost undeniably shorter than that of their Mage counterparts, the raw force and power a Sourcerer can unleash is terrifying. Still, Sourcerers adhere to the rules of mortal magic in many ways - through incantation and concentration, the weave of magic flows, sometimes with more subtle distinctions between their learned brethren, but other times in stark contrast. Unhindered by endless theorems and onerous ritual, the Sourcerer strides through the theater of war, bringing down those who would stand before them.",
@@ -9919,4 +9919,4 @@
     ],
     "greaterSpells": []
   }
-}
+]

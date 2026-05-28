@@ -1,0 +1,155 @@
+[
+  {
+    "name": "Rituals",
+    "description": "Rituals are a much more open and theatrical kind of magic that can produce some massive effects. Some have dangers, too. Many require more than one person to perform, and most get bigger and more powerful the more people join in. Some rituals are borne of the Ritualists' connection to and conception of arcane energies, while others drawn on aid from greater powers. All rituals benefit from being done in a time and place with a connection to the energies they draw on - and the outcomes often reflect the effort put into their creation. Below outlines the basic components and rules of rituals, as well as some of the general rituals most ritualists learn of during their training. Given the flexible and potent nature of the energies called upon, many more rituals exist in the game and can be learned. When a ritual is learned by players, it will be added to this document. Any character with the Ritual Magic skill of the appropriate Rank can cast the rituals listed here - they are common knowledge and accessible to all players. All rituals contain the following elements:"
+  },
+  {
+    "name": "Ritualists",
+    "description": "Noted in each ritual is a number that shows how many can take part in the Ritual. The first number will be the minimum number of characters involved who must have the appropriate Ritual Skill and Rank (ie: Primary and Secondary Ritualists) to perform the Ritual successfully. The second number shows how many additional Participants the Ritual can take beyond the minimum number. If there are no numbers listed, the ritual must be completed by the ritualist solo, and cannot benefit from others’ Participation."
+  },
+  {
+    "name": "Primary Ritualist",
+    "description": "The Primary Ritualist means the lead Ritualist who is responsible for the casting of the Ritual. They are responsible for providing the Resources for the Ritual, designating Participants, Secondary Ritualists, and the Targets of the ritual, and, finally, interacting with the Marshal. The Primary Ritualist is a Participant, but never a Secondary Ritualist."
+  },
+  {
+    "name": "Secondary Ritualist",
+    "description": "A Secondary Ritualist means a Participant with the appropriate Skill (including tier) who is specifically not the Primary Ritualist. They are generally aiding the Primary Ritualist in performing the Ritual, but can simply be present during the ritual, and inside the ritual area."
+  },
+  {
+    "name": "Participant",
+    "description": "A Participant is anyone who is participating in the Ritual, and includes all Ritualists unless specified. Expiration The length of time the ritual’s effect will last. Target The person, place, or thing being affected by the ritual. Required Components All rituals require some sort of offering to whatever power the ritual is targeted towards. This usually comes in the form of the Basic Resources (Wealth, Bloom, Ingots, Hide, Rare Mineral, Night Prizes, or Harvest), but also often includes crafted resources such as Ritual Powders or Ritual Wands; for some rituals, other sacrifices may be required. All resources used for rituals must be given to a member of staff or deposited in the nearest Ashbin (at each crafting station) afterward, and are considered expended as the magic of the ritual uses up their essence, even if the ritual does not explicitly say so. Tools Used Some rituals require tools to be used in performing the ritual. These tools need to be represented and supplied by the players doing the rituals. Other Requirements Some rituals have other requirements (such as cannot be performed during the day). These will be listed here. Location If there is a required location where the ritual must be cast, it will be specified here. Effect This is where the in-game description of the effects of the ritual will go, along with any instructions that may have to be provided (such as information cards for Consecrated areas). Ritual Process These are the steps that must be completed in order to cast the ritual. Any steps in brackets are dealing with out of game items, like item cards. If the ritual instructions direct any involved characters to grind up, burn, or otherwise vandalize any in-game resources, characters are encouraged to simply roleplay the action rather than destroying the resource props used; however, providing alternative items to enhance the roleplay (such as powders to represent ground-up resources or lighting pieces of paper safely on fire to represent burning a resource) is highly encouraged. Any fire or use of incense should be safely contained within a bowl or other container to prevent accidents, and should only be used in fire-safe locations (any location that is primarily covered in dirt, stone, or cement with no nearby grass, and not indoors); furthermore, fire or burning incense should never be left unattended. If the location is not fire-safe, or any fire hazard warnings are in effect, just use a representation of fire. For any ritual description that encourages physical contact, remember to obtain explicit consent for the action first, ideally in advance of the ritual’s beginning; if consent cannot be obtained, participants are encouraged to roleplay the process as best they can without making physical contact, such as by coming within 6” of other participants. Dark Territory Most rituals have a range of tested and understood parameters. Researchers, crafters, and ritualists, however, are often drawn outside the bounds of known territory. This exploration outside of the normal bounds of knowledge is represented as Dark Territory. Often expansions into Dark Territory end in tears, and if lucky, a little bit of knowledge - but sometimes, just sometimes, Dark Territory can lead to extreme successes that defy logic. Dark Territory Suit If a ritual is being Marshaled, this will list the base “suit” of the Dark Territory deck, the category of potential random effects. See the Marshaled Rituals section for more details. Dark Territory Marshal Required If this item is listed as “Yes”, the ritual cannot be cast without the presence of a Marshal and must follow the Dark Territory resolution process (see the Marshaled Rituals section for further details). If listed as “Optional,” the ritual may be marshaled by the participating players themselves and has no inherent risk of Dark Territory, unless a player chooses to intentionally add it (and a Marshal is available). If listed as “Never”, Dark Territory cannot be added."
+  },
+  {
+    "name": "Marshaled Rituals",
+    "description": "All rituals that involve a Marshal will go through a specific flow, with the Marshal overseeing the process and working with the players to resolve and narrate the outcome of the ritual being cast. A visual of the Marshaled Ritual flow can be found here: Ritual Flowchart"
+  },
+  {
+    "name": "How to Request a Marshal",
+    "description": "If you are looking for a ritual to be marshalled, you should place your request on the Staff Request Inbox, typically found in the player logistics area. You can mention you are looking for a Ritual Marshal to a staff member if you see them around, but a staff member to marshal the ritual cannot be guaranteed at all times."
+  },
+  {
+    "name": "Beginning the Ritual",
+    "description": "If any of the following Conditions are not true then the Ritual cannot begin, and no Powers or Resources are consumed. Should any of these Conditions not be met during the casting in progress, the casting immediately fails, all Resources and Powers used are consumed, any Ritual Points accrued are lost, and Dark Territory is applied with seven points subtracted from the final tally, with any positive result discarded.",
+    "bullets": [
+      "The Formula is present, appropriate to the Casting Location, and vice versa.",
+      "The Primary Ritualist and any Secondary Ritualists have the appropriate Skills.",
+      "The Primary Ritualist and any Secondary Ritualists are conscious and able to perform the Ritual Process.",
+      "The Resources are correct and unexpired.",
+      "The Target is valid for the crafting process, and is unexpired."
+    ]
+  },
+  {
+    "name": "Dark Territory Adjustments",
+    "description": "The Ritual marshal should take note of the following adjustments to the Dark Territory modifier: Once these have been recorded, the Marshal should notify The Primary Ritualist of the current Dark Territory Modifier and ask if The Primary Ritualist wishes to continue. If The Primary Ritualist assents, the Ritual may proceed. If the Primary Ritualist declines, all Resources are refunded, and any Powers expended are refreshed. Once the Ritual Process is begun, the Marshal should note any failures to follow the process outlined in the Ritual itself, and should add one to the Dark Territory total for each infraction. Additional steps taken by the Ritualist, or improvements or theatrics in addition to the prescribed ritual steps are counted as benefits described later on.",
+    "bullets": [
+      "Any adjustments to the Dark Territory from anyone Participating in the ritual.",
+      "Any adjustments to the Dark Territory from the Environment are recorded.",
+      "Any adjustments to the Dark Territory from Plot related sources are recorded.",
+      "Any adjustments to the Dark Territory from any other circumstances are recorded."
+    ]
+  },
+  {
+    "name": "Automatic Failure",
+    "description": "These states cause the ritual to fail, with all Resources and Powers consumed, any Ritual Points accrued are lost, and Dark Territory is applied with thirteen points removed from the final tally, with any positive result discarded.",
+    "bullets": [
+      "The Primary Ritualist is unable to maintain required Focus for the duration of the ritual Process.",
+      "The Primary Ritualist, Secondary Ritualist(s), or the Target uses an Ability or Power other than one notated in the description of the crafting Process, or one that does not have specific verbiage allowing it to be used during a Ritual.",
+      "The Primary Ritualist, Secondary Ritualist(s), or the Target leaves the casting area.",
+      "The Primary Ritualist, Secondary Ritualist(s), or the Target takes damage not part of the Ritual Process.",
+      "The Primary Ritualist or Secondary Ritualist(s) voluntarily or involuntarily cease the Ritual Process without ability that allows them to do so without consequence.",
+      "Dark Territory accrued from infractions or mistakes becomes 5 or more."
+    ]
+  },
+  {
+    "name": "Ritual Points",
+    "description": "These modifiers allow The Primary Ritualist to modify the card drawn from the Hand. The Ritual Marshal may grant these Ritual Points given the guidance below:",
+    "bullets": [
+      "Including additional Ritualists, known as Secondary Ritualists, one Point for each additional participant with the appropriate Ritual / Enchanting skill level.",
+      "Including additional Participants, one Point for every two additional Participants without the appropriate Ritual / Enchanting skill level, up to a maximum of 3 Points.",
+      "The Primary Caster adds additional steps to the ritual within the theme of the ritual, or goes above and beyond in the presentation of the ritual process."
+    ]
+  },
+  {
+    "name": "Potential Success",
+    "description": "Assuming no failure states are triggered, and the Ritual process is completed, the Ritual is considered a Potential Success.",
+    "bullets": [
+      "The attending Ritual Marshal calculates any Dark Territory Modifiers and arranges the Deck according to the default suit for the Ritual attempted. The Primary Ritualist is notified of any Ritual Points they have earned, and are given the opportunity to spend Ritual Points on adding Lesser Arcana, Major Arcana, or altering the suit of cards away from the Rituals’ default suit."
+    ]
+  },
+  {
+    "name": "The Deck",
+    "description": "Composed of thirty-six Minor Arcana, eleven Lesser Arcana, and six Major Arcana, the Dark Territory deck represents the myriad of ways that ritualistic attempts to tame magical and divine energies can express themselves. Each of the cards has a unique meaning, often derived from the more practical aspects of life in the Minor Arcana, and escalating into more overarching or broad themes. These decks represent vague concepts swirling in the ritualist’s mind as it grapples with the unknown. As the rank of the card grows, first in the Minor arcana, through the Lesser, and into the Major Arcana, the effects of those interactions become ever more pronounced, whether for good, or ill. Wary should the Ritualist be climbing into the heights of the Lesser and Major Arcana, for while the benefits that await there are tempting, greater heights have commensurate falls that must be weighed against. Below is the composition of the Deck, known to those with at least some knowledge of the systems of Ritual Magic, and Enchanting. The exact effects are not known by default, but can be discovered in game."
+  },
+  {
+    "name": "Arms: Physical",
+    "description": "Representing the tangible and the practical aspects of life in Wellspring, the concepts are most commonly denoted in the melee weapons of combat. These are sorted into their corresponding ranks, least to greatest."
+  },
+  {
+    "name": "Gems: Mental",
+    "description": "Representing mental clarity, perception, and knowledge, the Mental suit is often correlated with semi-precious and precious gems of ascending value:"
+  },
+  {
+    "name": "Implements: Magical",
+    "description": "Representing the magical aspects of life in Wellspring, the implements are ranked from the most familiar to the most esoteric, as the arcane or divine power grows in might:"
+  },
+  {
+    "name": "The Lesser Arcana",
+    "description": "This deck shifts the most over time, often with cards being removed or added as civilizations rise and fall. This arrangement is most common in the known worlds of Wellspring today:"
+  },
+  {
+    "name": "The Major Arcana",
+    "description": "These cards represent opaque and often confusing concepts, with very little concrete understanding - but they appear to those attempting to scale to the top of what ritualists are capable of:"
+  },
+  {
+    "name": "Ritual Magic",
+    "description": "Rituals can be performed by those with the Ritual Magic skill. Tools Used In order to cast all of the currently known rituals, a player should be prepared to supply the following items:",
+    "bullets": [
+      "Arcane matrix set (see below) - a set of six sigils, used as the foundation of many rituals",
+      "Bowl - used to hold ground powder, sand, water, or blood",
+      "Blood - Fake blood or other red liquid",
+      "Chalk/Makeup - used to scribe sigils on both buildings and people",
+      "Circle Rep: a rope or string used to encircle some rituals and contain their power",
+      "Incense - powder, stick or cone; usually lit for effect to represent Ritual Powder",
+      "Mortar and pestle - to grind down resources into powder",
+      "Paint: used to inscribe sigils on buildings and people",
+      "Parchment/Paper - for writing information cards or other elements of rituals",
+      "Powder - both edible and inedible needed, used to represent Ritual Powder (be aware of dietary restrictions when choosing edible representations)",
+      "Red String: to encompass the boundaries of areas to be magically empowered",
+      "Ritual Dagger prop - used to represent cutting participants for Sacrifices of Life Points",
+      "Source of fire (or prop, see fire rules in Introduction) - used to burn incense or other components",
+      "Stakes: to anchor the boundaries of ritually empowered spaces",
+      "String - to wrap around items and create sympathetic links",
+      "Wand - to represent Ritual Wands",
+      "Water - mixed with powder to make paint, or to anoint ritual targets",
+      "Writing implement - helpful for writing"
+    ]
+  },
+  {
+    "name": "Arcane Matrix",
+    "description": "Rituals often make use of an Arcane Matrix, a triangle created with three arcane sigils that represent three of the foundational Essences: Weave, Energy, Thought, Life, and Spirit. Additionally, many rituals benefit from a sixth sigil, Matter - representing the physical world. These physical sigils can take any design or material the ritualist chooses, and often have significant personal meaning to the ritualist. These sigils should be included in their ritual tool set. Rituals of Greater level may require the creation of two Arcane Matrices: one triangle made with the first three sigils, then an inverted triangle with three different sigils laid over the first matrix, creating a six-pointed star. There are five types of known Essences:",
+    "bullets": [
+      "Weave - raw magic, volatile and awe inspiring.",
+      "Energy - electricity, heat, and dissolution.",
+      "Thought - mental energy, will, and attention.",
+      "Life - representation of life everlasting.",
+      "Spirit - the consistency of sentience after life.",
+      "Matter - while not an Essence, rituals often include a sixth sigil in their Arcane Matrix to represent the physical world."
+    ]
+  },
+  {
+    "name": "Ritual Invocation",
+    "description": "Some rituals begin and end with an invocation to a greater power, such as “Oh glorious and magnificent Steed, I invoke your power!” This is usually the character’s Divine Being, but may be other greater powers. Rituals that call upon a greater power should include theming around the power they call on. Rituals that call on beings of power often require some kind of offering to the power, and this offering should vary based on the power being called - for example, a pile of corpses for The Steed, or a rare tome for the Librarian. If a Ritualist does not worship a greater power, but wishes to seek its aid, the Ritualist should prepare to include more offerings, and try to perform the Ritual in a space dedicated to the power to maximize the chances of the ritual working. For more information about the various powers to which Ritualists may devote themselves, please refer to the Devotions and Divine Beings document:"
+  },
+  {
+    "name": "Divine Locations",
+    "description": "While the vagaries of the divine can be debated, the effects of the divine upon the Wellspring are clear, and the rituals used to create these locations are available to all faiths, devotions, and deities alike."
+  },
+  {
+    "name": "Consecrated Buildings / Ground",
+    "description": "Consecrated areas are those devoted to a particular Devotion or Patron, and offer up benefits to those matching the Consecrations Qualifier. Generally, Consecrated areas offer up a sense of peace and calm, perhaps even sanctuary to those who follow the faith and little else. Those outside of the intended audience feel little, if anything, sometimes even being unaware of the divine nature of the place. An individual that is aware of the Consecration and has a matching Devotion or Patron may choose to complete a Short Rest in half the normal time. As they do so, they should offer up a prayer to the greater power of the Consecrated area."
+  },
+  {
+    "name": "Desecrated Buildings / Ground",
+    "description": "Likewise, Desecrated areas are those devoted to a particular Devotion or Patron, and offer up detriments to those not matching the Desecration’s Qualifier. Generally, Desecrated areas offer up a sense of unease and anxiety to those who do not follow the faith and little else. Those who follow the faith or devotion feel little, if anything, sometimes even being unaware of the wards against intruders. An individual that is aware of the Desecration and does not have a matching Devotion or Patron may not complete Short Rests in that space."
+  }
+]
