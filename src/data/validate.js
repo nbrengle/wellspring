@@ -80,10 +80,39 @@ function resolveId(item, field, character) {
 
 export const idName = (id) => id.slice(id.indexOf(':') + 1);
 
-// Level the character is built at, parsed from "Cleric 4". Defaults to 4.
+// Normalize a character's class/level info into [{ name, level }], the canonical
+// multi-class form. Accepts either the new `classes` array or the legacy
+// `classLevels` string ("Fighter 4", or "Fighter 2 / Rogue 2"). This is the one
+// place that understands both shapes; everything else reads through it.
+export function getClasses(character) {
+  if (Array.isArray(character?.classes) && character.classes.length) {
+    return character.classes
+      .filter((c) => c && c.name)
+      .map((c) => ({ name: c.name, level: c.level || 0 }));
+  }
+  const str = character?.classLevels;
+  if (typeof str === 'string' && str.trim()) {
+    return str.split('/').map((part) => {
+      const m = part.trim().match(/^(.+?)\s+(\d+)$/);
+      return m ? { name: m[1].trim(), level: parseInt(m[2], 10) } : null;
+    }).filter(Boolean);
+  }
+  return [];
+}
+
+// The character's PRIMARY (first) class — used for spell-slot tier shape and as
+// the default context where a single class is assumed.
+export function primaryClass(character) {
+  return getClasses(character)[0]?.name || null;
+}
+
+// Total Character Level = sum of all class levels (per the rules, BP and stats
+// scale with total level even when multiclassing). Defaults to 4 (starter level)
+// when no class info is present.
 export function characterLevel(character) {
-  const n = character.classLevels?.match(/\d+/)?.[0];
-  return n ? parseInt(n, 10) : 4;
+  const classes = getClasses(character);
+  if (!classes.length) return 4;
+  return classes.reduce((sum, c) => sum + (c.level || 0), 0);
 }
 
 // Base Build Points from the level table (9 at level 4).
@@ -210,72 +239,100 @@ function requiredLevel(power) {
   return m ? parseInt(m[1], 10) : 0;
 }
 
+// Bonus slots, keyed PER CLASS as "class:category" → count. Class features
+// attribute to their own class; skill grants attribute to a relevant class (the
+// caster class for cantrip/spell grants, the martial class for power grants), so
+// the bonus lands on the correct per-class slot row.
 function slotGrants(character) {
   const grants = {};
-  const add = (cat, n) => { grants[cat] = (grants[cat] || 0) + n; };
+  const addTo = (cls, cat, n) => {
+    if (!cls) return;
+    const k = `${cls}:${cat}`;
+    grants[k] = (grants[k] || 0) + n;
+  };
+  const classes = getClasses(character);
+  const casterClass = classes.find((c) => SPELLCASTERS.has(c.name))?.name;
+  const martialClass = classes.find((c) => !SPELLCASTERS.has(c.name))?.name;
+  // Route a category to the class whose slot it belongs to.
+  const classFor = (cat) => (cat === 'cantrips' || cat === 'spellsKnown') ? casterClass : martialClass;
 
   // 1. Purchased / starting skills that grant slots (Additional Cantrip,
-  //    Extended Capacity, …).
+  //    Extended Capacity, Spell-Scholar). Attribute to the relevant class.
   const skills = [...(character.startingSkills || []), ...(character.purchasedSkills || [])];
   for (const item of skills) {
     const ent = lookupEntity(resolveId(item, 'purchasedSkills', character))
       || lookupEntity(`skills:${cleanItemName(item)}`);
-    scanSlotGrant(ent?.description, add);
+    scanSlotGrant(ent?.description, (cat, n) => addTo(classFor(cat), cat, n));
   }
 
-  // 2. Automatic class INNATE powers that grant slots and whose level requirement
-  //    the character meets — e.g. Artisan "Brilliant Thinker" (lvl 3 → +1 Basic),
-  //    Socialite "Practiced Manner" (+1 Basic). (Class-skill grants like
-  //    "Cantrip Scholar" are PURCHASED, higher-level skills — not automatic — so
-  //    they're handled via the purchased-skills scan above, not here.)
-  const cls = character.classLevels?.split(' ')[0];
-  const level = characterLevel(character);
-  for (const p of (CLASS_POWERS[cls]?.innate || [])) {
-    if (requiredLevel(p) <= level) scanSlotGrant(p.desc || p.description, add);
-  }
-
-  // 3. Per-level progression bonuses up to the character's level — casters gain
-  //    an "Innate Bonus Cantrip" this way (a granted starting cantrip not counted
-  //    in the progression's `cantrips` column).
-  const progression = CLASS_PROGRESSION[cls] || {};
-  for (let lvl = 1; lvl <= level; lvl++) {
-    const bonus = progression[lvl]?.bonus;
-    if (bonus && /bonus\s+cantrip/i.test(bonus)) add('cantrips', 1);
+  // 2 + 3. Per-class automatic grants, gated by that class's own level:
+  //   - INNATE powers granting slots (Artisan "Brilliant Thinker" → +1 Basic).
+  //   - Per-level progression `bonus` prose ("Innate Bonus Cantrip" → +1 cantrip).
+  for (const { name: cls, level: clsLevel } of classes) {
+    for (const p of (CLASS_POWERS[cls]?.innate || [])) {
+      if (requiredLevel(p) <= clsLevel) scanSlotGrant(p.desc || p.description, (cat, n) => addTo(cls, cat, n));
+    }
+    const progression = CLASS_PROGRESSION[cls] || {};
+    for (let lvl = 1; lvl <= clsLevel; lvl++) {
+      const bonus = progression[lvl]?.bonus;
+      if (bonus && /bonus\s+cantrip/i.test(bonus)) addTo(cls, 'cantrips', 1);
+    }
   }
 
   return grants;
 }
 
-// Power-slot usage vs. the class's allotment at this level. Returns an array of
-// { category, used, base, bonus, allowed, over } rows — one per relevant slot
-// category for the character's class. `allowed` includes skill-granted bonus
-// slots. Empty when the class is unknown.
-export function computeSlots(character) {
-  const cls = character.classLevels?.split(' ')[0];
-  if (!cls || !CLASS_POWER_SLOTS[cls]) return [];
-  // Read the progression row for the character's actual level (not the fixed
-  // level-4 CLASS_POWER_SLOTS), so slot caps grow as the character levels.
-  const level = characterLevel(character);
-  const slots = CLASS_PROGRESSION[cls]?.[level] || CLASS_POWER_SLOTS[cls];
-  const isCaster = SPELLCASTERS.has(cls);
+// Which class a power pick belongs to. Slots are per-class, so each pick is
+// attributed: prefer the explicit `powerClass` sidecar (set when picked into a
+// class's slot); else infer from the entity's parentClass; else, if the character
+// has only one class, that class. Returns null when ambiguous/unknown.
+export function pickClass(character, field, index, name) {
+  const tag = character.powerClass?.[field]?.[index];
+  if (tag) return tag;
+  const classNames = getClasses(character).map((c) => c.name);
+  if (classNames.length === 1) return classNames[0];
+  const ent = lookupEntity(`powers:${name}`);
+  if (ent?.parentClass && classNames.includes(ent.parentClass)) return ent.parentClass;
+  return null;
+}
 
+// Count a field's picks belonging to `cls`.
+function countPicksForClass(character, field, cls) {
+  return (character[field] || []).reduce(
+    (n, name, i) => n + (pickClass(character, field, i, name) === cls ? 1 : 0), 0);
+}
+
+// Power-slot usage vs. allotment, PER CLASS. Slots are class-specific (a Fighter's
+// Utility slot can't hold a Rogue power, and a Cleric's cantrips differ from a
+// Mage's), so we emit one row per class × category, each counting only that
+// class's attributed picks and capped by that class's progression at its level.
+// Each row carries `cls` so the picker can filter candidates to that class.
+export function computeSlots(character) {
+  const classes = getClasses(character).filter((c) => CLASS_POWER_SLOTS[c.name]);
+  if (!classes.length) return [];
+  const multi = classes.length > 1;
   const bonus = slotGrants(character);
-  const row = (category, label, used, base) => ({
-    category, label, used,
-    base,
-    bonus: bonus[category] || 0,
-    allowed: base + (bonus[category] || 0),
-  });
 
   const rows = [];
-  if (isCaster) {
-    rows.push(row('cantrips', 'Cantrips', (character.cantrips || []).length, slots.cantrips ?? 0));
-    const known = CASTER_SLOT_FIELDS.spellsKnown
-      .reduce((n, f) => n + (character[f] || []).length, 0);
-    rows.push(row('spellsKnown', 'Spells Known', known, slots.spellsKnown ?? 0));
-  } else {
-    for (const [cat, field] of Object.entries(MARTIAL_SLOT_FIELDS)) {
-      rows.push(row(cat, cat[0].toUpperCase() + cat.slice(1), (character[field] || []).length, slots[cat] ?? 0));
+  for (const { name: cls, level } of classes) {
+    const prog = CLASS_PROGRESSION[cls]?.[level] || CLASS_POWER_SLOTS[cls];
+    const isCaster = SPELLCASTERS.has(cls);
+    const mkRow = (category, label, used, baseVal) => {
+      const b = bonus[`${cls}:${category}`] || 0;
+      return {
+        cls, category, label: multi ? `${cls} ${label}` : label,
+        used, base: baseVal, bonus: b, allowed: baseVal + b,
+      };
+    };
+    if (isCaster) {
+      rows.push(mkRow('cantrips', 'Cantrips', countPicksForClass(character, 'cantrips', cls), prog.cantrips ?? 0));
+      const known = CASTER_SLOT_FIELDS.spellsKnown
+        .reduce((n, f) => n + countPicksForClass(character, f, cls), 0);
+      rows.push(mkRow('spellsKnown', 'Spells Known', known, prog.spellsKnown ?? 0));
+    } else {
+      for (const [cat, field] of Object.entries(MARTIAL_SLOT_FIELDS)) {
+        rows.push(mkRow(cat, cat[0].toUpperCase() + cat.slice(1), countPicksForClass(character, field, cls), prog[cat] ?? 0));
+      }
     }
   }
   return rows.map((r) => ({ ...r, over: r.used > r.allowed }));
@@ -287,33 +344,31 @@ export function computeSlots(character) {
 // the character's level. Returns null for non-casters, else
 // { novice, adept, greater }.
 export function spellSlots(character) {
-  const cls = character.classLevels?.split(' ')[0];
-  const slots = cls && CLASS_POWER_SLOTS[cls];
-  if (!slots || !('cantrips' in slots)) return null; // not a caster
+  const casters = getClasses(character).filter((c) => SPELLCASTERS.has(c.name));
+  if (!casters.length) return null; // not a caster
 
-  // Prefer explicit archetype counts when present.
+  // Prefer explicit archetype counts when present (single-class starter sheets).
   const fromArchetype = {
     novice: character.noviceSpellSlots,
     adept: character.adeptSpellSlots,
     greater: character.greaterSpellSlots,
   };
-  if ([fromArchetype.novice, fromArchetype.adept, fromArchetype.greater].some((v) => v != null)) {
+  if (casters.length === 1
+      && [fromArchetype.novice, fromArchetype.adept, fromArchetype.greater].some((v) => v != null)) {
     const num = (v) => (v == null ? 0 : parseInt(v, 10) || 0);
-    return {
-      novice: num(fromArchetype.novice),
-      adept: num(fromArchetype.adept),
-      greater: num(fromArchetype.greater),
-    };
+    return { novice: num(fromArchetype.novice), adept: num(fromArchetype.adept), greater: num(fromArchetype.greater) };
   }
 
-  // Fallback: the progression "N/N/N" slots string for this level.
-  const level = characterLevel(character);
-  const str = CLASS_PROGRESSION[cls]?.[level]?.slots;
-  if (typeof str === 'string') {
-    const [novice = 0, adept = 0, greater = 0] = str.split('/').map((n) => parseInt(n, 10) || 0);
-    return { novice, adept, greater };
+  // Otherwise sum each caster class's progression "N/N/N" slots at its own level.
+  const total = { novice: 0, adept: 0, greater: 0 };
+  for (const { name, level } of casters) {
+    const str = CLASS_PROGRESSION[name]?.[level]?.slots;
+    if (typeof str === 'string') {
+      const [n = 0, a = 0, g = 0] = str.split('/').map((x) => parseInt(x, 10) || 0);
+      total.novice += n; total.adept += a; total.greater += g;
+    }
   }
-  return { novice: 0, adept: 0, greater: 0 };
+  return total;
 }
 
 // Level-scaled stats. Archetype LP/spikes are authored at the starter level (4)

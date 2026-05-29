@@ -14,7 +14,7 @@ import {
   ARCHETYPES, REFS, lookupEntity, LEVEL_TABLE,
   eligiblePowers, ALL_SKILLS, ALL_PERKS, ALL_FLAWS,
 } from "./data/index.js";
-import { validate, characterLevel, prereqStatus } from "./data/validate.js";
+import { validate, characterLevel, prereqStatus, pickClass, getClasses } from "./data/validate.js";
 import "./Builder.css";
 
 // ─── CHARACTER STATE ────────────────────────────────────────────────────────
@@ -249,8 +249,9 @@ function BuildSheet({ character, report, view, onPickArchetype, onInspect, onOpe
       {report.slots.length > 0 && (
         <Section title="Powers" tone="purple">
           {report.slots.map((slot) => (
-            <SlotBlock key={slot.category} slot={slot} character={character}
-                       onInspect={onInspect} onOpenSlot={onOpenSlot} isFocused={isFocused} />
+            <SlotBlock key={`${slot.cls}-${slot.category}`} slot={slot} character={character}
+                       onInspect={onInspect} onOpenSlot={onOpenSlot} isFocused={isFocused}
+                       pickClassOf={(field, i, name) => pickClass(character, field, i, name)} />
           ))}
         </Section>
       )}
@@ -280,13 +281,17 @@ function Section({ title, tone = "amber", onAdd, children }) {
 // A tier's slots as fixed rows: `allowed` positions, filled by the character's
 // picks in order, the rest shown as empty "choose" rows. The header shows
 // used/allowed and goes green when exactly filled, red when over.
-function SlotBlock({ slot, character, onInspect, onOpenSlot, isFocused }) {
+function SlotBlock({ slot, character, onInspect, onOpenSlot, isFocused, pickClassOf }) {
   const field = SLOT_FIELD[slot.category];
-  const picks = character[field] || [];
-  // Render max(allowed, used) rows so over-cap picks are still visible/removable.
-  const rowCount = Math.max(slot.allowed, picks.length);
-  const rows = Array.from({ length: rowCount }, (_, i) => picks[i] ?? null);
+  const allPicks = character[field] || [];
+  // Picks belonging to THIS class's slots (with their position in the flat array
+  // so clear/swap target the right element).
+  const myPicks = allPicks
+    .map((name, flatIndex) => ({ name, flatIndex }))
+    .filter((p) => pickClassOf(field, p.flatIndex, p.name) === slot.cls);
 
+  const rowCount = Math.max(slot.allowed, myPicks.length);
+  const rows = Array.from({ length: rowCount }, (_, i) => myPicks[i] ?? null);
   const state = slot.over ? "is-over" : slot.used === slot.allowed && slot.allowed > 0 ? "is-full" : "";
 
   return (
@@ -300,18 +305,18 @@ function SlotBlock({ slot, character, onInspect, onOpenSlot, isFocused }) {
           const over = i >= slot.allowed;
           if (pick) {
             return (
-              <li key={i} className={`b-slot-row is-filled ${over ? "is-over" : ""} ${isFocused(pick, field) ? "is-focused" : ""}`}>
+              <li key={i} className={`b-slot-row is-filled ${over ? "is-over" : ""} ${isFocused(pick.name, field) ? "is-focused" : ""}`}>
                 <span className="b-slot-num">{i + 1}</span>
-                <button className="b-slot-pick" onClick={() => onInspect(pick, field, "powers")}>{pick}</button>
-                <button className="b-slot-action" title="Swap" onClick={() => onOpenSlot(slot.category, i)}>✎</button>
-                <button className="b-slot-action" title="Clear" onClick={() => onOpenSlot(slot.category, i, true)}>✕</button>
+                <button className="b-slot-pick" onClick={() => onInspect(pick.name, field, "powers")}>{pick.name}</button>
+                <button className="b-slot-action" title="Swap" onClick={() => onOpenSlot(slot, pick.flatIndex)}>✎</button>
+                <button className="b-slot-action" title="Clear" onClick={() => onOpenSlot(slot, pick.flatIndex, true)}>✕</button>
               </li>
             );
           }
           return (
             <li key={i} className="b-slot-row is-empty">
               <span className="b-slot-num">{i + 1}</span>
-              <button className="b-slot-add" onClick={() => onOpenSlot(slot.category, i)}>
+              <button className="b-slot-add" onClick={() => onOpenSlot(slot, -1)}>
                 + choose a {slot.label} power
               </button>
             </li>
@@ -414,7 +419,7 @@ function ArchetypePicker({ onPick }) {
 // followable links. PICK lists the eligible powers for a slot, each inspectable
 // (with links) and choosable. Both modes share the entity-card renderer.
 
-function DetailPane({ view, onInspect, onChoosePower, onBack, onClose }) {
+function DetailPane({ view, onInspect, onBack, onClose }) {
   if (!view) {
     return (
       <aside className="b-rail b-rail-right">
@@ -424,8 +429,7 @@ function DetailPane({ view, onInspect, onChoosePower, onBack, onClose }) {
       </aside>
     );
   }
-  return <EntityDetail view={view} onInspect={onInspect} onChoose={view.choosable ? onChoosePower : null}
-                       onBack={onBack} onClose={onClose} />;
+  return <EntityDetail view={view} onInspect={onInspect} onBack={onBack} onClose={onClose} />;
 }
 
 // ─── PICKER OVERLAY ───────────────────────────────────────────────────────────
@@ -441,9 +445,9 @@ function DetailPane({ view, onInspect, onChoosePower, onBack, onClose }) {
 
 // Build a picker spec for filling a power SLOT.
 function powerPickerSpec(slot, character) {
-  const { category, index, label } = slot;
-  const cls = character.classLevels?.split(" ")[0];
+  const { category, index, label, cls } = slot;
   const field = SLOT_FIELD[category];
+  // Candidates are drawn from the SLOT'S class only — slots are class-specific.
   const candidates = eligiblePowers(cls, category);
   const byTier = { noviceSpells: "Novice", adeptSpells: "Adept", greaterSpells: "Greater", cantrips: "Cantrip" };
   const groupBy = category === "spellsKnown"
@@ -459,7 +463,7 @@ function powerPickerSpec(slot, character) {
   return {
     kind: "power", entityType: "powers",
     title: `Choose a ${label} power`,
-    subtitle: `slot ${index + 1} · ${candidates.length} options for ${cls}`,
+    subtitle: `${candidates.length} options for ${cls}`,
     candidates, groupBy,
     taken: new Set(character[field] || []),
     onChoose: (name) => slot.onChoose(name),
@@ -609,7 +613,7 @@ function PickerOverlay({ spec, character, onClose }) {
 }
 
 // INSPECT mode: one entity, its facts, and followable links.
-function EntityDetail({ view, onInspect, onChoose, onBack, onClose }) {
+function EntityDetail({ view, onInspect, onBack, onClose }) {
   const entity = useResolvedEntity(view.item, view.field, view.resolveType, view.archetypeName);
   const { item, resolveType } = view;
 
@@ -623,11 +627,6 @@ function EntityDetail({ view, onInspect, onChoose, onBack, onClose }) {
       </header>
       <div className="b-detail-body">
         <EntityBody entity={entity} onInspect={onInspect} />
-        {onChoose && (
-          <button className="b-detail-choose" onClick={() => onChoose(view.category, view.index, item)}>
-            Choose this power
-          </button>
-        )}
       </div>
     </aside>
   );
@@ -820,34 +819,41 @@ export default function Builder() {
     });
   }, [character.archetypeName]);
 
-  // Set a power slot's pick at `index` (used by both choose and the slot picker).
-  const setSlotPick = useCallback((category, index, powerName) => {
-    const field = SLOT_FIELD[category];
+  // Commit a power pick into `field`, tagged with the slot's class. When
+  // flatIndex >= 0 it replaces (swap); otherwise it appends (fill empty slot).
+  // powerClass[field][i] records the owning class so per-class slots stay sorted.
+  const setSlotPick = useCallback((slot, flatIndex, powerName) => {
+    const field = SLOT_FIELD[slot.category];
     setCharacter((c) => {
       const next = [...(c[field] || [])];
-      next[index] = powerName;
-      return { ...c, [field]: next };
+      const pc = { ...(c.powerClass || {}) };
+      pc[field] = [...(pc[field] || [])];
+      const at = flatIndex >= 0 ? flatIndex : next.length;
+      next[at] = powerName;
+      pc[field][at] = slot.cls;
+      return { ...c, [field]: next, powerClass: pc };
     });
     setPicking(null);
   }, []);
 
-  // Open a power slot for picking, or clear it when `clear` is set.
-  const handleOpenSlot = useCallback((category, index, clear = false) => {
+  // Open a power slot for picking; clear=true removes the pick at flatIndex.
+  const handleOpenSlot = useCallback((slot, flatIndex, clear = false) => {
+    const field = SLOT_FIELD[slot.category];
     if (clear) {
-      const field = SLOT_FIELD[category];
       setCharacter((c) => {
         const next = [...(c[field] || [])];
-        next.splice(index, 1);
-        return { ...c, [field]: next };
+        next.splice(flatIndex, 1);
+        const pc = { ...(c.powerClass || {}) };
+        if (pc[field]) { pc[field] = [...pc[field]]; pc[field].splice(flatIndex, 1); }
+        return { ...c, [field]: next, powerClass: pc };
       });
       return;
     }
-    const label = report.slots.find((s) => s.category === category)?.label || category;
     setPicking(powerPickerSpec(
-      { category, index, label, onChoose: (name) => setSlotPick(category, index, name) },
+      { ...slot, onChoose: (name) => setSlotPick(slot, flatIndex, name) },
       character,
     ));
-  }, [report.slots, character, setSlotPick]);
+  }, [character, setSlotPick]);
 
   // Append a skill / perk / flaw to its list (purchasedSkills / purchasedPerks /
   // flaws). De-duped; closes the picker after.
@@ -932,7 +938,7 @@ export default function Builder() {
                     onInspect={handleInspect} onOpenSlot={handleOpenSlot}
                     onOpenAdd={handleOpenAdd} onRemoveEntity={handleRemoveEntity} />
         <DetailPane view={view}
-                    onInspect={handleInspect} onChoosePower={setSlotPick}
+                    onInspect={handleInspect}
                     onBack={history.length ? handleBack : null} onClose={handleClose} />
       </div>
       {picking && (
