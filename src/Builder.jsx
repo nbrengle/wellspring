@@ -103,6 +103,25 @@ const SLOT_FIELD = {
 const MIN_LEVEL = LEVEL_TABLE.length ? Math.min(...LEVEL_TABLE.map((l) => l.level)) : 4;
 const MAX_LEVEL = LEVEL_TABLE.length ? Math.max(...LEVEL_TABLE.map((l) => l.level)) : 4;
 
+// A short, clear label for what KIND of thing a grant source is, so "free ·
+// Linked Armor" can read "free · Linked Armor (Utility Power)". Prefers the role
+// the archetype note stated; otherwise resolves the source entity's type/tier.
+function grantSourceRole(grant) {
+  if (!grant?.source) return null;
+  if (grant.sourceRole) {
+    // Title-case the stated role ("utility power" → "Utility Power").
+    return grant.sourceRole.replace(/\b\w/g, (c) => c.toUpperCase());
+  }
+  const ent = lookupEntity(`powers:${grant.source}`)
+    || lookupEntity(`skills:${grant.source}`)
+    || lookupEntity(`perks:${grant.source}`);
+  if (!ent) return null;
+  if (ent.type === "powers") return `${ent.tier || ""} Power`.trim();
+  if (ent.type === "skills") return "Skill";
+  if (ent.type === "perks") return "Perk";
+  return null;
+}
+
 // ─── UI PRIMITIVES ──────────────────────────────────────────────────────────
 
 function Tag({ label, tone = "amber" }) {
@@ -388,9 +407,15 @@ function EditableRows({ items, field, onClick, isFocused, resolveType, report, r
             {isAward && <span className="b-row-bp is-award">+{-cost.cost} BP</span>}
             {!isAward && cost && cost.base > 0 && (
               cost.cost === 0 && cost.grant?.source
-                ? <span className="b-row-bp is-free" title={`Granted by ${cost.grant.source}`}>
-                    free · {cost.grant.source}
-                  </span>
+                ? (() => {
+                    const role = grantSourceRole(cost.grant);
+                    return (
+                      <span className="b-row-bp is-free"
+                            title={`Granted by ${cost.grant.source}${role ? ` (${role})` : ""}`}>
+                        free · {cost.grant.source}{role && <span className="b-row-role"> ({role})</span>}
+                      </span>
+                    );
+                  })()
                 : <span className={`b-row-bp ${cost.cost === 0 ? "is-free" : ""}`}>
                     {cost.cost === 0 ? "free" : `${cost.cost} BP`}
                   </span>

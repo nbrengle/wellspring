@@ -129,11 +129,16 @@ function parseProvenance(s) {
   const [, amt, verb, rest] = m;
   const v = verb.toLowerCase();
   const kind = (v === 'refunded from' || v === 'discounted from' || amt) ? 'discount' : 'grant';
-  // Trim trailing role words ("Utility Power", "innate Power", "Perk") from the
-  // source so it reads as the entity name; keep it loose since it's a hint.
-  const source = rest.replace(/\b(utility|innate|basic|class)?\s*power\b/i, '')
-                     .replace(/\bperk\b/i, '').replace(/\s+/g, ' ').trim() || null;
-  return { kind, amount: amt ? Math.abs(parseInt(amt, 10)) : null, source };
+  // The note may name the source's ROLE ("Utility Power", "innate Power", "Perk").
+  // Capture it (when stated) so the UI can say what kind of thing granted this,
+  // then strip it from `source` so that's just the entity name. Role isn't always
+  // present ("from The Learned One") — the UI can fall back to entity lookup.
+  const roleMatch = rest.match(/\b((?:utility|innate|basic|class|advanced|veteran)?\s*power|perk|skill|class\s+feature)\b/i);
+  const sourceRole = roleMatch ? roleMatch[1].replace(/\s+/g, ' ').trim().toLowerCase() : null;
+  const source = rest.replace(/\b(utility|innate|basic|class|advanced|veteran)?\s*power\b/i, '')
+                     .replace(/\bperk\b/i, '').replace(/\bskill\b/i, '').replace(/\bclass\s+feature\b/i, '')
+                     .replace(/\s+/g, ' ').trim() || null;
+  return { kind, amount: amt ? Math.abs(parseInt(amt, 10)) : null, source, sourceRole };
 }
 
 // Rank multiplier: "Foo x2" / "Foo x2 (your choice)" means take Foo twice. We

@@ -47,7 +47,8 @@
         {
           "kind": "grant",
           "amount": null,
-          "source": "Linked Armor"
+          "source": "Linked Armor",
+          "sourceRole": "utility power"
         },
         null,
         null
@@ -555,20 +556,23 @@
         {
           "kind": "grant",
           "amount": null,
-          "source": "Ritual Affinity"
+          "source": "Ritual Affinity",
+          "sourceRole": "innate power"
         },
         null,
         {
           "kind": "discount",
           "amount": null,
-          "source": "Sharp Mind"
+          "source": "Sharp Mind",
+          "sourceRole": null
         }
       ],
       "purchasedPerks": [
         {
           "kind": "discount",
           "amount": 1,
-          "source": "Library Use"
+          "source": "Library Use",
+          "sourceRole": null
         },
         null
       ],
@@ -722,7 +726,8 @@
         {
           "kind": "discount",
           "amount": 1,
-          "source": "Poisoner"
+          "source": "Poisoner",
+          "sourceRole": null
         },
         null
       ],
@@ -828,12 +833,14 @@
         {
           "kind": "grant",
           "amount": null,
-          "source": "Way of the Blade"
+          "source": "Way of the Blade",
+          "sourceRole": null
         },
         {
           "kind": "grant",
           "amount": null,
-          "source": "Way of the Blade"
+          "source": "Way of the Blade",
+          "sourceRole": null
         },
         null,
         null
@@ -842,12 +849,14 @@
         {
           "kind": "grant",
           "amount": null,
-          "source": "Throat Slit"
+          "source": "Throat Slit",
+          "sourceRole": null
         },
         {
           "kind": "grant",
           "amount": null,
-          "source": "Throat Slit"
+          "source": "Throat Slit",
+          "sourceRole": null
         },
         null
       ],
@@ -968,7 +977,8 @@
         {
           "kind": "grant",
           "amount": null,
-          "source": null
+          "source": null,
+          "sourceRole": "perk"
         },
         null,
         null
@@ -1137,7 +1147,8 @@
         {
           "kind": "discount",
           "amount": 3,
-          "source": "Forgesource Specialist"
+          "source": "Forgesource Specialist",
+          "sourceRole": null
         },
         null,
         null,
@@ -1150,7 +1161,8 @@
         {
           "kind": "grant",
           "amount": null,
-          "source": "The Learned One"
+          "source": "The Learned One",
+          "sourceRole": null
         }
       ],
       "purchasedPerks": [
@@ -1260,12 +1272,14 @@
         {
           "kind": "grant",
           "amount": null,
-          "source": "Hunter Gatherer"
+          "source": "Hunter Gatherer",
+          "sourceRole": null
         },
         {
           "kind": "grant",
           "amount": null,
-          "source": "The Learned One"
+          "source": "The Learned One",
+          "sourceRole": null
         }
       ],
       "purchasedPerks": [
@@ -1369,7 +1383,8 @@
         {
           "kind": "discount",
           "amount": 2,
-          "source": "The Learned One"
+          "source": "The Learned One",
+          "sourceRole": null
         },
         null
       ],
@@ -1378,7 +1393,8 @@
         {
           "kind": "grant",
           "amount": null,
-          "source": "The Learned One"
+          "source": "The Learned One",
+          "sourceRole": null
         }
       ],
       "purchasedPerks": [
