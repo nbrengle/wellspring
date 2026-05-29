@@ -13,6 +13,36 @@ import levelTableJson from './level-table.json';
 import domainsJson from './domains.json';
 import craftingJson from './crafting-recipes.json';
 import ritualsJson from './ritual-recipes.json';
+import archetypesJson from './archetypes.json';
+import refsJson from './refs.json';
+
+// Concept content files — the glossary and rules-reference data the linker emits
+// references to (terms:, rules-concepts:, effects:, accents:, …). Indexed below
+// so those reference links resolve and open instead of dead-ending.
+import glossaryJson from './glossary.json';
+import effectsJson from './effects.json';
+import accentsJson from './accents.json';
+import resourcesJson from './resources.json';
+import modifiersJson from './modifiers.json';
+import conditionsJson from './conditions.json';
+import defenseCallsJson from './defense-calls.json';
+import craftingConceptsJson from './crafting-concepts.json';
+import ritualConceptsJson from './ritual-concepts.json';
+import creatureTypesJson from './types.json';
+import coreRulesJson from './core-rules.json';
+import combatRulesJson from './combat-rules.json';
+import restsJson from './rests.json';
+import powerWordsJson from './power-words-and-power-phrases.json';
+import callsJson from './calls.json';
+import gameMarkersJson from './game-markers-and-signals.json';
+import coreRulesMiscJson from './core-rules-miscellaneous.json';
+import craftingAllJson from './crafting-all.json';
+import advancementJson from './advancement.json';
+import deathDyingJson from './death-and-dying.json';
+import wealthJson from './wealth.json';
+import powersJson from './powers.json';
+import devotionsBeingsJson from './devotions-divine-beings.json';
+import introductionJson from './introduction.json';
 
 export const LEVEL_TABLE = levelTableJson;
 
@@ -118,6 +148,30 @@ export const CLASS_POWERS = Object.fromEntries(
   ])
 );
 
+// Which power list(s) a slot category draws from. Martial categories map 1:1 to
+// a tier; the caster "spellsKnown" budget spans every learnable spell tier, so
+// the picker offers them all under one budget. Keyed by the slot category names
+// used in CLASS_POWER_SLOTS / validate.computeSlots.
+export const SLOT_POWER_LISTS = {
+  utility: ['utility'],
+  basic: ['basic'],
+  advanced: ['advanced'],
+  veteran: ['veteran'],
+  cantrips: ['cantrips'],
+  spellsKnown: ['noviceSpells', 'adeptSpells', 'greaterSpells'],
+};
+
+// The powers a character may choose to fill a given slot category, i.e. every
+// power in the class's lists for that category's tier(s). Each carries a `tier`
+// label so the picker can group spells-known by novice/adept/greater. Returns []
+// for unknown class/category.
+export function eligiblePowers(className, category) {
+  const lists = SLOT_POWER_LISTS[category];
+  const byTier = CLASS_POWERS[className];
+  if (!lists || !byTier) return [];
+  return lists.flatMap(tier => (byTier[tier] || []).map(p => ({ ...p, tierList: tier })));
+}
+
 // Power-slot counts at the starting level come from the progression table's
 // level-4 row, so they stay in sync with the source rather than being hardcoded.
 export const CLASS_POWER_SLOTS = Object.fromEntries(
@@ -137,6 +191,13 @@ export const CLASS_POWER_SLOTS = Object.fromEntries(
       veteran: lvl4.veteran ?? 0,
     }];
   })
+);
+
+// Full per-level progression table per class (level → { cantrips, spellsKnown,
+// slots, utility, basic, …, bonus }). The validator scans the `bonus` prose for
+// level-granted features like the casters' "Innate Bonus Cantrip".
+export const CLASS_PROGRESSION = Object.fromEntries(
+  classesJson.map(c => [c.name, c.progression || {}])
 );
 
 // ─── LINEAGES ─────────────────────────────────────────────────────────────────
@@ -194,3 +255,115 @@ export const DEVOTIONS = devotionsJson.map(d => ({
 export const DOMAINS = domainsJson;
 export const CRAFTING = craftingJson;
 export const RITUALS = ritualsJson;
+
+// ─── ARCHETYPES + REFS ────────────────────────────────────────────────────────
+// Starter character templates and the cross-reference graph the builder uses
+// to look up details, backlinks, and prereqs.
+export const ARCHETYPES = archetypesJson;
+export const REFS = refsJson;
+
+// Lookup by entity id, e.g. "skills:Basic Faith" → { type, name, description, ... }.
+// Used by the detail pane when an item card is clicked.
+const ENTITY_INDEX = new Map();
+const indexCollection = (items, type, nameKey = 'name', extra = e => ({})) => {
+  for (const e of items) {
+    const name = e[nameKey];
+    if (!name) continue;
+    ENTITY_INDEX.set(`${type}:${name}`, { id: `${type}:${name}`, type, name, ...e, ...extra(e) });
+  }
+};
+indexCollection(skillsJson, 'skills');
+indexCollection(perksJson, 'perks');
+indexCollection(flawsJson, 'flaws');
+indexCollection(devotionsJson, 'devotions');
+indexCollection(domainsJson, 'domains');
+indexCollection(craftingJson, 'recipes');
+indexCollection(ritualsJson, 'rituals');
+for (const c of classesJson) {
+  ENTITY_INDEX.set(`classes:${c.name}`, { id: `classes:${c.name}`, type: 'classes', ...c });
+  for (const s of (c.specializations || [])) {
+    ENTITY_INDEX.set(`classes:${s.name}`, { id: `classes:${s.name}`, type: 'classes', parentClass: c.name, ...s });
+  }
+  const TIERS = ['innate','utility','basic','advanced','veteran','classSkills','rightHandPowers','cantrips','noviceSpells','adeptSpells','greaterSpells'];
+  for (const t of TIERS) for (const p of (c[t] || [])) {
+    ENTITY_INDEX.set(`powers:${p.name}`, { id: `powers:${p.name}`, type: 'powers', parentClass: c.name, tier: t, ...p });
+  }
+}
+for (const d of domainsJson) for (const p of (d.powers || [])) {
+  ENTITY_INDEX.set(`powers:${p.name}`, { id: `powers:${p.name}`, type: 'powers', domain: d.name, ...p });
+}
+
+// ─── CONCEPT / GLOSSARY INDEX ──────────────────────────────────────────────────
+// Index the rules-reference content so the linker's reference links (terms:,
+// rules-concepts:, effects:, accents:, …) resolve. Field names vary per file, so
+// normalize each entry to { name, description }. Multiple source files map to the
+// same linker type (e.g. rules-concepts is spread across core-rules, combat-rules,
+// power-words); they're merged into one type bucket.
+const indexConcepts = (items, type, { nameKey = 'name', descKey = 'description' } = {}) => {
+  for (const e of items || []) {
+    const name = e[nameKey] ?? e.name ?? e.term ?? e.heading;
+    if (!name) continue;
+    const description = e[descKey] ?? e.description ?? e.definition ?? e.content ?? '';
+    const id = `${type}:${name}`;
+    // Don't clobber a richer earlier entry (e.g. a real skill) with a concept.
+    if (!ENTITY_INDEX.has(id)) {
+      ENTITY_INDEX.set(id, { id, type, name, description, ...e });
+    }
+    // Many rules entries nest named sub-concepts (e.g. Spellcasting > Spellbook,
+    // Delivery > Weapon Delivery). Index those under the same type so refs to the
+    // sub-concept resolve too.
+    if (Array.isArray(e.subConcepts)) {
+      indexConcepts(
+        e.subConcepts.map((s) => (typeof s === 'string' ? { name: s, description: '' } : s)),
+        type,
+      );
+    }
+  }
+};
+
+indexConcepts(glossaryJson, 'terms', { nameKey: 'term', descKey: 'definition' });
+indexConcepts(effectsJson, 'effects');
+indexConcepts(accentsJson, 'accents');
+indexConcepts(resourcesJson, 'resources');
+indexConcepts(modifiersJson, 'modifiers');
+indexConcepts(conditionsJson, 'conditions');
+indexConcepts(defenseCallsJson, 'defenses');
+indexConcepts(craftingConceptsJson, 'crafting-concepts');
+indexConcepts(ritualConceptsJson, 'ritual-concepts');
+indexConcepts(creatureTypesJson, 'creature-types');
+// rules-concepts content is spread across many doc-derived rules files — index
+// all of them (recursing into subConcepts) under the one linker type so refs
+// like rules-concepts:Spellcasting / Summoned Armor / Multi-Classing resolve.
+// The intermediate JSON shape doesn't matter; it's regenerated from the doc.
+for (const src of [
+  coreRulesJson, combatRulesJson, restsJson, powerWordsJson, callsJson,
+  gameMarkersJson, coreRulesMiscJson, craftingAllJson, advancementJson,
+  deathDyingJson, wealthJson, powersJson, devotionsBeingsJson, introductionJson,
+]) {
+  indexConcepts(src, 'rules-concepts', { nameKey: 'name', descKey: 'description' });
+}
+
+// Canonical-name fallback: the linker's type prefix doesn't always match where
+// the content actually lives (e.g. it emits `terms:Long Rest` but the entry is
+// indexed under `rules-concepts:Long Rests`). Build a map from a normalized name
+// to the best entity id so lookup can recover across that mismatch.
+const canon = (s) => String(s).toLowerCase()
+  .replace(/[“”"’‘]/g, '').replace(/\s*\/\s*/g, ' / ').replace(/\s+/g, ' ').trim()
+  .replace(/(\w)s$/, (m, c) => (c === 's' ? m : c)); // drop trailing plural -s
+const NAME_INDEX = new Map();
+for (const [id, ent] of ENTITY_INDEX) {
+  const key = canon(ent.name);
+  if (!NAME_INDEX.has(key)) NAME_INDEX.set(key, id);
+}
+
+// Lookup by entity id, e.g. "skills:Basic Faith" → { type, name, description, ... }.
+// Falls back to a canonical-name match across all types when the exact id misses,
+// so reference links resolve despite linker/file namespace differences.
+export const lookupEntity = (id) => {
+  if (!id) return null;
+  const direct = ENTITY_INDEX.get(id);
+  if (direct) return direct;
+  const name = id.slice(id.indexOf(':') + 1);
+  const byName = NAME_INDEX.get(canon(name));
+  return byName ? ENTITY_INDEX.get(byName) : null;
+};

@@ -2,6 +2,74 @@
   {
     "name": "Defensive Sword + Shield Fighter",
     "tagline": "Guard your allies, block hits, and take a beating while you still stand.",
+    "effectiveBP": {
+      "startingSkills": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "purchasedSkills": [
+        null,
+        5,
+        2
+      ],
+      "purchasedPerks": [
+        1,
+        1
+      ],
+      "innatePowers": [
+        null,
+        null,
+        null
+      ],
+      "utilityPowers": [
+        null,
+        null
+      ],
+      "basicPowers": [
+        null,
+        null
+      ]
+    },
+    "grants": {
+      "startingSkills": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "purchasedSkills": [
+        {
+          "kind": "grant",
+          "amount": null,
+          "source": "Linked Armor"
+        },
+        null,
+        null
+      ],
+      "purchasedPerks": [
+        null,
+        null
+      ],
+      "innatePowers": [
+        null,
+        null,
+        null
+      ],
+      "utilityPowers": [
+        null,
+        null
+      ],
+      "basicPowers": [
+        null,
+        null
+      ]
+    },
     "lineage": "Human",
     "lineageChallenges": [],
     "lineageAdvantages": [],
@@ -19,13 +87,13 @@
       "Advanced Shields"
     ],
     "purchasedSkills": [
-      "Medium Armor - 0 BP (from Linked Armor Utility Power)",
-      "Shield Expertise - 5 BP",
-      "Basic Medicine - 2 BP"
+      "Medium Armor",
+      "Shield Expertise",
+      "Basic Medicine"
     ],
     "purchasedPerks": [
-      "Holding On - 1 BP",
-      "Will to Live - 1 BP"
+      "Holding On",
+      "Will to Live"
     ],
     "innatePowers": [
       "Deadly Remnants",
@@ -44,6 +112,35 @@
   {
     "name": "Great Weapon Fighter",
     "tagline": "You have a huge sword, and no one can take that away from you.",
+    "effectiveBP": {
+      "startingSkills": [
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "purchasedSkills": [
+        4
+      ],
+      "purchasedPerks": [
+        2,
+        3
+      ],
+      "innatePowers": [
+        null,
+        null,
+        null
+      ],
+      "utilityPowers": [
+        null,
+        null
+      ],
+      "basicPowers": [
+        null,
+        null
+      ]
+    },
     "lineage": "Human",
     "lineageChallenges": [],
     "lineageAdvantages": [],
@@ -60,11 +157,11 @@
       "Great Weapons"
     ],
     "purchasedSkills": [
-      "Weapon Specialization (Swords) - 4 BP"
+      "Weapon Specialization (Swords)"
     ],
     "purchasedPerks": [
-      "Ancestral Relic - 2 BP",
-      "Bloody Minded - 3 BP"
+      "Ancestral Relic",
+      "Bloody Minded"
     ],
     "innatePowers": [
       "Deadly Remnants",
@@ -83,6 +180,37 @@
   {
     "name": "Archer Fighter",
     "tagline": "Aim carefully from the back line, and pierce through enemies with your arrows.",
+    "effectiveBP": {
+      "startingSkills": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "purchasedSkills": [
+        3,
+        4,
+        1
+      ],
+      "purchasedPerks": [
+        1
+      ],
+      "innatePowers": [
+        null,
+        null,
+        null
+      ],
+      "utilityPowers": [
+        null,
+        null
+      ],
+      "basicPowers": [
+        null,
+        null
+      ]
+    },
     "lineage": "Human",
     "lineageChallenges": [],
     "lineageAdvantages": [],
@@ -100,12 +228,12 @@
       "Projectile Weapons"
     ],
     "purchasedSkills": [
-      "Accuracy - 3 BP",
-      "Tracking - 4 BP",
-      "Profession - Apprentice (your choice) - 1 BP"
+      "Accuracy",
+      "Tracking",
+      "Profession - Apprentice (your choice)"
     ],
     "purchasedPerks": [
-      "Deathgrip - 1 BP"
+      "Deathgrip"
     ],
     "innatePowers": [
       "Deadly Remnants",
@@ -124,6 +252,43 @@
   {
     "name": "Balanced Cleric",
     "tagline": "Use your divine might to heal your allies or smite your enemies.",
+    "effectiveBP": {
+      "startingSkills": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "domainPowers": [
+        5
+      ],
+      "purchasedSkills": [
+        2,
+        1
+      ],
+      "purchasedPerks": [
+        1
+      ],
+      "innatePowers": [
+        null,
+        null,
+        null
+      ],
+      "cantrips": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "noviceSpells": [
+        null,
+        null,
+        null,
+        null
+      ]
+    },
     "lineage": "Human",
     "lineageChallenges": [],
     "lineageAdvantages": [],
@@ -149,14 +314,14 @@
       "Life"
     ],
     "domainPowers": [
-      "Lifeline (Life) - 5 BP"
+      "Lifeline (Life)"
     ],
     "purchasedSkills": [
-      "Lore (Religious) - 2 BP",
-      "Path of Panic - 1 BP"
+      "Lore (Religious)",
+      "Path of Panic"
     ],
     "purchasedPerks": [
-      "Soothing Touch - 1 BP"
+      "Soothing Touch"
     ],
     "innatePowers": [
       "Ritual Affinity",
@@ -180,6 +345,39 @@
   {
     "name": "Form Fighter Druid",
     "tagline": "Harness your primal shapeshifting magic to fill your choice of combat roles.",
+    "effectiveBP": {
+      "startingSkills": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "purchasedSkills": [
+        4,
+        2
+      ],
+      "purchasedPerks": [
+        3
+      ],
+      "innatePowers": [
+        null,
+        null,
+        null
+      ],
+      "cantrips": [
+        null,
+        null,
+        null
+      ],
+      "noviceSpells": [
+        null,
+        null,
+        null,
+        null
+      ]
+    },
     "lineage": "Human",
     "lineageChallenges": [],
     "lineageAdvantages": [],
@@ -197,11 +395,11 @@
       "Lore (Nature)"
     ],
     "purchasedSkills": [
-      "Favored Form (your choice) - 4 BP",
-      "Red in Tooth and Claw - 2 BP"
+      "Favored Form (your choice)",
+      "Red in Tooth and Claw"
     ],
     "purchasedPerks": [
-      "Insight - 3 BP"
+      "Insight"
     ],
     "innatePowers": [
       "Commune with Nature",
@@ -224,6 +422,42 @@
   {
     "name": "Healer Druid",
     "tagline": "Call upon the restorative power of nature to shelter and heal your allies.",
+    "effectiveBP": {
+      "startingSkills": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "purchasedSkills": [
+        1,
+        1,
+        1,
+        4
+      ],
+      "purchasedPerks": [
+        2
+      ],
+      "innatePowers": [
+        null,
+        null,
+        null
+      ],
+      "cantrips": [
+        null,
+        null,
+        null
+      ],
+      "noviceSpells": [
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    },
     "lineage": "Human",
     "lineageChallenges": [],
     "lineageAdvantages": [],
@@ -241,13 +475,13 @@
       "Basic Medicine"
     ],
     "purchasedSkills": [
-      "Find the Path - 1 BP",
-      "Diagnose - 1 BP",
-      "Combat Medic - 1 BP",
-      "Spell-Scholar - 4 BP"
+      "Find the Path",
+      "Diagnose",
+      "Combat Medic",
+      "Spell-Scholar"
     ],
     "purchasedPerks": [
-      "Iron Stomach - 2 BP"
+      "Iron Stomach"
     ],
     "innatePowers": [
       "Commune with Nature",
@@ -271,6 +505,94 @@
   {
     "name": "Utility Mage",
     "tagline": "Gather information and support your allies using your mental and magical prowess.",
+    "effectiveBP": {
+      "startingSkills": [
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "purchasedSkills": [
+        null,
+        2,
+        null
+      ],
+      "purchasedPerks": [
+        null,
+        3
+      ],
+      "innatePowers": [
+        null,
+        null,
+        null
+      ],
+      "cantrips": [
+        null,
+        null,
+        null
+      ],
+      "noviceSpells": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "bookSpells": [
+        null,
+        null
+      ]
+    },
+    "grants": {
+      "startingSkills": [
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "purchasedSkills": [
+        {
+          "kind": "grant",
+          "amount": null,
+          "source": "Ritual Affinity"
+        },
+        null,
+        {
+          "kind": "discount",
+          "amount": null,
+          "source": "Sharp Mind"
+        }
+      ],
+      "purchasedPerks": [
+        {
+          "kind": "discount",
+          "amount": 1,
+          "source": "Library Use"
+        },
+        null
+      ],
+      "innatePowers": [
+        null,
+        null,
+        null
+      ],
+      "cantrips": [
+        null,
+        null,
+        null
+      ],
+      "noviceSpells": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "bookSpells": [
+        null,
+        null
+      ]
+    },
     "lineage": "Human",
     "lineageChallenges": [],
     "lineageAdvantages": [],
@@ -287,13 +609,13 @@
       "Extended Capacity - Novice x2"
     ],
     "purchasedSkills": [
-      "Apprentice Ritual Magic - 0 BP (from Ritual Affinity innate Power)",
-      "Arcane Charge - 2 BP",
-      "Lore x2 (your choice) - 2 BP (discounted from Sharp Mind)"
+      "Apprentice Ritual Magic",
+      "Arcane Charge",
+      "Lore x2 (your choice)"
     ],
     "purchasedPerks": [
-      "Sharp Mind - 2 BP (1 BP refunded from Library Use)",
-      "Sight - 3 BP"
+      "Sharp Mind",
+      "Sight"
     ],
     "innatePowers": [
       "Arcane Study",
@@ -320,6 +642,66 @@
   {
     "name": "Ranged Rogue",
     "tagline": "Throw knives and poisons from a safe distance.",
+    "effectiveBP": {
+      "startingSkills": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "purchasedSkills": [
+        4,
+        null,
+        3
+      ],
+      "innatePowers": [
+        null,
+        null,
+        null
+      ],
+      "utilityPowers": [
+        null,
+        null
+      ],
+      "basicPowers": [
+        null,
+        null
+      ]
+    },
+    "grants": {
+      "startingSkills": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "purchasedSkills": [
+        null,
+        {
+          "kind": "discount",
+          "amount": 1,
+          "source": "Poisoner"
+        },
+        null
+      ],
+      "innatePowers": [
+        null,
+        null,
+        null
+      ],
+      "utilityPowers": [
+        null,
+        null
+      ],
+      "basicPowers": [
+        null,
+        null
+      ]
+    },
     "lineage": "Human",
     "lineageChallenges": [],
     "lineageAdvantages": [],
@@ -337,10 +719,11 @@
       "Poisoner"
     ],
     "purchasedSkills": [
-      "Weapon Specialization (Thrown Weapons) - 4 BP",
-      "Apprentice Alchemy - 2 BP (1 BP refunded from Poisoner)",
-      "Forage I - 3 BP"
+      "Weapon Specialization (Thrown Weapons)",
+      "Apprentice Alchemy",
+      "Forage I"
     ],
+    "purchasedPerks": [],
     "innatePowers": [
       "Deflect Projectiles",
       "Backstab (+1 damage)",
@@ -358,6 +741,92 @@
   {
     "name": "Skirmisher Rogue",
     "tagline": "Position behind enemies, quickly take them out, and get away.",
+    "effectiveBP": {
+      "startingSkills": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "purchasedSkills": [
+        3,
+        null,
+        null,
+        4,
+        1
+      ],
+      "purchasedPerks": [
+        null,
+        null,
+        1
+      ],
+      "innatePowers": [
+        null,
+        null,
+        null
+      ],
+      "utilityPowers": [
+        null,
+        null
+      ],
+      "basicPowers": [
+        null,
+        null
+      ]
+    },
+    "grants": {
+      "startingSkills": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "purchasedSkills": [
+        null,
+        {
+          "kind": "grant",
+          "amount": null,
+          "source": "Way of the Blade"
+        },
+        {
+          "kind": "grant",
+          "amount": null,
+          "source": "Way of the Blade"
+        },
+        null,
+        null
+      ],
+      "purchasedPerks": [
+        {
+          "kind": "grant",
+          "amount": null,
+          "source": "Throat Slit"
+        },
+        {
+          "kind": "grant",
+          "amount": null,
+          "source": "Throat Slit"
+        },
+        null
+      ],
+      "innatePowers": [
+        null,
+        null,
+        null
+      ],
+      "utilityPowers": [
+        null,
+        null
+      ],
+      "basicPowers": [
+        null,
+        null
+      ]
+    },
     "lineage": "Human",
     "lineageChallenges": [],
     "lineageAdvantages": [],
@@ -375,14 +844,16 @@
       "Poisoner"
     ],
     "purchasedSkills": [
-      "Short Weapons - 3 BP",
-      "Two Weapon Style - 0 BP (free from Way of the Blade)",
-      "Weapon Specialization (Daggers) - 0 BP (free from Way of the Blade)",
-      "Advanced Traps - 4 BP",
-      "Apprentice Profession (your choice) - 1 BP",
-      "Purchased Perks:Deathgrip - 0 BP (free from Throat Slit)",
-      "Holding On - 0 BP (free from Throat Slit)",
-      "Carnal Creature - 1 BP"
+      "Short Weapons",
+      "Two Weapon Style",
+      "Weapon Specialization (Daggers)",
+      "Advanced Traps",
+      "Apprentice Profession (your choice)"
+    ],
+    "purchasedPerks": [
+      "Deathgrip",
+      "Holding On",
+      "Carnal Creature"
     ],
     "innatePowers": [
       "Deflect Projectiles",
@@ -401,6 +872,84 @@
   {
     "name": "Support Socialite",
     "tagline": "Use your intellect and charisma to get everything you want - from a safe distance behind your bodyguard, of course.",
+    "effectiveBP": {
+      "startingSkills": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "purchasedSkills": [
+        1,
+        1,
+        1
+      ],
+      "purchasedPerks": [
+        null,
+        3,
+        3
+      ],
+      "innatePowers": [
+        null,
+        null,
+        null
+      ],
+      "utilityPowers": [
+        null,
+        null
+      ],
+      "basicPowers": [
+        null,
+        null,
+        null
+      ]
+    },
+    "grants": {
+      "startingSkills": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "purchasedSkills": [
+        null,
+        null,
+        null
+      ],
+      "purchasedPerks": [
+        {
+          "kind": "grant",
+          "amount": null,
+          "source": null
+        },
+        null,
+        null
+      ],
+      "innatePowers": [
+        null,
+        null,
+        null
+      ],
+      "utilityPowers": [
+        null,
+        null
+      ],
+      "basicPowers": [
+        null,
+        null,
+        null
+      ]
+    },
     "lineage": "Human",
     "lineageChallenges": [],
     "lineageAdvantages": [],
@@ -421,14 +970,14 @@
       "Contact"
     ],
     "purchasedSkills": [
-      "The Right Hand - 1 BP",
-      "Holding Out for a Hero - 1 BP",
-      "Steel Yourself - 1 BP"
+      "The Right Hand",
+      "Holding Out for a Hero",
+      "Steel Yourself"
     ],
     "purchasedPerks": [
-      "Contact - 0 BP (starting Perk)",
-      "Manse - 3 BP",
-      "Income - 3 BP"
+      "Contact",
+      "Manse",
+      "Income"
     ],
     "innatePowers": [
       "Practiced Manner",
@@ -448,6 +997,32 @@
   {
     "name": "Blaster Sourcerer",
     "tagline": "Never meet a problem you can’t zap to smithereens.",
+    "effectiveBP": {
+      "startingSkills": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "purchasedSkills": [
+        5
+      ],
+      "purchasedPerks": [
+        3,
+        1
+      ],
+      "innatePowers": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "cantrips": [
+        null,
+        null,
+        null
+      ]
+    },
     "lineage": "Human",
     "lineageChallenges": [],
     "lineageAdvantages": [],
@@ -463,11 +1038,11 @@
       "Gift of Hateful Retribution I"
     ],
     "purchasedSkills": [
-      "Warcaster - 5 BP"
+      "Warcaster"
     ],
     "purchasedPerks": [
-      "Gift of Hateful Retribution II - 3 BP",
-      "Gift of Recognition - 1 BP"
+      "Gift of Hateful Retribution II",
+      "Gift of Recognition"
     ],
     "innatePowers": [
       "Internal Battery",
@@ -484,31 +1059,103 @@
   {
     "name": "Artificer Artisan",
     "tagline": "Smith minerals into the finest equipment, and enhance it on the battlefield.",
+    "effectiveBP": {
+      "startingSkills": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "purchasedSkills": [
+        3,
+        4,
+        2,
+        null
+      ],
+      "purchasedPerks": [
+        3
+      ],
+      "innatePowers": [
+        null
+      ],
+      "utilityPowers": [
+        null,
+        null
+      ],
+      "basicPowers": [
+        null,
+        null,
+        null
+      ]
+    },
+    "grants": {
+      "startingSkills": [
+        null,
+        null,
+        null,
+        {
+          "kind": "discount",
+          "amount": 3,
+          "source": "Forgesource Specialist"
+        },
+        null,
+        null,
+        null
+      ],
+      "purchasedSkills": [
+        null,
+        null,
+        null,
+        {
+          "kind": "grant",
+          "amount": null,
+          "source": "The Learned One"
+        }
+      ],
+      "purchasedPerks": [
+        null
+      ],
+      "innatePowers": [
+        null
+      ],
+      "utilityPowers": [
+        null,
+        null
+      ],
+      "basicPowers": [
+        null,
+        null,
+        null
+      ]
+    },
     "lineage": "Human",
     "lineageChallenges": [],
     "lineageAdvantages": [],
     "lifePoints": "3",
     "armorPoints": "4 (must be physrepped)",
     "spikes": "2",
-    "classLevels": "Artificer 4",
+    "classLevels": "Artisan 4",
     "flaws": [],
     "startingSkills": [
       "Basic Martial Weapons",
       "Short Weapons",
       "Basic Armor",
-      "Apprentice Tinkering (-3 BP refunded from Forgesource Specialist)",
+      "Apprentice Tinkering",
       "Prospect I",
       "Apprentice Profession (your choice)",
       "Journeyman Profession (your choice)"
     ],
     "purchasedSkills": [
-      "Light Armor - 3 BP",
-      "Journeyman Tinkering - 4 BP",
-      "Chronic Hobbyist (your choice) - 2 BP",
-      "Medium Armor - 0 BP (from The Learned One)"
+      "Light Armor",
+      "Journeyman Tinkering",
+      "Chronic Hobbyist (your choice)",
+      "Medium Armor"
     ],
     "purchasedPerks": [
-      "Fortunate Finder - 3 BP"
+      "Fortunate Finder"
     ],
     "innatePowers": [
       "Living Iron"
@@ -521,11 +1168,84 @@
       "Armor Upkeep Specialist",
       "Forcefield",
       "Overcharge"
-    ]
+    ],
+    "specialization": "Artificer"
   },
   {
     "name": "Crafter Artisan",
     "tagline": "Brew up a myriad of consumable items from the safety of the tavern.",
+    "effectiveBP": {
+      "startingSkills": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "purchasedSkills": [
+        3,
+        3,
+        null,
+        null
+      ],
+      "purchasedPerks": [
+        3
+      ],
+      "innatePowers": [
+        null
+      ],
+      "utilityPowers": [
+        null,
+        null
+      ],
+      "basicPowers": [
+        null,
+        null,
+        null
+      ]
+    },
+    "grants": {
+      "startingSkills": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "purchasedSkills": [
+        null,
+        null,
+        {
+          "kind": "grant",
+          "amount": null,
+          "source": "Hunter Gatherer"
+        },
+        {
+          "kind": "grant",
+          "amount": null,
+          "source": "The Learned One"
+        }
+      ],
+      "purchasedPerks": [
+        null
+      ],
+      "innatePowers": [
+        null
+      ],
+      "utilityPowers": [
+        null,
+        null
+      ],
+      "basicPowers": [
+        null,
+        null,
+        null
+      ]
+    },
     "lineage": "Human",
     "lineageChallenges": [],
     "lineageAdvantages": [],
@@ -544,13 +1264,13 @@
       "Hearth"
     ],
     "purchasedSkills": [
-      "Scavenge I - 3 BP",
-      "Scavenge II - 3 BP",
-      "Forage II - 0 BP (from Hunter Gatherer)",
-      "Journeyman Alchemy - 0 BP (from The Learned One)"
+      "Scavenge I",
+      "Scavenge II",
+      "Forage II",
+      "Journeyman Alchemy"
     ],
     "purchasedPerks": [
-      "Fortunate Finder - 3 BP"
+      "Fortunate Finder"
     ],
     "innatePowers": [
       "Living Iron"
@@ -563,15 +1283,89 @@
       "Apt Assistant",
       "Custom Brew",
       "Kick"
-    ]
+    ],
+    "specialization": "Crafter"
   },
   {
     "name": "Mystic Artisan",
     "tagline": "Perform magical rites to enchant weapons and uncover mysteries.",
+    "effectiveBP": {
+      "startingSkills": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "purchasedSkills": [
+        4,
+        null
+      ],
+      "purchasedPerks": [
+        3,
+        3,
+        1
+      ],
+      "innatePowers": [
+        null
+      ],
+      "utilityPowers": [
+        null,
+        null
+      ],
+      "basicPowers": [
+        null,
+        null,
+        null
+      ]
+    },
+    "grants": {
+      "startingSkills": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "kind": "discount",
+          "amount": 2,
+          "source": "The Learned One"
+        },
+        null
+      ],
+      "purchasedSkills": [
+        null,
+        {
+          "kind": "grant",
+          "amount": null,
+          "source": "The Learned One"
+        }
+      ],
+      "purchasedPerks": [
+        null,
+        null,
+        null
+      ],
+      "innatePowers": [
+        null
+      ],
+      "utilityPowers": [
+        null,
+        null
+      ],
+      "basicPowers": [
+        null,
+        null,
+        null
+      ]
+    },
     "lineage": "Human",
     "lineageChallenges": [],
     "lineageAdvantages": [],
     "lifePoints": "3",
+    "armorPoints": null,
     "spikes": "2",
     "classLevels": "Artisan 4",
     "flaws": [],
@@ -581,17 +1375,17 @@
       "Basic Armor",
       "Apprentice Enchanting",
       "Apprentice Ritual Magic",
-      "Lore (Rituals) (-2 BP refunded from The Learned One)",
+      "Lore (Rituals)",
       "Forage I"
     ],
     "purchasedSkills": [
-      "Journeyman Enchanting - 4 BP",
-      "Journeyman Ritual Magic - 0 BP (from The Learned One)"
+      "Journeyman Enchanting",
+      "Journeyman Ritual Magic"
     ],
     "purchasedPerks": [
-      "Soothsayer - 3 BP",
-      "Insight - 3 BP",
-      "Bits and Pieces - 1 BP"
+      "Soothsayer",
+      "Insight",
+      "Bits and Pieces"
     ],
     "innatePowers": [
       "Living Iron"
@@ -604,6 +1398,7 @@
       "Aegis of the Unknown/Sundering of the Unknown",
       "Dig Deep",
       "Mesmerize"
-    ]
+    ],
+    "specialization": "Mystic"
   }
 ]

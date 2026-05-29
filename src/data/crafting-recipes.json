@@ -103,13 +103,14 @@
     "type": null,
     "process": "Take Bloom five at a time and grind them in the mortal and pestle for 3 turns of the hourglass. Take the resulting powder and bottle it. After this process is complete, place the Bloom in the Ashbin and fill out the Bloom Powder card.",
     "description": "A small vial with brightly colored powder that looks like colored sand, often the same color as the petals of the flowers used to make it.",
-    "effect": "",
+    "effect": "Bloom Powder may be used as a direct substitute for almost anything that requires a Bloom such as Powers, Recipes, or other requirements. Of note, you may not use Bloom Powder to make additional Bloom Powder or other crafting that requires Bloom physreps. The yield of this recipe may not be altered under any circumstances.",
     "fields": {
       "Crafting Materials Needed": "10 Bloom (physreps only)",
       "Uses per Batch": "11 Bloom Powder (one item card)",
       "Expiration": "Until Used",
       "Crafting Process": "Take Bloom five at a time and grind them in the mortal and pestle for 3 turns of the hourglass. Take the resulting powder and bottle it. After this process is complete, place the Bloom in the Ashbin and fill out the Bloom Powder card.",
-      "Description": "A small vial with brightly colored powder that looks like colored sand, often the same color as the petals of the flowers used to make it."
+      "Description": "A small vial with brightly colored powder that looks like colored sand, often the same color as the petals of the flowers used to make it.",
+      "Effect": "Bloom Powder may be used as a direct substitute for almost anything that requires a Bloom such as Powers, Recipes, or other requirements. Of note, you may not use Bloom Powder to make additional Bloom Powder or other crafting that requires Bloom physreps. The yield of this recipe may not be altered under any circumstances."
     }
   },
   {
@@ -1322,14 +1323,15 @@
     "type": "Empower",
     "process": "Circle of Sacrifice: Enter the Circle of Sacrifice with the Harvest. Kneel or sit on the ground. One at a time, take a Harvest and set it on the ground. Using a piece of silver, ring a bell over the 10 Harvest and then recite the Chant of Material Sacrifice. At the end of the entire process, place the Harvest reps in the Ash Bin and fill out the item card.",
     "description": "",
-    "effect": "",
+    "effect": "Harvest Essence may be used as a direct substitute for almost anything that requires a Harvest such as Powers, Recipes, or other requirements. Of note, you may not use Harvest Essence to make additional Harvest Essence or other crafting that requires Harvest physreps. The yield of this recipe may not be altered under any circumstances.",
     "fields": {
       "Crafting Materials Needed": "10 Harvest (physreps only)",
       "Uses per Batch": "11 Harvest Essence (one item card)",
       "Expiration": "Until Used",
       "Type": "Empower",
       "Circle of Sacrifice": "Enter the Circle of Sacrifice with the Harvest. Kneel or sit on the ground. One at a time, take a Harvest and set it on the ground. Using a piece of silver, ring a bell over the 10 Harvest and then recite the Chant of Material Sacrifice. At the end of the entire process, place the Harvest reps in the Ash Bin and fill out the item card.",
-      "Reality Tear": "Ring the bell four times, each time waiting for silence before ringing it again. At that point, draw an Essence from the Reality Tear (see Drawing procedure at the beginning of the chapter). If you successfully draw the Spirit or Life Essence, place the Essence back and the process is complete. On any other draw including Unravelling, place the Essence back and begin the steps of the Reality Tear again."
+      "Reality Tear": "Ring the bell four times, each time waiting for silence before ringing it again. At that point, draw an Essence from the Reality Tear (see Drawing procedure at the beginning of the chapter). If you successfully draw the Spirit or Life Essence, place the Essence back and the process is complete. On any other draw including Unravelling, place the Essence back and begin the steps of the Reality Tear again.",
+      "Effect": "Harvest Essence may be used as a direct substitute for almost anything that requires a Harvest such as Powers, Recipes, or other requirements. Of note, you may not use Harvest Essence to make additional Harvest Essence or other crafting that requires Harvest physreps. The yield of this recipe may not be altered under any circumstances."
     }
   },
   {

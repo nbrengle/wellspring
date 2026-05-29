@@ -392,10 +392,10 @@
     "description": "The character may choose a Devotion and gain access to the abilities found in up to two of their Divine Domains. If a character does not purchase this Skill, they may still follow a Devotion without purchasing Divine Domain Powers. See:"
   },
   {
-    "name": "Divine Favor (Unlimited)",
+    "name": "Divine Favor",
     "cost": 2,
     "prereq": "Worship",
-    "ranks": null,
+    "ranks": "unlimited",
     "category": "Magic",
     "description": "The character may channel divine favor through their martial prowess. Once per Short Rest, they may add the Divine Accent to any one basic Spike weapon attack or replace the Accent of a Martial Power (Basic, Advanced, etc) or basic attack that has an Accent already to the Divine Accent."
   },
@@ -456,10 +456,10 @@
     "description": "The character chooses one spell-casting class in which they have at least 1 Known Spell, and adds 1 to the number of Known Spells that they have access to in that class."
   },
   {
-    "name": "Bookcaster (Unlimited)",
+    "name": "Bookcaster",
     "cost": 1,
     "prereq": "Basic Arcane Skill or Basic Faith",
-    "ranks": null,
+    "ranks": "unlimited",
     "category": "Magic",
     "description": "Upon purchasing this skill, the player selects one spell from any spell list they have access to through their classes, of a Tier they would normally be able to access. The character may cast this spell when they are out of combat by expending a spell-slot and reading the incantation a full five times, or actively studying their spell book for a full minute, while satisfying all the normal requirements of the spell. Additionally, once per event, the character may deposit one Hide and one Bloom into an ashbin and spend 10 minutes writing in their spell book to exchange one spell from their book for another from a list they have access to."
   },
@@ -520,12 +520,13 @@
     "description": "As handy as on-the-fly spell casting is, many of those that call upon greater forces recognize that much of the true power of the world rests in the hands of careful and considered rites and rituals. While many know the tried and true ritual methods, scarce few have the knowledge required to make these rituals themselves. A character with the Journeyman Ritual Magic skill has the ability to propose rituals to staff to be performed during the game, once per game/between-game period. Submissions must be done through the Player Outbox. These rituals must be at a power scale and cost similar to the existing rituals in the game, and must have similar pre-requisites, but can be tailored to specific use cases and goals. Staff will propose alterations as needed, as well as additional heavy one-time costs associated with the ritual. Depending on the ritual and its intended scope, rituals will either be approved as single-use one time rituals, or as a general use ritual. If it is approved as a general use ritual, the ritual will be added to the standard suite of rituals the game has access to. Submitting a potential ritual does not guarantee its approval. Note: This skill is experimental, and is subject to change - please be considerate of staff’s time and resources. Submitting rituals that are far outside of power scale and complicated require more plot consideration, and as a result are less likely to be approved during the course of a game. Rituals submitted during game should be more simple, and are more likely to be approved if they are one-off information or context specific rituals. Rituals meant for general purpose should be submitted between events."
   },
   {
-    "name": "Lore [Area of Lore] (Unlimited)",
+    "name": "Lore",
     "cost": 2,
     "prereq": "None",
-    "ranks": null,
+    "ranks": "unlimited",
     "category": "Scholar",
-    "description": "The character has learned about a specific area of study, with each area of study considered a separate skill. Lore confers a level of knowledge that is both deep and detailed, although not quite encyclopedic, and represents a long commitment to education on the topic. Mechanically, Lore skills will often appear as requirements on blue cards, or be prompted by a Marshal during modules when relevant. The following is a list of suggested areas of study. Players should feel free to choose ones not in this list as long as they are appropriate to the setting. The more granular the area of knowledge, the more in-depth the knowledge is likely to be, though it will be in turn less likely to come up in game. Arcane Lore: Magic and its uses, magical tools and applications, and magical constructs. Historical Lore: Major events, dates, interactions of events and casualties, historical figures. Nature Lore: Animals and their habits, woodcraft, myths and legends about the natural world, plants and their uses. This also includes creatures and monsters that are native to the region. Noble Lore: Etiquette, titles, traditions and customs, noble names and families, history of ruling families, especially the Great Houses. Religious Lore: Divine Beings and their domains, afterlife beliefs, Devotion traditions, cultural attitudes towards Divine Beings. Ritual Lore: Details about past ritual sites, determining ritual means to solving problems, etc. Shadow Lore: Underworld and underworld etiquette, power players, customs and mores, connections, illicit substances and their uses, cons and crimes."
+    "description": "The character has learned about a specific area of study, with each area of study considered a separate skill. Lore confers a level of knowledge that is both deep and detailed, although not quite encyclopedic, and represents a long commitment to education on the topic. Mechanically, Lore skills will often appear as requirements on blue cards, or be prompted by a Marshal during modules when relevant. The following is a list of suggested areas of study. Players should feel free to choose ones not in this list as long as they are appropriate to the setting. The more granular the area of knowledge, the more in-depth the knowledge is likely to be, though it will be in turn less likely to come up in game. Arcane Lore: Magic and its uses, magical tools and applications, and magical constructs. Historical Lore: Major events, dates, interactions of events and casualties, historical figures. Nature Lore: Animals and their habits, woodcraft, myths and legends about the natural world, plants and their uses. This also includes creatures and monsters that are native to the region. Noble Lore: Etiquette, titles, traditions and customs, noble names and families, history of ruling families, especially the Great Houses. Religious Lore: Divine Beings and their domains, afterlife beliefs, Devotion traditions, cultural attitudes towards Divine Beings. Ritual Lore: Details about past ritual sites, determining ritual means to solving problems, etc. Shadow Lore: Underworld and underworld etiquette, power players, customs and mores, connections, illicit substances and their uses, cons and crimes.",
+    "parameter": "Area of Lore"
   },
   {
     "name": "Library Use",
@@ -576,36 +577,40 @@
     "description": "Those trained in combat situations to help others have a few benefits. First, they need only have one hand free to pick up a Helpless, Dying. or Unconscious person, and can move at a jog while carrying a person. In addition, they require only a Quick 30 to stabilize another character when using Basic Medicine."
   },
   {
-    "name": "Chronic Hobbyist [Specific Profession]",
+    "name": "Chronic Hobbyist",
     "cost": 2,
     "prereq": "Profession - [Any]",
     "ranks": 3,
     "category": "Trade",
-    "description": "The character has functional knowledge in a profession. The character can perform all normal functions of the chosen profession and they will show solid knowledge related to it. Most tasks associated with that profession can be performed without aid or supervision. The character can choose one Profession-related Discern question and can ask it at-will (such as “Discern by Mind: Which civilization built this artifact?” for a Builder). This question should be approved by Staff (between games) and at Staff discretion, the question may be allowed to have the Subtle Modifier. The Accent is always “by Mind.” Note: This should be a different profession than the one used for the prerequisite."
+    "description": "The character has functional knowledge in a profession. The character can perform all normal functions of the chosen profession and they will show solid knowledge related to it. Most tasks associated with that profession can be performed without aid or supervision. The character can choose one Profession-related Discern question and can ask it at-will (such as “Discern by Mind: Which civilization built this artifact?” for a Builder). This question should be approved by Staff (between games) and at Staff discretion, the question may be allowed to have the Subtle Modifier. The Accent is always “by Mind.” Note: This should be a different profession than the one used for the prerequisite.",
+    "parameter": "Specific Profession"
   },
   {
-    "name": "Profession - Apprentice [Specific Profession]",
+    "name": "Profession - Apprentice",
     "cost": 1,
     "prereq": "None",
     "ranks": null,
     "category": "Trade",
-    "description": "The character has some basic knowledge in a profession and can generally perform in that profession on basic tasks without journeyman or master supervision. More complex tasks may require guidance. The character can perform the basic functions of the chosen profession and will have corollary knowledge of lore and procedures related to it. The character earns some basic income from their profession, represented by earning 3 Wealth at the beginning of each game."
+    "description": "The character has some basic knowledge in a profession and can generally perform in that profession on basic tasks without journeyman or master supervision. More complex tasks may require guidance. The character can perform the basic functions of the chosen profession and will have corollary knowledge of lore and procedures related to it. The character earns some basic income from their profession, represented by earning 3 Wealth at the beginning of each game.",
+    "parameter": "Specific Profession"
   },
   {
-    "name": "Profession - Journeyman [Specific Profession]",
+    "name": "Profession - Journeyman",
     "cost": 2,
     "prereq": "Profession - Apprentice in the chosen area.",
     "ranks": null,
     "category": "Trade",
-    "description": "The character has functional knowledge in a profession. The character can perform all normal functions of the chosen profession and they will show solid knowledge related to it. Most tasks associated with that profession can be performed without aid or supervision. The character earns income as a member of the profession, represented by earning 5 Wealth at the beginning of each game, in addition to what they earn from their Apprentice skill. In addition, the character can choose one Profession-related Discern question and can ask it at-will (such as “Discern by Mind: Which civilization built this?” for a mason). This question should be approved by Staff (between games) and at Staff discretion, the question may be allowed to have the Subtle Modifier. The Accent is always “by Mind.”"
+    "description": "The character has functional knowledge in a profession. The character can perform all normal functions of the chosen profession and they will show solid knowledge related to it. Most tasks associated with that profession can be performed without aid or supervision. The character earns income as a member of the profession, represented by earning 5 Wealth at the beginning of each game, in addition to what they earn from their Apprentice skill. In addition, the character can choose one Profession-related Discern question and can ask it at-will (such as “Discern by Mind: Which civilization built this?” for a mason). This question should be approved by Staff (between games) and at Staff discretion, the question may be allowed to have the Subtle Modifier. The Accent is always “by Mind.”",
+    "parameter": "Specific Profession"
   },
   {
-    "name": "Profession - Master [Specific Profession]",
+    "name": "Profession - Master",
     "cost": 3,
     "prereq": "Profession - Journeyman in the chosen area.",
     "ranks": null,
     "category": "Trade",
-    "description": "The character has mastered their chosen profession. They can perform the most complicated tasks and have a deep knowledge of lore associated with that mastery. The character’s mastery earns income represented by earning 8 Wealth at the beginning of each game, in addition to what they earn from their Apprentice and Journeyman skills. In addition, the character can choose one additional Profession-related Discern question and can ask it at-will (such as “Discern by Mind: Does this stone wall seem to be moveable?” for a mason). This question should be approved by Staff (between games) and at Staff discretion, the question may be allowed to have the Subtle Modifier. The Accent is always “by Mind.” Suggested Professions: Soldier, Hunter, Sailor, Wagoneer, Factor, Mercenary, Builder, Fisher, Scribe, Herbalist, Undertaker, Executioner, Merchant, Charlatan, Chirurgeon, Teacher, Magistrate, and other Professions with Staff approval."
+    "description": "The character has mastered their chosen profession. They can perform the most complicated tasks and have a deep knowledge of lore associated with that mastery. The character’s mastery earns income represented by earning 8 Wealth at the beginning of each game, in addition to what they earn from their Apprentice and Journeyman skills. In addition, the character can choose one additional Profession-related Discern question and can ask it at-will (such as “Discern by Mind: Does this stone wall seem to be moveable?” for a mason). This question should be approved by Staff (between games) and at Staff discretion, the question may be allowed to have the Subtle Modifier. The Accent is always “by Mind.” Suggested Professions: Soldier, Hunter, Sailor, Wagoneer, Factor, Mercenary, Builder, Fisher, Scribe, Herbalist, Undertaker, Executioner, Merchant, Charlatan, Chirurgeon, Teacher, Magistrate, and other Professions with Staff approval.",
+    "parameter": "Specific Profession"
   },
   {
     "name": "Tracking",

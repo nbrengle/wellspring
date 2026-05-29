@@ -108,6 +108,65 @@ function parseHTML() {
 
 const nodes = parseHTML();
 
+// ─── DEMOTED POWER HEADING RECOVERY ──────────────────────────────────────────
+// In the current Google Docs export, several power entries are styled to LOOK
+// like H4 headings (bold, same font as their siblings) but the underlying HTML
+// is <p><span class="cN">...</span></p>. The walker sees them as plain text and
+// the downstream class/domain parsers skip them. We recover by promoting text
+// nodes that match the power-heading grammar AND are followed by a power
+// stat-block field. Each promoted node is given the level of the nearest
+// sibling power heading (H3 for domain powers, H4 for class powers), so the
+// downstream parsers see them the same as un-demoted entries.
+//
+// See DOC_EDITS_WANTED.md #11g. Known affected entries: Care for the Fallen,
+// Arcane Barrage, Rise Above This, Infuriate, Synergistic Transfer, Disruption
+// (all [Tier]-tagged) and Lifeline - 3 BP (domain power, no tier tag).
+// Demote "headings" that are clearly prose paragraphs misstyled as H2/H3 in
+// the source doc — they truncate the real heading's range and cause the next
+// power section to look empty. Heuristic: a real heading is short (≤80 chars)
+// AND ends without sentence punctuation. Anything else gets demoted to text
+// so the heading walker treats it as body content.
+//
+// See DOC_EDITS_WANTED.md #11g/#11h. Known affected: "These Options are
+// available for the Socialite..." at Socialite Right Hand Powers, miscast as
+// H2 in the export.
+for (let i = 0; i < nodes.length; i++) {
+  const n = nodes[i];
+  if (n.type !== 'heading' || !n.text) continue;
+  if (n.level !== 2 && n.level !== 3) continue;
+  const looksLikeProse = n.text.length > 80 && /[.!?]\s*$/.test(n.text);
+  if (looksLikeProse) nodes[i] = { type: 'text', text: n.text };
+}
+
+const POWER_STAT_FIELD = /^(Incantation|Incant|Call|Target|Refresh|Cost|Requirement|Prerequisites?):\s/;
+// A power heading has either a tier tag in brackets OR a "- N BP" cost suffix.
+// Class powers live at H4 in the doc; domain powers at H3. Tier-tag presence
+// alone isn't enough to decide (domain powers may carry [Adept], [Greater],
+// etc.) — we also check whether the demoted entry sits inside the Divine
+// Domains section.
+const DEMOTED_POWER_TIERED = /^.{2,80}\[(Utility|Basic|Advanced|Veteran|Cantrip|Novice|Adept|Greater|Innate|Class|Form|Right Hand)\]/;
+const DEMOTED_POWER_DOMAIN = /^[A-Z][^[\n]{1,60}-\s*\d+\s*BP\s*$/;
+// Find the H1 range of "Divine Domains" so we can tell which demoted entries
+// belong to a domain (→ H3) vs. a class (→ H4).
+const divineDomainsIdx = nodes.findIndex((m) => m.type === 'heading' && m.level === 1 && m.text === 'Divine Domains');
+const divineDomainsEndIdx = nodes.findIndex((m, j) => j > divineDomainsIdx && m.type === 'heading' && m.level === 1);
+const inDivineDomains = (idx) => divineDomainsIdx !== -1 && idx > divineDomainsIdx && (divineDomainsEndIdx === -1 || idx < divineDomainsEndIdx);
+
+for (let i = 0; i < nodes.length; i++) {
+  const n = nodes[i];
+  if (n.type !== 'text') continue;
+  if (!DEMOTED_POWER_TIERED.test(n.text) && !DEMOTED_POWER_DOMAIN.test(n.text)) continue;
+  // Confirm the next text node is a power stat-block field.
+  let next = null;
+  for (let j = i + 1; j < Math.min(nodes.length, i + 4); j++) {
+    if (nodes[j].type === 'text') { next = nodes[j]; break; }
+  }
+  if (!next || !POWER_STAT_FIELD.test(next.text)) continue;
+  // Domain powers (H3) when inside Divine Domains; class powers (H4) otherwise.
+  const level = inDivineDomains(i) ? 3 : 4;
+  nodes[i] = { type: 'heading', level, text: n.text };
+}
+
 function write(filename, data) {
   const path = join(OUT, filename);
   writeFileSync(path, JSON.stringify(data, null, 2));
@@ -462,11 +521,26 @@ function parseSkills() {
       i++; continue;
     }
     if (n.type === 'heading' && n.level === 4) {
-      // H4 = skill entry
+      // H4 = skill entry. The heading text may carry annotations that are
+      // structural metadata, not part of the canonical name:
+      //   "(N)"          — finite max ranks  (parsed as numeric ranks)
+      //   "(Unlimited)"  — explicitly no rank cap (parsed as 'unlimited' sentinel)
+      //   "[Placeholder]"— parameter slot the player fills in (e.g.
+      //                    "Lore [Area of Lore]" → parameter "Area of Lore",
+      //                    canonical name "Lore"). The linker uses this so
+      //                    "Lore (Religious)" prose matches the entity.
+      // All three suffixes are stripped from the name as we parse them.
       const raw = n.text;
-      const ranksMatch = raw.match(/\((\d+)\)\s*$/);
-      const name = raw.replace(/\s*\(\d+\)\s*$/, '').trim();
-      const maxRanks = ranksMatch ? parseInt(ranksMatch[1]) : null;
+      const ranksMatch = raw.match(/\((\d+|Unlimited)\)\s*$/i);
+      const paramMatch = raw.match(/\s\[([^\]]+)\]/);
+      const name = raw
+        .replace(/\s*\((?:\d+|Unlimited)\)\s*$/i, '')
+        .replace(/\s\[[^\]]+\]/, '')
+        .trim();
+      const maxRanks = !ranksMatch ? null
+        : /unlimited/i.test(ranksMatch[1]) ? 'unlimited'
+        : parseInt(ranksMatch[1]);
+      const parameter = paramMatch ? paramMatch[1].trim() : null;
 
       // Collect text nodes until next H3/H4
       const bodyEnd = nodes.findIndex((m, j) => j > i && m.type === 'heading' && m.level <= 4);
@@ -488,7 +562,9 @@ function parseSkills() {
       }
 
       if (cost !== null) {
-        skills.push({ name, cost, prereq, ranks, category: currentCat, description: descParts.join(' ') });
+        const entry = { name, cost, prereq, ranks, category: currentCat, description: descParts.join(' ') };
+        if (parameter) entry.parameter = parameter;
+        skills.push(entry);
       }
       i = bodyEnd === -1 ? end : Math.min(bodyEnd, end);
     } else {

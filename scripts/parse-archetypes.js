@@ -17,6 +17,20 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
 const DOC = join(ROOT, 'StarterCharacterSheets.html');
 const OUT = join(ROOT, 'src', 'data', 'archetypes.json');
+const CLASSES_JSON = join(ROOT, 'src', 'data', 'classes.json');
+
+// Map of class name → array of specialization names, e.g. Artisan → [Artificer,
+// Crafter, Mystic]. Used to extract the implied specialization from archetype
+// names like "Artificer Artisan" (where "Artificer" is the spec, "Artisan" is
+// the base class). Optional dependency — if classes.json doesn't exist yet
+// (running parse-archetypes before parse-megadoc), skip specialization extraction.
+let CLASS_SPECS = {};
+if (existsSync(CLASSES_JSON)) {
+  const classes = JSON.parse(readFileSync(CLASSES_JSON, 'utf8'));
+  for (const c of classes) {
+    CLASS_SPECS[c.name] = (c.specializations || []).map((s) => s.name);
+  }
+}
 
 if (!existsSync(DOC)) {
   console.error(`Missing ${DOC} — drop the export at the project root and rerun.`);
@@ -66,6 +80,60 @@ function parseHTML() {
 }
 
 const nodes = parseHTML();
+
+// Strip author-side bookkeeping notes from a list item before it lands in the
+// archetype JSON. These are courtesy reminders explaining how a player got the
+// item for free or at a discount — they have no mechanical structure beyond the
+// BP cost (already written outside the parens) and clutter the canonical name.
+//
+// Stripped patterns (anywhere in the line):
+//   (from X)
+//   (free from X)
+//   (discounted from X)
+//   (refunded from X)
+//   (N BP refunded from X)
+//   (-N BP refunded from X)
+//   (starting <something>)
+// Kept patterns:
+//   (your choice)         — instruction to the player
+//   (Daggers), (Religious) — parameter values for parameterized entities
+const BOOKKEEPING_NOTE = /\s*\((?:-?\d+\s*BP\s+)?(?:free\s+from|discounted\s+from|refunded\s+from|from|starting)[^()]*\)/gi;
+
+// Trailing effective-cost suffix the doc author writes on purchased items, e.g.
+// "Shield Expertise - 5 BP". This is the *effective* per-build cost (after class
+// grants / upgrade discounts), which can differ from the entity's generic cost.
+// We strip it from the canonical name but capture the number so the validator
+// can cross-check its computed cost against the author's intent.
+const BP_SUFFIX = /\s*-\s*(-?\d+)\s*BP\s*$/i;
+const parseBPSuffix = (s) => {
+  const m = s.match(BP_SUFFIX);
+  return m ? parseInt(m[1], 10) : null;
+};
+
+// The bookkeeping notes aren't just clutter — they're the hand-authored grant
+// model. "(from Linked Armor Utility Power)" means the item is granted by that
+// power and so costs no BP; "(1 BP refunded from Poisoner)" is a discount.
+// Parse the first such note on a line into structured provenance so the
+// validator can model grants/discounts instead of guessing from prose.
+//   kind: 'grant'   — fully free, granted by source (free from / from / starting)
+//         'discount'— partial refund (N BP refunded / discounted from)
+//   amount: BP refunded for discounts (null for full grants)
+//   source: the granting entity text ("Linked Armor", "Poisoner"), best-effort
+const NOTE_DETAIL = /\((?:(-?\d+)\s*BP\s+)?(free\s+from|discounted\s+from|refunded\s+from|from|starting)\s*([^()]*)\)/i;
+function parseProvenance(s) {
+  const m = s.match(NOTE_DETAIL);
+  if (!m) return null;
+  const [, amt, verb, rest] = m;
+  const v = verb.toLowerCase();
+  const kind = (v === 'refunded from' || v === 'discounted from' || amt) ? 'discount' : 'grant';
+  // Trim trailing role words ("Utility Power", "innate Power", "Perk") from the
+  // source so it reads as the entity name; keep it loose since it's a hint.
+  const source = rest.replace(/\b(utility|innate|basic|class)?\s*power\b/i, '')
+                     .replace(/\bperk\b/i, '').replace(/\s+/g, ' ').trim() || null;
+  return { kind, amount: amt ? Math.abs(parseInt(amt, 10)) : null, source };
+}
+
+const stripNotes = (s) => s.replace(BOOKKEEPING_NOTE, '').replace(BP_SUFFIX, '').replace(/\s+/g, ' ').trim();
 
 // ─── ARCHETYPE EXTRACTION ─────────────────────────────────────────────────────
 // Each archetype is an H1 whose text nodes alternate between labeled fields
@@ -127,9 +195,12 @@ const normalizeListValue = (v) => v.trim() === 'None' ? [] : v.split(/,\s*/).map
 
 // Parse a section-header line: text ending with a colon, optionally followed
 // by an inline value. "Starting Skills (free):" → header; "Lineage: Human"
-// → inline field.
+// → inline field. Also catches the no-space-after-colon defect where the
+// doc author wrote "Purchased Perks:Deathgrip..." as one line — when the
+// label is a known section header, the rest of the line is the first item.
 const HEADER_RE = /^([^:]+):\s*$/;
 const INLINE_RE = /^([^:]+):\s+(.+)$/;
+const HEADER_PLUS_ITEM_RE = /^([^:]+):(\S.+)$/;
 
 function parseArchetype(start, end) {
   const archetype = { name: nodes[start].text };
@@ -141,7 +212,24 @@ function parseArchetype(start, end) {
     i++;
   }
 
-  let currentList = null; // when truthy, subsequent unlabeled text lines append here
+  let currentList = null;   // when truthy, subsequent unlabeled text lines append here
+  let currentField = null;  // field name backing currentList, for the BP sidecar
+  // effectiveBP[field] and grants[field] are index-aligned with archetype[field]:
+  // the author's stated per-build cost and grant provenance for each item (null
+  // when none was written).
+  archetype.effectiveBP = {};
+  archetype.grants = {};
+
+  // Append a raw item line to the current section list, splitting off the
+  // trailing "- N BP" cost and the "(from X)" provenance note into index-aligned
+  // sidecars before storing the cleaned canonical name.
+  const pushItem = (rawLine) => {
+    if (!currentList) return;
+    currentList.push(stripNotes(rawLine));
+    (archetype.effectiveBP[currentField] ||= []).push(parseBPSuffix(rawLine));
+    (archetype.grants[currentField] ||= []).push(parseProvenance(rawLine));
+  };
+
   while (i < end) {
     const n = nodes[i];
     if (n.type !== 'text') { i++; continue; }
@@ -149,31 +237,101 @@ function parseArchetype(start, end) {
 
     const inlineMatch = text.match(INLINE_RE);
     const headerMatch = text.match(HEADER_RE);
+    const headerPlusItemMatch = !inlineMatch && !headerMatch && text.match(HEADER_PLUS_ITEM_RE);
+    // "Purchased Perks:Deathgrip..." → label "Purchased Perks", first item
+    // "Deathgrip...". Only honour this shape when the label is a known section
+    // header (otherwise things like "URL:https://..." would false-trigger).
+    const headerPlusItem = headerPlusItemMatch && SECTION_FIELDS[headerPlusItemMatch[1].trim()]
+      ? headerPlusItemMatch : null;
 
     if (inlineMatch) {
       const [, rawLabel, value] = inlineMatch;
       const label = rawLabel.trim();
-      const field = INLINE_FIELDS[label];
-      if (field) {
-        archetype[field] = LIST_FIELDS.has(field) ? normalizeListValue(value) : value.trim();
+      const inlineField = INLINE_FIELDS[label];
+      const sectionField = SECTION_FIELDS[label];
+      if (inlineField) {
+        archetype[inlineField] = LIST_FIELDS.has(inlineField) ? normalizeListValue(value) : value.trim();
+      } else if (sectionField) {
+        // Section-list field written inline ("Purchased Perks: None" — common
+        // shorthand). "None" closes the list as empty; any other value would
+        // be unexpected here, so treat it as a single-item list.
+        if (value.trim() === 'None') {
+          archetype[sectionField] = [];
+        } else {
+          archetype[sectionField] = [stripNotes(value)];
+          archetype.effectiveBP[sectionField] = [parseBPSuffix(value)];
+          archetype.grants[sectionField] = [parseProvenance(value)];
+        }
       }
       currentList = null;
+      currentField = null;
     } else if (headerMatch) {
       const label = headerMatch[1].trim();
-      const field = SECTION_FIELDS[label];
-      if (field) {
-        archetype[field] = [];
-        currentList = archetype[field];
+      const inlineField = INLINE_FIELDS[label];
+      const sectionField = SECTION_FIELDS[label];
+      if (sectionField) {
+        archetype[sectionField] = [];
+        currentList = archetype[sectionField];
+        currentField = sectionField;
+      } else if (inlineField) {
+        // Scalar field with no value after the colon ("Armor Points:" with
+        // empty value). Record explicit null instead of silently dropping.
+        archetype[inlineField] = LIST_FIELDS.has(inlineField) ? [] : null;
+        currentList = null;
+        currentField = null;
       } else {
         // Unknown header — close any open list so its items don't accidentally
         // get appended to it.
         currentList = null;
+        currentField = null;
       }
+    } else if (headerPlusItem) {
+      const [, rawLabel, firstItem] = headerPlusItem;
+      const field = SECTION_FIELDS[rawLabel.trim()];
+      archetype[field] = [];
+      currentList = archetype[field];
+      currentField = field;
+      pushItem(firstItem);
     } else if (currentList) {
-      currentList.push(text);
+      pushItem(text);
     }
     i++;
   }
+
+  // Infer specialization from the archetype's H1 name. The convention is
+  // "<Specialization> <BaseClass>" — e.g. "Artificer Artisan", "Mystic
+  // Artisan". When the first word of the archetype name matches a known
+  // specialization for the base class implied by `classLevels`, record it.
+  //
+  // Side effect: the starter sheets occasionally have a doc-author error where
+  // `Class Levels: Artificer 4` was written instead of `Class Levels: Artisan 4`.
+  // When we detect the spec, we correct classLevels too.
+  if (archetype.classLevels) {
+    const classMatch = archetype.classLevels.match(/^([A-Z][a-zA-Z]+)\s+(\d+)/);
+    if (classMatch) {
+      const [, declaredClass, level] = classMatch;
+      // Find which base class has this declaredClass as a specialization
+      const baseClass = Object.entries(CLASS_SPECS).find(([, specs]) => specs.includes(declaredClass))?.[0];
+      if (baseClass) {
+        archetype.specialization = declaredClass;
+        archetype.classLevels = `${baseClass} ${level}`;
+      } else if (CLASS_SPECS[declaredClass]) {
+        // declaredClass IS a known base class. Look for spec in archetype name.
+        const firstWord = archetype.name.split(/\s+/)[0];
+        if (CLASS_SPECS[declaredClass].includes(firstWord)) {
+          archetype.specialization = firstWord;
+        }
+      }
+    }
+  }
+
+  // Drop each sidecar entirely when no item carried that kind of annotation, so
+  // archetypes without authored costs / grants stay clean.
+  const anyBP = Object.values(archetype.effectiveBP).some((arr) => arr.some((v) => v !== null));
+  if (!anyBP) delete archetype.effectiveBP;
+  const anyGrant = Object.values(archetype.grants).some((arr) => arr.some((v) => v !== null));
+  if (!anyGrant) delete archetype.grants;
+
   return archetype;
 }
 

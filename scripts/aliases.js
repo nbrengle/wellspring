@@ -11,6 +11,37 @@
 // STOP_WORDS are entity names too generic to link safely on their own; they only
 // link via an explicit curated alias, never by bare-name match.
 
+// Canonical-key reduction for named-entity lookups. Two entity names that
+// reduce to the same key are treated as the same entity when looking up by
+// name (e.g. "Heretic's Brand" and "Heretics' Brand"). Distinguishing
+// structure like trailing roman tier numerals is PRESERVED so siblings stay
+// separable; the tier fallback in `findEntityByName` handles the tier-skip
+// case separately.
+//
+// The reduction is intentionally lossy on:
+//   - case differences        ("from" vs "From")
+//   - apostrophe placement    ("Heretic's" vs "Heretics'")
+//   - whitespace around "/"   ("A/B" vs "A / B")
+//   - trailing-s plurals      ("Deflect Projectiles" vs "Deflect Projectile")
+//
+// The reduction is intentionally NOT lossy on:
+//   - trailing roman numerals ("Forage I" vs "Forage II" stay distinct)
+//   - parenthesized parameters ("Lore (Religious)" — stripped at lookup, not here)
+export function canonicalKey(name) {
+  if (!name) return "";
+  let s = name.toLowerCase();
+  // Apostrophe and quote variants → drop entirely so "heretic's" and
+  // "heretics'" both end up "heretics".
+  s = s.replace(/['’‘ʼ`]/g, "");
+  // Normalize whitespace around "/" and collapse all whitespace.
+  s = s.replace(/\s*\/\s*/g, " / ").replace(/\s+/g, " ").trim();
+  // Singularize trailing -s on the last word, unless the word ends in "ss"
+  // (e.g. "Compass", "Goddess"). Confirmed no entity-name collisions exist
+  // between singular and plural forms in the current dataset.
+  s = s.replace(/(\w)s$/, (m, c) => c === "s" ? m : c);
+  return s;
+}
+
 // Regular English inflections of a single-word (or trailing-word) keyword.
 export function inflect(name) {
   const forms = new Set([name]);
@@ -71,9 +102,30 @@ export const MATCH_POLICY = {
   "Flaw":       "case-sensitive", // 100%
   "Lineage":    "case-sensitive", // 100%
 
+  // Power names that overlap common English. When capitalized they reliably mean
+  // the power (always written "<Name> [Tier]" at the definition); the lowercase
+  // form is ordinary prose ("the loot", "kill", "charge them"). case-sensitive
+  // links the game-term without the false hits. (Caps ratios are deflated by
+  // frequent lowercase prose use, which is exactly what case-sensitive ignores.)
+  "Loot":     "case-sensitive", // power vs "the loot"
+  "Grit":     "case-sensitive", // power vs "true grit"
+  "Cancel":   "case-sensitive", // cantrip vs "cancel the effect"
+  "Kick":     "case-sensitive", // power vs "kicked"
+  "Execute":  "case-sensitive", // power vs "execute a plan"
+  "Soothe":   "case-sensitive", // power vs "soothe"
+  "Charge":   "case-sensitive", // cantrip vs "charge them / in charge"
+  "Stop":     "case-sensitive", // cantrip vs "stop"
+  "Shoulder": "case-sensitive", // power vs "shoulder the burden"
+
   // stop: capitalization doesn't disambiguate; the lowercase form ALSO means
   // the game-term (e.g. "they should call 'Counter…'" is mechanical use). The
   // compound entities exist as their own links.
+  // "Mine" (Rogue trap power) is uniquely unrecoverable: even capitalized it is
+  // dominated by the ore-noun ("each Mine or Mineral deposit", "the Mine deck")
+  // and the possessive pronoun ("Mine forever, yours is lost"). Only one cap
+  // occurrence is the power itself. No case/context rule separates them — stop
+  // the bare match; the power still exists as its own entity / picker entry.
+  "Mine":     "stop", // 62% caps but almost entirely ore-noun / pronoun
   "Call":     "stop", // 37% — verb usage of the game concept is common
   "Effects":  "stop", // 44% — "effects of that Trap" is the game-term, lowercased
   "Skills":   "stop", // 56% — "Lore skills" is meant
@@ -173,7 +225,4 @@ export const CURATED = {
   // Tinker's Workshop — entity name has the possessive "Tinker's" but body
   // text often just says "Workshop" in context.
   "The Tinker's Workshop": ["Workshop"],
-  // Lore skills use the bracketed-area form "Lore [Area of Lore] (Unlimited)"
-  // as the canonical name. Prose just says "Lore" or "Lore skill".
-  "Lore [Area of Lore] (Unlimited)": ["Lore"],
 };

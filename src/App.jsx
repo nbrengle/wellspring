@@ -1,5 +1,5 @@
-import WellspringCharacterCreator from "./CharacterCreator.jsx";
+import Builder from "./Builder.jsx";
 
 export default function App() {
-  return <WellspringCharacterCreator />;
+  return <Builder />;
 }

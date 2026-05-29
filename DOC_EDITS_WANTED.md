@@ -208,6 +208,47 @@ Format per item:
   H3 under "Armor Points"). The parser will then emit separate entities and
   links land directly.
 
+## 11g. Power entries demoted from <h4> to <p> — silently dropped
+
+- **What:** At least 6 powers in the MegaDoc are styled to LOOK like H4 power
+  headings (bold, same font as their siblings) but the underlying HTML tag is
+  `<p><span class="cN">Name [Tier]</span></p>` instead of `<h4>...</h4>`. The
+  parser walks heading levels only, so these entries vanish from the output —
+  same failure mode as Barrier inside Armor Points.
+- **Where:** Confirmed instances in the current export —
+  - `Care for the Fallen [Cantrip]` (Druid cantrip)
+  - `Arcane Barrage [Novice]` (Mage novice spell)
+  - `Rise Above This [Class] [Right Hand] - 1 BP`
+  - `Infuriate [Cantrip]`
+  - `Synergistic Transfer [Cantrip]`
+  - `Disruption [Adept] - 2 BP`
+  - `Lifeline - 3 BP` (Cleric Life domain power; no tier tag because domain
+    powers omit them in the doc)
+- **Parser workaround:** None at the heading-walker level — needs a recovery
+  pass that detects `<p>Name [Tier] [...]</p>` followed by `Cost:`/`Call:` lines
+  and treats it as a power entry. Same shape as `splitDemotedHeadings` for the
+  Barrier case, but matched on the power stat-block grammar instead of the
+  duplicated-noun heuristic.
+- **Wanted edit:** Reapply the correct H4 styling to these entries in the
+  source Google Doc. They were probably typed as plain bold-italic paragraphs
+  instead of using the H4 paragraph style.
+
+## 11h. Right Hand class powers — under-attributed to classes
+
+- **What:** Powers tagged `[Class] [Right Hand] - N BP` (e.g. `Steel Yourself`
+  for the Socialite Right Hand mechanic) are real H4 headings — but the
+  classes parser sweeps powers under section headings like "Socialite Right
+  Hand Powers", and when the source doc lists them under a generic "Right Hand"
+  section the class context is lost. Result: a power exists in `classes:` data
+  but under the wrong class, or not at all.
+- **Where:** Socialite Right Hand mechanic; possibly other classes that have
+  Right Hand mechanics.
+- **Parser workaround:** Verify the class power sections include "Right Hand"
+  in every class section header. May also need to honor the `[Class]` tier
+  tag explicitly.
+- **Wanted edit:** Ensure each Right Hand power lives under a class-prefixed
+  H2 like "Socialite Right Hand Powers", not a bare "Right Hand Powers" H1/H2.
+
 ## 11. Target / Individual / Mass / Self — used as keyword values but not defined
 
 - **What:** Power stat blocks have a `Target` field whose value is `Individual`,

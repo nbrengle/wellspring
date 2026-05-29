@@ -3095,7 +3095,26 @@
         "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "This minor cantrip takes the power out of a Spell-Packet (or multiple Spell-Packets) that has already been charged and returns that power to the caster. The Spell-Packet becomes inert, and the caster refreshes the spell-slot that was used to charge the Spell-Packet. If the spell charges more than one Spell-Packet, all the Spell-Packets must still be charged in order to cancel the spell. Care for the Fallen [Cantrip] Incantation: Standard Call: “Heal 1 to Dying” Target: Individual                                Duration: Instantaneous Delivery: Touch                                        Refresh: Focus Quick 100 Accent: None                                        Effect: Heal A simple trick taught by Druids of the past to prevent the transition to death, the caster can Call “Heal 1 to Dying.” This Call cannot be altered."
+        "description": "This minor cantrip takes the power out of a Spell-Packet (or multiple Spell-Packets) that has already been charged and returns that power to the caster. The Spell-Packet becomes inert, and the caster refreshes the spell-slot that was used to charge the Spell-Packet. If the spell charges more than one Spell-Packet, all the Spell-Packets must still be charged in order to cancel the spell."
+      },
+      {
+        "name": "Care for the Fallen",
+        "tier": "Cantrip",
+        "tags": [],
+        "maxRanks": 1,
+        "cost": null,
+        "incantation": "Standard",
+        "call": "“Heal 1 to Dying”",
+        "target": "Individual",
+        "duration": "Instantaneous",
+        "delivery": "Touch",
+        "refresh": "Focus Quick 100",
+        "accent": "None",
+        "effect": "Heal",
+        "requirement": null,
+        "prerequisites": null,
+        "skillsAndOptions": null,
+        "description": "A simple trick taught by Druids of the past to prevent the transition to death, the caster can Call “Heal 1 to Dying.” This Call cannot be altered."
       },
       {
         "name": "Enchanted Thorn",
@@ -5575,6 +5594,25 @@
       }
     ],
     "noviceSpells": [
+      {
+        "name": "Arcane Barrage",
+        "tier": "Novice",
+        "tags": [],
+        "maxRanks": 1,
+        "cost": null,
+        "incantation": "Standard",
+        "call": "“Wounding 1 by Force”",
+        "target": "Self, Individual",
+        "duration": "Short Rest or Until Expended, Instantaneous",
+        "delivery": "None, Spell-Packet",
+        "refresh": "Spell",
+        "accent": "Force",
+        "effect": "Wounding",
+        "requirement": null,
+        "prerequisites": null,
+        "skillsAndOptions": null,
+        "description": "After this spell is cast, the caster gains the ability to charge a Spell-Packet with power by simply holding it and calling Spell-Packet Charged! Each Spell-Packet charged in this way will do Wounding 1 when it strikes. Only one Spell-Packet can be charged at a time, and Arcane Barrage goes down if the caster completes a Short Rest, casts another Spell, or charges a fifth Spell-Packet using Arcane Barrage. Enhancement: Adept Slot: The caster can charge 10 Spell-Packets with Wounding 2. Enhancement: Greater Slot: The caster can charge 15 Spell-Packets with Wounding 3 and the caster may replace the Accent with the Mind, Acid, Flame, Ice, or Lightning Accent, changing the accent on each attack."
+      },
       {
         "name": "Bolster Shield",
         "tier": "Novice",
@@ -8542,7 +8580,260 @@
         "description": "The Socialite learns an additional Utility Power from the Socialite Class Powers."
       }
     ],
-    "rightHandPowers": [],
+    "rightHandPowers": [
+      {
+        "name": "Commission of Protection",
+        "tier": "Class",
+        "tags": [
+          "Right Hand"
+        ],
+        "maxRanks": 1,
+        "cost": 2,
+        "incantation": "None",
+        "call": "“Grant 1 Barrier to Bodyguard”",
+        "target": "Individual",
+        "duration": "Instantaneous",
+        "delivery": "Touch",
+        "refresh": "Focus Quick 100",
+        "accent": "None",
+        "effect": "Grant",
+        "requirement": "The Right Hand",
+        "prerequisites": null,
+        "skillsAndOptions": null,
+        "description": "A Bodyguard wearing the favor of their charge feels the weight of responsibility and can shrug off wounds in the name of duty. A trinket, token, necklace or similar adornment needs to be gifted to the Bodyguard during a time of peace (out of combat) so they may be reminded of what they fight for later. At this same time, the Bodyguard should be reminded about the effects of this Power. The Socialite may, “Grant One Barrier to Bodyguard” at-will (after the Refresh) while the Bodyguard is visibly displaying the object of their ward’s favor. Out-of-combat, the Socialite can Grant 3 Barrier all at once by Calling “Grant Three Barrier to Bodyguard”. Stacking limits will still apply."
+      },
+      {
+        "name": "Holding Out For a Hero",
+        "tier": "Class",
+        "tags": [
+          "Right Hand"
+        ],
+        "maxRanks": 1,
+        "cost": 1,
+        "incantation": "None",
+        "call": "“Short Grant Power: Save the Day”, Explanation",
+        "target": "Individual Bodyguard",
+        "duration": "Short Rest",
+        "delivery": "Touch",
+        "refresh": "Long Rest",
+        "accent": "None",
+        "effect": "Grant",
+        "requirement": "The Right Hand",
+        "prerequisites": null,
+        "skillsAndOptions": null,
+        "description": "After speaking for a few moments with their Bodyguard, the Socialite may ask them “Subtle Discern by Mind: Would you save me if I were in danger?” If the response is yes, the Socialite may Grant them the Save the Day Power below by explaining the Power to them."
+      },
+      {
+        "name": "It's Not Safe to Go Alone",
+        "tier": "Class",
+        "tags": [
+          "Right Hand"
+        ],
+        "maxRanks": 1,
+        "cost": 1,
+        "incantation": "None",
+        "call": "“[Bodyguard’s Name or Description] Grant Protect vs Damage”",
+        "target": "Individual",
+        "duration": "Until Used",
+        "delivery": "Verbal",
+        "refresh": "Short Rest",
+        "accent": "None",
+        "effect": "Grant",
+        "requirement": "The Right Hand",
+        "prerequisites": null,
+        "skillsAndOptions": null,
+        "description": "Socialites don’t make a habit of wandering around on their own, and seeing to their Bodyguard’s safety is mutually beneficial. Once per Short Rest the Socialite may bolster a Bodyguard. The Socialite grants a Protect vs. Damage. The Socialite may not give this Protect to the same Bodyguard more than once per Long Rest."
+      },
+      {
+        "name": "Magical Empowerment",
+        "tier": "Class",
+        "tags": [
+          "Right Hand"
+        ],
+        "maxRanks": 1,
+        "cost": 2,
+        "incantation": "None",
+        "call": "“Refresh 1 Novice or Adept Spell Slot”",
+        "target": "Individual (Bodyguard)",
+        "duration": "Instantaneous",
+        "delivery": "Touch",
+        "refresh": "Long Rest",
+        "accent": "None",
+        "effect": "Refresh",
+        "requirement": "The Right Hand",
+        "prerequisites": null,
+        "skillsAndOptions": null,
+        "description": "Bodyguards may be inspired and call upon their inner reserves to accomplish more than they thought possible. The Bodyguard may Refresh 1 Novice or Adept Spell Slot after a quick pep talk with the Socialite."
+      },
+      {
+        "name": "Rise Above This",
+        "tier": "Class",
+        "tags": [
+          "Right Hand"
+        ],
+        "maxRanks": 1,
+        "cost": 1,
+        "incantation": "None",
+        "call": "“[Bodyguard’s Name or Description] Heal 1 to Dying”",
+        "target": "Individual",
+        "duration": "Instantaneous",
+        "delivery": "Verbal",
+        "refresh": "Focus Quick 100",
+        "accent": "None",
+        "effect": "Heal",
+        "requirement": "The Right Hand",
+        "prerequisites": null,
+        "skillsAndOptions": null,
+        "description": "The Socialite knows how to rouse their companions, and their words can keep even the most desperate from teetering from the ledge. After a word or two of motivation or encouragement, they may call “[Bodyguard’s Name or Description] Heal 1 to Dying.”"
+      },
+      {
+        "name": "Steel Yourself",
+        "tier": "Class",
+        "tags": [
+          "Right Hand"
+        ],
+        "maxRanks": 1,
+        "cost": 1,
+        "incantation": "None",
+        "call": "“[Bodyguard’s Name or Description] Grant Protect vs Mind”",
+        "target": "Individual",
+        "duration": "Until Used",
+        "delivery": "Verbal",
+        "refresh": "Short Rest",
+        "accent": "None",
+        "effect": "Grant Protect",
+        "requirement": "The Right Hand",
+        "prerequisites": null,
+        "skillsAndOptions": null,
+        "description": "The Socialite knows how to convince their Bodyguard that everything will be alright, granting them one Protect vs Mind with a short pep talk."
+      },
+      {
+        "name": "Training Regiment",
+        "tier": "Class",
+        "tags": [
+          "Right Hand"
+        ],
+        "maxRanks": 1,
+        "cost": 2,
+        "incantation": "None",
+        "call": "“Refresh 1 Short Rest Martial Power”",
+        "target": "Individual (Bodyguard)",
+        "duration": "Instantaneous",
+        "delivery": "Touch",
+        "refresh": "Long Rest",
+        "accent": "None",
+        "effect": "Refresh",
+        "requirement": "The Right Hand",
+        "prerequisites": null,
+        "skillsAndOptions": null,
+        "description": "Through training with their Bodyguard, the Socialite learns their potential and drives them to excel martially even when the Bodyguard is at a breaking point. The Bodyguard may Refresh 1 Short Rest martial power after a quick pep talk with the Socialite."
+      },
+      {
+        "name": "Hidden Weapon",
+        "tier": "Class",
+        "tags": [
+          "Right Hand"
+        ],
+        "maxRanks": 1,
+        "cost": 0,
+        "incantation": "None",
+        "call": "“Grant Power: Concealed Weapon”, Explanation",
+        "target": "Individual",
+        "duration": "Long Rest",
+        "delivery": "Touch",
+        "refresh": "Long Rest",
+        "accent": "None",
+        "effect": "Grant Power",
+        "requirement": "The Right Hand, Socialite Level 6",
+        "prerequisites": null,
+        "skillsAndOptions": null,
+        "description": "Bodyguards aren’t particularly useful if they cannot defend the Socialite. The pair are used to taking advantage of the Socialite’s quick diversions to sneak weapons into places they are normally forbidden. To use this Power, the Socialite must give the Bodyguard a brightly colored cloth to attach or tie to a weapon. At this time, the Power should be explained to the Bodyguard."
+      },
+      {
+        "name": "Rousing Inspiration",
+        "tier": "Class",
+        "tags": [
+          "Right Hand"
+        ],
+        "maxRanks": 1,
+        "cost": 2,
+        "incantation": "None",
+        "call": "“[Bodyguard’s Name or Description] Refresh Two Spikes”",
+        "target": "Individual",
+        "duration": "Instantaneous",
+        "delivery": "Verbal",
+        "refresh": "Short Rest",
+        "accent": "None",
+        "effect": "Refresh",
+        "requirement": "The Right Hand, Socialite Level 6",
+        "prerequisites": null,
+        "skillsAndOptions": null,
+        "description": "When muscles tire and the will to continue flags, a voice of encouragement can be the best thing at your back. Most Socialites are experts in knowing exactly what to say to keep a stalwart soldier fighting… or goading them on into cleaning up a fight, at least. The Socialite Refreshes two of their Bodyguard’s Spikes with quick verbal encouragement."
+      },
+      {
+        "name": "Third Hand",
+        "tier": "Class",
+        "tags": [
+          "Right Hand"
+        ],
+        "maxRanks": 1,
+        "cost": 1,
+        "incantation": "None",
+        "call": "Explanation",
+        "target": "Self",
+        "duration": "Short Rest",
+        "delivery": "None",
+        "refresh": "Long Rest",
+        "accent": null,
+        "effect": null,
+        "requirement": "The Right Hand, Socialite Level 6",
+        "prerequisites": null,
+        "skillsAndOptions": null,
+        "description": "After a brief inspection of the Bodyguard’s materia, and an explanation of this Power, the Socialite becomes able to hold charged Packets that their Bodyguard has cast. The Socialite and the Bodyguard can pass Packets back and forth without them being discharged. The Socialite cannot use the Packets, only hold them. Packets held by the Socialite will not discharge or lose their charge if the Bodyguard casts other Spells. The Socialite is subject to all the rules for holding the Packet, but once the Socialite completes a Short Rest and this Power ends, any Packets still being held will also become inert. When the Packet is passed back and forth, the two should remind each other of the Call held within the Packet.For Example: Trobriand is the Bodyguard for Jheshyra, who has activated Third Hand. Trobriand, an Artificer, creates a charged Packet with Acid-Soak. He hands it to Jheshyra and says “Reminder: Wounding 8 by Acid”. He then does some other things, including creating other Packets and throwing them, before asking for the Packet back. Jheshyra hands him the Packet and says “Reminder: Wounding 8 by Acid”."
+      },
+      {
+        "name": "Guard and Savior",
+        "tier": "Class",
+        "tags": [
+          "Right Hand"
+        ],
+        "maxRanks": 1,
+        "cost": 1,
+        "incantation": "None",
+        "call": "“Long Imbue Touch Heal 5 to [Socialite’s Name]”",
+        "target": "Individual",
+        "duration": "Long Rest",
+        "delivery": "Touch",
+        "refresh": "Short Rest",
+        "accent": "None",
+        "effect": "Imbue Heal",
+        "requirement": "The Right Hand, Socialite Level 8",
+        "prerequisites": null,
+        "skillsAndOptions": null,
+        "description": "After the Socialite gives the Bodyguard instructions on when to use this Power, they should give the Call and any additional explanation needed. This lets the Bodyguard Heal the Socialite for 5 Points by Touch. Once used, the Socialite can give the Power again as long as they have completed a Short Rest. Remember that one can not have more than one Imbued Power at a time."
+      },
+      {
+        "name": "This Is My Bodyguard",
+        "tier": "Class",
+        "tags": [
+          "Right Hand"
+        ],
+        "maxRanks": 1,
+        "cost": 2,
+        "incantation": "RP: Explaining that your Bodyguard is going with you wherever you’re going",
+        "call": "“[Name or Description] Obey by Fear: Let my Bodyguard in with me if I am allowed in.”",
+        "target": "Individual",
+        "duration": "Instantaneous",
+        "delivery": "Verbal",
+        "refresh": "Focus Quick 100",
+        "accent": "Fear",
+        "effect": "Obey",
+        "requirement": "The Right Hand, Socialite Level 10",
+        "prerequisites": null,
+        "skillsAndOptions": null,
+        "description": "The Socialite may make allowances for their Bodyguard in any space they themselves are welcome. If a venue would try to prohibit the Bodyguard from entering with the Socialite, the Socialite may pull the contract to ensure their passage."
+      }
+    ],
     "cantrips": [],
     "noviceSpells": [],
     "adeptSpells": [],
@@ -8975,7 +9266,26 @@
         "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Sourcerer throws up a shield of energy to protect themself from the elements. This gives the caster one Protect from the Accent of their Arcane Source. If the Sourcerer has more than one Arcane Accent, they may have a Protect for each of those Accents. Infuriate [Cantrip] Incantation: Standard Call: “Quick Provoke by [Arcane Accent]” Target: Individual                                Duration: Short Rest Delivery: Spell-Packet                                Refresh: Focus Quick 100 Accent: [Arcane Accent]                                Effect: Provoke A creature struck by this Spell-Packet suddenly sees the caster as an arch-enemy and hated nemesis."
+        "description": "The Sourcerer throws up a shield of energy to protect themself from the elements. This gives the caster one Protect from the Accent of their Arcane Source. If the Sourcerer has more than one Arcane Accent, they may have a Protect for each of those Accents."
+      },
+      {
+        "name": "Infuriate",
+        "tier": "Cantrip",
+        "tags": [],
+        "maxRanks": 1,
+        "cost": null,
+        "incantation": "Standard",
+        "call": "“Quick Provoke by [Arcane Accent]”",
+        "target": "Individual",
+        "duration": "Short Rest",
+        "delivery": "Spell-Packet",
+        "refresh": "Focus Quick 100",
+        "accent": "[Arcane Accent]",
+        "effect": "Provoke",
+        "requirement": null,
+        "prerequisites": null,
+        "skillsAndOptions": null,
+        "description": "A creature struck by this Spell-Packet suddenly sees the caster as an arch-enemy and hated nemesis."
       },
       {
         "name": "Mass Flux",
@@ -8994,7 +9304,26 @@
         "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "When the Sourcerer casts this Cantrip and expends a Spike, it changes the mass of the struck shield, pulling it to the ground for a moment. Unlike other Effects, if no duration is called, the duration of Disarm is Instantaneous, and the item may be picked up immediately upon hitting the ground. Synergistic Transfer [Cantrip] Incantation: Standard Call: None Target: Self                                        Duration: Instantaneous Delivery: None                                  Refresh: Quick 100 Accent: None                                    Effect: Special The Sourcerer is able to twist the Weave to their needs when pressed. By Sacrificing two Barrier, the Sourcerer is able to activate an optional power of another Cantrip, as if they expended a Spike."
+        "description": "When the Sourcerer casts this Cantrip and expends a Spike, it changes the mass of the struck shield, pulling it to the ground for a moment. Unlike other Effects, if no duration is called, the duration of Disarm is Instantaneous, and the item may be picked up immediately upon hitting the ground."
+      },
+      {
+        "name": "Synergistic Transfer",
+        "tier": "Cantrip",
+        "tags": [],
+        "maxRanks": 1,
+        "cost": null,
+        "incantation": "Standard",
+        "call": "None",
+        "target": "Self",
+        "duration": "Instantaneous",
+        "delivery": "None",
+        "refresh": "Quick 100",
+        "accent": "None",
+        "effect": "Special",
+        "requirement": null,
+        "prerequisites": null,
+        "skillsAndOptions": null,
+        "description": "The Sourcerer is able to twist the Weave to their needs when pressed. By Sacrificing two Barrier, the Sourcerer is able to activate an optional power of another Cantrip, as if they expended a Spike."
       },
       {
         "name": "Whispers of the Unseen",

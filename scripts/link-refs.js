@@ -11,6 +11,7 @@ import { readFileSync, writeFileSync, readdirSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 import { inflect, CURATED, MATCH_POLICY } from "./aliases.js";
+import { buildLookup, resolve } from "./entity-lookup.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const DATA = join(__dirname, "..", "src", "data");
@@ -27,7 +28,7 @@ const read = (f) => JSON.parse(readFileSync(join(DATA, f), "utf8"));
 // short glossary definition). All identifiers are plural to match the JSON
 // collection files they correspond to; the one exception is `creature-types`,
 // because `types` would collide with the `type` field on every entity record.
-const TYPE_PRIORITY = ["effects", "conditions", "creature-types", "resources", "accents", "defenses", "modifiers", "crafting-concepts", "ritual-concepts", "skills", "perks", "flaws", "classes", "domains", "devotions", "powers", "recipes", "rituals", "rules-concepts", "terms"];
+const TYPE_PRIORITY = ["effects", "conditions", "creature-types", "resources", "accents", "defenses", "modifiers", "crafting-concepts", "ritual-concepts", "skills", "perks", "flaws", "classes", "domains", "devotions", "powers", "recipes", "rituals", "archetypes", "rules-concepts", "terms"];
 
 const POWER_TIERS = ["innate", "utility", "basic", "advanced", "veteran", "classSkills", "rightHandPowers", "cantrips", "noviceSpells", "adeptSpells", "greaterSpells"];
 
@@ -35,7 +36,7 @@ function buildRegistry() {
   const reg = [];
   const add = (type, name, body, extra) => { if (name) reg.push({ type, name, id: `${type}:${name}`, body: body || "", ...extra }); };
 
-  read("skills.json").forEach((s) => add("skills", s.name, s.description));
+  read("skills.json").forEach((s) => add("skills", s.name, s.description, s.parameter ? { parameter: s.parameter } : {}));
   read("perks.json").forEach((p) => add("perks", p.name, p.description));
   read("flaws.json").forEach((f) => add("flaws", f.name, f.description));
   read("glossary.json").forEach((g) => add("terms", g.term, g.definition));
@@ -84,6 +85,25 @@ function buildRegistry() {
   // creates a backlink to Bloom).
   read("crafting-recipes.json").forEach((r) => add("recipes", r.name, [r.materials, r.usesPerBatch, r.expiration, r.application, r.process, r.description, r.effect].filter(Boolean).join(" ")));
   read("ritual-recipes.json").forEach((r) => add("rituals", r.name, [r.summary, r.components, r.targets, r.tools, r.effect, r.process].filter(Boolean).join(" ")));
+  // Archetype templates from the Starter Sheets. The body is the tagline +
+  // joined references so the body-text scanner picks up the same skills/perks/
+  // powers the archetype lists. Structured refs are resolved separately below.
+  read("archetypes.json").forEach((a) => {
+    const body = [
+      a.tagline,
+      ...(a.startingSkills || []),
+      ...(a.purchasedSkills || []),
+      ...(a.purchasedPerks || []),
+      ...(a.flaws || []),
+      ...(a.innatePowers || []), ...(a.utilityPowers || []),
+      ...(a.basicPowers || []), ...(a.advancedPowers || []),
+      ...(a.veteranPowers || []), ...(a.cantrips || []),
+      ...(a.noviceSpells || []), ...(a.adeptSpells || []),
+      ...(a.greaterSpells || []), ...(a.bookSpells || []),
+      ...(a.domainPowers || []), ...(a.rightHandPowers || []),
+    ].filter(Boolean).join(" ");
+    add("archetypes", a.name, body, { specialization: a.specialization || null });
+  });
 
   // Sub-concept files (combat-rules.json, death-and-dying.json, etc.) are
   // structure-derived from the core-rules H1 sections by parse-megadoc. They all
@@ -96,7 +116,7 @@ function buildRegistry() {
     "defense-calls.json","modifiers.json","crafting-concepts.json",
     "ritual-concepts.json","domains.json","devotions.json","classes.json",
     "crafting-recipes.json","ritual-recipes.json","lineages.json",
-    "level-table.json","core-rules.json","refs.json",
+    "level-table.json","core-rules.json","refs.json","archetypes.json",
   ]);
   // Names already claimed by a more specific entity type (terms, defenses,
   // crafting-concepts, etc.). When a rules-concept H2 collides — e.g. "Short
@@ -173,6 +193,26 @@ function buildMatchers(registry) {
       }
       matchers.push({ form, key, id: e.id, type: e.type, caseSensitive });
     }
+    // Parameterized entity: prose instantiates the placeholder with a parenthe-
+    // sized value, e.g. "Lore (Religious)" → skills:Lore. Register one matcher
+    // per inflection that catches the `<form> (anything)` shape and consumes
+    // the whole span (so the parenthesized value isn't re-matched).
+    if (e.parameter) {
+      for (const form of forms) {
+        if (form.length < 3) continue;
+        const paramForm = `${form} (...)`;
+        const key = paramForm.toLowerCase();
+        if (matchers.some((m) => m.key === key)) continue;
+        matchers.push({
+          form,
+          key,
+          id: e.id,
+          type: e.type,
+          caseSensitive,
+          paramSuffix: true, // consume " (<value>)" after the form
+        });
+      }
+    }
   }
   // No need to sort here — the caller appends contextual matchers and sorts the
   // combined list.
@@ -195,7 +235,14 @@ function findRefs(text, selfId, matchers) {
     // must follow the form (consuming only the form itself). Used for duration
     // values like "Short" that should only link in "Short <Effect|Defense>"
     // shape, never as a bare word.
-    const tail = m.lookahead ? `(?=${m.lookahead})` : "";
+    //
+    // A parameterized matcher (paramSuffix) instead REQUIRES and consumes a
+    // " (value)" suffix. Used so "Lore (Religious)" links to skills:Lore and
+    // the parenthesized value is masked away (no follow-up matcher tries to
+    // match "Religious" as a separate entity).
+    const tail = m.lookahead ? `(?=${m.lookahead})`
+      : m.paramSuffix ? "\\s+\\([^)]+\\)"
+      : "";
     const re = new RegExp(`(?<![\\w-])${escapeRe(m.form)}(?![\\w-])${tail}`, flags);
     if (re.test(masked)) {
       if (m.id !== selfId) found.add(m.id);
@@ -209,9 +256,30 @@ function findRefs(text, selfId, matchers) {
 // Parse a skill's free-text prereq into linked skill ids, level requirements, and
 // leftover conditions. Skill names are matched against the skill registry.
 
+// All skill ids named in a fragment, longest-form-first so "Basic Arcane" wins
+// over "Arcane" but every distinct skill in the fragment is captured.
+function skillsIn(fragment, skillForms) {
+  const hits = skillForms
+    .filter((sf) => new RegExp(`(?<![\\w-])${escapeRe(sf.form)}(?![\\w-])`).test(fragment))
+    .sort((a, b) => b.form.length - a.form.length);
+  // De-dupe by id, preferring the longest form (already sorted), and drop a
+  // shorter form whose match is a substring of a longer one already taken.
+  const taken = [];
+  const ids = new Set();
+  for (const h of hits) {
+    if (ids.has(h.id)) continue;
+    if (taken.some((t) => t.form.includes(h.form))) continue;
+    taken.push(h); ids.add(h.id);
+  }
+  return [...ids];
+}
+
 function parsePrereq(prereqText, skillForms) {
-  if (!prereqText || prereqText === "None") return { skills: [], levels: [], other: [] };
+  if (!prereqText || prereqText === "None") {
+    return { skills: [], anyOf: [], levels: [], other: [] };
+  }
   const skills = new Set();
+  const anyOf = [];   // groups of alternative skill ids — satisfied if ANY is held
   const levels = [];
   const other = [];
 
@@ -220,16 +288,26 @@ function parsePrereq(prereqText, skillForms) {
   for (const part of parts) {
     // Level requirement: "N levels in X", "Nth character-level", "Character Level N".
     const lvl = part.match(/(\d+)\s*(?:levels?|character-level|character level)/i) || part.match(/(?:level|character[- ]level)\s*(\d+)/i);
-    // Does this part name a known skill? (match the longest skill form contained)
-    const skillHit = skillForms
-      .filter((sf) => new RegExp(`(?<![\\w-])${escapeRe(sf.form)}(?![\\w-])`).test(part))
-      .sort((a, b) => b.form.length - a.form.length)[0];
 
-    if (skillHit) skills.add(skillHit.id);
+    // Disjunction: "Basic Arcane or Basic Faith" — record every alternative as
+    // an anyOf group rather than collapsing to one required skill. Only treat it
+    // as a disjunction when more than one alternative actually names a skill.
+    if (!lvl && /\bor\b/i.test(part)) {
+      const alts = part.split(/\bor\b/i).map((s) => s.trim()).filter(Boolean);
+      const altIds = alts.flatMap((a) => skillsIn(a, skillForms));
+      const uniq = [...new Set(altIds)];
+      if (uniq.length > 1) { anyOf.push(uniq); continue; }
+      if (uniq.length === 1) { skills.add(uniq[0]); continue; }
+      other.push(part);
+      continue;
+    }
+
+    const hits = skillsIn(part, skillForms);
+    if (hits.length) hits.forEach((id) => skills.add(id));
     if (lvl) levels.push(part);
-    if (!skillHit && !lvl) other.push(part);
+    if (!hits.length && !lvl) other.push(part);
   }
-  return { skills: [...skills], levels, other };
+  return { skills: [...skills], anyOf, levels, other };
 }
 
 // ─── BUILD ────────────────────────────────────────────────────────────────────
@@ -294,12 +372,16 @@ for (const { word, entityName } of COUNT_DURATIONS) {
     lookahead: `\\s+(?:\\d+|Count\\b|(?:${callKeywordRe})\\b)`,
   });
 }
-// Re-sort: contextual (lookahead) matchers run FIRST so that the trailing word
-// they require — e.g. "Grant" after "Short" — is still on the page and hasn't
-// been consumed by an earlier same-length match (effects:Grant has form "Grant",
-// length 5, same as "Short"). Within each group, longest form first as before.
+// Re-sort: contextual matchers (lookahead and paramSuffix) run FIRST so the
+// trailing word/value they require — e.g. "Grant" after "Short", or "(Religious)"
+// after "Lore" — is still on the page and hasn't been consumed by an earlier
+// same-length match. paramSuffix matchers also need to fire before their own
+// bare-form sibling so "Lore (Religious)" links to skills:Lore via the param-
+// suffix matcher (consuming both words) before the bare "Lore" matcher fires.
+// Within each group, longest form first as before.
+const contextual = (m) => m.lookahead || m.paramSuffix;
 matchers.sort((a, b) => {
-  if (!!a.lookahead !== !!b.lookahead) return a.lookahead ? -1 : 1;
+  if (contextual(a) !== contextual(b)) return contextual(a) ? -1 : 1;
   return b.form.length - a.form.length;
 });
 
@@ -331,13 +413,79 @@ const skills = read("skills.json");
 for (const s of skills) {
   const id = `skills:${s.name}`;
   prereqs[id] = parsePrereq(s.prereq, skillForms);
-  for (const dep of prereqs[id].skills) {
+  // Required skills and every disjunction alternative both unlock this skill.
+  const depIds = [...prereqs[id].skills, ...prereqs[id].anyOf.flat()];
+  for (const dep of depIds) {
     (unlocks[dep] = unlocks[dep] || []).push(id);
   }
 }
 
 for (const id of Object.keys(mentionedBy)) mentionedBy[id] = [...new Set(mentionedBy[id])];
 for (const id of Object.keys(unlocks)) unlocks[id] = [...new Set(unlocks[id])];
+
+// ─── ARCHETYPE STRUCTURED REFS ───────────────────────────────────────────────
+// Resolve every skill/perk/power listed in each archetype to an entity id,
+// keyed by which field it came from. This is the typed, drift-tolerant
+// complement to the body-text mentions pass — useful for the future UI to
+// jump from an archetype directly to the entities it picks. Each non-literal
+// resolution is logged so authoring drift between docs stays visible.
+
+// Type-scoped lookup tables. The archetype fields each map to one of these
+// scopes (a starting "skill" might actually be a perk granted free by class,
+// a "purchased skill" might be a [Class] H4 power bought with BP).
+const allPowers = registry.filter((e) => e.type === "powers");
+const allSkills = registry.filter((e) => e.type === "skills");
+const allClassPowers = registry.filter((e) => e.type === "powers"); // class skills are powers in our registry
+const allPerks = registry.filter((e) => e.type === "perks");
+const allFlaws = registry.filter((e) => e.type === "flaws");
+const startingLookup = buildLookup([...allSkills, ...allClassPowers, ...allPerks]);
+const purchasedSkillLookup = buildLookup([...allSkills, ...allClassPowers, ...allPowers]);
+const perkLookup = buildLookup(allPerks);
+const flawLookup = buildLookup(allFlaws);
+const powerLookup = buildLookup(allPowers);
+
+const archetypeRefs = {};
+const archetypeDrift = [];
+
+// Each archetype field → which lookup table to resolve against.
+const ARCHETYPE_FIELD_LOOKUPS = {
+  startingSkills: startingLookup,
+  purchasedSkills: purchasedSkillLookup,
+  purchasedPerks: perkLookup,
+  flaws: flawLookup,
+  innatePowers: powerLookup, utilityPowers: powerLookup,
+  basicPowers: powerLookup, advancedPowers: powerLookup,
+  veteranPowers: powerLookup, cantrips: powerLookup,
+  noviceSpells: powerLookup, adeptSpells: powerLookup,
+  greaterSpells: powerLookup, bookSpells: powerLookup,
+  domainPowers: powerLookup, rightHandPowers: powerLookup,
+  classPowers: powerLookup, formPowers: powerLookup,
+};
+
+for (const a of read("archetypes.json")) {
+  const archetypeId = `archetypes:${a.name}`;
+  archetypeRefs[archetypeId] = {};
+  for (const [field, lookup] of Object.entries(ARCHETYPE_FIELD_LOOKUPS)) {
+    const items = a[field];
+    if (!Array.isArray(items) || items.length === 0) continue;
+    const ids = [];
+    for (const raw of items) {
+      const { entity, drift } = resolve(raw, lookup);
+      if (entity) {
+        ids.push(entity.id);
+        // Backlink: each referenced entity gets a mentionedBy edge from the
+        // archetype, so the graph supports "which archetypes pick this power?".
+        if (entity.id !== archetypeId) {
+          (mentionedBy[entity.id] = mentionedBy[entity.id] || []).push(archetypeId);
+        }
+        if (drift) archetypeDrift.push({ archetype: a.name, field, raw, drift });
+      }
+    }
+    archetypeRefs[archetypeId][field] = [...new Set(ids)];
+  }
+}
+// Re-dedupe mentionedBy after archetype backlinks were appended.
+for (const id of Object.keys(mentionedBy)) mentionedBy[id] = [...new Set(mentionedBy[id])];
 
 // Doc-derived effect→condition relationships (and the inverse).
 const causesCondition = {};
@@ -359,11 +507,17 @@ const result = {
   causedBy,
   prereqs,
   unlocks,
+  archetypeRefs,
 };
 
 writeFileSync(join(DATA, "refs.json"), JSON.stringify(result, null, 2));
 
 const totalRefs = Object.values(mentions).reduce((a, r) => a + r.length, 0);
 const totalPrereqEdges = Object.values(prereqs).reduce((a, p) => a + p.skills.length, 0);
-console.log(`  ${registry.length} entities, ${totalRefs} body references, ${totalPrereqEdges} prereq edges`);
+const totalArchetypeRefs = Object.values(archetypeRefs).reduce(
+  (a, fields) => a + Object.values(fields).reduce((b, ids) => b + ids.length, 0), 0);
+console.log(`  ${registry.length} entities, ${totalRefs} body references, ${totalPrereqEdges} prereq edges, ${totalArchetypeRefs} archetype refs`);
+if (archetypeDrift.length) {
+  console.log(`  ${archetypeDrift.length} archetype refs resolved via drift fallback (see validate-archetypes for detail).`);
+}
 console.log("  refs.json written.");
