@@ -13,6 +13,7 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import {
   ARCHETYPES, REFS, lookupEntity, LEVEL_TABLE,
   eligiblePowers, ALL_SKILLS, ALL_PERKS, ALL_FLAWS,
+  CLASS_POWER_SLOTS, CLASSES,
 } from "./data/index.js";
 import { validate, characterLevel, prereqStatus, pickClass, getClasses } from "./data/validate.js";
 import "./Builder.css";
@@ -110,10 +111,10 @@ function Tag({ label, tone = "amber" }) {
 // ─── IDENTITY RAIL ───────────────────────────────────────────────────────────
 // Shows class/lineage/devotion as cards, stats as a strip, plus the live BP
 // budget meter so spend is always visible.
-function IdentityRail({ character, report, onClickField, onRestart }) {
-  const cls = character.classLevels?.split(" ")[0] || null;
-  const fields = [
-    { key: "class", icon: "⚔", label: "Class", value: cls, sub: character.specialization },
+function IdentityRail({ character, report, onClickField, onRestart,
+                       onSetClassLevel, onRemoveClass, onAddClass }) {
+  const classes = getClasses(character);
+  const otherFields = [
     { key: "lineage", icon: "🧬", label: "Lineage", value: character.lineage, sub: character.sublineage },
     { key: "devotion", icon: "🌟", label: "Devotion", value: character.devotion, sub: null },
   ];
@@ -126,7 +127,11 @@ function IdentityRail({ character, report, onClickField, onRestart }) {
         )}
       </header>
 
-      {fields.map((f) => (
+      <ClassCard classes={classes} spec={character.specialization}
+                 onSetLevel={onSetClassLevel} onRemove={onRemoveClass} onAdd={onAddClass}
+                 onInspect={() => onClickField("class")} />
+
+      {otherFields.map((f) => (
         <button key={f.key} className={`b-id-card ${f.value ? "is-set" : "is-empty"}`} onClick={() => onClickField(f.key)}>
           <span className="b-id-icon">{f.icon}</span>
           <span className="b-id-body">
@@ -151,6 +156,38 @@ function IdentityRail({ character, report, onClickField, onRestart }) {
         <span className="b-restart-icon">↺</span> Start over
       </button>
     </aside>
+  );
+}
+
+// Interactive class card: one row per class with a per-class level stepper and a
+// remove control (when multiclassed), plus "+ add class". The first class is the
+// primary (grants Starting Skills); additional classes grant Multi-Class Skills.
+function ClassCard({ classes, spec, onSetLevel, onRemove, onAdd, onInspect }) {
+  return (
+    <div className="b-id-card b-class-card is-set">
+      <span className="b-id-icon">⚔</span>
+      <span className="b-id-body">
+        <span className="b-id-label">{classes.length > 1 ? "Classes" : "Class"}</span>
+        {classes.length === 0 && <span className="b-id-value"><em>not set</em></span>}
+        {classes.map((c, i) => (
+          <span key={c.name} className="b-class-row">
+            <button className="b-class-name" onClick={() => onInspect(c.name)} title="Inspect class">
+              {c.name}{i === 0 && spec ? ` (${spec})` : ""}
+            </button>
+            <span className="b-class-lvl">
+              <button className="b-level-btn" disabled={c.level <= 1}
+                      onClick={() => onSetLevel(c.name, c.level - 1)}>−</button>
+              <strong>{c.level}</strong>
+              <button className="b-level-btn" onClick={() => onSetLevel(c.name, c.level + 1)}>+</button>
+            </span>
+            {classes.length > 1 && (
+              <button className="b-class-remove" title="Remove class" onClick={() => onRemove(c.name)}>×</button>
+            )}
+          </span>
+        ))}
+        <button className="b-class-add" onClick={onAdd}>+ add class</button>
+      </span>
+    </div>
   );
 }
 
@@ -887,6 +924,71 @@ export default function Builder() {
     });
   }, []);
 
+  // ─── CLASS MANAGEMENT (multi-class) ──────────────────────────────────────
+  // Migrate a character onto the canonical `classes` array form (from the legacy
+  // classLevels string) so class edits have a stable shape to mutate.
+  const toClassesForm = (c) => {
+    if (Array.isArray(c.classes) && c.classes.length) return c;
+    const classes = getClasses(c);
+    return { ...c, classes, classLevels: undefined };
+  };
+
+  // Set a single class's level (clamped so total level stays within table bounds).
+  const handleSetClassLevel = useCallback((className, level) => {
+    setCharacter((c0) => {
+      const c = toClassesForm(c0);
+      const others = c.classes.filter((x) => x.name !== className)
+        .reduce((n, x) => n + x.level, 0);
+      const lvl = Math.max(1, Math.min(MAX_LEVEL - others, level));
+      return { ...c, classes: c.classes.map((x) => x.name === className ? { ...x, level: lvl } : x) };
+    });
+  }, []);
+
+  // Add a class at level 1 (additional classes grant Multi-Class Skills, not
+  // Starting Skills — surfaced in the picker copy).
+  const handleAddClass = useCallback((className) => {
+    setCharacter((c0) => {
+      const c = toClassesForm(c0);
+      if (c.classes.some((x) => x.name === className)) return c0;
+      return { ...c, classes: [...c.classes, { name: className, level: 1 }] };
+    });
+    setPicking(null);
+  }, []);
+
+  // Remove a class and its attributed power picks.
+  const handleRemoveClass = useCallback((className) => {
+    setCharacter((c0) => {
+      const c = toClassesForm(c0);
+      if (c.classes.length <= 1) return c0; // keep at least one class
+      const classes = c.classes.filter((x) => x.name !== className);
+      // Drop power picks tagged to the removed class.
+      const next = { ...c, classes };
+      for (const field of Object.values(SLOT_FIELD)) {
+        const picks = c[field]; if (!picks) continue;
+        const keep = picks.map((name, i) => ({ name, i }))
+          .filter(({ name, i }) => pickClass(c, field, i, name) !== className);
+        next[field] = keep.map((k) => k.name);
+        if (c.powerClass?.[field]) {
+          next.powerClass = { ...(next.powerClass || c.powerClass) };
+          next.powerClass[field] = keep.map((k) => c.powerClass[field][k.i]);
+        }
+      }
+      return next;
+    });
+  }, []);
+
+  // Open the class picker. Classes already taken are marked.
+  const handleOpenClassPicker = useCallback(() => {
+    const taken = new Set(getClasses(character).map((c) => c.name));
+    const candidates = Object.keys(CLASS_POWER_SLOTS).map((name) => ({
+      name, desc: CLASSES[name]?.description || "", cat: CLASSES[name]?.type || "Class",
+    }));
+    setPicking(entityPickerSpec({
+      kind: "class", entityType: "classes", candidates,
+      title: "Add a class", taken, onChoose: handleAddClass,
+    }));
+  }, [character, handleAddClass]);
+
   // Open the add-picker for skills / perks / flaws.
   const handleOpenAdd = useCallback((kind) => {
     const config = {
@@ -923,8 +1025,13 @@ export default function Builder() {
   }, []);
 
   const handleClickIdentityField = useCallback((field) => {
-    const item = character[field === "class" ? "classLevels" : field];
-    if (item) handleInspect(item, null, field === "class" ? "classes" : field);
+    if (field === "class") {
+      const primary = getClasses(character)[0]?.name;
+      if (primary) handleInspect(primary, null, "classes");
+      return;
+    }
+    const item = character[field];
+    if (item) handleInspect(item, null, field);
   }, [character, handleInspect]);
 
   return (
@@ -932,7 +1039,9 @@ export default function Builder() {
       <BTopBar character={character} report={report} onLevelChange={handleLevelChange} />
       <div className="b-cols">
         <IdentityRail character={character} report={report}
-                      onClickField={handleClickIdentityField} onRestart={handleRestart} />
+                      onClickField={handleClickIdentityField} onRestart={handleRestart}
+                      onSetClassLevel={handleSetClassLevel} onRemoveClass={handleRemoveClass}
+                      onAddClass={handleOpenClassPicker} />
         <BuildSheet character={character} report={report} view={view}
                     onPickArchetype={handlePickArchetype}
                     onInspect={handleInspect} onOpenSlot={handleOpenSlot}
