@@ -387,9 +387,13 @@ function EditableRows({ items, field, onClick, isFocused, resolveType, report, r
             </button>
             {isAward && <span className="b-row-bp is-award">+{-cost.cost} BP</span>}
             {!isAward && cost && cost.base > 0 && (
-              <span className={`b-row-bp ${cost.cost === 0 ? "is-free" : ""}`}>
-                {cost.cost === 0 ? "free" : `${cost.cost} BP`}
-              </span>
+              cost.cost === 0 && cost.grant?.source
+                ? <span className="b-row-bp is-free" title={`Granted by ${cost.grant.source}`}>
+                    free · {cost.grant.source}
+                  </span>
+                : <span className={`b-row-bp ${cost.cost === 0 ? "is-free" : ""}`}>
+                    {cost.cost === 0 ? "free" : `${cost.cost} BP`}
+                  </span>
             )}
             {canRemove && (
               <button className="b-row-remove" title="Remove" onClick={() => onRemove(i)}>×</button>
