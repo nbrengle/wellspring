@@ -1,0 +1,609 @@
+[
+  {
+    "name": "Defensive Sword + Shield Fighter",
+    "tagline": "Guard your allies, block hits, and take a beating while you still stand.",
+    "lineage": "Human",
+    "lineageChallenges": [],
+    "lineageAdvantages": [],
+    "lifePoints": "4",
+    "armorPoints": "7 (physrep up to 6 points, +1 from powers)",
+    "spikes": "2",
+    "classLevels": "Fighter 4",
+    "flaws": [],
+    "startingSkills": [
+      "Basic Armor",
+      "Light Armor",
+      "Basic Martial Weapons",
+      "Basic Shields",
+      "Short Weapons",
+      "Advanced Shields"
+    ],
+    "purchasedSkills": [
+      "Medium Armor - 0 BP (from Linked Armor Utility Power)",
+      "Shield Expertise - 5 BP",
+      "Basic Medicine - 2 BP"
+    ],
+    "purchasedPerks": [
+      "Holding On - 1 BP",
+      "Will to Live - 1 BP"
+    ],
+    "innatePowers": [
+      "Deadly Remnants",
+      "Fighting Instructor",
+      "Parry Blow"
+    ],
+    "utilityPowers": [
+      "Linked Armor",
+      "Armored Shell"
+    ],
+    "basicPowers": [
+      "Harry",
+      "Shake it Off"
+    ]
+  },
+  {
+    "name": "Great Weapon Fighter",
+    "tagline": "You have a huge sword, and no one can take that away from you.",
+    "lineage": "Human",
+    "lineageChallenges": [],
+    "lineageAdvantages": [],
+    "lifePoints": "4",
+    "armorPoints": "4 (must be physrepped)",
+    "spikes": "2 (3 when wielding a sword)",
+    "classLevels": "Fighter 4",
+    "flaws": [],
+    "startingSkills": [
+      "Basic Armor",
+      "Light Armor",
+      "Basic Martial Weapons",
+      "Basic Shields",
+      "Great Weapons"
+    ],
+    "purchasedSkills": [
+      "Weapon Specialization (Swords) - 4 BP"
+    ],
+    "purchasedPerks": [
+      "Ancestral Relic - 2 BP",
+      "Bloody Minded - 3 BP"
+    ],
+    "innatePowers": [
+      "Deadly Remnants",
+      "Fighting Instructor",
+      "Parry Blow"
+    ],
+    "utilityPowers": [
+      "Fortitude",
+      "Knight’s Strength"
+    ],
+    "basicPowers": [
+      "Shot Placement",
+      "Raging Blows"
+    ]
+  },
+  {
+    "name": "Archer Fighter",
+    "tagline": "Aim carefully from the back line, and pierce through enemies with your arrows.",
+    "lineage": "Human",
+    "lineageChallenges": [],
+    "lineageAdvantages": [],
+    "lifePoints": "4",
+    "armorPoints": "2 (Must be physrepped)",
+    "spikes": "2",
+    "classLevels": "Fighter 4",
+    "flaws": [],
+    "startingSkills": [
+      "Basic Armor",
+      "Light Armor",
+      "Basic Martial Weapons",
+      "Basic Shields",
+      "Lore (Historical)",
+      "Projectile Weapons"
+    ],
+    "purchasedSkills": [
+      "Accuracy - 3 BP",
+      "Tracking - 4 BP",
+      "Profession - Apprentice (your choice) - 1 BP"
+    ],
+    "purchasedPerks": [
+      "Deathgrip - 1 BP"
+    ],
+    "innatePowers": [
+      "Deadly Remnants",
+      "Fighting Instructor",
+      "Parry Blow"
+    ],
+    "utilityPowers": [
+      "Bowyer",
+      "Reload"
+    ],
+    "basicPowers": [
+      "Flaming Arrow",
+      "Snap Shot"
+    ]
+  },
+  {
+    "name": "Balanced Cleric",
+    "tagline": "Use your divine might to heal your allies or smite your enemies.",
+    "lineage": "Human",
+    "lineageChallenges": [],
+    "lineageAdvantages": [],
+    "lifePoints": "3",
+    "armorPoints": "2 (must be physrepped)",
+    "spikes": "2",
+    "classLevels": "Cleric 4",
+    "flaws": [],
+    "startingSkills": [
+      "Basic Faith",
+      "Worship - The Mother",
+      "Basic Martial Weapons",
+      "Basic Armor",
+      "Extended Capacity - Novice",
+      "Additional Cantrip"
+    ],
+    "divineDomains": [
+      "Life",
+      "Protection"
+    ],
+    "devotionAccents": [
+      "Flame",
+      "Life"
+    ],
+    "domainPowers": [
+      "Lifeline (Life) - 5 BP"
+    ],
+    "purchasedSkills": [
+      "Lore (Religious) - 2 BP",
+      "Path of Panic - 1 BP"
+    ],
+    "purchasedPerks": [
+      "Soothing Touch - 1 BP"
+    ],
+    "innatePowers": [
+      "Ritual Affinity",
+      "Healing Touch",
+      "Refreshing Prayer"
+    ],
+    "cantrips": [
+      "Cancel",
+      "Blade Blessing",
+      "Revivify",
+      "Devotion’s Strike"
+    ],
+    "noviceSpellSlots": "5",
+    "noviceSpells": [
+      "Cure",
+      "Heretic’s Brand",
+      "Rekindle",
+      "Spirit Speak"
+    ]
+  },
+  {
+    "name": "Form Fighter Druid",
+    "tagline": "Harness your primal shapeshifting magic to fill your choice of combat roles.",
+    "lineage": "Human",
+    "lineageChallenges": [],
+    "lineageAdvantages": [],
+    "lifePoints": "3",
+    "armorPoints": "0",
+    "spikes": "2",
+    "classLevels": "Druid 4",
+    "flaws": [],
+    "startingSkills": [
+      "Basic Martial Weapons",
+      "Profession - Apprentice (your choice)",
+      "Basic Faith",
+      "Scavenge I",
+      "Extended Capacity - Novice",
+      "Lore (Nature)"
+    ],
+    "purchasedSkills": [
+      "Favored Form (your choice) - 4 BP",
+      "Red in Tooth and Claw - 2 BP"
+    ],
+    "purchasedPerks": [
+      "Insight - 3 BP"
+    ],
+    "innatePowers": [
+      "Commune with Nature",
+      "Message of the Flowers",
+      "Nature’s Understanding"
+    ],
+    "cantrips": [
+      "Cancel",
+      "Hide",
+      "Festering Lash"
+    ],
+    "noviceSpellSlots": "5",
+    "noviceSpells": [
+      "Barkskin",
+      "Lesser Form of the Hulking Bear",
+      "Lesser Form of the Hunting Panther",
+      "Lesser Form of the Striking Serpent"
+    ]
+  },
+  {
+    "name": "Healer Druid",
+    "tagline": "Call upon the restorative power of nature to shelter and heal your allies.",
+    "lineage": "Human",
+    "lineageChallenges": [],
+    "lineageAdvantages": [],
+    "lifePoints": "3",
+    "armorPoints": "0",
+    "spikes": "2",
+    "classLevels": "Druid 4",
+    "flaws": [],
+    "startingSkills": [
+      "Basic Martial Weapons",
+      "Profession - Apprentice (your choice)",
+      "Forage I",
+      "Basic Faith",
+      "Peacecaster",
+      "Basic Medicine"
+    ],
+    "purchasedSkills": [
+      "Find the Path - 1 BP",
+      "Diagnose - 1 BP",
+      "Combat Medic - 1 BP",
+      "Spell-Scholar - 4 BP"
+    ],
+    "purchasedPerks": [
+      "Iron Stomach - 2 BP"
+    ],
+    "innatePowers": [
+      "Commune with Nature",
+      "Message of the Flowers",
+      "Nature’s Understanding"
+    ],
+    "cantrips": [
+      "Cancel",
+      "Care for the Fallen",
+      "Life Tap"
+    ],
+    "noviceSpellSlots": "4",
+    "noviceSpells": [
+      "Balm",
+      "Blessing of the Oak",
+      "Purifying Flame",
+      "Quell Beast",
+      "Sap of Life"
+    ]
+  },
+  {
+    "name": "Utility Mage",
+    "tagline": "Gather information and support your allies using your mental and magical prowess.",
+    "lineage": "Human",
+    "lineageChallenges": [],
+    "lineageAdvantages": [],
+    "lifePoints": "3",
+    "armorPoints": "0",
+    "spikes": "2",
+    "classLevels": "Mage 4",
+    "flaws": [],
+    "startingSkills": [
+      "Basic Arcane",
+      "Lore x1 (your choice)",
+      "Library Use",
+      "Bookcaster x2",
+      "Extended Capacity - Novice x2"
+    ],
+    "purchasedSkills": [
+      "Apprentice Ritual Magic - 0 BP (from Ritual Affinity innate Power)",
+      "Arcane Charge - 2 BP",
+      "Lore x2 (your choice) - 2 BP (discounted from Sharp Mind)"
+    ],
+    "purchasedPerks": [
+      "Sharp Mind - 2 BP (1 BP refunded from Library Use)",
+      "Sight - 3 BP"
+    ],
+    "innatePowers": [
+      "Arcane Study",
+      "Replicate Enhancement",
+      "Ritual Affinity"
+    ],
+    "cantrips": [
+      "Cancel",
+      "Identify",
+      "Stop"
+    ],
+    "noviceSpellSlots": "6",
+    "noviceSpells": [
+      "Carnate",
+      "Freeze",
+      "Mageskin",
+      "Town Portal"
+    ],
+    "bookSpells": [
+      "Magekey",
+      "Mask Aura"
+    ]
+  },
+  {
+    "name": "Ranged Rogue",
+    "tagline": "Throw knives and poisons from a safe distance.",
+    "lineage": "Human",
+    "lineageChallenges": [],
+    "lineageAdvantages": [],
+    "lifePoints": "3",
+    "armorPoints": "4 (must be physrepped)",
+    "spikes": "3",
+    "classLevels": "Rogue 4",
+    "flaws": [],
+    "startingSkills": [
+      "Basic Armor",
+      "Light Armor",
+      "Basic Martial Weapons",
+      "Thrown Weapons",
+      "Basic Locks",
+      "Poisoner"
+    ],
+    "purchasedSkills": [
+      "Weapon Specialization (Thrown Weapons) - 4 BP",
+      "Apprentice Alchemy - 2 BP (1 BP refunded from Poisoner)",
+      "Forage I - 3 BP"
+    ],
+    "innatePowers": [
+      "Deflect Projectiles",
+      "Backstab (+1 damage)",
+      "Loot"
+    ],
+    "utilityPowers": [
+      "Acquired Tolerance",
+      "Reload"
+    ],
+    "basicPowers": [
+      "Concealed Dart",
+      "Rogue’s Aim"
+    ]
+  },
+  {
+    "name": "Skirmisher Rogue",
+    "tagline": "Position behind enemies, quickly take them out, and get away.",
+    "lineage": "Human",
+    "lineageChallenges": [],
+    "lineageAdvantages": [],
+    "lifePoints": "3",
+    "armorPoints": "4 (must be physrepped)",
+    "spikes": "3",
+    "classLevels": "Rogue 4",
+    "flaws": [],
+    "startingSkills": [
+      "Basic Armor",
+      "Light Armor",
+      "Basic Martial Weapons",
+      "Thrown Weapons",
+      "Basic Traps",
+      "Poisoner"
+    ],
+    "purchasedSkills": [
+      "Short Weapons - 3 BP",
+      "Two Weapon Style - 0 BP (free from Way of the Blade)",
+      "Weapon Specialization (Daggers) - 0 BP (free from Way of the Blade)",
+      "Advanced Traps - 4 BP",
+      "Apprentice Profession (your choice) - 1 BP",
+      "Purchased Perks:Deathgrip - 0 BP (free from Throat Slit)",
+      "Holding On - 0 BP (free from Throat Slit)",
+      "Carnal Creature - 1 BP"
+    ],
+    "innatePowers": [
+      "Deflect Projectiles",
+      "Backstab (+1 damage)",
+      "Loot"
+    ],
+    "utilityPowers": [
+      "Throat Slit",
+      "Way of the Blade"
+    ],
+    "basicPowers": [
+      "Quick Nap",
+      "Unburdened Speed"
+    ]
+  },
+  {
+    "name": "Support Socialite",
+    "tagline": "Use your intellect and charisma to get everything you want - from a safe distance behind your bodyguard, of course.",
+    "lineage": "Human",
+    "lineageChallenges": [],
+    "lineageAdvantages": [],
+    "lifePoints": "3",
+    "armorPoints": "2 (Must be physrepped)",
+    "spikes": "2",
+    "classLevels": "Socialite 4",
+    "flaws": [],
+    "startingSkills": [
+      "Basic Martial Weapons",
+      "Library Use",
+      "Poisoner",
+      "Basic Armor",
+      "Lore (your choice) x1",
+      "Profession - Apprentice (your choice)",
+      "Profession - Journeyman (your choice)",
+      "Fence",
+      "Contact"
+    ],
+    "purchasedSkills": [
+      "The Right Hand - 1 BP",
+      "Holding Out for a Hero - 1 BP",
+      "Steel Yourself - 1 BP"
+    ],
+    "purchasedPerks": [
+      "Contact - 0 BP (starting Perk)",
+      "Manse - 3 BP",
+      "Income - 3 BP"
+    ],
+    "innatePowers": [
+      "Practiced Manner",
+      "Heart of the Group",
+      "Stern Willed"
+    ],
+    "utilityPowers": [
+      "Sources",
+      "Tax Evasion"
+    ],
+    "basicPowers": [
+      "Enthrall",
+      "Sizing Up the Opposition",
+      "Soothe"
+    ]
+  },
+  {
+    "name": "Blaster Sourcerer",
+    "tagline": "Never meet a problem you can’t zap to smithereens.",
+    "lineage": "Human",
+    "lineageChallenges": [],
+    "lineageAdvantages": [],
+    "lifePoints": "3",
+    "armorPoints": "0",
+    "spikes": "2",
+    "classLevels": "Sourcerer 4",
+    "flaws": [],
+    "startingSkills": [
+      "Basic Arcane",
+      "Advanced Recharge",
+      "Patron (your choice)",
+      "Gift of Hateful Retribution I"
+    ],
+    "purchasedSkills": [
+      "Warcaster - 5 BP"
+    ],
+    "purchasedPerks": [
+      "Gift of Hateful Retribution II - 3 BP",
+      "Gift of Recognition - 1 BP"
+    ],
+    "innatePowers": [
+      "Internal Battery",
+      "Arcane Source",
+      "Astride the Weave",
+      "Enduring Source"
+    ],
+    "cantrips": [
+      "Cancel",
+      "Charge",
+      "Wild Bolt"
+    ]
+  },
+  {
+    "name": "Artificer Artisan",
+    "tagline": "Smith minerals into the finest equipment, and enhance it on the battlefield.",
+    "lineage": "Human",
+    "lineageChallenges": [],
+    "lineageAdvantages": [],
+    "lifePoints": "3",
+    "armorPoints": "4 (must be physrepped)",
+    "spikes": "2",
+    "classLevels": "Artificer 4",
+    "flaws": [],
+    "startingSkills": [
+      "Basic Martial Weapons",
+      "Short Weapons",
+      "Basic Armor",
+      "Apprentice Tinkering (-3 BP refunded from Forgesource Specialist)",
+      "Prospect I",
+      "Apprentice Profession (your choice)",
+      "Journeyman Profession (your choice)"
+    ],
+    "purchasedSkills": [
+      "Light Armor - 3 BP",
+      "Journeyman Tinkering - 4 BP",
+      "Chronic Hobbyist (your choice) - 2 BP",
+      "Medium Armor - 0 BP (from The Learned One)"
+    ],
+    "purchasedPerks": [
+      "Fortunate Finder - 3 BP"
+    ],
+    "innatePowers": [
+      "Living Iron"
+    ],
+    "utilityPowers": [
+      "Forged from Steel",
+      "Forgesource Specialist"
+    ],
+    "basicPowers": [
+      "Armor Upkeep Specialist",
+      "Forcefield",
+      "Overcharge"
+    ]
+  },
+  {
+    "name": "Crafter Artisan",
+    "tagline": "Brew up a myriad of consumable items from the safety of the tavern.",
+    "lineage": "Human",
+    "lineageChallenges": [],
+    "lineageAdvantages": [],
+    "lifePoints": "3",
+    "armorPoints": "2 (must be physrepped)",
+    "spikes": "2",
+    "classLevels": "Artisan 4",
+    "flaws": [],
+    "startingSkills": [
+      "Basic Martial Weapons",
+      "Short Weapons",
+      "Basic Armor",
+      "Apprentice Alchemy",
+      "Forage I",
+      "Basic Medicine",
+      "Hearth"
+    ],
+    "purchasedSkills": [
+      "Scavenge I - 3 BP",
+      "Scavenge II - 3 BP",
+      "Forage II - 0 BP (from Hunter Gatherer)",
+      "Journeyman Alchemy - 0 BP (from The Learned One)"
+    ],
+    "purchasedPerks": [
+      "Fortunate Finder - 3 BP"
+    ],
+    "innatePowers": [
+      "Living Iron"
+    ],
+    "utilityPowers": [
+      "A Spoonful of Sugar",
+      "Hunter Gatherer"
+    ],
+    "basicPowers": [
+      "Apt Assistant",
+      "Custom Brew",
+      "Kick"
+    ]
+  },
+  {
+    "name": "Mystic Artisan",
+    "tagline": "Perform magical rites to enchant weapons and uncover mysteries.",
+    "lineage": "Human",
+    "lineageChallenges": [],
+    "lineageAdvantages": [],
+    "lifePoints": "3",
+    "spikes": "2",
+    "classLevels": "Artisan 4",
+    "flaws": [],
+    "startingSkills": [
+      "Basic Martial Weapons",
+      "Short Weapons",
+      "Basic Armor",
+      "Apprentice Enchanting",
+      "Apprentice Ritual Magic",
+      "Lore (Rituals) (-2 BP refunded from The Learned One)",
+      "Forage I"
+    ],
+    "purchasedSkills": [
+      "Journeyman Enchanting - 4 BP",
+      "Journeyman Ritual Magic - 0 BP (from The Learned One)"
+    ],
+    "purchasedPerks": [
+      "Soothsayer - 3 BP",
+      "Insight - 3 BP",
+      "Bits and Pieces - 1 BP"
+    ],
+    "innatePowers": [
+      "Living Iron"
+    ],
+    "utilityPowers": [
+      "Otherworldly Sight",
+      "Protected Casting"
+    ],
+    "basicPowers": [
+      "Aegis of the Unknown/Sundering of the Unknown",
+      "Dig Deep",
+      "Mesmerize"
+    ]
+  }
+]
