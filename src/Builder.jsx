@@ -341,13 +341,16 @@ function Section({ title, tone = "amber", onAdd, children }) {
 // picks in order, the rest shown as empty "choose" rows. The header shows
 // used/allowed and goes green when exactly filled, red when over.
 function SlotBlock({ slot, character, onInspect, onOpenSlot, isFocused, pickClassOf }) {
-  const field = SLOT_FIELD[slot.category];
-  const allPicks = character[field] || [];
-  // Picks belonging to THIS class's slots (with their position in the flat array
-  // so clear/swap target the right element).
-  const myPicks = allPicks
-    .map((name, flatIndex) => ({ name, flatIndex }))
-    .filter((p) => pickClassOf(field, p.flatIndex, p.name) === slot.cls);
+  // Spells-known spans three tier fields; every other category is a single field.
+  const fields = slot.category === "spellsKnown"
+    ? ["noviceSpells", "adeptSpells", "greaterSpells"]
+    : [SLOT_FIELD[slot.category]];
+  // Picks belonging to THIS class's slots, across the relevant field(s), each
+  // carrying its field + flat index so clear/swap target the right element.
+  const myPicks = fields.flatMap((field) =>
+    (character[field] || [])
+      .map((name, flatIndex) => ({ name, flatIndex, field }))
+      .filter((p) => pickClassOf(field, p.flatIndex, p.name) === slot.cls));
 
   const rowCount = Math.max(slot.allowed, myPicks.length);
   const rows = Array.from({ length: rowCount }, (_, i) => myPicks[i] ?? null);
@@ -364,11 +367,11 @@ function SlotBlock({ slot, character, onInspect, onOpenSlot, isFocused, pickClas
           const over = i >= slot.allowed;
           if (pick) {
             return (
-              <li key={i} className={`b-slot-row is-filled ${over ? "is-over" : ""} ${isFocused(pick.name, field) ? "is-focused" : ""}`}>
+              <li key={i} className={`b-slot-row is-filled ${over ? "is-over" : ""} ${isFocused(pick.name, pick.field) ? "is-focused" : ""}`}>
                 <span className="b-slot-num">{i + 1}</span>
-                <button className="b-slot-pick" onClick={() => onInspect(pick.name, field, "powers")}>{pick.name}</button>
-                <button className="b-slot-action" title="Swap" onClick={() => onOpenSlot(slot, pick.flatIndex)}>✎</button>
-                <button className="b-slot-action" title="Clear" onClick={() => onOpenSlot(slot, pick.flatIndex, true)}>✕</button>
+                <button className="b-slot-pick" onClick={() => onInspect(pick.name, pick.field, "powers")}>{pick.name}</button>
+                <button className="b-slot-action" title="Swap" onClick={() => onOpenSlot(slot, pick.flatIndex, false, pick.field)}>✎</button>
+                <button className="b-slot-action" title="Clear" onClick={() => onOpenSlot(slot, pick.flatIndex, true, pick.field)}>✕</button>
               </li>
             );
           }
@@ -527,13 +530,24 @@ function powerPickerSpec(slot, character) {
         if (r.includes("immediate")) return "Immediate";
         return p.refresh;
       };
+  // For spells-known, a pick is stored in the field matching its OWN tier
+  // (noviceSpells/adeptSpells/greaterSpells), not a single field — so the right
+  // tier's count is tracked. Map candidate name → its tier field.
+  const fieldFor = (name) => {
+    if (category !== "spellsKnown") return field;
+    const c = candidates.find((x) => x.name === name);
+    return c?.tierList || "noviceSpells";
+  };
+  // "taken" spans every tier field for spells-known so chosen spells are marked.
+  const takenFields = category === "spellsKnown"
+    ? ["noviceSpells", "adeptSpells", "greaterSpells"] : [field];
   return {
     kind: "power", entityType: "powers",
     title: `Choose a ${label} power`,
     subtitle: `${candidates.length} options for ${cls}`,
     candidates, groupBy,
-    taken: new Set(character[field] || []),
-    onChoose: (name) => slot.onChoose(name),
+    taken: new Set(takenFields.flatMap((f) => character[f] || [])),
+    onChoose: (name) => slot.onChoose(name, fieldFor(name)),
   };
 }
 
@@ -907,11 +921,13 @@ export default function Builder() {
     });
   }, [character.archetypeName]);
 
-  // Commit a power pick into `field`, tagged with the slot's class. When
-  // flatIndex >= 0 it replaces (swap); otherwise it appends (fill empty slot).
+  // Commit a power pick, tagged with the slot's class. When flatIndex >= 0 it
+  // replaces (swap); otherwise it appends. `fieldOverride` lets the spells-known
+  // picker route a pick to its actual tier field (noviceSpells/adeptSpells/
+  // greaterSpells) rather than the single SLOT_FIELD mapping.
   // powerClass[field][i] records the owning class so per-class slots stay sorted.
-  const setSlotPick = useCallback((slot, flatIndex, powerName) => {
-    const field = SLOT_FIELD[slot.category];
+  const setSlotPick = useCallback((slot, flatIndex, powerName, fieldOverride) => {
+    const field = fieldOverride || SLOT_FIELD[slot.category];
     setCharacter((c) => {
       const next = [...(c[field] || [])];
       const pc = { ...(c.powerClass || {}) };
@@ -925,8 +941,10 @@ export default function Builder() {
   }, []);
 
   // Open a power slot for picking; clear=true removes the pick at flatIndex.
-  const handleOpenSlot = useCallback((slot, flatIndex, clear = false) => {
-    const field = SLOT_FIELD[slot.category];
+  // `fieldHint` targets the pick's actual field (needed for spells-known, whose
+  // picks live across noviceSpells/adeptSpells/greaterSpells).
+  const handleOpenSlot = useCallback((slot, flatIndex, clear = false, fieldHint) => {
+    const field = fieldHint || SLOT_FIELD[slot.category];
     if (clear) {
       setCharacter((c) => {
         const next = [...(c[field] || [])];
@@ -938,7 +956,7 @@ export default function Builder() {
       return;
     }
     setPicking(powerPickerSpec(
-      { ...slot, onChoose: (name) => setSlotPick(slot, flatIndex, name) },
+      { ...slot, onChoose: (name, fieldOverride) => setSlotPick(slot, flatIndex, name, fieldOverride) },
       character,
     ));
   }, [character, setSlotPick]);
