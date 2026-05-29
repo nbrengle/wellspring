@@ -97,6 +97,10 @@ const SLOT_FIELD = {
   spellsKnown: "noviceSpells",
 };
 
+// Level bounds from the level table — the stepper clamps to these.
+const MIN_LEVEL = LEVEL_TABLE.length ? Math.min(...LEVEL_TABLE.map((l) => l.level)) : 4;
+const MAX_LEVEL = LEVEL_TABLE.length ? Math.max(...LEVEL_TABLE.map((l) => l.level)) : 4;
+
 // ─── UI PRIMITIVES ──────────────────────────────────────────────────────────
 
 function Tag({ label, tone = "amber" }) {
@@ -134,8 +138,8 @@ function IdentityRail({ character, report, onClickField, onRestart }) {
       ))}
 
       <div className="b-stat-strip">
-        <Stat label="LP" value={character.lifePoints ?? "—"} />
-        <Stat label="Spikes" value={character.spikes ?? "—"} />
+        <Stat label="LP" value={report.stats?.lifePoints ?? character.lifePoints ?? "—"} />
+        <Stat label="Spikes" value={report.stats?.spikes ?? character.spikes ?? "—"} />
         <Stat label="AP" value={character.armorPoints?.replace(/\s*\(.+\)/, "") ?? "—"} />
       </div>
 
@@ -865,6 +869,18 @@ export default function Builder() {
     });
   }, []);
 
+  // Change the character's level by rewriting the number in classLevels
+  // ("Fighter 4" → "Fighter 5"). Budget and slot caps follow automatically via
+  // the validator; existing picks are kept (the user prunes if a level-down puts
+  // them over a cap, which the validator flags).
+  const handleLevelChange = useCallback((next) => {
+    const level = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, next));
+    setCharacter((c) => {
+      if (!c.classLevels) return c;
+      return { ...c, classLevels: c.classLevels.replace(/\d+/, String(level)) };
+    });
+  }, []);
+
   // Open the add-picker for skills / perks / flaws.
   const handleOpenAdd = useCallback((kind) => {
     const config = {
@@ -907,7 +923,7 @@ export default function Builder() {
 
   return (
     <div className="b-root">
-      <BTopBar character={character} report={report} />
+      <BTopBar character={character} report={report} onLevelChange={handleLevelChange} />
       <div className="b-cols">
         <IdentityRail character={character} report={report}
                       onClickField={handleClickIdentityField} onRestart={handleRestart} />
@@ -926,7 +942,7 @@ export default function Builder() {
   );
 }
 
-function BTopBar({ character, report }) {
+function BTopBar({ character, report, onLevelChange }) {
   const level = character.archetypeName ? characterLevel(character) : null;
   return (
     <header className="b-topbar">
@@ -937,7 +953,14 @@ function BTopBar({ character, report }) {
       <div className="b-topbar-stats">
         {level && (
           <>
-            <span className="b-topbar-stat">Level <strong>{level}</strong></span>
+            <span className="b-topbar-stat b-level">
+              Level
+              <button className="b-level-btn" disabled={level <= MIN_LEVEL}
+                      onClick={() => onLevelChange(level - 1)} title="Level down">−</button>
+              <strong>{level}</strong>
+              <button className="b-level-btn" disabled={level >= MAX_LEVEL}
+                      onClick={() => onLevelChange(level + 1)} title="Level up">+</button>
+            </span>
             <span className="b-topbar-stat">Budget <strong>{report.budget} BP</strong></span>
             <span className={`b-topbar-stat ${report.valid ? "is-valid" : "is-invalid"}`}>
               {report.valid ? "✓ legal build" : "⚠ check build"}

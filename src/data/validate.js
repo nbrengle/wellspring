@@ -9,7 +9,7 @@
 // Pure functions, no React, so the UI calls them in a useMemo and they stay
 // unit-testable. The character shape is the flat object from Builder.jsx.
 
-import { LEVEL_TABLE, lookupEntity, REFS, CLASS_POWER_SLOTS, CLASS_POWERS, CLASS_PROGRESSION } from './index.js';
+import { LEVEL_TABLE, lookupEntity, REFS, CLASS_POWER_SLOTS, CLASS_POWERS, CLASS_PROGRESSION, SPELLCASTERS } from './index.js';
 
 // Character fields whose items cost BP. Starting skills are class-granted and
 // free; only purchased skills/perks spend BP.
@@ -252,8 +252,12 @@ function slotGrants(character) {
 // slots. Empty when the class is unknown.
 export function computeSlots(character) {
   const cls = character.classLevels?.split(' ')[0];
-  const slots = cls && CLASS_POWER_SLOTS[cls];
-  if (!slots) return [];
+  if (!cls || !CLASS_POWER_SLOTS[cls]) return [];
+  // Read the progression row for the character's actual level (not the fixed
+  // level-4 CLASS_POWER_SLOTS), so slot caps grow as the character levels.
+  const level = characterLevel(character);
+  const slots = CLASS_PROGRESSION[cls]?.[level] || CLASS_POWER_SLOTS[cls];
+  const isCaster = SPELLCASTERS.has(cls);
 
   const bonus = slotGrants(character);
   const row = (category, label, used, base) => ({
@@ -264,7 +268,6 @@ export function computeSlots(character) {
   });
 
   const rows = [];
-  const isCaster = 'cantrips' in slots;
   if (isCaster) {
     rows.push(row('cantrips', 'Cantrips', (character.cantrips || []).length, slots.cantrips ?? 0));
     const known = CASTER_SLOT_FIELDS.spellsKnown
@@ -311,6 +314,29 @@ export function spellSlots(character) {
     return { novice, adept, greater };
   }
   return { novice: 0, adept: 0, greater: 0 };
+}
+
+// Level-scaled stats. Archetype LP/spikes are authored at the starter level (4)
+// and already include class/lineage bonuses, so we keep that base and apply the
+// LEVEL-TABLE DELTA between level 4 and the character's current level. Returns
+// { lifePoints, spikes } as display strings/numbers, falling back to the stored
+// values when no numeric base is available.
+const BASE_LEVEL = 4;
+export function levelStats(character) {
+  const level = characterLevel(character);
+  const rowFor = (l) => LEVEL_TABLE.find((r) => r.level === l);
+  const base = rowFor(BASE_LEVEL);
+  const cur = rowFor(level);
+
+  const scale = (storedVal, key) => {
+    const stored = parseInt(String(storedVal), 10);
+    if (Number.isNaN(stored) || !base || !cur) return storedVal ?? '—';
+    return stored + ((cur[key] ?? 0) - (base[key] ?? 0));
+  };
+  return {
+    lifePoints: scale(character.lifePoints, 'lp'),
+    spikes: scale(character.spikes, 'spikes'),
+  };
 }
 
 // All entity ids the character owns, for satisfying skill-prereqs.
@@ -392,6 +418,7 @@ export function validate(character) {
   const spend = computeSpend(character);
   const slots = computeSlots(character);
   const spellSlotCounts = spellSlots(character);
+  const stats = levelStats(character);
   const prereqs = checkPrereqs(character);
   const slotsOver = slots.some((s) => s.over);
   // BP used beyond the base allowance, drawn from the bonus pool (clamped ≥0).
@@ -410,6 +437,7 @@ export function validate(character) {
     slots,
     slotsOver,
     spellSlots: spellSlotCounts,
+    stats,
     prereqs,
     valid: !prereqs.issues.length && !overBudget && !slotsOver,
   };

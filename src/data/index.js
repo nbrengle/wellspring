@@ -90,7 +90,7 @@ export const ALL_FLAWS = flawsJson.map(f => ({
 // description, startingSkills, multiclassSkills }. Role/keyFeatures prose is not
 // in the data (intentionally — to be parsed later), so it's simply omitted.
 
-const SPELLCASTERS = new Set(['Cleric', 'Druid', 'Mage', 'Sourcerer']);
+export const SPELLCASTERS = new Set(['Cleric', 'Druid', 'Mage', 'Sourcerer']);
 const MAGIC_TYPE = { Cleric: 'Divine', Druid: 'Divine', Mage: 'Arcane', Sourcerer: 'Arcane' };
 
 export const CLASSES = Object.fromEntries(

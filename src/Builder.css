@@ -758,3 +758,14 @@
   font-size: 0.62rem; color: var(--b-amber); margin-left: auto; padding-right: 0.3rem;
 }
 .b-picker-row-cost.is-award { color: var(--b-green); }
+
+/* ─── LEVEL STEPPER ───────────────────────────────────────────────────── */
+.b-level { display: inline-flex; align-items: center; gap: 0.4rem; }
+.b-level-btn {
+  width: 1.3rem; height: 1.3rem; border-radius: 0.3rem;
+  background: var(--b-panel); border: 1px solid var(--b-border-2); color: var(--b-muted);
+  font-size: 0.9rem; line-height: 1; cursor: pointer; padding: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.b-level-btn:hover:not(:disabled) { border-color: var(--b-amber-deep); color: var(--b-amber); }
+.b-level-btn:disabled { opacity: 0.35; cursor: default; }
