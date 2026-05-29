@@ -268,7 +268,7 @@ function BuildSheet({ character, report, view, onPickArchetype, onInspect, onOpe
       </header>
 
       <Section title="Skills" tone="amber" onAdd={() => onOpenAdd("skill")}>
-        <EditableGrid
+        <EditableRows
           items={[...character.startingSkills, ...character.purchasedSkills]}
           field="purchasedSkills" resolveType="skills" report={report}
           onClick={onInspect} isFocused={isFocused}
@@ -277,7 +277,7 @@ function BuildSheet({ character, report, view, onPickArchetype, onInspect, onOpe
       </Section>
 
       <Section title="Perks" tone="teal" onAdd={() => onOpenAdd("perk")}>
-        <EditableGrid
+        <EditableRows
           items={character.purchasedPerks} field="purchasedPerks" resolveType="perks" report={report}
           onClick={onInspect} isFocused={isFocused}
           removable={() => true} onRemove={(i) => onRemoveEntity("purchasedPerks", i)} />
@@ -294,7 +294,7 @@ function BuildSheet({ character, report, view, onPickArchetype, onInspect, onOpe
       )}
 
       <Section title="Flaws" tone="red" onAdd={() => onOpenAdd("flaw")}>
-        <EditableGrid
+        <EditableRows
           items={character.flaws} field="flaws" resolveType="flaws" report={report}
           onClick={onInspect} isFocused={isFocused}
           removable={() => true} onRemove={(i) => onRemoveEntity("flaws", i)} />
@@ -364,36 +364,31 @@ function SlotBlock({ slot, character, onInspect, onOpenSlot, isFocused, pickClas
   );
 }
 
-// Render item-name chips: click to inspect, BP cost/grant badge, and a remove (×)
-// control on removable items. `removable(i)` / `onRemove(i)` operate on the
-// rendered index; the parent maps that to the right backing list.
-function EditableGrid({ items, field, onClick, isFocused, resolveType, report, removable, onRemove }) {
+// Render items as full-width rows (matching the power slot rows): click the name
+// to inspect, a BP cost / award badge, and a remove (×) on removable items.
+// `removable(i)` / `onRemove(i)` operate on the rendered index; the parent maps
+// that to the right backing list.
+function EditableRows({ items, field, onClick, isFocused, resolveType, report, removable, onRemove }) {
   if (!items || items.length === 0) {
     return <p className="b-empty">none</p>;
   }
   return (
-    <ul className="b-item-grid">
+    <ul className="b-rows">
       {items.map((item, i) => {
         const cost = report?.spend.byItem[`${field}:${item}`];
         const canRemove = removable ? removable(i) : false;
-        // Flaws award BP (negative cost); show "+N BP" in green.
-        const isAward = cost && cost.cost < 0;
+        const isAward = cost && cost.cost < 0; // flaws award BP
         return (
-          <li key={`${field}-${i}-${item}`} className="b-item-wrap">
-            <button
-              className={`b-item ${isFocused(item, field) ? "is-focused" : ""}`}
-              onClick={() => onClick(item, field, resolveType)}
-            >
-              <span className="b-item-name">{item}</span>
-              {isAward && <span className="b-item-bp is-award">+{-cost.cost} BP</span>}
-              {!isAward && cost && cost.base > 0 && (
-                <span className={`b-item-bp ${cost.cost === 0 ? "is-free" : ""}`}>
-                  {cost.cost === 0 ? "free" : `${cost.cost} BP`}
-                </span>
-              )}
-            </button>
+          <li key={`${field}-${i}-${item}`} className={`b-row ${isFocused(item, field) ? "is-focused" : ""}`}>
+            <button className="b-row-name" onClick={() => onClick(item, field, resolveType)}>{item}</button>
+            {isAward && <span className="b-row-bp is-award">+{-cost.cost} BP</span>}
+            {!isAward && cost && cost.base > 0 && (
+              <span className={`b-row-bp ${cost.cost === 0 ? "is-free" : ""}`}>
+                {cost.cost === 0 ? "free" : `${cost.cost} BP`}
+              </span>
+            )}
             {canRemove && (
-              <button className="b-item-remove" title="Remove" onClick={() => onRemove(i)}>×</button>
+              <button className="b-row-remove" title="Remove" onClick={() => onRemove(i)}>×</button>
             )}
           </li>
         );

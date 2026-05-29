@@ -794,3 +794,28 @@
   border-radius: 0.3rem; padding: 0.2rem 0.5rem; cursor: pointer;
 }
 .b-class-add:hover { color: var(--b-amber); border-color: var(--b-amber-deep); }
+
+/* ─── EDITABLE ROWS (skills / perks / flaws — match power slot rows) ───── */
+.b-rows { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.3rem; }
+.b-row {
+  display: flex; align-items: center; gap: 0.5rem;
+  border: 1px solid var(--b-border); border-radius: 0.375rem;
+  background: var(--b-panel-2); padding: 0.1rem 0.5rem;
+}
+.b-row.is-focused { border-color: var(--b-amber); background: rgba(184,130,31,0.12); }
+.b-row-name {
+  flex: 1; text-align: left; background: transparent; border: none; cursor: pointer;
+  color: var(--b-text); font-family: inherit; font-size: 0.85rem; padding: 0.4rem 0;
+}
+.b-row-name:hover { color: var(--b-amber); }
+.b-row-bp {
+  flex: none; font-size: 0.62rem; letter-spacing: 0.05em; color: var(--b-amber);
+  background: rgba(184,130,31,0.15); border-radius: 0.2rem; padding: 0.1rem 0.4rem;
+}
+.b-row-bp.is-free { color: var(--b-green); background: rgba(111,191,115,0.15); }
+.b-row-bp.is-award { color: var(--b-green); background: rgba(111,191,115,0.15); }
+.b-row-remove {
+  flex: none; background: transparent; border: none; cursor: pointer;
+  color: var(--b-dim); font-size: 0.95rem; padding: 0.25rem 0.3rem; line-height: 1;
+}
+.b-row-remove:hover { color: var(--b-red); }
