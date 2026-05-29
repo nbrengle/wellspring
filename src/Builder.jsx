@@ -56,6 +56,7 @@ function loadArchetype(archetype) {
   // honor them; they aren't part of EMPTY_CHARACTER but ride along untouched.
   if (archetype.grants) c.grants = archetype.grants;
   if (archetype.effectiveBP) c.effectiveBP = archetype.effectiveBP;
+  if (archetype.ranks) c.ranks = archetype.ranks;
   return c;
 }
 
@@ -378,9 +379,12 @@ function EditableRows({ items, field, onClick, isFocused, resolveType, report, r
         const cost = report?.spend.byItem[`${field}:${item}`];
         const canRemove = removable ? removable(i) : false;
         const isAward = cost && cost.cost < 0; // flaws award BP
+        const rank = cost?.rank || 1;
         return (
           <li key={`${field}-${i}-${item}`} className={`b-row ${isFocused(item, field) ? "is-focused" : ""}`}>
-            <button className="b-row-name" onClick={() => onClick(item, field, resolveType)}>{item}</button>
+            <button className="b-row-name" onClick={() => onClick(item, field, resolveType)}>
+              {item}{rank > 1 && <span className="b-row-rank">×{rank}</span>}
+            </button>
             {isAward && <span className="b-row-bp is-award">+{-cost.cost} BP</span>}
             {!isAward && cost && cost.base > 0 && (
               <span className={`b-row-bp ${cost.cost === 0 ? "is-free" : ""}`}>

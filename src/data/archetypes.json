@@ -12,7 +12,7 @@
         null
       ],
       "purchasedSkills": [
-        null,
+        0,
         5,
         2
       ],
@@ -230,7 +230,7 @@
     "purchasedSkills": [
       "Accuracy",
       "Tracking",
-      "Profession - Apprentice (your choice)"
+      "Profession - Apprentice (Smith)"
     ],
     "purchasedPerks": [
       "Deathgrip"
@@ -388,14 +388,14 @@
     "flaws": [],
     "startingSkills": [
       "Basic Martial Weapons",
-      "Profession - Apprentice (your choice)",
+      "Profession - Apprentice (Smith)",
       "Basic Faith",
       "Scavenge I",
       "Extended Capacity - Novice",
       "Lore (Nature)"
     ],
     "purchasedSkills": [
-      "Favored Form (your choice)",
+      "Favored Form (Hunting Panther)",
       "Red in Tooth and Claw"
     ],
     "purchasedPerks": [
@@ -468,7 +468,7 @@
     "flaws": [],
     "startingSkills": [
       "Basic Martial Weapons",
-      "Profession - Apprentice (your choice)",
+      "Profession - Apprentice (Smith)",
       "Forage I",
       "Basic Faith",
       "Peacecaster",
@@ -514,12 +514,12 @@
         null
       ],
       "purchasedSkills": [
-        null,
+        0,
         2,
-        null
+        2
       ],
       "purchasedPerks": [
-        null,
+        2,
         3
       ],
       "innatePowers": [
@@ -593,6 +593,44 @@
         null
       ]
     },
+    "ranks": {
+      "startingSkills": [
+        1,
+        1,
+        1,
+        2,
+        2
+      ],
+      "purchasedSkills": [
+        1,
+        1,
+        2
+      ],
+      "purchasedPerks": [
+        1,
+        1
+      ],
+      "innatePowers": [
+        1,
+        1,
+        1
+      ],
+      "cantrips": [
+        1,
+        1,
+        1
+      ],
+      "noviceSpells": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "bookSpells": [
+        1,
+        1
+      ]
+    },
     "lineage": "Human",
     "lineageChallenges": [],
     "lineageAdvantages": [],
@@ -603,15 +641,15 @@
     "flaws": [],
     "startingSkills": [
       "Basic Arcane",
-      "Lore x1 (your choice)",
+      "Lore (Historical)",
       "Library Use",
-      "Bookcaster x2",
-      "Extended Capacity - Novice x2"
+      "Bookcaster",
+      "Extended Capacity - Novice"
     ],
     "purchasedSkills": [
       "Apprentice Ritual Magic",
       "Arcane Charge",
-      "Lore x2 (your choice)"
+      "Lore (Historical)"
     ],
     "purchasedPerks": [
       "Sharp Mind",
@@ -653,7 +691,7 @@
       ],
       "purchasedSkills": [
         4,
-        null,
+        2,
         3
       ],
       "innatePowers": [
@@ -752,14 +790,14 @@
       ],
       "purchasedSkills": [
         3,
-        null,
-        null,
+        0,
+        0,
         4,
         1
       ],
       "purchasedPerks": [
-        null,
-        null,
+        0,
+        0,
         1
       ],
       "innatePowers": [
@@ -848,7 +886,7 @@
       "Two Weapon Style",
       "Weapon Specialization (Daggers)",
       "Advanced Traps",
-      "Apprentice Profession (your choice)"
+      "Apprentice Profession"
     ],
     "purchasedPerks": [
       "Deathgrip",
@@ -890,7 +928,7 @@
         1
       ],
       "purchasedPerks": [
-        null,
+        0,
         3,
         3
       ],
@@ -963,9 +1001,9 @@
       "Library Use",
       "Poisoner",
       "Basic Armor",
-      "Lore (your choice) x1",
-      "Profession - Apprentice (your choice)",
-      "Profession - Journeyman (your choice)",
+      "Lore (Historical)",
+      "Profession - Apprentice (Smith)",
+      "Profession - Journeyman (Smith)",
       "Fence",
       "Contact"
     ],
@@ -1034,7 +1072,7 @@
     "startingSkills": [
       "Basic Arcane",
       "Advanced Recharge",
-      "Patron (your choice)",
+      "Patron (a Patron)",
       "Gift of Hateful Retribution I"
     ],
     "purchasedSkills": [
@@ -1073,7 +1111,7 @@
         3,
         4,
         2,
-        null
+        0
       ],
       "purchasedPerks": [
         3
@@ -1145,13 +1183,13 @@
       "Basic Armor",
       "Apprentice Tinkering",
       "Prospect I",
-      "Apprentice Profession (your choice)",
-      "Journeyman Profession (your choice)"
+      "Apprentice Profession",
+      "Journeyman Profession"
     ],
     "purchasedSkills": [
       "Light Armor",
       "Journeyman Tinkering",
-      "Chronic Hobbyist (your choice)",
+      "Chronic Hobbyist (Cooking)",
       "Medium Armor"
     ],
     "purchasedPerks": [
@@ -1187,8 +1225,8 @@
       "purchasedSkills": [
         3,
         3,
-        null,
-        null
+        0,
+        0
       ],
       "purchasedPerks": [
         3
@@ -1301,7 +1339,7 @@
       ],
       "purchasedSkills": [
         4,
-        null
+        0
       ],
       "purchasedPerks": [
         3,

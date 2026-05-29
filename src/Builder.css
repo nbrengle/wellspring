@@ -819,3 +819,6 @@
   color: var(--b-dim); font-size: 0.95rem; padding: 0.25rem 0.3rem; line-height: 1;
 }
 .b-row-remove:hover { color: var(--b-red); }
+
+/* Rank multiplier badge on a row name (e.g. "Bookcaster ×2") */
+.b-row-rank { color: var(--b-amber); font-size: 0.72rem; margin-left: 0.35rem; opacity: 0.85; }

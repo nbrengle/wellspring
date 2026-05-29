@@ -8167,6 +8167,7 @@
       "powers:Balm"
     ],
     "archetypes:Utility Mage": [
+      "skills:Lore",
       "skills:Extended Capacity - Novice",
       "skills:Apprentice Ritual Magic",
       "powers:Replicate Enhancement",
@@ -8186,7 +8187,6 @@
       "powers:Cancel",
       "powers:Freeze",
       "perks:Sight",
-      "skills:Lore",
       "powers:Stop"
     ],
     "archetypes:Ranged Rogue": [

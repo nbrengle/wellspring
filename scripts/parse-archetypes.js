@@ -106,7 +106,10 @@ const BOOKKEEPING_NOTE = /\s*\((?:-?\d+\s*BP\s+)?(?:free\s+from|discounted\s+fro
 // can cross-check its computed cost against the author's intent.
 const BP_SUFFIX = /\s*-\s*(-?\d+)\s*BP\s*$/i;
 const parseBPSuffix = (s) => {
-  const m = s.match(BP_SUFFIX);
+  // The "- N BP" cost may be followed by a trailing bookkeeping note, e.g.
+  // "Lore x2 (your choice) - 2 BP (discounted from Sharp Mind)". Strip the note
+  // first so the cost suffix lands at end-of-string for the match.
+  const m = s.replace(BOOKKEEPING_NOTE, '').match(BP_SUFFIX);
   return m ? parseInt(m[1], 10) : null;
 };
 
@@ -133,7 +136,45 @@ function parseProvenance(s) {
   return { kind, amount: amt ? Math.abs(parseInt(amt, 10)) : null, source };
 }
 
-const stripNotes = (s) => s.replace(BOOKKEEPING_NOTE, '').replace(BP_SUFFIX, '').replace(/\s+/g, ' ').trim();
+// Rank multiplier: "Foo x2" / "Foo x2 (your choice)" means take Foo twice. We
+// keep ONE row and record the count in a `ranks` sidecar; the name is stripped of
+// the multiplier. Returns the rank (default 1) and the cleaned string.
+const RANK_RE = /\s*x\s*(\d+)\b/i;
+function parseRank(s) {
+  const m = s.match(RANK_RE);
+  return m ? parseInt(m[1], 10) : 1;
+}
+
+// "(your choice)" is a parameter placeholder the author leaves for the player. For
+// a complete starter we pick a reasonable concrete value and keep the
+// PARAMETERIZED form (e.g. "Lore (your choice)" → "Lore (Historical)"), which
+// still resolves to the base entity (skills:Lore). Defaults per base skill:
+const CHOICE_DEFAULTS = {
+  Lore: 'Historical',
+  Profession: 'Smith',
+  Patron: 'a Patron',
+  'Favored Form': 'Hunting Panther',
+  'Chronic Hobbyist': 'Cooking',
+};
+// Replace a "(your choice)" parameter with a concrete default based on the base
+// skill name (the text before the first parameter / tier marker).
+function concretizeChoice(s) {
+  if (!/\(your choice\)/i.test(s)) return s;
+  // Base = leading words before " - ", " x", or " (".
+  const base = s.replace(RANK_RE, '').split(/\s*-\s*|\s*\(/)[0].trim();
+  const choice = CHOICE_DEFAULTS[base];
+  // Replace the "(your choice)" token specifically; if we have no mapped default,
+  // drop the particle rather than leave the placeholder.
+  return s.replace(/\s*\(your choice\)/i, choice ? ` (${choice})` : '');
+}
+
+const stripNotes = (s) =>
+  concretizeChoice(s)
+    .replace(BOOKKEEPING_NOTE, '')
+    .replace(BP_SUFFIX, '')
+    .replace(RANK_RE, '')
+    .replace(/\s+/g, ' ')
+    .trim();
 
 // ─── ARCHETYPE EXTRACTION ─────────────────────────────────────────────────────
 // Each archetype is an H1 whose text nodes alternate between labeled fields
@@ -219,15 +260,17 @@ function parseArchetype(start, end) {
   // when none was written).
   archetype.effectiveBP = {};
   archetype.grants = {};
+  archetype.ranks = {};
 
   // Append a raw item line to the current section list, splitting off the
-  // trailing "- N BP" cost and the "(from X)" provenance note into index-aligned
-  // sidecars before storing the cleaned canonical name.
+  // trailing "- N BP" cost, the "(from X)" provenance note, and the "xN" rank
+  // multiplier into index-aligned sidecars before storing the cleaned name.
   const pushItem = (rawLine) => {
     if (!currentList) return;
     currentList.push(stripNotes(rawLine));
     (archetype.effectiveBP[currentField] ||= []).push(parseBPSuffix(rawLine));
     (archetype.grants[currentField] ||= []).push(parseProvenance(rawLine));
+    (archetype.ranks[currentField] ||= []).push(parseRank(rawLine));
   };
 
   while (i < end) {
@@ -331,6 +374,8 @@ function parseArchetype(start, end) {
   if (!anyBP) delete archetype.effectiveBP;
   const anyGrant = Object.values(archetype.grants).some((arr) => arr.some((v) => v !== null));
   if (!anyGrant) delete archetype.grants;
+  const anyRank = Object.values(archetype.ranks).some((arr) => arr.some((v) => v > 1));
+  if (!anyRank) delete archetype.ranks;
 
   return archetype;
 }

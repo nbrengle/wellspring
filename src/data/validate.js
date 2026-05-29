@@ -139,21 +139,28 @@ export function bonusBudgetFor(level) {
 //   discount without amount  → entity cost (the discount amount is unknown; the
 //                              author's effectiveBP, if any, already reflects it)
 // Returns { cost, base, grant } so the UI can show "was N, now M (from X)".
+// Rank (purchase count) of an item, default 1. "Foo x2" → 2.
+function rankOf(character, field, idx) {
+  return character.ranks?.[field]?.[idx] || 1;
+}
+
 function effectiveCost(item, field, character, idx) {
   const ent = lookupEntity(resolveId(item, field, character));
   const base = typeof ent?.cost === 'number' ? ent.cost : 0;
   const grant = character.grants?.[field]?.[idx] || null;
   const authored = character.effectiveBP?.[field]?.[idx];
+  const rank = rankOf(character, field, idx);
 
-  // Trust the author's stated cost when they wrote one — it's the build's truth.
-  if (typeof authored === 'number') return { cost: authored, base, grant };
+  // Trust the author's stated cost when present — it already reflects the full
+  // rank (the "x2" suffix was on the same authored line).
+  if (typeof authored === 'number') return { cost: authored, base, grant, rank };
 
-  if (!grant) return { cost: base, base, grant: null };
-  if (grant.kind === 'grant') return { cost: 0, base, grant };
-  // discount: refund a specific amount; without an amount we can't know the
-  // reduction, so keep the base cost rather than wrongly zeroing it.
-  if (grant.amount == null) return { cost: base, base, grant };
-  return { cost: Math.max(0, base - grant.amount), base, grant };
+  // Otherwise derive: entity cost × rank, then apply grant/discount.
+  const full = base * rank;
+  if (!grant) return { cost: full, base, grant: null, rank };
+  if (grant.kind === 'grant') return { cost: 0, base, grant, rank };
+  if (grant.amount == null) return { cost: full, base, grant, rank };
+  return { cost: Math.max(0, full - grant.amount), base, grant, rank };
 }
 
 // BP spent on purchased skills + perks, minus BP refunded by flaws. Honors the
@@ -257,12 +264,15 @@ function slotGrants(character) {
   const classFor = (cat) => (cat === 'cantrips' || cat === 'spellsKnown') ? casterClass : martialClass;
 
   // 1. Purchased / starting skills that grant slots (Additional Cantrip,
-  //    Extended Capacity, Spell-Scholar). Attribute to the relevant class.
-  const skills = [...(character.startingSkills || []), ...(character.purchasedSkills || [])];
-  for (const item of skills) {
-    const ent = lookupEntity(resolveId(item, 'purchasedSkills', character))
-      || lookupEntity(`skills:${cleanItemName(item)}`);
-    scanSlotGrant(ent?.description, (cat, n) => addTo(classFor(cat), cat, n));
+  //    Extended Capacity, Spell-Scholar). Attribute to the relevant class, and
+  //    multiply by the item's rank ("Extended Capacity - Novice x2" → +2).
+  for (const field of ['startingSkills', 'purchasedSkills']) {
+    (character[field] || []).forEach((item, idx) => {
+      const ent = lookupEntity(resolveId(item, field, character))
+        || lookupEntity(`skills:${cleanItemName(item)}`);
+      const rank = rankOf(character, field, idx);
+      scanSlotGrant(ent?.description, (cat, n) => addTo(classFor(cat), cat, n * rank));
+    });
   }
 
   // 2 + 3. Per-class automatic grants, gated by that class's own level:
