@@ -731,3 +731,30 @@
 .b-spellslot-label { font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--b-dim); }
 .b-spellslot.is-zero { opacity: 0.4; }
 .b-spellslot.is-zero .b-spellslot-val { color: var(--b-dim); }
+
+/* ─── ADD / REMOVE CONTROLS ───────────────────────────────────────────── */
+.b-section-title { display: flex; align-items: center; justify-content: space-between; }
+.b-section-add {
+  font-family: inherit; font-size: 0.65rem; letter-spacing: 0.05em; text-transform: none;
+  background: transparent; border: 1px solid var(--b-border-2); color: var(--b-muted);
+  border-radius: 0.3rem; padding: 0.2rem 0.55rem; cursor: pointer;
+}
+.b-section-add:hover { border-color: var(--b-amber-deep); color: var(--b-amber); }
+
+.b-item-wrap { position: relative; display: inline-flex; }
+.b-item-remove {
+  position: absolute; top: -0.4rem; right: -0.4rem;
+  width: 1.1rem; height: 1.1rem; border-radius: 50%;
+  background: var(--b-panel-3); border: 1px solid var(--b-border-2); color: var(--b-dim);
+  font-size: 0.75rem; line-height: 1; cursor: pointer; padding: 0;
+  display: none; align-items: center; justify-content: center;
+}
+.b-item-wrap:hover .b-item-remove { display: flex; }
+.b-item-remove:hover { color: var(--b-red); border-color: var(--b-red); }
+.b-item-bp.is-award { color: var(--b-green); background: rgba(111,191,115,0.15); }
+
+/* Picker row cost badge */
+.b-picker-row-cost {
+  font-size: 0.62rem; color: var(--b-amber); margin-left: auto; padding-right: 0.3rem;
+}
+.b-picker-row-cost.is-award { color: var(--b-green); }

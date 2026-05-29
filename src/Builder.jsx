@@ -12,7 +12,7 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import {
   ARCHETYPES, REFS, lookupEntity, LEVEL_TABLE,
-  eligiblePowers,
+  eligiblePowers, ALL_SKILLS, ALL_PERKS, ALL_FLAWS,
 } from "./data/index.js";
 import { validate, characterLevel, prereqStatus } from "./data/validate.js";
 import "./Builder.css";
@@ -208,14 +208,16 @@ function BudgetMeter({ report }) {
 
 // ─── BUILD SHEET ─────────────────────────────────────────────────────────────
 
-function BuildSheet({ character, report, view, onPickArchetype, onInspect, onOpenSlot }) {
+function BuildSheet({ character, report, view, onPickArchetype, onInspect, onOpenSlot, onOpenAdd, onRemoveEntity }) {
   if (!character.archetypeName) {
     return <ArchetypePicker onPick={onPickArchetype} />;
   }
   const isFocused = (item, field) =>
     view?.mode === "inspect" && view.item === item && view.field === field;
-  const activeSlot = (category, index) =>
-    view?.mode === "pick" && view.category === category && view.index === index;
+
+  // Starting skills are class-granted (not removable); purchased ones can be
+  // removed. They share a row but only purchased items get a × control.
+  const startCount = character.startingSkills.length;
 
   return (
     <main className="b-sheet">
@@ -224,38 +226,48 @@ function BuildSheet({ character, report, view, onPickArchetype, onInspect, onOpe
         <p className="b-sheet-tagline">{ARCHETYPES.find((a) => a.name === character.archetypeName)?.tagline}</p>
       </header>
 
-      <Section title="Skills" tone="amber">
-        <ItemGrid items={[...character.startingSkills, ...character.purchasedSkills]} field="purchasedSkills"
-                 onClick={onInspect} isFocused={isFocused} resolveType="skills" report={report} />
+      <Section title="Skills" tone="amber" onAdd={() => onOpenAdd("skill")}>
+        <EditableGrid
+          items={[...character.startingSkills, ...character.purchasedSkills]}
+          field="purchasedSkills" resolveType="skills" report={report}
+          onClick={onInspect} isFocused={isFocused}
+          removable={(i) => i >= startCount}
+          onRemove={(i) => onRemoveEntity("purchasedSkills", i - startCount)} />
       </Section>
 
-      <Section title="Perks" tone="teal">
-        <ItemGrid items={character.purchasedPerks} field="purchasedPerks"
-                 onClick={onInspect} isFocused={isFocused} resolveType="perks" report={report} />
+      <Section title="Perks" tone="teal" onAdd={() => onOpenAdd("perk")}>
+        <EditableGrid
+          items={character.purchasedPerks} field="purchasedPerks" resolveType="perks" report={report}
+          onClick={onInspect} isFocused={isFocused}
+          removable={() => true} onRemove={(i) => onRemoveEntity("purchasedPerks", i)} />
       </Section>
 
       {report.slots.length > 0 && (
         <Section title="Powers" tone="purple">
           {report.slots.map((slot) => (
             <SlotBlock key={slot.category} slot={slot} character={character}
-                       onInspect={onInspect} onOpenSlot={onOpenSlot}
-                       isFocused={isFocused} activeSlot={activeSlot} />
+                       onInspect={onInspect} onOpenSlot={onOpenSlot} isFocused={isFocused} />
           ))}
         </Section>
       )}
 
-      <Section title="Flaws" tone="red">
-        <ItemGrid items={character.flaws} field="flaws"
-                 onClick={onInspect} isFocused={isFocused} resolveType="flaws" report={report} />
+      <Section title="Flaws" tone="red" onAdd={() => onOpenAdd("flaw")}>
+        <EditableGrid
+          items={character.flaws} field="flaws" resolveType="flaws" report={report}
+          onClick={onInspect} isFocused={isFocused}
+          removable={() => true} onRemove={(i) => onRemoveEntity("flaws", i)} />
       </Section>
     </main>
   );
 }
 
-function Section({ title, tone = "amber", children }) {
+function Section({ title, tone = "amber", onAdd, children }) {
   return (
     <section className="b-section">
-      <h2 className={`b-section-title b-section-${tone}`}>{title}</h2>
+      <h2 className={`b-section-title b-section-${tone}`}>
+        {title}
+        {onAdd && <button className="b-section-add" onClick={onAdd} title={`Add ${title.toLowerCase()}`}>+ add</button>}
+      </h2>
       <div className="b-section-body">{children}</div>
     </section>
   );
@@ -264,7 +276,7 @@ function Section({ title, tone = "amber", children }) {
 // A tier's slots as fixed rows: `allowed` positions, filled by the character's
 // picks in order, the rest shown as empty "choose" rows. The header shows
 // used/allowed and goes green when exactly filled, red when over.
-function SlotBlock({ slot, character, onInspect, onOpenSlot, isFocused, activeSlot }) {
+function SlotBlock({ slot, character, onInspect, onOpenSlot, isFocused }) {
   const field = SLOT_FIELD[slot.category];
   const picks = character[field] || [];
   // Render max(allowed, used) rows so over-cap picks are still visible/removable.
@@ -293,7 +305,7 @@ function SlotBlock({ slot, character, onInspect, onOpenSlot, isFocused, activeSl
             );
           }
           return (
-            <li key={i} className={`b-slot-row is-empty ${activeSlot(slot.category, i) ? "is-active" : ""}`}>
+            <li key={i} className="b-slot-row is-empty">
               <span className="b-slot-num">{i + 1}</span>
               <button className="b-slot-add" onClick={() => onOpenSlot(slot.category, i)}>
                 + choose a {slot.label} power
@@ -306,9 +318,10 @@ function SlotBlock({ slot, character, onInspect, onOpenSlot, isFocused, activeSl
   );
 }
 
-// Render a list of item names as clickable chips. Annotates each with its
-// effective BP cost / grant state from the report when available.
-function ItemGrid({ items, field, onClick, isFocused, resolveType, report }) {
+// Render item-name chips: click to inspect, BP cost/grant badge, and a remove (×)
+// control on removable items. `removable(i)` / `onRemove(i)` operate on the
+// rendered index; the parent maps that to the right backing list.
+function EditableGrid({ items, field, onClick, isFocused, resolveType, report, removable, onRemove }) {
   if (!items || items.length === 0) {
     return <p className="b-empty">none</p>;
   }
@@ -316,19 +329,26 @@ function ItemGrid({ items, field, onClick, isFocused, resolveType, report }) {
     <ul className="b-item-grid">
       {items.map((item, i) => {
         const cost = report?.spend.byItem[`${field}:${item}`];
+        const canRemove = removable ? removable(i) : false;
+        // Flaws award BP (negative cost); show "+N BP" in green.
+        const isAward = cost && cost.cost < 0;
         return (
-          <li key={`${field}-${i}-${item}`}>
+          <li key={`${field}-${i}-${item}`} className="b-item-wrap">
             <button
               className={`b-item ${isFocused(item, field) ? "is-focused" : ""}`}
               onClick={() => onClick(item, field, resolveType)}
             >
               <span className="b-item-name">{item}</span>
-              {cost && cost.base > 0 && (
+              {isAward && <span className="b-item-bp is-award">+{-cost.cost} BP</span>}
+              {!isAward && cost && cost.base > 0 && (
                 <span className={`b-item-bp ${cost.cost === 0 ? "is-free" : ""}`}>
                   {cost.cost === 0 ? "free" : `${cost.cost} BP`}
                 </span>
               )}
             </button>
+            {canRemove && (
+              <button className="b-item-remove" title="Remove" onClick={() => onRemove(i)}>×</button>
+            )}
           </li>
         );
       })}
@@ -404,79 +424,96 @@ function DetailPane({ view, onInspect, onChoosePower, onBack, onClose }) {
                        onBack={onBack} onClose={onClose} />;
 }
 
-// ─── POWER PICKER OVERLAY ─────────────────────────────────────────────────────
-// Full-screen two-pane picker. Left: searchable, grouped, prereq-aware candidate
-// list. Right: the full reading view for the highlighted candidate (description,
-// facts, followable sub-links) — following a link here is "just reading" via a
-// local nav stack and never commits the pick. Choose commits.
+// ─── PICKER OVERLAY ───────────────────────────────────────────────────────────
+// Full-screen two-pane picker, driven by a `spec` so it serves powers, skills,
+// perks, and flaws alike. Left: searchable, grouped, prereq-aware candidate list.
+// Right: the full reading view for the highlighted candidate (description, facts,
+// followable sub-links) — following a link here is "just reading" via a local nav
+// stack and never commits. Choose commits.
+//
+// A spec is:
+//   { kind, entityType, title, subtitle, candidates: [{name, desc, cat, ...}],
+//     groupBy(candidate)→string, taken: Set, onChoose(name) }
 
-function groupCandidates(candidates, character, groupBy) {
-  // Decorate each candidate with prereq status, then bucket by the chosen axis.
-  const decorated = candidates.map((p) => ({
-    ...p,
-    locked: !prereqStatus(character, `powers:${p.name}`).met,
-  }));
-  const buckets = new Map();
-  const keyOf = (p) => {
-    if (groupBy === "tier") {
-      return ({ noviceSpells: "Novice", adeptSpells: "Adept", greaterSpells: "Greater",
-                cantrips: "Cantrip" })[p.tierList] || "Other";
-    }
-    // refresh axis: normalize the noisy values into a few readable buckets.
-    const r = (p.refresh || "").toLowerCase();
-    if (!r || r === "none" || r === "passive") return "Passive";
-    if (r.includes("long")) return "Long Rest";
-    if (r.includes("short")) return "Short Rest";
-    if (r.includes("immediate")) return "Immediate";
-    return p.refresh;
-  };
-  for (const p of decorated) {
-    const k = keyOf(p);
-    if (!buckets.has(k)) buckets.set(k, []);
-    buckets.get(k).push(p);
-  }
-  return [...buckets.entries()];
-}
-
-function PickerOverlay({ slot, character, onChoose, onClose }) {
+// Build a picker spec for filling a power SLOT.
+function powerPickerSpec(slot, character) {
   const { category, index, label } = slot;
   const cls = character.classLevels?.split(" ")[0];
   const field = SLOT_FIELD[category];
-  const candidates = useMemo(() => eligiblePowers(cls, category), [cls, category]);
-  const taken = useMemo(() => new Set(character[field] || []), [character, field]);
-  // Casters' spell pickers span tiers → group by tier; martials → by refresh.
-  const groupBy = category === "spellsKnown" ? "tier" : "refresh";
+  const candidates = eligiblePowers(cls, category);
+  const byTier = { noviceSpells: "Novice", adeptSpells: "Adept", greaterSpells: "Greater", cantrips: "Cantrip" };
+  const groupBy = category === "spellsKnown"
+    ? (p) => byTier[p.tierList] || "Other"
+    : (p) => {                       // group martial powers by refresh cadence
+        const r = (p.refresh || "").toLowerCase();
+        if (!r || r === "none" || r === "passive") return "Passive";
+        if (r.includes("long")) return "Long Rest";
+        if (r.includes("short")) return "Short Rest";
+        if (r.includes("immediate")) return "Immediate";
+        return p.refresh;
+      };
+  return {
+    kind: "power", entityType: "powers",
+    title: `Choose a ${label} power`,
+    subtitle: `slot ${index + 1} · ${candidates.length} options for ${cls}`,
+    candidates, groupBy,
+    taken: new Set(character[field] || []),
+    onChoose: (name) => slot.onChoose(name),
+  };
+}
+
+// Build a picker spec for ADDING a skill / perk / flaw. Grouped by category.
+// Flaws award BP rather than cost it, reflected in the choose-button label.
+function entityPickerSpec({ kind, entityType, candidates, title, taken, onChoose }) {
+  return {
+    kind, entityType, title,
+    subtitle: `${candidates.length} options`,
+    candidates,
+    groupBy: (c) => c.cat || "Other",
+    taken, onChoose,
+  };
+}
+
+function PickerOverlay({ spec, character, onClose }) {
+  const { entityType, title, subtitle, candidates, groupBy, taken, onChoose } = spec;
 
   const [query, setQuery] = useState("");
   const [hideLocked, setHideLocked] = useState(false);
   const [selected, setSelected] = useState(candidates[0]?.name || null);
-  // Local reading stack: when null we're reading the selected candidate; pushing
-  // an entity id lets the user follow links without leaving the picker.
+  // Local reading stack: empty → reading the selected candidate; pushing an
+  // entity id lets the user follow links without leaving the picker.
   const [readStack, setReadStack] = useState([]);
+
+  const lockedOf = (name) => !prereqStatus(character, `${entityType}:${name}`).met;
 
   const groups = useMemo(() => {
     const q = query.trim().toLowerCase();
     let list = candidates;
-    if (q) list = list.filter((p) => p.name.toLowerCase().includes(q) || (p.desc || "").toLowerCase().includes(q));
-    const grouped = groupCandidates(list, character, groupBy);
-    if (hideLocked) return grouped.map(([g, ps]) => [g, ps.filter((p) => !p.locked)]).filter(([, ps]) => ps.length);
-    return grouped;
-  }, [candidates, query, hideLocked, character, groupBy]);
+    if (q) list = list.filter((c) => c.name.toLowerCase().includes(q) || (c.desc || "").toLowerCase().includes(q));
+    const decorated = list.map((c) => ({ ...c, locked: lockedOf(c.name) }));
+    const buckets = new Map();
+    for (const c of decorated) {
+      const k = groupBy(c);
+      if (!buckets.has(k)) buckets.set(k, []);
+      buckets.get(k).push(c);
+    }
+    let entries = [...buckets.entries()];
+    if (hideLocked) entries = entries.map(([g, cs]) => [g, cs.filter((c) => !c.locked)]).filter(([, cs]) => cs.length);
+    return entries;
+  }, [candidates, query, hideLocked, character, groupBy, entityType]);
 
-  // The entity currently shown in the reading pane: a followed link if the stack
-  // is non-empty, otherwise the selected candidate resolved to its full entity.
   const readingEntity = useMemo(() => {
     if (readStack.length) return lookupEntity(readStack[readStack.length - 1]);
-    return selected ? lookupEntity(`powers:${selected}`) : null;
-  }, [readStack, selected]);
+    return selected ? lookupEntity(`${entityType}:${selected}`) : null;
+  }, [readStack, selected, entityType]);
 
   const selectCandidate = (name) => { setSelected(name); setReadStack([]); };
   const followLink = (name, _field, type) => setReadStack((s) => [...s, `${type}:${name}`]);
   const readBack = () => setReadStack((s) => s.slice(0, -1));
   const isFollowing = readStack.length > 0;
-  const selectedLocked = selected && !prereqStatus(character, `powers:${selected}`).met;
+  const selectedLocked = selected && lockedOf(selected);
+  const selectedTaken = selected && taken.has(selected);
 
-  // Esc closes; keep focus trap simple for this pass.
   useEffect(() => {
     const onKey = (e) => { if (e.key === "Escape") onClose(); };
     window.addEventListener("keydown", onKey);
@@ -488,8 +525,8 @@ function PickerOverlay({ slot, character, onChoose, onClose }) {
       <div className="b-picker" onClick={(e) => e.stopPropagation()}>
         <header className="b-picker-head">
           <div>
-            <h2 className="b-picker-title">Choose a {label} power</h2>
-            <p className="b-picker-sub">slot {index + 1} · {candidates.length} options for {cls}</p>
+            <h2 className="b-picker-title">{title}</h2>
+            <p className="b-picker-sub">{subtitle}</p>
           </div>
           <button className="b-picker-x" onClick={onClose}>×</button>
         </header>
@@ -498,7 +535,7 @@ function PickerOverlay({ slot, character, onChoose, onClose }) {
           {/* LEFT: browse */}
           <div className="b-picker-browse">
             <div className="b-picker-controls">
-              <input className="b-picker-search" type="text" placeholder="Search powers…"
+              <input className="b-picker-search" type="text" placeholder="Search…"
                      value={query} onChange={(e) => setQuery(e.target.value)} autoFocus />
               <label className="b-picker-toggle">
                 <input type="checkbox" checked={hideLocked} onChange={(e) => setHideLocked(e.target.checked)} />
@@ -506,20 +543,22 @@ function PickerOverlay({ slot, character, onChoose, onClose }) {
               </label>
             </div>
             <div className="b-picker-groups">
-              {groups.length === 0 && <p className="b-detail-missing">No powers match.</p>}
-              {groups.map(([group, powers]) => (
+              {groups.length === 0 && <p className="b-detail-missing">Nothing matches.</p>}
+              {groups.map(([group, items]) => (
                 <div key={group} className="b-picker-group">
                   <h3 className="b-picker-group-label">{group}</h3>
                   <ul className="b-picker-names">
-                    {powers.map((p) => {
-                      const isTaken = taken.has(p.name);
+                    {items.map((c) => {
+                      const isTaken = taken.has(c.name);
                       return (
-                        <li key={p.name}>
+                        <li key={c.name}>
                           <button
-                            className={`b-picker-row ${selected === p.name ? "is-selected" : ""} ${p.locked ? "is-locked" : ""} ${isTaken ? "is-taken" : ""}`}
-                            onClick={() => selectCandidate(p.name)}>
-                            <span className="b-picker-row-name">{p.name}</span>
-                            {p.locked && <span className="b-picker-row-tag b-locked">locked</span>}
+                            className={`b-picker-row ${selected === c.name ? "is-selected" : ""} ${c.locked ? "is-locked" : ""} ${isTaken ? "is-taken" : ""}`}
+                            onClick={() => selectCandidate(c.name)}>
+                            <span className="b-picker-row-name">{c.name}</span>
+                            {typeof c.cost === "number" && c.cost > 0 && <span className="b-picker-row-cost">{c.cost} BP</span>}
+                            {typeof c.bp === "number" && c.bp > 0 && <span className="b-picker-row-cost is-award">+{c.bp} BP</span>}
+                            {c.locked && <span className="b-picker-row-tag b-locked">locked</span>}
                             {isTaken && <span className="b-picker-row-tag b-chosen">chosen</span>}
                           </button>
                         </li>
@@ -548,15 +587,15 @@ function PickerOverlay({ slot, character, onChoose, onClose }) {
                     {selectedLocked && (
                       <p className="b-read-warn">Prereqs not met — you can still choose it, but the build won't be legal.</p>
                     )}
-                    <button className="b-read-choose" disabled={taken.has(selected)}
-                            onClick={() => onChoose(category, index, selected)}>
-                      {taken.has(selected) ? "Already chosen" : `Choose ${selected}`}
+                    <button className="b-read-choose" disabled={selectedTaken}
+                            onClick={() => onChoose(selected)}>
+                      {selectedTaken ? "Already chosen" : `Choose ${selected}`}
                     </button>
                   </footer>
                 )}
               </>
             ) : (
-              <p className="b-detail-hint">Select a power on the left to read it.</p>
+              <p className="b-detail-hint">Select an option on the left to read it.</p>
             )}
           </div>
         </div>
@@ -742,7 +781,7 @@ export default function Builder() {
   // The rail detail pane is inspect-only now; picking happens in a full-screen
   // overlay tracked separately by `picking`.
   const [view, setView] = useState(null);
-  const [picking, setPicking] = useState(null); // null | { category, index, label }
+  const [picking, setPicking] = useState(null); // null | picker spec
   // Navigation history for the inspector so link-following has a back button.
   const [history, setHistory] = useState([]);
 
@@ -777,7 +816,18 @@ export default function Builder() {
     });
   }, [character.archetypeName]);
 
-  // Open a slot for picking, or clear it when `clear` is set.
+  // Set a power slot's pick at `index` (used by both choose and the slot picker).
+  const setSlotPick = useCallback((category, index, powerName) => {
+    const field = SLOT_FIELD[category];
+    setCharacter((c) => {
+      const next = [...(c[field] || [])];
+      next[index] = powerName;
+      return { ...c, [field]: next };
+    });
+    setPicking(null);
+  }, []);
+
+  // Open a power slot for picking, or clear it when `clear` is set.
   const handleOpenSlot = useCallback((category, index, clear = false) => {
     if (clear) {
       const field = SLOT_FIELD[category];
@@ -789,19 +839,48 @@ export default function Builder() {
       return;
     }
     const label = report.slots.find((s) => s.category === category)?.label || category;
-    setPicking({ category, index, label });
-  }, [report.slots]);
+    setPicking(powerPickerSpec(
+      { category, index, label, onChoose: (name) => setSlotPick(category, index, name) },
+      character,
+    ));
+  }, [report.slots, character, setSlotPick]);
 
-  // Commit a power choice into the slot's field at the given index.
-  const handleChoosePower = useCallback((category, index, powerName) => {
-    const field = SLOT_FIELD[category];
+  // Append a skill / perk / flaw to its list (purchasedSkills / purchasedPerks /
+  // flaws). De-duped; closes the picker after.
+  const handleAddEntity = useCallback((field, name) => {
     setCharacter((c) => {
-      const next = [...(c[field] || [])];
-      next[index] = powerName;
-      return { ...c, [field]: next };
+      const list = c[field] || [];
+      if (list.includes(name)) return c;
+      return { ...c, [field]: [...list, name] };
     });
     setPicking(null);
   }, []);
+
+  // Remove a purchased skill / perk / flaw by index.
+  const handleRemoveEntity = useCallback((field, index) => {
+    setCharacter((c) => {
+      const next = [...(c[field] || [])];
+      next.splice(index, 1);
+      return { ...c, [field]: next };
+    });
+  }, []);
+
+  // Open the add-picker for skills / perks / flaws.
+  const handleOpenAdd = useCallback((kind) => {
+    const config = {
+      skill: { field: "purchasedSkills", entityType: "skills", candidates: ALL_SKILLS, title: "Add a skill",
+               takenFrom: (c) => [...(c.startingSkills || []), ...(c.purchasedSkills || [])] },
+      perk:  { field: "purchasedPerks", entityType: "perks", candidates: ALL_PERKS, title: "Add a perk",
+               takenFrom: (c) => c.purchasedPerks || [] },
+      flaw:  { field: "flaws", entityType: "flaws", candidates: ALL_FLAWS, title: "Add a flaw",
+               takenFrom: (c) => c.flaws || [] },
+    }[kind];
+    setPicking(entityPickerSpec({
+      kind, entityType: config.entityType, candidates: config.candidates, title: config.title,
+      taken: new Set(config.takenFrom(character)),
+      onChoose: (name) => handleAddEntity(config.field, name),
+    }));
+  }, [character, handleAddEntity]);
 
   const handleBack = useCallback(() => {
     setHistory((h) => {
@@ -834,14 +913,14 @@ export default function Builder() {
                       onClickField={handleClickIdentityField} onRestart={handleRestart} />
         <BuildSheet character={character} report={report} view={view}
                     onPickArchetype={handlePickArchetype}
-                    onInspect={handleInspect} onOpenSlot={handleOpenSlot} />
+                    onInspect={handleInspect} onOpenSlot={handleOpenSlot}
+                    onOpenAdd={handleOpenAdd} onRemoveEntity={handleRemoveEntity} />
         <DetailPane view={view}
-                    onInspect={handleInspect} onChoosePower={handleChoosePower}
+                    onInspect={handleInspect} onChoosePower={setSlotPick}
                     onBack={history.length ? handleBack : null} onClose={handleClose} />
       </div>
       {picking && (
-        <PickerOverlay slot={picking} character={character}
-                       onChoose={handleChoosePower} onClose={() => setPicking(null)} />
+        <PickerOverlay spec={picking} character={character} onClose={() => setPicking(null)} />
       )}
     </div>
   );
