@@ -1,0 +1,32 @@
+[
+  {
+    "name": "Retraining",
+    "section": "Advancement",
+    "description": "Each time you advance a level in a Class, you may also choose one of the following: Remove a Tiered Power your character currently has and gain a new Tiered Power of the same Tier in the Class you are leveling into. Remove a Known Spell and replace it with a spell from the Class you are leveling into. Remove a Cantrip or Utility Power and choose another (of either) in the Class you are leveling into. Tiered Power, Utility Power, and Cantrip alterations must remain within the limits set from the character’s Base Class Progression Table."
+  },
+  {
+    "name": "Level Progression Table",
+    "section": "Advancement",
+    "description": "Character Level Total XP Base BP LP Spikes 4 0 9 3 2 5 10 11 3 2 6 21 13 4 2 7 33 15 4 3 8 46 17 4 3 9 60 19 4 3 10 75 21 4 3 11 91 23 5 3 12 108 25 5 3 13 126 27 5 3 14 145 29 5 3 15 165 31 5 4"
+  },
+  {
+    "name": "Level Floor",
+    "section": "Advancement",
+    "description": "If you are creating a new character partway into the campaign, the character will start at a higher Character Level based on how many events have already taken place. In addition, your character will gain experience at 1.5 times the normal rate while under the seasonal cap, until they “catch up” to the game’s current maximum XP. Event Number Level Floor Starting BP 1 4 9 2 5 11 3 6 13 4 6 13 5 7 15 6 8 17 7 8 17 8 9 19 9 9 19 10 10 21 11 10 21 12 11 23"
+  },
+  {
+    "name": "Multi-Classing",
+    "section": "Advancement",
+    "description": "A character may put levels into multiple Classes. When taking levels in a new Class that is not your first, you gain the “Multi-Class Skills” listed, rather than the “Starting Skills”. Otherwise, follow the Class level progression as normal, based on the levels in that Class only."
+  },
+  {
+    "name": "Advanced Classes",
+    "section": "Advancement",
+    "description": "Once a character has reached total level 10, they may begin taking levels in Advanced Classes for which they have met the requirements. Each Advanced Class has a maximum of five levels. One character can have a maximum of two Advanced Classes. Retraining for Advanced Classes: Unlike the standard retraining rules, when taking a level in an Advanced Class, you may remove a Tiered Power, Utility Power, Cantrip, or Known Spell from a Base Class in order to gain one of the same type and tier from the new Advanced Class. Advanced Classes will be published when the campaign draws closer to players having access to them."
+  },
+  {
+    "name": "Building a New Character After Permadeath",
+    "section": "Advancement",
+    "description": "If your character permanently dies (or if you choose to permanently retire them) after the three-game free rebuild period, the following mechanics will apply to your next character: They will retain all previously accrued Experience Points and Build Points. They will not retain any in-character knowledge or possessions from the previous character. If a Legacy Item has been awarded, a new Legacy Item for the new character will be created (see  for more details)."
+  }
+]

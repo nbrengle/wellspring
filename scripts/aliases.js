@@ -108,6 +108,16 @@ export const MATCH_POLICY = {
   "Immune":        "stop", // 44% caps low volume
   "Obvious":       "stop", // 0% caps
   "Environmental": "stop", // 0% caps low volume
+
+  // Duration-value entities (rules-concepts:Short/Long/Permanent/Instantaneous)
+  // are real concepts but their names are common English words. We stop the bare
+  // match here, and link-refs adds CONTEXTUAL matchers that fire only when the
+  // word is followed by a known Effect or Defense Call name — i.e. when it's
+  // actually being used as a Duration in a Call shape.
+  "Short":         "stop",
+  "Long":          "stop",
+  "Permanent":     "stop",
+  "Instantaneous": "stop",
 };
 
 // Backwards-compat: legacy code paths that only care about "is this stopped?"
@@ -133,4 +143,37 @@ export const CURATED = {
   // Documentation spelling inconsistency, surfaced by `npm run link:audit`:
   // the skill is "Daggercraft" but a prereq writes it "Dagger Craft".
   "Daggercraft": ["Dagger Craft"],
+  // The doc has no entity literally named "Devotion" — the individual deities
+  // are entities of their own. "Devotions & Divine Beings" is the H1 section
+  // that introduces the concept. Alias "Devotion"/"Devotions" so prose
+  // references ("the character may choose a Devotion") link to that intro.
+  "Devotions & Divine Beings": ["Devotion", "Devotions"],
+  // Tiered skill families have entries "Forage I/II/III", "Scavenge I/II/III".
+  // Prose references the family by the bare verb ("Foraging skill", "Scavenge
+  // unless ...") — route those to the tier-I entry, the canonical entry point.
+  "Forage I":   ["Forage", "Foraging"],
+  "Scavenge I": ["Scavenge", "Scavenging"],
+  // Tinkering crafting skill ladder. Bare "Tinker"/"Tinkering" → Apprentice tier.
+  "Apprentice Tinkering": ["Tinker", "Tinkering"],
+  // Irregular inflections that `inflect()` can't derive algorithmically.
+  "Rebuild": ["Rebuilt"],
+  // Latin plural.
+  "Formula Types": ["Formula", "Formulae"],
+  // Magic spheres: bare "Arcane" / "Divine" / "Druidic" referenced everywhere
+  // as the sphere of magic. Route to the canonical entry-level skill.
+  "Basic Arcane": ["Arcane"],
+  // The Enchanting Forge has five inline sub-components (Reality Tear, Circle
+  // of Sacrifice, Circle of Assignment, Circle of Empowerment, Rune Circle).
+  // They're defined in one paragraph inside the Forge's description, not as
+  // their own headings. Route the compounds to the parent concept.
+  "The Enchanting Forge": [
+    "Reality Tear", "Circle of Sacrifice", "Circle of Assignment",
+    "Circle of Empowerment", "Rune Circle",
+  ],
+  // Tinker's Workshop — entity name has the possessive "Tinker's" but body
+  // text often just says "Workshop" in context.
+  "The Tinker's Workshop": ["Workshop"],
+  // Lore skills use the bracketed-area form "Lore [Area of Lore] (Unlimited)"
+  // as the canonical name. Prose just says "Lore" or "Lore skill".
+  "Lore [Area of Lore] (Unlimited)": ["Lore"],
 };

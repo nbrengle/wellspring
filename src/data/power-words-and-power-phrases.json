@@ -1,0 +1,64 @@
+[
+  {
+    "name": "“Hold!”",
+    "section": "Power Words and Power Phrases",
+    "description": "The “Hold” call is an important “pause button” for the game. If someone calls Hold!, all players must immediately stop playing the game, stay where they are, and repeat “Hold!” until the entire game is paused. If possible, uninvolved players should take a knee for easier visibility. At this point, no one should speak or move, other than game staff or medical staff, until the issue has been resolved. Hold is generally called for one of two reasons:",
+    "subConcepts": [
+      {
+        "name": "Safety Hold",
+        "section": "“Hold!”",
+        "description": "A Safety Hold will be called if a player is in out of game physical danger, or has been injured. The only people who may move, speak and act during a Safety Hold are staff and first aid certified participants. The injured player may move off the battlefield during the Hold."
+      },
+      {
+        "name": "Narrative Hold",
+        "section": "“Hold!”",
+        "description": "A Narrative Hold will be called for large, important story or mechanical effects that everyone must be aware of. The only people who may move, speak and act during a Narrative Hold are staff. Players should keep quiet and still during a Hold so that any necessary communication is not disrupted. When the Hold has been resolved, a staff member will call Is there any reason for this Hold to continue? If anyone says Yes, the Hold will continue. If there is no response (saying No is not necessary), the Hold will be ended by the call 3, 2, 1, lay on!"
+      },
+      {
+        "name": "Personal Hold",
+        "section": "“Hold!”",
+        "description": "If a player needs to withdraw from a combat for out of game reasons, such as minor injury or equipment malfunction, but does not wish to pause the scene, they may take a Personal Hold. Personal Holds are shown by placing your hand on your head and moving directly to outside of the scene or battlefield. A player who takes a Personal Hold may rejoin the scene when they are ready, but should use discretion to determine when it would not be disruptive."
+      }
+    ]
+  },
+  {
+    "name": "Caution",
+    "section": "Power Words and Power Phrases",
+    "description": "If there is potential out-of-game danger, such as a player fighting near an unseen tripping hazard, any player may call “Caution”. When hearing this call, nearby players should pause gameplay for a few seconds until the hazard has been seen or dealt with."
+  },
+  {
+    "name": "Clarify",
+    "section": "Power Words and Power Phrases",
+    "description": "If you are ever hit with an effect or call in combat that you don’t understand, you may call “Clarify” and point both hands or weapons at the player who made the call. They will also point both hands back at you, and briefly explain the effect. While players are making the visible Clarify signal, all other players should avoid or play around them until the clarification is resolved - this should not be used as an opportunity to attack them as soon as they come back into the game."
+  },
+  {
+    "name": "Instruction",
+    "section": "Power Words and Power Phrases",
+    "description": "When staff needs to directly tell a player or players to take an action, they will use “Instruction” to make it clear that it is an out-of-game request. This can also be written on info cards, in which case the players should follow the Instruction when read. Example: “Instruction: All players please close your eyes and open them again when the music stops.”"
+  },
+  {
+    "name": "It Has Been Told…",
+    "section": "Power Words and Power Phrases",
+    "description": "This phrase signifies official setting lore. Once stated, players can treat it as a pre-existing fact their characters might remember. Staff will use this only to introduce established canon, and players should only use this if a Skill or Power allows. Example: “It Has Been Told that Lady Verity threw the social event of the season last year.”"
+  },
+  {
+    "name": "It Can Be Seen…",
+    "section": "Power Words and Power Phrases",
+    "description": "This phrase will describe something that characters can perceive in-game that may not be physically represented. Example: “It Can Be Seen that there is a faint glow coming from within Kroznaks’s bag.”"
+  },
+  {
+    "name": "It Can Be Believed…",
+    "section": "Power Words and Power Phrases",
+    "description": "This phrase is used to clear up out-of-game confusion around in-game situations. Examples: If a plot member plays two different NPCs, Aeos and Damien, a PC who approaches and mistakes them for “Damien” could be told by that plot member, “It Can Be Believed that this is Aeos, not Damien.” If a PC had to leave a module early because of an out-of-game injury, and returns to the tavern during loot split, the player could say It Can Be Believed that I was there the whole time."
+  },
+  {
+    "name": "“What Would Your Mother Say?”",
+    "section": "Power Words and Power Phrases",
+    "description": "The phrase “What would your mother say?” means that a player is OOG uncomfortable with the current roleplay. For more information, please see the Consent and Calibration section."
+  },
+  {
+    "name": "“Prepare for Action”",
+    "section": "Power Words and Power Phrases",
+    "description": "This phrase is an out-of-game indicator that character antagonism is about to happen, so that the receiving player is not taken by surprise. For more information, see the Character Antagonism section under Consent and Calibration."
+  }
+]

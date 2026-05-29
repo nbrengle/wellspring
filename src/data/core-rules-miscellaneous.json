@@ -1,0 +1,56 @@
+[
+  {
+    "name": "Locks",
+    "section": "Core Rules - Miscellaneous",
+    "description": "Locks, whether provided by staff or by players, should be physrepped by simple “diary” or luggage locks, and attached to the relevant latch but not actually keeping it closed (in case someone needs to access the inside OOG). They must be physically picked before the character can open the latch in-game, but the actual difficulty is intended to be low for anyone who has the in-game skill. The Shatter effect will bypass a lock, but will set off any associated Latch Traps. All locks will have an associated “Trap” card, even if the lock is not trapped. If a lockpicking attempt begins and fails (i.e. the lockpicker takes damage, or uses another power), the person failing it should open the card and read the effect of the trap."
+  },
+  {
+    "name": "Traps",
+    "section": "Core Rules - Miscellaneous",
+    "description": "In-game traps will have a physrepped triggering object, along with an Information Card describing its effects. By default, a character may not physically interact with a trap physrep in any way without setting it off. When the trap goes off, everyone nearby should stop until the card on the trap is read, describing the area and the effect of the trap. If a Marshal is present, they will read the information card aloud, but if not, the nearest player should move to read the card and then return to where they started.",
+    "subConcepts": [
+      {
+        "name": "Trap Information Cards",
+        "section": "Traps",
+        "description": "All Traps and any locks need a trap information card to go with them. It can be of any size but needs to be able to be viewable from about ten feet, although not necessarily obvious until after the trap has been activated. On the outside it should have the word “Trap” and a description of the kind of thing that sets it off (“opening the door”). On the inside or back of the information card, should be all the details of the trap. These details will include who is affected by the trap, what it does, any Effects, etc. If a trap is set in a container no larger than 3 feet in any dimension, by default, setting it off will apply a Shatter Effect to everything inside the area regardless of the other Effect(s) of the trap. Generally, this means that Wealth, items, paper, and everything else inside will be destroyed and cannot be taken from the box. After a trap is set off, the card will also have information as to what should be done with the card. Often, it should be discarded (taken to the Ashbin), but other times it will need to be put back in place."
+      },
+      {
+        "name": "Disarming Traps",
+        "section": "Traps",
+        "description": "If the character interacting with the object has the Basic Traps Skill, they may attempt to disarm the Trap per the Skill. Characters with the Advanced Traps Skill may keep the Trap Card, if they are successful at disarming it. A trigger trap may be disarmed by any means which does not permanently damage the trap prop. Permanent damage means treating the trap in such a way that a Marshal cannot fix the damage within ten minutes or needs a tool. For Example: popping a battery clip off a battery, untying a trip line, or carefully unsetting a mousetrap (so that it does not snap shut) can all represent the disarming of the trap. Conversely, a trap cannot require specific tools to disarm (If the only way to prevent a trap from making a noise requires a screwdriver to open the battery compartment, that trap isn’t valid)."
+      }
+    ]
+  },
+  {
+    "name": "Nighttime Content",
+    "section": "Core Rules - Miscellaneous",
+    "description": "By default, content at Wellspring may come into play anytime between the start of the event Friday and the end of the event Sunday, including during the night. Players staying in the same cabin may choose how they wish to interact with nighttime content between 11pm and 7am. To do so, they may attach a visual hanging marker of a specific color on their cabin’s front door, at least 10” long by 4” wide. The options for nighttime content consent are the following:",
+    "subConcepts": [
+      {
+        "name": "Green",
+        "section": "Nighttime Content",
+        "description": "This Consent Status is marked with a Green door hanger, indicating that the cabin is open to nighttime NPC encounters of all types, from peaceful roleplay encounters, up to violent, combat-based, or strongly emotionally-engaging content. This is the default state of all player cabins, and a lack of a colored door hanger will be interpreted as “Green.”"
+      },
+      {
+        "name": "Yellow",
+        "section": "Nighttime Content",
+        "description": "This Consent Status is marked with a Yellow door hanger, indicating that the cabin is open to nighttime NPC encounters of limited types, including peaceful roleplay encounters, messengers, or invitations to more strenuous encounters outside the cabin, such as module hooks, which may include combat, or other more strenuous content elsewhere."
+      },
+      {
+        "name": "Red",
+        "section": "Nighttime Content",
+        "description": "This Consent Status is marked with a Red door hanger, indicating that the cabin is closed to nighttime NPC encounters of all types. Plot and wandering encounters will consider the residence off limits, and will not engage with the cabin directly. Note that using the Red marker does not exempt residing players from the consequences of in-game actions."
+      },
+      {
+        "name": "Blue",
+        "section": "Nighttime Content",
+        "description": "This Consent Status is marked with a Blue door hanger, and some form of moderate light source, indicating that the cabin is closed to NPC encounters of all types due to medical necessity. This exemption from content extends into the daytime, and is considered active 24 hours a day. The residents of the cabin should notify Staff that they intend to use the Blue hanger in pre-registration when possible, to allow adjustments in sleeping accommodations to avoid interactions and disruptions to the game and the needs of the residents. Plot and wandering encounters will consider the residence off limits, and will not engage with the cabin unless specifically requested to do so by the residents."
+      }
+    ]
+  },
+  {
+    "name": "Tents",
+    "section": "Core Rules - Miscellaneous",
+    "description": "If players are inside tents and it is unsafe for combat NPCs to engage them, they will approach within melee distance and announce that the tent is under attack, and collect the names of each character inside the tent. Each player inside the tent should respond with one of the following: “Responding” - the players intend to move to a safe location to continue playing out the scenario. They have a few minutes to quietly put on essential costuming or makeup, but should be considered “paused” and not use this time to use any Powers or call for help. “Remaining Within” - Once the responding players have left the tent and combat has begun, any characters staying inside the tent in-game will have a Slow 100 before they become valid targets of attacking NPCs. For NPCs to attack characters remaining within, they may call any damage or Effects they have as Verbal delivery. Staff Discretion - Staff will describe what happens to all involved without playing it out, including mechanics and statuses. This affords the least control to the Players, as should be used as a last resort. Note that tents are still subject to Nighttime Content consent policies above, and tent doors can be marked in the same way."
+  }
+]

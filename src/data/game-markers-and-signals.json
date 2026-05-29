@@ -1,0 +1,79 @@
+[
+  {
+    "name": "Out-of-Game",
+    "section": "Game Markers and Signals",
+    "description": "To briefly indicate “out-of-game”, such as to ask a clarification question, players should put their fist or weapon on their head. If someone is wearing a white headband (or white glowstick at night), they are passively out-of-game and should be ignored by characters until the headband is removed. For guidance about when to be in-game vs out-of-game, see the Roleplay Etiquette section of the core rules."
+  },
+  {
+    "name": "Non-Combatant",
+    "section": "Game Markers and Signals",
+    "description": "Non-combatant players (non-coms) do not participate in physical combat due to out-of-game reasons like medical conditions. They wear a bright pink headband or sash at all times (or pink glowstick at night) for clear visibility. Players must not physically hit non-coms, and non-coms should try to avoid combat areas. If a non-com does end up being attacked, the attacker in striking distance should point their hand or weapon at the non-com and state the Call. Non-combatant players should inform staff in advance when possible."
+  },
+  {
+    "name": "Clarify",
+    "section": "Game Markers and Signals",
+    "description": "A clarifying player will point both hands or weapons at any other involved player(s). For more information, see the Power Words and Power Phrases section."
+  },
+  {
+    "name": "Lookdown",
+    "section": "Game Markers and Signals",
+    "description": "The “Lookdown” signal is the player putting their head down with one hand shading the eyes. A player using Lookdown needs to eject themselves from a roleplay scene for OOG reasons. Characters should continue the scene without commenting on the Lookdown player’s absence. For more information, see the Consent and Calibration section."
+  },
+  {
+    "name": "OK Check",
+    "section": "Game Markers and Signals",
+    "description": "An “OK” hand signal signifies that a player is checking in on another player’s emotional state. For more information, see the Consent and Calibration section."
+  },
+  {
+    "name": "Spirit Form",
+    "section": "Game Markers and Signals",
+    "description": "If a character is visibly in Spirit Form, they will wear an orange headband (or orange glowstick at night). If a player finds themselves in Spirit Form and does not have immediate access to an orange headband, they may instead use the Insubstantial hand sign (see below). More information on Spirit Form can be found in the Death and Dying section."
+  },
+  {
+    "name": "Insubstantial",
+    "section": "Game Markers and Signals",
+    "description": "If a character is insubstantial for an extended length of time, they may optionally use the hand sign of one hand or weapon bent parallel in front of the face (ie “vampire cape”), rather than calling “Insubstantial” repeatedly. More information on insubstantial can be found in the Conditions section."
+  },
+  {
+    "name": "Flying",
+    "section": "Game Markers and Signals",
+    "description": "Characters that are under the flying condition will demonstrate this by pointing one hand (with closed fist) or weapon straight up in the air. More information on flying can be found in the Conditions section."
+  },
+  {
+    "name": "Imprisoned",
+    "section": "Game Markers and Signals",
+    "description": "Characters under the imprisoned condition may optionally demonstrate this by crossing both arms or weapons across their chest. More information on imprisoned can be found in the Conditions section."
+  },
+  {
+    "name": "Object and Location Markers",
+    "section": "Game Markers and Signals",
+    "description": "The following visual markers have a specific mechanic for the game.",
+    "subConcepts": [
+      {
+        "name": "White Halo",
+        "section": "Object and Location Markers",
+        "description": "Objects or locations marked with a plain white halo are considered “out-of-game” and should be ignored. A white halo on a red or green background means that the object or location should be ignored by default, but some Powers and abilities allow a character to see or interact with them."
+      },
+      {
+        "name": "Black Key",
+        "section": "Object and Location Markers",
+        "description": "An item marked with a black key is in-game, but cannot be opened, moved, or broken by default. Some black key signs will include written conditions about who can open the item."
+      },
+      {
+        "name": "Yellow Lock",
+        "section": "Object and Location Markers",
+        "description": "Areas marked with a yellow lock are not allowed to be entered by players for any reason, unless given express permission by a staff member."
+      },
+      {
+        "name": "Blue Exclamation Point",
+        "section": "Object and Location Markers",
+        "description": "This marker is generally posted at the entrance to an area. It means that there is important game mechanic information that must be conveyed to players before they enter the area. Players should look for an accompanying written sheet and read it before proceeding."
+      }
+    ]
+  },
+  {
+    "name": "Location Cards",
+    "section": "Game Markers and Signals",
+    "description": "Some skills and Powers will reference a named location, such as an Arcane Locus. These locations will be set up on-site by staff during the game. They will be marked with a blue information card that explains any game mechanics associated with the location. Some cards will have additional information that can only be read by characters with certain skills - this info will be on the reverse of the card, and the requirements to read them will be listed on the front."
+  }
+]

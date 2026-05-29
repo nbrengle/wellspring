@@ -116,7 +116,7 @@
     "bp": 5,
     "ranks": null,
     "prereq": null,
-    "category": "Spiritual",
+    "category": "Oaths",
     "description": "Swears Oath to protect and champion the poor and oppressed. Cannot keep goods other than for survival."
   },
   {
@@ -124,7 +124,7 @@
     "bp": 1,
     "ranks": null,
     "prereq": null,
-    "category": "Spiritual",
+    "category": "Oaths",
     "description": "Swears Oath to not have sexual or romantic relationships with others."
   },
   {
@@ -132,7 +132,7 @@
     "bp": 2,
     "ranks": null,
     "prereq": null,
-    "category": "Spiritual",
+    "category": "Oaths",
     "description": "Swears Oath to treat others with respect and civility."
   },
   {
@@ -140,7 +140,7 @@
     "bp": 2,
     "ranks": null,
     "prereq": null,
-    "category": "Spiritual",
+    "category": "Oaths",
     "description": "Swears Oath to be fair in your dealings, to not cheat, and to be honorable in your actions."
   },
   {
@@ -148,7 +148,7 @@
     "bp": 5,
     "ranks": null,
     "prereq": null,
-    "category": "Spiritual",
+    "category": "Oaths",
     "description": "Swears Oath to not end life, to prevent other lives from being ended and to only fight in self-defense."
   }
 ]

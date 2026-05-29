@@ -1,0 +1,12 @@
+[
+  {
+    "name": "Short Rests",
+    "section": "Rests",
+    "description": "A character completes a short rest when they have spent 5 minutes out of combat, not actively Dying, and having used no Powers. A character who completes a short rest refreshes their Spikes up to their maximum. Short duration conditions will end, and Powers with a Refresh of Short Rest will become available again."
+  },
+  {
+    "name": "Long Rests",
+    "section": "Rests",
+    "description": "A character completes a long rest at 7am and 7pm each in-game day. Long duration conditions will end, and Powers with a Refresh of Long Rest will become available again. Completing a Long Rest also counts as completing a Short Rest."
+  }
+]

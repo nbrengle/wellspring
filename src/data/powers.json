@@ -1,0 +1,51 @@
+[
+  {
+    "name": "Power Requirements",
+    "section": "Powers",
+    "description": "Some Powers have specific conditions or requirements in order to be used or Refreshed. The common keywords referenced in Power requirements are the following:",
+    "subConcepts": [
+      {
+        "name": "Focus",
+        "section": "Power Requirements",
+        "description": "If an action requires a Focus count to complete, the character must spend the count silently concentrating or meditating, and cannot move or take any other actions during the Focus count. If a Focus count is interrupted by resolving damage or Effects, the Focus count must be restarted from the beginning."
+      },
+      {
+        "name": "Sacrifice",
+        "section": "Power Requirements",
+        "description": "If a Power requires a character to “sacrifice” a resource (usually Life Points), the Power cannot be used unless the character has that resource available to spend, and the character cannot apply any defenses to the sacrifice (including Immunity)."
+      }
+    ]
+  },
+  {
+    "name": "Spellcasting",
+    "section": "Powers",
+    "description": "Spells are a type of Power that have extra mechanics for how they are used and delivered.",
+    "subConcepts": [
+      {
+        "name": "Spheres of Magic",
+        "section": "Spellcasting",
+        "description": "In Wellspring, there are several types of magic, each defined by the source of its power. In game terms, these Spheres are wholly distinct from each other, and are cast and powered by different spell-slots, and often granted by different classes. The two most well known Spheres are Arcane and Divine, representing the source of the power."
+      },
+      {
+        "name": "Spellbook",
+        "section": "Spellcasting",
+        "description": "Any character with levels in a spellcasting class will have a spellbook, an in-game item recording all of their known spells. This can be phys-repped as a book, scroll, slate, or any other item that can be written on. A spellbook must contain, at minimum, the name and incantation of each spell that the character has learned, including Cantrips. Spellcasting classes cannot Refresh their spell-slots unless their spellbook prop is on their person."
+      },
+      {
+        "name": "Spell-Slots",
+        "section": "Spellcasting",
+        "description": "Gaining levels in spellcasting classes will grant numbers of spell-slots. There are three Tiers of spells: Novice, Adept, and Greater. In order for a character to cast a spell that they know, they must spend one spell-slot of the spell’s Tier or higher. Spell-slots do not refresh automatically - see the Class descriptions for the mechanics of how each class refreshes their spell-slots."
+      },
+      {
+        "name": "Cantrips",
+        "section": "Spellcasting",
+        "description": "Cantrips are Powers that can be cast without spending spell-slots. Cantrips are gained by leveling up in spellcasting classes, separately from spell-slots."
+      },
+      {
+        "name": "Incanting",
+        "section": "Spellcasting",
+        "description": "Spells (and some other Powers) require a verbal incantation in order to activate. The “standard incantation” for each class will be listed in its class description. The higher Tier the spell, the more lines of the standard incant are required. Each incant should be ended with “to cast <Name of Spell>”. While incanting, the caster must have one foot planted and a free hand holding only the appropriate packet, weapon, or nothing in the case of Touch delivered spells. The incantation, once begun, should not pause for longer than 2 seconds between words, and should be at a clear volume. If the caster takes any Damage or Effects, the incant is interrupted and the caster must start over. When the incantation is completed successfully, the caster should immediately make the Call of the spell. However, if a Spell is packet- or weapon-delivered, the incantation can be used in advance to “charge” the packet or weapon, at which point it can be held indefinitely until the caster chooses to throw or swing the Call. Only one spell can be “charged” at a time, and the caster cannot put down the packet or weapon while charged - doing so will cause the spell to be lost."
+      }
+    ]
+  }
+]

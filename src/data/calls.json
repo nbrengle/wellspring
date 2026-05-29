@@ -1,0 +1,185 @@
+[
+  {
+    "name": "Uncalled Damage",
+    "section": "Calls",
+    "description": "Melee weapons can be swung with no Call made. If so, then it is assumed that the weapon is dealing 1 point of damage with no Accent. Uncalled damage can be blocked with weapons or shields. Ranged weapons and packets should always include a damage Call, even if they are dealing 1 unaccented damage. All weapons deal base 1 damage by default."
+  },
+  {
+    "name": "Damage Calls",
+    "section": "Calls",
+    "description": "Any attack that deals more than 1 point of damage, or includes an Accent, will have a Call. If the Call is only numbered damage with an Accent, the “by” can be left out of the Call (i.e. “2 Ice” instead of “2 by Ice”). Any damage Calls that start with a number can be blocked with weapons or shields. Any player may also call “Zero” or “Padded” to indicate that they are sparring with a weapon and not dealing damage."
+  },
+  {
+    "name": "Effect Calls",
+    "section": "Calls",
+    "description": "Effect Calls include an Effect keyword. Any attack with an Effect Call cannot be blocked by weapons or shields - if it lands anywhere on the player or their equipment, they must resolve the attack. This includes Effects that modify damage such as Wounding or Piercing, since they will not start with a number."
+  },
+  {
+    "name": "Delivery",
+    "section": "Calls",
+    "description": "This keyword defines how the Call lands on the target.",
+    "subConcepts": [
+      {
+        "name": "Weapon Delivery",
+        "section": "Delivery",
+        "description": "The Call is delivered through a strike with a weapon. By default, this includes melee, ranged, and thrown weapons, though individual Powers may restrict this further. This delivery is not included in the actual Call."
+      },
+      {
+        "name": "Packet Delivery",
+        "section": "Delivery",
+        "description": "The Call is delivered by throwing a cloth packet, which is called “materia” in-game. Any Spell that is listed as Packet Delivery can also be delivered as Touch, as long as the target is willing or Helpless. This delivery is not included in the actual Call."
+      },
+      {
+        "name": "Touch Delivery",
+        "section": "Delivery",
+        "description": "The Call is delivered by reaching a hand to within 6” of the target, who must be willing or Helpless. Please note that physical touch outside of a tag on the shoulder requires OOG consent in advance. This delivery is not included in the actual Call."
+      },
+      {
+        "name": "Verbal Delivery",
+        "section": "Delivery",
+        "description": "The Call is delivered by the user verbally indicating their target, either by calling their in-game or out-of-game name, or giving a description of the target. The target then resolves the Call. Examples: “Cora, 2 Ice!” “Saffi, Heal 1 by Flame!” “You in the red dress, Short Sleep by Poison!”"
+      },
+      {
+        "name": "“By My Voice” Delivery",
+        "section": "Delivery",
+        "description": "The Call is delivered to everyone within range of hearing the Call, not including the user. If the Call also has a Qualifier, it should be moved to immediately after “By My Voice” so that the appropriate targets are aware. Examples: “By My Voice, 5 Flame!” “By My Voice to Undead, Expose by Radiant!”"
+      },
+      {
+        "name": "“In This Room” Delivery",
+        "section": "Delivery",
+        "description": "The Call is delivered to everyone physically present inside the designated area."
+      },
+      {
+        "name": "Roleplay Delivery",
+        "section": "Delivery",
+        "description": "The Call is delivered through a roleplayed action, such as teaching another character, or acting out item repair. This delivery is not included in the actual Call."
+      }
+    ]
+  },
+  {
+    "name": "Duration",
+    "section": "Calls",
+    "description": "This keyword defines how long the Call lasts.",
+    "subConcepts": [
+      {
+        "name": "Instantaneous",
+        "section": "Duration",
+        "description": "These Calls happen immediately and do not wear off. This can include damage, healing, and Shattering items."
+      },
+      {
+        "name": "“Quick X” Count",
+        "section": "Duration",
+        "description": "The word “Quick” followed by a number means that the duration is as long as it takes for the affected player to count to that number under their breath. If “Quick” is in a call without a number, the default count is 100. If a Quick count is interrupted, or a player pauses a Quick count to take a different action, the player may resume the count at the previous number rather than having to start over."
+      },
+      {
+        "name": "“Slow X” Count",
+        "section": "Duration",
+        "description": "The word “Slow” followed by a number means that the duration is X number of seconds. Players should make a good faith attempt to silently count at the rate of seconds, not slower or faster. Slow counts are passive unless otherwise stated (the time will pass even if the character is incapacitated). Optionally, a player who needs to make a Quick count may instead perform an active Slow count equal to the Quick count value divided by 3. This count must still follow all mechanical properties of a Quick count (i.e. it must be done actively and verbally)."
+      },
+      {
+        "name": "Short",
+        "section": "Duration",
+        "description": "These Calls will last until the target takes a Short Rest. (See the Rests section for more information.)"
+      },
+      {
+        "name": "Long",
+        "section": "Duration",
+        "description": "These Calls will last until the target takes a Long Rest. (See the Rests section for more information.)"
+      },
+      {
+        "name": "Permanent",
+        "section": "Duration",
+        "description": "When a Call is made without a Duration keyword and is not an Instantaneous effect, it is assumed to be Permanent. Permanent duration lasts until either the end of the event or until the effect is removed with another Call."
+      }
+    ]
+  },
+  {
+    "name": "Qualifier",
+    "section": "Calls",
+    "description": "A Qualifier in a Call means that only targets who are under that Qualifier will be affected. If the delivery is single-target, and the character who is hit does not count as that Qualifier, they can respond with “No Effect.” Examples: “Death to Helpless!” “Heal 1 to Dying by Flame!” “By my voice to Clerics, Short Charm by Shadow!”"
+  },
+  {
+    "name": "Accent",
+    "section": "Calls",
+    "description": "The Accent is the “flavor” of the call, describing how the Call looks or feels in-game. Some Powers also only work for specific Accents, and monsters may have defenses or immunities to different Accents. Whenever damage and an Accent are paired, it can be called as “[Damage] [Accent]” without the normal “by. There is also no need to Call the Accent on Powers a character uses on themselves, as long as they are aware of the Accent. The known Accents that exist in Wellspring are: Agony - Wracking pain and physical torment. Acid [Elemental] - Caustic substances that burn chemically, eating away at flesh and bone. Disease - Plague, rot, and decay: all detrimental to the living. Divine - Associated with direct expressions of the divine: the outpouring of the raw energies of reality’s undercurrent. It is often asked “what does the divine feel like?” - but all those who have witnessed it never forget. Fear - Even the most formidable warrior is subject to fear, hesitation, and doubt. Flame [Elemental] - Searing heat and crackling blasts of fire to burn and incinerate. Force - Physical power generated magically or otherwise. These effects can be invisible to the eye, but more often felt as a thrumming in the air. Ice [Elemental] - Just as often extreme cold as actual shards of deadly ice. Life - The vibrant energy of life itself. Lightning [Elemental] - Blue-white bolts of electricity that crackle through the air, leaving the scent of ozone. Mind - Represents mental or psionic power, or sometimes sheer willpower. Poison - Venoms, gasses and toxins, whether natural or manufactured. Radiant - Brilliant blinding light. Shadow - Crushing blinding darkness. Void - Suffocating nothingness: usually from the creatures of the Void."
+  },
+  {
+    "name": "Defense Calls",
+    "section": "Calls",
+    "description": "There are a few different ways for the target of a Call to indicate that the Call did not have the intended effect. These are called “defense calls” and consist of the following:",
+    "subConcepts": [
+      {
+        "name": "Counter",
+        "section": "Defense Calls",
+        "description": "If actively using a Power that negates the effect of a Call, the target will say “Counter,” followed by the name of the Power being used. (Note: if the name of the Power is long, you are allowed to abbreviate it for ease of play. For example, instead of “Counter, Scales of the Serpent”, it is OK to say “Counter, Scales.”)"
+      },
+      {
+        "name": "Protect",
+        "section": "Defense Calls",
+        "description": "Some Powers grant a “Protect” vs a specific Effect, damage, Accent, or Delivery (examples: Protect vs Sleep, Protect vs Packets, Protect vs Flame). Once active on the target, these Protects can be used as a Counter, but the Call is “Protect!” instead. Note that this is a “smart” defense and the target can choose not to activate it until they wish to. Only 3 Protects can be active on one target at a time."
+      },
+      {
+        "name": "Resist",
+        "section": "Defense Calls",
+        "description": "The call “Resist” means that the target took 1 point of damage instead of the original Call. Resistance is generally a condition, meaning that the “Resist” call can be used repeatedly for the duration. Unless this is a Selective Resistance, the target cannot choose to take the Call they are Resistant to."
+      },
+      {
+        "name": "Altered",
+        "section": "Defense Calls",
+        "description": "The call of “Altered to <new result>” means that the target changed the incoming Call into a different result. Note: Altered can be used against Calls with the Final modifier."
+      },
+      {
+        "name": "Reduced",
+        "section": "Defense Calls",
+        "description": "The “Reduced” call means the target took less damage or a shorter duration than the original effect."
+      },
+      {
+        "name": "Immune",
+        "section": "Defense Calls",
+        "description": "The call of “Immune” means that the target will not take that particular effect, damage, Accent, Effect, Condition, or Delivery, defined by the Immunity that the target has. Unless this is a Selective Immunity, the target cannot choose to take a Call that they are Immune to."
+      },
+      {
+        "name": "No Effect",
+        "section": "Defense Calls",
+        "description": "If an incoming effect does not work on the target for any other reason, the target should call “No Effect” followed by the reason. Example: a character in Spirit Form would call “No Effect, Spirit” to any Power used on them that does not use the “to Spirit” modifier."
+      }
+    ]
+  },
+  {
+    "name": "Modifiers",
+    "section": "Calls",
+    "description": "Modifiers are uncommon extra keywords that can be added to Calls. They are as follows:",
+    "subConcepts": [
+      {
+        "name": "Environmental",
+        "section": "Modifiers",
+        "description": "This modifier is added to the beginning of a Call to show that the effect is coming from the location that the characters are in, rather than from a specific target. Any Calls with the Environment modifier will not wear off and cannot be Cured until the characters leave that location. These effects can still be defended against as normal."
+      },
+      {
+        "name": "Final",
+        "section": "Modifiers",
+        "description": "This modifier is added to the end of a Call. Final effects cannot be Countered, Protected, or Resisted. The only defense calls that work against Final effects are “Immune” and “Altered.”"
+      },
+      {
+        "name": "Inherent",
+        "section": "Modifiers",
+        "description": "This modifier applies to Conditions. If a Condition is Inherent, it cannot be Cured or removed by any means, as it is an innate property of the target."
+      },
+      {
+        "name": "Obvious",
+        "section": "Modifiers",
+        "description": "This modifier is added to the beginning of a Call to signal that it is extremely noticeable to anyone who can hear the Call."
+      },
+      {
+        "name": "Self",
+        "section": "Modifiers",
+        "description": "If it is ambiguous who is being targeted by a Call, the user can add “to Self” as a Qualifier to make it clear that they are targeting themselves."
+      },
+      {
+        "name": "Subtle",
+        "section": "Modifiers",
+        "description": "This modifier is added to the beginning of a Call to signal that it cannot be perceived by characters in-game."
+      }
+    ]
+  }
+]

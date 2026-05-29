@@ -1,0 +1,91 @@
+[
+  {
+    "name": "No Tests of Strength",
+    "section": "Combat Rules",
+    "description": "After each swing hits a valid target or is blocked, then you should pull your weapon away to begin a new swing. If your swing is blocked, you may not continue physically pushing against the player with your weapon. You are also not allowed to physically pin or trap an opponent’s weapon."
+  },
+  {
+    "name": "Physical Contact",
+    "section": "Combat Rules",
+    "description": "In combat, you may only tag other players with a weapon or packet. If you use a Power with the range “Touch” on a willing or Helpless target, you may physically tag players on the shoulder. Out of combat, you may only touch other players if you have express OOG permission. It is your responsibility to gauge your proximity to others and ensure you do not collide with players in combat."
+  },
+  {
+    "name": "Speed of Combat",
+    "section": "Combat Rules",
+    "description": "When making uncalled swings or swings for numerical damage in melee, players must pull back at least 45 degrees and change the targeted location between each swing. In addition, when delivering a Called Effect (i.e. not just damage), players should allow a “beat” of time between each attack that lands on their target, in order for the defender to call a defense. Attackers should calibrate their Call speed to how quickly their attacks are acknowledged, so that the defender can process the attacks correctly. Conversely, defenders, as a courtesy, should ensure each attack that lands is acknowledged, either with a defense call, roleplaying the impact or effect, or saying “got it.” Additionally, if a player is moving and takes an attack, they may only continue moving if they immediately resolve the attack."
+  },
+  {
+    "name": "Weapon Safety",
+    "section": "Combat Rules",
+    "description": "All melee weapons, ranged weapons, and shields brought to the game must be approved by a Safety Marshal before use. See the Weapon Construction document for more details on approved weapons. Weapons should not be used to thrust."
+  },
+  {
+    "name": "Valid Hits",
+    "section": "Combat Rules",
+    "description": "A melee hit is considered valid if it lands solidly on the target as part of its initial swing. Once a hit has been blocked, angling the weapon to contact the target before pulling back is not valid. Hands holding melee weapons are not valid targets, and garb outside of the player’s silhouette (such as a flowing cloak) also does not count. Weapon attacks should never be aimed at the head, neck, or groin and any accidental hits to those locations are not valid."
+  },
+  {
+    "name": "Blocking Hits",
+    "section": "Combat Rules",
+    "description": "Weapons and shields can block any attack that starts with a number, i.e. a damaging attack with no additional Effects such as Wounding or Piercing. This applies to any physically delivered attack, whether via a melee weapon, projectile, or packet. Uncalled damage swings can also be blocked. Any attack that starts with a word, i.e. an Effect or Wounding/Piercing damage, cannot be blocked - if the attack lands anywhere on the target or their equipment, they must resolve the attack."
+  },
+  {
+    "name": "Proficiency",
+    "section": "Combat Rules",
+    "description": "Characters can only use weapons or shields in combat that they have proficiency with. Proficiencies are Skills that can be purchased or gained through taking Class levels. If a character attempts to use a weapon that they are not proficient with, they cannot deal damage or block with it, and incoming attacks go through the weapon or shield as if it hit their limb."
+  },
+  {
+    "name": "Natural Weapons",
+    "section": "Combat Rules",
+    "description": "A character using claws, tentacles, or other natural weapons will be represented using red weapons, or weapons with prominent red markings. Natural weapons cannot be dropped, looted, or Disarmed. If a natural weapon takes a Disarm effect, it is Altered to a Disable effect. If it is Shattered, it is no longer usable and hits to that weapon are considered to have landed on the limb. Shields can also be marked as “natural” and follow the same rules."
+  },
+  {
+    "name": "Life Points",
+    "section": "Combat Rules",
+    "description": "Life Points, or LP, represent your character’s physical health and will to keep fighting. When a damaging attack lands, the damage number is subtracted from your Life Points. Life Points can be restored with the Heal effect. Characters begin each event at full Life Points."
+  },
+  {
+    "name": "Armor Points",
+    "section": "Combat Rules",
+    "description": "Armor Points, or AP, are extra Life Points that are subtracted first when taking damage. The exception is the Piercing effect, which bypasses Armor Points and goes directly to Life Points. A character’s armor proficiency determines the maximum amount of Armor Points they can benefit from. Their phys-repped armor is what calculates the actual number of Armor Points they have, up to their maximum. Armor Points can be restored with the Mend effect, or by a Tinker at a Workshop.",
+    "subConcepts": [
+      {
+        "name": "Calculating Physical Armor Points",
+        "section": "Armor Points",
+        "description": "First, determine the types of armor you are wearing. Armor phys-reps can either use real or simulated materials, but should reasonably resemble the type being simulated. Armor must be approved by an Armor Marshal when being brought into game. Quilted - Thick padded or reinforced cloth armor. Worth 2 points. Leather - Armor made of hardened leather or hide. Worth 4 points. Chainmail - Armor made of metallic rings. Worth 6 points. Brigandine/Scale/Lamellar - Overlapping plates, sometimes between layers of leather. Worth 8 points. Plate Mail - Armor made of rigid metallic plates, shaped to the body. Worth 10 points. Next, determine which body locations have the type of armor you are wearing. The ten locations are: Neck (Note: a helmet may also be used to count for the Neck location.) Shoulders Upper Torso Lower Torso Back Sides Upper Arms Lower Arms Upper Legs Lower Legs Lastly, each armor piece that is particularly high quality or well crafted can be awarded a bonus point by an Armor Marshal for each location it covers. Add the point values of all locations together, divide by 10, and round to the nearest whole number. This number is your total calculated Armor Points. This system allows mixing and matching of different types of physical armor for an averaged total, if desired."
+      },
+      {
+        "name": "Natural Armor",
+        "section": "Armor Points",
+        "description": "Natural armor can be granted from Powers, Advantages, or Perks. Like physical armor, it also grants Armor Points, and can be Shattered or Rebuilt. Unlike physical armor, natural armor can be restored both by the Mend effect and by the Heal effect. Note that different types of armor cannot be stacked on the same character."
+      },
+      {
+        "name": "Summoned Armor",
+        "section": "Armor Points",
+        "description": "Summoned armor is created by Powers, Spells, or other abilities. Like physical armor, it also grants Armor Points, and can be Shattered or Rebuilt. Unlike physical armor, summoned armor can only be restored by Mend or Rebuild effects from spells and Powers, or by an Enchanter at an Enchanting Forge. The Dispel effect will remove Summoned Armor entirely. Note that different types of armor cannot be stacked on the same character.",
+        "subConcepts": [
+          {
+            "name": "Barrier",
+            "section": "Armor Points",
+            "description": "Barrier is a type of temporary Armor Points that can be granted by Powers or Effects. These points are subtracted first by damage and cannot be Mended."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Spikes",
+    "section": "Combat Rules",
+    "description": "Spikes are a universal resource that all characters gain through leveling up. Spikes are refreshed to their maximum value any time a character completes a short rest. Many Powers require spending a Spike as part of their cost. In addition, any character can spend Spikes to temporarily boost their weapon damage. By default, spending a Spike will allow a character to increase their weapon damage by 1 for the next swing (regardless of whether it hits or misses). Some Classes can increase their Spike damage temporarily or permanently."
+  },
+  {
+    "name": "Carrying",
+    "section": "Combat Rules",
+    "description": "In order to move a character who is Dying, Dead, or Helpless: The carrying character stands next to the downed character with both hands free and calls “Carrying”. The downed character stands up with their head down and leaves any handheld items behind. Both characters can then move at a walking pace, until the carrier states that they are putting the downed character back down. If the carrier is hit with Effects or damage, that will not end the carry unless it causes the carrier to become Helpless. If the carried person is hit with Effects or damage, they will take it normally."
+  },
+  {
+    "name": "Searching",
+    "section": "Combat Rules",
+    "description": "To search a willing or Helpless target, any character can spend a Quick 100 miming the act of searching. At the end of the count, they may state “Instruction: Give me your treasure.” Note that searching and Scavenging can occur simultaneously - for more information on Scavenging, see the Skills document."
+  }
+]

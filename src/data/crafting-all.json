@@ -1,0 +1,39 @@
+[
+  {
+    "name": "Crafting Materials",
+    "section": "Crafting (all)",
+    "description": "This lists what Crafting Materials or Resources are required in order to make the recipe successfully."
+  },
+  {
+    "name": "Uses Per Batch",
+    "section": "Crafting (all)",
+    "description": "If the process creates more than one use of a recipe, then it will be noted here."
+  },
+  {
+    "name": "Expiration",
+    "section": "Crafting (all)",
+    "description": "This lists how long the item will last after creation. Note: if an Enchantment is being applied to an item, the enchantment’s expiration cannot exceed the base item’s expiration."
+  },
+  {
+    "name": "Crafting Process",
+    "section": "Crafting (all)",
+    "description": "This is the actual description of how the item is created: the recipe itself. These listed steps must be roleplayed at a crafting station, using the required tools. If the ritual instructions direct any involved characters to grind up, burn, or otherwise vandalize any in-game resources, characters are encouraged to simply roleplay the action rather than destroying the resource props used; however, providing alternative items to enhance the roleplay (such as powders to represent ground-up resources or lighting pieces of paper safely on fire to represent burning a resource) is highly encouraged. Any use of fire should be safely contained within a bowl or other container to prevent accidents, and should only be used in fire-safe locations (any location that is primarily covered in dirt, stone, or cement with no nearby grass, and not indoors); furthermore, fire should never be left unattended. If the location is not fire-safe, or any fire hazard warnings are in effect, just use a representation of fire. All referenced phys-reps will be provided by staff, but players are welcome to bring additional props to enhance their roleplay as long as the structure of the process is followed. If any part of the crafting process is not followed, the process must either be immediately restarted, or it can be abandoned. If it is restarted, the Crafting Materials are not used up, but the process must start again immediately. If abandoned, all Crafting Materials that would have been used in the recipe are rendered useless and ruined. If the crafter takes or deals damage, takes an Effect, leaves the general area of the crafting station, or completes a Rest, this is considered an interruption, and the crafting process must be restarted or abandoned.",
+    "subConcepts": [
+      {
+        "name": "Turn of the Hourglass",
+        "section": "Crafting Process",
+        "description": "Many instructions say to do something for a “turn”; this means one turn of the provided hourglass, which should take approximately one minute."
+      },
+      {
+        "name": "Ashbin",
+        "section": "Crafting Process",
+        "description": "Any spent, consumed or destroyed materials or item cards should be placed in an “ashbin”, a designated container provided by staff nearby the crafting station."
+      }
+    ]
+  },
+  {
+    "name": "Dark Territory",
+    "section": "Crafting (all)",
+    "description": "Most crafting recipes, and procedures, have a range of tested and understood parameters. Researchers, crafters, and ritualists, however, are often drawn outside the bounds of known territory. This exploration outside of the normal bounds of knowledge is represented as Dark Territory. Often expansions into Dark Territory end in tears, and if lucky, a little bit of knowledge - but sometimes, just sometimes, Dark Territory can lead to extreme successes that defy logic. If a recipe lists “Ritualists,” the requirement to count as a Ritualist is the appropriate rank of the Crafting skill (rather than the Ritual Magic skill). If a recipe lists “Dark Territory Required: Optional”, that means that the crafting process may be marshaled by the participating player(s) themselves and has no inherent risk of Dark Territory, unless a player chooses to intentionally add it (and a Marshal is available). All crafting attempts that include Dark Territory require an appropriate Marshal. For rules on how to resolve Dark Territory, see the Rituals document:"
+  }
+]

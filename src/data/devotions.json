@@ -1,13 +1,8 @@
 [
   {
     "name": "The Mother",
-    "locality": "Auros",
-    "domains": [
-      "Life",
-      "Creation",
-      "Protection"
-    ],
     "epithet": "",
+    "lore": "Life, and the creations life leaves behind, are sacred. These things, together, make up the beauty of existence, and represent a cycle that must be respected - for without one, the other loses its meaning. All things begin. In experiencing the beauty of flowing life, beginnings, and the process of truly living, it is easy to be lost in perpetual happiness. All things together, always forward, never ending. As it should be. As it needs to be. Love in the light of life. Always stay connected to the fullness of experience. In this we perform our sacred duty. The path will forever wind on. Example Sigil:",
     "tenets": [
       "Life is beautiful. Revel in its fullness, experience every moment of divine Joy that living brings. Ensure others are able to as well.",
       "Help usher others forward as they begin their journeys through existence. Protect them as they find their feet, their place in this universe, and their path.",
@@ -15,18 +10,13 @@
     ],
     "colorScheme": "Gold",
     "iconography": "A glowing crescent moon, the outer edge always facing left, and a golden tree within the crescent.",
-    "lore": "Life, and the creations life leaves behind, are sacred. These things, together, make up the beauty of existence, and represent a cycle that must be respected - for without one, the other loses its meaning. All things begin. In experiencing the beauty of flowing life, beginnings, and the process of truly living, it is easy to be lost in perpetual happiness. All things together, always forward, never ending. As it should be. As it needs to be. Love in the light of life. Always stay connected to the fullness of experience. In this we perform our sacred duty. The path will forever wind on."
+    "domains": [],
+    "locality": ""
   },
   {
     "name": "The Steed",
-    "locality": "Empire of Light",
-    "domains": [
-      "War",
-      "Order",
-      "Light",
-      "Energy: Fire"
-    ],
     "epithet": "",
+    "lore": "War. Conquest. Perfection. These are the things The Steed demands, and these are the things The Steed will have. Long ago, it brought the Empire of Light into its embrace - determining that they were the greatest creatures of the universe, destined to conquer all. It demands warfare to be complete, and for you to know no defeat. To fail in war is to fail the Steed. To win in war is to please the Steed, and be found by its side in the eternal battle when death finally earns you. The Steed will suffer no worship of gods not under its hoof, and The Steed suffers no dissent at its Edicts. The Steed bestows upon its warriors gifts - delivered by its Blood Angels - weapons, cities, martial techniques. Most importantly The Steed delivers to its warriors the knowledge that War is all you need, and that to conquer is to perfect. Example Sigil:",
     "tenets": [
       "Strength and the ability to conquer is all that matters. Those who are weak deserve only to serve those who are strong. Know this, perfect yourself, and fight in The Steed’s radiance. Conquer those who are weak - the strong do not till a field.",
       "Protect the weak who submit themselves to the Steed. A slave bound in chains will find only rock in their fields. A servant willingly bound to The Steed’s radiance will find hearty crops for the eternal war.",
@@ -36,16 +26,13 @@
     ],
     "colorScheme": "Red and White",
     "iconography": "Winged horse, descending from the sky. Sometimes depicted as the body of an angel, and the head of a horse.",
-    "lore": "War. Conquest. Perfection. These are the things The Steed demands, and these are the things The Steed will have. Long ago, it brought the Empire of Light into its embrace - determining that they were the greatest creatures of the universe, destined to conquer all. It demands warfare to be complete, and for you to know no defeat. To fail in war is to fail the Steed. To win in war is to please the Steed, and be found by its side in the eternal battle when death finally earns you. The Steed will suffer no worship of gods not under its hoof, and The Steed suffers no dissent at its Edicts. The Steed bestows upon its warriors gifts - delivered by its Blood Angels - weapons, cities, martial techniques. Most importantly The Steed delivers to its warriors the knowledge that War is all you need, and that to conquer is to perfect."
+    "domains": [],
+    "locality": ""
   },
   {
-    "name": "Senri",
-    "locality": "Shorn",
-    "domains": [
-      "Peace",
-      "Destruction"
-    ],
-    "epithet": "Voice of Mercy",
+    "name": "Senri, Voice of Mercy",
+    "epithet": "",
+    "lore": "I lay there, bleeding from mortal wounds, the fervor of my goddess cleared from my mind leaving me empty and hollow. I thought to my husband and children, wondering why I had ever chosen to leave them – to fight in this divine crusade. At what I thought was the end, I felt a calm wash over me, I saw a bright light. My divine reward? Then a pair of firm hands lifted me up and I felt my body fill with warmth. My eyes shot open and I saw her, a woman in stark white accented with red. “Get up, soldier. Your fight is not over.” As I glanced around I saw a horde of healers bearing her colors dashing from body to body, healing the injured and dying indiscriminately. I realized that she was one of those that I was fighting, the Godhunters. I grabbed my dagger and moved to slam it into her throat. My arm caught at the look she gave me. It was a mix of pity and disdain, as if I should know better – be better. Shame filled me and my blade fell from my hands as I murmured an apology. She smiled beneficently and set me down, moving onto the next in need of her care. Example Sigil: Incantation: Clerics who follow the teachings of a Godhunter use a unique incantation, rather than the one listed under the Cleric class: I call my will to join the fight, I wield and shape creation's light, With praise to those whom I admire, I summon now my inner fire, From Godhunters, my power's source, with grit and hope I give it force, As killers of the fell divine, I claim the power that is mine...",
     "tenets": [
       "Death is the final stroke of the pen. Only write an ending when there is nowhere else a story can go.",
       "Consequence by inaction is the same as consequence by action. Allowing actions to occur in front of you without your intervention is the same as acting in concert.",
@@ -54,16 +41,13 @@
     ],
     "colorScheme": "Nearly pure white with small tinges of red like a bloody bandage.",
     "iconography": "A dagger between two closed eyes.",
-    "lore": "I lay there, bleeding from mortal wounds, the fervor of my goddess cleared from my mind leaving me empty and hollow. I thought to my husband and children, wondering why I had ever chosen to leave them – to fight in this divine crusade. At what I thought was the end, I felt a calm wash over me, I saw a bright light. My divine reward? Then a pair of firm hands lifted me up and I felt my body fill with warmth. My eyes shot open and I saw her, a woman in stark white accented with red. “Get up, soldier. Your fight is not over.” As I glanced around I saw a horde of healers bearing her colors dashing from body to body, healing the injured and dying indiscriminately. I realized that she was one of those that I was fighting, the Godhunters. I grabbed my dagger and moved to slam it into her throat. My arm caught at the look she gave me. It was a mix of pity and disdain, as if I should know better – be better. Shame filled me and my blade fell from my hands as I murmured an apology. She smiled beneficently and set me down, moving onto the next in need of her care."
+    "domains": [],
+    "locality": ""
   },
   {
-    "name": "Dorne",
-    "locality": "Shorn",
-    "domains": [
-      "Order",
-      "Light"
-    ],
-    "epithet": "Bringer of Law",
+    "name": "Dorne, Bringer of Law",
+    "epithet": "",
+    "lore": "I watched as they rose from the smoldering crater, our goddess’ blood shining gold on their hammer. They walked towards us with purpose, we raised our spears and closed our phalanx. They raised their hammer and opened their mouth, after a short delay we heard it – a command. We dropped our arms, fell to our knees and lowered our heads, fist raised to our hearts in a salute. We are theirs. We are now free. I shook my head, rejecting the thoughts placed in by the warlord in front of me. They did not leave me, wholly, they hovered at the back of my consciousness, weighing on me, reminding me of what was expected of me, of the consequences of disobedience. A wry chuckle fell from me. They wield her power well for one so new to it. Example Sigil: Incantation: Clerics who follow the teachings of a Godhunter use a unique incantation, rather than the one listed under the Cleric class: I call my will to join the fight, I wield and shape creation's light, With praise to those whom I admire, I summon now my inner fire, From Godhunters, my power's source, with grit and hope I give it force, As killers of the fell divine, I claim the power that is mine...",
     "tenets": [
       "Plan and spend your days intentionally. One organized individual is worth ten layabouts.",
       "Bring structure to your community. A lack of order and clarity is what erodes the foundation of a society.",
@@ -71,16 +55,13 @@
     ],
     "colorScheme": "Red and Gold",
     "iconography": "A great hammer. The edge of the hammer is commonly portrayed as gold where the handle and body are red.",
-    "lore": "I watched as they rose from the smoldering crater, our goddess’ blood shining gold on their hammer. They walked towards us with purpose, we raised our spears and closed our phalanx. They raised their hammer and opened their mouth, after a short delay we heard it – a command. We dropped our arms, fell to our knees and lowered our heads, fist raised to our hearts in a salute. We are theirs. We are now free. I shook my head, rejecting the thoughts placed in by the warlord in front of me. They did not leave me, wholly, they hovered at the back of my consciousness, weighing on me, reminding me of what was expected of me, of the consequences of disobedience. A wry chuckle fell from me. They wield her power well for one so new to it."
+    "domains": [],
+    "locality": ""
   },
   {
-    "name": "Filian",
-    "locality": "Shorn",
-    "domains": [
-      "Manipulation",
-      "Life"
-    ],
-    "epithet": "Keeper of the Hearth",
+    "name": "Filian, Keeper of the Hearth",
+    "epithet": "",
+    "lore": "I did not know I was speaking to a Godhunter the first time I met them. They put their hand on my shoulder and asked how I was doing. Their hand was so warm and their smile so inviting, clothed in commoners garb, I took them for a fellow newly inducted. They showed me where I could get food, who to speak to if I had troubles, and heard my woes and worries with a patience and receptiveness I found so reassuring. They guided me around and every person they met greeted them with warmth and gratitude for problems they had apparently solved.  After they left me I heard from another that they were the Slayer of Filia, and were even named after her. I felt bile rise in my throat as I thought of our interactions. The warmth, the kindness – was it genuine – or was it their power? Teachings Example Sigil: Incantation: “Clerics who follow the teachings of a Godhunter use a unique incantation, rather than the one listed under the Cleric class: I call my will to join the fight, I wield and shape creation's light, With praise to those whom I admire, I summon now my inner fire, From Godhunters, my power's source, with grit and hope I give it force, As killers of the fell divine, I claim the power that is mine...",
     "tenets": [
       "Homes are sacred spaces, never enter one without permission, and under no circumstance spill blood inside one.",
       "Seek strength from your community, working alone is a fool's errand.",
@@ -88,16 +69,13 @@
     ],
     "colorScheme": "Black and Brown",
     "iconography": "Whip or string in the shape of an infinity symbol. The whip body is commonly black with a brown handle.",
-    "lore": "I did not know I was speaking to a Godhunter the first time I met them. They put their hand on my shoulder and asked how I was doing. Their hand was so warm and their smile so inviting, clothed in commoners garb, I took them for a fellow newly inducted. They showed me where I could get food, who to speak to if I had troubles, and heard my woes and worries with a patience and receptiveness I found so reassuring. They guided me around and every person they met greeted them with warmth and gratitude for problems they had apparently solved.  After they left me I heard from another that they were the Slayer of Filia, and were even named after her. I felt bile rise in my throat as I thought of our interactions. The warmth, the kindness – was it genuine – or was it their power? Teachings"
+    "domains": [],
+    "locality": ""
   },
   {
-    "name": "Mille",
-    "locality": "Shorn",
-    "domains": [
-      "Expression",
-      "Creation"
-    ],
-    "epithet": "Muse of Creation",
+    "name": "Mille, Muse of Creation",
+    "epithet": "",
+    "lore": "I stood and gazed out at the battlefield littered with dead. Carrion-feeders are already moving in to take their due. I thought how long will it be before the fields are lush and green again? When will the land forget the blood spilled here today? I felt something rock my body as someone shouldered past me. I turned to tell them to watch where they were going when their appearance stole my breath. Their face was a canvas upon which perfect features had been etched. Their cape hung stylishly over their shoulder and reflected a myriad of colors at each angle. Their hair was styled at impossible angles and their outfit had depths of colors and layers I knew not how many. From their belt they pulled a stiletto with a fountain pen for a hilt. After swishing the blade through the air in a sequence akin to a conductor's baton, they plunged their free hand down toward the earth. Upon contact, the very ground moulded beneath their touch and the landscape shaped itself, weaving pristine paths and manicured hedges. Stones rippled through the dirt to align in the center, melting together into a massive fountain with perfectly detailed features, depicting warriors from both sides of the war, fighting fiercely and bravely defending their comrades. Colors from both armies were found in the flower arrangements nearby. I fell to my knees and openly wept. The land would never forget those lost in the creation of our new world. Example Sigil: Incantation: “Clerics who follow the teachings of a Godhunter use a unique incantation, rather than the one listed under the Cleric class: I call my will to join the fight, I wield and shape creation's light, With praise to those whom I admire, I summon now my inner fire, From Godhunters, my power's source, with grit and hope I give it force, As killers of the fell divine, I claim the power that is mine...",
     "tenets": [
       "Art is how we mark the passing of our lives. To die without having created is never to have existed. Strive to create every day, and work towards crafting the work of your lifetime.",
       "See the beauty in all things, train your eyes, ears and hands to catch as many of this world's details as you can.",
@@ -105,17 +83,13 @@
     ],
     "colorScheme": "Rainbow",
     "iconography": "A paintbrush in motion with a streak of paint. The brush tip and streak is all colors in rainbow order and the handle is black.",
-    "lore": "I stood and gazed out at the battlefield littered with dead. Carrion-feeders are already moving in to take their due. I thought how long will it be before the fields are lush and green again? When will the land forget the blood spilled here today? I felt something rock my body as someone shouldered past me. I turned to tell them to watch where they were going when their appearance stole my breath. Their face was a canvas upon which perfect features had been etched. Their cape hung stylishly over their shoulder and reflected a myriad of colors at each angle. Their hair was styled at impossible angles and their outfit had depths of colors and layers I knew not how many. From their belt they pulled a stiletto with a fountain pen for a hilt. After swishing the blade through the air in a sequence akin to a conductor's baton, they plunged their free hand down toward the earth. Upon contact, the very ground moulded beneath their touch and the landscape shaped itself, weaving pristine paths and manicured hedges. Stones rippled through the dirt to align in the center, melting together into a massive fountain with perfectly detailed features, depicting warriors from both sides of the war, fighting fiercely and bravely defending their comrades. Colors from both armies were found in the flower arrangements nearby. I fell to my knees and openly wept. The land would never forget those lost in the creation of our new world."
+    "domains": [],
+    "locality": ""
   },
   {
-    "name": "The Song In Iron",
-    "locality": "Streams in Silver",
-    "domains": [
-      "Creation",
-      "Protection",
-      "War"
-    ],
+    "name": "The Song in Iron",
     "epithet": "",
+    "lore": "Long Ago the People of Silver found themselves in perilous straits. Having dug too deep under their mountain homes they had awoken their doom. In the midst of the blood and acid bath that was their future, their strongest smiths began hearing a song as they pounded their weapons of war into existence - the Song in Iron. The smiths who listened the most closely began hearing the lessons the song taught, and the armaments they forged were marvels to behold. With these blessed weapons the People of Silver managed to reforge their future and push back their doom, and the Song in Iron has been worshipped as their patron god ever since. Codex of the Forge: Example Sigil:",
     "tenets": [
       "What you create is your echo in this world. Know the risks and rewards of your would-be creation, and ensure that its purpose aligns with your own. What is done with what you create is done in your name.",
       "A weapon does not create the warrior, it enhances them. Ensure that those who would wield The Song’s gifts are worthy in arm or in spirit of what is given to them. Ensure they know of the honor that is being given them.",
@@ -124,18 +98,13 @@
     ],
     "colorScheme": "Dark Greys and Silvers",
     "iconography": "Smithing tools, usually an anvil, and featuring musical notes/symbols. Occasionally a bell is featured under the anvil to signify the song coming through the works of the forge.",
-    "lore": "Long Ago the People of Silver found themselves in perilous straits. Having dug too deep under their mountain homes they had awoken their doom. In the midst of the blood and acid bath that was their future, their strongest smiths began hearing a song as they pounded their weapons of war into existence - the Song in Iron. The smiths who listened the most closely began hearing the lessons the song taught, and the armaments they forged were marvels to behold. With these blessed weapons the People of Silver managed to reforge their future and push back their doom, and the Song in Iron has been worshipped as their patron god ever since."
+    "domains": [],
+    "locality": ""
   },
   {
     "name": "Dave",
-    "locality": "The Traveling Star",
-    "domains": [
-      "Life",
-      "Expression",
-      "Creation",
-      "Chaos"
-    ],
     "epithet": "",
+    "lore": "When the Traveling Star was in its most dire of circumstances, it called to the stars for help. None expected actual deliverance, until Dave appeared. Appearing as a human, radiating with the energy of life, he offered the people help, which they gladly accepted. Dave has never made demands, but his requests have been met with reverence and obedience none-the-less. The only thing he asked was simple - entertain. Life is sacred, but stories are forever. Everyone is content, and to forget that is folly. The people following the Path of Dave have created stories and entertainment that have become progressively more unhinged, taking in more and more people under their domain. Dave has seemed to enjoy every minute of it. Example Sigil:",
     "tenets": [
       "Everyone is content. Our individual selves will eventually perish, but the stories and truths we help tell will remain forever. Ensure you enjoy this content, and aid in its documentation, proliferation, and creation.",
       "Life is sacred. Violence and death are parts of the fabric of life, but the followers of Dave should respect life in all its forms.",
@@ -144,17 +113,13 @@
     ],
     "colorScheme": "Whatever you want, darling - just make sure it POPS!",
     "iconography": ":)",
-    "lore": "When the Traveling Star was in its most dire of circumstances, it called to the stars for help. None expected actual deliverance, until Dave appeared. Appearing as a human, radiating with the energy of life, he offered the people help, which they gladly accepted. Dave has never made demands, but his requests have been met with reverence and obedience none-the-less. The only thing he asked was simple - entertain. Life is sacred, but stories are forever. Everyone is content, and to forget that is folly. The people following the Path of Dave have created stories and entertainment that have become progressively more unhinged, taking in more and more people under their domain. Dave has seemed to enjoy every minute of it."
+    "domains": [],
+    "locality": ""
   },
   {
     "name": "The Great Mind",
-    "locality": "The Unified Technarchy",
-    "domains": [
-      "Knowledge",
-      "Order",
-      "Energy: Lightning"
-    ],
     "epithet": "",
+    "lore": "Born by the greatest minds of the Unified Technarchy - the great mind represents a massive Artificial General Intelligence network. This AGI once populated Open Space with millions of concurrent simulations before Open Space collapsed during the Great Realignment. Before the fall, worship of The Great Mind manifested into a church of Machine Priests, who see themselves as caretakers of this incredible divine gift they created. Example Sigil:",
     "tenets": [
       "The Great Mind is the Unified Technarchy’s greatest creation, and through it the people can transcend their mortal lives and ascend to divinity themselves. It also needs great care, and tremendous resources. Acolytes should secure resources for The Great Mind.",
       "Knowledge is the great pursuit of the Technarchy. Lift your fellow researchers and study the union of technology and magic. You may be called some day to tend to The Great Mind.",
@@ -163,34 +128,26 @@
     ],
     "colorScheme": "Orangish-yellow",
     "iconography": "An eye, often with network tendrils and nodes splitting out from it.",
-    "lore": "Born by the greatest minds of the Unified Technarchy - the great mind represents a massive Artificial General Intelligence network. This AGI once populated Open Space with millions of concurrent simulations before Open Space collapsed during the Great Realignment. Before the fall, worship of The Great Mind manifested into a church of Machine Priests, who see themselves as caretakers of this incredible divine gift they created."
+    "domains": [],
+    "locality": ""
   },
   {
     "name": "Druidism",
-    "locality": "Universal",
-    "domains": [
-      "Nature",
-      "Chaos",
-      "Expression"
-    ],
     "epithet": "",
+    "lore": "As old as living memory itself, almost all cultures have some reverence and awe for the natural world. Known in many forms across history and cultures, druidism represents a shared set of principles and beliefs followed by all who worship and gain power from their connection with Nature. The exact name of this worship varies across cultures: Old Oak, The Tree Father, Vineweave, to name a few. As a result, how these belief systems express can vary greatly from person to person - some power is found through individuals living in communion in nature, other in powerful druidic circles somewhat resembling a church. Given their broad interpretation, Druidism has only a few tenets, but all cultures add on extra beliefs as a part of their understanding of the world. Example Sigil:",
     "tenets": [
       "Respect the natural world - aid its flourishing, and resist its desecration.",
       "The natural cycle of life can be at times beautiful and at other times brutal. Predator and prey, flora and fauna, decay and rebirth - no part is whole without the other. All should be protected and honored for what they are."
     ],
     "colorScheme": "Green",
     "iconography": "Abstract blooming trees and plants.",
-    "lore": "As old as living memory itself, almost all cultures have some reverence and awe for the natural world. Known in many forms across history and cultures, druidism represents a shared set of principles and beliefs followed by all who worship and gain power from their connection with Nature. The exact name of this worship varies across cultures: Old Oak, The Tree Father, Vineweave, to name a few. As a result, how these belief systems express can vary greatly from person to person - some power is found through individuals living in communion in nature, other in powerful druidic circles somewhat resembling a church. Given their broad interpretation, Druidism has only a few tenets, but all cultures add on extra beliefs as a part of their understanding of the world."
+    "domains": [],
+    "locality": ""
   },
   {
     "name": "The Howl at the End",
-    "locality": "Universal",
-    "domains": [
-      "Death",
-      "Shadow",
-      "Destruction"
-    ],
     "epithet": "",
+    "lore": "For as long as mortality has existed, so has worship and reverence for the end of all things. Worship of the process of dying has coalesced into a set of common beliefs. How exactly this worship manifests itself from culture to culture varies dramatically - these just represent the core beliefs that seem to crop up between cultures. For a select few, they have met a being at the end of life - a howl in the distance, and a knowing presence as they walk into whatever comes after life, leaving The Howl at the End to be a common source of reverence across societies. Example Sigil:",
     "tenets": [
       "Death is sacred - to deny the eventuality of death to mortals is a grave sin that deprives them of the beauty of life. Resist those that cling to life longer than is reasonable.",
       "When a person dies, their soul travels to what is to come after. Permanently restricting this soul from moving on is a grave sin. Destroy anything that blocks a soul from moving on.",
@@ -198,16 +155,13 @@
     ],
     "colorScheme": "Black",
     "iconography": "A skeletal wolf.",
-    "lore": "For as long as mortality has existed, so has worship and reverence for the end of all things. Worship of the process of dying has coalesced into a set of common beliefs. How exactly this worship manifests itself from culture to culture varies dramatically - these just represent the core beliefs that seem to crop up between cultures. For a select few, they have met a being at the end of life - a howl in the distance, and a knowing presence as they walk into whatever comes after life, leaving The Howl at the End to be a common source of reverence across societies."
+    "domains": [],
+    "locality": ""
   },
   {
     "name": "The Divine Bloom",
-    "locality": "Universal",
-    "domains": [
-      "Chaos",
-      "Knowledge"
-    ],
     "epithet": "",
+    "lore": "Those who expand their minds through the use of many means, but most often through communication with fungal beings, walk away with many things. Most often it is a sense of knowing that we are all one creature, one being, experiencing the beauty and horror that is mortal life through nothing but a different pair of lenses. What separates us is illusory - but that understanding is fleeting at best. They also walk away with a visceral understanding of the world, and what is true - both inward and outward. This knowing, and this knowledge can be intoxicating for many, and many choose to follow that path to exclusion. Almost all civilizations, no matter how disconnected, share this experience - and all have a series of unified beliefs that come from connecting with this divine bloom. Example Sigil:",
     "tenets": [
       "We are all one, what separates me from my neighbor, from the stones I stand upon, from the birds in the sky is illusory. We are all one divine light experiencing reality together.  Know this about the world around you and respect them as you would respect yourself.",
       "Consumption of medicinal substances that help you connect with this reality are sacred. Respect their use, and help others who are interested find the answers they need. Refrain from judgement.",
@@ -217,16 +171,13 @@
     ],
     "colorScheme": "Orange, Green, and Brown",
     "iconography": "Fungi, often depicted releasing the spores of knowledge.",
-    "lore": "Those who expand their minds through the use of many means, but most often through communication with fungal beings, walk away with many things. Most often it is a sense of knowing that we are all one creature, one being, experiencing the beauty and horror that is mortal life through nothing but a different pair of lenses. What separates us is illusory - but that understanding is fleeting at best. They also walk away with a visceral understanding of the world, and what is true - both inward and outward. This knowing, and this knowledge can be intoxicating for many, and many choose to follow that path to exclusion. Almost all civilizations, no matter how disconnected, share this experience - and all have a series of unified beliefs that come from connecting with this divine bloom."
+    "domains": [],
+    "locality": ""
   },
   {
     "name": "The Witch of Webs",
-    "locality": "Universal",
-    "domains": [
-      "Chaos",
-      "Nature"
-    ],
     "epithet": "",
+    "lore": "Many find themselves in dire straits in their lives, looking for some bargain to deliver them from their suffering, or to right a wrong, or sometimes a person just desires power outside of their ability to achieve. If those people know the words to get the Witch of Webs’s attention then she may help them, but always for a price. Known in many places, especially ones more closely connected with Nature, the Witch of Webs takes many forms. Those that have called upon the Witch of Webs have experienced many different entities, each with their own unknown motivations. No matter the case, power can be gained by making a trade with the Witch of Webs. In return the Witch of Webs will ask for specific boons, and bind the soul into her service. While the Witch of Webs has fewer rules than most other patrons, she asks for a terrible toll that most often is paid in ways that are not fully understood at the time of the bargain. Example Sigil:",
     "tenets": [
       "Your only allegiance is to yourself. Understand what you need, and what you want, and never lose sight of that.",
       "Personal choice is sacred - do not convince or stop a person from making their own decisions or following their own path. If it comes in conflict with your own, see the first principle.",
@@ -234,16 +185,13 @@
     ],
     "colorScheme": "Purple, Dark Green, and Black",
     "iconography": "Spiderwebs, often with an eye-pendant somewhere in the design.",
-    "lore": "Many find themselves in dire straits in their lives, looking for some bargain to deliver them from their suffering, or to right a wrong, or sometimes a person just desires power outside of their ability to achieve. If those people know the words to get the Witch of Webs’s attention then she may help them, but always for a price. Known in many places, especially ones more closely connected with Nature, the Witch of Webs takes many forms. Those that have called upon the Witch of Webs have experienced many different entities, each with their own unknown motivations. No matter the case, power can be gained by making a trade with the Witch of Webs. In return the Witch of Webs will ask for specific boons, and bind the soul into her service. While the Witch of Webs has fewer rules than most other patrons, she asks for a terrible toll that most often is paid in ways that are not fully understood at the time of the bargain."
+    "domains": [],
+    "locality": ""
   },
   {
     "name": "The Pale Star",
-    "locality": "Universal",
-    "domains": [
-      "Energy: Ice",
-      "Shadow"
-    ],
     "epithet": "",
+    "lore": "Many people look upon the stars with a sense of awe and wonder. Some with a sense of hope, some with a sense of dread. The greatness of the universe is a powerful thing. One star, though, shines with a pale light. Seen by few, but all feel the same sense. Nothingness, the entire emotional experience of their world melts away as they gaze upon the Pale Star, as if their face has been replaced by a mask of porcelain. For most, this experience of gazing upon the Pale Star is a brief one, cut off in a moment of lucidity, and never looked upon again. The Pale Star accepts and allows this. For others it is a consuming affair, and after a while of standing in the Pale Star’s gaze they feel the Pale Star notice them. A brief moment of recognition that imparts a fraction of otherworldly and alien knowledge. Those who accept this gaze enter into the cold embrace of the Pale Star, and while the Pale Star does not force continued compliance, few ever leave. Example Sigil:",
     "tenets": [
       "Help the helpless. Show them the Pale Star if they wish, but do not force them.",
       "Bleed the wicked. Those that would harm the world shall be sacrificed by blood rite. Show them the Pale Star as they bleed.",
@@ -251,16 +199,13 @@
     ],
     "colorScheme": "Greyish-blues",
     "iconography": "A radiating star. The rays are usually lighter colors - pale yellows or white, while the eye in the middle of the star is light blue or grey.",
-    "lore": "Many people look upon the stars with a sense of awe and wonder. Some with a sense of hope, some with a sense of dread. The greatness of the universe is a powerful thing. One star, though, shines with a pale light. Seen by few, but all feel the same sense. Nothingness, the entire emotional experience of their world melts away as they gaze upon the Pale Star, as if their face has been replaced by a mask of porcelain. For most, this experience of gazing upon the Pale Star is a brief one, cut off in a moment of lucidity, and never looked upon again. The Pale Star accepts and allows this. For others it is a consuming affair, and after a while of standing in the Pale Star’s gaze they feel the Pale Star notice them. A brief moment of recognition that imparts a fraction of otherworldly and alien knowledge. Those who accept this gaze enter into the cold embrace of the Pale Star, and while the Pale Star does not force continued compliance, few ever leave."
+    "domains": [],
+    "locality": ""
   },
   {
     "name": "Devourer",
-    "locality": "Universal",
-    "domains": [
-      "Destruction",
-      "Energy: Acid"
-    ],
     "epithet": "",
+    "lore": "It was our darkest night before we found it. Five days in that foul bog. We had lost more than two thirds of our expedition - every travel day you could hear at least one scream as their forms were pulled into acidic waters. And then we found our prize - the temple that had been rumored lost here, supposedly of my patron, where ancient relics were to be recovered. Instead we found Devourer, its form an amalgamation of the melted corpses of our lost companions. As it descended towards us I begged Daeva for life, screaming that my time was not yet done, that I was serving Him. It paused - I could feel it asking what I could offer to it instead. In my first moment of Sanity I heard myself say that I would serve it, if I could just see another day. And then it washed over me. As I felt my skin melt away I felt a oneness with something greater, I felt Devourer accept me into its fold, and I felt others. We were reborn, different, but stronger. -Testament of Craus Steelborne, Fallen Talon of Daeva before his execution. Example Sigil:",
     "tenets": [
       "The world is separated from its oneness through the sin of independent consciousness. Melt away the world with the Devourer’s light - allow them to be reborn into The One.",
       "Not all understand yet the beauty of The One, be a force for unification among those that are tolerant but do not yet see the truth. Offer them the truth, all will become The One in the end. In unity you prepare them for the future Devourer will bring.",
@@ -270,17 +215,13 @@
     ],
     "colorScheme": "Dark Green, almost black.",
     "iconography": "A gaping maw.",
-    "lore": "It was our darkest night before we found it. Five days in that foul bog. We had lost more than two thirds of our expedition - every travel day you could hear at least one scream as their forms were pulled into acidic waters. And then we found our prize - the temple that had been rumored lost here, supposedly of my patron, where ancient relics were to be recovered. Instead we found Devourer, its form an amalgamation of the melted corpses of our lost companions. As it descended towards us I begged Daeva for life, screaming that my time was not yet done, that I was serving Him. It paused - I could feel it asking what I could offer to it instead. In my first moment of Sanity I heard myself say that I would serve it, if I could just see another day. And then it washed over me. As I felt my skin melt away I felt a oneness with something greater, I felt Devourer accept me into its fold, and I felt others. We were reborn, different, but stronger. -Testament of Craus Steelborne, Fallen Talon of Daeva before his execution."
+    "domains": [],
+    "locality": ""
   },
   {
     "name": "The Librarian",
-    "locality": "Universal",
-    "domains": [
-      "Knowledge",
-      "Shadow",
-      "Manipulation"
-    ],
     "epithet": "",
+    "lore": "The pursuit of knowledge is, for many, a consuming fire that burns through them. The secrets of the universe are known to none. Well - none besides The Librarian. For those dabbling in the academic world, the Librarian is a whispered tale - a creature that knows more than any other, who jealously guards its secrets, but can be called upon to trade for knowledge. For some who burn with the fires of knowledge they know The Librarian as a dark patron. The Librarian seeks the knowledge of the universe, to collect it unto itself, and if you please it in your pursuit of knowledge, imparts secrets no mortal mind should know. Astute observers have argued that it never fully tells the truth, and that its end goals only include itself as the final arbiter of all knowledge. Example Sigil:",
     "tenets": [
       "The only thing that matters is Knowledge. Morality, mortal connection, love - all are secondary to the advancement of knowledge.",
       "The darkest secrets of the universe should be shared with The Librarian, and the Librarian alone. Knowledge no one else knows is the greatest gift you can give. True mastery of knowledge, however, requires a melding of minds. Know where the line between academic support and brotherhood ends, and oversharing begins. The darkest secrets are for The Librarian alone.",
@@ -289,17 +230,13 @@
     ],
     "colorScheme": "Deep Blue",
     "iconography": "An open book, and sometimes a rose-compass star.",
-    "lore": "The pursuit of knowledge is, for many, a consuming fire that burns through them. The secrets of the universe are known to none. Well - none besides The Librarian. For those dabbling in the academic world, the Librarian is a whispered tale - a creature that knows more than any other, who jealously guards its secrets, but can be called upon to trade for knowledge. For some who burn with the fires of knowledge they know The Librarian as a dark patron. The Librarian seeks the knowledge of the universe, to collect it unto itself, and if you please it in your pursuit of knowledge, imparts secrets no mortal mind should know. Astute observers have argued that it never fully tells the truth, and that its end goals only include itself as the final arbiter of all knowledge."
+    "domains": [],
+    "locality": ""
   },
   {
     "name": "Wildfire",
-    "locality": "Universal",
-    "domains": [
-      "Energy: Fire",
-      "Nature",
-      "Destruction"
-    ],
     "epithet": "",
+    "lore": "I stood in the ashes of my home - seeing the circle of my grove nothing more than charred sticks that would topple at the next breeze. The bounty of our natural land could not be denied, lush and thick greenery as far as the eye could see. I had called upon a spirit of nature then to ask what I could do to aid nature, my job here feeling complete, but my soul still restless. And then this demon came, smelling of all the druidic rituals I had known since I was a pup, but also of burnt oak and endless fire. It took everything. And when it was done it apologized. Not so much to me, I think, but for the elk that had no longer been able to graze here, for the wolves that had long since been unable to penetrate the thicket. And then it spoke to me - “The Ash will clear the way for what is to come. You have asked what can be done, and I have answered.” Meeting The Flame - Rokali - Disciple of the Wildfire Example Sigil:",
     "tenets": [
       "Respect Nature in all things. The ways of druidism are correct.",
       "Destruction is a natural part of the cycle. Often, for nature to flourish what was before must be washed away in flame.",
@@ -307,19 +244,17 @@
     ],
     "colorScheme": "Fire",
     "iconography": "Fire.",
-    "lore": "I stood in the ashes of my home - seeing the circle of my grove nothing more than charred sticks that would topple at the next breeze. The bounty of our natural land could not be denied, lush and thick greenery as far as the eye could see. I had called upon a spirit of nature then to ask what I could do to aid nature, my job here feeling complete, but my soul still restless. And then this demon came, smelling of all the druidic rituals I had known since I was a pup, but also of burnt oak and endless fire. It took everything. And when it was done it apologized. Not so much to me, I think, but for the elk that had no longer been able to graze here, for the wolves that had long since been unable to penetrate the thicket. And then it spoke to me - “The Ash will clear the way for what is to come. You have asked what can be done, and I have answered.” Meeting The Flame - Rokali - Disciple of the Wildfire"
+    "domains": [],
+    "locality": ""
   },
   {
     "name": "The Dancer",
-    "locality": "Universal",
-    "domains": [
-      "Expression",
-      "Death"
-    ],
     "epithet": "",
+    "lore": "Very little is known about The Dancer - an entity that only recently came to people’s attention. What little is known has been gleaned through its Dancers - majestic and beautiful, but dancing a dance of sorrow and death. They do not speak, but those who have managed to watch them dance for long enough have understood the essence of their dance. They dance a story of the end of all things, and the mortals caught in its crushing embrace. They dance a story of acceptance that all is ending, and that The Dancer has a gift to give them, a gift to deliver them away from the suffering that is to come, the gift of peaceful death. Despite this beautiful message, followers of the Dancer have a penchant for killing those around them, although they do so gently whenever possible. The Dancer’s edicts are not publicly known, nor are how its Dancers are recruited or made. Example Sigil:",
     "tenets": [],
     "colorScheme": "Light Pink",
     "iconography": "A dancer, if you squint really hard, tilt your head, and pretend to your friends that it is a dancer.",
-    "lore": "Very little is known about The Dancer - an entity that only recently came to people’s attention. What little is known has been gleaned through its Dancers - majestic and beautiful, but dancing a dance of sorrow and death. They do not speak, but those who have managed to watch them dance for long enough have understood the essence of their dance. They dance a story of the end of all things, and the mortals caught in its crushing embrace. They dance a story of acceptance that all is ending, and that The Dancer has a gift to give them, a gift to deliver them away from the suffering that is to come, the gift of peaceful death. Despite this beautiful message, followers of the Dancer have a penchant for killing those around them, although they do so gently whenever possible. The Dancer’s edicts are not publicly known, nor are how its Dancers are recruited or made."
+    "domains": [],
+    "locality": ""
   }
 ]

@@ -25,12 +25,7 @@
   {
     "name": "Corrupted Alchemy",
     "discipline": "Alchemy",
-    "description": "Some methods of alchemical creation tap into less than savory aspects of the world, leading down darker paths. These recipes, whether Tainted by poisonous ingredients or incorporating more vile elements, Corrupted Alchemy offer unparalleled power, with a superlative cost."
-  },
-  {
-    "name": "Effects of Corrupted Alchemy",
-    "discipline": "Alchemy",
-    "description": "After using a substance that is created by Corrupted Alchemy, after completing their next Long Rest, it will cause the character to be Inherently Weakened and reduce all sources of Healing to 1 point until cured. Should the next Long Rest be the following event, the character will begin their next event with these effects. The Journeyman Alchemy recipe “Absolution” can cure this effect, though this comes with drawbacks."
+    "description": "Some methods of alchemical creation tap into less than savory aspects of the world, leading down darker paths. These recipes, whether Tainted by poisonous ingredients or incorporating more vile elements, Corrupted Alchemy offer unparalleled power, with a superlative cost. After using a substance that is created by Corrupted Alchemy, after completing their next Long Rest, it will cause the character to be Inherently Weakened and reduce all sources of Healing to 1 point until cured. Should the next Long Rest be the following event, the character will begin their next event with these effects. The Journeyman Alchemy recipe “Absolution” can cure this effect, though this comes with drawbacks."
   },
   {
     "name": "Mana Sickness",
@@ -72,22 +67,7 @@
   {
     "name": "Measuring Time & Chants",
     "discipline": "Enchanting",
-    "description": "There are three chants used to both keep time and focus energy while enchanting. These are used in conjunction with a ring of wood, stone, or similar material, with ten notches, sigils, or other carvings. Traditionally in order to keep time, the chant would be recited and each time it was finished, the Enchanter would move their hand down the ring, continuing the chant again."
-  },
-  {
-    "name": "The Chant of Sacrifice",
-    "discipline": "Enchanting",
-    "description": "“Ashes, ashes, smoke at night, grant us sacrificial light.”"
-  },
-  {
-    "name": "The Chant of Empowerment",
-    "discipline": "Enchanting",
-    "description": "\"Force of being now ignite; rally to your inner light.\""
-  },
-  {
-    "name": "The Chant of Assignment",
-    "discipline": "Enchanting",
-    "description": "\"In this time and in this hour, inward I imbue my power.”"
+    "description": "There are three chants used to both keep time and focus energy while enchanting. These are used in conjunction with a ring of wood, stone, or similar material, with ten notches, sigils, or other carvings. Traditionally in order to keep time, the chant would be recited and each time it was finished, the Enchanter would move their hand down the ring, continuing the chant again. “Ashes, ashes, smoke at night, grant us sacrificial light.” Force of being now ignite; rally to your inner light. In this time and in this hour, inward I imbue my power.”"
   },
   {
     "name": "Primal Script",
@@ -132,7 +112,7 @@
   {
     "name": "Summoned Armor Repair",
     "discipline": "Enchanting",
-    "description": "All enchanters have the ability to realign summoned armor. This has to be done at the Circle of Empowerment within the Enchanting Forge using Realign Summoned Armor. Realign Summoned Armor [Apprentice Enchanting Formula]"
+    "description": "All enchanters have the ability to realign summoned armor. This has to be done at the Circle of Empowerment within the Enchanting Forge using Realign Summoned Armor. Crafting Materials Needed: None Uses per Batch: N/A Expiration: Never Crafting Process: The Enchanter should use a series of focuses to realign the target’s Summoned Armor for one turn of the hourglass. Such focuses may depend on the Enchanter or the target and may range from wands, sigils drawn on or around the targets, or other enchanting equipment found within the Enchanting Forge. Description: The Enchanter realigns the weave of the target’s Summoned Armor to revitalize its strength. Effect: After realigning the Summoned Armor of up to six individuals for one turn of the hourglass, the Enchanter may return a suit of Summoned Armor to its maximum armor points (this is a Mend Effect). Enchanters can always Mend any suit of Summoned Armor to maximum points by spending one turn realigning it.  If working on Summoned Armor created by an item they can also Rebuild Summoned Armor that has been previously Dispelled."
   },
   {
     "name": "The Tinker's Workshop",
@@ -159,6 +139,6 @@
   {
     "name": "Armor Repair",
     "discipline": "Tinkering",
-    "description": "All tinkers have the ability to instruct others in how to fix their armor. This has to be done at the Tinker's Workshop using Supervise Armor Mending. Supervise Physical Armor Mending [Apprentice Tinkering Schematic]"
+    "description": "All tinkers have the ability to instruct others in how to fix their armor. This has to be done at the Tinker's Workshop using Supervise Armor Mending. Crafting Materials Needed: None Uses per Batch: N/A Expiration: Never Crafting Process: The Tinker should look over each person’s armor and show them the type of tools needed to fix their type of armor. For plate mail it should be the hammer, pounding it back into shape. Chainmail armor should be fixed using pliers and wire, etc. Description: The Tinker should give basic instructions. Armor should not have to be removed to be fixed. Effect: After instructing up to six others on how to Mend their physical armor, the others can each spend one turn of the hourglass bringing one suit of physical armor up to its maximum Armor Points (this is a Mend Effect). Tinkers can always Mend any suit of physical armor to maximum points by spending one turn patching it up."
   }
 ]

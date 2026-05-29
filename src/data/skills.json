@@ -29,7 +29,7 @@
     "prereq": "Basic Martial Weapons",
     "ranks": null,
     "category": "Martial",
-    "description": "The character has proficiency with Great Weapons (48”- 90”). When a character uses a great weapon to perform a Spike, the wielder may choose to either do 1 additional point of base damage, on call “Quick Disable Leg” on a swing. You may block attacks with it wielded in one hand but to deal damage or Effects with the Great Weapon it must be wielded in two hands."
+    "description": "The character has proficiency with Great Weapons (48”- 90”). When a character uses a great weapon to perform a Spike, the wielder may choose to either do 1 additional point of base damage, on call “Quick Disable Leg” on a swing. You may block attacks with it wielded in one hand but to deal damage or Effects with the Great Weapon it must be wielded in two hands. Note: A Polearm is a type of Great Weapon that is simply 61” or longer."
   },
   {
     "name": "Projectile Weapons",
@@ -165,7 +165,7 @@
     "prereq": "Short Weapons, Weapon Specialization (Axes), 2 levels in Martial Classes",
     "ranks": null,
     "category": "Martial",
-    "description": "An axe is a special short weapon (22\"-36\") or great weapon (48\"+) that must have an obvious \"bladed head.\" The character has a special skill with an axe to sunder shields. Each time the axe strikes a shield, the character can expend a Spike to call ‘Wounding X’ where X is their base damage. If using a great weapon that’s an axe, you may instead refresh one Spike whenever you Destroy or Shatter a shield and the effect is not Prevented."
+    "description": "An axe is a special short weapon (22-36) or great weapon (48+) that must have an obvious bladed head. The character has a special skill with an axe to sunder shields. Each time the axe strikes a shield, the character can expend a Spike to call ‘Wounding X’ where X is their base damage. If using a great weapon that’s an axe, you may instead refresh one Spike whenever you Destroy or Shatter a shield and the effect is not Prevented."
   },
   {
     "name": "Hooked Head",
@@ -173,7 +173,7 @@
     "prereq": "Axecraft, 5 levels in Martial Classes",
     "ranks": null,
     "category": "Martial",
-    "description": "The character has a special skill with an axe. When the axe strikes a held weapon or shield, the character may expend a Spike to \"Disarm [Item]\" where the item named must be the weapon or shield that was hit."
+    "description": "The character has a special skill with an axe. When the axe strikes a held weapon or shield, the character may expend a Spike to Disarm [Item] where the item named must be the weapon or shield that was hit."
   },
   {
     "name": "Chopper",
@@ -205,7 +205,7 @@
     "prereq": "Quick Shot, 10 levels in Martial Classes",
     "ranks": null,
     "category": "Martial",
-    "description": "When the character spends a Quick 10 aiming with a projectile weapon, they may choose to do one of the following: * Add one to their Base Damage for that shot. * Expend a Spike to deliver a Disable Effect. This is called as “Disable [Limb]” where the limb called must be the one struck by the projectile. In the case of held objects, the limb holding the object must be called. Torso hits will allow the character to call any limb they wish."
+    "description": "When the character spends a Quick 10 aiming with a projectile weapon, they may choose to do one of the following:"
   },
   {
     "name": "Daggercraft",
@@ -213,7 +213,7 @@
     "prereq": "Weapon Specialization (Daggers), 2 levels in Martial Classes",
     "ranks": null,
     "category": "Martial",
-    "description": "When only using one or two bladed hand weapons (each under 22\") you find it easier to deal critical damage. While using daggers only, you have +1 Base Maximum Spikes for attacks with daggers. This bonus to Maximum Spikes is a Base change, and does not interact with the stacking rules for Maximum Spikes."
+    "description": "When only using one or two bladed hand weapons (each under 22) you find it easier to deal critical damage. While using daggers only, you have +1 Base Maximum Spikes for attacks with daggers. This bonus to Maximum Spikes is a Base change, and does not interact with the stacking rules for Maximum Spikes."
   },
   {
     "name": "Parrying Dagger",
@@ -221,7 +221,7 @@
     "prereq": "Dagger Craft, 5 levels in Martial Classes",
     "ranks": null,
     "category": "Martial",
-    "description": "When only using one or two bladed hand weapons (each under 22\"), the character may Counter any melee weapon attack that hits the character if they can see the source of the attack, by calling \"Counter, Parry\" once per Short Rest."
+    "description": "When only using one or two bladed hand weapons (each under 22), the character may Counter any melee weapon attack that hits the character if they can see the source of the attack, by calling Counter, Parry once per Short Rest."
   },
   {
     "name": "Flurry of Cuts",
@@ -229,7 +229,7 @@
     "prereq": "Parrying Dagger, 10 levels in Martial Classes",
     "ranks": null,
     "category": "Martial",
-    "description": "When only using one or two bladed hand weapons (each under 22\"), they may spend a Spike to do an attack that does “Piercing 1 by Force.” This attack can’t be modified other than changing its accent. In addition, whenever the character Counters an attack that hits their hand weapons they may regain a Spike."
+    "description": "When only using one or two bladed hand weapons (each under 22), they may spend a Spike to do an attack that does “Piercing 1 by Force.” This attack can’t be modified other than changing its accent. In addition, whenever the character Counters an attack that hits their hand weapons they may regain a Spike."
   },
   {
     "name": "Macecraft",
@@ -237,7 +237,7 @@
     "prereq": "Short Weapons, Weapon Specialization (Maces), 2 levels in Martial Classes",
     "ranks": null,
     "category": "Martial",
-    "description": "The character has a special skill with a mace and can use it to cause damage through shields. A mace is a special short weapon (22\"-36\") or great weapon (48”+) that must have an obvious \"head\" and must have its center of balance closer to the head than the pommel. The character is skilled with a mace and can use it to crush through shields to damage their enemies. Each time the mace is blocked by a shield, the character may expend a Spike to add Wounding to that attack with a mace."
+    "description": "The character has a special skill with a mace and can use it to cause damage through shields. A mace is a special short weapon (22-36) or great weapon (48”+) that must have an obvious head and must have its center of balance closer to the head than the pommel. The character is skilled with a mace and can use it to crush through shields to damage their enemies. Each time the mace is blocked by a shield, the character may expend a Spike to add Wounding to that attack with a mace. Note: This Power cannot be used with other Powers or be modified in any way."
   },
   {
     "name": "Toppling Blows",
@@ -245,7 +245,7 @@
     "prereq": "Macecraft, 5 levels in Martial Classes",
     "ranks": null,
     "category": "Martial",
-    "description": "The character has a notable skill with a mace and can use it to knock foes off balance. Each time the mace strikes a target they may expend a Spike to call \"Quick Slow.\""
+    "description": "The character has a notable skill with a mace and can use it to knock foes off balance. Each time the mace strikes a target they may expend a Spike to call Quick Slow."
   },
   {
     "name": "Denting Blows",
@@ -253,7 +253,7 @@
     "prereq": "Toppling Blows, 10 levels in Martial Classes",
     "ranks": null,
     "category": "Martial",
-    "description": "The character has a special skill with a mace and can use it to rend Armor. If you are confident you landed a regular melee hit on the target, you can expend a Spike and call \"Shatter Armor by Force\" on your next swing which must be against the same target."
+    "description": "The character has a special skill with a mace and can use it to rend Armor. If you are confident you landed a regular melee hit on the target, you can expend a Spike and call Shatter Armor by Force on your next swing which must be against the same target."
   },
   {
     "name": "Polearmcraft",
@@ -261,7 +261,7 @@
     "prereq": "Great Weapons, Weapon Specialization (Polearms, Swords, Axes, or Maces), 2 levels in Martial Classes",
     "ranks": null,
     "category": "Martial",
-    "description": "When wielding a polearm (A great weapon with an overall length of 61\"-90\") in two hands you may spend a Spike to Counter any Disarm Effect that targets the polearm by calling \"Counter, Polearmcraft.\""
+    "description": "When wielding a polearm (A great weapon with an overall length of 61-90) in two hands you may spend a Spike to Counter any Disarm Effect that targets the polearm by calling Counter, Polearmcraft."
   },
   {
     "name": "Sweeping Strike",
@@ -285,7 +285,7 @@
     "prereq": "Thrown Weapons, Weapon Specialization (Thrown Weapons), 2 levels in Martial Classes",
     "ranks": null,
     "category": "Martial",
-    "description": "When using a Thrown Weapon, the character may spend a Spike to call \"Quick Repel by Agony.\" If this Power misses they may immediately throw an additional weapon with the same call. Note, if the second one also misses, it can't be used again without expending another Spike."
+    "description": "When using a Thrown Weapon, the character may spend a Spike to call Quick Repel by Agony. If this Power misses they may immediately throw an additional weapon with the same call. Note, if the second one also misses, it can't be used again without expending another Spike."
   },
   {
     "name": "Shattering Toss",
@@ -293,7 +293,7 @@
     "prereq": "Thrown Weaponcraft, 5 levels in Martial Classes",
     "ranks": null,
     "category": "Martial",
-    "description": "Once per Short Rest, when using a Thrown Weapon the character may use a Spike to call \"Shatter [Item] by Force\" as their weapon tears apart any item held by the character hit or a door if it hits a door."
+    "description": "Once per Short Rest, when using a Thrown Weapon the character may use a Spike to call Shatter [Item] by Force as their weapon tears apart any item held by the character hit or a door if it hits a door."
   },
   {
     "name": "Jester’s Lethality",
@@ -517,7 +517,7 @@
     "prereq": "Journeyman Ritual Magic",
     "ranks": null,
     "category": "Magic",
-    "description": "As handy as on-the-fly spell casting is, many of those that call upon greater forces recognize that much of the true power of the world rests in the hands of careful and considered rites and rituals. While many know the tried and true ritual methods, scarce few have the knowledge required to make these rituals themselves. A character with the Journeyman Ritual Magic skill has the ability to propose rituals to staff to be performed during the game, once per game/between-game period. Submissions must be done through the Player Outbox. These rituals must be at a power scale and cost similar to the existing rituals in the game, and must have similar pre-requisites, but can be tailored to specific use cases and goals. Staff will propose alterations as needed, as well as additional heavy one-time costs associated with the ritual. Depending on the ritual and its intended scope, rituals will either be approved as single-use one time rituals, or as a general use ritual. If it is approved as a general use ritual, the ritual will be added to the standard suite of rituals the game has access to. Submitting a potential ritual does not guarantee its approval."
+    "description": "As handy as on-the-fly spell casting is, many of those that call upon greater forces recognize that much of the true power of the world rests in the hands of careful and considered rites and rituals. While many know the tried and true ritual methods, scarce few have the knowledge required to make these rituals themselves. A character with the Journeyman Ritual Magic skill has the ability to propose rituals to staff to be performed during the game, once per game/between-game period. Submissions must be done through the Player Outbox. These rituals must be at a power scale and cost similar to the existing rituals in the game, and must have similar pre-requisites, but can be tailored to specific use cases and goals. Staff will propose alterations as needed, as well as additional heavy one-time costs associated with the ritual. Depending on the ritual and its intended scope, rituals will either be approved as single-use one time rituals, or as a general use ritual. If it is approved as a general use ritual, the ritual will be added to the standard suite of rituals the game has access to. Submitting a potential ritual does not guarantee its approval. Note: This skill is experimental, and is subject to change - please be considerate of staff’s time and resources. Submitting rituals that are far outside of power scale and complicated require more plot consideration, and as a result are less likely to be approved during the course of a game. Rituals submitted during game should be more simple, and are more likely to be approved if they are one-off information or context specific rituals. Rituals meant for general purpose should be submitted between events."
   },
   {
     "name": "Lore [Area of Lore] (Unlimited)",
@@ -549,7 +549,7 @@
     "prereq": "None",
     "ranks": null,
     "category": "Medical",
-    "description": "The character has some basic understanding of the way living creatures work and has some minor skill in the healing arts. By spending a Quick 100 tending to an individual, that individual, if dying, will become stable. The character’s death-count will not stop or pause while being tended to, so the target may die during the count. The character using this skill should role-play checking and binding wounds, and overall treating the character (please remember not to touch other players without explicit previous consent). The character using Basic Medicine may use any of the following at-will delivered by Touch: * “Discern: Are you currently at max Life Points?” * “Discern: Are you Dying?” * “Discern: Are you Dead?”"
+    "description": "The character has some basic understanding of the way living creatures work and has some minor skill in the healing arts. By spending a Quick 100 tending to an individual, that individual, if dying, will become stable. The character’s death-count will not stop or pause while being tended to, so the target may die during the count. The character using this skill should role-play checking and binding wounds, and overall treating the character (please remember not to touch other players without explicit previous consent). The character using Basic Medicine may use any of the following at-will delivered by Touch:"
   },
   {
     "name": "Diagnose",
@@ -557,7 +557,7 @@
     "prereq": "Basic Medicine",
     "ranks": null,
     "category": "Medical",
-    "description": "With only a glance, the trained character can tell the extent of someone’s wounds. At-will the character can give a person a quick look over while within Touch range and then ask: * Discern: What non-Inherent Conditions do you have currently? * Discern: How many Life Points are you down? * Discern: Are you sick? * Discern: Are you diseased? * Discern: Are you Living? * Discern: Did you take damage that was from a sharp instrument? * Discern: Did you take damage from a blunt instrument? * Discern to Corpse: Are you 5th level or lower?"
+    "description": "With only a glance, the trained character can tell the extent of someone’s wounds. At-will the character can give a person a quick look over while within Touch range and then ask:"
   },
   {
     "name": "Advanced Medicine",
@@ -565,7 +565,7 @@
     "prereq": "Basic Medicine",
     "ranks": null,
     "category": "Medical",
-    "description": "The character has a number of techniques at their disposal to help those around them. The character can perform any of the following actions by spending a Slow 60 out of combat tending to another (these cannot be performed on the character themself). These can be done as part of a Short Rest. * Cure Disabled [one limb] * Cure Weakened * Cure Slept"
+    "description": "The character has a number of techniques at their disposal to help those around them. The character can perform any of the following actions by spending a Slow 60 out of combat tending to another (these cannot be performed on the character themself). These can be done as part of a Short Rest."
   },
   {
     "name": "Combat Medic",
@@ -581,7 +581,7 @@
     "prereq": "Profession - [Any]",
     "ranks": 3,
     "category": "Trade",
-    "description": "The character has functional knowledge in a profession. The character can perform all normal functions of the chosen profession and they will show solid knowledge related to it. Most tasks associated with that profession can be performed without aid or supervision. The character can choose one Profession-related Discern question and can ask it at-will (such as “Discern by Mind: Which civilization built this artifact?” for a Builder). This question should be approved by Staff (between games) and at Staff discretion, the question may be allowed to have the Subtle Modifier. The Accent is always “by Mind.”"
+    "description": "The character has functional knowledge in a profession. The character can perform all normal functions of the chosen profession and they will show solid knowledge related to it. Most tasks associated with that profession can be performed without aid or supervision. The character can choose one Profession-related Discern question and can ask it at-will (such as “Discern by Mind: Which civilization built this artifact?” for a Builder). This question should be approved by Staff (between games) and at Staff discretion, the question may be allowed to have the Subtle Modifier. The Accent is always “by Mind.” Note: This should be a different profession than the one used for the prerequisite."
   },
   {
     "name": "Profession - Apprentice [Specific Profession]",
@@ -621,7 +621,7 @@
     "prereq": "None",
     "ranks": null,
     "category": "Trade",
-    "description": "Almost all can go about their daily tasks - but few have the internal processes, drive, and motivational elbow grease to truly get things done. A character with Hustle is entitled to submitting one background action between events, and is entitled to a response from staff. The bodies of these background actions should not be longer than 250 words. These submissions should include what the character is doing, context as to why and what they hope to achieve, as well as supporting information, resources, items, or contacts they have. Note - Hustle does not guarantee that these actions will be successful, only that they will be considered and responded to by staff in a way that is appropriate for the support/actions taken. Submissions must be sent at least two weeks prior to the pre-registration deadline."
+    "description": "Almost all can go about their daily tasks - but few have the internal processes, drive, and motivational elbow grease to truly get things done. A character with Hustle is entitled to submitting one background action between events, and is entitled to a response from staff. The bodies of these background actions should not be longer than 250 words. These submissions should include what the character is doing, context as to why and what they hope to achieve, as well as supporting information, resources, items, or contacts they have. Note - Hustle does not guarantee that these actions will be successful, only that they will be considered and responded to by staff in a way that is appropriate for the support/actions taken. Submissions must be sent at least two weeks prior to the pre-registration deadline. Note: By default, Wellspring has no background action system that allows players to submit actions between events. This skill is experimental, and is subject to change - please be considerate of staff’s time and resources."
   },
   {
     "name": "Basic Locks",
@@ -837,6 +837,6 @@
     "prereq": "Greater rank of one Crafting Skill and Profession - Apprentice.",
     "ranks": null,
     "category": "Crafting",
-    "description": "Once ever, the crafter may create an item that they can submit to Staff for a master craft. A mastercrafted item has additional effects and powers, and is often the pinnacle of a crafter’s career. Often completing this master craft will require additional steps, special locations, and special materials. If the Mastercrafted item falls into a category of item for which the character has Profession skill (such as Tinkering a sword and having Profession - Weaponsmith), the chances of good or multiple boons will be increased. Exceptional, immersive items (items submitted for a boon along with a physical prop of high production value) that are submitted have a chance of gaining more powerful boons than others. The build points spent on this skill may never be refunded once the item is created. Character Options There are a number of things that define a person, and most of those things are not skills, or professions, or weapon choices. In this section you will find Perks and Flaws. Perks are generally things that will add to the power or diversity of a character, and cost Build Points to buy. Flaws are generally things that will make life harder, and may give extra Build Points. A character can gain up to 5 Build Points for taking the below flaws. These Build Points can be spent on Perks, Skills, or Divine Domain Powers."
+    "description": "Once ever, the crafter may create an item that they can submit to Staff for a master craft. A mastercrafted item has additional effects and powers, and is often the pinnacle of a crafter’s career. Often completing this master craft will require additional steps, special locations, and special materials. If the Mastercrafted item falls into a category of item for which the character has Profession skill (such as Tinkering a sword and having Profession - Weaponsmith), the chances of good or multiple boons will be increased. Exceptional, immersive items (items submitted for a boon along with a physical prop of high production value) that are submitted have a chance of gaining more powerful boons than others. The build points spent on this skill may never be refunded once the item is created."
   }
 ]

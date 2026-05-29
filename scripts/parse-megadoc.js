@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// parse-megadoc.js — reads Wellspring MegaDoc.txt, writes structured JSON to src/data/
+// parse-megadoc.js — reads WellspringMegaDoc.html, writes structured JSON to src/data/
 // Run: node scripts/parse-megadoc.js
 
 import { readFileSync, writeFileSync, mkdirSync } from 'fs';
@@ -8,78 +8,192 @@ import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
-const DOC = join(ROOT, 'Wellspring MegaDoc.txt');
+const DOC = join(ROOT, 'WellspringMegaDoc.html');
 const OUT = join(ROOT, 'src', 'data');
 
 mkdirSync(OUT, { recursive: true });
 
-const raw = readFileSync(DOC, 'utf8').replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-const lines = raw.split('\n');
+// ─── HTML PARSER ──────────────────────────────────────────────────────────────
+// Parse the HTML into a flat list of nodes: { type: 'heading'|'text'|'list', level?, text, items? }
+// We don't need a full DOM — just heading levels and text content in order.
+
+const raw = readFileSync(DOC, 'utf8');
+
+// Decode common HTML entities.
+function decode(s) {
+  return s
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&rsquo;/g, '’')
+    .replace(/&lsquo;/g, '‘')
+    .replace(/&ldquo;/g, '“')
+    .replace(/&rdquo;/g, '”')
+    .replace(/&hellip;/g, '…')
+    .replace(/&ndash;/g, '–')
+    .replace(/&mdash;/g, '—')
+    .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(+n))
+    .replace(/&#x([0-9a-f]+);/gi, (_, h) => String.fromCharCode(parseInt(h, 16)))
+    .replace(/&[a-z]+;/gi, '');
+}
+
+function stripTags(s) {
+  return decode(s.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ')).trim();
+}
+
+// Walk the raw HTML once, emitting nodes in document order.
+// Headings become { type:'heading', level, text }.
+// <li> items become { type:'list', items:[...] } groups.
+// <p> / <span> text becomes { type:'text', text }.
+// Table cells (<td>) become { type:'cell', text } — used for tab-table equivalents.
+function parseHTML() {
+  const nodes = [];
+  // Match tags we care about. Everything else is consumed as inter-tag text.
+  const TAG = /<(\/?)([a-zA-Z][a-zA-Z0-9]*)[^>]*>/g;
+  let pos = 0;
+  let inTag = null;      // current open block tag being accumulated
+  let inList = false;
+  let listItems = [];
+
+  const flushList = () => {
+    if (listItems.length) { nodes.push({ type: 'list', items: [...listItems] }); listItems = []; }
+    inList = false;
+  };
+
+  // We collect text content between tags into a buffer when inside a known block.
+  let buf = '';
+  const BLOCK_TAGS = new Set(['p','li','td','th','h1','h2','h3','h4','h5','h6']);
+
+  let match;
+  TAG.lastIndex = 0;
+  while ((match = TAG.exec(raw)) !== null) {
+    const between = raw.slice(pos, match.index);
+    if (inTag) buf += between;
+    pos = match.index + match[0].length;
+
+    const closing = match[1] === '/';
+    const tag = match[2].toLowerCase();
+
+    if (!closing && BLOCK_TAGS.has(tag)) {
+      buf = '';
+      inTag = tag;
+    } else if (closing && inTag === tag) {
+      const text = stripTags(buf).trim();
+      buf = '';
+      inTag = null;
+      if (!text) continue;
+
+      if (tag === 'li') {
+        listItems.push(text);
+      } else {
+        if (listItems.length && tag !== 'li') flushList();
+        if (/^h[1-6]$/.test(tag)) {
+          nodes.push({ type: 'heading', level: +tag[1], text });
+        } else if (tag === 'td' || tag === 'th') {
+          nodes.push({ type: 'cell', text });
+        } else {
+          nodes.push({ type: 'text', text });
+        }
+      }
+    } else if (!closing && tag === 'ul' || !closing && tag === 'ol') {
+      inList = true;
+    } else if (closing && (tag === 'ul' || tag === 'ol')) {
+      flushList();
+    }
+  }
+  flushList();
+  return nodes;
+}
+
+const nodes = parseHTML();
 
 function write(filename, data) {
   const path = join(OUT, filename);
   writeFileSync(path, JSON.stringify(data, null, 2));
   const count = Array.isArray(data) ? data.length : Object.keys(data).length;
-  console.log(`  ${filename.padEnd(24)} ${count} entries`);
+  console.log(`  ${filename.padEnd(26)} ${count} entries`);
 }
 
-function findIdx(pattern, after = 0) {
-  return lines.findIndex((l, i) => i >= after && pattern.test(l.trim()));
+// ─── NODE HELPERS ─────────────────────────────────────────────────────────────
+
+// Find the index of the first heading matching text (exact) at a given level,
+// optionally starting after `after`.
+function findHeading(text, level = null, after = 0) {
+  return nodes.findIndex((n, i) =>
+    i >= after &&
+    n.type === 'heading' &&
+    (level === null || n.level === level) &&
+    n.text === text
+  );
 }
 
-// Two nested TOCs the parser needs to skip past, named for the structural
-// intent rather than the specific line numbers they hide. The body sections we
-// want all sit past one of these:
-//   - PAST_DOC_TOC: past the 140-line doc-summary table at the top of the doc.
-//   - PAST_CORE_RULES_TOC: past the Core Rules' own nested TOC (~lines 519-583),
-//     where Effects/Conditions/Types/Level Progression Table also appear as
-//     bare title-only entries before their real body sections.
-const PAST_DOC_TOC = 200;
-const PAST_CORE_RULES_TOC = 600;
+// Find first heading whose text matches a regex, optionally at a given level.
+function findHeadingRe(re, level = null, after = 0) {
+  return nodes.findIndex((n, i) =>
+    i >= after &&
+    n.type === 'heading' &&
+    (level === null || n.level === level) &&
+    re.test(n.text)
+  );
+}
 
-function findBodyHeader(pattern, after = PAST_DOC_TOC) {
-  return lines.findIndex((l, i) => i >= after && pattern.test(l.trim()));
+// Return all text content between two node indices as a single joined string.
+function textBetween(start, end) {
+  return nodes.slice(start, end)
+    .filter(n => n.type === 'text')
+    .map(n => n.text)
+    .join(' ');
+}
+
+// Return all text+list content between two node indices.
+function bodyBetween(start, end) {
+  return nodes.slice(start, end)
+    .filter(n => n.type === 'text' || n.type === 'list')
+    .map(n => n.type === 'list' ? n.items.join(' ') : n.text)
+    .join(' ');
+}
+
+// Find the next heading at or above `level` starting after `after`.
+// Used to bound a section: "end of this H2 is the next H2 or H1".
+function nextHeadingAtOrAbove(level, after) {
+  return nodes.findIndex((n, i) => i > after && n.type === 'heading' && n.level <= level);
+}
+
+// Collect all direct children of a heading node (nodes between it and the next
+// sibling/parent heading). Returns { heading: node, children: node[] }.
+function sectionBetween(startIdx, endIdx) {
+  return nodes.slice(startIdx + 1, endIdx === -1 ? nodes.length : endIdx);
 }
 
 // ─── POWER BLOCK PARSER ───────────────────────────────────────────────────────
+// Powers are H4 (occasionally H5 for sub-variants) with the tier tag in the name.
+// The stat-block fields follow as text nodes before the description prose.
 
 const TIER_PATTERN = /\[(Utility|Basic|Advanced|Veteran|Cantrip|Novice|Adept|Greater|Innate|Class|Form|Right Hand)\]/;
-
-// A real power header is "Name [Tier]" with the tier tag in the trailing tag
-// cluster: optionally more [Tags], an optional "- N BP" cost (Class-tier powers),
-// and an optional (N) ranks, then end-of-line. This rejects prose that merely
-// mentions a "[Tier]" mid-sentence.
 const POWER_HEADER = new RegExp(
   TIER_PATTERN.source + String.raw`(\s*\[[^\]]+\])*\s*(-\s*\d+\s*BP)?\s*(\(\d+\))?\s*$`
 );
 
-function isPowerHeader(line) {
-  return POWER_HEADER.test(line.trim());
-}
+const STAT_FIELD = /^(Incantation|Incant|Call|Target|Duration|Delivery|Refresh|Accent|Effect|Requirement|Prerequisites?|Skills and Options):\s*(.*)$/;
+const STAT_TWO = /^(Target|Delivery|Accent):\s*(.+?)\s{2,}(Duration|Refresh|Effect):\s*(.+)$/;
+const statKey = l => l.toLowerCase().replace(/^incant$/, 'incantation').replace(/\s+/g, '_').replace(/s$/, '');
 
-// Shared stat-block reader for power-like entries (class powers, spells, domain
-// powers). Walks the lines after the header, pulling "Label: value" stat fields
-// (two can share a line, e.g. "Target: ...  Duration: ...") until the first
-// non-field line, which begins the description. Returns lowercase-keyed fields
-// plus the joined description. "Incant" is normalized to "incantation".
-const STAT_TWO_FIELD = /^(Target|Delivery|Accent):\s*(.+?)\s{2,}(Duration|Refresh|Effect):\s*(.+)$/;
-const STAT_SINGLE_FIELD = /^(Incantation|Incant|Call|Target|Duration|Delivery|Refresh|Accent|Effect|Requirement|Prerequisites?|Skills and Options):\s*(.*)$/;
-const statKey = label => label.toLowerCase().replace(/^incant$/, 'incantation').replace(/\s+/g, '_').replace(/s$/, '');
-
-function extractStatBlock(blockLines) {
+function parsePowerNodes(powerNodes) {
+  // powerNodes: array of text nodes belonging to one power (after its heading node)
+  const lines = powerNodes.map(n => n.text).filter(Boolean);
   const fields = {};
-  let descStart = 1;
-  for (let i = 1; i < blockLines.length; i++) {
-    const line = blockLines[i].trim();
-    if (!line) { descStart = i + 1; break; }
-    const two = line.match(STAT_TWO_FIELD);
+  let descStart = 0;
+
+  for (let i = 0; i < lines.length; i++) {
+    const two = lines[i].match(STAT_TWO);
     if (two) {
       fields[statKey(two[1])] = two[2].trim();
       fields[statKey(two[3])] = two[4].trim();
       descStart = i + 1;
       continue;
     }
-    const one = line.match(STAT_SINGLE_FIELD);
+    const one = lines[i].match(STAT_FIELD);
     if (one) {
       fields[statKey(one[1])] = one[2].trim();
       descStart = i + 1;
@@ -88,327 +202,298 @@ function extractStatBlock(blockLines) {
     descStart = i;
     break;
   }
-  const description = blockLines.slice(descStart).map(l => l.trim()).filter(Boolean).join(' ');
-  return { fields, description };
-}
-
-function parsePowerBlock(blockLines) {
-  const header = blockLines[0].trim();
-  // Name is everything before the first tag or the "- N BP" cost, whichever comes
-  // first (Class-tier headers vary: "Name [Class] - N BP" and "Name - N BP [Class]").
-  const name = header.replace(/\s*(\[|-\s*\d+\s*BP).*$/, '').trim();
-  const tierMatch = header.match(TIER_PATTERN);
-  const tier = tierMatch ? tierMatch[1] : 'Unknown';
-  const tags = [...header.matchAll(/\[([^\]]+)\]/g)].map(m => m[1]).filter(t => t !== tier);
-  const ranksMatch = header.match(/\((\d+)\)\s*$/);
-  const maxRanks = ranksMatch ? parseInt(ranksMatch[1]) : 1;
-  // Class-tier powers carry an explicit BP cost in the header ("- N BP").
-  const costMatch = header.match(/-\s*(\d+)\s*BP/);
-  const cost = costMatch ? parseInt(costMatch[1]) : null;
-
-  const { fields, description } = extractStatBlock(blockLines);
 
   return {
-    name,
-    tier,
-    tags,
-    maxRanks,
-    cost,
-    incantation: fields['incantation'] ?? null,
-    call: fields['call'] ?? null,
-    target: fields['target'] ?? null,
-    duration: fields['duration'] ?? null,
-    delivery: fields['delivery'] ?? null,
-    refresh: fields['refresh'] ?? null,
-    accent: fields['accent'] ?? null,
-    effect: fields['effect'] ?? null,
-    requirement: fields['requirement'] ?? null,
-    prerequisites: fields['prerequisite'] ?? fields['prerequisites'] ?? null,
-    skillsAndOptions: fields['skills_and_option'] ?? null,
-    description,
+    fields,
+    description: lines.slice(descStart).join(' '),
   };
 }
 
-function parsePowerSection(sectionLines) {
-  const filtered = sectionLines.filter(l => l.trim());
-  const blocks = [];
-  let current = [];
+function parsePowerHeading(text) {
+  const name = text.replace(/\s*(\[|-\s*\d+\s*BP).*$/, '').trim();
+  const tierMatch = text.match(TIER_PATTERN);
+  const tier = tierMatch ? tierMatch[1] : 'Unknown';
+  const tags = [...text.matchAll(/\[([^\]]+)\]/g)].map(m => m[1]).filter(t => t !== tier);
+  const ranksMatch = text.match(/\((\d+)\)\s*$/);
+  const maxRanks = ranksMatch ? parseInt(ranksMatch[1]) : 1;
+  const costMatch = text.match(/-\s*(\d+)\s*BP/);
+  const cost = costMatch ? parseInt(costMatch[1]) : null;
+  return { name, tier, tags, maxRanks, cost };
+}
 
-  for (const line of filtered) {
-    if (isPowerHeader(line) && current.length > 0) {
-      blocks.push(current);
-      current = [line];
+// Collect all H4/H5 power entries under a section bounded by [start, end).
+// Each power heading is followed by text nodes until the next heading of any level.
+function parsePowersInRange(start, end) {
+  const powers = [];
+  let i = start;
+  while (i < end) {
+    const n = nodes[i];
+    if (n.type === 'heading' && (n.level === 4 || n.level === 5) && POWER_HEADER.test(n.text)) {
+      const bodyEnd = nodes.findIndex((m, j) => j > i && m.type === 'heading');
+      const bodyNodes = nodes.slice(i + 1, bodyEnd === -1 ? end : Math.min(bodyEnd, end))
+        .filter(m => m.type === 'text');
+      const { name, tier, tags, maxRanks, cost } = parsePowerHeading(n.text);
+      const { fields, description } = parsePowerNodes(bodyNodes);
+      powers.push({
+        name, tier, tags, maxRanks, cost,
+        incantation: fields['incantation'] ?? null,
+        call: fields['call'] ?? null,
+        target: fields['target'] ?? null,
+        duration: fields['duration'] ?? null,
+        delivery: fields['delivery'] ?? null,
+        refresh: fields['refresh'] ?? null,
+        accent: fields['accent'] ?? null,
+        effect: fields['effect'] ?? null,
+        requirement: fields['requirement'] ?? null,
+        prerequisites: fields['prerequisite'] ?? fields['prerequisites'] ?? null,
+        skillsAndOptions: fields['skills_and_option'] ?? null,
+        description,
+      });
+      i = bodyEnd === -1 ? end : Math.min(bodyEnd, end);
     } else {
-      current.push(line);
+      i++;
     }
   }
-  if (current.length > 0) blocks.push(current);
-  return blocks.filter(b => isPowerHeader(b[0])).map(parsePowerBlock);
+  return powers;
 }
 
-// ─── CLASS SECTION EXTRACTION ─────────────────────────────────────────────────
+// ─── CLASSES ──────────────────────────────────────────────────────────────────
 
-const CLASSES = ['Artisan', 'Cleric', 'Druid', 'Fighter', 'Mage', 'Rogue', 'Socialite', 'Sourcerer'];
+console.log('\nParsing classes...');
 
-// Sentinel: any known class power section header OR major doc section.
-// Must match the section header but NOT "Mage Cantrip Incantation" or similar subtitle lines.
-const MAJOR_SECTION = new RegExp(
-  `^(${CLASSES.join('|')})\\s+(Utility|Basic|Advanced|Veteran|Innate|Class) Powers$|` +
-  `^(${CLASSES.join('|')})\\s+(Cantrip|Novice|Adept|Greater)( Form)? (Spells|Skills|Powers)$|` +
-  `^(${CLASSES.join('|')}) Cantrips?$|` +                       // bare "Mage Cantrips" header
-  `^(${CLASSES.join('|')}) (Class )?Skills$|` +
-  `^(${CLASSES.join('|')}) Right Hand Powers$|` +
-  `^Basic (${CLASSES.join('|')}) Powers$|` +
-  `^(Skills,|Flaws|Perks|Devotions|Lineages|Advanced Classes|Champion Classes|Appendix)`
-);
+function parseClasses() {
+  const classesStart = findHeading('Base Classes (All)');
+  const classesEnd = findHeading('Lineages (All)');
+  const classes = [];
 
-function extractPowerSection(headerPattern, afterIdx = 0) {
-  const startIdx = findIdx(headerPattern, afterIdx);
-  if (startIdx === -1) return [];
+  // Each class is an H1 "Name: Base Class" between those bounds.
+  let i = classesStart + 1;
+  while (i < classesEnd) {
+    const n = nodes[i];
+    if (n.type !== 'heading' || n.level !== 1 || !/^(.+):\s*Base Class$/.test(n.text)) { i++; continue; }
 
-  // Skip past any "Incantation" label line immediately after the section header
-  let contentStart = startIdx + 1;
-  if (/Incantation$/i.test(lines[contentStart]?.trim())) contentStart++;
+    const clsName = n.text.replace(/:\s*Base Class$/, '').trim();
+    const clsStart = i;
+    // Class ends at the next H1
+    const clsEnd = nodes.findIndex((m, j) => j > clsStart && m.type === 'heading' && m.level === 1);
+    const end = clsEnd === -1 ? classesEnd : Math.min(clsEnd, classesEnd);
 
-  const end = lines.findIndex((l, i) => i > startIdx && MAJOR_SECTION.test(l.trim()));
-  return parsePowerSection(lines.slice(contentStart, end === -1 ? lines.length : end));
+    // H2 sections within the class
+    const h2 = (text) => {
+      const idx = nodes.findIndex((m, j) => j > clsStart && j < end && m.type === 'heading' && m.level === 2 && m.text === text);
+      if (idx === -1) return -1;
+      const next = nodes.findIndex((m, j) => j > idx && m.type === 'heading' && m.level <= 2);
+      return { start: idx, end: next === -1 ? end : Math.min(next, end) };
+    };
+
+    // Description: text between class H1 and first H2
+    const firstH2 = nodes.findIndex((m, j) => j > clsStart && j < end && m.type === 'heading' && m.level === 2);
+    const description = textBetween(clsStart + 1, firstH2 === -1 ? end : firstH2);
+
+    // Starting / multiclass skills: list nodes under those H2s
+    const skillList = (sectionText) => {
+      const sec = h2(sectionText);
+      if (!sec) return [];
+      return nodes.slice(sec.start + 1, sec.end)
+        .filter(m => m.type === 'list')
+        .flatMap(m => m.items);
+    };
+
+    // Class progression table: cells under "Class Progression Table" H2
+    const progression = parseProgressionTable(clsStart, end);
+
+    // Specializations: H3 entries under the "Specializations" H2 (e.g. Artisan
+    // → Artificer / Crafter / Mystic). Some classes don't have any.
+    const specSec = h2('Specializations');
+    const specializations = specSec === -1 ? [] : (() => {
+      const out = [];
+      let j = specSec.start + 1;
+      while (j < specSec.end) {
+        const m = nodes[j];
+        if (m.type === 'heading' && m.level === 3 && m.text) {
+          const specEnd = nodes.findIndex((x, k) => k > j && x.type === 'heading' && x.level <= 3);
+          const sEnd = specEnd === -1 ? specSec.end : Math.min(specEnd, specSec.end);
+          out.push({ name: m.text, description: textBetween(j + 1, sEnd) });
+          j = sEnd;
+        } else j++;
+      }
+      return out;
+    })();
+
+    // Power sections: each is an H2 like "Artisan Innate Powers", "Artisan Basic Powers" etc.
+    // We collect all H4/H5 power nodes under each matching H2.
+    const powers = (h2Pattern) => {
+      const results = [];
+      let j = clsStart + 1;
+      while (j < end) {
+        const m = nodes[j];
+        if (m.type === 'heading' && m.level === 2 && h2Pattern.test(m.text)) {
+          const secEnd = nodes.findIndex((x, k) => k > j && x.type === 'heading' && x.level <= 2);
+          results.push(...parsePowersInRange(j + 1, secEnd === -1 ? end : Math.min(secEnd, end)));
+        }
+        j++;
+      }
+      return results;
+    };
+
+    const isCaster = ['Cleric', 'Druid', 'Mage', 'Sourcerer'].includes(clsName);
+
+    classes.push({
+      name: clsName,
+      type: isCaster ? 'Spellcaster' : 'Martial',
+      description,
+      startingSkills:   skillList('Starting Skills'),
+      multiclassSkills: skillList('Multiclass Skills'),
+      progression,
+      specializations,
+      innate:       powers(new RegExp(`^${clsName} Innate Powers$`)),
+      utility:      powers(new RegExp(`^${clsName} Utility Powers$`)),
+      basic:        powers(new RegExp(`^(${clsName} Basic Powers|Basic ${clsName} Powers)$`)),
+      advanced:     powers(new RegExp(`^${clsName} Advanced Powers$`)),
+      veteran:      powers(new RegExp(`^${clsName} Veteran Powers$`)),
+      classSkills:  powers(new RegExp(`^${clsName} (Class )?Skills$`)),
+      rightHandPowers: powers(new RegExp(`^${clsName} Right Hand Powers$`)),
+      cantrips:     powers(new RegExp(`^${clsName} Cantrips?$`)),
+      noviceSpells: powers(new RegExp(`^${clsName} (Novice( Form)? Spells?)$`)),
+      adeptSpells:  powers(new RegExp(`^${clsName} (Adept( Form)? Spells?)$`)),
+      greaterSpells: powers(new RegExp(`^${clsName} (Greater( Form)? Spells?)$`)),
+    });
+
+    i = end;
+  }
+  return classes;
 }
 
-// ─── CLASS PROGRESSION TABLE ──────────────────────────────────────────────────
-// The doc exports each table cell on its own tab-indented line. Two wrinkles:
-//   1. A long "Class Bonuses" cell word-wraps onto a following NON-tab line
-//      (e.g. "\tInnate Bonus Cantrip: Cancel," then "Astride the Weave"). That
-//      continuation belongs to the preceding cell, not a new row/section.
-//   2. The table always ends at the "Note:" line — the only reliable terminator.
-// Row shape is fixed: a level integer, then the per-column data cells, then a
-// bonus cell that may be "-", empty, or wrapped. We anchor on the level integer
-// and treat everything up to the next level integer as that row's cells.
-
-function parseProgressionTable(classStartIdx) {
-  const tableIdx = findIdx(/^Class Progression Table$/, classStartIdx);
+// Class progression table: read cell nodes under the "Class Progression Table" H2.
+function parseProgressionTable(clsStart, clsEnd) {
+  const tableIdx = nodes.findIndex((n, i) =>
+    i > clsStart && i < clsEnd && n.type === 'heading' && n.level === 2 && n.text === 'Class Progression Table'
+  );
   if (tableIdx === -1) return {};
 
-  // Bound the table at the trailing Note: line (present for every class).
-  let endIdx = lines.length;
-  for (let i = tableIdx + 1; i < Math.min(tableIdx + 300, lines.length); i++) {
-    if (/^Note:/.test(lines[i].trim())) { endIdx = i; break; }
-  }
-  const rawLines = lines.slice(tableIdx + 1, endIdx);
+  const tableEnd = nodes.findIndex((n, i) => i > tableIdx && n.type === 'heading' && n.level <= 2);
+  const end = tableEnd === -1 ? clsEnd : Math.min(tableEnd, clsEnd);
+  // Table exported as text nodes (not <td>).
+  const cells = nodes.slice(tableIdx + 1, end).filter(n => n.type === 'text').map(n => n.text);
 
-  const isCaster = /cantrip|spell/i.test(rawLines.slice(0, 20).join(' '));
+  // Drop column headers. "BasicPowers" / "AdvancedPowers" / "VeteranPowers" have no
+  // space in the export.
+  const HEADER = /^(Class|Level|Utility ?Powers|Basic ?Powers|Advanced ?Powers|Veteran ?Powers|Cantrips?|Spells? Known|Spell Slots|Class Bonuses?)$/i;
+  const data = cells.filter(v => !HEADER.test(v));
 
-  // Build cells: tab-indented lines are new cells; non-tab, non-blank lines are
-  // wrapped continuations appended to the previous cell. Column headers (single-
-  // and multi-word) are dropped so the remaining stream is pure row data.
-  const HEADER_CELLS = /^(Class|Level|Utility Powers|Basic Powers|Advanced Powers|Veteran Powers|Cantrips?|Spells? Known|Spell Slots|Class Bonuses?)$/i;
-  const cells = [];
-  for (const line of rawLines) {
-    if (line.startsWith('\t')) {
-      const v = line.trim();
-      if (v) cells.push(v);
-    } else {
-      // A non-tab line is a wrapped continuation only when the previous cell is
-      // visibly incomplete (ends with a comma). Otherwise it's a heading or body
-      // line that happens to sit inside the table region — ignore it.
-      const cont = line.trim();
-      const prev = cells[cells.length - 1];
-      if (cont && prev && /,$/.test(prev)) cells[cells.length - 1] = prev + ' ' + cont;
-    }
-  }
-  const data = cells.filter(v => !HEADER_CELLS.test(v));
-
+  const isCaster = cells.some(v => /cantrip|spell/i.test(v));
+  // numeric cols per row (excluding bonus): caster = level + cantrips + spellsKnown + slots(string) = 4,
+  // martial = level + utility + basic + advanced + veteran = 5.
+  // The bonus cell can split across multiple text nodes (commas, dashes), so we
+  // anchor on the level number and collapse anything between the last numeric/dash
+  // col and the next level marker into the bonus.
   const num = v => parseInt(v) || 0;
   const orNull = v => (!v || v === '-' ? null : v);
+  const isLevelStart = (arr, i, expected) => {
+    if (arr[i] !== String(expected)) return false;
+    // Next N entries must look like numeric / dash / slot-string cells.
+    const cols = isCaster ? 3 : 4;
+    for (let k = 1; k <= cols; k++) {
+      const v = arr[i + k];
+      if (v === undefined) return false;
+      if (!/^(\d+|-|\d+\/\d+\/\d+)$/.test(v)) return false;
+    }
+    return true;
+  };
 
-  // The stream is now regular: each row is a level integer followed by a fixed
-  // number of data cells (caster: cantrips, spellsKnown, slots, bonus = 4;
-  // martial: utility, basic, advanced, veteran, bonus = 5). Consume fixed-width.
-  const width = isCaster ? 4 : 5;
   const progression = {};
   let i = 0;
-  // Skip any leading non-level cells (stray header fragments).
-  while (i < data.length && !/^\d+$/.test(data[i])) i++;
-
-  for (; i + width < data.length + 1; i += 1 + width) {
-    const level = parseInt(data[i]);
-    if (!(level >= 1 && level <= 20)) break;
-    const cols = data.slice(i + 1, i + 1 + width);
+  while (i < data.length && data[i] !== '1') i++;
+  let level = 1;
+  while (i < data.length && level <= 20) {
+    if (!isLevelStart(data, i, level)) break;
+    const numericCols = isCaster ? 3 : 4;
+    const cols = data.slice(i + 1, i + 1 + numericCols);
+    // Bonus runs from after the numeric block to the next level start (or end).
+    let j = i + 1 + numericCols;
+    const nextLevelIdx = (() => {
+      for (let k = j; k < data.length; k++) {
+        if (isLevelStart(data, k, level + 1)) return k;
+      }
+      return data.length;
+    })();
+    // Stop the bonus span at any meta paragraph like "Note: ..." that follows the table.
+    let stopAt = nextLevelIdx;
+    for (let k = j; k < nextLevelIdx; k++) {
+      if (/^(Note|Notes|Footnote):/i.test(data[k])) { stopAt = k; break; }
+    }
+    const bonusParts = data.slice(j, stopAt).filter(v => v && v !== '-');
+    const bonus = bonusParts.length ? bonusParts.join(' ').replace(/,\s*$/, '').trim() : null;
 
     if (isCaster) {
-      progression[level] = {
-        cantrips:    num(cols[0]),
-        spellsKnown: num(cols[1]),
-        slots:       orNull(cols[2]),
-        bonus:       orNull(cols[3]),
-      };
+      progression[level] = { cantrips: num(cols[0]), spellsKnown: num(cols[1]), slots: orNull(cols[2]), bonus };
     } else {
-      progression[level] = {
-        utility:  num(cols[0]),
-        basic:    num(cols[1]),
-        advanced: num(cols[2]),
-        veteran:  num(cols[3]),
-        bonus:    orNull(cols[4]),
-      };
+      progression[level] = { utility: num(cols[0]), basic: num(cols[1]), advanced: num(cols[2]), veteran: num(cols[3]), bonus };
     }
+    i = nextLevelIdx;
+    level++;
   }
-
   return progression;
 }
 
-// ─── PARSE ALL CLASSES ────────────────────────────────────────────────────────
-
-console.log('\nParsing class powers...');
-const allClassData = [];
-
-for (const cls of CLASSES) {
-  const classIdx = findIdx(new RegExp(`^${cls}: Base Class$`));
-
-  // Description
-  const ssIdx = findIdx(/^Starting Skills$/, classIdx);
-  const descLines = [];
-  for (let i = classIdx + 1; i < (ssIdx === -1 ? classIdx + 30 : ssIdx); i++) {
-    const l = lines[i]?.trim();
-    if (l && !/^Description$/.test(l)) descLines.push(l);
-  }
-
-  // Starting skills (bullet lines)
-  const startingSkills = [];
-  if (ssIdx !== -1) {
-    for (let i = ssIdx + 1; i < ssIdx + 50; i++) {
-      const l = lines[i]?.trim();
-      if (!l || /^(Multiclass|Note:|Class Progression)/.test(l)) break;
-      if (l.startsWith('*')) startingSkills.push(l.replace(/^\*\s*/, ''));
-    }
-  }
-
-  // Multiclass skills
-  const mcIdx = findIdx(/^Multiclass Skills$/, classIdx);
-  const multiclassSkills = [];
-  if (mcIdx !== -1) {
-    for (let i = mcIdx + 1; i < mcIdx + 15; i++) {
-      const l = lines[i]?.trim();
-      if (!l || /^(Note:|Class Progression|Becoming)/.test(l)) break;
-      if (l.startsWith('*')) multiclassSkills.push(l.replace(/^\*\s*/, ''));
-    }
-  }
-
-  const sec = (tier, altPat) =>
-    extractPowerSection(altPat ?? new RegExp(`^${cls} ${tier} Powers$`), classIdx);
-
-  const spell = (tier) => {
-    if (tier === 'Cantrip') {
-      return extractPowerSection(new RegExp(`^${cls} Cantrips?$`), classIdx);
-    }
-    // A tier can be split across two sibling sections: "Cls <Tier> Form Spells"
-    // (Druid's shapeshift spells) AND "Cls <Tier> Spells". findIdx only returns
-    // the first, so collect every matching header in the class range and merge.
-    const headerRe = new RegExp(`^${cls} ${tier}( Form)? Spells$`);
-    const spells = [];
-    let from = classIdx;
-    for (;;) {
-      const idx = findIdx(headerRe, from);
-      if (idx === -1) break;
-      spells.push(...extractPowerSection(headerRe, idx));
-      from = idx + 1;
-    }
-    return spells;
-  };
-
-  allClassData.push({
-    name: cls,
-    type: ['Cleric', 'Druid', 'Mage', 'Sourcerer'].includes(cls) ? 'Spellcaster' : 'Martial',
-    description: descLines.join(' '),
-    startingSkills,
-    multiclassSkills,
-    progression: parseProgressionTable(classIdx),
-    innate:        sec('Innate'),
-    utility:       sec('Utility'),
-    basic:         sec('Basic', new RegExp(`^(${cls} Basic Powers|Basic ${cls} Powers)$`)),
-    advanced:      sec('Advanced'),
-    veteran:       sec('Veteran'),
-    classSkills:   sec('Class', new RegExp(`^${cls} (Class )?Skills$`)),
-    rightHandPowers: sec('RightHand', new RegExp(`^${cls} Right Hand Powers$`)),
-    cantrips:      spell('Cantrip'),
-    noviceSpells:  spell('Novice'),
-    adeptSpells:   spell('Adept'),
-    greaterSpells: spell('Greater'),
-  });
-}
-
-write('classes.json', allClassData);
+write('classes.json', parseClasses());
 
 // ─── SKILLS ───────────────────────────────────────────────────────────────────
-// Name\nCost: N\nPrerequisites: ...\n<description>
+// H1: "Base Skills, Perks, and Flaws" → H1: "Skills" → H2: "Skill Descriptions"
+// Skills are H4 entries; category is the nearest H3 ancestor.
 
 console.log('\nParsing skills...');
 
 function parseSkills() {
-  // Start at "Skill Descriptions" so the leading "Martial Skills" category header
-  // is included (the old "Basic Martial Weapons" anchor skipped past it). End at
-  // the Perks/Flaws section.
-  const startIdx = findBodyHeader(/^Skill Descriptions$/);
-  const endIdx = findIdx(/^(Perks( List)?$|Flaws( List)?$|Devotions)/, startIdx);
-  const section = lines.slice(startIdx + 1, endIdx);
+  const skillsH1 = findHeading('Skills', 1);
+  const descH2 = findHeading('Skill Descriptions', 2, skillsH1);
+  const descEnd = nextHeadingAtOrAbove(1, descH2);
+  const end = descEnd === -1 ? nodes.length : descEnd;
 
-  // Category headers are bare "<Name> Skills" lines between entries.
-  const CATEGORY = /^(Martial|Magic|Scholar|Medical|Trade|Thieving|Gathering|Crafting) Skills$/;
-
-  // A skill begins with a name line whose next non-empty line is "Cost: N".
-  const costAfter = i => {
-    let n = i + 1;
-    while (n < section.length && !section[n].trim()) n++;
-    return /^Cost:\s*\d/.test(section[n]?.trim() || '') ? n : -1;
-  };
-  const isNameLine = i => {
-    const l = section[i].trim();
-    if (!l || l.startsWith('*') || /^Note:/.test(l) || CATEGORY.test(l)) return false;
-    if (/^(Cost:|Prerequisites?:|Ranks?:)/.test(l)) return false;
-    return costAfter(i) !== -1;
-  };
-
-  let currentCat = 'Martial';
   const skills = [];
-  let i = 0;
+  let currentCat = 'Martial';
+  let i = descH2 + 1;
 
-  while (i < section.length) {
-    const l = section[i].trim();
-    const cat = l.match(CATEGORY);
-    if (cat) { currentCat = cat[1]; i++; continue; }
-
-    if (isNameLine(i)) {
-      // Ranks may be embedded in the name as a trailing "(N)".
-      const rawName = l;
-      const ranksInName = rawName.match(/\((\d+)\)\s*$/);
-      const name = rawName.replace(/\s*\(\d+\)\s*$/, '').trim();
-
-      const ci = costAfter(i);
-      const cost = parseInt(section[ci].match(/Cost:\s*(\d+)/)[1]);
-      let prereq = null;
-      let ranks = ranksInName ? parseInt(ranksInName[1]) : null;
-      let j = ci + 1;
-      for (; j < section.length; j++) {
-        const fl = section[j].trim();
-        if (!fl) continue;
-        if (/^Prerequisites?:\s*/.test(fl)) prereq = fl.replace(/^Prerequisites?:\s*/, '').trim();
-        else if (/^Ranks?:\s*/.test(fl)) ranks = parseInt(fl.match(/\d+/)[0]);
-        else break;
-      }
-
-      // Description runs until the next category header or next skill name.
-      // Blank lines and inline "Note:" lines are skipped, not treated as ends.
-      const descParts = [];
-      while (j < section.length) {
-        const dl = section[j].trim();
-        if (CATEGORY.test(dl) || isNameLine(j)) break;
-        if (dl && !/^Note:/.test(dl)) descParts.push(dl);
-        j++;
-      }
-
-      skills.push({ name, cost, prereq, ranks, category: currentCat, description: descParts.join(' ') });
-      i = j;
-      continue;
+  while (i < end) {
+    const n = nodes[i];
+    if (n.type === 'heading' && n.level === 3) {
+      // H3 = category (e.g. "Martial Skills")
+      currentCat = n.text.replace(/\s+Skills$/, '');
+      i++; continue;
     }
-    i++;
+    if (n.type === 'heading' && n.level === 4) {
+      // H4 = skill entry
+      const raw = n.text;
+      const ranksMatch = raw.match(/\((\d+)\)\s*$/);
+      const name = raw.replace(/\s*\(\d+\)\s*$/, '').trim();
+      const maxRanks = ranksMatch ? parseInt(ranksMatch[1]) : null;
+
+      // Collect text nodes until next H3/H4
+      const bodyEnd = nodes.findIndex((m, j) => j > i && m.type === 'heading' && m.level <= 4);
+      const bodyNodes = nodes.slice(i + 1, bodyEnd === -1 ? end : Math.min(bodyEnd, end));
+
+      let cost = null, prereq = null, ranks = maxRanks;
+      const descParts = [];
+
+      for (const bn of bodyNodes) {
+        if (bn.type !== 'text') continue;
+        const t = bn.text;
+        const cm = t.match(/^Cost:\s*(\d+)/);
+        if (cm) { cost = parseInt(cm[1]); continue; }
+        const pm = t.match(/^Prerequisites?:\s*(.+)/);
+        if (pm) { prereq = pm[1].trim(); continue; }
+        const rm = t.match(/^Ranks?:\s*(\d+)/);
+        if (rm) { ranks = parseInt(rm[1]); continue; }
+        descParts.push(t);
+      }
+
+      if (cost !== null) {
+        skills.push({ name, cost, prereq, ranks, category: currentCat, description: descParts.join(' ') });
+      }
+      i = bodyEnd === -1 ? end : Math.min(bodyEnd, end);
+    } else {
+      i++;
+    }
   }
   return skills;
 }
@@ -416,430 +501,394 @@ function parseSkills() {
 write('skills.json', parseSkills());
 
 // ─── PERKS & FLAWS ────────────────────────────────────────────────────────────
-// Tab-per-line table: one value per line with leading \t.
-// Rows are 5 cells: Name, Cost/Award, Ranks, Prerequisites, Description.
-// Category headers are non-indented lines between rows.
+// Under "Character Options" H1. Perks/Flaws are H3 entries with Cost/Award, Ranks,
+// Prerequisites, Description as text nodes. Category is the H2 ancestor.
 
 console.log('\nParsing perks & flaws...');
 
-function parseTabTable(startPattern, endPattern, valueKey) {
-  const startIdx = findIdx(startPattern);
-  if (startIdx === -1) return [];
-  const endIdx = findIdx(endPattern, startIdx + 1);
-  const section = lines.slice(startIdx, endIdx === -1 ? lines.length : endIdx);
-
-  const HEADER = /^(Name|Cost|Award|Ranks?|Pre-requisites?|Prerequisites?|Description)$/i;
-  const CAT_SUFFIX = /\s+(Perks|Flaws)$/;
+function parsePerkFlaw(h1Text, valueKey) {
+  const h1 = findHeading(h1Text, null);
+  if (h1 === -1) return [];
+  const h1End = nextHeadingAtOrAbove(nodes[h1].level, h1);
+  const end = h1End === -1 ? nodes.length : h1End;
 
   const results = [];
   let currentCat = '';
+  let i = h1 + 1;
+
+  while (i < end) {
+    const n = nodes[i];
+    if (n.type === 'heading' && n.level === 2) {
+      currentCat = n.text.replace(/\s+(Perks|Flaws)$/, '');
+      i++; continue;
+    }
+    if (n.type === 'heading' && n.level === 3) {
+      const name = n.text;
+      const bodyEnd = nodes.findIndex((m, j) => j > i && m.type === 'heading' && m.level <= 3);
+      const bodyNodes = nodes.slice(i + 1, bodyEnd === -1 ? end : Math.min(bodyEnd, end));
+
+      let value = null, ranks = null, prereq = null;
+      const descParts = [];
+
+      for (const bn of bodyNodes) {
+        if (bn.type !== 'text') continue;
+        const t = bn.text;
+        const cm = t.match(/^(?:Cost|Award):\s*(.+)/i);
+        if (cm) { const v = cm[1].trim(); value = /^\d+$/.test(v) ? parseInt(v) : v; continue; }
+        const rm = t.match(/^Ranks?:\s*(\d+)/i);
+        if (rm) { ranks = parseInt(rm[1]); continue; }
+        const pm = t.match(/^(?:Pre-?requisites?|Prerequisites?):\s*(.+)/i);
+        if (pm) { prereq = pm[1].trim(); continue; }
+        descParts.push(t);
+      }
+
+      if (value !== null) {
+        results.push({ name, [valueKey]: value, ranks, prereq, category: currentCat, description: descParts.join(' ') });
+      }
+      i = bodyEnd === -1 ? end : Math.min(bodyEnd, end);
+    } else {
+      i++;
+    }
+  }
+  return results;
+}
+
+// Perks and Flaws are both under "Character Options" as H2 sections.
+const charOptionsH1 = findHeading('Character Options', 1);
+const charOptionsEnd = nextHeadingAtOrAbove(1, charOptionsH1);
+
+function parsePerkFlawSection(sectionName, valueKey) {
+  const h2 = nodes.findIndex((n, i) =>
+    i > charOptionsH1 && i < charOptionsEnd &&
+    n.type === 'heading' && n.level === 2 &&
+    new RegExp(sectionName, 'i').test(n.text)
+  );
+  if (h2 === -1) return [];
+  const secEnd = nodes.findIndex((n, i) => i > h2 && n.type === 'heading' && n.level <= 2);
+  const end = secEnd === -1 ? charOptionsEnd : Math.min(secEnd, charOptionsEnd);
+
+  const results = [];
+  let currentCat = '';
+  let i = h2 + 1;
+
+  while (i < end) {
+    const n = nodes[i];
+    if (n.type === 'heading' && n.level === 3) {
+      currentCat = n.text.replace(/\s+(Perks|Flaws)$/, '');
+      i++; continue;
+    }
+    if (n.type === 'heading' && n.level === 4) {
+      const name = n.text;
+      const bodyEnd = nodes.findIndex((m, j) => j > i && m.type === 'heading' && m.level <= 4);
+      const bodyNodes = nodes.slice(i + 1, bodyEnd === -1 ? end : Math.min(bodyEnd, end));
+
+      let value = null, ranks = null, prereq = null;
+      const descParts = [];
+
+      for (const bn of bodyNodes) {
+        if (bn.type !== 'text') continue;
+        const t = bn.text;
+        const cm = t.match(/^(?:Cost|Award):\s*(.+)/i);
+        if (cm) { const v = cm[1].trim(); value = /^\d+$/.test(v) ? parseInt(v) : v; continue; }
+        const rm = t.match(/^Ranks?:\s*(\d+)/i);
+        if (rm) { ranks = parseInt(rm[1]); continue; }
+        const pm = t.match(/^(?:Pre-?requisites?|Prerequisites?):\s*(.+)/i);
+        if (pm) { prereq = pm[1].trim(); continue; }
+        descParts.push(t);
+      }
+
+      if (value !== null) {
+        results.push({ name, [valueKey]: value, ranks, prereq, category: currentCat, description: descParts.join(' ') });
+      }
+      i = bodyEnd === -1 ? end : Math.min(bodyEnd, end);
+    } else {
+      i++;
+    }
+  }
+  return results;
+}
+
+// Perks and Flaws each have a "Perks List" / "Flaws List" H2 under Character Options.
+// Entries are H4 under H3 category headings.
+// Perks/Flaws export as 5-column flat text (not <td>): Name, Cost/Award, Ranks, Prereq, Desc.
+// Each row is 5 consecutive text nodes under an H3 category. Header rows are "Name","Cost",etc.
+const PERK_HEADER = /^(Name|Cost|Award|Ranks?|Pre-?requisites?|Prerequisites?|Description)$/i;
+
+function parsePerkFlawList(listH2Text, valueKey) {
+  const h2 = nodes.findIndex((n, i) =>
+    i > charOptionsH1 && i < charOptionsEnd &&
+    n.type === 'heading' && n.level === 2 && n.text === listH2Text
+  );
+  if (h2 === -1) return [];
+  const secEnd = nodes.findIndex((n, i) => i > h2 && n.type === 'heading' && n.level <= 2);
+  const end = secEnd === -1 ? charOptionsEnd : Math.min(secEnd, charOptionsEnd);
+
+  const results = [];
+  let currentCat = '';
+  let i = h2 + 1;
   let cells = [];
 
   const flushRow = () => {
-    if (cells.length >= 2 && cells[0] && !HEADER.test(cells[0])) {
-      // Cost/Award is usually numeric but can be a word like "Var" (variable);
-      // keep the string in that case rather than flattening it to 0.
+    if (cells.length >= 2 && !PERK_HEADER.test(cells[0])) {
       const rawVal = cells[1];
       const value = /^\d+$/.test(rawVal) ? parseInt(rawVal) : rawVal;
-      const entry = {
+      results.push({
         name: cells[0],
         [valueKey]: value,
-        ranks: !cells[2] || cells[2] === '-' ? null : parseInt(cells[2]) || null,
-        prereq: !cells[3] || cells[3] === '-' ? null : cells[3],
+        ranks: cells[2] && cells[2] !== '-' ? parseInt(cells[2]) || null : null,
+        prereq: cells[3] && cells[3] !== '-' ? cells[3] : null,
         category: currentCat,
         description: cells[4] || '',
-      };
-      results.push(entry);
-    }
-    cells = [];
-  };
-
-  for (const line of section) {
-    if (line.startsWith('\t')) {
-      const v = line.trim();
-      if (!v) { flushRow(); continue; }
-      if (HEADER.test(v)) continue;
-      // Columns are exactly Name, value, Ranks, Prereq, Description (verified a
-      // clean /5 across every group), so flush each row at 5 cells.
-      cells.push(v);
-      if (cells.length === 5) flushRow();
-    } else {
-      // A whitespace-only non-tab line is an export artifact mid-row (e.g. a
-      // lone space between a perk name and its Cost cell). Ignore it — flushing
-      // here would drop the partial row and desync every following row.
-      const l = line.trim();
-      if (!l) continue;
-      // A real non-tab line ends the current row; if it's a category header,
-      // switch categories.
-      flushRow();
-      if (CAT_SUFFIX.test(l)) {
-        currentCat = l.replace(CAT_SUFFIX, '');
-      }
-    }
-  }
-  flushRow();
-  return results.filter(r => r.name && !HEADER.test(r.name));
-}
-
-// The Perks List tab-table ends at "Descriptions" (the expanded Award:-format
-// flaw text that follows). Stopping at Devotions would swallow that region and
-// produce malformed cost=0 rows.
-const perks = parseTabTable(/^Perks List$/, /^Descriptions$/, 'cost');
-const flaws = parseTabTable(/^Flaws List$/, /^(Perks List|Descriptions|Devotions)/, 'bp');
-
-write('perks.json', perks);
-write('flaws.json', flaws);
-
-// ─── DEVOTIONS ────────────────────────────────────────────────────────────────
-// Two parts: (1) a tab-table mapping each Devotion to Locality + up to 4 Domains,
-// then (2) per-Devotion descriptive entries (lore, tenets, color, iconography).
-// Bound the section at "Divine Domains" so it doesn't run into that section and
-// the Economy table beyond it.
-
-console.log('\nParsing devotions...');
-
-function parseDevotions() {
-  const startIdx = findBodyHeader(/^Devotions & Divine Beings$/);
-  if (startIdx === -1) return [];
-  const endIdx = findIdx(/^Divine Domains$/, startIdx + 1);
-  const section = lines.slice(startIdx, endIdx === -1 ? lines.length : endIdx);
-
-  // (1) Mapping table: God, Locality, Domain 1..4 (tab-indented, 6-cell rows).
-  const HEADER = /^(God|Locality|Domain \d+)$/i;
-  const mapping = [];
-  let cells = [];
-  const flush = () => {
-    if (cells.length >= 2 && cells[0] && !HEADER.test(cells[0])) {
-      mapping.push({
-        name: cells[0],
-        locality: cells[1] || '',
-        domains: cells.slice(2).filter(d => d && d !== '-'),
       });
     }
     cells = [];
   };
-  for (const line of section) {
-    if (!line.startsWith('\t')) continue; // table is entirely tab-indented
-    const v = line.trim();
-    if (!v) { flush(); continue; }
-    if (HEADER.test(v)) continue;
-    cells.push(v);
-    if (cells.length === 6) flush();
+
+  while (i < end) {
+    const n = nodes[i];
+    if (n.type === 'heading' && n.level === 3) {
+      flushRow();
+      currentCat = n.text.replace(/\s+(Perks|Flaws)$/, '');
+      i++; continue;
+    }
+    if (n.type === 'heading' && n.level <= 2) break;
+    if (n.type === 'text') {
+      if (PERK_HEADER.test(n.text)) { i++; continue; }
+      cells.push(n.text);
+      if (cells.length === 5) flushRow();
+    }
+    i++;
   }
-  flush();
+  flushRow();
+  return results.filter(r => r.name && !PERK_HEADER.test(r.name));
+}
 
-  // (2) Descriptions: each devotion is a non-indented name header (matching a
-  // mapping entry, optionally with an epithet like "Senri, Voice of Mercy"),
-  // followed by lore, a tenets block (label varies: "The Truth:", "Laws:",
-  // "Guiding Principles:", etc.) of "*" bullets, then Color Scheme / Iconography.
-  const byName = new Map(mapping.map(m => [m.name, { ...m, epithet: '', tenets: [], colorScheme: '', iconography: '', lore: '' }]));
-  // Name headers are matched case-insensitively: the mapping table and the
-  // description headers disagree on casing for some devotions (e.g. "The Song In
-  // Iron" vs "The Song in Iron").
-  const nameAt = line => {
-    const t = line.trim();
-    const lc = t.toLowerCase();
-    for (const m of mapping) {
-      const ml = m.name.toLowerCase();
-      if (lc === ml) return { name: m.name, epithet: '' };
-      if (lc.startsWith(ml + ',')) return { name: m.name, epithet: t.slice(m.name.length + 1).trim() };
+write('perks.json', parsePerkFlawList('Perks List', 'cost'));
+write('flaws.json', parsePerkFlawList('Flaws List', 'bp'));
+
+// ─── DEVOTIONS ────────────────────────────────────────────────────────────────
+// Each devotion is an H1. Content is text nodes with bullet lists for tenets.
+
+console.log('\nParsing devotions...');
+
+function parseDevotions() {
+  const divDomainsIdx = findHeading('Divine Domains', 1);
+
+  // Collect all H1s between "Devotions & Divine Beings" and "Divine Domains"
+  const devotionsStart = findHeading('Devotions & Divine Beings', 1);
+  const results = [];
+
+  let i = devotionsStart + 1;
+  while (i < divDomainsIdx) {
+    const n = nodes[i];
+    if (n.type !== 'heading' || n.level !== 1 || !n.text) { i++; continue; }
+
+    const name = n.text;
+    const devEnd = nodes.findIndex((m, j) => j > i && m.type === 'heading' && m.level === 1);
+    const end = devEnd === -1 ? divDomainsIdx : Math.min(devEnd, divDomainsIdx);
+
+    const bodyNodes = nodes.slice(i + 1, end);
+    const tenets = [];
+    const loreParts = [];
+    let colorScheme = '', iconography = '';
+
+    for (const bn of bodyNodes) {
+      if (bn.type === 'list') { tenets.push(...bn.items); continue; }
+      if (bn.type !== 'text') continue;
+      const t = bn.text;
+      const cs = t.match(/^Devotion Color Scheme:\s*(.+)/i);
+      if (cs) { colorScheme = cs[1].trim(); continue; }
+      const ic = t.match(/^Common Iconography:\s*(.+)/i);
+      if (ic) { iconography = ic[1].trim(); continue; }
+      if (/^(Example Sigil:|The Truth|Truths|Divine Truths|Divine Demands|Guiding Principles|Guiding Beliefs|Laws|Lessons|Edicts|Codex|Church Principles):/.test(t)) continue;
+      loreParts.push(t);
     }
-    return null;
-  };
 
-  // Index the description lines (skip the tab-table region at the top).
-  const descStart = section.findIndex((l, i) => !l.startsWith('\t') && nameAt(l) && i > 5);
-  let cur = null;
-  let mode = 'lore';
-  const loreParts = [];
-  const commit = () => { if (cur) cur.lore = loreParts.join(' ').trim(); loreParts.length = 0; };
-
-  for (let i = descStart; i >= 0 && i < section.length; i++) {
-    const raw = section[i];
-    if (raw.startsWith('\t')) continue;
-    const t = raw.trim();
-    if (!t) continue;
-
-    const hit = nameAt(t);
-    if (hit && (!cur || hit.name !== cur.name)) {
-      commit();
-      cur = byName.get(hit.name);
-      if (cur) cur.epithet = hit.epithet;
-      mode = 'lore';
-      continue;
-    }
-    if (!cur) continue;
-
-    if (/^(The Truth|Truths|Divine Truths|Divine Demands|Guiding Principles|Guiding Beliefs|Laws|Lessons|Edicts|Codex of the Forge|Church Principles):$/.test(t)) {
-      mode = 'tenets';
-      continue;
-    }
-    if (/^Devotion Color Scheme:/.test(t)) { cur.colorScheme = t.replace(/^Devotion Color Scheme:\s*/, '').trim(); mode = 'meta'; continue; }
-    if (/^Common Iconography:/.test(t)) { cur.iconography = t.replace(/^Common Iconography:\s*/, '').trim(); mode = 'meta'; continue; }
-    if (/^Example Sigil:/.test(t)) { mode = 'meta'; continue; }
-
-    // Bullets are always tenets — the label (Laws:/Lessons:/etc.) is optional and
-    // some devotions (e.g. Filian) list tenets with no label at all.
-    if (t.startsWith('*')) { cur.tenets.push(t.replace(/^\*\s*/, '').trim()); continue; }
-    if (mode === 'lore') loreParts.push(t);
+    results.push({ name, epithet: '', lore: loreParts.join(' '), tenets, colorScheme, iconography, domains: [], locality: '' });
+    i = end;
   }
-  commit();
-
-  return [...byName.values()];
+  return results;
 }
 
 write('devotions.json', parseDevotions());
 
 // ─── DIVINE DOMAINS ───────────────────────────────────────────────────────────
-// 16 domains, each a bare domain-name header followed by exactly 3 Domain Powers.
-// Power header is "Name - N BP" (an [Adept] tier tag may prefix the name). Powers
-// share the class stat-block fields (Call/Target/Duration/Delivery/Accent/Effect).
-// Preceding the powers are two tab-tables we also capture: Devotion→Domains and
-// Domain→Devotion-Accent.
+// H1: "Divine Domains" → H2s for each domain. Powers are H3 entries "Name - N BP".
 
 console.log('\nParsing divine domains...');
 
-const DOMAIN_NAMES = [
-  'Chaos', 'Creation', 'Death', 'Destruction', 'Expression', 'Life', 'Light',
-  'Knowledge', 'Manipulation', 'Nature', 'Order', 'Peace', 'Protection', 'Shadow', 'War',
-];
-const isDomainHeader = t => DOMAIN_NAMES.includes(t) || /^Energy:/.test(t);
-
-function parseDomainPowerBlock(blockLines) {
-  const header = blockLines[0].trim();
-  // "[Adept] Name - N BP" or "Name - N BP"; tier tag may lead.
-  const tierMatch = header.match(/\[(\w+)\]/);
-  const tier = tierMatch ? tierMatch[1] : null;
-  const costMatch = header.match(/-\s*(\d+)\s*BP\s*$/);
-  const cost = costMatch ? parseInt(costMatch[1]) : null;
-  const name = header
-    .replace(/\[\w+\]/, '')
-    .replace(/-\s*\d+\s*BP\s*$/, '')
-    .trim();
-
-  const { fields, description } = extractStatBlock(blockLines);
-
-  return {
-    name, tier, cost,
-    incantation: fields['incantation'] ?? null,
-    call: fields['call'] ?? null,
-    target: fields['target'] ?? null,
-    duration: fields['duration'] ?? null,
-    delivery: fields['delivery'] ?? null,
-    refresh: fields['refresh'] ?? null,
-    accent: fields['accent'] ?? null,
-    effect: fields['effect'] ?? null,
-    prerequisites: fields['prerequisite'] ?? fields['prerequisites'] ?? null,
-    description,
-  };
-}
-
 function parseDivineDomains() {
-  const startIdx = findBodyHeader(/^Divine Domains$/);
-  if (startIdx === -1) return { domains: [], accents: {} };
-  // Powers end at the Economy section ("Wellspring Economy Overview").
-  const endIdx = findIdx(/^Wellspring Economy Overview$/, startIdx);
-  const section = lines.slice(startIdx, endIdx === -1 ? lines.length : endIdx);
+  const start = findHeading('Divine Domains', 1);
+  const end = findHeading('Wellspring Economy Overview', 1, start);
 
-  // Domain → Devotion Accent table (pairs of tab cells after "Devotion Accent").
+  // Devotion accents table: H2 "Devotion Accents" → cell pairs
   const accents = {};
-  const accIdx = section.findIndex(l => /^Divine Domain$/.test(l.trim()));
-  if (accIdx !== -1) {
-    const accCells = [];
-    for (let i = accIdx + 1; i < section.length; i++) {
-      const l = section[i];
-      if (!l.startsWith('\t')) break;
-      const v = l.trim();
-      if (!v || v === 'Devotion Accent') continue;
-      accCells.push(v);
-    }
-    for (let i = 0; i + 1 < accCells.length; i += 2) accents[accCells[i]] = accCells[i + 1];
+  const accH2 = nodes.findIndex((n, i) => i > start && i < end && n.type === 'heading' && n.level === 2 && n.text === 'Devotion Accents');
+  if (accH2 !== -1) {
+    const accEnd = nodes.findIndex((n, i) => i > accH2 && n.type === 'heading' && n.level <= 2);
+    const cells = nodes.slice(accH2 + 1, accEnd === -1 ? end : Math.min(accEnd, end))
+      .filter(n => n.type === 'cell').map(n => n.text);
+    for (let i = 0; i + 1 < cells.length; i += 2) accents[cells[i]] = cells[i + 1];
   }
-
-  // Domain power blocks: walk from the first domain header, grouping powers under
-  // the current domain. A power block starts at a "... - N BP" header and runs to
-  // the next power header or domain header.
-  const firstDomain = section.findIndex((l, i) => i > accIdx && !l.startsWith('\t') && isDomainHeader(l.trim()));
-  const isPwrHeader = t => /-\s*\d+\s*BP\s*$/.test(t);
 
   const domains = [];
-  let cur = null;
-  let block = [];
-  const flushBlock = () => {
-    if (cur && block.length) cur.powers.push(parseDomainPowerBlock(block));
-    block = [];
-  };
-  const flushDomain = () => { flushBlock(); if (cur) domains.push(cur); };
+  let i = start + 1;
+  while (i < end) {
+    const n = nodes[i];
+    if (n.type !== 'heading' || n.level !== 2 || !n.text || n.text === 'Devotion Accents') { i++; continue; }
 
-  for (let i = firstDomain; i >= 0 && i < section.length; i++) {
-    const raw = section[i];
-    const t = raw.trim();
-    if (raw.startsWith('\t')) { if (block.length) block.push(raw); continue; }
-    if (!t) { if (block.length) block.push(raw); continue; }
+    const rawName = n.text;
+    // "Energy: [Acid, Flame, Ice, or Lightning]" → name "Energy"
+    const name = rawName.replace(/^Energy:.*$/, 'Energy').trim();
+    const domEnd = nodes.findIndex((m, j) => j > i && m.type === 'heading' && m.level <= 2);
+    const dEnd = domEnd === -1 ? end : Math.min(domEnd, end);
 
-    if (isDomainHeader(t) && !isPwrHeader(t)) {
-      flushDomain();
-      const name = /^Energy:/.test(t) ? 'Energy' : t;
-      cur = { name, label: t, accent: accents[name] || accents[t] || null, powers: [] };
-      continue;
+    // Powers: H3 "Name - N BP" pattern
+    const DOMAIN_PWR = /-\s*\d+\s*BP\s*$/;
+    const powers = [];
+    let j = i + 1;
+    while (j < dEnd) {
+      const m = nodes[j];
+      if (m.type === 'heading' && m.level === 3 && DOMAIN_PWR.test(m.text)) {
+        const pwrEnd = nodes.findIndex((x, k) => k > j && x.type === 'heading' && x.level <= 3);
+        const bodyNodes = nodes.slice(j + 1, pwrEnd === -1 ? dEnd : Math.min(pwrEnd, dEnd))
+          .filter(x => x.type === 'text');
+        const header = m.text;
+        const tierMatch = header.match(/\[(\w+)\]/);
+        const costMatch = header.match(/-\s*(\d+)\s*BP\s*$/);
+        const pwrName = header.replace(/\[\w+\]/, '').replace(/-\s*\d+\s*BP\s*$/, '').trim();
+        const { fields, description } = parsePowerNodes(bodyNodes);
+        powers.push({
+          name: pwrName,
+          tier: tierMatch ? tierMatch[1] : null,
+          cost: costMatch ? parseInt(costMatch[1]) : null,
+          incantation: fields['incantation'] ?? null,
+          call: fields['call'] ?? null,
+          target: fields['target'] ?? null,
+          duration: fields['duration'] ?? null,
+          delivery: fields['delivery'] ?? null,
+          refresh: fields['refresh'] ?? null,
+          accent: fields['accent'] ?? null,
+          effect: fields['effect'] ?? null,
+          prerequisites: fields['prerequisite'] ?? fields['prerequisites'] ?? null,
+          description,
+        });
+        j = pwrEnd === -1 ? dEnd : Math.min(pwrEnd, dEnd);
+      } else {
+        j++;
+      }
     }
-    if (isPwrHeader(t)) { flushBlock(); block = [raw]; continue; }
-    if (block.length) block.push(raw);
-  }
-  flushDomain();
 
-  return { domains, accents };
+    domains.push({ name, label: rawName, accent: accents[name] ?? accents[rawName] ?? null, powers });
+    i = dEnd;
+  }
+  return domains;
 }
 
-const divineDomains = parseDivineDomains();
-write('domains.json', divineDomains.domains);
+write('domains.json', parseDivineDomains());
 
 // ─── LINEAGES ─────────────────────────────────────────────────────────────────
-// Inline format: Name [Repped] [Required] (LBP): description text
+// Each lineage is an H1. Challenges and Advantages are H2s; sub-lineages are H3s;
+// individual items are H4s.
 
 console.log('\nParsing lineages...');
 
-const LINEAGE_NAMES = ['Aewen', 'Chimera', 'Forged', 'Human', 'Lost', 'Oaksworn', 'Ogrim', 'Underkin'];
-
-function parseInlineItems(section) {
-  // Item line: "Name [Tag] (LBP): description". Items are grouped under subgroup
-  // headers — "General" (available to all) or a named sub-lineage like
-  // "Stonewalker" / "People of Silver (Civilization: Streams in Silver)". A
-  // header is any non-item, non-structural line; it sets the group for the items
-  // that follow, which we record on each item as `sublineage`.
-  // Item line: "Name [Tags] (LBP): desc" — also the dash variant "...(LBP) - desc".
-  const ITEM_RE = /^(.+?)\s*\((\d+|Variable)\)\s*[:\-]\s*(.+)$/;
-  const SKIP = /^(Challenges|Advantages|Costuming|Sub-?[Ll]ineages?|Description|Illustration|Note:|Table of)/;
-  // A subgroup header is a short title line: no terminal sentence punctuation,
-  // not a power stat-field (Call:/Target:/etc.), not a bracketed power tag. This
-  // separates real sub-lineage headers from wrapped descriptions and the inline
-  // power stat-blocks that some advantages embed.
-  const isHeader = l =>
-    l.length <= 60 &&
-    !/[.,:]$/.test(l) &&
-    !/^(Call|Target|Duration|Delivery|Refresh|Accent|Effect|Incantation|Requirement|Prerequisites?):/.test(l) &&
-    !/\[(Lineage|Repped|Required)\]/.test(l) &&
-    !/:/.test(l.replace(/\(Civilization:[^)]*\)/, '')); // allow only the civ-note colon
-
-  const items = [];
-  let group = 'General';
-
-  for (const line of section) {
-    const l = line.trim();
-    if (!l || SKIP.test(l)) continue;
-
-    const m = l.match(ITEM_RE);
-    if (m) {
-      const fullName = m[1].trim();
-      const required = /\[Required\]/i.test(fullName);
-      const repped = /\[Repped\]/i.test(fullName);
-      const name = fullName
-        .replace(/\s*\[Required\]/gi, '')
-        .replace(/\s*\[Repped\]/gi, '')
-        .replace(/\s*\[Requires[^\]]*\]/gi, '')
-        .trim();
-      const lbp = m[2] === 'Variable' ? null : parseInt(m[2]);
-      items.push({ name, lbp, required, repped, sublineage: group, description: m[3].trim() });
-    } else if (isHeader(l)) {
-      group = l;
-    }
-    // Otherwise: a wrapped description or embedded stat-line — ignore for grouping.
-  }
-  return items;
-}
-
 function parseLineages() {
-  // Find the "Lineages (All)" section which has the actual lineage content
-  const LINEAGES_ALL_IDX = findIdx(/^Lineages \(All\)$/);
+  const start = findHeading('Lineages (All)', 1);
+  const end = findHeading('Base Skills, Perks, and Flaws', 1, start);
+
   const lineages = [];
+  let i = start + 1;
 
-  for (let li = 0; li < LINEAGE_NAMES.length; li++) {
-    const name = LINEAGE_NAMES[li];
-    const nextName = LINEAGE_NAMES[li + 1];
+  while (i < end) {
+    const n = nodes[i];
+    if (n.type !== 'heading' || n.level !== 1 || !n.text) { i++; continue; }
 
-    // The TOC lists each lineage name once; the actual content section repeats the name.
-    // Skip the first occurrence (TOC) by searching for the second match.
-    const firstOccurrence = findIdx(new RegExp(`^${name}$`), LINEAGES_ALL_IDX);
-    const startIdx = findIdx(new RegExp(`^${name}$`), firstOccurrence + 1);
-    if (startIdx === -1) { console.warn(`  ${name}: not found`); continue; }
+    const name = n.text;
+    const linEnd = nodes.findIndex((m, j) => j > i && m.type === 'heading' && m.level === 1);
+    const lEnd = linEnd === -1 ? end : Math.min(linEnd, end);
 
-    const endIdx = nextName
-      ? findIdx(new RegExp(`^${nextName}$`), startIdx + 1)
-      : findIdx(/^(Advanced Classes|Devotions & Divine|Skills,|Champion)/, startIdx + 1);
+    // Description: text under H2 "Description" before any H3
+    const descH2 = nodes.findIndex((m, j) => j > i && j < lEnd && m.type === 'heading' && m.level === 2 && m.text === 'Description');
+    const descEnd = descH2 === -1 ? i : nodes.findIndex((m, j) => j > descH2 && m.type === 'heading' && m.level <= 2);
+    const description = descH2 === -1 ? '' : textBetween(descH2 + 1, descEnd === -1 ? lEnd : Math.min(descEnd, lEnd));
 
-    const section = lines.slice(startIdx + 1, endIdx === -1 ? startIdx + 700 : endIdx);
+    // Parse challenges/advantages from an H2 section.
+    // Each entry is a single text node: "Name [Tag] [Tag] (Cost): Description"
+    // Sublineage groups are H3 headings under the H2.
+    const ITEM_LINE = /^(.+?)((?:\s*\[[^\]]+\])*)\s*\((\d+|Variable)\)\s*[:\-]\s*(.+)$/;
+    const parseItems = (sectionName) => {
+      const h2 = nodes.findIndex((m, j) => j > i && j < lEnd && m.type === 'heading' && m.level === 2 && m.text === sectionName);
+      if (h2 === -1) return [];
+      const secEnd = nodes.findIndex((m, j) => j > h2 && m.type === 'heading' && m.level <= 2);
+      const sEnd = secEnd === -1 ? lEnd : Math.min(secEnd, lEnd);
+      const items = [];
+      let currentGroup = 'General';
+      for (let j = h2 + 1; j < sEnd; j++) {
+        const m = nodes[j];
+        if (m.type === 'heading' && m.level === 3) { currentGroup = m.text; continue; }
+        if (m.type !== 'text') continue;
+        const lm = m.text.match(ITEM_LINE);
+        if (!lm) continue;
+        const [, rawName, tagsStr, costStr, desc] = lm;
+        const tags = [...tagsStr.matchAll(/\[([^\]]+)\]/g)].map(t => t[1]);
+        const required = tags.some(t => /^required$/i.test(t));
+        const repped = tags.some(t => /^repped$/i.test(t));
+        const lbp = costStr === 'Variable' ? null : parseInt(costStr);
+        items.push({
+          name: rawName.trim(),
+          lbp,
+          required,
+          repped,
+          tags: tags.filter(t => !/^(required|repped)$/i.test(t)),
+          sublineage: currentGroup,
+          description: desc.trim(),
+        });
+      }
+      return items;
+    };
 
-    // Description
-    const descIdx = section.findIndex(l => /^Description$/.test(l.trim()));
-    const descStop = section.findIndex((l, i) => i > descIdx && /^(Sub-?[Ll]ineages?|Costuming|Challenges)/.test(l.trim()));
-    const descLines = [];
-    for (let i = (descIdx === -1 ? 0 : descIdx + 1); i < (descStop === -1 ? 30 : descStop); i++) {
-      const l = section[i]?.trim();
-      if (l && !/^(Description|".*")/.test(l)) descLines.push(l);
-    }
+    const challenges = parseItems('Challenges');
+    const advantages = parseItems('Advantages');
 
-    // Costume
-    const costumeLine = section.find(l => /^Costuming (Challenge|Requirement|Difficulty)?:?/.test(l.trim()));
-    const costume = costumeLine ? costumeLine.trim().replace(/^Costuming.*?:\s*/i, '').trim() : '';
-
-    // Challenges
-    const chalIdx = section.findIndex(l => /^Challenges$/.test(l.trim()));
-    const chalStop = section.findIndex((l, i) => i > chalIdx && /^Advantages$/.test(l.trim()));
-    const challenges = chalIdx !== -1
-      ? parseInlineItems(section.slice(chalIdx + 1, chalStop === -1 ? undefined : chalStop))
-      : [];
-
-    // Advantages
-    const advIdx = section.findIndex(l => /^Advantages$/.test(l.trim()));
-    const advantages = advIdx !== -1
-      ? parseInlineItems(section.slice(advIdx + 1))
-      : [];
-
-    // Sub-lineages are the distinct non-"General" groups that the challenge and
-    // advantage items fall under. A group name may carry a civ note in parens,
-    // e.g. "People of Silver (Civilization: Streams in Silver)".
-    // Dedup by base name (a sub-lineage can appear under both Challenges and
-    // Advantages, sometimes with the civ-note on only one occurrence — keep the
-    // noted variant).
+    // Derive sub-lineages from distinct non-General groups
     const byName = new Map();
     for (const it of [...challenges, ...advantages]) {
-      const g = it.sublineage;
-      if (g === 'General') continue;
-      const m = g.match(/^([^(]+?)(?:\s*\((.+)\))?$/);
-      const sub = { name: (m ? m[1] : g).trim(), note: m && m[2] ? m[2].trim() : '' };
-      const existing = byName.get(sub.name);
-      if (!existing || (!existing.note && sub.note)) byName.set(sub.name, sub);
+      if (it.sublineage === 'General') continue;
+      const m = it.sublineage.match(/^([^(]+?)(?:\s*\((.+)\))?$/);
+      const sub = { name: (m ? m[1] : it.sublineage).trim(), note: m?.[2]?.trim() ?? '' };
+      if (!byName.has(sub.name) || (!byName.get(sub.name).note && sub.note)) byName.set(sub.name, sub);
     }
-    const sublineages = [...byName.values()];
 
-    lineages.push({ name, description: descLines.join(' '), costume, sublineages, challenges, advantages });
+    lineages.push({ name, description, costume: '', sublineages: [...byName.values()], challenges, advantages });
+    i = lEnd;
   }
-
   return lineages;
 }
 
 write('lineages.json', parseLineages());
 
 // ─── LEVEL TABLE ──────────────────────────────────────────────────────────────
-// Parsed from the Core Rules "Level Progression Table" (one cell per line):
-// columns Level, Total XP, Base BP, LP, Spikes. Ends at "Level Floor".
 
 console.log('\nParsing level table...');
 
 function parseLevelTable() {
-  // "Level Progression Table" appears in the Core Rules nested TOC before the
-  // actual body table; skip past that.
-  const start = findBodyHeader(/^Level Progression Table$/, PAST_CORE_RULES_TOC);
-  if (start === -1) return [];
-  const nums = [];
-  for (let i = start + 1; i < start + 120; i++) {
-    const t = lines[i].trim();
-    if (/^Level Floor$/.test(t)) break;
-    if (/^\d+$/.test(t)) nums.push(parseInt(t));
-  }
+  // Under "Advancement" H1 → "Level Progression Table" H2
+  const advH1 = findHeading('Advancement', 1);
+  const tableH = nodes.findIndex((n, i) =>
+    i > advH1 && n.type === 'heading' && n.level === 2 && n.text === 'Level Progression Table'
+  );
+  if (tableH === -1) return [];
+  const tableEnd = nodes.findIndex((n, i) => i > tableH && n.type === 'heading' && n.level <= 2);
+  // Table exported as text nodes (not <td>)
+  const texts = nodes.slice(tableH + 1, tableEnd === -1 ? nodes.length : tableEnd)
+    .filter(n => n.type === 'text').map(n => n.text);
+
+  const HEADER = /^(Character Level|Total XP|Base BP|LP|Spikes|Level|XP|BP)$/i;
+  const nums = texts.filter(v => /^\d+$/.test(v) && !HEADER.test(v)).map(Number);
   const rows = [];
   for (let i = 0; i + 4 < nums.length; i += 5) {
-    rows.push({ level: nums[i], xp: nums[i + 1], bp: nums[i + 2], lp: nums[i + 3], spikes: nums[i + 4] });
+    rows.push({ level: nums[i], xp: nums[i+1], bp: nums[i+2], lp: nums[i+3], spikes: nums[i+4] });
   }
   return rows;
 }
@@ -847,336 +896,458 @@ function parseLevelTable() {
 write('level-table.json', parseLevelTable());
 
 // ─── CRAFTING RECIPES ─────────────────────────────────────────────────────────
-// Each recipe is a header "Name [<Tier> <Discipline> Recipe|Formula|Schematic]"
-// followed by "Label: value" fields. Most fields are one line; Crafting Process,
-// Effect and Description run across multiple lines until the next field or recipe.
-// Tier and discipline come from the header tag. Fields vary by discipline (Alchemy
-// has Application; Enchanting/Tinkering have Type and ritual-style sub-steps), so
-// we collect fields generically into a map and surface the common ones explicitly.
+// Each recipe is an H3 "Name [Tier Discipline Recipe/Formula/Schematic]".
+// Fields are text nodes following the heading.
 
 console.log('\nParsing crafting recipes...');
 
-// A recipe header may carry extra trailing tags after the recipe tag, e.g.
-// "... [Greater Alchemy Recipe] [BLOOD MAGIC]".
 const RECIPE_HEADER = /^(.+?)\s*\[(Apprentice|Journeyman|Greater)\s+(Alchemy|Enchanting|Tinkering)\s+(Recipe|Formula|Schematic)\]((?:\s*\[[^\]]+\])*)\s*$/;
-// Field labels that begin a new field within a recipe.
-const RECIPE_FIELD = /^(Crafting Materials Needed|Crafting Materials|Uses per Batch|Expiration|Application|Type|Ritualists|Total Participants|Dark Territory Required|Dark Territory Suit|Reality Tear|Requirements|Crafting Process|Description|Effect|Note|IMPORTANT|Circle of Sacrifice|Circle of Empowerment|Circle of Assignment|Rune Circle):\s*(.*)$/;
+const RECIPE_FIELD = /^(Crafting Materials(?: Needed)?|Uses per Batch|Expiration|Application|Type|Ritualists|Total Participants|Dark Territory Required|Dark Territory Suit|Reality Tear|Requirements|Crafting Process|Description|Effect|Note|IMPORTANT|Circle of Sacrifice|Circle of Empowerment|Circle of Assignment|Rune Circle):\s*(.*)$/;
 const FIELD_KEY = {
-  'Crafting Materials Needed': 'materials',
-  'Crafting Materials': 'materials',
-  'Uses per Batch': 'usesPerBatch',
-  'Expiration': 'expiration',
-  'Application': 'application',
-  'Type': 'type',
-  'Ritualists': 'ritualists',
-  'Total Participants': 'totalParticipants',
-  'Dark Territory Required': 'darkTerritoryRequired',
-  'Dark Territory Suit': 'darkTerritorySuit',
-  'Crafting Process': 'process',
-  'Description': 'description',
-  'Effect': 'effect',
-  'Note': 'note',
+  'Crafting Materials Needed': 'materials', 'Crafting Materials': 'materials',
+  'Uses per Batch': 'usesPerBatch', 'Expiration': 'expiration',
+  'Application': 'application', 'Type': 'type',
+  'Crafting Process': 'process', 'Description': 'description', 'Effect': 'effect',
 };
 
 function parseCraftingRecipes() {
-  const startIdx = findBodyHeader(/^Apprentice Alchemy Recipes$/);
-  const endIdx = findIdx(/^Rituals$/, startIdx);
-  const section = lines.slice(startIdx, endIdx === -1 ? lines.length : endIdx);
+  const craftingH1 = findHeading('Crafting (all)', 1);
+  const ritualH1 = findHeading('Rituals', 1, craftingH1);
+  const recipes = [];
 
-  // Split into recipe blocks anchored on recipe headers. A tier section header
-  // ("Journeyman Alchemy Recipes" etc.) ends the current block without starting a
-  // new one — otherwise it would leak into the last recipe's trailing field.
-  const SECTION_HEADER = /^(Apprentice|Journeyman|Greater)\s+(Alchemy|Enchanting|Tinkering)\s+(Recipes|Formulae|Schematics)$/;
-  const blocks = [];
-  let cur = null;
-  for (const line of section) {
-    const t = line.trim();
-    if (RECIPE_HEADER.test(t)) { if (cur) blocks.push(cur); cur = [t]; }
-    else if (SECTION_HEADER.test(t) || t === '________________') { if (cur) { blocks.push(cur); cur = null; } }
-    else if (cur) cur.push(t);
-  }
-  if (cur) blocks.push(cur);
+  let i = craftingH1 + 1;
+  while (i < ritualH1) {
+    const n = nodes[i];
+    if (n.type === 'heading' && n.level === 3 && RECIPE_HEADER.test(n.text)) {
+      const h = n.text.match(RECIPE_HEADER);
+      const extraTags = [...(h[5] || '').matchAll(/\[([^\]]+)\]/g)].map(m => m[1].trim());
+      const recipe = {
+        name: h[1].trim(), discipline: h[3], tier: h[2], tags: extraTags,
+        materials: null, usesPerBatch: null, expiration: null, application: null,
+        type: null, process: '', description: '', effect: '', fields: {},
+      };
 
-  return blocks.map(block => {
-    const h = block[0].match(RECIPE_HEADER);
-    const extraTags = [...(h[5] || '').matchAll(/\[([^\]]+)\]/g)].map(m => m[1].trim());
-    const recipe = {
-      name: h[1].trim(),
-      discipline: h[3],
-      tier: h[2],
-      tags: extraTags,
-      materials: null, usesPerBatch: null, expiration: null, application: null,
-      type: null, process: '', description: '', effect: '', fields: {},
-    };
+      const recEnd = nodes.findIndex((m, j) => j > i && m.type === 'heading' && m.level <= 3);
+      const rEnd = recEnd === -1 ? ritualH1 : Math.min(recEnd, ritualH1);
+      const bodyNodes = nodes.slice(i + 1, rEnd).filter(m => m.type === 'text');
 
-    let curField = null;            // current known field key being appended to
-    let curRaw = null;              // current raw label (for the generic fields map)
-    let inProcess = false;          // inside the Crafting Process region
-    const append = (key, text) => { recipe.fields[key] = (recipe.fields[key] ? recipe.fields[key] + ' ' : '') + text; };
-    const addTo = (key, text) => { recipe[key] = recipe[key] ? recipe[key] + ' ' + text : text; };
+      let curKey = null, curLabel = null, inProcess = false;
+      const addTo = (key, text) => { recipe[key] = recipe[key] ? recipe[key] + ' ' + text : text; };
+      const append = (label, text) => { recipe.fields[label] = (recipe.fields[label] ? recipe.fields[label] + ' ' : '') + text; };
 
-    for (let i = 1; i < block.length; i++) {
-      const t = block[i];
-      if (!t) continue;
-      const m = t.match(RECIPE_FIELD);
-      if (m) {
-        const label = m[1];
-        curRaw = label;
-        curField = FIELD_KEY[label] || null;
-        // Description/Effect end the process region; Note inside it does not.
-        if (label === 'Crafting Process') inProcess = true;
-        else if (label === 'Description' || label === 'Effect') inProcess = false;
-        const val = m[2].trim();
-        if (curField && curField in recipe && curField !== 'fields') addTo(curField, val);
-        if (val) append(label, val);
-      } else if (curRaw) {
-        // Continuation line. Bare prose in the process region belongs to the
-        // process even when it follows a Note: constraint line.
-        if (inProcess && curField !== 'process') addTo('process', t);
-        else if (curField && curField in recipe) addTo(curField, t);
-        append(curRaw, t);
+      for (const bn of bodyNodes) {
+        const m = bn.text.match(RECIPE_FIELD);
+        if (m) {
+          curLabel = m[1]; curKey = FIELD_KEY[m[1]] ?? null;
+          if (m[1] === 'Crafting Process') inProcess = true;
+          else if (m[1] === 'Description' || m[1] === 'Effect') inProcess = false;
+          const val = m[2].trim();
+          if (curKey && curKey in recipe) addTo(curKey, val);
+          if (val) append(m[1], val);
+        } else if (curLabel) {
+          if (inProcess && curKey !== 'process') addTo('process', bn.text);
+          else if (curKey && curKey in recipe) addTo(curKey, bn.text);
+          append(curLabel, bn.text);
+        }
       }
-    }
 
-    // Enchanting recipes express the process as labeled sub-steps (Circle of
-    // Sacrifice / Empowerment / Assignment, Rune Circle) instead of a single
-    // "Crafting Process" field. When there's no standalone process, assemble one
-    // from those steps in their canonical order.
-    if (!recipe.process) {
-      const steps = ['Circle of Sacrifice', 'Circle of Empowerment', 'Circle of Assignment', 'Rune Circle']
-        .filter(k => recipe.fields[k])
-        .map(k => `${k}: ${recipe.fields[k]}`);
-      if (steps.length) recipe.process = steps.join(' ');
+      // Assemble Enchanting process from sub-steps when no explicit process field
+      if (!recipe.process) {
+        const steps = ['Circle of Sacrifice','Circle of Empowerment','Circle of Assignment','Rune Circle']
+          .filter(k => recipe.fields[k]).map(k => `${k}: ${recipe.fields[k]}`);
+        if (steps.length) recipe.process = steps.join(' ');
+      }
+
+      recipes.push(recipe);
+      i = rEnd;
+    } else {
+      i++;
     }
-    return recipe;
-  });
+  }
+  return recipes;
 }
 
 write('crafting-recipes.json', parseCraftingRecipes());
 
 // ─── RITUALS ──────────────────────────────────────────────────────────────────
-// The ritual list (after the Dark Territory rules preamble) is uniform: a header
-// "Name [<Tier> Ritual]" then a fixed set of "Label: value" fields, with Ritual
-// Process running multi-line. Same field-block shape as crafting recipes.
+// H1: "Rituals" (second occurrence — actual ritual list, not concepts preamble)
+// Ritual entries are H3 "Name [Tier Ritual]".
 
 console.log('\nParsing rituals...');
 
 const RITUAL_HEADER = /^(.+?)\s*\[(Apprentice|Journeyman|Greater)\s+Ritual\]\s*$/;
 const RITUAL_FIELD = /^(Summary|Required Components|Ritualists|Total Participants|Expiration|Targets?|Tools Used|Location|Other Requirements|Dark Territory Marshal Required|Dark Territory Suit|Category|Effect|Ritual Process|Note):\s*(.*)$/;
 const RITUAL_KEY = {
-  'Summary': 'summary',
-  'Required Components': 'components',
-  'Ritualists': 'ritualists',
-  'Total Participants': 'totalParticipants',
-  'Expiration': 'expiration',
-  'Target': 'targets',
-  'Targets': 'targets',
-  'Tools Used': 'tools',
-  'Location': 'location',
-  'Other Requirements': 'otherRequirements',
+  'Summary': 'summary', 'Required Components': 'components', 'Ritualists': 'ritualists',
+  'Total Participants': 'totalParticipants', 'Expiration': 'expiration',
+  'Target': 'targets', 'Targets': 'targets', 'Tools Used': 'tools',
+  'Location': 'location', 'Other Requirements': 'otherRequirements',
   'Dark Territory Marshal Required': 'darkTerritoryMarshal',
   'Dark Territory Suit': 'darkTerritorySuit',
-  'Effect': 'effect',
-  'Ritual Process': 'process',
-  'Note': 'note',
+  'Effect': 'effect', 'Ritual Process': 'process',
 };
 
-// Split a section into header-anchored blocks, parse each into a record of known
-// fields. Multi-line fields accumulate continuation lines until the next label.
-// stopRe lines (sub-section headers, dividers) end the current block without
-// starting a new one, so they don't leak into the last entry's trailing field.
-function parseFieldBlocks(section, headerRe, fieldRe, keyMap, baseFields, stopRe = null) {
-  const blocks = [];
-  let cur = null;
-  for (const line of section) {
-    const t = line.trim();
-    if (headerRe.test(t)) { if (cur) blocks.push(cur); cur = [t]; }
-    else if (stopRe && stopRe.test(t)) { if (cur) { blocks.push(cur); cur = null; } }
-    else if (cur) cur.push(t);
-  }
-  if (cur) blocks.push(cur);
-
-  return blocks.map(block => {
-    const h = block[0].match(headerRe);
-    const rec = baseFields(h);
-    let key = null;
-    for (let i = 1; i < block.length; i++) {
-      const t = block[i];
-      if (!t) continue;
-      const m = t.match(fieldRe);
-      if (m) {
-        key = keyMap[m[1]] || null;
-        if (key) rec[key] = rec[key] ? rec[key] + ' ' + m[2].trim() : m[2].trim();
-      } else if (key) {
-        rec[key] = rec[key] ? rec[key] + ' ' + t : t;
-      }
-    }
-    return rec;
-  });
-}
-
 function parseRituals() {
-  const startIdx = findBodyHeader(/^Apprentice Rituals$/);
-  const endIdx = lines.findIndex((l, i) => i > findIdx(/^Greater Rituals$/, startIdx) && /^________________$/.test(l.trim()));
-  const section = lines.slice(startIdx, endIdx === -1 ? lines.length : endIdx);
+  // The actual ritual list is under "Ritual Magic" H1
+  const ritualMagicH1 = findHeading('Ritual Magic', 1);
+  const ritualEnd = nextHeadingAtOrAbove(1, ritualMagicH1);
+  const end = ritualEnd === -1 ? nodes.length : ritualEnd;
+  const rituals = [];
 
-  const stopRe = /^(Apprentice|Journeyman|Greater) Rituals$|^________________$/;
-  return parseFieldBlocks(section, RITUAL_HEADER, RITUAL_FIELD, RITUAL_KEY, h => ({
-    name: h[1].trim(),
-    tier: h[2],
-    summary: '', components: null, ritualists: null, totalParticipants: null,
-    expiration: null, targets: null, tools: null, location: null,
-    otherRequirements: null, darkTerritoryMarshal: null, effect: '', process: '',
-  }), stopRe);
+  let i = ritualMagicH1 + 1;
+  while (i < end) {
+    const n = nodes[i];
+    if (n.type === 'heading' && n.level === 3 && RITUAL_HEADER.test(n.text)) {
+      const h = n.text.match(RITUAL_HEADER);
+      const rec = {
+        name: h[1].trim(), tier: h[2],
+        summary: '', components: null, ritualists: null, totalParticipants: null,
+        expiration: null, targets: null, tools: null, location: null,
+        otherRequirements: null, darkTerritoryMarshal: null, darkTerritorySuit: null,
+        effect: '', process: '',
+      };
+
+      const recEnd = nodes.findIndex((m, j) => j > i && m.type === 'heading' && m.level <= 3);
+      const rEnd = recEnd === -1 ? end : Math.min(recEnd, end);
+      const bodyNodes = nodes.slice(i + 1, rEnd).filter(m => m.type === 'text');
+
+      let curKey = null;
+      for (const bn of bodyNodes) {
+        const m = bn.text.match(RITUAL_FIELD);
+        if (m) {
+          curKey = RITUAL_KEY[m[1]] ?? null;
+          if (curKey) rec[curKey] = rec[curKey] ? rec[curKey] + ' ' + m[2].trim() : m[2].trim();
+        } else if (curKey) {
+          rec[curKey] = rec[curKey] ? rec[curKey] + ' ' + bn.text : bn.text;
+        }
+      }
+      rituals.push(rec);
+      i = rEnd;
+    } else {
+      i++;
+    }
+  }
+  return rituals;
 }
 
 write('ritual-recipes.json', parseRituals());
 
 // ─── CORE RULES ───────────────────────────────────────────────────────────────
-// The Core Rules doc is prose under nested headers. Its own Table of Contents
-// lists every section title, which we use as a header whitelist to split the body
-// into { heading, content } chunks. The Glossary/Index is pulled out separately
-// as clean "Term: definition" entries.
+// The heading hierarchy directly encodes the section structure.
+// We emit three things:
+//   1. core-rules.json — flat list of H1 sections with their prose content
+//   2. glossary.json   — term/definition pairs from the Glossary/Index H1
+//   3. Per-concept files (combat-rules.json, death-and-dying.json, etc.)
+//      derived recursively from each H1's named children at any depth. The
+//      bucket name is derived from the parent H1 heading.
 
 console.log('\nParsing core rules...');
 
+// Sections to skip entirely (policy/etiquette, not navigable game mechanics).
+const SKIP_SECTIONS = new Set([
+  'Code of Conduct', 'Wellspring Code of Conduct',
+  'Consent and Calibration', 'Combat Etiquette', 'Roleplay Etiquette',
+  'Wellspring Setting Start Guide',
+]);
+
+// Sections whose H2/H3 children are already extracted better elsewhere.
+// Their concepts are not emitted as sub-concepts.
+const ALREADY_EXTRACTED = new Set([
+  'Effects', 'Conditions', 'Types', 'Defense Calls', 'Modifiers',
+  'Stacking Effects', 'Items',
+]);
+
+// Names that look like sub-concept headings but are actually stat-block field
+// labels used inside crafting recipes ("Description:", "Effect:"). Skipping
+// them prevents an "Effect" entity (255 false matches) and "Description"
+// entity from clobbering real game terms.
+const STATBLOCK_LABEL_NAMES = new Set([
+  'Description', 'Effect', 'Recipes/Formulae/Schematics',
+  'Crafting Resources List', 'Auros Starting Wealth', 'Typical Merchant Prices',
+  'Item Cards',
+]);
+
 function parseCoreRules() {
-  const tocIdx = findIdx(/^Table of Contents$/, findIdx(/^Wellspring - Core Rules$/) - 1);
-  // Each section title appears twice: once in the TOC, then again as the body
-  // header. The TOC is a contiguous run of short title lines ending where the
-  // body begins (the SECOND "Introduction"). Find that to bound the TOC and to
-  // mark the body start.
-  const tocIntro = findIdx(/^Introduction$/, tocIdx);          // TOC entry
-  const bodyStart = findIdx(/^Introduction$/, tocIntro + 1);   // body header
-  const glossIdx = findIdx(/^Glossary\/Index$/, bodyStart);    // body glossary header
-  const endIdx = findIdx(/^Wellspring Setting Start Guide$/, glossIdx);
+  const crStart = findHeading('Wellspring Core Rules', 1);
+  const glossaryH1 = findHeading('Glossary/Index', 1, crStart);
+  const settingH1 = findHeading('Wellspring Setting Start Guide', 1, glossaryH1);
+  const crEnd = settingH1 === -1 ? nodes.length : settingH1;
 
-  // TOC entries: from "Table of Contents" up to the body start.
-  const toc = [];
-  for (let i = tocIdx + 1; i < bodyStart; i++) {
-    const t = lines[i].trim();
-    if (t) toc.push(t);
-  }
-
-  // (1) Prose sections. The body repeats the TOC titles in order, so we consume
-  // the TOC as an ordered queue: a line only starts a new section if it matches
-  // an upcoming TOC title (searched within a small look-ahead window). This
-  // rejects body lines that coincidentally equal a title out of order — e.g. a
-  // "Spikes" column header inside the Level Progression Table, which would
-  // otherwise be mistaken for the much-later "Spikes" section. We also record
-  // the source line range per section so a sub-concept walker can find them.
+  // (1) Top-level sections: each H1 between crStart and glossaryH1
   const sections = [];
-  const promotedToSection = new Set(); // TOC entries that became top-level sections
-  let cur = null;
-  let tp = 0; // pointer into toc
-  for (let i = bodyStart; i < glossIdx; i++) {
-    const t = lines[i].trim();
-    if (!t || t === '________________') continue;
+  let i = crStart + 1;
+  while (i < glossaryH1) {
+    const n = nodes[i];
+    if (n.type !== 'heading' || n.level !== 1) { i++; continue; }
+    if (!n.text) { i++; continue; }
 
-    let matchAt = -1;
-    for (let k = tp; k < Math.min(tp + 4, toc.length); k++) {
-      if (toc[k] === t) { matchAt = k; break; }
-    }
-    if (matchAt !== -1) {
-      if (cur) { cur.endLine = i - 1; sections.push(cur); }
-      cur = { heading: t, content: '', startLine: i, endLine: glossIdx - 1 };
-      promotedToSection.add(t);
-      tp = matchAt + 1;
-    } else if (cur) {
-      cur.content += (cur.content ? ' ' : '') + t;
-    }
-  }
-  if (cur) sections.push(cur);
+    const secEnd = nodes.findIndex((m, j) => j > i && m.type === 'heading' && m.level === 1);
+    const end = secEnd === -1 ? glossaryH1 : Math.min(secEnd, glossaryH1);
 
-  // Second pass: any TOC entry not promoted to a top-level section is a child
-  // of the nearest preceding promoted entry. This derives the parent→children
-  // map from the doc structure rather than hardcoding it.
-  const tocChildren = {};
-  let lastParent = null;
-  for (const entry of toc) {
-    if (promotedToSection.has(entry)) {
-      lastParent = entry;
-    } else if (lastParent) {
-      (tocChildren[lastParent] ??= []).push(entry);
-    }
+    sections.push({
+      heading: n.text,
+      content: bodyBetween(i + 1, end),
+      nodeStart: i,
+      nodeEnd: end,
+    });
+    i = end;
   }
 
-  // (2) Glossary: "Term: definition" lines.
+  // (2) Glossary: text nodes under Glossary/Index H1, parsed as "Term: definition"
   const glossary = [];
-  for (let i = glossIdx + 1; i < (endIdx === -1 ? lines.length : endIdx); i++) {
-    const t = lines[i].trim();
-    if (!t || t === '________________') continue;
-    const m = t.match(/^([A-Z][A-Za-z '/-]{1,40}?):\s+(.+)$/);
-    if (m) glossary.push({ term: m[1].trim(), definition: m[2].trim() });
-    else if (glossary.length) {
-      // Wrapped continuation of the previous definition.
-      glossary[glossary.length - 1].definition += ' ' + t;
+  const glossEnd = crEnd;
+  let j = glossaryH1 + 1;
+  while (j < glossEnd) {
+    const n = nodes[j];
+    if (n.type === 'heading') break;
+    if (n.type === 'text') {
+      const m = n.text.match(/^([A-Z][A-Za-z '\/\-]{1,40}?):\s+(.+)$/);
+      if (m) glossary.push({ term: m[1].trim(), definition: m[2].trim() });
+      else if (glossary.length) glossary[glossary.length - 1].definition += ' ' + n.text;
     }
+    j++;
   }
 
-  return { sections, glossary, tocChildren };
+  return { sections, glossary };
 }
 
 const coreRules = parseCoreRules();
-write('core-rules.json', coreRules.sections);
+write('core-rules.json', coreRules.sections.map(s => ({ heading: s.heading, content: s.content })));
 write('glossary.json', coreRules.glossary);
-console.log('\nDerived TOC parent→children:');
-for (const [parent, children] of Object.entries(coreRules.tocChildren)) {
-  console.log(' ', parent, '->', children);
+
+// Additional H1 blocks outside the Core Rules range whose H2/H3/H4/H5 children
+// are referenced heavily from other entity bodies and so are worth extracting.
+// (Audit found Wealth/Ashbin/Turn of the Hourglass/Dark Territory etc. each
+// referenced 30+ times — extracting them turns those into graph edges.)
+function collectExtraSections() {
+  const extras = [];
+  const tryRange = (startHeading, endHeading) => {
+    const start = findHeading(startHeading, 1);
+    if (start === -1) return;
+    const end = findHeading(endHeading, 1, start);
+    if (end === -1) return;
+    extras.push({
+      heading: startHeading,
+      content: bodyBetween(start + 1, end),
+      nodeStart: start,
+      nodeEnd: end,
+    });
+  };
+  // Wealth lives between "Wealth" H1 and the next "Crafting (all)" H1.
+  tryRange('Wealth', 'Crafting (all)');
+  // The Crafting Introduction lives between "Crafting (all)" and the first
+  // crafting-discipline H1 ("Alchemy").
+  tryRange('Crafting (all)', 'Alchemy');
+  // Devotions & Divine Beings — the H1 intro (before the per-deity H1s) is
+  // the only place "Devotion" as a concept is defined. We pull the intro prose
+  // up to the first deity H1 ("The Mother").
+  tryRange('Devotions & Divine Beings', 'The Mother');
+  return extras;
+}
+const extraSections = collectExtraSections();
+
+// ─── CORE RULES SUB-CONCEPTS ──────────────────────────────────────────────────
+// Walk each H1 section's node range, recursively emitting one entity per named
+// heading at any depth. Deeper headings become `subConcepts` of their parent.
+// The bucket (output file) is derived from the H1 section heading — no
+// hardcoded section→type maps.
+//
+// Sections in SKIP_SECTIONS and ALREADY_EXTRACTED are ignored. Heading names in
+// STATBLOCK_LABEL_NAMES (e.g. "Description", "Effect") are skipped as entries
+// but still descended into.
+
+console.log('\nParsing core rules sub-concepts...');
+
+function slugify(s) {
+  return s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+}
+
+// Pick the lowest (smallest) heading level present in (start, end). Returns
+// null if no headings exist. Used so recursion lands on the next existing
+// deeper level rather than always assuming level+1 (the doc sometimes skips
+// levels — e.g. Crafting Process H3 → Ashbin H5 with no H4 in between).
+function nextHeadingLevel(start, end, above) {
+  let lvl = null;
+  for (let i = start; i < end; i++) {
+    const n = nodes[i];
+    if (n.type === 'heading' && n.text && n.level > above) {
+      if (lvl === null || n.level < lvl) lvl = n.level;
+    }
+  }
+  return lvl;
+}
+
+// Walk the range [start, end) and emit one entry per heading at `level`. Each
+// entry's own children at deeper levels become its `subConcepts` recursively.
+// Prose between a heading and its first child becomes the entry's description.
+function walkHeadings(start, end, level, sectionName) {
+  const entries = [];
+  let i = start;
+  while (i < end) {
+    const n = nodes[i];
+    if (n.type !== 'heading' || n.level !== level || !n.text) { i++; continue; }
+
+    const headingEnd = nodes.findIndex((m, j) => j > i && m.type === 'heading' && m.level <= level);
+    const eEnd = headingEnd === -1 ? end : Math.min(headingEnd, end);
+
+    if (STATBLOCK_LABEL_NAMES.has(n.text)) {
+      // Skip this heading as an entry but harvest its sub-tree, descending to
+      // the next deeper level that actually exists.
+      const childLevel = nextHeadingLevel(i + 1, eEnd, level);
+      if (childLevel !== null) entries.push(...walkHeadings(i + 1, eEnd, childLevel, sectionName));
+      i = eEnd;
+      continue;
+    }
+
+    // Description: prose nodes between this heading and the first deeper heading.
+    const firstChild = nodes.findIndex((m, j) => j > i && j < eEnd && m.type === 'heading' && m.level > level);
+    const proseEnd = firstChild === -1 ? eEnd : firstChild;
+    const description = bodyBetween(i + 1, proseEnd);
+
+    // Recurse into the next existing deeper level (not necessarily level+1).
+    const childLevel = nextHeadingLevel(i + 1, eEnd, level);
+    const subConcepts = childLevel !== null
+      ? walkHeadings(i + 1, eEnd, childLevel, n.text)
+      : [];
+
+    entries.push({
+      name: n.text,
+      section: sectionName,
+      description,
+      ...(subConcepts.length ? { subConcepts } : {}),
+    });
+    i = eEnd;
+  }
+  return entries;
+}
+
+function parseSubConcepts(sections) {
+  const buckets = {};
+  const push = (bucket, entry) => { (buckets[bucket] ??= []).push(entry); };
+
+  for (const section of sections) {
+    if (SKIP_SECTIONS.has(section.heading)) continue;
+    if (ALREADY_EXTRACTED.has(section.heading)) continue;
+
+    const { nodeStart, nodeEnd } = section;
+    const bucket = slugify(section.heading);
+
+    // Enter at the next existing deeper heading level (skips missing levels —
+    // e.g. an H1 with H3 children but no H2).
+    const childLevel = nextHeadingLevel(nodeStart, nodeEnd, 1);
+    const entries = childLevel !== null
+      ? walkHeadings(nodeStart + 1, nodeEnd, childLevel, section.heading)
+      : [];
+    if (entries.length) {
+      entries.forEach(e => push(bucket, e));
+      continue;
+    }
+    // No child headings at all (e.g. Wealth, whose only H2s are stat-block
+    // labels we skipped): emit the H1 itself as a single entry in its bucket,
+    // provided it has meaningful body prose.
+    const prose = bodyBetween(nodeStart + 1, nodeEnd);
+    if (prose.trim()) {
+      push(bucket, { name: section.heading, section: section.heading, description: prose });
+    }
+  }
+  return buckets;
+}
+
+const subConcepts = parseSubConcepts([...coreRules.sections, ...extraSections]);
+
+// Recover doc-defined concepts whose heading was demoted to body text during
+// the Google Docs HTML export. The export pattern is "<Term> <Term> is a
+// type of..." — the same word appearing twice in a row at the start of a
+// sentence, because the original heading became a styled span instead of an
+// <h2>/<h3> tag. We detect this and split off `<Term>` as its own sub-concept
+// of whatever entry currently holds it.
+//
+// Known affected term so far: "Barrier" inside Combat Rules → Armor Points →
+// Summoned Armor. See DOC_EDITS_WANTED #11e for the upstream fix.
+const DEMOTED_HEADING_RE = /(?:^|\.\s+)([A-Z][a-zA-Z]+(?:\s[A-Z][a-zA-Z]+){0,2})\s+\1\s+(is|are|means|refers to)\b/;
+function splitDemotedHeadings(entries) {
+  return entries.map((e) => {
+    const out = { ...e };
+    if (typeof out.description === "string") {
+      const m = out.description.match(DEMOTED_HEADING_RE);
+      if (m) {
+        const term = m[1];
+        const dupStart = out.description.indexOf(`${term} ${term}`);
+        if (dupStart >= 0) {
+          const before = out.description.slice(0, dupStart).trim();
+          const splitOff = out.description.slice(dupStart + term.length + 1).trim();
+          out.description = before;
+          out.subConcepts = [...(out.subConcepts || []), {
+            name: term,
+            section: e.section,
+            description: splitOff,
+          }];
+        }
+      }
+    }
+    if (out.subConcepts) out.subConcepts = splitDemotedHeadings(out.subConcepts);
+    return out;
+  });
+}
+
+for (const [bucket, entries] of Object.entries(subConcepts).sort(([a], [b]) => a.localeCompare(b))) {
+  write(`${bucket}.json`, splitDemotedHeadings(entries));
 }
 
 // ─── EFFECTS / CONDITIONS / TYPES ─────────────────────────────────────────────
-// The Core Rules Effects, Conditions, and Types sections are keyword lists in the
-// source: "Keyword\nDefinition…" separated by blank lines. These keywords (Wounding,
-// Slept, Discern, Berserk, …) are the dense mechanical vocabulary referenced all
-// over skill/power text, so we extract them as first-class entities to link against.
-// A keyword may carry a bracketed parameter, e.g. "Discern [Information]" — the
-// entity name is the stem ("Discern"); the bracket is kept as `param`.
+// H1 sections with no heading children. Content is keyword\nprose pairs.
+// We parse the text nodes directly.
 
 console.log('\nParsing effects / conditions / types...');
 
-function parseKeywordList(headerRe, endRe) {
-  // Effects/Conditions/Types also appear as bare entries in the Core Rules
-  // nested TOC, so we need to skip past that to reach the keyword-list body.
-  const start = findBodyHeader(headerRe, PAST_CORE_RULES_TOC);
+function parseKeywordSection(headingText, endHeadingText) {
+  const crStart = findHeading('Wellspring Core Rules', 1);
+  // Search without level restriction — Effects/Conditions/Types are H1,
+  // Defense Calls/Modifiers are H2. Always search from within core rules.
+  const start = nodes.findIndex((n, i) =>
+    i > crStart && n.type === 'heading' && n.text === headingText
+  );
   if (start === -1) return [];
-  const end = findIdx(endRe, start + 1);
-  // Skip the intro sentence ("The following is a list of…").
-  const body = lines.slice(start + 1, end === -1 ? start + 400 : end);
+  const startLevel = nodes[start].level;
+  const endNode = endHeadingText ? findHeading(endHeadingText, null, start) : -1;
+  const end = endNode !== -1
+    ? endNode
+    : nodes.findIndex((n, i) => i > start && n.type === 'heading' && n.level <= startLevel);
 
-  const entries = [];
-  let i = 0;
-  // Advance past the intro line(s) to the first blank-separated block.
-  while (i < body.length && body[i].trim() && !/^[A-Z]/.test(body[i].trim())) i++;
+  const textNodes = nodes.slice(start + 1, end === -1 ? nodes.length : end)
+    .filter(n => n.type === 'text' || n.type === 'list');
 
-  // The canonical entity name is the leading keyword stem before any bracketed
-  // parameter (so "Grant [Number] Barrier" and "Grant [Accent]" both belong to
-  // "Grant"; "Vulnerable to" -> "Vulnerable"). The full source form is kept as a
-  // variant. Variants of the same stem are merged into one entity.
-  // A keyword line is short, starts with a capital or "[", and has no sentence
-  // punctuation. Definition lines are prose. We use this to start a new entry
-  // even when the source omits the blank-line separator between two entries
-  // (e.g. Insubstantial's multi-line def runs straight into "Obedient").
-  const isKeywordLine = (t) =>
-    t && t.length <= 45 && /^[A-Z[]/.test(t) && !/[.!?:),]$/.test(t) && !/^The\s/.test(t);
+  // Keyword line: short, title-case, no terminal punctuation.
+  const isKeyword = t =>
+    t.length <= 50 && /^[A-Z\[]/.test(t) && !/[.!?,):]\s*$/.test(t) && !/^The\s/.test(t);
 
   const byName = new Map();
-  while (i < body.length) {
-    while (i < body.length && !body[i].trim()) i++;
-    if (i >= body.length) break;
-    const keyword = body[i].trim();
+  let i = 0;
+  // Skip intro sentence (ends with period)
+  while (i < textNodes.length && textNodes[i].type === 'text' && /[.!?]$/.test(textNodes[i].text)) i++;
+
+  while (i < textNodes.length) {
+    const n = textNodes[i];
+    if (n.type === 'list') { i++; continue; }
+    const keyword = n.text;
+    if (!isKeyword(keyword)) { i++; continue; }
     i++;
-    // Definition: following non-blank lines until a blank OR the next keyword.
+
+    // Definition: following text nodes until next keyword
     const def = [];
-    while (i < body.length && body[i].trim() && !isKeywordLine(body[i].trim())) { def.push(body[i].trim()); i++; }
+    while (i < textNodes.length) {
+      const m = textNodes[i];
+      if (m.type === 'list') { def.push(m.items.join(' ')); i++; continue; }
+      if (isKeyword(m.text)) break;
+      def.push(m.text);
+      i++;
+    }
     if (!def.length) continue;
 
-    // Stem = the keyword without bracketed parameters (leading or inline) and
-    // trailing connective words. "Grant [Number] Barrier" -> "Grant";
-    // "[Kind] Immunity" -> "Immunity"; "Vulnerable to" -> "Vulnerable".
+    // Stem: strip leading/trailing bracketed params and connective words
     const stem = keyword
-      .replace(/^\[[^\]]+\]\s*/, '')   // drop a leading [param]
-      .replace(/\s*\[.*$/, '')          // drop from the first inline [param] on
+      .replace(/^\[[^\]]+\]\s*/, '')
+      .replace(/\s*\[.*$/, '')
       .replace(/\s+(to|or|vs\.?|Plus)\s*$/i, '')
       .trim() || keyword;
 
@@ -1184,13 +1355,9 @@ function parseKeywordList(headerRe, endRe) {
       byName.set(stem, { name: stem, variants: [], description: def.join(' ') });
     }
     const entry = byName.get(stem);
-    // Record the full source form when it differs from the bare stem.
     if (keyword !== stem) entry.variants.push({ form: keyword, description: def.join(' ') });
   }
 
-  // Derive the effect→condition relationship the doc states in each definition
-  // ("Causes the Charmed Condition"). This makes the edge rebuildable from the
-  // source rather than hand-encoded downstream.
   for (const entry of byName.values()) {
     const m = entry.description.match(/(?:causes?|applies|grants?|inflicts?) the (\w[\w '-]*?) condition/i);
     if (m) entry.causesCondition = m[1].trim();
@@ -1199,39 +1366,98 @@ function parseKeywordList(headerRe, endRe) {
   return [...byName.values()];
 }
 
-// The intro sentence ends with a period so the keyword-walk skips it; the first
-// real keyword (e.g. "Berserk") begins the list.
-write('effects.json', parseKeywordList(/^Effects$/, /^Stacking Effects$/));
-write('conditions.json', parseKeywordList(/^Conditions$/, /^Types$/));
-write('types.json', parseKeywordList(/^Types$/, /^Items$/));
+write('effects.json',    parseKeywordSection('Effects', 'Stacking Effects'));
+write('conditions.json', parseKeywordSection('Conditions', 'Types'));
+write('types.json',      parseKeywordSection('Types', 'Items'));
+// Defense Calls and Modifiers are H2s with H3 children — parse structurally.
+function parseH3Concepts(headingText) {
+  const crStart = findHeading('Wellspring Core Rules', 1);
+  const h2 = nodes.findIndex((n, i) => i > crStart && n.type === 'heading' && n.text === headingText);
+  if (h2 === -1) return [];
+  const h2Level = nodes[h2].level;
+  const h2End = nodes.findIndex((n, i) => i > h2 && n.type === 'heading' && n.level <= h2Level);
+  const end = h2End === -1 ? nodes.length : h2End;
+  const out = [];
+  let i = h2 + 1;
+  while (i < end) {
+    const n = nodes[i];
+    if (n.type !== 'heading' || n.level !== h2Level + 1 || !n.text) { i++; continue; }
+    const entryEnd = nodes.findIndex((m, j) => j > i && m.type === 'heading' && m.level <= n.level);
+    const eEnd = entryEnd === -1 ? end : Math.min(entryEnd, end);
+    const description = bodyBetween(i + 1, eEnd);
+    out.push({ name: n.text, variants: [], description });
+    i = eEnd;
+  }
+  return out;
+}
+write('defense-calls.json', parseH3Concepts('Defense Calls'));
+write('modifiers.json',  parseH3Concepts('Modifiers'));
 
-// ─── CRAFTING RESOURCES ──────────────────────────────────────────────────────
-// Source format: "Name (Tier)\nDescription" pairs in the Crafting Resources
-// List section. Tier is Basic / Uncommon / Advanced. The list ends at "Named
-// Resources".
+// ─── ACCENTS ─────────────────────────────────────────────────────────────────
+// Under the "Accent" H2 within Core Rules. Each line: "Name [Elemental] - desc"
+
+console.log('\nParsing accents...');
+
+function parseAccents() {
+  const crStart = findHeading('Wellspring Core Rules', 1);
+  const accentH2 = nodes.findIndex((n, i) =>
+    i > crStart && n.type === 'heading' && n.level === 2 && n.text === 'Accent'
+  );
+  if (accentH2 === -1) return [];
+  const accentEnd = nodes.findIndex((n, i) => i > accentH2 && n.type === 'heading' && n.level <= 2);
+  const end = accentEnd === -1 ? nodes.length : accentEnd;
+
+  const out = [];
+  for (let i = accentH2 + 1; i < end; i++) {
+    const n = nodes[i];
+    if (n.type !== 'text') continue;
+    // "Agony - Wracking pain..." or "Acid [Elemental] - Caustic..."
+    const m = n.text.match(/^(.+?)(?:\s*(\[Elemental\]))?\s+-\s+(.+)$/);
+    if (!m) continue;
+    out.push({ name: m[1].trim(), elemental: !!m[2], description: m[3].trim() });
+  }
+  return out;
+}
+
+write('accents.json', parseAccents());
+
+// ─── CRAFTING RESOURCES ───────────────────────────────────────────────────────
+// H2 "Crafting Resources List" under Crafting (all). Entries: H3 "Name (Tier)"
+// or inline "Name (Tier)\nDescription" text.
 
 console.log('\nParsing crafting resources...');
 
 function parseResources() {
-  const start = findBodyHeader(/^Crafting Resources List$/, PAST_CORE_RULES_TOC);
-  if (start === -1) return [];
-  const end = findIdx(/^Named Resources$/, start + 1);
-  const body = lines.slice(start + 1, end === -1 ? start + 50 : end);
+  const craftingH1 = findHeading('Crafting (all)', 1);
+  const resourcesH2 = nodes.findIndex((n, i) =>
+    i > craftingH1 && n.type === 'heading' && n.level === 2 && n.text === 'Crafting Resources List'
+  );
+  if (resourcesH2 === -1) return [];
+  const resourcesEnd = nodes.findIndex((n, i) => i > resourcesH2 && n.type === 'heading' && n.level <= 2);
+  const end = resourcesEnd === -1 ? nodes.length : resourcesEnd;
 
   const out = [];
-  for (let i = 0; i < body.length; i++) {
-    const t = body[i].trim();
-    if (!t) continue;
-    const m = t.match(/^(.+?)\s*\((Basic|Uncommon|Advanced)\)\s*$/);
+  for (let i = resourcesH2 + 1; i < end; i++) {
+    const n = nodes[i];
+    if (n.type !== 'text') continue;
+    // Resources export as "Name (Tier)Description" concatenated in one text node.
+    // Split on the (Tier) boundary.
+    const m = n.text.match(/^(.+?)\s*\((Basic|Uncommon|Advanced)\)\s*(.*)$/);
     if (!m) continue;
-    // Description: next non-blank line(s) until blank or next keyword line.
-    const def = [];
+    const name = m[1].trim(), tier = m[2];
+    let description = m[3].trim();
+    // Continuation nodes follow until the next resource or heading
     let j = i + 1;
-    while (j < body.length && body[j].trim() && !/\((Basic|Uncommon|Advanced)\)$/.test(body[j].trim())) {
-      def.push(body[j].trim());
+    while (j < end) {
+      const next = nodes[j];
+      if (next.type === 'heading') break;
+      if (next.type === 'text') {
+        if (/\((Basic|Uncommon|Advanced)\)/.test(next.text)) break;
+        description += (description ? ' ' : '') + next.text;
+      }
       j++;
     }
-    out.push({ name: m[1].trim(), tier: m[2], description: def.join(' ') });
+    out.push({ name, tier, description });
     i = j - 1;
   }
   return out;
@@ -1239,126 +1465,57 @@ function parseResources() {
 
 write('resources.json', parseResources());
 
-// ─── ACCENTS ─────────────────────────────────────────────────────────────────
-// 15 accents in the Core Rules Accent section. Each line: "Name [Elemental] - desc.
-// The list starts after "The known Accents that exist in Wellspring are:" and
-// ends at "Defense Calls".
-
-console.log('\nParsing accents...');
-
-function parseAccents() {
-  const intro = findIdx(/^The known Accents that exist in Wellspring are:/);
-  if (intro === -1) return [];
-  const end = findIdx(/^Defense Calls$/, intro + 1);
-  const out = [];
-  for (let i = intro + 1; i < end; i++) {
-    const t = lines[i].trim();
-    if (!t) continue;
-    // "Acid [Elemental] - Caustic substances..." or "Force - Physical power..."
-    const m = t.match(/^(.+?)(?:\s*(\[Elemental\]))?\s*-\s*(.+)$/);
-    if (!m) continue;
-    out.push({
-      name: m[1].trim(),
-      elemental: !!m[2],
-      description: m[3].trim(),
-    });
-  }
-  return out;
-}
-
-write('accents.json', parseAccents());
-
-// ─── DEFENSE CALLS & MODIFIERS ───────────────────────────────────────────────
-// Same keyword-list pattern as Effects/Conditions/Types (Name\nDefinition).
-
-console.log('\nParsing defense calls / modifiers...');
-write('defense-calls.json', parseKeywordList(/^Defense Calls$/, /^Modifiers$/));
-write('modifiers.json', parseKeywordList(/^Modifiers$/, /^Combat Rules$/));
-
-// ─── CRAFTING CONCEPTS ───────────────────────────────────────────────────────
-// Each crafting discipline (Alchemy / Enchanting / Tinkering) has a cluster of
-// structural sub-sections defined between the discipline header and its first
-// recipe list (e.g. "The Hermetic Laboratory" / "Corrupted Alchemy" /
-// "Mana Sickness" under Alchemy; "Essences" / "Drawing" / "Unravelling Essence"
-// / "The Enchanting Forge" under Enchanting). These read as terms in body text
-// but only get described in the prose. Extract them as discrete entities so
-// references resolve.
-//
-// Each entry: { name, discipline, description, tools? (when an equipment list
-// follows) }. Filters out recipe field-label sub-sections (Application/Quaff/
-// Topical/Ingest/Component) which are already captured per-recipe.
+// ─── CRAFTING CONCEPTS ────────────────────────────────────────────────────────
+// H2 sections under each discipline H1 (Alchemy/Enchanting/Tinkering), before
+// the recipe list H2s. The discipline name is the parent H1 text.
 
 console.log('\nParsing crafting concepts...');
 
-const RECIPE_FIELD_LABELS = new Set([
+const RECIPE_SECTION_RE = /^(Apprentice|Journeyman|Greater)\s+(Alchemy Recipes|Enchanting Formulae|Tinkering Schematics)$/;
+const RECIPE_FIELD_NOISE = new Set([
   'Application', 'Quaff', 'Topical', 'Ingest', 'Component',
   'Crafting Materials', 'Uses Per Batch', 'Expiration', 'Crafting Process',
   'Description', 'Effect', 'Recipes/Formulae/Schematics', 'Introduction',
   'Turn of the Hourglass', 'Item Cards', 'Ashbin', 'Dark Territory',
-  'Crafting Resources List', 'Named Resources',
-  // Per-discipline parent headers
-  'Alchemy', 'Enchanting', 'Tinkering',
+  'Crafting Resources List', 'Named Resources', 'Alchemy', 'Enchanting', 'Tinkering',
 ]);
 
 function parseCraftingConcepts() {
+  const craftingH1 = findHeading('Crafting (all)', 1);
+  const ritualH1 = findHeading('Rituals', 1, craftingH1);
   const out = [];
-  // Each discipline's concept-sub-sections live between its body header and the
-  // start of its first recipe list. The discipline headers also appear in the
-  // Crafting table-of-contents (~lines 14412-14415), so we chain searches: find
-  // each discipline's body header by walking forward from the *previous*
-  // discipline's recipe list (or from "Named Resources" for the first).
-  const disciplines = [
-    { name: 'Alchemy', start: /^Alchemy$/, end: /^Apprentice Alchemy Recipes$/, after: /^Named Resources$/ },
-    { name: 'Enchanting', start: /^Enchanting$/, end: /^Apprentice Enchanting Formulae$/, after: /^Apprentice Alchemy Recipes$/ },
-    { name: 'Tinkering', start: /^Tinkering$/, end: /^Apprentice Tinkering Schematics$/, after: /^Apprentice Enchanting Formulae$/ },
-  ];
 
-  const isHeader = (t) => t && t.length <= 50 && !/[.!?:),]\s*$/.test(t) && !/^\*/.test(t) && !/^[a-z]/.test(t) && !/[\[\]]/.test(t);
+  const disciplines = ['Alchemy', 'Enchanting', 'Tinkering'];
+  for (const disc of disciplines) {
+    const discH1 = findHeading(disc, 1, craftingH1);
+    if (discH1 === -1 || discH1 >= ritualH1) continue;
+    const discEnd = nodes.findIndex((n, i) =>
+      i > discH1 && n.type === 'heading' && n.level === 1
+    );
+    const dEnd = discEnd === -1 ? ritualH1 : Math.min(discEnd, ritualH1);
 
-  for (const d of disciplines) {
-    const afterIdx = findIdx(d.after, PAST_CORE_RULES_TOC);
-    if (afterIdx === -1) continue;
-    const s = findIdx(d.start, afterIdx + 1);
-    if (s === -1) continue;
-    const e = findIdx(d.end, s + 1);
-    if (e === -1) continue;
+    // Concept H2s are those before the first recipe-list H2
+    const firstRecipeH2 = nodes.findIndex((n, i) =>
+      i > discH1 && i < dEnd && n.type === 'heading' && n.level === 2 && RECIPE_SECTION_RE.test(n.text)
+    );
+    const conceptEnd = firstRecipeH2 === -1 ? dEnd : firstRecipeH2;
 
-    for (let i = s + 1; i < e; i++) {
-      const t = lines[i].trim();
-      if (!isHeader(t) || RECIPE_FIELD_LABELS.has(t)) continue;
-      // Look at the next non-blank line — must be prose (long sentence), not a
-      // bullet or another header. That distinguishes real concept-sections from
-      // mis-classified lines.
-      let j = i + 1;
-      while (j < e && !lines[j].trim()) j++;
-      if (j >= e) continue;
-      const nextLine = lines[j].trim();
-      if (nextLine.length < 30 || /^\*/.test(nextLine) || isHeader(nextLine) && !RECIPE_FIELD_LABELS.has(nextLine)) continue;
+    let i = discH1 + 1;
+    while (i < conceptEnd) {
+      const n = nodes[i];
+      if (n.type !== 'heading' || n.level !== 2 || !n.text || RECIPE_FIELD_NOISE.has(n.text)) { i++; continue; }
 
-      // Capture description (prose lines) and any bullet list that follows.
-      const descLines = [];
-      const tools = [];
-      let k = j;
-      while (k < e) {
-        const line = lines[k].trim();
-        if (!line) { k++; continue; }
-        if (/^\*/.test(line)) {
-          tools.push(line.replace(/^\*\s*/, '').trim());
-          k++; continue;
-        }
-        // Stop if we hit the next header.
-        if (isHeader(line) && !RECIPE_FIELD_LABELS.has(line)) break;
-        descLines.push(line);
-        k++;
-      }
-      const concept = {
-        name: t,
-        discipline: d.name,
-        description: descLines.join(' '),
-      };
+      const conceptH2End = nodes.findIndex((m, j) => j > i && m.type === 'heading' && m.level <= 2);
+      const cEnd = conceptH2End === -1 ? conceptEnd : Math.min(conceptH2End, conceptEnd);
+
+      const subNodes = nodes.slice(i + 1, cEnd);
+      const prose = subNodes.filter(m => m.type === 'text').map(m => m.text).join(' ');
+      const tools = subNodes.filter(m => m.type === 'list').flatMap(m => m.items);
+
+      const concept = { name: n.text, discipline: disc, description: prose };
       if (tools.length) concept.tools = tools;
       out.push(concept);
-      i = k - 1;
+      i = cEnd;
     }
   }
   return out;
@@ -1366,215 +1523,67 @@ function parseCraftingConcepts() {
 
 write('crafting-concepts.json', parseCraftingConcepts());
 
-// ─── RITUAL CONCEPTS ─────────────────────────────────────────────────────────
-// The Rituals body (before the ritual list itself) defines roles (Ritualists,
-// Primary/Secondary Ritualist, Participant), the Dark Territory process
-// (Beginning the Ritual, Ritual Points, Potential Success, The Deck and its
-// suits), and other structural concepts (Arcane Matrix, Consecrated/Desecrated
-// locations). These are referenced throughout ritual descriptions; extract
-// them so the links resolve.
+// ─── RITUAL CONCEPTS ──────────────────────────────────────────────────────────
+// H3/H4 concepts under the "Rituals" H1 preamble (before "Ritual Magic" H1).
 
 console.log('\nParsing ritual concepts...');
 
-// Field labels that are part of a per-ritual definition (already captured via
-// rituals.json), not standalone concepts.
-const RITUAL_FIELD_LABELS = new Set([
-  'Expiration', 'Target', 'Required Components', 'Tools Used',
-  'Other Requirements', 'Location', 'Effect', 'Ritual Process',
-  'Dark Territory', 'Dark Territory Suit', 'Dark Territory Marshal Required',
-]);
-
 function parseRitualConcepts() {
-  const start = findIdx(/^Rituals$/, PAST_CORE_RULES_TOC);
-  if (start === -1) return [];
-  const end = findIdx(/^Apprentice Rituals$/, start + 1);
-  if (end === -1) return [];
+  const ritualsH1 = findHeading('Rituals', 1);
+  const ritualMagicH1 = findHeading('Ritual Magic', 1, ritualsH1);
+  const end = ritualMagicH1 === -1 ? nodes.length : ritualMagicH1;
 
-  const isHeader = (t) => t && t.length <= 50 && !/[.!?:),]\s*$/.test(t) && !/^\*/.test(t) && !/^[a-z]/.test(t) && !/[\[\]]/.test(t);
+  const RITUAL_FIELD_NOISE = new Set([
+    'Expiration', 'Target', 'Required Components', 'Tools Used',
+    'Other Requirements', 'Location', 'Effect', 'Ritual Process',
+    'Dark Territory', 'Dark Territory Suit', 'Dark Territory Marshal Required',
+  ]);
 
   const out = [];
-  for (let i = start + 1; i < end; i++) {
-    const t = lines[i].trim();
-    if (!isHeader(t) || RITUAL_FIELD_LABELS.has(t)) continue;
-    let j = i + 1;
-    while (j < end && !lines[j].trim()) j++;
-    if (j >= end) continue;
-    const nextLine = lines[j].trim();
-    if (nextLine.length < 30 || /^\*/.test(nextLine)) continue;
-    if (isHeader(nextLine) && !RITUAL_FIELD_LABELS.has(nextLine)) continue;
+  let i = ritualsH1 + 1;
+  while (i < end) {
+    const n = nodes[i];
+    if (n.type !== 'heading' || (n.level !== 3 && n.level !== 4) || !n.text || RITUAL_FIELD_NOISE.has(n.text)) { i++; continue; }
 
-    const descLines = [];
-    const bullets = [];
-    let k = j;
-    while (k < end) {
-      const line = lines[k].trim();
-      if (!line) { k++; continue; }
-      if (/^\*/.test(line)) {
-        bullets.push(line.replace(/^\*\s*/, '').trim());
-        k++; continue;
+    const conceptEnd = nodes.findIndex((m, j) => j > i && m.type === 'heading' && m.level <= n.level);
+    const cEnd = conceptEnd === -1 ? end : Math.min(conceptEnd, end);
+
+    // Description = prose between this heading and its first deeper child
+    // (so children like H4 "Primary Ritualist" under H3 "Ritualists" aren't
+    // swallowed into the parent's description).
+    const firstChild = nodes.findIndex((m, j) => j > i && j < cEnd && m.type === 'heading' && m.level > n.level);
+    const proseEnd = firstChild === -1 ? cEnd : firstChild;
+    const proseNodes = nodes.slice(i + 1, proseEnd);
+    const prose = proseNodes.filter(m => m.type === 'text').map(m => m.text).join(' ');
+    const bullets = proseNodes.filter(m => m.type === 'list').flatMap(m => m.items);
+
+    // Sub-concepts: deeper headings inside this concept's range.
+    const subConcepts = [];
+    let k = firstChild === -1 ? cEnd : firstChild;
+    while (k < cEnd) {
+      const m = nodes[k];
+      if (m.type === 'heading' && m.level > n.level && m.text && !RITUAL_FIELD_NOISE.has(m.text)) {
+        const subEnd = nodes.findIndex((x, l) => l > k && x.type === 'heading' && x.level <= m.level);
+        const sEnd = subEnd === -1 ? cEnd : Math.min(subEnd, cEnd);
+        subConcepts.push({
+          name: m.text,
+          description: nodes.slice(k + 1, sEnd).filter(x => x.type === 'text').map(x => x.text).join(' '),
+        });
+        k = sEnd;
+      } else {
+        k++;
       }
-      if (isHeader(line) && !RITUAL_FIELD_LABELS.has(line)) break;
-      descLines.push(line);
-      k++;
     }
-    const concept = { name: t, description: descLines.join(' ') };
+
+    const concept = { name: n.text, description: prose };
     if (bullets.length) concept.bullets = bullets;
+    if (subConcepts.length) concept.subConcepts = subConcepts;
     out.push(concept);
-    i = k - 1;
+    i = cEnd;
   }
   return out;
 }
 
 write('ritual-concepts.json', parseRitualConcepts());
-
-// ─── CORE RULES SUB-CONCEPTS ─────────────────────────────────────────────────
-// Each Core Rules top-level section has nested sub-headers (Header\nProse) that
-// the original parseCoreRules flattened into one prose blob per section. Carve
-// them out as discrete entities so they can participate in the linker graph.
-// Sections already carved out (Effects, Conditions, Types, Modifiers, Defense
-// Calls, Accent, Glossary) are skipped. Policy/etiquette sections are skipped.
-// The remaining sub-concepts route to typed files (deliveries.json, durations.json,
-// etc.) where they form a coherent cluster, or to rules-concepts.json otherwise.
-
-console.log('\nParsing core rules sub-concepts...');
-
-// Section title -> target entity type. Sections not in this map send their
-// sub-concepts to rules-concepts.json. SKIP suppresses extraction entirely.
-//
-// Some sections in the doc TOC are *themselves* sub-concepts of an earlier
-// parent section (the TOC happens to be flat, but the doc semantically groups
-// them). For those, we route the whole section's body — heading + prose —
-// directly into the parent's typed bucket via the AS_SELF marker, so e.g.
-// "Hold!"/Caution/Clarify each become power-words entities.
-const SECTION_TO_TYPE = {
-  // Already carved out as their own entity files; skip to avoid duplication.
-  'Effects': 'SKIP', 'Conditions': 'SKIP', 'Types': 'SKIP',
-  'Modifiers': 'SKIP', 'Defense Calls': 'SKIP', 'Accent': 'SKIP',
-  // Policy / etiquette — not navigable game mechanics; skip.
-  'Code of Conduct': 'SKIP', 'Consent and Calibration': 'SKIP',
-  'Combat Etiquette': 'SKIP', 'Roleplay Etiquette': 'SKIP',
-  // New typed clusters whose own bodies have sub-headers worth extracting.
-  'Delivery': 'deliveries',
-  'Duration': 'durations',
-  'Death and Dying': 'death-states',
-  'Armor Points': 'armor-types',
-  'Object and Location Markers': 'markers',
-  'Spellcasting': 'spellcasting-concepts',
-};
-
-// Parent sections that have TOC-sibling children. The walker enters the parent's
-// context when it sees the parent heading; subsequent sections become AS_SELF
-// children of that parent (routed whole to the parent's type bucket) until
-// either another parent appears or we hit a non-child (e.g. "Object and
-// Location Markers" terminates "Game Markers and Signals" children). This
-// position-based grouping correctly handles duplicate child names like
-// "Clarify" appearing under both Power Words and Game Markers.
-const AS_SELF_PARENTS = new Map([
-  ['Power Words and Power Phrases', {
-    type: 'power-words',
-    children: new Set(['“Hold!”', 'Caution', 'Clarify', 'Instruction',
-      'It Has Been Told…', 'It Can Be Seen…', 'It Can Be Believed…',
-      '“What Would Your Mother Say?”', '“Prepare for Action”']),
-  }],
-  ['Game Markers and Signals', {
-    type: 'game-markers',
-    children: new Set(['Out-of-Game', 'Non-Combatant', 'Clarify', 'Lookdown',
-      'OK Check', 'Spirit Form']),
-  }],
-]);
-
-// Sub-header detection inside a section's source range: short, title-case, no
-// terminal punctuation, no brackets, followed by prose. Matches both bare names
-// ("Berserk") and quoted phrases ("“Hold!”").
-function isSubHeader(t, nextLine) {
-  if (!t || t.length > 50) return false;
-  if (/[.!?,):]\s*$/.test(t)) return false;
-  if (/^\*/.test(t) || /[\[\]]/.test(t)) return false;
-  if (/^[a-z0-9]/.test(t)) return false;
-  return nextLine && nextLine.length > 30 && !/^\*/.test(nextLine);
-}
-
-function parseSubConcepts(sections) {
-  // bucketsByType: { 'rules-concepts': [...], 'deliveries': [...], ... }
-  const bucketsByType = {};
-  const push = (type, entry) => { (bucketsByType[type] ??= []).push(entry); };
-  // Track which AS_SELF parent we're currently inside (so duplicate child
-  // names like "Clarify" route to the right type based on position).
-  let asSelfParent = null;
-
-  for (let s = 0; s < sections.length; s++) {
-    const section = sections[s];
-
-    // Entering an AS_SELF parent? Set the context (and also extract its body as
-    // an introductory entry into the parent's bucket).
-    if (AS_SELF_PARENTS.has(section.heading)) {
-      asSelfParent = AS_SELF_PARENTS.get(section.heading);
-      if (section.content.trim()) {
-        push(asSelfParent.type, { name: section.heading, section: section.heading, description: section.content });
-      }
-      continue;
-    }
-    // Inside an AS_SELF parent and this section is one of its children?
-    if (asSelfParent && asSelfParent.children.has(section.heading)) {
-      push(asSelfParent.type, {
-        name: section.heading.replace(/^[“"]+|[”"]+$/g, '').trim(),
-        section: section.heading,
-        description: section.content,
-      });
-      continue;
-    }
-    // Any other section ends the AS_SELF parent context.
-    asSelfParent = null;
-
-    const target = SECTION_TO_TYPE[section.heading];
-    if (target === 'SKIP') continue;
-    const bucket = target || 'rules-concepts';
-
-    // Walk the source range for this section. Use the *next* section's start
-    // line as the exclusive end so a sub-concept whose body falls in the gap
-    // immediately before the next top-level section (e.g. Roleplay Delivery is
-    // the last sub-header in Delivery, and its body line is one before the
-    // Duration section starts) is still captured.
-    const sectionEnd = sections[s + 1]?.startLine ?? (section.endLine + 1);
-    let i = section.startLine + 1;
-    while (i < sectionEnd) {
-      const t = lines[i].trim();
-      if (!t) { i++; continue; }
-      // Skip any nested header that IS the section heading itself (e.g. "Effects"
-      // section header repeating inside).
-      if (t === section.heading) { i++; continue; }
-      let nextI = i + 1;
-      while (nextI < sectionEnd && !lines[nextI].trim()) nextI++;
-      const nextLine = lines[nextI]?.trim() || '';
-      if (!isSubHeader(t, nextLine)) { i++; continue; }
-      // Capture sub-concept body: lines until the next sub-header or end.
-      const descLines = [];
-      let j = nextI;
-      while (j < sectionEnd) {
-        const lt = lines[j].trim();
-        if (!lt) { j++; continue; }
-        let nj = j + 1;
-        while (nj < sectionEnd && !lines[nj].trim()) nj++;
-        const nl = lines[nj]?.trim() || '';
-        if (isSubHeader(lt, nl) && lt !== section.heading) break;
-        descLines.push(lt);
-        j++;
-      }
-      push(bucket, {
-        name: t,
-        section: section.heading,
-        description: descLines.join(' '),
-      });
-      i = j;
-    }
-  }
-  return bucketsByType;
-}
-
-const subConcepts = parseSubConcepts(coreRules.sections);
-// Write each typed bucket to its own file. Order is fixed so reruns are stable.
-for (const [type, entries] of Object.entries(subConcepts).sort(([a], [b]) => a.localeCompare(b))) {
-  write(`${type}.json`, entries);
-}
 
 console.log('\nDone.');

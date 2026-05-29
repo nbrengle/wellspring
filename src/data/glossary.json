@@ -133,11 +133,11 @@
   },
   {
     "term": "Materia",
-    "definition": "Materia are the special material components needed to cast many spells. It is what makes up spell-packets. Often, in-game, Packets are just called “Materia.\""
+    "definition": "Materia are the special material components needed to cast many spells. It is what makes up spell-packets. Often, in-game, Packets are just called “Materia."
   },
   {
     "term": "Paces",
-    "definition": "If a rules text references movement distance in \"paces\", it assumes that one \"pace\" is approximately 2 feet. Exact measurements are not required, but players should use their best judgment when taking steps to keep them at this average."
+    "definition": "If a rules text references movement distance in paces, it assumes that one pace is approximately 2 feet. Exact measurements are not required, but players should use their best judgment when taking steps to keep them at this average."
   },
   {
     "term": "Packet",

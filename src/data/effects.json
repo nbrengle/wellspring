@@ -42,10 +42,10 @@
     "variants": [
       {
         "form": "Disarm [Equipment/Limb]",
-        "description": "A \"Disarm\" call requires naming a hand-held item or a limb. The specified item, or one held by that limb, must be dropped. If a shield is named (or worn on the limb), the arm must extend straight down to allow the shield to fall. Unless a duration is specified, Disarm is instantaneous, and the item can be picked up immediately. Any stated duration dictates how long the item remains inaccessible."
+        "description": "A Disarm call requires naming a hand-held item or a limb. The specified item, or one held by that limb, must be dropped. If a shield is named (or worn on the limb), the arm must extend straight down to allow the shield to fall. Unless a duration is specified, Disarm is instantaneous, and the item can be picked up immediately. Any stated duration dictates how long the item remains inaccessible."
       }
     ],
-    "description": "A \"Disarm\" call requires naming a hand-held item or a limb. The specified item, or one held by that limb, must be dropped. If a shield is named (or worn on the limb), the arm must extend straight down to allow the shield to fall. Unless a duration is specified, Disarm is instantaneous, and the item can be picked up immediately. Any stated duration dictates how long the item remains inaccessible."
+    "description": "A Disarm call requires naming a hand-held item or a limb. The specified item, or one held by that limb, must be dropped. If a shield is named (or worn on the limb), the arm must extend straight down to allow the shield to fall. Unless a duration is specified, Disarm is instantaneous, and the item can be picked up immediately. Any stated duration dictates how long the item remains inaccessible."
   },
   {
     "name": "Discern",
@@ -132,17 +132,7 @@
         "description": "Grant can be used in a number of other ways at staff discretion, but will always be communicated as clearly as possible."
       }
     ],
-    "description": "Using the Grant Effect applies one of the following Conditions. By default, these Conditions are considered a Bonus, and subject to Stacking (see the Stacking Effects section)."
-  },
-  {
-    "name": "Grant Protect",
-    "variants": [
-      {
-        "form": "Grant Protect Vs. [Accent, Effect, Delivery, Damage, or Description]",
-        "description": "This gives the target one “Protect” against the listed type given. (See the Defense Calls sections for more information.)"
-      }
-    ],
-    "description": "This gives the target one “Protect” against the listed type given. (See the Defense Calls sections for more information.)"
+    "description": "Using the Grant Effect applies one of the following Conditions. By default, these Conditions are considered a Bonus, and subject to Stacking (see the Stacking Effects section). Grant Protect Vs. [Accent, Effect, Delivery, Damage, or Description] This gives the target one “Protect” against the listed type given. (See the Defense Calls sections for more information.)"
   },
   {
     "name": "Grant Power",
@@ -239,20 +229,10 @@
     "variants": [
       {
         "form": "Rebuild [Item]",
-        "description": "Makes a Shattered or broken item usable again. A suit of armor will be returned to 1 Armor Point. A weapon will be returned to full functionality. Single use, “consumable” items, such as potions and scrolls, cannot be Rebuilt if they are Shattered."
+        "description": "Makes a Shattered or broken item usable again. A suit of armor will be returned to 1 Armor Point. A weapon will be returned to full functionality. Single use, “consumable” items, such as potions and scrolls, cannot be Rebuilt if they are Shattered. Refresh [Power, Spell-Slot, or Description of Power] By use of this Effect, a Power that has been expended can be recharged as if it had not been used. The individual Power will give the limitations of what kind of Power can be recharged. Note: The Refresh effect cannot be used on Powers that also give the Refresh effect."
       }
     ],
-    "description": "Makes a Shattered or broken item usable again. A suit of armor will be returned to 1 Armor Point. A weapon will be returned to full functionality. Single use, “consumable” items, such as potions and scrolls, cannot be Rebuilt if they are Shattered."
-  },
-  {
-    "name": "Refresh",
-    "variants": [
-      {
-        "form": "Refresh [Power, Spell-Slot, or Description of Power]",
-        "description": "By use of this Effect, a Power that has been expended can be recharged as if it had not been used. The individual Power will give the limitations of what kind of Power can be recharged. Note: The Refresh effect cannot be used on Powers that also give the Refresh effect."
-      }
-    ],
-    "description": "By use of this Effect, a Power that has been expended can be recharged as if it had not been used. The individual Power will give the limitations of what kind of Power can be recharged. Note: The Refresh effect cannot be used on Powers that also give the Refresh effect."
+    "description": "Makes a Shattered or broken item usable again. A suit of armor will be returned to 1 Armor Point. A weapon will be returned to full functionality. Single use, “consumable” items, such as potions and scrolls, cannot be Rebuilt if they are Shattered. Refresh [Power, Spell-Slot, or Description of Power] By use of this Effect, a Power that has been expended can be recharged as if it had not been used. The individual Power will give the limitations of what kind of Power can be recharged. Note: The Refresh effect cannot be used on Powers that also give the Refresh effect."
   },
   {
     "name": "Repel",
@@ -276,10 +256,10 @@
     "variants": [
       {
         "form": "Shatter [Item]",
-        "description": "Breaks the item specified in the Call, making it unusable until Rebuilt. If armor (of any type) is Shattered, even just a single piece (such as a bracer), the whole suit of armor is reduced to zero Armor Points and cannot be Mended until Rebuilt. A Shattered weapon is broken and cannot be used to do damage or block, until Rebuilt."
+        "description": "Breaks the item specified in the Call, making it unusable until Rebuilt. If armor (of any type) is Shattered, even just a single piece (such as a bracer), the whole suit of armor is reduced to zero Armor Points and cannot be Mended until Rebuilt. A Shattered weapon is broken and cannot be used to do damage or block, until Rebuilt. There are a few special kinds of Shatter that only come up in special circumstances. These are not valid Calls unless specifically stated in the Power. “Shatter Corpse” on an inanimate corpse will cause it to immediately discorporate. This only includes Undead if they are inanimate at 0 Life Points. “Shatter Body” will cause the body to immediately discorporate. If it was living, it will die first. “Shatter Spirit” will cause the character to die, the body to discorporate, and the Spirit to dissipate, causing the character to die permanently."
       }
     ],
-    "description": "Breaks the item specified in the Call, making it unusable until Rebuilt. If armor (of any type) is Shattered, even just a single piece (such as a bracer), the whole suit of armor is reduced to zero Armor Points and cannot be Mended until Rebuilt. A Shattered weapon is broken and cannot be used to do damage or block, until Rebuilt."
+    "description": "Breaks the item specified in the Call, making it unusable until Rebuilt. If armor (of any type) is Shattered, even just a single piece (such as a bracer), the whole suit of armor is reduced to zero Armor Points and cannot be Mended until Rebuilt. A Shattered weapon is broken and cannot be used to do damage or block, until Rebuilt. There are a few special kinds of Shatter that only come up in special circumstances. These are not valid Calls unless specifically stated in the Power. “Shatter Corpse” on an inanimate corpse will cause it to immediately discorporate. This only includes Undead if they are inanimate at 0 Life Points. “Shatter Body” will cause the body to immediately discorporate. If it was living, it will die first. “Shatter Spirit” will cause the character to die, the body to discorporate, and the Spirit to dissipate, causing the character to die permanently."
   },
   {
     "name": "Silence",

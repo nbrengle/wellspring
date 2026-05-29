@@ -7,7 +7,7 @@
   {
     "name": "Hide",
     "tier": "Basic",
-    "description": "Hide can be carved with skill off of an animal caught in a trap, or hunted from around the wilderness. Hide is obtained through the Scavenging skill. Usually represented by a small scrap of leather about 2\" x 2.\""
+    "description": "Hide can be carved with skill off of an animal caught in a trap, or hunted from around the wilderness. Hide is obtained through the Scavenging skill. Usually represented by a small scrap of leather about 2 x 2."
   },
   {
     "name": "Ingots",
@@ -47,6 +47,6 @@
   {
     "name": "Enchanted Hyperium",
     "tier": "Advanced",
-    "description": "Enchanted Hyperium is a constructed resource, with a number of processes to refine and craft it. The final result is a silvery-white powder after having been alchemically purified from the raw ore, subjected to high heat by tinkering, and then magically enchanted."
+    "description": "Enchanted Hyperium is a constructed resource, with a number of processes to refine and craft it. The final result is a silvery-white powder after having been alchemically purified from the raw ore, subjected to high heat by tinkering, and then magically enchanted. Named ResourcesThe Basic and Advanced Resources above are not the only items that can be required for crafting. Certain recipes may call for a “named” resource. Often, Named Resources will require investigation, danger, and a quest or task to obtain."
   }
 ]
