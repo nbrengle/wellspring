@@ -115,9 +115,19 @@ export function characterLevel(character) {
   return classes.reduce((sum, c) => sum + (c.level || 0), 0);
 }
 
-// Base Build Points from the level table (9 at level 4).
+// The lowest level the level table documents — the legal campaign floor (4).
+export const LEGAL_MIN_LEVEL = LEVEL_TABLE.length
+  ? Math.min(...LEVEL_TABLE.map((l) => l.level)) : 4;
+
+// Base Build Points from the level table (9 at level 4). Below the table's floor
+// the rule is "2 BP per level", so we extrapolate down (L3=7, L2=5, L1=3) rather
+// than report 0 — even though such a character is flagged below-floor / invalid.
 export function budgetFor(level) {
-  return LEVEL_TABLE.find((l) => l.level === level)?.bp ?? 0;
+  const row = LEVEL_TABLE.find((l) => l.level === level);
+  if (row) return row.bp;
+  const floor = LEVEL_TABLE.find((l) => l.level === LEGAL_MIN_LEVEL);
+  if (floor && level < LEGAL_MIN_LEVEL) return Math.max(0, floor.bp - 2 * (LEGAL_MIN_LEVEL - level));
+  return 0;
 }
 
 // Bonus BP allowance: a character may earn bonus Build Points up to a cap equal
@@ -489,6 +499,9 @@ export function validate(character) {
   // BP used beyond the base allowance, drawn from the bonus pool (clamped ≥0).
   const bonusUsed = Math.max(0, spend.net - budget);
   const overBudget = spend.net > maxBudget;          // exceeds even base+bonus
+  // Characters below the campaign's documented floor (level 4) are buildable but
+  // not legal play — flagged so the UI can mark them invalid with a reason.
+  const belowFloor = level < LEGAL_MIN_LEVEL;
   return {
     level,
     budget,
@@ -504,6 +517,8 @@ export function validate(character) {
     spellSlots: spellSlotCounts,
     stats,
     prereqs,
-    valid: !prereqs.issues.length && !overBudget && !slotsOver,
+    belowFloor,
+    legalMinLevel: LEGAL_MIN_LEVEL,
+    valid: !prereqs.issues.length && !overBudget && !slotsOver && !belowFloor,
   };
 }

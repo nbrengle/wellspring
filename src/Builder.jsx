@@ -99,9 +99,11 @@ const SLOT_FIELD = {
   spellsKnown: "noviceSpells",
 };
 
-// Level bounds from the level table — the stepper clamps to these.
-const MIN_LEVEL = LEVEL_TABLE.length ? Math.min(...LEVEL_TABLE.map((l) => l.level)) : 4;
+// Level bounds. The level table documents the legal campaign range (starts at 4);
+// the stepper allows down to level 1 for from-scratch builds, but a character
+// below the table's minimum is flagged invalid by the validator.
 const MAX_LEVEL = LEVEL_TABLE.length ? Math.max(...LEVEL_TABLE.map((l) => l.level)) : 4;
+const MIN_LEVEL = 1; // stepper floor (legality enforced separately by the validator)
 
 // A short, clear label for what KIND of thing a grant source is, so "free ·
 // Linked Armor" can read "free · Linked Armor (Utility Power)". Prefers the role
@@ -269,9 +271,9 @@ function BudgetMeter({ report }) {
 
 // ─── BUILD SHEET ─────────────────────────────────────────────────────────────
 
-function BuildSheet({ character, report, view, onPickArchetype, onInspect, onOpenSlot, onOpenAdd, onRemoveEntity }) {
+function BuildSheet({ character, report, view, onPickArchetype, onStartBlank, onInspect, onOpenSlot, onOpenAdd, onRemoveEntity }) {
   if (!character.archetypeName) {
-    return <ArchetypePicker onPick={onPickArchetype} />;
+    return <ArchetypePicker onPick={onPickArchetype} onStartBlank={onStartBlank} />;
   }
   const isFocused = (item, field) =>
     view?.mode === "inspect" && view.item === item && view.field === field;
@@ -431,7 +433,7 @@ function EditableRows({ items, field, onClick, isFocused, resolveType, report, r
 }
 
 // Initial archetype picker — shown when no character is loaded yet.
-function ArchetypePicker({ onPick }) {
+function ArchetypePicker({ onPick, onStartBlank }) {
   const byClass = useMemo(() => {
     const map = new Map();
     for (const a of ARCHETYPES) {
@@ -471,7 +473,7 @@ function ArchetypePicker({ onPick }) {
       ))}
 
       <section className="b-section">
-        <button className="b-blank-button" onClick={() => onPick({ ...EMPTY_CHARACTER, archetypeName: "Custom Build" })}>
+        <button className="b-blank-button" onClick={onStartBlank}>
           Start blank — I want full control
         </button>
       </section>
@@ -871,6 +873,27 @@ export default function Builder() {
     setView(null); setHistory([]);
   }, []);
 
+  // Start a blank build: pick a class first (a character with no class has no
+  // slots and nothing to build), then land in a buildable empty character at the
+  // starter level with that class.
+  const handleStartBlank = useCallback(() => {
+    const candidates = Object.keys(CLASS_POWER_SLOTS).map((name) => ({
+      name, desc: CLASSES[name]?.description || "", cat: CLASSES[name]?.type || "Class",
+    }));
+    setPicking(entityPickerSpec({
+      kind: "class", entityType: "classes", candidates,
+      title: "Start blank — choose your class", taken: new Set(),
+      onChoose: (name) => {
+        setCharacter({
+          ...EMPTY_CHARACTER,
+          archetypeName: "Custom Build",
+          classes: [{ name, level: 1 }],
+        });
+        setView(null); setHistory([]); setPicking(null);
+      },
+    }));
+  }, []);
+
   // Inspect an entity. `slot` (optional) carries the pick context so the
   // inspector can offer "Choose this power". Pushes current view onto history.
   const handleInspect = useCallback((item, field, resolveType, slot = null) => {
@@ -1071,7 +1094,7 @@ export default function Builder() {
                       onSetClassLevel={handleSetClassLevel} onRemoveClass={handleRemoveClass}
                       onAddClass={handleOpenClassPicker} />
         <BuildSheet character={character} report={report} view={view}
-                    onPickArchetype={handlePickArchetype}
+                    onPickArchetype={handlePickArchetype} onStartBlank={handleStartBlank}
                     onInspect={handleInspect} onOpenSlot={handleOpenSlot}
                     onOpenAdd={handleOpenAdd} onRemoveEntity={handleRemoveEntity} />
         <DetailPane view={view}
@@ -1106,7 +1129,9 @@ function BTopBar({ character, report, onLevelChange }) {
             </span>
             <span className="b-topbar-stat">Budget <strong>{report.budget} BP</strong></span>
             <span className={`b-topbar-stat ${report.valid ? "is-valid" : "is-invalid"}`}>
-              {report.valid ? "✓ legal build" : "⚠ check build"}
+              {report.valid ? "✓ legal build"
+                : report.belowFloor ? `⚠ below level ${report.legalMinLevel}`
+                : "⚠ check build"}
             </span>
           </>
         )}
