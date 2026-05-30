@@ -124,6 +124,22 @@ function grantSourceRole(grant) {
   return null;
 }
 
+// Short spell-tier label for a candidate/entity (Novice / Adept / Greater /
+// Cantrip), derived from the tierList field or the entity's tier. Returns null
+// for non-spell things so the badge only appears on spells.
+const SPELL_TIER_LABEL = {
+  noviceSpells: "Novice", adeptSpells: "Adept", greaterSpells: "Greater", cantrips: "Cantrip",
+};
+function spellTierLabel(c) {
+  if (!c) return null;
+  if (c.tierList) return SPELL_TIER_LABEL[c.tierList] || null;
+  const t = (c.tier || "").toLowerCase();
+  if (["novice", "adept", "greater", "cantrip"].includes(t)) {
+    return t[0].toUpperCase() + t.slice(1);
+  }
+  return null;
+}
+
 // ─── UI PRIMITIVES ──────────────────────────────────────────────────────────
 
 function Tag({ label, tone = "amber" }) {
@@ -370,6 +386,9 @@ function SlotBlock({ slot, character, onInspect, onOpenSlot, isFocused, pickClas
               <li key={i} className={`b-slot-row is-filled ${over ? "is-over" : ""} ${isFocused(pick.name, pick.field) ? "is-focused" : ""}`}>
                 <span className="b-slot-num">{i + 1}</span>
                 <button className="b-slot-pick" onClick={() => onInspect(pick.name, pick.field, "powers")}>{pick.name}</button>
+                {slot.category === "spellsKnown" && SPELL_TIER_LABEL[pick.field] && (
+                  <span className="b-slot-tier">{SPELL_TIER_LABEL[pick.field]}</span>
+                )}
                 <button className="b-slot-action" title="Swap" onClick={() => onOpenSlot(slot, pick.flatIndex, false, pick.field)}>✎</button>
                 <button className="b-slot-action" title="Clear" onClick={() => onOpenSlot(slot, pick.flatIndex, true, pick.field)}>✕</button>
               </li>
@@ -518,6 +537,9 @@ function powerPickerSpec(slot, character) {
   const { category, index, label, cls } = slot;
   const field = SLOT_FIELD[category];
   // Candidates are drawn from the SLOT'S class only — slots are class-specific.
+  // Spells-known is NOT gated by spell-slots: per the rules, a caster learns "one
+  // known Spell of any Tier" each level — Known Spells are which spells you CAN
+  // cast, Spell-Slots are how many times. So all learnable tiers are offered.
   const candidates = eligiblePowers(cls, category);
   const byTier = { noviceSpells: "Novice", adeptSpells: "Adept", greaterSpells: "Greater", cantrips: "Cantrip" };
   const groupBy = category === "spellsKnown"
@@ -645,6 +667,7 @@ function PickerOverlay({ spec, character, onClose }) {
                             className={`b-picker-row ${selected === c.name ? "is-selected" : ""} ${c.locked ? "is-locked" : ""} ${isTaken ? "is-taken" : ""}`}
                             onClick={() => selectCandidate(c.name)}>
                             <span className="b-picker-row-name">{c.name}</span>
+                            {spellTierLabel(c) && <span className="b-picker-row-tier">{spellTierLabel(c)}</span>}
                             {typeof c.cost === "number" && c.cost > 0 && <span className="b-picker-row-cost">{c.cost} BP</span>}
                             {typeof c.bp === "number" && c.bp > 0 && <span className="b-picker-row-cost is-award">+{c.bp} BP</span>}
                             {c.locked && <span className="b-picker-row-tag b-locked">locked</span>}

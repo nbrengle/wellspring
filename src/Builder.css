@@ -823,3 +823,15 @@
 /* Rank multiplier badge on a row name (e.g. "Bookcaster ×2") */
 .b-row-rank { color: var(--b-amber); font-size: 0.72rem; margin-left: 0.35rem; opacity: 0.85; }
 .b-row-role { opacity: 0.7; font-style: italic; }
+
+/* Spell-tier badges (picker rows + sheet slot rows) */
+.b-picker-row-tier {
+  font-size: 0.55rem; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--b-purple); border: 1px solid rgba(176,143,208,0.4);
+  border-radius: 1rem; padding: 0.05rem 0.4rem; margin-left: auto;
+}
+.b-slot-tier {
+  flex: none; font-size: 0.58rem; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--b-purple); border: 1px solid rgba(176,143,208,0.35);
+  border-radius: 1rem; padding: 0.05rem 0.45rem;
+}
