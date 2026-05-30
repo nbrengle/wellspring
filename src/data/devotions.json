@@ -10,8 +10,12 @@
     ],
     "colorScheme": "Gold",
     "iconography": "A glowing crescent moon, the outer edge always facing left, and a golden tree within the crescent.",
-    "domains": [],
-    "locality": ""
+    "domains": [
+      "Life",
+      "Creation",
+      "Protection"
+    ],
+    "locality": "Auros"
   },
   {
     "name": "The Steed",
@@ -26,8 +30,13 @@
     ],
     "colorScheme": "Red and White",
     "iconography": "Winged horse, descending from the sky. Sometimes depicted as the body of an angel, and the head of a horse.",
-    "domains": [],
-    "locality": ""
+    "domains": [
+      "War",
+      "Order",
+      "Light",
+      "Energy: Fire"
+    ],
+    "locality": "Empire of Light"
   },
   {
     "name": "Senri, Voice of Mercy",
@@ -41,8 +50,11 @@
     ],
     "colorScheme": "Nearly pure white with small tinges of red like a bloody bandage.",
     "iconography": "A dagger between two closed eyes.",
-    "domains": [],
-    "locality": ""
+    "domains": [
+      "Peace",
+      "Destruction"
+    ],
+    "locality": "Shorn"
   },
   {
     "name": "Dorne, Bringer of Law",
@@ -55,8 +67,11 @@
     ],
     "colorScheme": "Red and Gold",
     "iconography": "A great hammer. The edge of the hammer is commonly portrayed as gold where the handle and body are red.",
-    "domains": [],
-    "locality": ""
+    "domains": [
+      "Order",
+      "Light"
+    ],
+    "locality": "Shorn"
   },
   {
     "name": "Filian, Keeper of the Hearth",
@@ -69,8 +84,11 @@
     ],
     "colorScheme": "Black and Brown",
     "iconography": "Whip or string in the shape of an infinity symbol. The whip body is commonly black with a brown handle.",
-    "domains": [],
-    "locality": ""
+    "domains": [
+      "Manipulation",
+      "Life"
+    ],
+    "locality": "Shorn"
   },
   {
     "name": "Mille, Muse of Creation",
@@ -83,8 +101,11 @@
     ],
     "colorScheme": "Rainbow",
     "iconography": "A paintbrush in motion with a streak of paint. The brush tip and streak is all colors in rainbow order and the handle is black.",
-    "domains": [],
-    "locality": ""
+    "domains": [
+      "Expression",
+      "Creation"
+    ],
+    "locality": "Shorn"
   },
   {
     "name": "The Song in Iron",
@@ -98,8 +119,12 @@
     ],
     "colorScheme": "Dark Greys and Silvers",
     "iconography": "Smithing tools, usually an anvil, and featuring musical notes/symbols. Occasionally a bell is featured under the anvil to signify the song coming through the works of the forge.",
-    "domains": [],
-    "locality": ""
+    "domains": [
+      "Creation",
+      "Protection",
+      "War"
+    ],
+    "locality": "Streams in Silver"
   },
   {
     "name": "Dave",
@@ -113,8 +138,13 @@
     ],
     "colorScheme": "Whatever you want, darling - just make sure it POPS!",
     "iconography": ":)",
-    "domains": [],
-    "locality": ""
+    "domains": [
+      "Life",
+      "Expression",
+      "Creation",
+      "Chaos"
+    ],
+    "locality": "The Traveling Star"
   },
   {
     "name": "The Great Mind",
@@ -128,8 +158,12 @@
     ],
     "colorScheme": "Orangish-yellow",
     "iconography": "An eye, often with network tendrils and nodes splitting out from it.",
-    "domains": [],
-    "locality": ""
+    "domains": [
+      "Knowledge",
+      "Order",
+      "Energy: Lightning"
+    ],
+    "locality": "The Unified Technarchy"
   },
   {
     "name": "Druidism",
@@ -141,8 +175,12 @@
     ],
     "colorScheme": "Green",
     "iconography": "Abstract blooming trees and plants.",
-    "domains": [],
-    "locality": ""
+    "domains": [
+      "Nature",
+      "Chaos",
+      "Expression"
+    ],
+    "locality": "Universal"
   },
   {
     "name": "The Howl at the End",
@@ -155,8 +193,12 @@
     ],
     "colorScheme": "Black",
     "iconography": "A skeletal wolf.",
-    "domains": [],
-    "locality": ""
+    "domains": [
+      "Death",
+      "Shadow",
+      "Destruction"
+    ],
+    "locality": "Universal"
   },
   {
     "name": "The Divine Bloom",
@@ -171,8 +213,11 @@
     ],
     "colorScheme": "Orange, Green, and Brown",
     "iconography": "Fungi, often depicted releasing the spores of knowledge.",
-    "domains": [],
-    "locality": ""
+    "domains": [
+      "Chaos",
+      "Knowledge"
+    ],
+    "locality": "Universal"
   },
   {
     "name": "The Witch of Webs",
@@ -185,8 +230,11 @@
     ],
     "colorScheme": "Purple, Dark Green, and Black",
     "iconography": "Spiderwebs, often with an eye-pendant somewhere in the design.",
-    "domains": [],
-    "locality": ""
+    "domains": [
+      "Chaos",
+      "Nature"
+    ],
+    "locality": "Universal"
   },
   {
     "name": "The Pale Star",
@@ -199,8 +247,11 @@
     ],
     "colorScheme": "Greyish-blues",
     "iconography": "A radiating star. The rays are usually lighter colors - pale yellows or white, while the eye in the middle of the star is light blue or grey.",
-    "domains": [],
-    "locality": ""
+    "domains": [
+      "Energy: Ice",
+      "Shadow"
+    ],
+    "locality": "Universal"
   },
   {
     "name": "Devourer",
@@ -215,8 +266,11 @@
     ],
     "colorScheme": "Dark Green, almost black.",
     "iconography": "A gaping maw.",
-    "domains": [],
-    "locality": ""
+    "domains": [
+      "Destruction",
+      "Energy: Acid"
+    ],
+    "locality": "Universal"
   },
   {
     "name": "The Librarian",
@@ -230,8 +284,12 @@
     ],
     "colorScheme": "Deep Blue",
     "iconography": "An open book, and sometimes a rose-compass star.",
-    "domains": [],
-    "locality": ""
+    "domains": [
+      "Knowledge",
+      "Shadow",
+      "Manipulation"
+    ],
+    "locality": "Universal"
   },
   {
     "name": "Wildfire",
@@ -244,8 +302,12 @@
     ],
     "colorScheme": "Fire",
     "iconography": "Fire.",
-    "domains": [],
-    "locality": ""
+    "domains": [
+      "Energy: Fire",
+      "Nature",
+      "Destruction"
+    ],
+    "locality": "Universal"
   },
   {
     "name": "The Dancer",
@@ -254,7 +316,10 @@
     "tenets": [],
     "colorScheme": "Light Pink",
     "iconography": "A dancer, if you squint really hard, tilt your head, and pretend to your friends that it is a dancer.",
-    "domains": [],
-    "locality": ""
+    "domains": [
+      "Expression",
+      "Death"
+    ],
+    "locality": "Universal"
   }
 ]

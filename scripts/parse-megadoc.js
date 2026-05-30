@@ -747,11 +747,58 @@ write('flaws.json', parsePerkFlawList('Flaws List', 'bp'));
 
 console.log('\nParsing devotions...');
 
+// The Divine Domains section opens with a table mapping each Devotion to its
+// divine domains: header "God|Devotion | Locality | Domain 1 … Domain 4", then a
+// row per devotion. The Google Docs export nests <p> inside each <td>, so cells
+// arrive as TEXT nodes and EMPTY cells are dropped — rows are variable length.
+// We can't split by a fixed column count, so we split on devotion-name
+// boundaries: each known devotion name begins a row, the next token is its
+// locality, and the remaining tokens (until the next devotion name) are domains.
+// `devNames` is the set of canonical devotion names (base, before any comma).
+const normDevName = (s) => s.toLowerCase().replace(/[^a-z]/g, '');
+function parseDevotionDomains(devNames) {
+  const known = new Set(devNames.map(normDevName));
+  // Locate the table header text node ("God" or "Devotion") and the run after it.
+  const hdr = nodes.findIndex((n) => n.type === 'text' && /^(God|Devotion)$/i.test(n.text));
+  if (hdr === -1) return {};
+  // Read forward, collecting tokens until we leave the table (a heading, a long
+  // prose paragraph, or the "See the Devotions & Divine Beings" note).
+  const tokens = [];
+  for (let j = hdr; j < nodes.length; j++) {
+    const n = nodes[j];
+    if (n.type !== 'text') break;
+    if (/^See the Devotions/i.test(n.text) || n.text.length > 60) break;
+    tokens.push(n.text.trim());
+  }
+  // Drop the 6 header labels.
+  const body = tokens.slice(6);
+  const map = {};
+  let cur = null;
+  for (const tok of body) {
+    if (known.has(normDevName(tok))) {
+      cur = { name: tok, locality: null, domains: [] };
+      map[normDevName(tok)] = cur;
+    } else if (cur) {
+      if (cur.locality === null) cur.locality = tok;   // first token after name
+      else cur.domains.push(tok);                      // rest are domains
+    }
+  }
+  return map;
+}
+
 function parseDevotions() {
   const divDomainsIdx = findHeading('Divine Domains', 1);
 
   // Collect all H1s between "Devotions & Divine Beings" and "Divine Domains"
   const devotionsStart = findHeading('Devotions & Divine Beings', 1);
+  // First pass: gather the devotion names so the domain-table splitter knows the
+  // row boundaries.
+  const names = [];
+  for (let j = devotionsStart + 1; j < divDomainsIdx; j++) {
+    const n = nodes[j];
+    if (n.type === 'heading' && n.level === 1 && n.text) names.push(n.text.split(',')[0]);
+  }
+  const domainMap = parseDevotionDomains(names);
   const results = [];
 
   let i = devotionsStart + 1;
@@ -780,7 +827,14 @@ function parseDevotions() {
       loreParts.push(t);
     }
 
-    results.push({ name, epithet: '', lore: loreParts.join(' '), tenets, colorScheme, iconography, domains: [], locality: '' });
+    // Match this devotion to its row in the domain table by base name (the table
+    // uses short names like "Senri"; the H1 may be "Senri, Voice of Mercy").
+    const base = name.split(',')[0];
+    const dm = domainMap[normDevName(base)] || domainMap[normDevName(name)] || {};
+    results.push({
+      name, epithet: '', lore: loreParts.join(' '), tenets, colorScheme, iconography,
+      domains: dm.domains || [], locality: dm.locality || '',
+    });
     i = end;
   }
   return results;
