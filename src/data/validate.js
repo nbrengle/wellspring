@@ -119,6 +119,10 @@ export function characterLevel(character) {
 export const LEGAL_MIN_LEVEL = LEVEL_TABLE.length
   ? Math.min(...LEVEL_TABLE.map((l) => l.level)) : 4;
 
+// Current total-level cap (10). The only path past 10 is Advanced Classes, which
+// aren't published yet. Not enforced by the builder — only flagged.
+export const LEVEL_CAP = 10;
+
 // Base Build Points from the level table (9 at level 4). Below the table's floor
 // the rule is "2 BP per level", so we extrapolate down (L3=7, L2=5, L1=3) rather
 // than report 0 — even though such a character is flagged below-floor / invalid.
@@ -519,6 +523,9 @@ export function validate(character) {
   // Characters below the campaign's documented floor (level 4) are buildable but
   // not legal play — flagged so the UI can mark them invalid with a reason.
   const belowFloor = level < LEGAL_MIN_LEVEL;
+  // Total level above the current play cap (10). Not enforced — just flagged —
+  // since the only path past 10 is Advanced Classes, which aren't published yet.
+  const aboveCap = level > LEVEL_CAP;
   // Any class past its documented progression (base classes cap at 10; 11+ is
   // Advanced Classes, not yet published). Slots/stats are frozen at the top row.
   const beyondProgression = getClasses(character)
@@ -539,8 +546,10 @@ export function validate(character) {
     stats,
     prereqs,
     belowFloor,
+    aboveCap,
     beyondProgression,
     legalMinLevel: LEGAL_MIN_LEVEL,
+    levelCap: LEVEL_CAP,
     valid: !prereqs.issues.length && !overBudget && !slotsOver && !belowFloor,
   };
 }

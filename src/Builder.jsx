@@ -99,11 +99,14 @@ const SLOT_FIELD = {
   spellsKnown: "noviceSpells",
 };
 
-// Level bounds. The level table documents the legal campaign range (starts at 4);
-// the stepper allows down to level 1 for from-scratch builds, but a character
-// below the table's minimum is flagged invalid by the validator.
-const MAX_LEVEL = LEVEL_TABLE.length ? Math.max(...LEVEL_TABLE.map((l) => l.level)) : 4;
-const MIN_LEVEL = 1; // stepper floor (legality enforced separately by the validator)
+// Level bounds for the stepper. We don't ENFORCE a ceiling — the user can push
+// levels up freely — but the validator FLAGS a total level above 10, since 10 is
+// the current play cap (past 10 needs Advanced Classes, not yet published, and
+// base progression tables stop at 10). The stepper goes down to level 1 for
+// from-scratch builds; below the documented floor (4) the build is flagged.
+const MAX_LEVEL = LEVEL_TABLE.length ? Math.max(...LEVEL_TABLE.map((l) => l.level)) : 15;
+const MIN_LEVEL = 1;
+const LEVEL_CAP = 10; // current total-level cap (flagged, not enforced)
 
 // A short, clear label for what KIND of thing a grant source is, so "free ·
 // Linked Armor" can read "free · Linked Armor (Utility Power)". Prefers the role
@@ -1178,9 +1181,9 @@ function BTopBar({ character, report, onLevelChange }) {
                 : report.belowFloor ? `⚠ below level ${report.legalMinLevel}`
                 : "⚠ check build"}
             </span>
-            {report.beyondProgression && (
-              <span className="b-topbar-stat is-note" title="Base classes are documented through level 10; levels beyond that are Advanced Classes (not yet published). Slots/stats are frozen at level 10.">
-                ⚑ beyond L10 (Advanced Classes pending)
+            {report.aboveCap && (
+              <span className="b-topbar-stat is-note" title={`Total level ${report.level} exceeds the current cap of ${report.levelCap}. Advancing past ${report.levelCap} requires Advanced Classes, which aren't published yet; slots/stats are frozen at level ${report.levelCap}.`}>
+                ⚑ above level {report.levelCap} cap (Advanced Classes pending)
               </span>
             )}
           </>
