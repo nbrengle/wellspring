@@ -15,7 +15,7 @@ import {
 } from '../src/data/validate.js';
 import { formatCharacterSheet, parseCharacterSheet } from '../src/data/sheet.js';
 import { readFileSync } from 'node:fs';
-import { lookupEntity, eligiblePowers, DEVOTIONS, DOMAINS, REFS, CLASSES } from '../src/data/index.js';
+import { lookupEntity, eligiblePowers, DEVOTIONS, DOMAINS, REFS, CLASSES, LINEAGES } from '../src/data/index.js';
 import ARCHETYPES from '../src/data/archetypes.json' with { type: 'json' };
 
 // ─── tiny harness ─────────────────────────────────────────────────────────────
@@ -153,6 +153,42 @@ test('xN rank multiplies a slot-granting skill (Utility Mage Extended Capacity x
   const r = validate(fromArchetype(mage));
   const sk = r.slots.find((s) => s.category === 'spellsKnown');
   ok(sk.bonus >= 2, `spellsKnown bonus from x2 grants (got ${sk.bonus})`);
+});
+
+// ─── lineages / LBP ───────────────────────────────────────────────────────────
+test('LBP: challenges award, advantages spend, cap at 10', () => {
+  const a = LINEAGES.Aewen;
+  const req = a.challenges.find((c) => c.required);
+  const c = {
+    lineage: 'Aewen',
+    lineageChallenges: [req.name, 'Mana Lines [Repped]', 'Pointed Ears [Repped]'],
+    lineageAdvantages: ['Deep Reserves'],
+  };
+  const s = validate(c).lbp;
+  eq(s.awarded, 5, 'awarded'); eq(s.spent, 4, 'spent'); eq(s.remaining, 1, 'remaining');
+  ok(s.valid, 'complete build is valid');
+});
+test('LBP: overspend is invalid', () => {
+  const s = validate({ lineage: 'Aewen', lineageChallenges: ['Pointed Ears [Repped]'], lineageAdvantages: ['Deep Reserves'] }).lbp;
+  ok(s.overspent, 'overspent (1 awarded, 4 spent)');
+});
+test('LBP: missing required challenge is invalid', () => {
+  const s = validate({ lineage: 'Aewen', lineageChallenges: ['Mana Lines [Repped]'], lineageAdvantages: [] }).lbp;
+  ok(s.missingRequired.length > 0, 'required challenge flagged');
+});
+test('sublineage: same sublineage (inconsistent strings) is NOT mixed', () => {
+  const a = LINEAGES.Aewen;
+  const accC = a.challenges.find((c) => /^Accented/.test(c.sublineage));
+  const accA = a.advantages.find((c) => c.sublineage === 'Accented');
+  const s = validate({ lineage: 'Aewen', lineageChallenges: [accC.name], lineageAdvantages: [accA.name] }).lbp;
+  ok(!s.mixedSublineage, 'Accented long/short forms treated as one sublineage');
+});
+test('sublineage: mixing two sublineages is flagged', () => {
+  const a = LINEAGES.Aewen;
+  const accC = a.challenges.find((c) => /^Accented/.test(c.sublineage));
+  const shornC = a.challenges.find((c) => /Shorn Urbanite/.test(c.sublineage));
+  const s = validate({ lineage: 'Aewen', lineageChallenges: [accC.name, shornC.name], lineageAdvantages: [] }).lbp;
+  ok(s.mixedSublineage, 'two sublineages flagged as mixed');
 });
 
 // ─── devotions ────────────────────────────────────────────────────────────────

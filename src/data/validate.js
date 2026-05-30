@@ -9,7 +9,67 @@
 // Pure functions, no React, so the UI calls them in a useMemo and they stay
 // unit-testable. The character shape is the flat object from Builder.jsx.
 
-import { LEVEL_TABLE, lookupEntity, REFS, CLASS_POWER_SLOTS, CLASS_POWERS, CLASS_PROGRESSION, SPELLCASTERS, DEVOTIONS, DOMAINS, CLASSES } from './index.js';
+import { LEVEL_TABLE, lookupEntity, REFS, CLASS_POWER_SLOTS, CLASS_POWERS, CLASS_PROGRESSION, SPELLCASTERS, DEVOTIONS, DOMAINS, CLASSES, LINEAGES } from './index.js';
+
+// Max Lineage Build Points a character can be awarded from challenges (MegaDoc:
+// "up to 10 awarded LBP").
+export const MAX_LBP = 10;
+
+// Normalize a sublineage label to its base name. The data is inconsistent: a
+// sublineage may appear as "Accented (Any Accent…)" on a challenge but just
+// "Accented" on an advantage. Compare on the part before " (" so the same
+// sublineage matches across challenges, advantages, and the sublineage list.
+export const subKey = (s) => String(s || '').split(' (')[0].trim().toLowerCase();
+
+// Lineage Build Point economy — a separate currency from BP. Challenges AWARD LBP
+// (capped at MAX_LBP); advantages SPEND it. Challenges/advantages are scoped to
+// "General" or a single sublineage (you can't mix sublineages). Returns null when
+// no lineage is set, else the full state for the UI + validity.
+export function lbpState(character) {
+  const lin = character?.lineage && LINEAGES[character.lineage];
+  if (!lin) return null;
+  const chosenC = character.lineageChallenges || [];
+  const chosenA = character.lineageAdvantages || [];
+  // Match a chosen item-name back to its lineage entry (names may carry [Repped]
+  // / sublineage tags; compare on the display name the data exposes).
+  const findIn = (list, name) => list.find((x) => x.name === name || x.baseName === name);
+
+  const challenges = chosenC.map((n) => findIn(lin.challenges, n)).filter(Boolean);
+  const advantages = chosenA.map((n) => findIn(lin.advantages, n)).filter(Boolean);
+
+  const rawAwarded = challenges.reduce((s, c) => s + (c.lbp || 0), 0);
+  const awarded = Math.min(rawAwarded, MAX_LBP);
+  const spent = advantages.reduce((s, a) => s + (a.lbp || 0), 0);
+
+  // Sublineage scoping: all chosen non-"General" items must share ONE sublineage
+  // (normalized, since the data tags it inconsistently), and — when the character
+  // has picked a sublineage — must match that one.
+  const subs = new Set([...challenges, ...advantages]
+    .map((x) => subKey(x.sublineage)).filter((s) => s && s !== 'general'));
+  const pickedSub = character.sublineage ? subKey(character.sublineage) : null;
+  const mixedSublineage = subs.size > 1
+    || (pickedSub && [...subs].some((s) => s !== pickedSub));
+
+  // Required challenges the character hasn't taken (some lineages mandate them).
+  const missingRequired = lin.challenges
+    .filter((c) => c.required && !challenges.some((x) => x.baseName === c.baseName));
+
+  return {
+    lineage: character.lineage,
+    sublineage: character.sublineage || null,
+    sublineages: lin.sublineages || [],
+    challenges: lin.challenges,
+    advantages: lin.advantages,
+    chosenChallenges: challenges,
+    chosenAdvantages: advantages,
+    awarded, rawAwarded, capped: rawAwarded > MAX_LBP,
+    spent, remaining: awarded - spent,
+    overspent: spent > awarded,
+    mixedSublineage,
+    missingRequired,
+    valid: spent <= awarded && !mixedSublineage && !missingRequired.length,
+  };
+}
 
 // Max divine domains a worshipper may access (per the Worship skill: "up to two").
 export const MAX_DOMAINS = 2;
@@ -593,6 +653,7 @@ export function validate(character) {
   const spellSlotCounts = spellSlots(character);
   const stats = levelStats(character);
   const devotion = devotionState(character);
+  const lbp = lbpState(character);
   const prereqs = checkPrereqs(character);
   const slotsOver = slots.some((s) => s.over);
   // BP used beyond the base allowance, drawn from the bonus pool (clamped ≥0).
@@ -625,12 +686,14 @@ export function validate(character) {
     spellSlots: spellSlotCounts,
     stats,
     devotion,
+    lbp,
     prereqs,
     belowFloor,
     aboveCap,
     beyondProgression,
     legalMinLevel: LEGAL_MIN_LEVEL,
     levelCap: LEVEL_CAP,
-    valid: !prereqs.issues.length && !overBudget && !slotsOver && !belowFloor,
+    valid: !prereqs.issues.length && !overBudget && !slotsOver && !belowFloor
+      && (!lbp || lbp.valid),
   };
 }

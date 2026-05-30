@@ -13,9 +13,9 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import {
   ARCHETYPES, REFS, lookupEntity, LEVEL_TABLE,
   eligiblePowers, ALL_SKILLS, ALL_PERKS, ALL_FLAWS,
-  CLASS_POWER_SLOTS, CLASSES, DEVOTIONS, DOMAINS,
+  CLASS_POWER_SLOTS, CLASSES, DEVOTIONS, DOMAINS, LINEAGES,
 } from "./data/index.js";
-import { validate, characterLevel, prereqStatus, pickClass, getClasses, MAX_DOMAINS } from "./data/validate.js";
+import { validate, characterLevel, prereqStatus, pickClass, getClasses, MAX_DOMAINS, subKey } from "./data/validate.js";
 import { formatCharacterSheet, parseCharacterSheet } from "./data/sheet.js";
 import "./Builder.css";
 
@@ -157,7 +157,7 @@ function Tag({ label, tone = "amber" }) {
 // budget meter so spend is always visible.
 function IdentityRail({ character, report, onClickField, onRestart,
                        onSetClassLevel, onRemoveClass, onAddClass,
-                       onPickDevotion, onToggleDomain, onClearDevotion }) {
+                       onPickDevotion, onToggleDomain, onClearDevotion, onOpenLineage }) {
   const classes = getClasses(character);
   return (
     <aside className="b-rail b-rail-left">
@@ -172,16 +172,20 @@ function IdentityRail({ character, report, onClickField, onRestart,
                  onSetLevel={onSetClassLevel} onRemove={onRemoveClass} onAdd={onAddClass}
                  onInspect={() => onClickField("class")} />
 
-      {[{ key: "lineage", icon: "🧬", label: "Lineage", value: character.lineage, sub: character.sublineage }].map((f) => (
-        <button key={f.key} className={`b-id-card ${f.value ? "is-set" : "is-empty"}`} onClick={() => onClickField(f.key)}>
-          <span className="b-id-icon">{f.icon}</span>
-          <span className="b-id-body">
-            <span className="b-id-label">{f.label}</span>
-            <span className="b-id-value">{f.value || <em>not set</em>}</span>
-            {f.sub && <span className="b-id-sub">{f.sub}</span>}
-          </span>
-        </button>
-      ))}
+      {/* Lineage card — opens the lineage panel (challenges/advantages/LBP). */}
+      <button className={`b-id-card ${character.lineage ? "is-set" : "is-empty"}`} onClick={onOpenLineage}>
+        <span className="b-id-icon">🧬</span>
+        <span className="b-id-body">
+          <span className="b-id-label">Lineage</span>
+          <span className="b-id-value">{character.lineage || <em>+ choose a lineage</em>}</span>
+          {character.sublineage && <span className="b-id-sub">{character.sublineage}</span>}
+          {report.lbp && (report.lbp.chosenChallenges.length > 0 || report.lbp.chosenAdvantages.length > 0) && (
+            <span className={`b-id-sub ${report.lbp.valid ? "" : "b-lbp-warn"}`}>
+              LBP {report.lbp.spent}/{report.lbp.awarded}
+            </span>
+          )}
+        </span>
+      </button>
 
       <DevotionCard character={character} devotion={report.devotion}
                     onPick={onPickDevotion} onToggleDomain={onToggleDomain}
@@ -967,6 +971,115 @@ function useResolvedEntity(item, field, resolveType, archetypeName) {
   }, [item, field, resolveType, archetypeName]);
 }
 
+// ─── LINEAGE PANEL ────────────────────────────────────────────────────────────
+// Full-screen panel for the lineage build economy: pick a lineage + sublineage,
+// then take Challenges (which AWARD Lineage Build Points, capped at MAX_LBP) and
+// spend that LBP on Advantages. Items scoped to "General" or the chosen
+// sublineage. Live LBP meter + validity (overspend / required / mixed sublineage).
+function LineagePanel({ character, report, onSetLineage, onSetSublineage, onToggle, onInspect, onClose }) {
+  const lbp = report.lbp;
+  const lin = character.lineage ? LINEAGES[character.lineage] : null;
+
+  useEffect(() => {
+    const onKey = (e) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
+  // Items selectable given the chosen sublineage: always "General"; before a
+  // sublineage is picked, show all (so you can browse); after, only that
+  // sublineage's items (matched on the normalized sublineage key, since the data
+  // tags it inconsistently).
+  const picked = character.sublineage ? subKey(character.sublineage) : null;
+  const visible = (items) => (items || []).filter((it) => {
+    const k = subKey(it.sublineage);
+    return !k || k === "general" || !picked || k === picked;
+  });
+
+  const Row = ({ it, field, kind }) => {
+    const chosen = (character[field] || []).includes(it.name);
+    return (
+      <li className={`b-lin-row ${chosen ? "is-on" : ""}`}>
+        <button className="b-lin-toggle" onClick={() => onToggle(field, it.name)}
+                title={chosen ? "Remove" : "Take"}>{chosen ? "✓" : "+"}</button>
+        <button className="b-lin-name" onClick={() => onInspect(it.name, field, kind === "challenge" ? "flaws" : "perks")}>
+          {it.baseName || it.name}
+          {it.required && <span className="b-lin-req">required</span>}
+          {it.repped && <span className="b-lin-repped">repped</span>}
+        </button>
+        <span className={`b-lin-lbp ${kind === "challenge" ? "is-award" : ""}`}>
+          {kind === "challenge" ? `+${it.lbp}` : `${it.lbp}`} LBP
+        </span>
+      </li>
+    );
+  };
+
+  return (
+    <div className="b-overlay" onClick={onClose}>
+      <div className="b-picker" onClick={(e) => e.stopPropagation()}>
+        <header className="b-picker-head">
+          <div>
+            <h2 className="b-picker-title">Lineage</h2>
+            <p className="b-picker-sub">
+              {lin ? `${character.lineage} · LBP ${lbp.spent}/${lbp.awarded}${lbp.capped ? " (capped at " + 10 + ")" : ""}`
+                   : "Choose your ancestry"}
+            </p>
+          </div>
+          <button className="b-picker-x" onClick={onClose}>×</button>
+        </header>
+
+        {/* Lineage + sublineage selectors */}
+        <div className="b-lin-selectors">
+          <select className="b-lin-select" value={character.lineage || ""}
+                  onChange={(e) => onSetLineage(e.target.value)}>
+            <option value="">— choose a lineage —</option>
+            {Object.keys(LINEAGES).map((n) => <option key={n} value={n}>{n}</option>)}
+          </select>
+          {lin?.sublineages?.length > 0 && (
+            <div className="b-domain-chips">
+              {lin.sublineages.map((s) => {
+                const label = typeof s === "string" ? s : s.name;
+                const on = character.sublineage === label;
+                return (
+                  <button key={label} className={`b-domain-chip ${on ? "is-on" : ""}`}
+                          onClick={() => onSetSublineage(label)}>{label}</button>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+        {lin && (
+          <>
+            {/* validity hints */}
+            {!lbp.valid && (
+              <p className="b-lin-flag">
+                {lbp.overspent && `Over by ${lbp.spent - lbp.awarded} LBP. `}
+                {lbp.mixedSublineage && "Items from more than one sublineage. "}
+                {lbp.missingRequired.length > 0 && `Required: ${lbp.missingRequired.map((c) => c.baseName).join(", ")}.`}
+              </p>
+            )}
+            <div className="b-export-cols">
+              <div className="b-export-half">
+                <h3 className="b-export-label">Challenges — award LBP</h3>
+                <ul className="b-lin-list">
+                  {visible(lin.challenges).map((it) => <Row key={it.name} it={it} field="lineageChallenges" kind="challenge" />)}
+                </ul>
+              </div>
+              <div className="b-export-half">
+                <h3 className="b-export-label">Advantages — spend {lbp.remaining} LBP left</h3>
+                <ul className="b-lin-list">
+                  {visible(lin.advantages).map((it) => <Row key={it.name} it={it} field="lineageAdvantages" kind="advantage" />)}
+                </ul>
+              </div>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ─── EXPORT / IMPORT PANEL ────────────────────────────────────────────────────
 // Overlay with two halves: EXPORT (the current character as plain text, in the
 // archetype sheet format, with copy + download) and IMPORT (paste a sheet → parse
@@ -1130,6 +1243,28 @@ export default function Builder() {
 
   const handleClearDevotion = useCallback(() => {
     setCharacter((c) => ({ ...c, devotion: null, divineDomains: [], domainPowers: [] }));
+  }, []);
+
+  // ─── LINEAGE ─────────────────────────────────────────────────────────────
+  const [lineageOpen, setLineageOpen] = useState(false);
+
+  // Set the lineage. Clears sublineage + chosen challenges/advantages that don't
+  // belong to the new lineage (simplest: reset them on lineage change).
+  const handleSetLineage = useCallback((name) => {
+    setCharacter((c) => name === c.lineage ? c
+      : { ...c, lineage: name, sublineage: null, lineageChallenges: [], lineageAdvantages: [] });
+  }, []);
+
+  const handleSetSublineage = useCallback((sub) => {
+    setCharacter((c) => ({ ...c, sublineage: c.sublineage === sub ? null : sub }));
+  }, []);
+
+  // Toggle a lineage challenge or advantage by its display name.
+  const handleToggleLineageItem = useCallback((field, name) => {
+    setCharacter((c) => {
+      const cur = c[field] || [];
+      return { ...c, [field]: cur.includes(name) ? cur.filter((x) => x !== name) : [...cur, name] };
+    });
   }, []);
 
   // Start a blank build: pick a class first (a character with no class has no
@@ -1374,7 +1509,7 @@ export default function Builder() {
                       onSetClassLevel={handleSetClassLevel} onRemoveClass={handleRemoveClass}
                       onAddClass={handleOpenClassPicker}
                       onPickDevotion={handlePickDevotion} onToggleDomain={handleToggleDomain}
-                      onClearDevotion={handleClearDevotion} />
+                      onClearDevotion={handleClearDevotion} onOpenLineage={() => setLineageOpen(true)} />
         <BuildSheet character={character} report={report} view={view}
                     onPickArchetype={handlePickArchetype} onStartBlank={handleStartBlank}
                     onInspect={handleInspect} onOpenSlot={handleOpenSlot}
@@ -1392,6 +1527,11 @@ export default function Builder() {
           character={character} report={report}
           onImport={(c) => { setCharacter(c); setExportOpen(false); setView(null); setHistory([]); }}
           onClose={() => setExportOpen(false)} />
+      )}
+      {lineageOpen && (
+        <LineagePanel character={character} report={report} onInspect={handleInspect}
+          onSetLineage={handleSetLineage} onSetSublineage={handleSetSublineage}
+          onToggle={handleToggleLineageItem} onClose={() => setLineageOpen(false)} />
       )}
     </div>
   );
