@@ -9,7 +9,41 @@
 // Pure functions, no React, so the UI calls them in a useMemo and they stay
 // unit-testable. The character shape is the flat object from Builder.jsx.
 
-import { LEVEL_TABLE, lookupEntity, REFS, CLASS_POWER_SLOTS, CLASS_POWERS, CLASS_PROGRESSION, SPELLCASTERS } from './index.js';
+import { LEVEL_TABLE, lookupEntity, REFS, CLASS_POWER_SLOTS, CLASS_POWERS, CLASS_PROGRESSION, SPELLCASTERS, DEVOTIONS, DOMAINS } from './index.js';
+
+// Max divine domains a worshipper may access (per the Worship skill: "up to two").
+export const MAX_DOMAINS = 2;
+
+// Whether the character has the Worship skill (lets them follow a devotion and
+// access its domains). Archetypes encode it as "Worship - <Devotion>", so match
+// the prefix. Any class can take it.
+export function hasWorship(character) {
+  return [...(character?.startingSkills || []), ...(character?.purchasedSkills || [])]
+    .some((s) => /^worship\b/i.test(s));
+}
+
+// Devotion / domain state for the UI: the chosen devotion, the domains it grants,
+// the character's selected domains (≤2, intersected with what the devotion has),
+// whether Worship is held, and the domain powers available to purchase from the
+// selected domains. Returns null when no devotion is set.
+export function devotionState(character) {
+  const devName = character?.devotion;
+  if (!devName) return null;
+  const dev = DEVOTIONS.find((d) => d.name === devName || d.baseName === devName);
+  const available = dev?.domains || [];
+  const chosen = (character.divineDomains || []).filter((d) => available.includes(d)).slice(0, MAX_DOMAINS);
+  // Domain powers purchasable from the chosen domains.
+  const powers = chosen.flatMap((dn) => {
+    const dom = DOMAINS.find((x) => x.name === dn);
+    return (dom?.powers || []).map((p) => ({ ...p, domain: dn }));
+  });
+  return {
+    devotion: dev || { name: devName, domains: [] },
+    available, chosen,
+    worship: hasWorship(character),
+    eligiblePowers: powers,
+  };
+}
 
 // Character fields whose items cost BP. Starting skills are class-granted and
 // free; only purchased skills/perks spend BP.
@@ -515,6 +549,7 @@ export function validate(character) {
   const slots = computeSlots(character);
   const spellSlotCounts = spellSlots(character);
   const stats = levelStats(character);
+  const devotion = devotionState(character);
   const prereqs = checkPrereqs(character);
   const slotsOver = slots.some((s) => s.over);
   // BP used beyond the base allowance, drawn from the bonus pool (clamped ≥0).
@@ -544,6 +579,7 @@ export function validate(character) {
     slotsOver,
     spellSlots: spellSlotCounts,
     stats,
+    devotion,
     prereqs,
     belowFloor,
     aboveCap,

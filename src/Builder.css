@@ -906,3 +906,19 @@
 .b-export-status.is-invalid { color: var(--b-red); }
 .b-export-err { font-size: 0.72rem; color: var(--b-red); margin: 0; }
 @media (max-width: 720px) { .b-export-cols { grid-template-columns: 1fr; } }
+
+/* ─── DEVOTION CARD ───────────────────────────────────────────────────── */
+.b-devotion-card .b-id-body { width: 100%; gap: 0.35rem; }
+.b-devotion-head { display: flex; align-items: center; gap: 0.4rem; }
+.b-devotion-head .b-class-name { flex: 1; }
+.b-devotion-sub { font-size: 0.6rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--b-dim); }
+.b-domain-chips { display: flex; flex-wrap: wrap; gap: 0.25rem; }
+.b-domain-chip {
+  font-family: inherit; font-size: 0.7rem; cursor: pointer;
+  background: var(--b-panel); border: 1px solid var(--b-border-2); color: var(--b-muted);
+  border-radius: 1rem; padding: 0.12rem 0.5rem;
+}
+.b-domain-chip:hover:not(:disabled) { border-color: var(--b-amber-deep); color: var(--b-amber); }
+.b-domain-chip.is-on { background: rgba(176,143,208,0.18); color: var(--b-purple); border-color: rgba(176,143,208,0.5); }
+.b-domain-chip:disabled { opacity: 0.4; cursor: default; }
+.b-devotion-flag { font-size: 0.65rem; color: var(--b-blue); }

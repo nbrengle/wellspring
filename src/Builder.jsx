@@ -13,9 +13,9 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import {
   ARCHETYPES, REFS, lookupEntity, LEVEL_TABLE,
   eligiblePowers, ALL_SKILLS, ALL_PERKS, ALL_FLAWS,
-  CLASS_POWER_SLOTS, CLASSES,
+  CLASS_POWER_SLOTS, CLASSES, DEVOTIONS, DOMAINS,
 } from "./data/index.js";
-import { validate, characterLevel, prereqStatus, pickClass, getClasses } from "./data/validate.js";
+import { validate, characterLevel, prereqStatus, pickClass, getClasses, MAX_DOMAINS } from "./data/validate.js";
 import { formatCharacterSheet, parseCharacterSheet } from "./data/sheet.js";
 import "./Builder.css";
 
@@ -156,12 +156,9 @@ function Tag({ label, tone = "amber" }) {
 // Shows class/lineage/devotion as cards, stats as a strip, plus the live BP
 // budget meter so spend is always visible.
 function IdentityRail({ character, report, onClickField, onRestart,
-                       onSetClassLevel, onRemoveClass, onAddClass }) {
+                       onSetClassLevel, onRemoveClass, onAddClass,
+                       onPickDevotion, onToggleDomain, onClearDevotion }) {
   const classes = getClasses(character);
-  const otherFields = [
-    { key: "lineage", icon: "🧬", label: "Lineage", value: character.lineage, sub: character.sublineage },
-    { key: "devotion", icon: "🌟", label: "Devotion", value: character.devotion, sub: null },
-  ];
   return (
     <aside className="b-rail b-rail-left">
       <header className="b-rail-header">
@@ -175,7 +172,7 @@ function IdentityRail({ character, report, onClickField, onRestart,
                  onSetLevel={onSetClassLevel} onRemove={onRemoveClass} onAdd={onAddClass}
                  onInspect={() => onClickField("class")} />
 
-      {otherFields.map((f) => (
+      {[{ key: "lineage", icon: "🧬", label: "Lineage", value: character.lineage, sub: character.sublineage }].map((f) => (
         <button key={f.key} className={`b-id-card ${f.value ? "is-set" : "is-empty"}`} onClick={() => onClickField(f.key)}>
           <span className="b-id-icon">{f.icon}</span>
           <span className="b-id-body">
@@ -185,6 +182,10 @@ function IdentityRail({ character, report, onClickField, onRestart,
           </span>
         </button>
       ))}
+
+      <DevotionCard character={character} devotion={report.devotion}
+                    onPick={onPickDevotion} onToggleDomain={onToggleDomain}
+                    onClear={onClearDevotion} onInspect={() => onClickField("devotion")} />
 
       <div className="b-stat-strip">
         <Stat label="Life" title="Life Points" value={report.stats?.lifePoints ?? character.lifePoints ?? "—"} />
@@ -230,6 +231,57 @@ function ClassCard({ classes, spec, onSetLevel, onRemove, onAdd, onInspect }) {
           </span>
         ))}
         <button className="b-class-add" onClick={onAdd}>+ add class</button>
+      </span>
+    </div>
+  );
+}
+
+// Devotion card: pick a devotion (any character may), then toggle up to 2 of its
+// divine domains (which unlock domain-power purchasing). Flags when a devotion is
+// set without the Worship skill, since domain powers need it.
+function DevotionCard({ character, devotion, onPick, onToggleDomain, onClear, onInspect }) {
+  if (!character.devotion || !devotion) {
+    return (
+      <button className="b-id-card is-empty" onClick={onPick}>
+        <span className="b-id-icon">🌟</span>
+        <span className="b-id-body">
+          <span className="b-id-label">Devotion</span>
+          <span className="b-id-value"><em>+ choose a devotion</em></span>
+        </span>
+      </button>
+    );
+  }
+  const { available, chosen, worship } = devotion;
+  return (
+    <div className="b-id-card b-devotion-card is-set">
+      <span className="b-id-icon">🌟</span>
+      <span className="b-id-body">
+        <span className="b-id-label">Devotion</span>
+        <span className="b-devotion-head">
+          <button className="b-class-name" onClick={onInspect} title="Inspect devotion">{character.devotion}</button>
+          <button className="b-class-remove" title="Clear devotion" onClick={onClear}>×</button>
+        </span>
+        {available.length > 0 && (
+          <>
+            <span className="b-devotion-sub">Domains ({chosen.length}/{MAX_DOMAINS}):</span>
+            <span className="b-domain-chips">
+              {available.map((d) => {
+                const on = chosen.includes(d);
+                const full = chosen.length >= MAX_DOMAINS && !on;
+                return (
+                  <button key={d} disabled={full}
+                          className={`b-domain-chip ${on ? "is-on" : ""}`}
+                          onClick={() => onToggleDomain(d)}
+                          title={full ? `Pick up to ${MAX_DOMAINS} domains` : on ? "Remove domain" : "Add domain"}>
+                    {d}
+                  </button>
+                );
+              })}
+            </span>
+          </>
+        )}
+        {!worship && <span className="b-devotion-flag">⚑ needs Worship skill to buy domain powers</span>}
+        <button className="b-class-add" onClick={onPick}>change devotion</button>
       </span>
     </div>
   );
@@ -337,6 +389,19 @@ function BuildSheet({ character, report, view, onPickArchetype, onStartBlank, on
           onClick={onInspect} isFocused={isFocused}
           removable={() => true} onRemove={(i) => onRemoveEntity("purchasedPerks", i)} />
       </Section>
+
+      {report.devotion?.chosen.length > 0 && (
+        <Section title={`Domain Powers — ${report.devotion.chosen.join(" · ")}`} tone="purple"
+                 onAdd={report.devotion.worship ? () => onOpenAdd("domainPower") : undefined}>
+          {!report.devotion.worship && (
+            <p className="b-empty">Take the Worship skill to purchase domain powers.</p>
+          )}
+          <EditableRows
+            items={character.domainPowers} field="domainPowers" resolveType="powers" report={report}
+            onClick={onInspect} isFocused={isFocused}
+            removable={() => true} onRemove={(i) => onRemoveEntity("domainPowers", i)} />
+        </Section>
+      )}
 
       {report.slots.length > 0 && (
         <Section title="Powers" tone="purple">
@@ -1018,6 +1083,52 @@ export default function Builder() {
     setCharacter((c) => ({ ...c, name }));
   }, []);
 
+  // ─── DEVOTION ────────────────────────────────────────────────────────────
+  // Open the devotion picker (any character may follow a devotion). Choosing one
+  // sets character.devotion and resets domain choices to those still valid.
+  const handlePickDevotion = useCallback(() => {
+    const candidates = DEVOTIONS.map((d) => ({
+      name: d.name, desc: d.lore || (d.tenets || []).join(" "),
+      cat: d.locality || "Devotion",
+    }));
+    setPicking(entityPickerSpec({
+      kind: "devotion", entityType: "devotions", candidates, title: "Choose a devotion",
+      taken: new Set(character.devotion ? [character.devotion] : []),
+      onChoose: (name) => {
+        const dev = DEVOTIONS.find((d) => d.name === name);
+        setCharacter((c) => ({
+          ...c, devotion: name,
+          // Keep only domains the new devotion actually has.
+          divineDomains: (c.divineDomains || []).filter((dn) => dev?.domains.includes(dn)),
+        }));
+        setPicking(null);
+      },
+    }));
+  }, [character.devotion]);
+
+  // Toggle a divine domain on/off (cap MAX_DOMAINS). Removing a domain drops the
+  // domain powers purchased from it.
+  const handleToggleDomain = useCallback((domain) => {
+    setCharacter((c) => {
+      const cur = c.divineDomains || [];
+      if (cur.includes(domain)) {
+        const nextDomains = cur.filter((d) => d !== domain);
+        // Drop domain powers that belonged to the removed domain.
+        const domPowers = (DOMAINS.find((x) => x.name === domain)?.powers || []).map((p) => p.name);
+        return {
+          ...c, divineDomains: nextDomains,
+          domainPowers: (c.domainPowers || []).filter((p) => !domPowers.includes(p.replace(/\s*\(.+\)$/, "")) && !domPowers.includes(p)),
+        };
+      }
+      if (cur.length >= MAX_DOMAINS) return c;
+      return { ...c, divineDomains: [...cur, domain] };
+    });
+  }, []);
+
+  const handleClearDevotion = useCallback(() => {
+    setCharacter((c) => ({ ...c, devotion: null, divineDomains: [], domainPowers: [] }));
+  }, []);
+
   // Start a blank build: pick a class first (a character with no class has no
   // slots and nothing to build), then land in a buildable empty character at the
   // starter level with that class.
@@ -1191,6 +1302,19 @@ export default function Builder() {
 
   // Open the add-picker for skills / perks / flaws.
   const handleOpenAdd = useCallback((kind) => {
+    // Domain powers are dynamic — drawn from the devotion's chosen domains, each
+    // tagged with its domain for grouping. Built here rather than from a static list.
+    if (kind === "domainPower") {
+      const eligible = (report.devotion?.eligiblePowers || []).map((p) => ({
+        name: p.name, desc: p.description || p.desc || "", cat: p.domain, cost: p.cost,
+      }));
+      setPicking(entityPickerSpec({
+        kind: "domainPower", entityType: "powers", candidates: eligible, title: "Add a domain power",
+        taken: new Set(character.domainPowers || []),
+        onChoose: (name) => handleAddEntity("domainPowers", name),
+      }));
+      return;
+    }
     const config = {
       skill: { field: "purchasedSkills", entityType: "skills", candidates: ALL_SKILLS, title: "Add a skill",
                takenFrom: (c) => [...(c.startingSkills || []), ...(c.purchasedSkills || [])] },
@@ -1204,7 +1328,7 @@ export default function Builder() {
       taken: new Set(config.takenFrom(character)),
       onChoose: (name) => handleAddEntity(config.field, name),
     }));
-  }, [character, handleAddEntity]);
+  }, [character, handleAddEntity, report.devotion]);
 
   const handleBack = useCallback(() => {
     setHistory((h) => {
@@ -1242,7 +1366,9 @@ export default function Builder() {
         <IdentityRail character={character} report={report}
                       onClickField={handleClickIdentityField} onRestart={handleRestart}
                       onSetClassLevel={handleSetClassLevel} onRemoveClass={handleRemoveClass}
-                      onAddClass={handleOpenClassPicker} />
+                      onAddClass={handleOpenClassPicker}
+                      onPickDevotion={handlePickDevotion} onToggleDomain={handleToggleDomain}
+                      onClearDevotion={handleClearDevotion} />
         <BuildSheet character={character} report={report} view={view}
                     onPickArchetype={handlePickArchetype} onStartBlank={handleStartBlank}
                     onInspect={handleInspect} onOpenSlot={handleOpenSlot}
