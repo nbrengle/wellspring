@@ -167,7 +167,7 @@
   flex-direction: column;
 }
 .b-stat-val { font-size: 1.1rem; font-weight: 700; color: var(--b-amber); }
-.b-stat-label { font-size: 0.65rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--b-dim); }
+.b-stat-label { font-size: 0.58rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--b-dim); white-space: nowrap; }
 
 .b-restart {
   margin-top: auto;
@@ -753,7 +753,7 @@
   padding: 0.35rem 0.2rem;
 }
 .b-spellslot-val { font-size: 1rem; font-weight: 700; color: var(--b-tier); }
-.b-spellslot-label { font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--b-dim); }
+.b-spellslot-label { font-size: 0.52rem; letter-spacing: 0.04em; text-transform: uppercase; color: var(--b-dim); white-space: nowrap; }
 .b-spellslot.is-zero { opacity: 0.4; }
 .b-spellslot.is-zero .b-spellslot-val { color: var(--b-dim); }
 

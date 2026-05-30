@@ -187,9 +187,9 @@ function IdentityRail({ character, report, onClickField, onRestart,
       ))}
 
       <div className="b-stat-strip">
-        <Stat label="LP" value={report.stats?.lifePoints ?? character.lifePoints ?? "—"} />
-        <Stat label="Spikes" value={report.stats?.spikes ?? character.spikes ?? "—"} />
-        <Stat label="AP" value={character.armorPoints?.replace(/\s*\(.+\)/, "") ?? "—"} />
+        <Stat label="Life" title="Life Points" value={report.stats?.lifePoints ?? character.lifePoints ?? "—"} />
+        <Stat label="Spikes" title="Maximum Spikes" value={report.stats?.spikes ?? character.spikes ?? "—"} />
+        <Stat label="Max Armor" title="Maximum Armor Points" value={character.armorPoints?.replace(/\s*\(.+\)/, "") ?? "—"} />
       </div>
 
       {report.spellSlots && <SpellSlotStrip slots={report.spellSlots} />}
@@ -235,9 +235,9 @@ function ClassCard({ classes, spec, onSetLevel, onRemove, onAdd, onInspect }) {
   );
 }
 
-function Stat({ label, value }) {
+function Stat({ label, value, title }) {
   return (
-    <div className="b-stat">
+    <div className="b-stat" title={title}>
       <span className="b-stat-val">{value}</span>
       <span className="b-stat-label">{label}</span>
     </div>
@@ -249,13 +249,13 @@ function Stat({ label, value }) {
 // dimmed rather than hidden so the progression is legible.
 function SpellSlotStrip({ slots }) {
   const tiers = [
-    { key: "novice", label: "Nov" },
-    { key: "adept", label: "Adp" },
-    { key: "greater", label: "Grt" },
+    { key: "novice", label: "Novice" },
+    { key: "adept", label: "Adept" },
+    { key: "greater", label: "Greater" },
   ];
   return (
     <div className="b-spellslots">
-      <span className="b-spellslots-label">Spell Slots</span>
+      <span className="b-spellslots-label">Spell Slots (per rest)</span>
       <div className="b-spellslots-row">
         {tiers.map((t) => (
           <div key={t.key} className={`b-spellslot b-tier-${t.key} ${slots[t.key] ? "" : "is-zero"}`}>
