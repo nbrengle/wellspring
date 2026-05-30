@@ -120,15 +120,19 @@ test('every class has parsed multiclassGrants that resolve to entities', () => {
   }
 });
 
-test('redundant multiclass grant awards free BP (budget grows)', () => {
-  // A character who already has a skill the new class would grant gets free BP
-  // equal to its cost instead of a duplicate; freeBP adds to the budget.
+test('multiclass grants are derived (new skills free, redundant → free BP)', () => {
+  // Rogue (2nd class) grants Basic Martial Weapons (1) + Thrown Weapons (3).
+  // The character (a Fighter) already has BMW → that becomes free BP; Thrown is
+  // a new free skill. Derived purely from the class list — nothing cached.
   const c = {
     archetypeName: 'x', classes: [{ name: 'Fighter', level: 2 }, { name: 'Rogue', level: 2 }],
-    startingSkills: ['Basic Martial Weapons', 'Thrown Weapons'], freeBP: 1,
+    startingSkills: ['Basic Martial Weapons', 'Basic Armor'],
   };
   const r = validate(c);
-  eq(r.freeBP, 1, 'freeBP surfaced');
+  const granted = r.multiclassGrants.skills.map((g) => g.name);
+  ok(granted.includes('Thrown Weapons'), 'Thrown Weapons granted as new free skill');
+  ok(!granted.includes('Basic Martial Weapons'), 'redundant BMW not re-granted');
+  eq(r.freeBP, 1, 'redundant BMW → 1 free BP');
   eq(r.budget, budgetFor(4) + 1, 'budget includes free BP');
 });
 

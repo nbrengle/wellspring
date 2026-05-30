@@ -9,7 +9,7 @@
 // Pure functions, no React, so the UI calls them in a useMemo and they stay
 // unit-testable. The character shape is the flat object from Builder.jsx.
 
-import { LEVEL_TABLE, lookupEntity, REFS, CLASS_POWER_SLOTS, CLASS_POWERS, CLASS_PROGRESSION, SPELLCASTERS, DEVOTIONS, DOMAINS } from './index.js';
+import { LEVEL_TABLE, lookupEntity, REFS, CLASS_POWER_SLOTS, CLASS_POWERS, CLASS_PROGRESSION, SPELLCASTERS, DEVOTIONS, DOMAINS, CLASSES } from './index.js';
 
 // Max divine domains a worshipper may access (per the Worship skill: "up to two").
 export const MAX_DOMAINS = 2;
@@ -138,6 +138,44 @@ export function getClasses(character) {
 // the default context where a single class is assumed.
 export function primaryClass(character) {
   return getClasses(character)[0]?.name || null;
+}
+
+// Strip a trailing "(parameter)" from a skill name for ownership comparison.
+const bareSkill = (s) => String(s).replace(/\s*\([^)]*\)\s*$/, '').trim();
+
+// DERIVED multi-class grants — a pure function of the character's classes, so the
+// same rule drives both the forward path (materialize grants when a class is
+// added) and the reflective path (validate). Each class AFTER the first grants
+// its Multi-Class Skills; a granted skill the character already has instead
+// yields free BP equal to its cost ("Redundant Skills and Discounts" rule).
+// Returns { skills:[{name,source}], freeBP, freeBPItems:[{skill,source,bp}] }.
+// `skills` are the genuinely-new free skills; the caller decides whether to
+// display/merge them. Nothing here is cached on the character.
+export function multiclassGrants(character) {
+  const classes = getClasses(character);
+  const skills = [];
+  const freeBPItems = [];
+  let freeBP = 0;
+  // Skills the character already has from elsewhere (starting + purchased + the
+  // first class isn't re-granted). Track as we go so two classes granting the
+  // same skill only grant it once (second one becomes free BP).
+  const owned = new Set([
+    ...(character.startingSkills || []),
+    ...(character.purchasedSkills || []),
+  ].map(bareSkill));
+
+  classes.slice(1).forEach(({ name }) => {
+    for (const g of (CLASSES[name]?.multiclassGrants || [])) {
+      if (owned.has(bareSkill(g.name))) {
+        freeBP += g.cost || 0;
+        freeBPItems.push({ skill: g.name, source: name, bp: g.cost || 0 });
+      } else {
+        skills.push({ name: g.name, source: name });
+        owned.add(bareSkill(g.name));
+      }
+    }
+  });
+  return { skills, freeBP, freeBPItems };
 }
 
 // Total Character Level = sum of all class levels (per the rules, BP and stats
@@ -542,9 +580,11 @@ export function checkPrereqs(character) {
 // base+bonus is a hard overage.
 export function validate(character) {
   const level = characterLevel(character);
-  // Base budget plus any "free BP" the character earned (e.g. redundant multiclass
-  // grants award free BP equal to the skill's cost). Free BP adds to spendable BP.
-  const freeBP = character.freeBP || 0;
+  // Base budget plus DERIVED "free BP" (redundant multiclass grants award free BP
+  // equal to the skill's cost). Derived from the classes, not a cached field, so
+  // it's correct for any character (built, imported, or hand-edited).
+  const mcGrants = multiclassGrants(character);
+  const freeBP = mcGrants.freeBP;
   const budget = budgetFor(level) + freeBP;
   const bonusBudget = bonusBudgetFor(level);
   const maxBudget = budget + bonusBudget;
@@ -572,6 +612,7 @@ export function validate(character) {
     level,
     budget,
     freeBP,
+    multiclassGrants: mcGrants,
     bonusBudget,
     maxBudget,
     spend,

@@ -353,9 +353,11 @@ function BuildSheet({ character, report, view, onPickArchetype, onStartBlank, on
   const isFocused = (item, field) =>
     view?.mode === "inspect" && view.item === item && view.field === field;
 
-  // Starting skills are class-granted (not removable); purchased ones can be
-  // removed. They share a row but only purchased items get a × control.
-  const startCount = character.startingSkills.length;
+  // Skills shown = starting (class-granted) + multiclass-granted (derived) +
+  // purchased. Only purchased ones are removable. The granted ones are derived
+  // from the class list (report.multiclassGrants), never stored on the character.
+  const grantedSkills = (report.multiclassGrants?.skills || []).map((g) => g.name);
+  const freeCount = character.startingSkills.length + grantedSkills.length;
 
   return (
     <main className="b-sheet">
@@ -377,11 +379,11 @@ function BuildSheet({ character, report, view, onPickArchetype, onStartBlank, on
 
       <Section title="Skills" tone="amber" onAdd={() => onOpenAdd("skill")}>
         <EditableRows
-          items={[...character.startingSkills, ...character.purchasedSkills]}
+          items={[...character.startingSkills, ...grantedSkills, ...character.purchasedSkills]}
           field="purchasedSkills" resolveType="skills" report={report}
           onClick={onInspect} isFocused={isFocused}
-          removable={(i) => i >= startCount}
-          onRemove={(i) => onRemoveEntity("purchasedSkills", i - startCount)} />
+          removable={(i) => i >= freeCount}
+          onRemove={(i) => onRemoveEntity("purchasedSkills", i - freeCount)} />
       </Section>
 
       <Section title="Perks" tone="teal" onAdd={() => onOpenAdd("perk")}>
@@ -1256,65 +1258,27 @@ export default function Builder() {
     });
   }, []);
 
-  // Add a class at level 1 (additional classes grant Multi-Class Skills, not
-  // Starting Skills — surfaced in the picker copy).
+  // Add a class. Its Multi-Class Skills + redundant-grant free BP are DERIVED from
+  // the class list by the validator (multiclassGrants), not materialized here —
+  // so the handler only records the user's intent: which class, at level 1.
   const handleAddClass = useCallback((className) => {
     setCharacter((c0) => {
       const c = toClassesForm(c0);
       if (c.classes.some((x) => x.name === className)) return c0;
-      // Additional classes grant their Multi-Class Skills for free (rules: a
-      // non-first class gives Multiclass Skills, not Starting Skills). For each
-      // grant the character DOESN'T have, add the skill free (tagged so removing
-      // the class cleans it up). For one they ALREADY have, the rule "Redundant
-      // Skills and Discounts" awards free BP equal to the skill's cost instead.
-      const bare = (s) => s.replace(/\s*\([^)]*\)\s*$/, '').trim();
-      const owned = new Set([...(c.startingSkills || []), ...(c.purchasedSkills || [])].map(bare));
-      const startingSkills = [...(c.startingSkills || [])];
-      const grantSide = { ...(c.grants || {}) };
-      grantSide.startingSkills = [...(grantSide.startingSkills || [])];
-      while (grantSide.startingSkills.length < startingSkills.length) grantSide.startingSkills.push(null);
-      let freeBPGained = 0;
-      const freeBPLog = [...(c.freeBPLog || [])];
-      for (const g of (CLASSES[className]?.multiclassGrants || [])) {
-        if (owned.has(bare(g.name))) {
-          // Redundant: free BP equal to its cost, logged so it's reversible.
-          freeBPGained += g.cost || 0;
-          freeBPLog.push({ source: className, skill: g.name, bp: g.cost || 0 });
-        } else {
-          startingSkills.push(g.name);
-          grantSide.startingSkills.push({ kind: 'multiclass', source: className, amount: null });
-          owned.add(bare(g.name));
-        }
-      }
-      return {
-        ...c, classes: [...c.classes, { name: className, level: 1 }],
-        startingSkills, grants: grantSide,
-        freeBP: (c.freeBP || 0) + freeBPGained,
-        freeBPLog,
-      };
+      return { ...c, classes: [...c.classes, { name: className, level: 1 }] };
     });
     setPicking(null);
   }, []);
 
-  // Remove a class and its attributed power picks.
+  // Remove a class and its attributed power picks. Multiclass-granted skills and
+  // free BP are derived, so removing the class drops them automatically — only the
+  // class's POWER picks (real stored state) need cleaning up here.
   const handleRemoveClass = useCallback((className) => {
     setCharacter((c0) => {
       const c = toClassesForm(c0);
       if (c.classes.length <= 1) return c0; // keep at least one class
       const classes = c.classes.filter((x) => x.name !== className);
       const next = { ...c, classes };
-      // Reverse free BP this class awarded for redundant grants.
-      const reclaimed = (c.freeBPLog || []).filter((e) => e.source === className).reduce((n, e) => n + e.bp, 0);
-      next.freeBP = Math.max(0, (c.freeBP || 0) - reclaimed);
-      next.freeBPLog = (c.freeBPLog || []).filter((e) => e.source !== className);
-      // Drop skills this class granted on multiclass (tagged in the grants sidecar).
-      if (c.grants?.startingSkills) {
-        const keep = (c.startingSkills || []).map((name, i) => ({ name, i }))
-          .filter(({ i }) => !(c.grants.startingSkills[i]?.kind === 'multiclass'
-                               && c.grants.startingSkills[i]?.source === className));
-        next.startingSkills = keep.map((k) => k.name);
-        next.grants = { ...c.grants, startingSkills: keep.map((k) => c.grants.startingSkills[k.i] ?? null) };
-      }
       // Drop power picks tagged to the removed class.
       for (const field of Object.values(SLOT_FIELD)) {
         const picks = c[field]; if (!picks) continue;
