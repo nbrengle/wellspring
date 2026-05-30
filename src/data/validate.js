@@ -542,7 +542,10 @@ export function checkPrereqs(character) {
 // base+bonus is a hard overage.
 export function validate(character) {
   const level = characterLevel(character);
-  const budget = budgetFor(level);
+  // Base budget plus any "free BP" the character earned (e.g. redundant multiclass
+  // grants award free BP equal to the skill's cost). Free BP adds to spendable BP.
+  const freeBP = character.freeBP || 0;
+  const budget = budgetFor(level) + freeBP;
   const bonusBudget = bonusBudgetFor(level);
   const maxBudget = budget + bonusBudget;
   const spend = computeSpend(character);
@@ -568,6 +571,7 @@ export function validate(character) {
   return {
     level,
     budget,
+    freeBP,
     bonusBudget,
     maxBudget,
     spend,

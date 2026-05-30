@@ -15,7 +15,7 @@ import {
 } from '../src/data/validate.js';
 import { formatCharacterSheet, parseCharacterSheet } from '../src/data/sheet.js';
 import { readFileSync } from 'node:fs';
-import { lookupEntity, eligiblePowers, DEVOTIONS, DOMAINS, REFS } from '../src/data/index.js';
+import { lookupEntity, eligiblePowers, DEVOTIONS, DOMAINS, REFS, CLASSES } from '../src/data/index.js';
 import ARCHETYPES from '../src/data/archetypes.json' with { type: 'json' };
 
 // ─── tiny harness ─────────────────────────────────────────────────────────────
@@ -105,6 +105,31 @@ test('Fighter 2 / Rogue 2 yields separate per-class slot rows at L2 caps', () =>
   const ru = rows.find((s) => s.cls === 'Rogue' && s.category === 'utility');
   ok(fu && ru, 'both Fighter and Rogue utility rows exist');
   eq(fu.allowed, 1, 'Fighter L2 utility'); eq(ru.allowed, 1, 'Rogue L2 utility');
+});
+
+// ─── multiclass skills ────────────────────────────────────────────────────────
+test('every class has parsed multiclassGrants that resolve to entities', () => {
+  const cleanName = (n) => n.replace(/\s*\([^)]*\)\s*$/, '').trim();
+  for (const name of Object.keys(CLASSES)) {
+    const grants = CLASSES[name].multiclassGrants;
+    ok(grants.length >= 1, `${name} has multiclass grants`);
+    for (const g of grants) {
+      ok(lookupEntity(`skills:${cleanName(g.name)}`) || lookupEntity(`perks:${cleanName(g.name)}`),
+        `${name} grant "${g.name}" resolves`);
+    }
+  }
+});
+
+test('redundant multiclass grant awards free BP (budget grows)', () => {
+  // A character who already has a skill the new class would grant gets free BP
+  // equal to its cost instead of a duplicate; freeBP adds to the budget.
+  const c = {
+    archetypeName: 'x', classes: [{ name: 'Fighter', level: 2 }, { name: 'Rogue', level: 2 }],
+    startingSkills: ['Basic Martial Weapons', 'Thrown Weapons'], freeBP: 1,
+  };
+  const r = validate(c);
+  eq(r.freeBP, 1, 'freeBP surfaced');
+  eq(r.budget, budgetFor(4) + 1, 'budget includes free BP');
 });
 
 // ─── spell-slots + tiers ──────────────────────────────────────────────────────

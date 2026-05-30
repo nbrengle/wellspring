@@ -103,6 +103,7 @@ export const CLASSES = Object.fromEntries(
       description: c.description,
       startingSkills: c.startingSkills,
       multiclassSkills: c.multiclassSkills,
+      multiclassGrants: c.multiclassGrants || [],
     },
   ])
 );

@@ -213,6 +213,44 @@ function bodyBetween(start, end) {
     .join(' ');
 }
 
+// Parse the prose multiclass-skill blobs into a clean granted-skill list.
+// Each entry looks like: "<Header>: Skill A (1), Choose a X: [Opt1, Opt2] (3)".
+// We drop the leading header, split on commas (keeping "[...]" groups intact),
+// and for each part extract { name, cost }. A "Choose a …: [a, b, c]" part picks
+// the FIRST option as a sensible default (the builder can change it later).
+function parseMulticlassSkills(blobs) {
+  const out = [];
+  for (const blob of blobs || []) {
+    // Strip the leading "<Header>: " (the flavor name before the first colon that
+    // is NOT part of a "Choose a …:" clause).
+    const body = blob.replace(/^[^:[]+:\s*/, '');
+    // Split on commas not inside brackets.
+    const parts = body.split(/,(?![^[]*\])/).map(s => s.trim()).filter(Boolean);
+    for (const part of parts) {
+      const costM = part.match(/\((\d+)\)\s*$/);
+      const cost = costM ? parseInt(costM[1], 10) : null;
+      const noCost = part.replace(/\s*\(\d+\)\s*$/, '').trim();
+      const bracketM = noCost.match(/choose[^[]*\[([^\]]+)\]/i);
+      if (bracketM) {
+        const first = bracketM[1].split(',')[0].trim();   // default to first listed option
+        if (first) out.push({ name: first, cost });
+        continue;
+      }
+      // Unbracketed "Choose a <Skill> Skill" → resolve to a concrete default.
+      const chooseM = noCost.match(/choose\s+a\s+(.+?)\s+skill/i);
+      if (chooseM) {
+        const fam = chooseM[1].trim();
+        // e.g. "Lore" → "Lore (Historical)"; fall back to the bare family name.
+        const dflt = { Lore: 'Lore (Historical)', Gathering: 'Forage I' }[fam] || fam;
+        out.push({ name: dflt, cost });
+        continue;
+      }
+      if (noCost) out.push({ name: noCost, cost });
+    }
+  }
+  return out;
+}
+
 // Find the next heading at or above `level` starting after `after`.
 // Used to bound a section: "end of this H2 is the next H2 or H1".
 function nextHeadingAtOrAbove(level, after) {
@@ -403,6 +441,7 @@ function parseClasses() {
       description,
       startingSkills:   skillList('Starting Skills'),
       multiclassSkills: skillList('Multiclass Skills'),
+      multiclassGrants: parseMulticlassSkills(skillList('Multiclass Skills')),
       progression,
       specializations,
       innate:       powers(new RegExp(`^${clsName} Innate Powers$`)),

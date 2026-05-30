@@ -17,6 +17,16 @@
     "multiclassSkills": [
       "Materials, Everywhere: Basic Martial Weapons (1), Choose a Gathering Skill: [Forage I, Prospect I, Scavenge] (3)"
     ],
+    "multiclassGrants": [
+      {
+        "name": "Basic Martial Weapons",
+        "cost": 1
+      },
+      {
+        "name": "Forage I",
+        "cost": 3
+      }
+    ],
     "progression": {
       "1": {
         "utility": 0,
@@ -1656,6 +1666,16 @@
     "multiclassSkills": [
       "A Vow to the Divine: Basic Faith (4), Worship (1)"
     ],
+    "multiclassGrants": [
+      {
+        "name": "Basic Faith",
+        "cost": 4
+      },
+      {
+        "name": "Worship",
+        "cost": 1
+      }
+    ],
     "progression": {
       "1": {
         "cantrips": 0,
@@ -2738,6 +2758,12 @@
     ],
     "multiclassSkills": [
       "The Voice of the Forest: Basic Faith (4)"
+    ],
+    "multiclassGrants": [
+      {
+        "name": "Basic Faith",
+        "cost": 4
+      }
     ],
     "progression": {
       "1": {
@@ -3967,6 +3993,16 @@
     "multiclassSkills": [
       "Combat for the Uninitiated: Basic Martial Weapons (1), Short Weapons (3)"
     ],
+    "multiclassGrants": [
+      {
+        "name": "Basic Martial Weapons",
+        "cost": 1
+      },
+      {
+        "name": "Short Weapons",
+        "cost": 3
+      }
+    ],
     "progression": {
       "1": {
         "utility": 0,
@@ -5177,6 +5213,12 @@
     "multiclassSkills": [
       "Dabbling in the Arcane: Basic Arcane (4)"
     ],
+    "multiclassGrants": [
+      {
+        "name": "Basic Arcane",
+        "cost": 4
+      }
+    ],
     "progression": {
       "1": {
         "cantrips": 0,
@@ -6260,6 +6302,16 @@
     ],
     "multiclassSkills": [
       "The Tools of the Trade: Basic Martial Weapons (1), Thrown Weapons (3)"
+    ],
+    "multiclassGrants": [
+      {
+        "name": "Basic Martial Weapons",
+        "cost": 1
+      },
+      {
+        "name": "Thrown Weapons",
+        "cost": 3
+      }
     ],
     "progression": {
       "1": {
@@ -7431,6 +7483,20 @@
     ],
     "multiclassSkills": [
       "Finishing School: Choose a Lore Skill (2), Library Use (1), Poisoner (1)"
+    ],
+    "multiclassGrants": [
+      {
+        "name": "Lore (Historical)",
+        "cost": 2
+      },
+      {
+        "name": "Library Use",
+        "cost": 1
+      },
+      {
+        "name": "Poisoner",
+        "cost": 1
+      }
     ],
     "progression": {
       "1": {
@@ -8852,6 +8918,12 @@
     ],
     "multiclassSkills": [
       "The Fundamentals: Basic Arcane (4)"
+    ],
+    "multiclassGrants": [
+      {
+        "name": "Basic Arcane",
+        "cost": 4
+      }
     ],
     "progression": {
       "1": {

@@ -331,6 +331,7 @@ function BudgetMeter({ report }) {
         <span className="b-budget-nums">
           <strong>{spend.net}</strong> / {budget}
           {spend.awarded > 0 && <span className="b-budget-flaws"> (+{spend.awarded} from flaws)</span>}
+          {report.freeBP > 0 && <span className="b-budget-flaws"> (incl. +{report.freeBP} free BP)</span>}
         </span>
       </div>
       <div className="b-budget-bar"><div className="b-budget-fill" style={{ width: `${pct}%` }} /></div>
@@ -1261,7 +1262,36 @@ export default function Builder() {
     setCharacter((c0) => {
       const c = toClassesForm(c0);
       if (c.classes.some((x) => x.name === className)) return c0;
-      return { ...c, classes: [...c.classes, { name: className, level: 1 }] };
+      // Additional classes grant their Multi-Class Skills for free (rules: a
+      // non-first class gives Multiclass Skills, not Starting Skills). For each
+      // grant the character DOESN'T have, add the skill free (tagged so removing
+      // the class cleans it up). For one they ALREADY have, the rule "Redundant
+      // Skills and Discounts" awards free BP equal to the skill's cost instead.
+      const bare = (s) => s.replace(/\s*\([^)]*\)\s*$/, '').trim();
+      const owned = new Set([...(c.startingSkills || []), ...(c.purchasedSkills || [])].map(bare));
+      const startingSkills = [...(c.startingSkills || [])];
+      const grantSide = { ...(c.grants || {}) };
+      grantSide.startingSkills = [...(grantSide.startingSkills || [])];
+      while (grantSide.startingSkills.length < startingSkills.length) grantSide.startingSkills.push(null);
+      let freeBPGained = 0;
+      const freeBPLog = [...(c.freeBPLog || [])];
+      for (const g of (CLASSES[className]?.multiclassGrants || [])) {
+        if (owned.has(bare(g.name))) {
+          // Redundant: free BP equal to its cost, logged so it's reversible.
+          freeBPGained += g.cost || 0;
+          freeBPLog.push({ source: className, skill: g.name, bp: g.cost || 0 });
+        } else {
+          startingSkills.push(g.name);
+          grantSide.startingSkills.push({ kind: 'multiclass', source: className, amount: null });
+          owned.add(bare(g.name));
+        }
+      }
+      return {
+        ...c, classes: [...c.classes, { name: className, level: 1 }],
+        startingSkills, grants: grantSide,
+        freeBP: (c.freeBP || 0) + freeBPGained,
+        freeBPLog,
+      };
     });
     setPicking(null);
   }, []);
@@ -1272,8 +1302,20 @@ export default function Builder() {
       const c = toClassesForm(c0);
       if (c.classes.length <= 1) return c0; // keep at least one class
       const classes = c.classes.filter((x) => x.name !== className);
-      // Drop power picks tagged to the removed class.
       const next = { ...c, classes };
+      // Reverse free BP this class awarded for redundant grants.
+      const reclaimed = (c.freeBPLog || []).filter((e) => e.source === className).reduce((n, e) => n + e.bp, 0);
+      next.freeBP = Math.max(0, (c.freeBP || 0) - reclaimed);
+      next.freeBPLog = (c.freeBPLog || []).filter((e) => e.source !== className);
+      // Drop skills this class granted on multiclass (tagged in the grants sidecar).
+      if (c.grants?.startingSkills) {
+        const keep = (c.startingSkills || []).map((name, i) => ({ name, i }))
+          .filter(({ i }) => !(c.grants.startingSkills[i]?.kind === 'multiclass'
+                               && c.grants.startingSkills[i]?.source === className));
+        next.startingSkills = keep.map((k) => k.name);
+        next.grants = { ...c.grants, startingSkills: keep.map((k) => c.grants.startingSkills[k.i] ?? null) };
+      }
+      // Drop power picks tagged to the removed class.
       for (const field of Object.values(SLOT_FIELD)) {
         const picks = c[field]; if (!picks) continue;
         const keep = picks.map((name, i) => ({ name, i }))
