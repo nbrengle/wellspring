@@ -1034,7 +1034,7 @@ function ExportImportPanel({ character, report, onImport, onClose }) {
                 </span>
               )}
             </div>
-            <textarea className="b-export-text" placeholder="Paste a character sheet here…"
+            <textarea className="b-export-text" placeholder="Paste a character sheet — plain text, the HTML export, or a spreadsheet copy…"
                       value={draft} onChange={(e) => setDraft(e.target.value)} />
             {preview?.error && <p className="b-export-err">Couldn’t parse: {preview.error}</p>}
             <button className="b-read-choose" disabled={!preview || preview.error}

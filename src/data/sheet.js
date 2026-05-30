@@ -189,7 +189,28 @@ function cleanItem(raw) {
 const splitItems = (v) => v.trim() === 'None' || v.trim() === ''
   ? [] : v.split(/,\s*/).map((s) => s.trim()).filter(Boolean);
 
-export function parseCharacterSheet(text) {
+// Look up a field by label, tolerating case and a missing "(free)" suffix so
+// variant sheets ("Starting Skills" / "starting skills (free)") still match.
+function fieldForLabel(label) {
+  if (LABEL_FIELD[label]) return LABEL_FIELD[label];
+  const norm = label.toLowerCase().replace(/\s*\(free\)\s*$/, '').trim();
+  for (const [k, v] of Object.entries(LABEL_FIELD)) {
+    if (k.toLowerCase().replace(/\s*\(free\)\s*$/, '').trim() === norm) return v;
+  }
+  return null;
+}
+// True for a line that looks like "Label: …" where Label is a known section.
+function labelOf(line) {
+  const m = line.match(/^([^:]{1,40}):\s*(.*)$/);
+  if (!m) return null;
+  const label = m[1].trim();
+  if (label === 'Lineage' || fieldForLabel(label)) return { label, value: m[2].trim() };
+  return null;
+}
+
+// Parse already-normalized plain text in the "Label: value" sheet shape. Internal
+// — callers use parseCharacterSheet, which handles format detection first.
+function parseSheetText(text) {
   const raw = String(text).replace(/\r/g, '');
   const rows = raw.split('\n').map((l) => l.trim());
   const character = { name: '', archetypeName: 'Imported Character', effectiveBP: {}, grants: {} };
@@ -199,37 +220,112 @@ export function parseCharacterSheet(text) {
   let i = 0;
   while (i < rows.length && !rows[i]) i++;
   if (i < rows.length) { character.name = rows[i]; i++; }
-  if (i < rows.length && rows[i] && !/^[^:]+:/.test(rows[i])) { character.tagline = rows[i]; i++; }
+  if (i < rows.length && rows[i] && !rows[i].includes(':')) { character.tagline = rows[i]; i++; }
+
+  // Apply a parsed section (label + its collected item strings) to the character.
+  const apply = (label, valueStr, extraItems) => {
+    if (label === 'Lineage') {
+      const lm = valueStr.match(/^(.+?)(?:\s*\(([^)]+)\))?$/);
+      if (valueStr && valueStr !== 'None') {
+        character.lineage = lm[1].trim();
+        if (lm[2]) character.sublineage = lm[2].trim();
+      }
+      return;
+    }
+    const field = fieldForLabel(label);
+    if (!field) return;
+    if (SCALAR_FIELDS.has(field)) { character[field] = valueStr || null; return; }
+    if (!ITEM_FIELDS.has(field)) return;
+    // Items can be inline (comma-separated after the label) AND/OR on the lines
+    // that follow the label until the next section — gather both.
+    const items = [...splitItems(valueStr), ...extraItems].map(cleanItem);
+    character[field] = items.map((it) => it.name);
+    if (items.some((it) => it.bp != null)) character.effectiveBP[field] = items.map((it) => it.bp);
+    if (items.some((it) => it.grant)) character.grants[field] = items.map((it) => it.grant);
+  };
 
   for (; i < rows.length; i++) {
     const r = rows[i];
     if (!r) continue;
-    const m = r.match(/^([^:]+):\s*(.*)$/);
-    if (!m) continue;
-    const label = m[1].trim();
-    const value = m[2].trim();
-    if (label === 'Lineage') {
-      const lm = value.match(/^(.+?)(?:\s*\(([^)]+)\))?$/);
-      if (value !== 'None') { character.lineage = lm[1].trim(); if (lm[2]) character.sublineage = lm[2].trim(); }
-      continue;
+    const lab = labelOf(r);
+    if (!lab) continue;
+    // Collect following item lines for this section (the source lists each
+    // skill/power on its own line). Stop at the next blank line or any line with a
+    // colon — that's either the next section label or a footer ("Build Points:"),
+    // never an item. This prevents the export footer leaking into the last section.
+    const extra = [];
+    let j = i + 1;
+    for (; j < rows.length; j++) {
+      if (!rows[j]) break;
+      if (rows[j].includes(':')) break;
+      extra.push(rows[j]);
     }
-    const field = LABEL_FIELD[label];
-    if (!field) continue;
-    if (SCALAR_FIELDS.has(field)) {
-      character[field] = value || null;
-    } else if (ITEM_FIELDS.has(field)) {
-      const items = splitItems(value).map(cleanItem);
-      character[field] = items.map((it) => it.name);
-      if (items.some((it) => it.bp != null)) {
-        character.effectiveBP[field] = items.map((it) => it.bp);
-      }
-      if (items.some((it) => it.grant)) {
-        character.grants[field] = items.map((it) => it.grant);
-      }
-    }
+    apply(lab.label, lab.value, extra);
+    i = j - 1;
   }
   if (!Object.keys(character.effectiveBP).length) delete character.effectiveBP;
   if (!Object.keys(character.grants).length) delete character.grants;
   return character;
+}
+
+// ─── FORMAT-TOLERANT ENTRY POINT ──────────────────────────────────────────────
+// Real characters arrive in varied formats: our plain-text export, an HTML export
+// (Google Docs), or spreadsheet/Excel paste (tab-separated). Normalize to the
+// text shape parseCharacterSheet understands, then parse. For multi-character
+// HTML (like the full starter sheet) only the FIRST character block is taken.
+function htmlToText(html) {
+  const decode = (s) => s
+    .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+    .replace(/&nbsp;/g, ' ').replace(/&rsquo;|&#8217;/g, '’')
+    .replace(/&lsquo;|&#8216;/g, '‘').replace(/&ldquo;|&#8220;/g, '“')
+    .replace(/&rdquo;|&#8221;/g, '”').replace(/&#(\d+);/g, (_, n) => String.fromCharCode(+n))
+    .replace(/&[a-z]+;/gi, ' ');
+  return decode(html
+    .replace(/<\/(p|li|h[1-6]|tr|div|td|th)>/gi, '\n')
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<[^>]+>/g, ''))
+    .split('\n').map((l) => l.replace(/\s+/g, ' ').trim()).filter(Boolean).join('\n');
+}
+
+// Trim a multi-block sheet down to a single character: from the first line that
+// is immediately followed (within a few lines) by a "Lineage:"/"Class Levels:"
+// header, up to the next such header. Keeps single-character input intact.
+function firstCharacterBlock(lines) {
+  const isHeader = (l) => /^(Lineage|Class Levels|Life Points):/i.test(l);
+  // A real block is: name → tagline → header. A table-of-contents is a run of
+  // bare name lines (name → name). So the block starts at a NON-header, NON-label
+  // line whose NEXT line is also non-header/non-label (the tagline) and the line
+  // after that begins the headers. This skips the TOC.
+  // Tightest, least-ambiguous shape: name, then tagline, then a header on the
+  // very next line (name / tagline / "Lineage:"). The TOC has no taglines between
+  // its name lines, so this lands on the first real block.
+  let start = 0;
+  const plain = (l) => l && !isHeader(l) && !l.includes(':');
+  for (let i = 0; i < lines.length - 2; i++) {
+    if (plain(lines[i]) && plain(lines[i + 1]) && isHeader(lines[i + 2])) { start = i; break; }
+  }
+  // End at the next name+header boundary (a non-header line followed by a header,
+  // after we've already seen this block's headers).
+  let seenHeader = false, end = lines.length;
+  for (let i = start + 1; i < lines.length; i++) {
+    if (isHeader(lines[i])) { seenHeader = true; continue; }
+    if (seenHeader && lines.slice(i + 1, i + 4).some(isHeader) && !lines[i].includes(':')) { end = i; break; }
+  }
+  return lines.slice(start, end);
+}
+
+// Parse a character from a pasted sheet in ANY supported format — our plain-text
+// export, an HTML export (Google Docs), or a spreadsheet/Excel copy (tab-
+// separated). Detects the format, normalizes to text, isolates the first
+// character block (skipping a table of contents), and parses. This is the single
+// public entry point; callers don't need to know the input format.
+export function parseCharacterSheet(input) {
+  let text = String(input);
+  if (/<[a-z][^>]*>/i.test(text)) text = htmlToText(text);       // HTML
+  else if (text.includes('\t')) {                                 // spreadsheet/TSV
+    text = text.split('\n').map((row) => row.replace(/\t+/g, ': ')).join('\n');
+  }
+  const lines = text.split('\n').map((l) => l.trim()).filter(Boolean);
+  return parseSheetText(firstCharacterBlock(lines).join('\n'));
 }
 
