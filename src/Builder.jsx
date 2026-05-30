@@ -16,6 +16,7 @@ import {
   CLASS_POWER_SLOTS, CLASSES,
 } from "./data/index.js";
 import { validate, characterLevel, prereqStatus, pickClass, getClasses } from "./data/validate.js";
+import { formatCharacterSheet, parseCharacterSheet } from "./data/sheet.js";
 import "./Builder.css";
 
 // ─── CHARACTER STATE ────────────────────────────────────────────────────────
@@ -887,6 +888,90 @@ function useResolvedEntity(item, field, resolveType, archetypeName) {
   }, [item, field, resolveType, archetypeName]);
 }
 
+// ─── EXPORT / IMPORT PANEL ────────────────────────────────────────────────────
+// Overlay with two halves: EXPORT (the current character as plain text, in the
+// archetype sheet format, with copy + download) and IMPORT (paste a sheet → parse
+// → preview validity → load). The text format round-trips with the export.
+function ExportImportPanel({ character, report, onImport, onClose }) {
+  const exported = useMemo(() => formatCharacterSheet(character, report), [character, report]);
+  const [draft, setDraft] = useState("");
+  const [copied, setCopied] = useState(false);
+
+  // Live preview of pasted text: parse + validate without committing.
+  const preview = useMemo(() => {
+    const text = draft.trim();
+    if (!text) return null;
+    try {
+      const parsed = parseCharacterSheet(text);
+      return { parsed, report: validate(parsed) };
+    } catch (e) {
+      return { error: String(e) };
+    }
+  }, [draft]);
+
+  const copy = () => {
+    navigator.clipboard?.writeText(exported);
+    setCopied(true); setTimeout(() => setCopied(false), 1500);
+  };
+  const download = () => {
+    const blob = new Blob([exported], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${(character.name || character.archetypeName || "character").replace(/[^\w]+/g, "-")}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  useEffect(() => {
+    const onKey = (e) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
+  return (
+    <div className="b-overlay" onClick={onClose}>
+      <div className="b-export" onClick={(e) => e.stopPropagation()}>
+        <header className="b-picker-head">
+          <h2 className="b-picker-title">Export / Import</h2>
+          <button className="b-picker-x" onClick={onClose}>×</button>
+        </header>
+        <div className="b-export-cols">
+          {/* EXPORT */}
+          <div className="b-export-half">
+            <div className="b-export-head">
+              <h3 className="b-export-label">Export</h3>
+              <div className="b-export-actions">
+                <button className="b-topbar-btn" onClick={copy}>{copied ? "Copied!" : "Copy"}</button>
+                <button className="b-topbar-btn" onClick={download}>Download .txt</button>
+              </div>
+            </div>
+            <textarea className="b-export-text" readOnly value={exported} />
+          </div>
+          {/* IMPORT */}
+          <div className="b-export-half">
+            <div className="b-export-head">
+              <h3 className="b-export-label">Import</h3>
+              {preview && !preview.error && (
+                <span className={`b-export-status ${preview.report.valid ? "is-valid" : "is-invalid"}`}>
+                  {preview.report.valid ? "✓ legal" : "⚠ check"} · BP {preview.report.spend.net}/{preview.report.budget} · L{preview.report.level}
+                </span>
+              )}
+            </div>
+            <textarea className="b-export-text" placeholder="Paste a character sheet here…"
+                      value={draft} onChange={(e) => setDraft(e.target.value)} />
+            {preview?.error && <p className="b-export-err">Couldn’t parse: {preview.error}</p>}
+            <button className="b-read-choose" disabled={!preview || preview.error}
+                    onClick={() => onImport(preview.parsed)}>
+              Load this character
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── ROOT COMPONENT ─────────────────────────────────────────────────────────
 
 export default function Builder() {
@@ -896,6 +981,7 @@ export default function Builder() {
   // overlay tracked separately by `picking`.
   const [view, setView] = useState(null);
   const [picking, setPicking] = useState(null); // null | picker spec
+  const [exportOpen, setExportOpen] = useState(false);
   // Navigation history for the inspector so link-following has a back button.
   const [history, setHistory] = useState([]);
 
@@ -1135,7 +1221,8 @@ export default function Builder() {
 
   return (
     <div className="b-root">
-      <BTopBar character={character} report={report} onLevelChange={handleLevelChange} />
+      <BTopBar character={character} report={report} onLevelChange={handleLevelChange}
+               onExport={() => setExportOpen(true)} />
       <div className="b-cols">
         <IdentityRail character={character} report={report}
                       onClickField={handleClickIdentityField} onRestart={handleRestart}
@@ -1152,11 +1239,17 @@ export default function Builder() {
       {picking && (
         <PickerOverlay spec={picking} character={character} onClose={() => setPicking(null)} />
       )}
+      {exportOpen && (
+        <ExportImportPanel
+          character={character} report={report}
+          onImport={(c) => { setCharacter(c); setExportOpen(false); setView(null); setHistory([]); }}
+          onClose={() => setExportOpen(false)} />
+      )}
     </div>
   );
 }
 
-function BTopBar({ character, report, onLevelChange }) {
+function BTopBar({ character, report, onLevelChange, onExport }) {
   const level = character.archetypeName ? characterLevel(character) : null;
   return (
     <header className="b-topbar">
@@ -1190,6 +1283,7 @@ function BTopBar({ character, report, onLevelChange }) {
         )}
       </div>
       <div className="b-topbar-actions">
+        <button className="b-topbar-btn" onClick={onExport}>Export / Import</button>
         <button className="b-topbar-btn" onClick={() => navigator.clipboard?.writeText(window.location.href)}>
           Copy share link
         </button>
