@@ -130,14 +130,16 @@ function grantSourceRole(grant) {
 const SPELL_TIER_LABEL = {
   noviceSpells: "Novice", adeptSpells: "Adept", greaterSpells: "Greater", cantrips: "Cantrip",
 };
-function spellTierLabel(c) {
+// Tier key ("novice"/"adept"/"greater"/"cantrip") for color-coding, or null.
+function spellTierKey(c) {
   if (!c) return null;
-  if (c.tierList) return SPELL_TIER_LABEL[c.tierList] || null;
+  if (c.tierList) return { noviceSpells: "novice", adeptSpells: "adept", greaterSpells: "greater", cantrips: "cantrip" }[c.tierList] || null;
   const t = (c.tier || "").toLowerCase();
-  if (["novice", "adept", "greater", "cantrip"].includes(t)) {
-    return t[0].toUpperCase() + t.slice(1);
-  }
-  return null;
+  return ["novice", "adept", "greater", "cantrip"].includes(t) ? t : null;
+}
+function spellTierLabel(c) {
+  const k = spellTierKey(c);
+  return k ? k[0].toUpperCase() + k.slice(1) : null;
 }
 
 // ─── UI PRIMITIVES ──────────────────────────────────────────────────────────
@@ -252,7 +254,7 @@ function SpellSlotStrip({ slots }) {
       <span className="b-spellslots-label">Spell Slots</span>
       <div className="b-spellslots-row">
         {tiers.map((t) => (
-          <div key={t.key} className={`b-spellslot ${slots[t.key] ? "" : "is-zero"}`}>
+          <div key={t.key} className={`b-spellslot b-tier-${t.key} ${slots[t.key] ? "" : "is-zero"}`}>
             <span className="b-spellslot-val">{slots[t.key]}</span>
             <span className="b-spellslot-label">{t.label}</span>
           </div>
@@ -386,8 +388,10 @@ function SlotBlock({ slot, character, onInspect, onOpenSlot, isFocused, pickClas
               <li key={i} className={`b-slot-row is-filled ${over ? "is-over" : ""} ${isFocused(pick.name, pick.field) ? "is-focused" : ""}`}>
                 <span className="b-slot-num">{i + 1}</span>
                 <button className="b-slot-pick" onClick={() => onInspect(pick.name, pick.field, "powers")}>{pick.name}</button>
-                {slot.category === "spellsKnown" && SPELL_TIER_LABEL[pick.field] && (
-                  <span className="b-slot-tier">{SPELL_TIER_LABEL[pick.field]}</span>
+                {slot.category === "spellsKnown" && spellTierKey({ tierList: pick.field }) && (
+                  <span className={`b-slot-tier b-tier-${spellTierKey({ tierList: pick.field })}`}>
+                    {SPELL_TIER_LABEL[pick.field]}
+                  </span>
                 )}
                 <button className="b-slot-action" title="Swap" onClick={() => onOpenSlot(slot, pick.flatIndex, false, pick.field)}>✎</button>
                 <button className="b-slot-action" title="Clear" onClick={() => onOpenSlot(slot, pick.flatIndex, true, pick.field)}>✕</button>
@@ -667,7 +671,7 @@ function PickerOverlay({ spec, character, onClose }) {
                             className={`b-picker-row ${selected === c.name ? "is-selected" : ""} ${c.locked ? "is-locked" : ""} ${isTaken ? "is-taken" : ""}`}
                             onClick={() => selectCandidate(c.name)}>
                             <span className="b-picker-row-name">{c.name}</span>
-                            {spellTierLabel(c) && <span className="b-picker-row-tier">{spellTierLabel(c)}</span>}
+                            {spellTierKey(c) && <span className={`b-picker-row-tier b-tier-${spellTierKey(c)}`}>{spellTierLabel(c)}</span>}
                             {typeof c.cost === "number" && c.cost > 0 && <span className="b-picker-row-cost">{c.cost} BP</span>}
                             {typeof c.bp === "number" && c.bp > 0 && <span className="b-picker-row-cost is-award">+{c.bp} BP</span>}
                             {c.locked && <span className="b-picker-row-tag b-locked">locked</span>}

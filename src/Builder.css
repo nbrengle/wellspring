@@ -20,6 +20,14 @@
   --b-purple: #b08fd0;
   --b-blue: #6fa8d9;
 
+  /* Spell-tier colors — shared by the identity-rail spell-slot strip and the
+     per-spell tier badges, so a tier reads the same everywhere. Escalating hues:
+     novice (blue) → adept (purple) → greater (gold), cantrip (teal). */
+  --b-tier-novice: #6fa8d9;
+  --b-tier-adept: #b08fd0;
+  --b-tier-greater: #e0b04a;
+  --b-tier-cantrip: #4fb8a8;
+
   font-family: "EB Garamond", "Palatino Linotype", Georgia, serif;
   background: linear-gradient(135deg, #1a1410 0%, #0f0e0c 50%, #16140f 100%);
   min-height: 100vh;
@@ -727,10 +735,21 @@
   background: var(--b-panel); border: 1px solid var(--b-border); border-radius: 0.375rem;
   padding: 0.35rem 0.2rem;
 }
-.b-spellslot-val { font-size: 1rem; font-weight: 700; color: var(--b-purple); }
+.b-spellslot-val { font-size: 1rem; font-weight: 700; color: var(--b-tier); }
 .b-spellslot-label { font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--b-dim); }
 .b-spellslot.is-zero { opacity: 0.4; }
 .b-spellslot.is-zero .b-spellslot-val { color: var(--b-dim); }
+
+/* Per-tier color, used by both the spell-slot strip and the tier badges via a
+   shared --b-tier variable. */
+.b-tier-novice  { --b-tier: var(--b-tier-novice); }
+.b-tier-adept   { --b-tier: var(--b-tier-adept); }
+.b-tier-greater { --b-tier: var(--b-tier-greater); }
+.b-tier-cantrip { --b-tier: var(--b-tier-cantrip); }
+/* Tint the spell-slot cell border to match its tier. */
+.b-spellslot.b-tier-novice  { border-color: rgba(111,168,217,0.4); }
+.b-spellslot.b-tier-adept   { border-color: rgba(176,143,208,0.4); }
+.b-spellslot.b-tier-greater { border-color: rgba(224,176,74,0.4); }
 
 /* ─── ADD / REMOVE CONTROLS ───────────────────────────────────────────── */
 .b-section-title { display: flex; align-items: center; justify-content: space-between; }
@@ -825,13 +844,15 @@
 .b-row-role { opacity: 0.7; font-style: italic; }
 
 /* Spell-tier badges (picker rows + sheet slot rows) */
+/* Tier badges take their color from the shared --b-tier variable set by the
+   .b-tier-{novice|adept|greater|cantrip} class, matching the spell-slot strip. */
 .b-picker-row-tier {
   font-size: 0.55rem; letter-spacing: 0.08em; text-transform: uppercase;
-  color: var(--b-purple); border: 1px solid rgba(176,143,208,0.4);
-  border-radius: 1rem; padding: 0.05rem 0.4rem; margin-left: auto;
+  color: var(--b-tier, var(--b-purple)); border: 1px solid currentColor;
+  border-radius: 1rem; padding: 0.05rem 0.4rem; margin-left: auto; opacity: 0.9;
 }
 .b-slot-tier {
   flex: none; font-size: 0.58rem; letter-spacing: 0.08em; text-transform: uppercase;
-  color: var(--b-purple); border: 1px solid rgba(176,143,208,0.35);
-  border-radius: 1rem; padding: 0.05rem 0.45rem;
+  color: var(--b-tier, var(--b-purple)); border: 1px solid currentColor;
+  border-radius: 1rem; padding: 0.05rem 0.45rem; opacity: 0.9;
 }
