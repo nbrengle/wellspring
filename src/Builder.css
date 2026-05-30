@@ -856,3 +856,4 @@
   color: var(--b-tier, var(--b-purple)); border: 1px solid currentColor;
   border-radius: 1rem; padding: 0.05rem 0.45rem; opacity: 0.9;
 }
+.b-topbar-stat.is-note { color: var(--b-blue); font-size: 0.72rem; }

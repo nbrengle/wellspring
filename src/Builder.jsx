@@ -1178,6 +1178,11 @@ function BTopBar({ character, report, onLevelChange }) {
                 : report.belowFloor ? `⚠ below level ${report.legalMinLevel}`
                 : "⚠ check build"}
             </span>
+            {report.beyondProgression && (
+              <span className="b-topbar-stat is-note" title="Base classes are documented through level 10; levels beyond that are Advanced Classes (not yet published). Slots/stats are frozen at level 10.">
+                ⚑ beyond L10 (Advanced Classes pending)
+              </span>
+            )}
           </>
         )}
       </div>

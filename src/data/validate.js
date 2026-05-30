@@ -322,6 +322,22 @@ function countPicksForClass(character, field, cls) {
     (n, name, i) => n + (pickClass(character, field, i, name) === cls ? 1 : 0), 0);
 }
 
+// The highest level a class's progression documents (base classes cap at 10; the
+// source tables stop there, with levels 11+ being Advanced Classes — not yet
+// published). Used to clamp slot/stat lookups for levels beyond the table.
+function maxProgressionLevel(cls) {
+  const levels = Object.keys(CLASS_PROGRESSION[cls] || {}).map(Number).filter((n) => n > 0);
+  return levels.length ? Math.max(...levels) : 4;
+}
+
+// The progression row for a class at `level`, clamped to the highest documented
+// level so an undocumented L11+ falls back to the top (L10) row rather than
+// undefined / the level-4 default.
+function progressionRow(cls, level) {
+  const prog = CLASS_PROGRESSION[cls] || {};
+  return prog[level] || prog[Math.min(level, maxProgressionLevel(cls))] || CLASS_POWER_SLOTS[cls];
+}
+
 // Power-slot usage vs. allotment, PER CLASS. Slots are class-specific (a Fighter's
 // Utility slot can't hold a Rogue power, and a Cleric's cantrips differ from a
 // Mage's), so we emit one row per class × category, each counting only that
@@ -335,7 +351,8 @@ export function computeSlots(character) {
 
   const rows = [];
   for (const { name: cls, level } of classes) {
-    const prog = CLASS_PROGRESSION[cls]?.[level] || CLASS_POWER_SLOTS[cls];
+    // Clamp to the highest documented progression level (base classes cap at 10).
+    const prog = progressionRow(cls, level);
     const isCaster = SPELLCASTERS.has(cls);
     const mkRow = (category, label, used, baseVal) => {
       const b = bonus[`${cls}:${category}`] || 0;
@@ -382,7 +399,7 @@ export function spellSlots(character) {
   // Otherwise sum each caster class's progression "N/N/N" slots at its own level.
   const total = { novice: 0, adept: 0, greater: 0 };
   for (const { name, level } of casters) {
-    const str = CLASS_PROGRESSION[name]?.[level]?.slots;
+    const str = progressionRow(name, level)?.slots;
     if (typeof str === 'string') {
       const [n = 0, a = 0, g = 0] = str.split('/').map((x) => parseInt(x, 10) || 0);
       total.novice += n; total.adept += a; total.greater += g;
@@ -502,6 +519,10 @@ export function validate(character) {
   // Characters below the campaign's documented floor (level 4) are buildable but
   // not legal play — flagged so the UI can mark them invalid with a reason.
   const belowFloor = level < LEGAL_MIN_LEVEL;
+  // Any class past its documented progression (base classes cap at 10; 11+ is
+  // Advanced Classes, not yet published). Slots/stats are frozen at the top row.
+  const beyondProgression = getClasses(character)
+    .some((c) => CLASS_POWER_SLOTS[c.name] && c.level > maxProgressionLevel(c.name));
   return {
     level,
     budget,
@@ -518,6 +539,7 @@ export function validate(character) {
     stats,
     prereqs,
     belowFloor,
+    beyondProgression,
     legalMinLevel: LEGAL_MIN_LEVEL,
     valid: !prereqs.issues.length && !overBudget && !slotsOver && !belowFloor,
   };
