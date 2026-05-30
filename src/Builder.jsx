@@ -293,7 +293,7 @@ function BudgetMeter({ report }) {
 
 // ─── BUILD SHEET ─────────────────────────────────────────────────────────────
 
-function BuildSheet({ character, report, view, onPickArchetype, onStartBlank, onInspect, onOpenSlot, onOpenAdd, onRemoveEntity }) {
+function BuildSheet({ character, report, view, onPickArchetype, onStartBlank, onInspect, onOpenSlot, onOpenAdd, onRemoveEntity, onSetName }) {
   if (!character.archetypeName) {
     return <ArchetypePicker onPick={onPickArchetype} onStartBlank={onStartBlank} />;
   }
@@ -307,8 +307,19 @@ function BuildSheet({ character, report, view, onPickArchetype, onStartBlank, on
   return (
     <main className="b-sheet">
       <header className="b-sheet-header">
-        <h1 className="b-sheet-title">{character.archetypeName}</h1>
-        <p className="b-sheet-tagline">{ARCHETYPES.find((a) => a.name === character.archetypeName)?.tagline}</p>
+        <input
+          className="b-sheet-name"
+          value={character.name || ""}
+          placeholder={character.archetypeName || "Name your character"}
+          aria-label="Character name"
+          onChange={(e) => onSetName(e.target.value)}
+        />
+        <p className="b-sheet-tagline">
+          {character.archetypeName && character.archetypeName !== "Custom Build"
+            ? <>Based on <em>{character.archetypeName}</em>{" — "}
+                {ARCHETYPES.find((a) => a.name === character.archetypeName)?.tagline}</>
+            : ARCHETYPES.find((a) => a.name === character.archetypeName)?.tagline}
+        </p>
       </header>
 
       <Section title="Skills" tone="amber" onAdd={() => onOpenAdd("skill")}>
@@ -1003,6 +1014,10 @@ export default function Builder() {
     setView(null); setHistory([]);
   }, []);
 
+  const handleSetName = useCallback((name) => {
+    setCharacter((c) => ({ ...c, name }));
+  }, []);
+
   // Start a blank build: pick a class first (a character with no class has no
   // slots and nothing to build), then land in a buildable empty character at the
   // starter level with that class.
@@ -1231,7 +1246,8 @@ export default function Builder() {
         <BuildSheet character={character} report={report} view={view}
                     onPickArchetype={handlePickArchetype} onStartBlank={handleStartBlank}
                     onInspect={handleInspect} onOpenSlot={handleOpenSlot}
-                    onOpenAdd={handleOpenAdd} onRemoveEntity={handleRemoveEntity} />
+                    onOpenAdd={handleOpenAdd} onRemoveEntity={handleRemoveEntity}
+                    onSetName={handleSetName} />
         <DetailPane view={view}
                     onInspect={handleInspect}
                     onBack={history.length ? handleBack : null} onClose={handleClose} />

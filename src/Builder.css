@@ -204,6 +204,23 @@
   color: var(--b-amber);
   margin: 0;
 }
+/* Editable character-name title — looks like the title, edits in place. */
+.b-sheet-name {
+  font-family: "Cinzel", serif;
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--b-amber);
+  background: transparent;
+  border: none;
+  border-bottom: 1px dashed transparent;
+  padding: 0 0 0.1rem;
+  width: 100%;
+  max-width: 40rem;
+}
+.b-sheet-name::placeholder { color: var(--b-dim); }
+.b-sheet-name:hover { border-bottom-color: var(--b-border-2); }
+.b-sheet-name:focus { outline: none; border-bottom-color: var(--b-amber-deep); }
 .b-sheet-tagline {
   font-size: 0.95rem;
   color: var(--b-muted);
