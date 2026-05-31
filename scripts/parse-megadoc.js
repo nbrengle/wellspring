@@ -564,10 +564,38 @@ function extractPowerBenefits(power) {
   }
 }
 
+// Powers offering "choose one of the following: • … • …". Two flavors:
+//   - BUILD-TIME permanent: "gains one of the following FOR FREE" (Expert Craft) —
+//     a character-creation pick; each option names a skill granted free. Tagged
+//     `chooseOne.kind:'build'` with `options[].grantsSkill`.
+//   - IN-PLAY tactical: "may choose one … (each Long Rest / per use / per cast)"
+//     (Warrior Spirit, Kick, …) — the player picks at play time, not in the
+//     builder. Tagged `kind:'play'`; options are display-only.
+// Lead-in: "…one of (the following|three) <benefits|ways|boons|…>…:" then bullets.
+const CHOOSE_LEAD = /\bone\s+of\s+(?:the\s+following|three|the)\b[^:]*:\s*(.+)$/i;
+function extractChooseOne(power) {
+  const d = power.description || '';
+  const m = d.match(CHOOSE_LEAD);
+  if (!m) return;
+  // Options are the "• …" bullets after the lead-in (stop at a trailing prose
+  // sentence that isn't a bullet).
+  const opts = [...m[1].matchAll(/•\s*([^•]+?)(?=\s*•|$)/g)].map((x) => x[1].trim()).filter(Boolean);
+  if (opts.length < 2) return;
+  const build = /one of the following for free|gains? one of the following/i.test(d);
+  power.chooseOne = {
+    kind: build ? 'build' : 'play',
+    options: opts.map((text) => {
+      // Build-time options name a skill + "(cost)": "Greater Alchemy (5)".
+      const sk = build && text.match(/^([A-Z][\w’' ]+?)\s*\(\d+\)/);
+      return sk ? { text, grantsSkill: sk[1].trim() } : { text };
+    }),
+  };
+}
+
 const CLASSES_OUT = parseClasses();
 for (const c of CLASSES_OUT) {
   for (const arr of Object.values(c)) {
-    if (Array.isArray(arr)) for (const p of arr) if (p && p.description) extractPowerBenefits(p);
+    if (Array.isArray(arr)) for (const p of arr) if (p && p.description) { extractPowerBenefits(p); extractChooseOne(p); }
   }
 }
 write('classes.json', CLASSES_OUT);

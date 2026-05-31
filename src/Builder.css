@@ -391,6 +391,19 @@
 .b-level-benefit.is-locked .b-level-tag { color: var(--b-dim); border-color: var(--b-border); }
 .b-level-text { color: var(--b-text); }
 .b-level-locked { flex: none; font-size: 0.55rem; text-transform: uppercase; color: var(--b-dim); }
+/* Choose-one options: build-time picks are selectable (radio), play-time are text. */
+.b-choose-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.25rem; }
+.b-choose-opt { font-size: 0.8rem; line-height: 1.4; }
+.b-choose-text { color: var(--b-text); }
+.b-choose-btn {
+  width: 100%; text-align: left; background: transparent; cursor: pointer;
+  border: 1px solid var(--b-border); border-radius: 0.3rem; padding: 0.3rem 0.5rem;
+  color: var(--b-text); font-family: inherit; font-size: 0.8rem;
+}
+.b-choose-btn:hover { border-color: rgba(111,191,115,0.5); }
+.b-choose-opt.is-chosen .b-choose-btn { border-color: var(--b-green); background: rgba(111,191,115,0.1); }
+.b-choose-mark { color: var(--b-green); margin-right: 0.3rem; }
+.b-choose-free { color: var(--b-green); font-size: 0.7rem; }
 .b-detail-missing {
   font-size: 0.85rem;
   color: var(--b-dim);

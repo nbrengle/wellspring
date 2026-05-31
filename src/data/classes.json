@@ -245,7 +245,24 @@
         "requirement": "Artisan Level 9",
         "prerequisites": null,
         "skillsAndOptions": "The Artisan gains a rank of the Fortunate Finder Character Option.",
-        "description": "If the Artisan meets the following criteria: • Artisan is the Crafter Specialization • At least 7 [Crafter] tagged Powers (Basic, Advanced, Veteran, Utility) • Possesses the prerequisite Journeyman Skill Then the Artisan also gains one of the following for free: • Greater Alchemy (5) • Greater Enchanting (5) • Greater Tinkering (5)"
+        "description": "If the Artisan meets the following criteria: • Artisan is the Crafter Specialization • At least 7 [Crafter] tagged Powers (Basic, Advanced, Veteran, Utility) • Possesses the prerequisite Journeyman Skill Then the Artisan also gains one of the following for free: • Greater Alchemy (5) • Greater Enchanting (5) • Greater Tinkering (5)",
+        "chooseOne": {
+          "kind": "build",
+          "options": [
+            {
+              "text": "Greater Alchemy (5)",
+              "grantsSkill": "Greater Alchemy"
+            },
+            {
+              "text": "Greater Enchanting (5)",
+              "grantsSkill": "Greater Enchanting"
+            },
+            {
+              "text": "Greater Tinkering (5)",
+              "grantsSkill": "Greater Tinkering"
+            }
+          ]
+        }
       },
       {
         "name": "Opus",
@@ -1000,7 +1017,21 @@
         "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "An Artisan can take an existing potion (any quaffed liquid created with alchemy or tagged quaffed liquid found in the world) and add a little kick to it. After spending a minute or so adding to, mixing, and enhancing the potion, they may choose one of three benefits that will take place when the potion is imbibed: • Heal 1 • Grant 1 Barrier • Intoxicate No Potion can be Kicked more than once. The Kick effect should be added to the information card for the item if it has one. If there is no information card, either one must be made, or only the Artisan can get the Kick effects."
+        "description": "An Artisan can take an existing potion (any quaffed liquid created with alchemy or tagged quaffed liquid found in the world) and add a little kick to it. After spending a minute or so adding to, mixing, and enhancing the potion, they may choose one of three benefits that will take place when the potion is imbibed: • Heal 1 • Grant 1 Barrier • Intoxicate No Potion can be Kicked more than once. The Kick effect should be added to the information card for the item if it has one. If there is no information card, either one must be made, or only the Artisan can get the Kick effects.",
+        "chooseOne": {
+          "kind": "play",
+          "options": [
+            {
+              "text": "Heal 1"
+            },
+            {
+              "text": "Grant 1 Barrier"
+            },
+            {
+              "text": "Intoxicate No Potion can be Kicked more than once. The Kick effect should be added to the information card for the item if it has one. If there is no information card, either one must be made, or only the Artisan can get the Kick effects."
+            }
+          ]
+        }
       },
       {
         "name": "Mesmerize",
@@ -1554,7 +1585,27 @@
         "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "After completing a Ritual where the Artisan Mystic is the Primary Ritualist, the Artisan may ask one of the following questions of the Marshal guiding the ritual, which the Marshal should attempt to answer honestly: • “What is the effect of the next card in the deck (either higher or lower)?” • “What downsides to this ritual being cast may I not have considered that you can think of?” • “Provide me a potentially helpful cryptic phrase, vision, or short story.” Or instead, the Ritualist may target one of the ritual’s Participants with a verbal Obey Effect: • Short Obey by Mind, “Tell me one of your most important secrets that I do not know.” • Long Obey by Mind, “Tell no one of this Ritual or what took place here.”"
+        "description": "After completing a Ritual where the Artisan Mystic is the Primary Ritualist, the Artisan may ask one of the following questions of the Marshal guiding the ritual, which the Marshal should attempt to answer honestly: • “What is the effect of the next card in the deck (either higher or lower)?” • “What downsides to this ritual being cast may I not have considered that you can think of?” • “Provide me a potentially helpful cryptic phrase, vision, or short story.” Or instead, the Ritualist may target one of the ritual’s Participants with a verbal Obey Effect: • Short Obey by Mind, “Tell me one of your most important secrets that I do not know.” • Long Obey by Mind, “Tell no one of this Ritual or what took place here.”",
+        "chooseOne": {
+          "kind": "play",
+          "options": [
+            {
+              "text": "“What is the effect of the next card in the deck (either higher or lower)?”"
+            },
+            {
+              "text": "“What downsides to this ritual being cast may I not have considered that you can think of?”"
+            },
+            {
+              "text": "“Provide me a potentially helpful cryptic phrase, vision, or short story.” Or instead, the Ritualist may target one of the ritual’s Participants with a verbal Obey Effect:"
+            },
+            {
+              "text": "Short Obey by Mind, “Tell me one of your most important secrets that I do not know.”"
+            },
+            {
+              "text": "Long Obey by Mind, “Tell no one of this Ritual or what took place here.”"
+            }
+          ]
+        }
       }
     ],
     "veteran": [],
@@ -4185,7 +4236,24 @@
         "requirement": "Fighter Level 10",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "At the beginning of an Event, and after finishing a Long Rest, the Fighter may choose one of the following bonuses that last until the next Long Rest: • While wielding a Melee Weapon with one hand, you may add the Piercing effect to any Spike attack once per Short Rest and increase the Base Spike Damage of that attack by 3. • While Wielding a Great Weapon in both hands, you may add +1 to your Melee Base Damage. • While Wielding a Projectile Weapon, you may add the Wounding Effect to your normal shots that utilize the Aiming mechanic, these shots also gain +1 Base Damage. • While Wielding a Shield, you gain a Counter vs Shatter after completing a Short Rest. The Call is “Counter, Warrior Spirit.” Additionally, the Fighter gains +1 Maximum Health, physical Armor Point, and Natural Armor Point."
+        "description": "At the beginning of an Event, and after finishing a Long Rest, the Fighter may choose one of the following bonuses that last until the next Long Rest: • While wielding a Melee Weapon with one hand, you may add the Piercing effect to any Spike attack once per Short Rest and increase the Base Spike Damage of that attack by 3. • While Wielding a Great Weapon in both hands, you may add +1 to your Melee Base Damage. • While Wielding a Projectile Weapon, you may add the Wounding Effect to your normal shots that utilize the Aiming mechanic, these shots also gain +1 Base Damage. • While Wielding a Shield, you gain a Counter vs Shatter after completing a Short Rest. The Call is “Counter, Warrior Spirit.” Additionally, the Fighter gains +1 Maximum Health, physical Armor Point, and Natural Armor Point.",
+        "chooseOne": {
+          "kind": "play",
+          "options": [
+            {
+              "text": "While wielding a Melee Weapon with one hand, you may add the Piercing effect to any Spike attack once per Short Rest and increase the Base Spike Damage of that attack by 3."
+            },
+            {
+              "text": "While Wielding a Great Weapon in both hands, you may add +1 to your Melee Base Damage."
+            },
+            {
+              "text": "While Wielding a Projectile Weapon, you may add the Wounding Effect to your normal shots that utilize the Aiming mechanic, these shots also gain +1 Base Damage."
+            },
+            {
+              "text": "While Wielding a Shield, you gain a Counter vs Shatter after completing a Short Rest. The Call is “Counter, Warrior Spirit.” Additionally, the Fighter gains +1 Maximum Health, physical Armor Point, and Natural Armor Point."
+            }
+          ]
+        }
       }
     ],
     "utility": [
@@ -5628,7 +5696,27 @@
         "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "See Magic gives the Mage the ability to detect magical emanations from enchantments, active spells (including summoned armor), or magical items. Once cast, the Mage can ask any or all of the following questions of as many targets as desired. The Mage can do this until they cast another spell, says anything that is not one of the questions, takes damage, takes an Effect, or completes a Short Rest: • “What non-Inherent Conditions do you have?” • “How many points of summoned armor do you have?” • “What items are you carrying that are magical?” • “What was the last spell you cast?” • “Are you a Construct?”"
+        "description": "See Magic gives the Mage the ability to detect magical emanations from enchantments, active spells (including summoned armor), or magical items. Once cast, the Mage can ask any or all of the following questions of as many targets as desired. The Mage can do this until they cast another spell, says anything that is not one of the questions, takes damage, takes an Effect, or completes a Short Rest: • “What non-Inherent Conditions do you have?” • “How many points of summoned armor do you have?” • “What items are you carrying that are magical?” • “What was the last spell you cast?” • “Are you a Construct?”",
+        "chooseOne": {
+          "kind": "play",
+          "options": [
+            {
+              "text": "“What non-Inherent Conditions do you have?”"
+            },
+            {
+              "text": "“How many points of summoned armor do you have?”"
+            },
+            {
+              "text": "“What items are you carrying that are magical?”"
+            },
+            {
+              "text": "“What was the last spell you cast?”"
+            },
+            {
+              "text": "“Are you a Construct?”"
+            }
+          ]
+        }
       },
       {
         "name": "Stop",
@@ -6069,7 +6157,24 @@
         "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "This powerful spell can be used to end the duration of many Spells or Powers, including Spells like Elemental Node or protective circles. It can be used in one of the following ways: • Harm Constructs: “Piercing 3 to Construct.” If the caster expends a Spike an additional Spell-Packet is charged. • Dispel any of the following: “Dispel Protects”, “Dispel Summoned Armor”, “Dispel Barrier”, or a specific Condition: “Dispel [Condition].” • Dispel all Conditions caused by a specific Accent: “Dispel [Accent].” • Break any circle represented by a cord, rope, or the like: “Dispel Circle.” Note: Dispel Magic may have other specific uses."
+        "description": "This powerful spell can be used to end the duration of many Spells or Powers, including Spells like Elemental Node or protective circles. It can be used in one of the following ways: • Harm Constructs: “Piercing 3 to Construct.” If the caster expends a Spike an additional Spell-Packet is charged. • Dispel any of the following: “Dispel Protects”, “Dispel Summoned Armor”, “Dispel Barrier”, or a specific Condition: “Dispel [Condition].” • Dispel all Conditions caused by a specific Accent: “Dispel [Accent].” • Break any circle represented by a cord, rope, or the like: “Dispel Circle.” Note: Dispel Magic may have other specific uses.",
+        "chooseOne": {
+          "kind": "play",
+          "options": [
+            {
+              "text": "Harm Constructs: “Piercing 3 to Construct.” If the caster expends a Spike an additional Spell-Packet is charged."
+            },
+            {
+              "text": "Dispel any of the following: “Dispel Protects”, “Dispel Summoned Armor”, “Dispel Barrier”, or a specific Condition: “Dispel [Condition].”"
+            },
+            {
+              "text": "Dispel all Conditions caused by a specific Accent: “Dispel [Accent].”"
+            },
+            {
+              "text": "Break any circle represented by a cord, rope, or the like: “Dispel Circle.” Note: Dispel Magic may have other specific uses."
+            }
+          ]
+        }
       },
       {
         "name": "Dominate Creature",
@@ -6126,7 +6231,21 @@
         "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "Elemental Survival must be cast focusing on one of the Elemental Cornerstones (Fire, Air, Water, Earth). The caster designates 3 targets to gain traits based on the plane chosen. The character cannot be affected by this spell more than once at a time, even if a different plane is chosen. • Air: The character is unaffected by high winds, including natural tornadoes and the like. The character is unaffected by natural lightning strikes and can see normally through clouds and the dust caused by weather. The character has resistance to Lightning and resistance to falling damage a number of times equal to their Maximum Life Points. • Fire: The character takes no damage from normal fire or heat, and can breathe and see normally in smoky environments. The character has resistance to Flame a number of times equal to their Maximum Life Points. • Earth: The character can pass through some rock and stone (the player can touch stone for a Focus Quick 10 then meld into or out of it, becoming Insubstantial and inherently Slowed while in this state). The character has resistance to Acid a number of times equal to their Maximum Life Points. • Water: The character can walk normally on icy surfaces and can breathe normally underwater. The character will suffer no ill effects from being in deep water and can see normally underwater, even in almost total darkness. The character has resistance to Ice a number of times equal to their Maximum Life Points. Enhancement: Greater Slot: The Spell’s Duration changes to be Long Rest."
+        "description": "Elemental Survival must be cast focusing on one of the Elemental Cornerstones (Fire, Air, Water, Earth). The caster designates 3 targets to gain traits based on the plane chosen. The character cannot be affected by this spell more than once at a time, even if a different plane is chosen. • Air: The character is unaffected by high winds, including natural tornadoes and the like. The character is unaffected by natural lightning strikes and can see normally through clouds and the dust caused by weather. The character has resistance to Lightning and resistance to falling damage a number of times equal to their Maximum Life Points. • Fire: The character takes no damage from normal fire or heat, and can breathe and see normally in smoky environments. The character has resistance to Flame a number of times equal to their Maximum Life Points. • Earth: The character can pass through some rock and stone (the player can touch stone for a Focus Quick 10 then meld into or out of it, becoming Insubstantial and inherently Slowed while in this state). The character has resistance to Acid a number of times equal to their Maximum Life Points. • Water: The character can walk normally on icy surfaces and can breathe normally underwater. The character will suffer no ill effects from being in deep water and can see normally underwater, even in almost total darkness. The character has resistance to Ice a number of times equal to their Maximum Life Points. Enhancement: Greater Slot: The Spell’s Duration changes to be Long Rest.",
+        "chooseOne": {
+          "kind": "play",
+          "options": [
+            {
+              "text": "Fire: The character takes no damage from normal fire or heat, and can breathe and see normally in smoky environments. The character has resistance to Flame a number of times equal to their Maximum Life Points."
+            },
+            {
+              "text": "Earth: The character can pass through some rock and stone (the player can touch stone for a Focus Quick 10 then meld into or out of it, becoming Insubstantial and inherently Slowed while in this state). The character has resistance to Acid a number of times equal to their Maximum Life Points."
+            },
+            {
+              "text": "Water: The character can walk normally on icy surfaces and can breathe normally underwater. The character will suffer no ill effects from being in deep water and can see normally underwater, even in almost total darkness. The character has resistance to Ice a number of times equal to their Maximum Life Points. Enhancement: Greater Slot: The Spell’s Duration changes to be Long Rest."
+            }
+          ]
+        }
       },
       {
         "name": "Gift of Solitude",
@@ -8216,7 +8335,21 @@
         "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "“Our waitress is left-handed and the Legionnaire sitting up at the counter weighs two hundred fifteen pounds and knows how to handle himself.” Socialites rely on their wit and observation to survive, and have learned to uncover threats. Once an opponent has been identified they can be negotiated with. Socialites may ask one of the below questions once per Individual per Short Rest after the Focus is completed: • Do you intend to harm us? • Are you willing to negotiate a peaceful resolution? • Will you accept a bribe?"
+        "description": "“Our waitress is left-handed and the Legionnaire sitting up at the counter weighs two hundred fifteen pounds and knows how to handle himself.” Socialites rely on their wit and observation to survive, and have learned to uncover threats. Once an opponent has been identified they can be negotiated with. Socialites may ask one of the below questions once per Individual per Short Rest after the Focus is completed: • Do you intend to harm us? • Are you willing to negotiate a peaceful resolution? • Will you accept a bribe?",
+        "chooseOne": {
+          "kind": "play",
+          "options": [
+            {
+              "text": "Do you intend to harm us?"
+            },
+            {
+              "text": "Are you willing to negotiate a peaceful resolution?"
+            },
+            {
+              "text": "Will you accept a bribe?"
+            }
+          ]
+        }
       },
       {
         "name": "Time to Go",
@@ -8639,7 +8772,21 @@
         "requirement": "Socialite Level 7",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "Whether walking the lines before a battle, delving into a dungeon, or starting off a council meeting, Socialites know how to inspire allies. The Socialite should give a speech lasting at least two minutes. It may include tactical or strategic information, but it must also attempt to inspire and motivate. This speech is an Incantation, so the Socialite cannot move their foot, must have one hand free, and cannot be disturbed while giving it (or else begin again). Once that rousing speech is completed, the Socialite can inspire individuals who listened to the speech. For each individual who the Socialite believes was motivated by the speech, the Socialite can give them a few individual words of encouragement, and give one of the following boons by Touch: • “Short Grant 1 Bonus Maximum Spike” • “Short Grant 5 Barrier by Mind” • “Grant Protect vs Packets by Mind” The Socialite may give themself any or all of these boons upon completion of the speech."
+        "description": "Whether walking the lines before a battle, delving into a dungeon, or starting off a council meeting, Socialites know how to inspire allies. The Socialite should give a speech lasting at least two minutes. It may include tactical or strategic information, but it must also attempt to inspire and motivate. This speech is an Incantation, so the Socialite cannot move their foot, must have one hand free, and cannot be disturbed while giving it (or else begin again). Once that rousing speech is completed, the Socialite can inspire individuals who listened to the speech. For each individual who the Socialite believes was motivated by the speech, the Socialite can give them a few individual words of encouragement, and give one of the following boons by Touch: • “Short Grant 1 Bonus Maximum Spike” • “Short Grant 5 Barrier by Mind” • “Grant Protect vs Packets by Mind” The Socialite may give themself any or all of these boons upon completion of the speech.",
+        "chooseOne": {
+          "kind": "play",
+          "options": [
+            {
+              "text": "“Short Grant 1 Bonus Maximum Spike”"
+            },
+            {
+              "text": "“Short Grant 5 Barrier by Mind”"
+            },
+            {
+              "text": "“Grant Protect vs Packets by Mind” The Socialite may give themself any or all of these boons upon completion of the speech."
+            }
+          ]
+        }
       },
       {
         "name": "Utilitarian",
@@ -9602,7 +9749,21 @@
         "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Sourcerer charges two Spell-Packets that can do one of three things. The Spell-Packets need not have the same Call: • “Dispel All Barrier by Acid” • “Dispel All Protects by Acid” • “Wounding 3 by Acid” Enhancement: Expend a Spike: The caster may also choose “Shatter Physical Armor by Acid”"
+        "description": "The Sourcerer charges two Spell-Packets that can do one of three things. The Spell-Packets need not have the same Call: • “Dispel All Barrier by Acid” • “Dispel All Protects by Acid” • “Wounding 3 by Acid” Enhancement: Expend a Spike: The caster may also choose “Shatter Physical Armor by Acid”",
+        "chooseOne": {
+          "kind": "play",
+          "options": [
+            {
+              "text": "“Dispel All Barrier by Acid”"
+            },
+            {
+              "text": "“Dispel All Protects by Acid”"
+            },
+            {
+              "text": "“Wounding 3 by Acid” Enhancement: Expend a Spike: The caster may also choose “Shatter Physical Armor by Acid”"
+            }
+          ]
+        }
       },
       {
         "name": "Primal Ray",

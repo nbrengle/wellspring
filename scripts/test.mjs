@@ -349,6 +349,16 @@ test('Adept Ritualist level-benefits activate by Artisan class level', () => {
   ok(pb7.benefits.every((b) => b.active), 'all active at Artisan 7');
 });
 
+// ─── choose-one: build-time selection grants the chosen skill free ────────────
+test('Expert Craft build-time choice grants the selected skill at 0 BP', () => {
+  const base = { classLevels: 'Artisan 10', innatePowers: ['Expert Craft'], purchasedSkills: ['Greater Alchemy'] };
+  eq(computeSpend(base).byItem['purchasedSkills:Greater Alchemy'].cost, 5, 'full cost without a choice');
+  const chosen = { ...base, choices: { 'powers:Expert Craft': 'Greater Alchemy' } };
+  const eff = computeSpend(chosen).byItem['purchasedSkills:Greater Alchemy'];
+  eq(eff.cost, 0, 'free once chosen');
+  eq(eff.grant.source, 'Expert Craft', 'attributed to Expert Craft');
+});
+
 // ─── report ───────────────────────────────────────────────────────────────────
 console.log(`\n${passed} passed, ${failures.length} failed`);
 if (failures.length) {

@@ -685,7 +685,7 @@ function ArchetypePicker({ onPick, onStartBlank }) {
 // followable links. PICK lists the eligible powers for a slot, each inspectable
 // (with links) and choosable. Both modes share the entity-card renderer.
 
-function DetailPane({ view, report, onInspect, onBack, onClose }) {
+function DetailPane({ view, report, choices, onSetChoice, onInspect, onBack, onClose }) {
   if (!view) {
     return (
       <aside className="b-rail b-rail-right">
@@ -695,7 +695,7 @@ function DetailPane({ view, report, onInspect, onBack, onClose }) {
       </aside>
     );
   }
-  return <EntityDetail view={view} report={report} onInspect={onInspect} onBack={onBack} onClose={onClose} />;
+  return <EntityDetail view={view} report={report} choices={choices} onSetChoice={onSetChoice} onInspect={onInspect} onBack={onBack} onClose={onClose} />;
 }
 
 // ─── PICKER OVERLAY ───────────────────────────────────────────────────────────
@@ -937,7 +937,7 @@ function PickerOverlay({ spec, character, onClose }) {
 }
 
 // INSPECT mode: one entity, its facts, and followable links.
-function EntityDetail({ view, report, onInspect, onBack, onClose }) {
+function EntityDetail({ view, report, choices, onSetChoice, onInspect, onBack, onClose }) {
   const entity = useResolvedEntity(view.item, view.field, view.resolveType, view.archetypeName);
   const { item, resolveType } = view;
 
@@ -950,7 +950,7 @@ function EntityDetail({ view, report, onInspect, onBack, onClose }) {
         <p className="b-detail-type">{entity?.type || resolveType}</p>
       </header>
       <div className="b-detail-body">
-        <EntityBody entity={entity} report={report} onInspect={onInspect} />
+        <EntityBody entity={entity} report={report} choices={choices} onSetChoice={onSetChoice} onInspect={onInspect} />
       </div>
     </aside>
   );
@@ -959,7 +959,7 @@ function EntityDetail({ view, report, onInspect, onBack, onClose }) {
 // The shared reading body for an entity — description, facts, forward + back
 // links. Used by both the rail inspector and the picker's reading pane so the
 // content (and link-following) is identical everywhere.
-function EntityBody({ entity, report, onInspect }) {
+function EntityBody({ entity, report, choices, onSetChoice, onInspect }) {
   if (!entity) {
     return <p className="b-detail-missing">No detail available — this item may be unresolved.</p>;
   }
@@ -994,6 +994,35 @@ function EntityBody({ entity, report, onInspect }) {
           </ul>
         </div>
       )}
+      {entity.chooseOne && (() => {
+        const co = entity.chooseOne;
+        const powerId = `powers:${entity.name}`;
+        const chosen = choices?.[powerId];
+        const build = co.kind === "build";
+        return (
+          <div className="b-detail-section">
+            <h3 className="b-detail-section-title">
+              {build ? "Choose one (free)" : "Choose one when used"}
+            </h3>
+            <ul className="b-choose-list">
+              {co.options.map((o, i) => {
+                const key = o.grantsSkill || o.text;
+                const sel = build && (chosen === key);
+                return (
+                  <li key={i} className={`b-choose-opt ${build ? "is-selectable" : ""} ${sel ? "is-chosen" : ""}`}>
+                    {build && onSetChoice
+                      ? <button className="b-choose-btn" onClick={() => onSetChoice(powerId, key)}>
+                          <span className="b-choose-mark">{sel ? "●" : "○"}</span> {o.text}
+                          {o.grantsSkill && <span className="b-choose-free"> · free</span>}
+                        </button>
+                      : <span className="b-choose-text">• {o.text}</span>}
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        );
+      })()}
       {domainPowers && domainPowers.length > 0 && (
         <LinkList title="Domain powers" tone="purple" onInspect={onInspect}
                   ids={domainPowers.map((p) => `powers:${p.name}`)} />
@@ -1462,6 +1491,16 @@ export default function Builder() {
     setCharacter((c) => ({ ...c, sublineage: c.sublineage === sub ? null : sub }));
   }, []);
 
+  // Record (or clear) a build-time choose-one selection, keyed by power id.
+  const handleSetChoice = useCallback((powerId, option) => {
+    setCharacter((c) => {
+      const choices = { ...(c.choices || {}) };
+      if (option == null || choices[powerId] === option) delete choices[powerId];
+      else choices[powerId] = option;
+      return { ...c, choices };
+    });
+  }, []);
+
   // Toggle a lineage challenge or advantage by its display name.
   const handleToggleLineageItem = useCallback((field, name) => {
     setCharacter((c) => {
@@ -1719,6 +1758,7 @@ export default function Builder() {
                     onOpenAdd={handleOpenAdd} onRemoveEntity={handleRemoveEntity}
                     onSetName={handleSetName} onOpenLineage={() => setLineageOpen(true)} />
         <DetailPane view={view} report={report}
+                    choices={character.choices} onSetChoice={handleSetChoice}
                     onInspect={handleInspect}
                     onBack={history.length ? handleBack : null} onClose={handleClose} />
       </div>

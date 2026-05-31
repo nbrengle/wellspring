@@ -163,6 +163,26 @@ export function grantedAbilities(character) {
         .abilities.push(row);
     }
   }
+
+  // Choice-driven grants: a build-time choose-one power (Expert Craft) grants the
+  // skill the player SELECTED for free. The choice is recorded on the character;
+  // resolve it to the same grant shape so it zeroes the skill's cost like any grant.
+  const push = (ability, src) => {
+    const ent = lookupEntity(ability);
+    const row = { ability, abilityName: ent?.name || idName(ability),
+      abilityType: ability.slice(0, ability.indexOf(':')), source: src, sourceId: `powers:${src}`, sourceKind: 'choice' };
+    list.push(row);
+    (bySource[row.sourceId] = bySource[row.sourceId] || { source: src, sourceKind: 'choice', abilities: [] }).abilities.push(row);
+  };
+  for (const field of POWER_SOURCE_FIELDS) {
+    for (const item of (character[field] || [])) {
+      const ent = lookupEntity(`powers:${cleanItemName(item)}`);
+      if (ent?.chooseOne?.kind !== 'build') continue;
+      const chosen = character.choices?.[`powers:${ent.name}`];
+      const opt = ent.chooseOne.options.find((o) => o.grantsSkill === chosen || o.text === chosen);
+      if (opt?.grantsSkill) push(`skills:${opt.grantsSkill}`, ent.name);
+    }
+  }
   return { list, bySource };
 }
 
