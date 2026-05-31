@@ -28,7 +28,7 @@ const read = (f) => JSON.parse(readFileSync(join(DATA, f), "utf8"));
 // short glossary definition). All identifiers are plural to match the JSON
 // collection files they correspond to; the one exception is `creature-types`,
 // because `types` would collide with the `type` field on every entity record.
-const TYPE_PRIORITY = ["effects", "conditions", "creature-types", "resources", "accents", "defenses", "modifiers", "crafting-concepts", "ritual-concepts", "skills", "perks", "flaws", "classes", "domains", "devotions", "powers", "recipes", "rituals", "archetypes", "rules-concepts", "terms"];
+const TYPE_PRIORITY = ["effects", "conditions", "creature-types", "resources", "accents", "defenses", "modifiers", "crafting-concepts", "ritual-concepts", "skills", "perks", "flaws", "classes", "domains", "devotions", "powers", "recipes", "rituals", "advantages", "challenges", "archetypes", "rules-concepts", "terms"];
 
 const POWER_TIERS = ["innate", "utility", "basic", "advanced", "veteran", "classSkills", "rightHandPowers", "cantrips", "noviceSpells", "adeptSpells", "greaterSpells"];
 
@@ -73,6 +73,15 @@ function buildRegistry() {
     (d.powers || []).forEach((p) => add("powers", p.name, powerBody(p)));
   });
   read("devotions.json").forEach((d) => add("devotions", d.name, [d.lore, (d.tenets || []).join(" ")].join(" ")));
+  // Lineage advantages/challenges are linkable entities in their own right: their
+  // descriptions bestow named abilities ("gains the Magical Resilience Perk") and
+  // carry grant/discount consequences, so they must be in the registry to be a
+  // source of those edges. Typed as advantages/challenges, scoped per lineage so
+  // same-named items in different lineages stay distinct.
+  read("lineages.json").forEach((lin) => {
+    (lin.advantages || []).forEach((a) => add("advantages", `${lin.name} - ${a.name}`, a.description, { lineage: lin.name, baseName: a.name }));
+    (lin.challenges || []).forEach((c) => add("challenges", `${lin.name} - ${c.name}`, c.description, { lineage: lin.name, baseName: c.name }));
+  });
   read("classes.json").forEach((c) => {
     add("classes", c.name, [c.description, (c.startingSkills || []).join(" "), (c.multiclassSkills || []).join(" ")].filter(Boolean).join(" "));
     // Class specializations (e.g. Artisan → Mystic, Crafter, Artificer).
@@ -165,6 +174,11 @@ function buildMatchers(registry) {
   const priority = (t) => TYPE_PRIORITY.indexOf(t);
 
   for (const e of registry) {
+    // Lineage advantages/challenges are link SOURCES (their bodies bestow/grant),
+    // never surface-form link targets — you reach them through the lineage UI, not
+    // by a prose mention of "Deep Reserves". Skip generating matchers for them so
+    // their names don't pollute the mention graph.
+    if (e.type === "advantages" || e.type === "challenges") continue;
     const policy = MATCH_POLICY[e.name];
     if (policy === "stop") {
       // Skip the algorithmic inflections — only explicit CURATED aliases link.
@@ -310,6 +324,87 @@ function parsePrereq(prereqText, skillForms) {
   return { skills: [...skills], anyOf, levels, other };
 }
 
+// ─── BESTOWAL GRANTS ──────────────────────────────────────────────────────────
+// Some entities BESTOW a named ability: "the character gains the Magical
+// Resilience Perk", "gains the Regenerate Power", "adds the Poisoner Skill". This
+// is distinct from a body MENTION — it means "now possess this entity, for free".
+// Parse the explicit "gains/adds the <Name> <Perk|Power|Skill>" form and resolve
+// <Name> against the matching type's lookup. Conservative: only the explicit
+// noun-tagged form, so prose like "gains 3 points of Natural Armor" stays prose.
+const GRANT_RE = /\b(?:gains?|adds?|learns?|receives?)\s+(?:the\s+|one\s+|a\s+)?([A-Z][\w’'-]+(?:\s+[A-Z][\w’'-]+){0,3})\s+(Perk|Power|Skill)\b/gi;
+function parseGrants(text, grantLookups) {
+  if (!text) return [];
+  const out = new Set();
+  let m;
+  GRANT_RE.lastIndex = 0;
+  while ((m = GRANT_RE.exec(text))) {
+    const name = m[1].trim();
+    const noun = m[2].toLowerCase(); // perk | power | skill
+    const lookup = grantLookups[noun];
+    if (!lookup) continue;
+    const { entity } = resolve(name, lookup);
+    if (entity) out.add(entity.id);
+  }
+  return [...out];
+}
+
+// ─── DISCOUNT SOURCES ─────────────────────────────────────────────────────────
+// A discount SOURCE makes a whole category of other purchases cheaper, e.g.
+// Patron ("any Gift perk … costs 1 BP less … maximum of 10 BP in discounts"),
+// Technarchist ("learn any Martial, Medical or Crafting skill for one less BP, to
+// a minimum cost of 1"), Human Environmental Mastery ("1 BP discount on Gathering
+// skills"), Lost ("first three Lore skills … discounted by 1 BP"). The general
+// rule: a discount on something already free becomes free BP (refundIfFree).
+//
+// Returns { amount, scope, cap, min, refundIfFree, exclusions } or null. Scope is
+// the structured target: { kind: 'prereq'|'category'|'firstN', value, n? }.
+function parseDiscounts(text, exclusionLookup) {
+  if (!text) return null;
+  // Must actually be a discount source (not just mention the word in flavor).
+  if (!/\bdiscount(?:ed|s)?\b|\bBP\s+less\b|\bless\s+BP\b/i.test(text)) return null;
+
+  // Amount: "1 BP less" / "N BP discount" / "discounted by N BP" → default 1.
+  const amtM = text.match(/(\d+)\s*BP\s+less/i)
+    || text.match(/(\d+)\s*BP\s+discount/i)
+    || text.match(/discount(?:ed)?\s+(?:by\s+)?(\d+)\s*BP/i)
+    || (/\bone\s+less\s+BP\b/i.test(text) ? [null, "1"] : null);
+  if (!amtM) return null;
+  const amount = parseInt(amtM[1], 10);
+
+  const cap = (text.match(/maximum\s+of\s+(\d+)\s*BP\s+in\s+discounts/i) || [])[1];
+  const min = (text.match(/minimum\s+(?:cost\s+)?of\s+(\d+)/i) || [])[1];
+  const refundIfFree = !/does not apply to|granted for free|unless the source states/i.test(text)
+    ? true : true; // general rule: refund unless explicitly stated otherwise (rare)
+
+  // Scope detection, most specific first.
+  let scope = null;
+  const prereqM = text.match(/with\s+the\s+([A-Z][\w’'-]+(?:\s+[A-Z][\w’'-]+){0,3})\s+prerequisite/i);
+  const firstNM = text.match(/first\s+(\w+)\s+([A-Z][\w’'-]+)\s+skills?/i);
+  const catM = text.match(/(?:on|any)\s+((?:[A-Z][\w’'-]+(?:,?\s+(?:and\s+|or\s+)?)?){1,4})\s+skills?/i);
+  const WORD_NUM = { one: 1, two: 2, three: 3, four: 4, five: 5 };
+  if (prereqM) {
+    scope = { kind: "prereq", value: prereqM[1].trim() };
+  } else if (firstNM) {
+    const n = WORD_NUM[firstNM[1].toLowerCase()] || parseInt(firstNM[1], 10) || null;
+    scope = { kind: "firstN", value: firstNM[2].trim(), n };
+  } else if (catM) {
+    const cats = catM[1].split(/,|\band\b|\bor\b/i).map((s) => s.trim()).filter(Boolean);
+    scope = { kind: "category", value: cats };
+  }
+  if (!scope) return null;
+
+  // Exclusions: "X and Y cannot be discounted".
+  const exclusions = [];
+  const exM = text.match(/\b([A-Z][\w’'-]+(?:\s+[A-Z][\w’'-]+){0,3}(?:\s+and\s+[A-Z][\w’'-]+(?:\s+[A-Z][\w’'-]+){0,3})?)\s+(?:Perks?\s+)?cannot\s+be\s+discounted/i);
+  if (exM) {
+    for (const nm of exM[1].split(/\band\b/i).map((s) => s.trim()).filter(Boolean)) {
+      const { entity } = resolve(nm, exclusionLookup);
+      if (entity) exclusions.push(entity.id);
+    }
+  }
+  return { amount, scope, cap: cap ? parseInt(cap, 10) : null, min: min ? parseInt(min, 10) : null, refundIfFree, exclusions };
+}
+
 // ─── BUILD ────────────────────────────────────────────────────────────────────
 
 console.log("Linking references…");
@@ -423,6 +518,33 @@ for (const s of skills) {
 for (const id of Object.keys(mentionedBy)) mentionedBy[id] = [...new Set(mentionedBy[id])];
 for (const id of Object.keys(unlocks)) unlocks[id] = [...new Set(unlocks[id])];
 
+// ─── BESTOWAL + DISCOUNT EDGES ────────────────────────────────────────────────
+// Scan every entity body for "gains the X Perk/Power/Skill" (bestowal) and for a
+// discount-source clause. Sources are mainly perks, class features (powers), and
+// lineage advantages. Resolution lookups are type-scoped so "Magical Resilience
+// Perk" resolves against perks, not a same-named power.
+const grantTargetLookups = {
+  perk: buildLookup(registry.filter((e) => e.type === "perks")),
+  power: buildLookup(registry.filter((e) => e.type === "powers")),
+  skill: buildLookup(registry.filter((e) => e.type === "skills")),
+};
+// Exclusions ("Strong Bloodline and Inheritance cannot be discounted") name perks.
+const exclusionLookup = grantTargetLookups.perk;
+
+const grants = {};
+const grantedBy = {};
+const discounts = {};
+for (const e of registry) {
+  const g = parseGrants(e.body, grantTargetLookups).filter((id) => id !== e.id);
+  if (g.length) {
+    grants[e.id] = g;
+    for (const t of g) (grantedBy[t] = grantedBy[t] || []).push(e.id);
+  }
+  const d = parseDiscounts(e.body, exclusionLookup);
+  if (d) discounts[e.id] = d;
+}
+for (const id of Object.keys(grantedBy)) grantedBy[id] = [...new Set(grantedBy[id])];
+
 // ─── ARCHETYPE STRUCTURED REFS ───────────────────────────────────────────────
 // Resolve every skill/perk/power listed in each archetype to an entity id,
 // keyed by which field it came from. This is the typed, drift-tolerant
@@ -507,6 +629,9 @@ const result = {
   causedBy,
   prereqs,
   unlocks,
+  grants,
+  grantedBy,
+  discounts,
   archetypeRefs,
 };
 
@@ -516,7 +641,9 @@ const totalRefs = Object.values(mentions).reduce((a, r) => a + r.length, 0);
 const totalPrereqEdges = Object.values(prereqs).reduce((a, p) => a + p.skills.length, 0);
 const totalArchetypeRefs = Object.values(archetypeRefs).reduce(
   (a, fields) => a + Object.values(fields).reduce((b, ids) => b + ids.length, 0), 0);
+const totalGrants = Object.values(grants).reduce((a, g) => a + g.length, 0);
 console.log(`  ${registry.length} entities, ${totalRefs} body references, ${totalPrereqEdges} prereq edges, ${totalArchetypeRefs} archetype refs`);
+console.log(`  ${totalGrants} bestowal edges, ${Object.keys(discounts).length} discount sources`);
 if (archetypeDrift.length) {
   console.log(`  ${archetypeDrift.length} archetype refs resolved via drift fallback (see validate-archetypes for detail).`);
 }

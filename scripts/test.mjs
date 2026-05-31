@@ -12,6 +12,7 @@
 import {
   validate, getClasses, characterLevel, budgetFor, computeSlots, spellSlots,
   devotionState, prereqStatus, LEVEL_CAP, LEGAL_MIN_LEVEL,
+  grantedAbilities, computeSpend, discountSources,
 } from '../src/data/validate.js';
 import { formatCharacterSheet, parseCharacterSheet } from '../src/data/sheet.js';
 import { readFileSync } from 'node:fs';
@@ -221,6 +222,70 @@ test('≥99% of reference links resolve', () => {
   let total = 0, resolved = 0;
   for (const id in REFS.mentions) for (const ref of REFS.mentions[id]) { total++; if (lookupEntity(ref)) resolved++; }
   ok(resolved / total >= 0.99, `resolved ${resolved}/${total}`);
+});
+
+// ─── devotion: Worship skill is canonical, inline is the fallback ─────────────
+test('import derives devotion from Worship skill when no inline line', () => {
+  const c = parseCharacterSheet([
+    'Cleric Test', 'Class Levels: Cleric 4',
+    'Purchased Skills:', 'Worship - The Mother',
+  ].join('\n'));
+  eq(c.devotion, 'The Mother', 'devotion from Worship');
+  ok(!c.devotionWarning, 'no warning when only Worship');
+});
+test('import: Worship wins over a mismatched inline Devotion, with a warning', () => {
+  const c = parseCharacterSheet([
+    'Cleric Test', 'Class Levels: Cleric 4', 'Devotion: The Father',
+    'Purchased Skills:', 'Worship - The Mother',
+  ].join('\n'));
+  eq(c.devotion, 'The Mother', 'Worship is canonical');
+  ok(c.devotionWarning, 'mismatch warns');
+});
+test('import: inline Devotion alone is honored when no Worship skill', () => {
+  const c = parseCharacterSheet([
+    'Cleric Test', 'Class Levels: Cleric 4', 'Devotion: The Mother',
+  ].join('\n'));
+  eq(c.devotion, 'The Mother', 'inline fallback');
+  ok(!c.devotionWarning, 'no warning when only inline');
+});
+
+// ─── grants: a source grants a named ability, for free (kind #1) ──────────────
+test('lineage advantage grants the named perk (Aewen → Magical Resilience)', () => {
+  const c = { lineage: 'Aewen', lineageAdvantages: ['Mystic Resilience'] };
+  const g = grantedAbilities(c);
+  ok(g.list.some((x) => x.ability === 'perks:Magical Resilience'), 'Magical Resilience granted');
+  eq(g.list.find((x) => x.ability === 'perks:Magical Resilience').source, 'Mystic Resilience', 'source name');
+});
+test('a slot-grant advantage is NOT a named entity grant (Aewen Deep Reserves)', () => {
+  const c = { lineage: 'Aewen', lineageAdvantages: ['Deep Reserves'] };
+  eq(grantedAbilities(c).list.length, 0, 'no named-entity grant');
+});
+test('a selected power that grants a perk zeroes that perk (Implicit Truths → Insight)', () => {
+  const c = { classLevels: 'Socialite 4', utilityPowers: ['Implicit Truths'], purchasedPerks: ['Insight'] };
+  const eff = computeSpend(c).byItem['purchasedPerks:Insight'];
+  eq(eff.cost, 0, 'Insight free');
+  eq(eff.grant.source, 'Implicit Truths', 'grant source attributed');
+  ok(eff.grant.derived, 'derived from the graph, not a sidecar');
+});
+
+// ─── discount sources: category, firstN, refund-if-free, cap ──────────────────
+test('Human Environmental Mastery discounts a Gathering skill by 1', () => {
+  const c = { lineage: 'Human', lineageAdvantages: ['Environmental Mastery'], purchasedSkills: ['Forage I'] };
+  const s = computeSpend(c);
+  eq(s.byItem['purchasedSkills:Forage I'].cost, 2, 'Forage 3→2');
+  eq(s.byItem['purchasedSkills:Forage I'].discount.source, 'Environmental Mastery', 'source on chip');
+});
+test('Lost Wisdom of Many discounts only the first three Lore skills', () => {
+  const c = { lineage: 'Lost', lineageAdvantages: ['Wisdom of Many'],
+    purchasedSkills: ['Lore (History)', 'Lore (Religion)', 'Lore (Arcana)', 'Lore (Nature)'] };
+  const s = computeSpend(c);
+  eq(s.byItem['purchasedSkills:Lore (History)'].cost, 1, '1st discounted');
+  eq(s.byItem['purchasedSkills:Lore (Arcana)'].cost, 1, '3rd discounted');
+  eq(s.byItem['purchasedSkills:Lore (Nature)'].cost, 2, '4th full');
+});
+test('discountSources lists owned sources only', () => {
+  eq(discountSources({}).length, 0, 'none by default');
+  ok(discountSources({ lineage: 'Human', lineageAdvantages: ['Environmental Mastery'] }).length === 1, 'one when owned');
 });
 
 // ─── report ───────────────────────────────────────────────────────────────────

@@ -245,59 +245,10 @@
 .b-section-teal { color: var(--b-teal); border-bottom-color: rgba(79, 184, 168, 0.4); }
 .b-section-purple { color: var(--b-purple); border-bottom-color: rgba(176, 143, 208, 0.4); }
 .b-section-red { color: var(--b-red); border-bottom-color: rgba(217, 117, 107, 0.4); }
+.b-section-green { color: var(--b-green); border-bottom-color: rgba(111, 191, 115, 0.4); }
 .b-section-body { display: flex; flex-direction: column; gap: 0.5rem; }
 
-.b-power-tier {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-  margin-top: 0.4rem;
-}
-.b-power-tier-label {
-  font-size: 0.7rem;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  color: var(--b-dim);
-  margin: 0;
-  font-weight: 500;
-}
-
 .b-empty { color: var(--b-dim); font-style: italic; font-size: 0.85rem; margin: 0; }
-
-/* ─── ITEMS (chips inside sections) ───────────────────────────────────── */
-.b-item-grid {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem;
-}
-.b-item {
-  font-family: inherit;
-  font-size: 0.85rem;
-  background: var(--b-panel-2);
-  color: var(--b-text);
-  border: 1px solid var(--b-border);
-  border-radius: 0.375rem;
-  padding: 0.4rem 0.75rem;
-  cursor: pointer;
-  transition: border-color 0.1s, background 0.1s;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-.b-item:hover { border-color: var(--b-amber-deep); background: var(--b-panel-3); }
-.b-item.is-focused { border-color: var(--b-amber); background: rgba(184, 130, 31, 0.2); color: var(--b-amber); }
-.b-item-bp {
-  font-size: 0.62rem;
-  letter-spacing: 0.05em;
-  color: var(--b-amber);
-  background: rgba(184, 130, 31, 0.15);
-  border-radius: 0.2rem;
-  padding: 0.1rem 0.35rem;
-}
-.b-item-bp.is-free { color: var(--b-green); background: rgba(111, 191, 115, 0.15); }
 
 /* ─── TAGS ────────────────────────────────────────────────────────────── */
 .b-tag {
@@ -430,49 +381,6 @@
   font-style: italic;
   margin: 0;
 }
-.b-detail-fact {
-  font-size: 0.8rem;
-  color: var(--b-text);
-  background: var(--b-panel-2);
-  border: 1px solid var(--b-border);
-  border-radius: 0.375rem;
-  padding: 0.4rem 0.75rem;
-}
-.b-detail-fact-label {
-  font-size: 0.65rem;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  color: var(--b-dim);
-  margin-right: 0.5rem;
-}
-
-.b-backlinks {
-  border-top: 1px solid var(--b-border);
-  padding-top: 0.75rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-}
-.b-backlinks-title {
-  font-size: 0.65rem;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  color: var(--b-dim);
-  margin: 0;
-  font-weight: 600;
-}
-.b-backlinks-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-}
-.b-backlinks-list li {
-  font-size: 0.8rem;
-  color: var(--b-muted);
-}
 
 /* ─── BUDGET METER ────────────────────────────────────────────────────── */
 .b-budget {
@@ -591,44 +499,6 @@
   background: var(--b-panel-2); border-radius: 0.3rem; padding: 0.25rem 0.5rem;
 }
 
-/* ─── SLOT PICKER ─────────────────────────────────────────────────────── */
-.b-picker-list { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.75rem; }
-.b-picker-item {
-  border: 1px solid var(--b-border); border-radius: 0.4rem;
-  background: var(--b-panel-2); padding: 0.5rem 0.6rem;
-}
-.b-picker-item.is-taken { opacity: 0.55; }
-.b-picker-name {
-  display: flex; align-items: center; gap: 0.5rem; width: 100%; text-align: left;
-  background: transparent; border: none; cursor: pointer; padding: 0;
-  font-family: "Cinzel", serif; font-size: 0.9rem; font-weight: 600; color: var(--b-amber);
-}
-.b-picker-name:hover { text-decoration: underline; }
-.b-picker-taken {
-  font-size: 0.55rem; text-transform: uppercase; letter-spacing: 0.1em;
-  color: var(--b-green); border: 1px solid rgba(111,191,115,0.4); border-radius: 1rem;
-  padding: 0.05rem 0.4rem;
-}
-.b-picker-desc {
-  font-size: 0.78rem; line-height: 1.4; color: var(--b-muted); margin: 0.35rem 0;
-  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
-}
-.b-picker-choose {
-  font-family: inherit; font-size: 0.75rem; cursor: pointer;
-  background: rgba(176,143,208,0.15); color: var(--b-purple);
-  border: 1px solid rgba(176,143,208,0.4); border-radius: 0.3rem; padding: 0.3rem 0.7rem;
-}
-.b-picker-choose:hover:not(:disabled) { background: rgba(176,143,208,0.28); }
-.b-picker-choose:disabled { opacity: 0.5; cursor: default; }
-
-.b-detail-choose {
-  font-family: inherit; font-size: 0.85rem; cursor: pointer; width: 100%;
-  background: rgba(176,143,208,0.18); color: var(--b-purple);
-  border: 1px solid rgba(176,143,208,0.45); border-radius: 0.4rem; padding: 0.5rem;
-  margin-top: 0.5rem;
-}
-.b-detail-choose:hover { background: rgba(176,143,208,0.3); }
-
 /* ─── TOPBAR VALIDITY ─────────────────────────────────────────────────── */
 .b-topbar-stat.is-valid { color: var(--b-green); }
 .b-topbar-stat.is-invalid { color: var(--b-red); }
@@ -644,6 +514,19 @@
   background: var(--b-panel); border: 1px solid var(--b-border-2);
   border-radius: 0.75rem; box-shadow: 0 24px 60px rgba(0,0,0,0.5);
   display: flex; flex-direction: column; overflow: hidden;
+}
+/* Docked variant (lineage panel): no full-screen scrim, anchored to the right,
+   so the main character view behind it stays scrollable and interactive. The
+   wrapper passes pointer events through to the background; only the panel itself
+   captures them. */
+.b-overlay-dock {
+  background: none; backdrop-filter: none; padding: 0;
+  justify-content: flex-end; align-items: stretch; pointer-events: none;
+}
+.b-picker-dock {
+  pointer-events: auto; width: min(40rem, 96vw); height: 100vh;
+  border-radius: 0; border-top: none; border-bottom: none; border-right: none;
+  box-shadow: -24px 0 60px rgba(0,0,0,0.55);
 }
 .b-picker-head {
   display: flex; align-items: flex-start; justify-content: space-between;
@@ -777,18 +660,6 @@
 }
 .b-section-add:hover { border-color: var(--b-amber-deep); color: var(--b-amber); }
 
-.b-item-wrap { position: relative; display: inline-flex; }
-.b-item-remove {
-  position: absolute; top: -0.4rem; right: -0.4rem;
-  width: 1.1rem; height: 1.1rem; border-radius: 50%;
-  background: var(--b-panel-3); border: 1px solid var(--b-border-2); color: var(--b-dim);
-  font-size: 0.75rem; line-height: 1; cursor: pointer; padding: 0;
-  display: none; align-items: center; justify-content: center;
-}
-.b-item-wrap:hover .b-item-remove { display: flex; }
-.b-item-remove:hover { color: var(--b-red); border-color: var(--b-red); }
-.b-item-bp.is-award { color: var(--b-green); background: rgba(111,191,115,0.15); }
-
 /* Picker row cost badge */
 .b-picker-row-cost {
   font-size: 0.62rem; color: var(--b-amber); margin-left: auto; padding-right: 0.3rem;
@@ -850,6 +721,16 @@
 }
 .b-row-bp.is-free { color: var(--b-green); background: rgba(111,191,115,0.15); }
 .b-row-bp.is-award { color: var(--b-green); background: rgba(111,191,115,0.15); }
+.b-row-bp.is-cost { color: var(--b-amber); background: rgba(184,130,31,0.15); }
+/* Discounted item: shows the reduced price + the "−N · source" that cut it. */
+.b-row-bp.is-discounted { color: var(--b-amber); background: rgba(184,130,31,0.12); }
+.b-row-disc { color: var(--b-green); margin-left: 0.3rem; }
+/* Lineage summary on the main sheet: an advantage with its granted abilities
+   nested beneath it (indented, dimmed connector ↳). */
+.b-lin-adv-group { display: flex; flex-direction: column; gap: 0.25rem; }
+.b-lin-grant-row { margin-left: 1.1rem; opacity: 0.92; }
+.b-lin-grant-row .b-row-name { color: var(--b-dim); }
+.b-lin-grant-row .b-row-name:hover { color: var(--b-green); }
 .b-row-remove {
   flex: none; background: transparent; border: none; cursor: pointer;
   color: var(--b-dim); font-size: 0.95rem; padding: 0.25rem 0.3rem; line-height: 1;
@@ -932,11 +813,42 @@
 .b-lin-select:focus { outline: none; border-color: var(--b-amber-deep); }
 .b-lin-flag { margin: 0; padding: 0.5rem 1.1rem; color: var(--b-red); font-size: 0.78rem; background: rgba(217,117,107,0.08); }
 .b-lin-list { list-style: none; margin: 0; padding: 0.5rem; overflow-y: auto; display: flex; flex-direction: column; gap: 0.3rem; }
-.b-lin-row {
-  display: flex; align-items: center; gap: 0.5rem;
-  border: 1px solid var(--b-border); border-radius: 0.375rem; background: var(--b-panel-2); padding: 0.1rem 0.5rem;
+/* Initial lineage chooser: a grid of cards (name + flavor + sublineages). */
+.b-lin-cards {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
+  gap: 0.6rem; padding: 1rem 1.4rem; overflow-y: auto;
 }
+.b-lin-card {
+  display: flex; flex-direction: column; gap: 0.3rem; text-align: left; cursor: pointer;
+  background: var(--b-panel-2); border: 1px solid var(--b-border); border-radius: 0.5rem;
+  padding: 0.7rem 0.8rem; font-family: inherit; color: var(--b-text);
+}
+.b-lin-card:hover { border-color: rgba(111,191,115,0.5); background: rgba(111,191,115,0.07); }
+.b-lin-card-name { font-family: "Cinzel", serif; font-size: 0.95rem; color: var(--b-green); }
+.b-lin-card-desc {
+  font-size: 0.72rem; color: var(--b-muted); line-height: 1.4;
+  display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden;
+}
+.b-lin-card-subs { display: flex; flex-wrap: wrap; gap: 0.25rem; margin-top: 0.1rem; }
+.b-lin-card-sub {
+  font-size: 0.58rem; color: var(--b-dim); border: 1px solid var(--b-border-2);
+  border-radius: 1rem; padding: 0.05rem 0.4rem;
+}
+
+.b-lin-row {
+  display: flex; flex-direction: column; gap: 0.15rem;
+  border: 1px solid var(--b-border); border-radius: 0.375rem; background: var(--b-panel-2); padding: 0.1rem 0.5rem 0.4rem;
+}
+.b-lin-row-head { display: flex; align-items: center; gap: 0.5rem; }
 .b-lin-row.is-on { border-color: rgba(184,130,31,0.5); background: rgba(184,130,31,0.1); }
+/* Inline rules text + "grants:" links so you can judge a pick without a click. */
+.b-lin-desc { margin: 0 0 0 2rem; font-size: 0.72rem; color: var(--b-muted); line-height: 1.4; }
+.b-lin-grants { margin: 0.1rem 0 0 2rem; font-size: 0.68rem; color: var(--b-dim); }
+.b-lin-grant-link {
+  background: transparent; border: none; cursor: pointer; padding: 0;
+  color: var(--b-green); font-family: inherit; font-size: 0.68rem;
+}
+.b-lin-grant-link:hover { text-decoration: underline; }
 .b-lin-toggle {
   flex: none; width: 1.5rem; height: 1.5rem; border-radius: 0.3rem; cursor: pointer;
   background: var(--b-panel); border: 1px solid var(--b-border-2); color: var(--b-muted); font-size: 0.85rem; line-height: 1;
@@ -955,5 +867,23 @@
 .b-lin-req { color: var(--b-red); border-color: rgba(217,117,107,0.4); }
 .b-lin-repped { color: var(--b-blue); border-color: rgba(111,168,217,0.4); }
 .b-lin-lbp { flex: none; font-size: 0.7rem; color: var(--b-amber); }
-.b-lin-lbp.is-award { color: var(--b-green); }
+.b-lin-lbp.is-award { color: var(--b-green); }   /* challenge: +LBP earned */
+.b-lin-lbp.is-cost { color: var(--b-amber); }    /* advantage: −LBP spent */
 .b-lbp-warn { color: var(--b-red) !important; }
+
+/* ─── PICKER GROUP/SORT CONTROLS ──────────────────────────────────────── */
+.b-picker-sortrow { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
+.b-picker-sortlabel { display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.68rem; color: var(--b-dim); }
+.b-picker-sortsel {
+  font-family: inherit; font-size: 0.72rem; background: var(--b-panel-2);
+  color: var(--b-text); border: 1px solid var(--b-border); border-radius: 0.3rem; padding: 0.15rem 0.3rem;
+}
+.b-picker-sortsel:focus { outline: none; border-color: var(--b-amber-deep); }
+
+/* ─── IMPORT VALIDITY REASONS ─────────────────────────────────────────── */
+.b-import-reasons {
+  list-style: none; margin: 0 0 0.5rem; padding: 0.5rem 0.7rem;
+  background: rgba(217,117,107,0.08); border: 1px solid rgba(217,117,107,0.3);
+  border-radius: 0.4rem; display: flex; flex-direction: column; gap: 0.2rem;
+}
+.b-import-reasons li { font-size: 0.72rem; color: var(--b-red); }

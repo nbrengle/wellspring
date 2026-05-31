@@ -11,7 +11,8 @@
     "link": "node scripts/link-refs.js",
     "link:audit": "node scripts/link-audit.js",
     "doc:feedback": "node scripts/doc-feedback.js",
-    "test": "node --import ./scripts/register-json.mjs scripts/test.mjs"
+    "test": "node --import ./scripts/register-json.mjs scripts/test.mjs",
+    "shot": "node scripts/shot.mjs"
   },
   "dependencies": {
     "react": "^19.2.6",
@@ -19,6 +20,7 @@
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^6.0.1",
+    "playwright": "^1.60.0",
     "vite": "^8.0.12"
   }
 }

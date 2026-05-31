@@ -109,6 +109,34 @@ const MAX_LEVEL = LEVEL_TABLE.length ? Math.max(...LEVEL_TABLE.map((l) => l.leve
 const MIN_LEVEL = 1;
 const LEVEL_CAP = 10; // current total-level cap (flagged, not enforced)
 
+// Human-readable list of why a build is illegal/flagged, drawn from the validator
+// report. Empty when the build is clean. Shared by the import preview, top bar,
+// and anywhere a "why isn't this legal?" explanation is useful.
+function validityReasons(report) {
+  if (!report) return [];
+  const out = [];
+  if (report.belowFloor) out.push(`Below the level-${report.legalMinLevel} minimum`);
+  if (report.aboveCap) out.push(`Above the level-${report.levelCap} cap (Advanced Classes pending)`);
+  if (report.overBudget) out.push(`Over budget by ${report.spend.net - report.maxBudget} BP`);
+  for (const s of report.slots || []) {
+    if (s.over) out.push(`${s.label}: ${s.used}/${s.allowed} (over by ${s.used - s.allowed})`);
+  }
+  for (const iss of report.prereqs?.issues || []) {
+    const need = [
+      ...iss.missing.map((m) => m.name),
+      ...(iss.anyOf || []).map((g) => g.map((m) => m.name).join(" or ")),
+    ].join(", ");
+    out.push(`${iss.item} needs: ${need}`);
+  }
+  const lbp = report.lbp;
+  if (lbp) {
+    if (lbp.overspent) out.push(`Lineage: ${lbp.spent - lbp.awarded} LBP overspent`);
+    if (lbp.mixedSublineage) out.push("Lineage: items from more than one sublineage");
+    if (lbp.missingRequired?.length) out.push(`Lineage: missing required ${lbp.missingRequired.map((c) => c.baseName).join(", ")}`);
+  }
+  return out;
+}
+
 // A short, clear label for what KIND of thing a grant source is, so "free ·
 // Linked Armor" can read "free · Linked Armor (Utility Power)". Prefers the role
 // the archetype note stated; otherwise resolves the source entity's type/tier.
@@ -180,8 +208,9 @@ function IdentityRail({ character, report, onClickField, onRestart,
           <span className="b-id-value">{character.lineage || <em>+ choose a lineage</em>}</span>
           {character.sublineage && <span className="b-id-sub">{character.sublineage}</span>}
           {report.lbp && (report.lbp.chosenChallenges.length > 0 || report.lbp.chosenAdvantages.length > 0) && (
-            <span className={`b-id-sub ${report.lbp.valid ? "" : "b-lbp-warn"}`}>
-              LBP {report.lbp.spent}/{report.lbp.awarded}
+            <span className={`b-id-sub ${report.lbp.valid ? "" : "b-lbp-warn"}`}
+                  title={`${report.lbp.awarded} LBP earned from challenges − ${report.lbp.spent} spent on advantages`}>
+              {report.lbp.remaining} LBP left
             </span>
           )}
         </span>
@@ -224,13 +253,15 @@ function ClassCard({ classes, spec, onSetLevel, onRemove, onAdd, onInspect }) {
               {c.name}{i === 0 && spec ? ` (${spec})` : ""}
             </button>
             <span className="b-class-lvl">
-              <button className="b-level-btn" disabled={c.level <= 1}
+              <button className="b-level-btn" disabled={c.level <= 1} aria-label={`Lower ${c.name} level`}
                       onClick={() => onSetLevel(c.name, c.level - 1)}>−</button>
               <strong>{c.level}</strong>
-              <button className="b-level-btn" onClick={() => onSetLevel(c.name, c.level + 1)}>+</button>
+              <button className="b-level-btn" aria-label={`Raise ${c.name} level`}
+                      onClick={() => onSetLevel(c.name, c.level + 1)}>+</button>
             </span>
             {classes.length > 1 && (
-              <button className="b-class-remove" title="Remove class" onClick={() => onRemove(c.name)}>×</button>
+              <button className="b-class-remove" title="Remove class" aria-label={`Remove ${c.name}`}
+                      onClick={() => onRemove(c.name)}>×</button>
             )}
           </span>
         ))}
@@ -263,7 +294,7 @@ function DevotionCard({ character, devotion, onPick, onToggleDomain, onClear, on
         <span className="b-id-label">Devotion</span>
         <span className="b-devotion-head">
           <button className="b-class-name" onClick={onInspect} title="Inspect devotion">{character.devotion}</button>
-          <button className="b-class-remove" title="Clear devotion" onClick={onClear}>×</button>
+          <button className="b-class-remove" title="Clear devotion" aria-label="Clear devotion" onClick={onClear}>×</button>
         </span>
         {available.length > 0 && (
           <>
@@ -350,7 +381,52 @@ function BudgetMeter({ report }) {
 
 // ─── BUILD SHEET ─────────────────────────────────────────────────────────────
 
-function BuildSheet({ character, report, view, onPickArchetype, onStartBlank, onInspect, onOpenSlot, onOpenAdd, onRemoveEntity, onSetName }) {
+// Lineage at a glance on the main sheet: the lineage + sublineage, each chosen
+// advantage, and — nested under the advantage that grants it — any granted
+// ability (a perk/power/skill the advantage gives for free). Clicking the lineage
+// header opens the full LineagePanel; clicking an advantage or granted ability
+// inspects it in the detail pane. Surfaces what was previously buried in the panel.
+function LineageSummary({ character, report, onInspect, onOpenLineage }) {
+  if (!character.lineage) return null;
+  const lbp = report.lbp;
+  const chosen = lbp?.chosenAdvantages || [];
+  // Granted abilities grouped by their source advantage name, for the sub-rows.
+  const grantedBySource = {};
+  for (const g of (report.grantedAbilities?.list || [])) {
+    if (g.sourceKind !== "advantage") continue;
+    (grantedBySource[g.source] = grantedBySource[g.source] || []).push(g);
+  }
+  const title = `Lineage — ${character.lineage}${character.sublineage ? ` · ${character.sublineage}` : ""}`;
+  return (
+    <Section title={title} tone="green" onAdd={onOpenLineage}>
+      {chosen.length === 0 && <p className="b-empty">No advantages chosen yet.</p>}
+      <ul className="b-rows">
+        {chosen.map((adv, i) => {
+          const name = adv.baseName || adv.name;
+          const grants = grantedBySource[name] || [];
+          return (
+            <li key={`adv-${i}-${name}`} className="b-lin-adv-group">
+              <div className="b-row b-lin-adv-row">
+                <button className="b-row-name" onClick={() => onInspect(name, "lineageAdvantages", "perks")}>{name}</button>
+                <span className="b-row-bp is-cost">−{adv.lbp} LBP</span>
+              </div>
+              {grants.map((g) => (
+                <div key={g.ability} className="b-row b-lin-grant-row">
+                  <button className="b-row-name" onClick={() => onInspect(g.abilityName, g.abilityType, g.abilityType)}>
+                    ↳ {g.abilityName}
+                  </button>
+                  <span className="b-row-bp is-free" title={`Granted by ${g.source}`}>free · {g.source}</span>
+                </div>
+              ))}
+            </li>
+          );
+        })}
+      </ul>
+    </Section>
+  );
+}
+
+function BuildSheet({ character, report, view, onPickArchetype, onStartBlank, onInspect, onOpenSlot, onOpenAdd, onRemoveEntity, onSetName, onOpenLineage }) {
   if (!character.archetypeName) {
     return <ArchetypePicker onPick={onPickArchetype} onStartBlank={onStartBlank} />;
   }
@@ -396,6 +472,8 @@ function BuildSheet({ character, report, view, onPickArchetype, onStartBlank, on
           onClick={onInspect} isFocused={isFocused}
           removable={() => true} onRemove={(i) => onRemoveEntity("purchasedPerks", i)} />
       </Section>
+
+      <LineageSummary character={character} report={report} onInspect={onInspect} onOpenLineage={onOpenLineage} />
 
       {report.devotion?.chosen.length > 0 && (
         <Section title={`Domain Powers — ${report.devotion.chosen.join(" · ")}`} tone="purple"
@@ -480,8 +558,8 @@ function SlotBlock({ slot, character, onInspect, onOpenSlot, isFocused, pickClas
                     {SPELL_TIER_LABEL[pick.field]}
                   </span>
                 )}
-                <button className="b-slot-action" title="Swap" onClick={() => onOpenSlot(slot, pick.flatIndex, false, pick.field)}>✎</button>
-                <button className="b-slot-action" title="Clear" onClick={() => onOpenSlot(slot, pick.flatIndex, true, pick.field)}>✕</button>
+                <button className="b-slot-action" title="Swap" aria-label={`Swap ${pick.name}`} onClick={() => onOpenSlot(slot, pick.flatIndex, false, pick.field)}>✎</button>
+                <button className="b-slot-action" title="Clear" aria-label={`Clear ${pick.name}`} onClick={() => onOpenSlot(slot, pick.flatIndex, true, pick.field)}>✕</button>
               </li>
             );
           }
@@ -531,12 +609,17 @@ function EditableRows({ items, field, onClick, isFocused, resolveType, report, r
                       </span>
                     );
                   })()
-                : <span className={`b-row-bp ${cost.cost === 0 ? "is-free" : ""}`}>
-                    {cost.cost === 0 ? "free" : `${cost.cost} BP`}
-                  </span>
+                : cost.discount
+                  ? <span className="b-row-bp is-discounted"
+                          title={`${cost.base} BP, discounted ${cost.discount.amount} by ${cost.discount.source}`}>
+                      {cost.cost} BP <span className="b-row-disc">−{cost.discount.amount} · {cost.discount.source}</span>
+                    </span>
+                  : <span className={`b-row-bp ${cost.cost === 0 ? "is-free" : ""}`}>
+                      {cost.cost === 0 ? "free" : `${cost.cost} BP`}
+                    </span>
             )}
             {canRemove && (
-              <button className="b-row-remove" title="Remove" onClick={() => onRemove(i)}>×</button>
+              <button className="b-row-remove" title="Remove" aria-label={`Remove ${item}`} onClick={() => onRemove(i)}>×</button>
             )}
           </li>
         );
@@ -676,12 +759,33 @@ function entityPickerSpec({ kind, entityType, candidates, title, taken, onChoose
   };
 }
 
+// Alternate group-by axes available in any picker, on top of the spec's default.
+// Each maps a candidate → a bucket label. "Default" uses the spec's own grouping
+// (refresh for martials, tier for spells, category for skills/perks).
+const refreshBucket = (c) => {
+  const r = (c.refresh || "").toLowerCase();
+  if (!r || r === "none" || r === "passive") return "Passive";
+  if (r.includes("long")) return "Long Rest";
+  if (r.includes("short")) return "Short Rest";
+  if (r.includes("immediate")) return "Immediate";
+  return c.refresh;
+};
+const GROUP_AXES = {
+  category: { label: "Category", fn: (c) => c.cat || c.tierList || "Other" },
+  refresh: { label: "Refresh", fn: refreshBucket },
+  alphabetical: { label: "A–Z", fn: (c) => (c.name[0] || "#").toUpperCase() },
+  cost: { label: "Cost", fn: (c) => (typeof c.cost === "number" ? `${c.cost} BP` : "—") },
+};
+
 function PickerOverlay({ spec, character, onClose }) {
   const { entityType, title, subtitle, candidates, groupBy, taken, onChoose } = spec;
 
   const [query, setQuery] = useState("");
   const [hideLocked, setHideLocked] = useState(false);
   const [selected, setSelected] = useState(candidates[0]?.name || null);
+  // Group/sort controls: "default" uses the spec's grouping; others use GROUP_AXES.
+  const [groupMode, setGroupMode] = useState("default");
+  const [sortMode, setSortMode] = useState("name"); // "name" | "cost"
   // Local reading stack: empty → reading the selected candidate; pushing an
   // entity id lets the user follow links without leaving the picker.
   const [readStack, setReadStack] = useState([]);
@@ -693,16 +797,24 @@ function PickerOverlay({ spec, character, onClose }) {
     let list = candidates;
     if (q) list = list.filter((c) => c.name.toLowerCase().includes(q) || (c.desc || "").toLowerCase().includes(q));
     const decorated = list.map((c) => ({ ...c, locked: lockedOf(c.name) }));
+    const keyFn = groupMode === "default" ? groupBy : GROUP_AXES[groupMode].fn;
     const buckets = new Map();
     for (const c of decorated) {
-      const k = groupBy(c);
+      const k = keyFn(c);
       if (!buckets.has(k)) buckets.set(k, []);
       buckets.get(k).push(c);
     }
     let entries = [...buckets.entries()];
     if (hideLocked) entries = entries.map(([g, cs]) => [g, cs.filter((c) => !c.locked)]).filter(([, cs]) => cs.length);
+    // Sort items within each group.
+    const cmp = sortMode === "cost"
+      ? (a, b) => (a.cost ?? 999) - (b.cost ?? 999) || a.name.localeCompare(b.name)
+      : (a, b) => a.name.localeCompare(b.name);
+    for (const [, cs] of entries) cs.sort(cmp);
+    // Alphabetical group-by also sorts the group headers A–Z.
+    if (groupMode === "alphabetical") entries.sort((a, b) => a[0].localeCompare(b[0]));
     return entries;
-  }, [candidates, query, hideLocked, character, groupBy, entityType]);
+  }, [candidates, query, hideLocked, character, groupBy, entityType, groupMode, sortMode]);
 
   const readingEntity = useMemo(() => {
     if (readStack.length) return lookupEntity(readStack[readStack.length - 1]);
@@ -723,26 +835,40 @@ function PickerOverlay({ spec, character, onClose }) {
   }, [onClose]);
 
   return (
-    <div className="b-overlay" onClick={onClose}>
+    <div className="b-overlay" role="dialog" aria-modal="true" onClick={onClose}>
       <div className="b-picker" onClick={(e) => e.stopPropagation()}>
         <header className="b-picker-head">
           <div>
             <h2 className="b-picker-title">{title}</h2>
             <p className="b-picker-sub">{subtitle}</p>
           </div>
-          <button className="b-picker-x" onClick={onClose}>×</button>
+          <button className="b-picker-x" aria-label="Close" onClick={onClose}>×</button>
         </header>
 
         <div className="b-picker-cols">
           {/* LEFT: browse */}
           <div className="b-picker-browse">
             <div className="b-picker-controls">
-              <input className="b-picker-search" type="text" placeholder="Search…"
+              <input className="b-picker-search" type="text" aria-label="Search" placeholder="Search…"
                      value={query} onChange={(e) => setQuery(e.target.value)} autoFocus />
-              <label className="b-picker-toggle">
-                <input type="checkbox" checked={hideLocked} onChange={(e) => setHideLocked(e.target.checked)} />
-                Hide locked
-              </label>
+              <div className="b-picker-sortrow">
+                <label className="b-picker-sortlabel">Group
+                  <select className="b-picker-sortsel" value={groupMode} onChange={(e) => setGroupMode(e.target.value)}>
+                    <option value="default">Default</option>
+                    {Object.entries(GROUP_AXES).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
+                  </select>
+                </label>
+                <label className="b-picker-sortlabel">Sort
+                  <select className="b-picker-sortsel" value={sortMode} onChange={(e) => setSortMode(e.target.value)}>
+                    <option value="name">A–Z</option>
+                    <option value="cost">Cost</option>
+                  </select>
+                </label>
+                <label className="b-picker-toggle">
+                  <input type="checkbox" checked={hideLocked} onChange={(e) => setHideLocked(e.target.checked)} />
+                  Hide locked
+                </label>
+              </div>
             </div>
             <div className="b-picker-groups">
               {groups.length === 0 && <p className="b-detail-missing">Nothing matches.</p>}
@@ -815,7 +941,7 @@ function EntityDetail({ view, onInspect, onBack, onClose }) {
   return (
     <aside className="b-rail b-rail-right">
       <header className="b-detail-header">
-        <button className="b-detail-close" onClick={onClose}>×</button>
+        <button className="b-detail-close" aria-label="Close" onClick={onClose}>×</button>
         {onBack && <button className="b-detail-back" onClick={onBack}>‹ back</button>}
         <h2 className="b-detail-title">{entity?.name || item}</h2>
         <p className="b-detail-type">{entity?.type || resolveType}</p>
@@ -998,56 +1124,105 @@ function LineagePanel({ character, report, onSetLineage, onSetSublineage, onTogg
 
   const Row = ({ it, field, kind }) => {
     const chosen = (character[field] || []).includes(it.name);
+    // Named abilities this item grants (advantages mostly): resolve the build-time
+    // grant edge so the picker shows "grants: Magical Resilience" before you take it.
+    const srcId = `${kind === "challenge" ? "challenges" : "advantages"}:${character.lineage} - ${it.baseName || it.name}`;
+    const grantIds = (REFS.grants || {})[srcId] || [];
     return (
       <li className={`b-lin-row ${chosen ? "is-on" : ""}`}>
-        <button className="b-lin-toggle" onClick={() => onToggle(field, it.name)}
-                title={chosen ? "Remove" : "Take"}>{chosen ? "✓" : "+"}</button>
-        <button className="b-lin-name" onClick={() => onInspect(it.name, field, kind === "challenge" ? "flaws" : "perks")}>
-          {it.baseName || it.name}
-          {it.required && <span className="b-lin-req">required</span>}
-          {it.repped && <span className="b-lin-repped">repped</span>}
-        </button>
-        <span className={`b-lin-lbp ${kind === "challenge" ? "is-award" : ""}`}>
-          {kind === "challenge" ? `+${it.lbp}` : `${it.lbp}`} LBP
-        </span>
+        <div className="b-lin-row-head">
+          <button className="b-lin-toggle" onClick={() => onToggle(field, it.name)}
+                  title={chosen ? "Remove" : "Take"}>{chosen ? "✓" : "+"}</button>
+          <button className="b-lin-name" onClick={() => onInspect(it.name, field, kind === "challenge" ? "flaws" : "perks")}>
+            {it.baseName || it.name}
+            {it.required && <span className="b-lin-req">required</span>}
+            {it.repped && <span className="b-lin-repped">repped</span>}
+          </button>
+          <span className={`b-lin-lbp ${kind === "challenge" ? "is-award" : "is-cost"}`}>
+            {kind === "challenge" ? `+${it.lbp}` : `−${it.lbp}`} LBP
+          </span>
+        </div>
+        {(it.desc || it.description) && <p className="b-lin-desc">{it.desc || it.description}</p>}
+        {grantIds.length > 0 && (
+          <p className="b-lin-grants">
+            grants:{" "}
+            {grantIds.map((id, i) => {
+              const ent = lookupEntity(id);
+              const type = id.slice(0, id.indexOf(":"));
+              return (
+                <button key={id} className="b-lin-grant-link"
+                        onClick={() => onInspect(ent?.name || id.slice(id.indexOf(":") + 1), type, type)}>
+                  {ent?.name || id.slice(id.indexOf(":") + 1)}{i < grantIds.length - 1 ? ", " : ""}
+                </button>
+              );
+            })}
+          </p>
+        )}
       </li>
     );
   };
 
   return (
-    <div className="b-overlay" onClick={onClose}>
-      <div className="b-picker" onClick={(e) => e.stopPropagation()}>
+    // Docked as a right-side sheet (not a centered modal) so the main character
+    // view stays scrollable beside it while you pick — aria-modal is false since
+    // the background remains usable.
+    <div className="b-overlay b-overlay-dock" role="dialog" aria-modal="false" aria-label="Lineage">
+      <div className="b-picker b-picker-dock" onClick={(e) => e.stopPropagation()}>
         <header className="b-picker-head">
           <div>
             <h2 className="b-picker-title">Lineage</h2>
             <p className="b-picker-sub">
-              {lin ? `${character.lineage} · LBP ${lbp.spent}/${lbp.awarded}${lbp.capped ? " (capped at " + 10 + ")" : ""}`
+              {lin ? `${character.lineage} · ${lbp.remaining} LBP left (${lbp.awarded} earned − ${lbp.spent} spent)${lbp.capped ? ", capped at 10" : ""}`
                    : "Choose your ancestry"}
             </p>
           </div>
-          <button className="b-picker-x" onClick={onClose}>×</button>
+          <button className="b-picker-x" aria-label="Close" onClick={onClose}>×</button>
         </header>
 
-        {/* Lineage + sublineage selectors */}
-        <div className="b-lin-selectors">
-          <select className="b-lin-select" value={character.lineage || ""}
-                  onChange={(e) => onSetLineage(e.target.value)}>
-            <option value="">— choose a lineage —</option>
-            {Object.keys(LINEAGES).map((n) => <option key={n} value={n}>{n}</option>)}
-          </select>
-          {lin?.sublineages?.length > 0 && (
-            <div className="b-domain-chips">
-              {lin.sublineages.map((s) => {
-                const label = typeof s === "string" ? s : s.name;
-                const on = character.sublineage === label;
-                return (
-                  <button key={label} className={`b-domain-chip ${on ? "is-on" : ""}`}
-                          onClick={() => onSetSublineage(label)}>{label}</button>
-                );
-              })}
-            </div>
-          )}
-        </div>
+        {/* Initial chooser: a card per lineage (name + flavor + sublineages) so you
+            can see what each ancestry is before committing. */}
+        {!lin && (
+          <div className="b-lin-cards">
+            {Object.entries(LINEAGES).map(([name, l]) => (
+              <button key={name} className="b-lin-card" onClick={() => onSetLineage(name)}>
+                <span className="b-lin-card-name">{name}</span>
+                {l.description && <span className="b-lin-card-desc">{l.description}</span>}
+                {l.sublineages?.length > 0 && (
+                  <span className="b-lin-card-subs">
+                    {l.sublineages.map((s) => (
+                      <span key={typeof s === "string" ? s : s.name} className="b-lin-card-sub">
+                        {typeof s === "string" ? s : s.name}
+                      </span>
+                    ))}
+                  </span>
+                )}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* Once chosen: a compact lineage switcher + sublineage chips. */}
+        {lin && (
+          <div className="b-lin-selectors">
+            <select className="b-lin-select" value={character.lineage || ""}
+                    onChange={(e) => onSetLineage(e.target.value)}>
+              <option value="">— choose a lineage —</option>
+              {Object.keys(LINEAGES).map((n) => <option key={n} value={n}>{n}</option>)}
+            </select>
+            {lin?.sublineages?.length > 0 && (
+              <div className="b-domain-chips">
+                {lin.sublineages.map((s) => {
+                  const label = typeof s === "string" ? s : s.name;
+                  const on = character.sublineage === label;
+                  return (
+                    <button key={label} className={`b-domain-chip ${on ? "is-on" : ""}`}
+                            onClick={() => onSetSublineage(label)}>{label}</button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
 
         {lin && (
           <>
@@ -1122,11 +1297,11 @@ function ExportImportPanel({ character, report, onImport, onClose }) {
   }, [onClose]);
 
   return (
-    <div className="b-overlay" onClick={onClose}>
+    <div className="b-overlay" role="dialog" aria-modal="true" onClick={onClose}>
       <div className="b-export" onClick={(e) => e.stopPropagation()}>
         <header className="b-picker-head">
           <h2 className="b-picker-title">Export / Import</h2>
-          <button className="b-picker-x" onClick={onClose}>×</button>
+          <button className="b-picker-x" aria-label="Close" onClick={onClose}>×</button>
         </header>
         <div className="b-export-cols">
           {/* EXPORT */}
@@ -1138,7 +1313,7 @@ function ExportImportPanel({ character, report, onImport, onClose }) {
                 <button className="b-topbar-btn" onClick={download}>Download .txt</button>
               </div>
             </div>
-            <textarea className="b-export-text" readOnly value={exported} />
+            <textarea className="b-export-text" readOnly aria-label="Exported character sheet" value={exported} />
           </div>
           {/* IMPORT */}
           <div className="b-export-half">
@@ -1150,6 +1325,11 @@ function ExportImportPanel({ character, report, onImport, onClose }) {
                 </span>
               )}
             </div>
+            {preview && !preview.error && !preview.report.valid && (
+              <ul className="b-import-reasons">
+                {validityReasons(preview.report).map((r, i) => <li key={i}>{r}</li>)}
+              </ul>
+            )}
             <textarea className="b-export-text" placeholder="Paste a character sheet — plain text, the HTML export, or a spreadsheet copy…"
                       value={draft} onChange={(e) => setDraft(e.target.value)} />
             {preview?.error && <p className="b-export-err">Couldn’t parse: {preview.error}</p>}
@@ -1514,7 +1694,7 @@ export default function Builder() {
                     onPickArchetype={handlePickArchetype} onStartBlank={handleStartBlank}
                     onInspect={handleInspect} onOpenSlot={handleOpenSlot}
                     onOpenAdd={handleOpenAdd} onRemoveEntity={handleRemoveEntity}
-                    onSetName={handleSetName} />
+                    onSetName={handleSetName} onOpenLineage={() => setLineageOpen(true)} />
         <DetailPane view={view}
                     onInspect={handleInspect}
                     onBack={history.length ? handleBack : null} onClose={handleClose} />
@@ -1550,14 +1730,15 @@ function BTopBar({ character, report, onLevelChange, onExport }) {
           <>
             <span className="b-topbar-stat b-level">
               Level
-              <button className="b-level-btn" disabled={level <= MIN_LEVEL}
+              <button className="b-level-btn" disabled={level <= MIN_LEVEL} aria-label="Level down"
                       onClick={() => onLevelChange(level - 1)} title="Level down">−</button>
-              <strong>{level}</strong>
-              <button className="b-level-btn" disabled={level >= MAX_LEVEL}
+              <strong aria-live="polite">{level}</strong>
+              <button className="b-level-btn" disabled={level >= MAX_LEVEL} aria-label="Level up"
                       onClick={() => onLevelChange(level + 1)} title="Level up">+</button>
             </span>
             <span className="b-topbar-stat">Budget <strong>{report.budget} BP</strong></span>
-            <span className={`b-topbar-stat ${report.valid ? "is-valid" : "is-invalid"}`}>
+            <span className={`b-topbar-stat ${report.valid ? "is-valid" : "is-invalid"}`}
+                  title={report.valid ? "" : validityReasons(report).join("\n")}>
               {report.valid ? "✓ legal build"
                 : report.belowFloor ? `⚠ below level ${report.legalMinLevel}`
                 : "⚠ check build"}

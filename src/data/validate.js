@@ -71,6 +71,91 @@ export function lbpState(character) {
   };
 }
 
+// Wellspring has three distinct "consequence" kinds, kept separate by design:
+//   1. GRANT-OF-ENTITY — a source gives you a named Perk/Power/Skill for free
+//      ("gains the Magical Resilience Perk"). Edge: REFS.grants/grantedBy. ↓ here.
+//   2. GRANT-OF-SLOT    — a source gives you an extra slot/pool ("+1 Novice
+//      spell-slot"). Handled by scanSlotGrant/slotGrants, not here.
+//   3. DISCOUNT         — a source makes other purchases cheaper (Patron, etc.).
+//      Edge: REFS.discounts. Handled by discountSources/applyDiscounts.
+// (We use one word — "grant" — for #1; an earlier draft called it "bestowal".)
+
+// Grant/discount SOURCES the character owns: lineage advantages, purchased perks,
+// and class innate powers held at level. Shared by the grant (#1) and discount
+// (#3) paths so "what does the character own that can grant/discount" has one
+// definition. Returns [{ id, name, kind }].
+export function ownedGrantSources(character) {
+  const sources = [];
+  // Lineage advantages: registry id is "advantages:<Lineage> - <baseName>".
+  if (character?.lineage) {
+    for (const name of (character.lineageAdvantages || [])) {
+      const base = cleanItemName(name);
+      sources.push({ id: `advantages:${character.lineage} - ${base}`, name: base, kind: 'advantage' });
+    }
+  }
+  // Owned perks (purchased or class-granted).
+  for (const name of (character?.purchasedPerks || [])) {
+    const base = cleanItemName(name);
+    sources.push({ id: `perks:${base}`, name: base, kind: 'perk' });
+  }
+  // Class innate powers the character has at level (automatic features).
+  for (const { name: cls } of getClasses(character)) {
+    for (const p of (CLASS_POWERS[cls]?.innate || [])) {
+      sources.push({ id: `powers:${p.name}`, name: p.name, kind: 'feature' });
+    }
+  }
+  // Powers the character has actually selected into slots (any tier) — a chosen
+  // power can itself grant an ability (e.g. Implicit Truths → Insight).
+  const seen = new Set(sources.map((s) => s.id));
+  for (const field of POWER_SOURCE_FIELDS) {
+    for (const item of (character[field] || [])) {
+      const id = `powers:${cleanItemName(item)}`;
+      if (!seen.has(id)) { seen.add(id); sources.push({ id, name: cleanItemName(item), kind: 'power' }); }
+    }
+  }
+  return sources;
+}
+// Power fields a character fills by choice — any of these can be a grant source.
+const POWER_SOURCE_FIELDS = [
+  'innatePowers', 'utilityPowers', 'basicPowers', 'advancedPowers',
+  'veteranPowers', 'classPowers', 'rightHandPowers', 'domainPowers', 'formPowers',
+];
+
+// Named abilities the character GAINS FOR FREE from a source they own — a lineage
+// advantage, perk, or selected power whose text says "gains the X Perk/Power/Skill"
+// (grant-of-entity, kind #1). The source→target edges are computed at build time
+// (REFS.grants); this walks the owned grant-sources and collects what each gives.
+// A granted ability is FREE (part of the source already paid for), so never adds
+// BP. Returns { list, bySource }; list is [{ ability, abilityName, abilityType,
+// source, sourceId, sourceKind }], bySource groups list by sourceId.
+export function grantedAbilities(character) {
+  const grants = REFS.grants || {};
+  // Only sources that actually grant something (have a grants edge).
+  const sources = ownedGrantSources(character).filter((s) => grants[s.id]);
+
+  const list = [];
+  const bySource = {};
+  for (const src of sources) {
+    const targets = grants[src.id];
+    if (!targets) continue;
+    for (const ability of targets) {
+      const ent = lookupEntity(ability);
+      const row = {
+        ability,
+        abilityName: ent?.name || idName(ability),
+        abilityType: ability.slice(0, ability.indexOf(':')),
+        source: src.name,
+        sourceId: src.id,
+        sourceKind: src.kind,
+      };
+      list.push(row);
+      (bySource[src.id] = bySource[src.id] || { source: src.name, sourceKind: src.kind, abilities: [] })
+        .abilities.push(row);
+    }
+  }
+  return { list, bySource };
+}
+
 // Max divine domains a worshipper may access (per the Worship skill: "up to two").
 export const MAX_DOMAINS = 2;
 
@@ -290,8 +375,32 @@ function rankOf(character, field, idx) {
   return character.ranks?.[field]?.[idx] || 1;
 }
 
-function effectiveCost(item, field, character, idx) {
-  const ent = lookupEntity(resolveId(item, field, character));
+// Index the character's granted abilities by target entity id → granting source
+// name. This is the SAME computation as grantedAbilities() (the single source of
+// truth for "what does this character gain free"); cost-zeroing consumes this
+// index rather than re-joining the grant graph, so the two can't drift.
+function grantIndex(character) {
+  const idx = {};
+  for (const g of grantedAbilities(character).list) {
+    if (!(g.ability in idx)) idx[g.ability] = g.source;
+  }
+  return idx;
+}
+
+// Is this item granted-free by a source the character owns? Looks the item up in
+// the precomputed grant index (derived once from grantedAbilities). Returns a
+// grant note {kind,source} for the badge, or null. `ent` may be undefined.
+function derivedGrant(item, field, ent, granted) {
+  const itemId = ent?.id || `${entityType(field)}:${bareSkill(cleanItemName(item))}`;
+  const source = granted?.[itemId];
+  return source ? { kind: 'grant', amount: null, source, derived: true } : null;
+}
+
+function effectiveCost(item, field, character, idx, granted) {
+  // Parameterized skills carry a "(value)" the entity index doesn't ("Lore
+  // (History)" → skills:Lore), so fall back to the bare name for the cost.
+  const ent = lookupEntity(resolveId(item, field, character))
+    || lookupEntity(`${entityType(field)}:${bareSkill(cleanItemName(item))}`);
   const base = typeof ent?.cost === 'number' ? ent.cost : 0;
   const grant = character.grants?.[field]?.[idx] || null;
   const authored = character.effectiveBP?.[field]?.[idx];
@@ -303,10 +412,108 @@ function effectiveCost(item, field, character, idx) {
 
   // Otherwise derive: entity cost × rank, then apply grant/discount.
   const full = base * rank;
-  if (!grant) return { cost: full, base, grant: null, rank };
-  if (grant.kind === 'grant') return { cost: 0, base, grant, rank };
-  if (grant.amount == null) return { cost: full, base, grant, rank };
-  return { cost: Math.max(0, full - grant.amount), base, grant, rank };
+  if (grant) {
+    if (grant.kind === 'grant') return { cost: 0, base, grant, rank };
+    if (grant.amount == null) return { cost: full, base, grant, rank };
+    return { cost: Math.max(0, full - grant.amount), base, grant, rank };
+  }
+  // No authored sidecar grant — derive it from the grant index (the single
+  // computation shared with grantedAbilities). An item the character gains free
+  // from an owned source (e.g. Medium Armor from the Linked Armor power) zeroes
+  // its cost without a hand-tagged sidecar.
+  const derived = derivedGrant(item, field, ent, granted);
+  if (derived) return { cost: 0, base, grant: derived, rank };
+  return { cost: full, base, grant: null, rank };
+}
+
+// Active discount SOURCES the character owns (lineage advantages, perks). Each is
+// a build-time REFS.discounts edge: { amount, scope, cap, min, refundIfFree,
+// exclusions }. Returns the list with the owning source's name attached.
+export function discountSources(character) {
+  const D = REFS.discounts || {};
+  const out = [];
+  if (character?.lineage) {
+    for (const name of (character.lineageAdvantages || [])) {
+      const id = `advantages:${character.lineage} - ${cleanItemName(name)}`;
+      if (D[id]) out.push({ id, name: cleanItemName(name), ...D[id] });
+    }
+  }
+  for (const name of (character?.purchasedPerks || [])) {
+    const id = `perks:${cleanItemName(name)}`;
+    if (D[id]) out.push({ id, name: cleanItemName(name), ...D[id] });
+  }
+  return out;
+}
+
+// Does a discount source's scope apply to this purchased item? `pos` is the
+// item's 0-based index among items of its category (for firstN scopes).
+function discountApplies(src, item, ent, pos) {
+  if (src.exclusions?.includes(`${ent ? ent.id : ''}`) || src.exclusions?.includes(`perks:${cleanItemName(item)}`)) return false;
+  const cat = ent?.category;
+  if (src.scope.kind === 'category') {
+    return Array.isArray(src.scope.value)
+      && src.scope.value.some((c) => c.toLowerCase() === String(cat).toLowerCase());
+  }
+  if (src.scope.kind === 'firstN') {
+    // Target named by skill prefix ("Lore"), limited to the first N purchased.
+    return new RegExp(`^${src.scope.value}\\b`, 'i').test(cleanItemName(item))
+      && (src.scope.n == null || pos < src.scope.n);
+  }
+  if (src.scope.kind === 'prereq') {
+    // Item lists the source's named perk as a prerequisite (e.g. Patron Gifts).
+    const pr = REFS.prereqs?.[ent?.id];
+    const target = `perks:${src.scope.value}`;
+    return !!pr && (pr.skills?.includes(target) || pr.other?.some((o) => new RegExp(src.scope.value, 'i').test(o)));
+  }
+  return false;
+}
+
+// Apply owned discount sources to the per-item costs in `byItem`. Mutates the
+// cost down by `amount` (to `min`, default 0), tracks a per-source running cap,
+// and — per the general rule — converts a discount on an already-free item into
+// free BP rather than a negative cost. Returns { freeBP, applied } where applied
+// is a list of { key, source, amount } for UI annotation.
+function applyDiscounts(character, byItem) {
+  const sources = discountSources(character);
+  if (!sources.length) return { freeBP: 0, applied: [] };
+  const used = new Map();        // sourceId → BP discounted so far (for caps)
+  const catCount = new Map();    // category key → count seen (for firstN ordering)
+  let freeBP = 0;
+  const applied = [];
+  for (const [key, eff] of Object.entries(byItem)) {
+    const sep = key.indexOf(':');
+    const field = key.slice(0, sep);
+    const item = key.slice(sep + 1);
+    if (field !== 'purchasedSkills' && field !== 'purchasedPerks' && field !== 'startingSkills') continue;
+    const ent = lookupEntity(resolveId(item, field, character)) || lookupEntity(`skills:${cleanItemName(item)}`);
+    const catKey = ent?.category || cleanItemName(item).split(' ')[0];
+    const pos = catCount.get(catKey) || 0;
+    catCount.set(catKey, pos + 1);
+    for (const src of sources) {
+      if (!discountApplies(src, item, ent, pos)) continue;
+      const min = src.min ?? 0;
+      const room = src.cap == null ? Infinity : src.cap - (used.get(src.id) || 0);
+      if (room <= 0) continue;
+      const reducible = Math.max(0, eff.cost - min);
+      const cut = Math.min(src.amount, reducible, room);
+      if (cut <= 0) {
+        // Item already at/below min (e.g. free-granted) → refund as free BP.
+        if (eff.cost <= min && src.refundIfFree) {
+          const refund = Math.min(src.amount, room);
+          freeBP += refund;
+          used.set(src.id, (used.get(src.id) || 0) + refund);
+          applied.push({ key, source: src.name, amount: refund, asFreeBP: true });
+        }
+        continue;
+      }
+      eff.cost -= cut;
+      eff.discount = { source: src.name, amount: cut };
+      used.set(src.id, (used.get(src.id) || 0) + cut);
+      applied.push({ key, source: src.name, amount: cut });
+      break; // one discount source per item
+    }
+  }
+  return { freeBP, applied };
 }
 
 // BP spent on purchased skills + perks, minus BP refunded by flaws. Honors the
@@ -315,9 +522,12 @@ function effectiveCost(item, field, character, idx) {
 export function computeSpend(character) {
   let spent = 0;
   const byItem = {};
+  // Grant index computed once, shared by every per-item cost lookup so the
+  // free-grant zeroing and grantedAbilities() never diverge.
+  const granted = grantIndex(character);
   for (const field of BP_FIELDS) {
     (character[field] || []).forEach((item, idx) => {
-      const eff = effectiveCost(item, field, character, idx);
+      const eff = effectiveCost(item, field, character, idx, granted);
       byItem[`${field}:${item}`] = eff;
       spent += eff.cost;
     });
@@ -328,7 +538,7 @@ export function computeSpend(character) {
   for (const field of BP_POWER_FIELDS) {
     (character[field] || []).forEach((item, idx) => {
       if (character.effectiveBP?.[field]?.[idx] == null) return;
-      const eff = effectiveCost(item, field, character, idx);
+      const eff = effectiveCost(item, field, character, idx, granted);
       byItem[`${field}:${item}`] = eff;
       spent += eff.cost;
     });
@@ -354,7 +564,23 @@ export function computeSpend(character) {
     byItem[`flaws:${item}`] = { cost: -bp, base: -bp, grant: null };
     awarded += bp;
   }
-  return { spent, awarded, refunded, net: spent - awarded - refunded, byItem };
+
+  // Discount sources (Patron, Technarchist, etc.) reduce matching item costs in
+  // place; a discount on an already-free item becomes free BP instead. Recompute
+  // `spent` from the adjusted costs so totals reflect the discounts.
+  const { freeBP: discountFreeBP, applied: discountsApplied } = applyDiscounts(character, byItem);
+  spent = 0;
+  for (const field of [...BP_FIELDS, ...BP_POWER_FIELDS]) {
+    (character[field] || []).forEach((item) => {
+      const eff = byItem[`${field}:${item}`];
+      if (eff && eff.cost > 0) spent += eff.cost;
+    });
+  }
+
+  return {
+    spent, awarded, refunded, discountFreeBP, discountsApplied,
+    net: spent - awarded - refunded - discountFreeBP, byItem,
+  };
 }
 
 // Bonus slots granted by purchased skills (e.g. "Additional Cantrip",
@@ -654,6 +880,7 @@ export function validate(character) {
   const stats = levelStats(character);
   const devotion = devotionState(character);
   const lbp = lbpState(character);
+  const granted = grantedAbilities(character);
   const prereqs = checkPrereqs(character);
   const slotsOver = slots.some((s) => s.over);
   // BP used beyond the base allowance, drawn from the bonus pool (clamped ≥0).
@@ -687,6 +914,7 @@ export function validate(character) {
     stats,
     devotion,
     lbp,
+    grantedAbilities: granted,
     prereqs,
     belowFloor,
     aboveCap,

@@ -12,6 +12,7 @@
 import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
+import { LABEL_FIELD } from '../src/data/sheet-schema.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
@@ -187,47 +188,24 @@ const stripNotes = (s) =>
 // (free):", "Innate Powers:") that introduce a list of items running until the
 // next labeled or header line.
 //
-// Section header → field name on the output object:
-const SECTION_FIELDS = {
-  'Starting Skills (free)':       'startingSkills',
-  'Purchased Skills':             'purchasedSkills',
-  'Purchased Perks':              'purchasedPerks',
-  'Innate Powers':                'innatePowers',
-  'Utility Powers':               'utilityPowers',
-  'Basic Powers':                 'basicPowers',
-  'Advanced Powers':              'advancedPowers',
-  'Veteran Powers':               'veteranPowers',
-  'Class Powers':                 'classPowers',
-  'Right Hand Powers':            'rightHandPowers',
-  'Domain Powers':                'domainPowers',
-  'Cantrips':                     'cantrips',
-  'Novice Spells known':          'noviceSpells',
-  'Novice Spells Known':          'noviceSpells',
-  'Adept Spells known':           'adeptSpells',
-  'Adept Spells Known':           'adeptSpells',
-  'Greater Spells known':         'greaterSpells',
-  'Greater Spells Known':         'greaterSpells',
-  'Book Spells':                  'bookSpells',
-  'Form Powers':                  'formPowers',
-};
-
-// Inline label → field name on the output object. Some are list-shaped
-// ("Divine Domains: Life, Protection"), some are scalar ("Life Points: 4").
-const INLINE_FIELDS = {
-  'Lineage':                     'lineage',
-  'Lineage Challenges':          'lineageChallenges',
-  'Lineage Advantages':          'lineageAdvantages',
-  'Life Points':                 'lifePoints',
-  'Armor Points':                'armorPoints',
-  'Spikes':                      'spikes',
-  'Class Levels':                'classLevels',
-  'Flaws':                       'flaws',
-  'Divine Domains':              'divineDomains',
-  'Available Devotion Accents':  'devotionAccents',
-  'Novice Spell-slots':          'noviceSpellSlots',
-  'Adept Spell-slots':           'adeptSpellSlots',
-  'Greater Spell-slots':         'greaterSpellSlots',
-};
+// The label→field map is shared with the runtime importer (sheet-schema.js) so
+// the two parsers can't drift on spelling/casing variants. The HTML walker still
+// needs to know which labels are *section headers* (gather the item-nodes that
+// follow) vs *inline labels* (take the value on the same line) — that split is
+// structural to this parser, so we partition the shared map here by field name.
+//
+// Fields whose label appears as an inline "Label: value" line:
+const INLINE_FIELD_NAMES = new Set([
+  'lineage', 'lineageChallenges', 'lineageAdvantages', 'lifePoints', 'armorPoints',
+  'spikes', 'classLevels', 'specialization', 'devotion', 'flaws', 'divineDomains',
+  'devotionAccents', 'noviceSpellSlots', 'adeptSpellSlots', 'greaterSpellSlots',
+]);
+const SECTION_FIELDS = Object.fromEntries(
+  Object.entries(LABEL_FIELD).filter(([, f]) => !INLINE_FIELD_NAMES.has(f)),
+);
+const INLINE_FIELDS = Object.fromEntries(
+  Object.entries(LABEL_FIELD).filter(([, f]) => INLINE_FIELD_NAMES.has(f)),
+);
 
 // Inline-list fields are stored as arrays (split on ", "). Comma-less values
 // pass through as single-element arrays.
@@ -381,6 +359,21 @@ function parseArchetype(start, end) {
   if (!anyGrant) delete archetype.grants;
   const anyRank = Object.values(archetype.ranks).some((arr) => arr.some((v) => v > 1));
   if (!anyRank) delete archetype.ranks;
+
+  // Devotion can come from an inline "Devotion: <X>" label or be encoded in the
+  // Worship skill as "Worship - <X>". The Worship skill is the canonical source
+  // (it's what costs BP and gates the domains); the inline label is a convenience
+  // fallback when no Worship skill is listed. When BOTH are present they must name
+  // the same devotion — a mismatch is a data error, so warn rather than silently
+  // trusting one over the other.
+  const worshipMatch = [...(archetype.startingSkills || []), ...(archetype.purchasedSkills || [])]
+    .map((s) => s.match(/^Worship\s*[-–—:]\s*(.+)$/i))
+    .find(Boolean);
+  const worshipDevotion = worshipMatch ? worshipMatch[1].trim() : null;
+  if (worshipDevotion && archetype.devotion && archetype.devotion !== worshipDevotion) {
+    console.warn(`  ⚠ ${archetype.name}: devotion mismatch — inline "${archetype.devotion}" vs Worship "${worshipDevotion}"; using Worship.`);
+  }
+  if (worshipDevotion) archetype.devotion = worshipDevotion;
 
   return archetype;
 }

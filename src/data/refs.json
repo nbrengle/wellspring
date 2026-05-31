@@ -1,6 +1,6 @@
 {
   "generatedFrom": "src/data/*.json",
-  "entities": 1144,
+  "entities": 1341,
   "mentions": {
     "skills:Basic Martial Weapons": [
       "terms:Proficiency"
@@ -2055,6 +2055,947 @@
     ],
     "devotions:The Dancer": [
       "crafting-concepts:Essences"
+    ],
+    "advantages:Aewen - Deep Reserves": [
+      "terms:Spell-slots",
+      "skills:Basic Arcane"
+    ],
+    "advantages:Aewen - Arcane Aptitude": [
+      "rules-concepts:Spellcasting",
+      "terms:Spell-slots",
+      "terms:Advantage",
+      "accents:Lightning",
+      "terms:Cantrip",
+      "skills:Basic Arcane",
+      "terms:Accent",
+      "terms:Sphere",
+      "accents:Flame",
+      "accents:Acid",
+      "accents:Ice"
+    ],
+    "advantages:Aewen - Mystic Resilience": [
+      "perks:Magical Resilience",
+      "conditions:Resistance",
+      "terms:Advantage",
+      "terms:Lineage",
+      "terms:Flaw",
+      "terms:Perk"
+    ],
+    "advantages:Aewen - Naturally Attuned": [
+      "crafting-concepts:Attunement"
+    ],
+    "advantages:Aewen - Sigil Shield": [
+      "terms:Short Rest",
+      "defenses:Protect"
+    ],
+    "advantages:Aewen - Sigil Quickening": [
+      "terms:Incantation",
+      "rules-concepts:Spikes"
+    ],
+    "advantages:Aewen - Master of Rites": [
+      "rules-concepts:Dark Territory",
+      "rules-concepts:Duration",
+      "terms:Power"
+    ],
+    "advantages:Aewen - Elemental Fortitude": [
+      "conditions:Resistance",
+      "terms:Advantage",
+      "terms:Long Rest",
+      "terms:Accent",
+      "defenses:Resist"
+    ],
+    "advantages:Aewen - Elemental Strikes": [
+      "terms:Short Rest",
+      "terms:Accent",
+      "rules-concepts:Spikes"
+    ],
+    "advantages:Aewen - Affinity Healing": [
+      "powers:Reinforce",
+      "terms:Accent",
+      "powers:Infuse",
+      "rules-concepts:Barrier"
+    ],
+    "advantages:Aewen - Elemental Party Trick": [
+      "terms:Accent",
+      "terms:Wielding"
+    ],
+    "challenges:Aewen - Mana Lines": [],
+    "challenges:Aewen - Pointed Ears": [],
+    "challenges:Aewen - Arcane Glow": [
+      "powers:Blessing",
+      "skills:Basic Arcane",
+      "domains:Light"
+    ],
+    "challenges:Aewen - Deathbound": [
+      "rules-concepts:Spirit Form",
+      "terms:Dying"
+    ],
+    "challenges:Aewen - Runic Lattice": [],
+    "challenges:Aewen - Focal Totem": [
+      "terms:Life Points",
+      "effects:Shatter",
+      "powers:Sources"
+    ],
+    "challenges:Aewen - Bugs in the Sigils": [
+      "rules-concepts:Dark Territory"
+    ],
+    "challenges:Aewen - Neglected Conditioning": [
+      "skills:Basic Arcane"
+    ],
+    "challenges:Aewen - Elemental Expression": [
+      "terms:Accent",
+      "accents:Divine",
+      "accents:Void"
+    ],
+    "challenges:Aewen - Power Shines through the Eyes": [
+      "perks:Contact",
+      "terms:Accent"
+    ],
+    "challenges:Aewen - Like Attracts Like": [
+      "flaws:Fragile Bones",
+      "conditions:Vulnerable",
+      "terms:Challenge",
+      "terms:Accent",
+      "terms:Flaw",
+      "accents:Force"
+    ],
+    "challenges:Aewen - Accent Incompatibility": [
+      "perks:Elemental Affinity",
+      "terms:Accent",
+      "effects:Heal"
+    ],
+    "advantages:Chimera - Flight": [],
+    "advantages:Chimera - Heightened Flight": [
+      "rules-concepts:“Slow X” Count",
+      "rules-concepts:Duration",
+      "terms:Power"
+    ],
+    "advantages:Chimera - Tough Hide": [
+      "rules-concepts:Natural Armor"
+    ],
+    "advantages:Chimera - Armored Carapace": [
+      "rules-concepts:Natural Armor",
+      "resources:Hide"
+    ],
+    "advantages:Chimera - Claws": [
+      "rules-concepts:Natural Weapons"
+    ],
+    "advantages:Chimera - Shifting Form": [
+      "terms:Advantage",
+      "terms:Challenge",
+      "terms:Short Rest",
+      "effects:Disable",
+      "terms:Lineage",
+      "domains:Nature"
+    ],
+    "advantages:Chimera - Keen Senses": [
+      "creature-types:Animal"
+    ],
+    "advantages:Chimera - Bestial Strength": [
+      "terms:Spike Damage"
+    ],
+    "challenges:Chimera - Altered Skin": [],
+    "challenges:Chimera - Ears": [],
+    "challenges:Chimera - Fangs": [],
+    "challenges:Chimera - Horns": [],
+    "challenges:Chimera - Tail": [],
+    "challenges:Chimera - Wings": [],
+    "challenges:Chimera - Digitigrade legs": [],
+    "challenges:Chimera - Eyes": [],
+    "challenges:Chimera - Incompatible Vocal Cords": [],
+    "challenges:Chimera - Prey Animal": [
+      "conditions:Vulnerable",
+      "effects:Dominate",
+      "terms:Accent",
+      "creature-types:Animal",
+      "accents:Fear"
+    ],
+    "advantages:Forged - Hardened Plating": [
+      "rules-concepts:Armor Points"
+    ],
+    "advantages:Forged - Sturdy Construction": [
+      "terms:Short Rest",
+      "effects:Shatter",
+      "defenses:Protect"
+    ],
+    "advantages:Forged - Artificial Anatomy": [
+      "conditions:Resistance",
+      "terms:Advantage",
+      "terms:Long Rest",
+      "terms:Accent",
+      "accents:Disease",
+      "accents:Poison",
+      "defenses:Resist"
+    ],
+    "advantages:Forged - Analysis Module": [
+      "powers:Identify",
+      "accents:Divine"
+    ],
+    "advantages:Forged - Mass Production": [
+      "rules-concepts:Crafting Process",
+      "skills:Apprentice Tinkering",
+      "domains:Knowledge",
+      "rules-concepts:Duration",
+      "powers:Sources",
+      "terms:Power"
+    ],
+    "advantages:Forged - Crowdsourced": [
+      "powers:Sources"
+    ],
+    "advantages:Forged - Read the Feed": [
+      "perks:Bits and Pieces",
+      "devotions:The Great Mind",
+      "terms:Advantage",
+      "perks:Insight",
+      "terms:Lineage",
+      "terms:Flaw",
+      "terms:Perk"
+    ],
+    "advantages:Forged - Quickhack": [
+      "terms:Lineage"
+    ],
+    "advantages:Forged - Automatic Repair System": [
+      "terms:Death-count",
+      "terms:Life Points",
+      "creature-types:Construct",
+      "effects:Heal"
+    ],
+    "advantages:Forged - Resilient Auxiliary Systems": [
+      "perks:Cold Dead Hands",
+      "terms:Advantage",
+      "perks:Deathgrip",
+      "creature-types:Construct",
+      "terms:Lineage",
+      "terms:Flaw",
+      "terms:Perk"
+    ],
+    "advantages:Forged - Self Destruct": [
+      "rules-concepts:Spirit Form",
+      "creature-types:Construct",
+      "accents:Lightning",
+      "effects:Piercing",
+      "powers:Sources",
+      "terms:Power"
+    ],
+    "advantages:Forged - Vigilant Attendant": [
+      "perks:Boon Bonds",
+      "terms:Advantage",
+      "creature-types:Construct",
+      "terms:Lineage",
+      "terms:Flaw",
+      "terms:Perk"
+    ],
+    "challenges:Forged - Vulnerable Construction": [
+      "effects:Wounding",
+      "effects:Shatter",
+      "modifiers:Final"
+    ],
+    "challenges:Forged - Visible Wiring": [
+      "effects:Expose"
+    ],
+    "challenges:Forged - Plating": [],
+    "challenges:Forged - Cyber Eye(s)": [
+      "perks:Contact"
+    ],
+    "challenges:Forged - Hybrid Physiology": [
+      "flaws:Torn Soul",
+      "terms:Challenge",
+      "terms:Lineage",
+      "domains:Nature",
+      "terms:Flaw",
+      "terms:Perk"
+    ],
+    "challenges:Forged - Uplink Jack": [
+      "devotions:The Great Mind"
+    ],
+    "challenges:Forged - Backdoor Vulnerability": [
+      "devotions:The Great Mind",
+      "conditions:Vulnerable",
+      "terms:Accent",
+      "accents:Mind"
+    ],
+    "challenges:Forged - Fragile Circuitry": [
+      "conditions:Vulnerable",
+      "accents:Lightning",
+      "terms:Accent"
+    ],
+    "challenges:Forged - Soft Life": [
+      "rules-concepts:Spikes"
+    ],
+    "challenges:Forged - Computational Hallucination": [],
+    "challenges:Forged - Voice Box": [
+      "creature-types:Construct"
+    ],
+    "challenges:Forged - Power Source": [
+      "creature-types:Construct"
+    ],
+    "challenges:Forged - Imprinted": [
+      "terms:Short Rest",
+      "creature-types:Construct",
+      "modifiers:Inherent",
+      "effects:Drain",
+      "perks:Sight",
+      "domains:Order"
+    ],
+    "challenges:Forged - Literal Bias": [
+      "creature-types:Construct"
+    ],
+    "challenges:Forged - Zero-Harm Protocol": [
+      "flaws:Binding Oath of Peace",
+      "terms:Challenge",
+      "creature-types:Construct",
+      "terms:Lineage",
+      "creature-types:Living",
+      "terms:Flaw",
+      "terms:Perk"
+    ],
+    "advantages:Human - Rallying Cry": [
+      "terms:Power"
+    ],
+    "advantages:Human - Heart Full of Greed": [
+      "perks:Greedy Soul",
+      "terms:Advantage",
+      "terms:Lineage",
+      "terms:Flaw",
+      "terms:Perk"
+    ],
+    "advantages:Human - Environmental Mastery": [
+      "powers:Sources"
+    ],
+    "advantages:Human - Heirloom": [
+      "perks:Ancestral Relic",
+      "terms:Advantage",
+      "terms:Lineage",
+      "terms:Flaw",
+      "terms:Perk"
+    ],
+    "advantages:Human - Telepathy": [
+      "rules-concepts:Instruction",
+      "effects:Discern",
+      "modifiers:Subtle",
+      "rules-concepts:Spikes",
+      "accents:Mind"
+    ],
+    "advantages:Human - Telekinesis": [
+      "terms:Power"
+    ],
+    "advantages:Human - Mental Bastion": [
+      "conditions:Resistance",
+      "terms:Advantage",
+      "terms:Long Rest",
+      "terms:Accent",
+      "defenses:Resist",
+      "accents:Mind"
+    ],
+    "advantages:Human - Psionic Cantrip": [
+      "terms:Advantage",
+      "accents:Lightning",
+      "terms:Cantrip",
+      "rules-concepts:Devotions & Divine Beings",
+      "terms:Accent",
+      "skills:Basic Arcane",
+      "accents:Divine",
+      "accents:Flame",
+      "domains:Order",
+      "rules-concepts:Spikes",
+      "accents:Acid",
+      "accents:Ice"
+    ],
+    "advantages:Human - Ward Against the Void": [
+      "terms:Life Points",
+      "conditions:Resistance",
+      "terms:Advantage",
+      "terms:Long Rest",
+      "terms:Accent",
+      "defenses:Resist",
+      "accents:Void"
+    ],
+    "advantages:Human - Adaptive Physiology": [
+      "conditions:Resistance",
+      "terms:Advantage",
+      "terms:Long Rest",
+      "terms:Accent",
+      "rituals:Attune",
+      "defenses:Resist",
+      "accents:Flame",
+      "accents:Ice"
+    ],
+    "advantages:Human - Natural Affinity": [
+      "terms:Cantrip",
+      "accents:Divine",
+      "domains:Nature",
+      "classes:Druid"
+    ],
+    "advantages:Human - Won’t Stay Dead": [
+      "perks:Carnal Creature",
+      "perks:Will to Live",
+      "perks:Holding On",
+      "terms:Advantage",
+      "terms:Lineage",
+      "terms:Flaw",
+      "terms:Perk"
+    ],
+    "challenges:Human - Communal Debt": [
+      "flaws:Honor Debt",
+      "terms:Challenge",
+      "terms:Lineage",
+      "terms:Flaw",
+      "terms:Perk"
+    ],
+    "challenges:Human - Hotheaded": [
+      "domains:Manipulation",
+      "terms:Challenge",
+      "effects:Berserk",
+      "flaws:Pliant",
+      "effects:Charm",
+      "modifiers:Final"
+    ],
+    "challenges:Human - Mundane": [
+      "rules-concepts:Spellcasting",
+      "skills:Basic Arcane"
+    ],
+    "challenges:Human - Utterly Mundane": [
+      "crafting-concepts:Attunement",
+      "rituals:Attune",
+      "powers:Sources"
+    ],
+    "challenges:Human - Squeamish": [
+      "creature-types:Living",
+      "perks:Sight",
+      "terms:Dying",
+      "effects:Sleep",
+      "modifiers:Final"
+    ],
+    "challenges:Human - Born Follower": [
+      "domains:Order"
+    ],
+    "challenges:Human - Fear Resonance": [
+      "flaws:Nightmares",
+      "terms:Challenge",
+      "terms:Lineage",
+      "terms:Flaw",
+      "terms:Perk"
+    ],
+    "challenges:Human - Leaky Bucket": [
+      "resources:Night Prizes",
+      "terms:Advantage"
+    ],
+    "challenges:Human - Mental Overload": [
+      "rules-concepts:Sacrifice",
+      "terms:Life Points",
+      "terms:Advantage",
+      "rules-concepts:Spikes"
+    ],
+    "challenges:Human - Frail of Body": [
+      "terms:Proficiency",
+      "domains:Order"
+    ],
+    "challenges:Human - Energy Vampire": [
+      "terms:Short Rest",
+      "domains:Energy",
+      "domains:Order"
+    ],
+    "challenges:Human - Hibernator": [
+      "terms:Short Rest",
+      "effects:Sleep"
+    ],
+    "challenges:Human - Haggard": [
+      "flaws:Torn Soul",
+      "terms:Challenge",
+      "terms:Lineage",
+      "terms:Flaw",
+      "terms:Perk",
+      "accents:Void"
+    ],
+    "challenges:Human - Fight or Flight": [
+      "rules-concepts:“Quick X” Count",
+      "effects:Berserk",
+      "terms:Accent",
+      "effects:Repel",
+      "accents:Void"
+    ],
+    "challenges:Human - Nervous Fidgeting": [
+      "rules-concepts:Dark Territory",
+      "accents:Void",
+      "domains:War"
+    ],
+    "advantages:Lost - Consume Vitality": [
+      "terms:Helpless"
+    ],
+    "advantages:Lost - Creature of Void": [
+      "rules-concepts:Effect Calls",
+      "accents:Void"
+    ],
+    "advantages:Lost - Void Strikes": [
+      "terms:Accent",
+      "accents:Void"
+    ],
+    "advantages:Lost - Void Resistance": [
+      "conditions:Resistance",
+      "terms:Advantage",
+      "terms:Long Rest",
+      "terms:Accent",
+      "defenses:Resist",
+      "accents:Void"
+    ],
+    "advantages:Lost - Power from the Gods": [
+      "accents:Divine"
+    ],
+    "advantages:Lost - Divine Armaments": [
+      "perks:Connections",
+      "terms:Accent",
+      "accents:Divine",
+      "terms:Power",
+      "rules-concepts:Spikes"
+    ],
+    "advantages:Lost - Close Connection": [
+      "terms:Advantage",
+      "terms:Lineage",
+      "perks:Patron",
+      "accents:Divine",
+      "terms:Flaw",
+      "terms:Perk"
+    ],
+    "advantages:Lost - Divine Magic": [
+      "rules-concepts:Spellcasting",
+      "terms:Advantage",
+      "rules-concepts:Devotions & Divine Beings",
+      "terms:Cantrip",
+      "terms:Accent",
+      "accents:Divine"
+    ],
+    "advantages:Lost - Wisdom of Many": [
+      "domains:Knowledge",
+      "powers:Sources",
+      "skills:Lore"
+    ],
+    "advantages:Lost - Ride the Tide of the Mind": [
+      "terms:Short Rest",
+      "effects:Dominate",
+      "effects:Berserk",
+      "defenses:Protect",
+      "effects:Charm"
+    ],
+    "advantages:Lost - Ambidextrous": [
+      "skills:Two Weapon Style",
+      "skills:Short Weapons",
+      "terms:Advantage",
+      "terms:Lineage",
+      "terms:Flaw",
+      "terms:Perk"
+    ],
+    "advantages:Lost - Pick and Choose": [
+      "terms:Advantage",
+      "terms:Lineage"
+    ],
+    "challenges:Lost - Born of the Void": [
+      "creature-types:Voidborn",
+      "creature-types:Living"
+    ],
+    "challenges:Lost - Scarred by the Void": [
+      "accents:Void",
+      "rules-concepts:Blue"
+    ],
+    "challenges:Lost - Lost Life": [
+      "terms:Build Points",
+      "terms:Challenge",
+      "terms:Lineage",
+      "accents:Life"
+    ],
+    "challenges:Lost - Visions of Stars": [
+      "perks:Contact",
+      "accents:Void",
+      "rules-concepts:Blue"
+    ],
+    "challenges:Lost - Limited Stores": [
+      "conditions:Vulnerable",
+      "effects:Drain"
+    ],
+    "challenges:Lost - Acquired Taste": [
+      "terms:Life Points",
+      "terms:Advantage",
+      "terms:Challenge",
+      "terms:Long Rest",
+      "crafting-concepts:Essences",
+      "effects:Slow",
+      "creature-types:Living"
+    ],
+    "challenges:Lost - Reborn": [
+      "creature-types:Voidborn",
+      "creature-types:Exalted"
+    ],
+    "challenges:Lost - Divine Tenet": [
+      "effects:Death",
+      "modifiers:Final",
+      "effects:Obey"
+    ],
+    "challenges:Lost - Divine Brand": [
+      "accents:Divine"
+    ],
+    "challenges:Lost - Ragdoll": [
+      "conditions:Vulnerable",
+      "effects:Imprison",
+      "effects:Root",
+      "accents:Void"
+    ],
+    "challenges:Lost - Something to Prove": [
+      "flaws:Truthbound",
+      "terms:Challenge",
+      "terms:Lineage",
+      "terms:Flaw",
+      "terms:Perk",
+      "accents:Void"
+    ],
+    "challenges:Lost - Additional Lost Life": [
+      "terms:Advantage",
+      "terms:Challenge",
+      "terms:Lineage",
+      "powers:Share",
+      "accents:Life"
+    ],
+    "challenges:Lost - Void-filled Gaps": [
+      "accents:Void"
+    ],
+    "challenges:Lost - Fragile Form": [
+      "terms:Life Points",
+      "terms:Challenge"
+    ],
+    "challenges:Lost - Unstable Form [Repped][": [
+      "terms:Advantage",
+      "terms:Challenge",
+      "domains:Order"
+    ],
+    "advantages:Oaksworn - Natural Locus of Power": [
+      "terms:Power",
+      "creature-types:Plant"
+    ],
+    "advantages:Oaksworn - Natural Knowledge": [
+      "resources:Night Prizes",
+      "skills:Forage III",
+      "skills:Forage I",
+      "resources:Bloom"
+    ],
+    "advantages:Oaksworn - Vines": [
+      "terms:Short Rest",
+      "terms:Lineage",
+      "terms:Power"
+    ],
+    "advantages:Oaksworn - Nature’s Bite": [
+      "terms:Advantage",
+      "domains:Knowledge",
+      "skills:Poisoner",
+      "terms:Lineage",
+      "domains:Nature",
+      "terms:Flaw",
+      "terms:Perk"
+    ],
+    "advantages:Oaksworn - Shine Bright": [
+      "terms:Life Points",
+      "powers:Burn"
+    ],
+    "advantages:Oaksworn - Oak Father’s Aegis": [
+      "rules-concepts:Short",
+      "terms:Long Rest",
+      "effects:Obfuscate"
+    ],
+    "advantages:Oaksworn - Shepherd of Life": [
+      "perks:Generous Soul",
+      "terms:Advantage",
+      "terms:Lineage",
+      "terms:Flaw",
+      "terms:Perk"
+    ],
+    "advantages:Oaksworn - Natural Healer": [
+      "perks:Connections",
+      "rules-concepts:Spikes",
+      "effects:Cure"
+    ],
+    "advantages:Oaksworn - Hardened Flesh": [
+      "rules-concepts:Natural Armor"
+    ],
+    "advantages:Oaksworn - Enhanced Hardened Flesh": [
+      "rules-concepts:Natural Armor"
+    ],
+    "advantages:Oaksworn - Strength from Sunlight": [
+      "rules-concepts:“Quick X” Count",
+      "creature-types:Plant",
+      "powers:Life Tap",
+      "terms:Cantrip",
+      "classes:Druid"
+    ],
+    "advantages:Oaksworn - Decompose": [],
+    "challenges:Oaksworn - Symbiotic Growths": [
+      "domains:Nature"
+    ],
+    "challenges:Oaksworn - Metal Ban": [
+      "flaws:Mild Allergy",
+      "terms:Challenge",
+      "terms:Lineage",
+      "terms:Flaw",
+      "terms:Perk"
+    ],
+    "challenges:Oaksworn - Agoraphilic": [
+      "terms:Short Rest"
+    ],
+    "challenges:Oaksworn - Grovebound": [
+      "effects:Revive",
+      "classes:Druid",
+      "powers:Grove"
+    ],
+    "challenges:Oaksworn - Mark of Ash’haie": [],
+    "challenges:Oaksworn - Mantle of the Great Ray": [
+      "effects:Drain"
+    ],
+    "challenges:Oaksworn - Oath of Nature’s Protection": [],
+    "challenges:Oaksworn - Weakened Immune System": [
+      "conditions:Vulnerable",
+      "accents:Disease",
+      "terms:Accent"
+    ],
+    "challenges:Oaksworn - Chlorophyll Veins": [
+      "effects:Expose",
+      "rules-concepts:Green"
+    ],
+    "challenges:Oaksworn - Oakskin": [
+      "effects:Expose"
+    ],
+    "challenges:Oaksworn - Tinderbox": [
+      "conditions:Vulnerable",
+      "terms:Accent",
+      "creature-types:Plant",
+      "accents:Flame"
+    ],
+    "challenges:Oaksworn - One With Nature": [
+      "perks:Connections",
+      "terms:Lineage",
+      "creature-types:Animal",
+      "creature-types:Plant"
+    ],
+    "advantages:Ogrim - Regeneration": [
+      "terms:Power"
+    ],
+    "advantages:Ogrim - Undeniable Fortitude": [
+      "terms:Life Points",
+      "terms:Short Rest",
+      "defenses:Protect"
+    ],
+    "advantages:Ogrim - Battlefield Vulture": [
+      "skills:Scavenge III",
+      "skills:Scavenge I"
+    ],
+    "advantages:Ogrim - Rapid Muscle Growth": [
+      "effects:Heal",
+      "rules-concepts:Spikes"
+    ],
+    "advantages:Ogrim - Call To Honor": [
+      "classes:Fighter",
+      "terms:Power",
+      "powers:Harry"
+    ],
+    "advantages:Ogrim - Assess Your Foes": [
+      "terms:Power"
+    ],
+    "advantages:Ogrim - Great Endurance": [
+      "terms:Long Rest",
+      "terms:Refresh",
+      "rules-concepts:Spikes",
+      "terms:Power",
+      "modifiers:Self"
+    ],
+    "advantages:Ogrim - Bind Oath": [],
+    "advantages:Ogrim - Bone Claws": [
+      "rules-concepts:Natural Weapons"
+    ],
+    "advantages:Ogrim - Thorns": [
+      "terms:Life Points",
+      "terms:Short Rest",
+      "effects:Piercing"
+    ],
+    "advantages:Ogrim - Used to It": [
+      "conditions:Resistance",
+      "terms:Advantage",
+      "terms:Long Rest",
+      "terms:Accent",
+      "defenses:Resist",
+      "accents:Agony"
+    ],
+    "advantages:Ogrim - Bone to Pick": [
+      "skills:Basic Locks",
+      "terms:Advantage",
+      "terms:Lineage",
+      "terms:Flaw",
+      "terms:Perk",
+      "rules-concepts:Locks"
+    ],
+    "challenges:Ogrim - Scarring": [],
+    "challenges:Ogrim - Thick Jaw": [],
+    "challenges:Ogrim - Never Back Down": [
+      "rules-concepts:Short",
+      "conditions:Vulnerable",
+      "terms:Challenge",
+      "effects:Provoke",
+      "effects:Drain"
+    ],
+    "challenges:Ogrim - Claws": [
+      "rules-concepts:Natural Weapons"
+    ],
+    "challenges:Ogrim - Honorable Warrior": [
+      "flaws:Binding Oath of Honor",
+      "terms:Challenge",
+      "powers:Reinforce",
+      "terms:Lineage",
+      "terms:Flaw",
+      "terms:Perk",
+      "effects:Root"
+    ],
+    "challenges:Ogrim - Tribal Marks": [],
+    "challenges:Ogrim - Restless": [
+      "flaws:Indoor Discomfort",
+      "terms:Challenge",
+      "terms:Lineage",
+      "terms:Flaw",
+      "terms:Perk"
+    ],
+    "challenges:Ogrim - Divine Distrust": [
+      "flaws:Divine Vulnerability",
+      "conditions:Vulnerable",
+      "terms:Challenge",
+      "terms:Accent",
+      "accents:Divine"
+    ],
+    "challenges:Ogrim - Rib Protrusions": [],
+    "challenges:Ogrim - Joint Spurs": [],
+    "challenges:Ogrim - Brittle Bones": [
+      "rules-concepts:“Quick X” Count",
+      "effects:Disable",
+      "effects:Shatter"
+    ],
+    "challenges:Ogrim - Bone Dreams": [
+      "flaws:Nightmares",
+      "terms:Challenge",
+      "terms:Lineage",
+      "terms:Flaw",
+      "terms:Perk"
+    ],
+    "advantages:Underkin - Secrets of Stone": [
+      "skills:Prospect III",
+      "terms:Long Rest"
+    ],
+    "advantages:Underkin - Darksight": [
+      "terms:Short Rest",
+      "terms:Power"
+    ],
+    "advantages:Underkin - Structural Awareness": [
+      "terms:Short Rest",
+      "rituals:Attune",
+      "effects:Grant",
+      "defenses:Protect",
+      "rules-concepts:Traps"
+    ],
+    "advantages:Underkin - One with Shadows": [
+      "conditions:Insubstantial",
+      "terms:Long Rest",
+      "effects:Grant",
+      "effects:Cure",
+      "modifiers:Self"
+    ],
+    "advantages:Underkin - Resistant to Acid": [
+      "conditions:Resistance",
+      "terms:Long Rest",
+      "terms:Accent",
+      "accents:Acid"
+    ],
+    "advantages:Underkin - Blood Money": [
+      "terms:Life Points",
+      "rules-concepts:Wealth",
+      "powers:Rest"
+    ],
+    "advantages:Underkin - Chorus of the Song": [
+      "conditions:Resistance",
+      "modifiers:Inherent",
+      "effects:Silence"
+    ],
+    "advantages:Underkin - Iron Touch": [
+      "devotions:The Song in Iron",
+      "perks:Mystic Armorer",
+      "terms:Advantage",
+      "terms:Lineage",
+      "terms:Flaw",
+      "terms:Perk"
+    ],
+    "advantages:Underkin - Smiths of Legend": [
+      "devotions:The Song in Iron",
+      "skills:Mastercrafter",
+      "terms:Advantage",
+      "terms:Lineage",
+      "terms:Flaw",
+      "terms:Perk"
+    ],
+    "advantages:Underkin - Stoneshaper": [
+      "effects:Shatter"
+    ],
+    "advantages:Underkin - Cavern Fortress": [
+      "perks:Expanded Hearth",
+      "terms:Advantage",
+      "perks:Bolt Hole",
+      "terms:Lineage",
+      "perks:Hearth",
+      "terms:Flaw",
+      "terms:Perk"
+    ],
+    "advantages:Underkin - Strike like a Boulder": [
+      "terms:Spike Damage",
+      "terms:Lineage"
+    ],
+    "advantages:Underkin - Juggernaut": [
+      "conditions:Resistance",
+      "modifiers:Inherent",
+      "effects:Slow",
+      "effects:Repel",
+      "effects:Root"
+    ],
+    "challenges:Underkin - Sun-deprived": [],
+    "challenges:Underkin - Sensitive Eyes": [
+      "perks:Sensitive"
+    ],
+    "challenges:Underkin - Ruby Eyes See the Prize": [
+      "perks:Sensitive",
+      "perks:Contact",
+      "rules-concepts:Red"
+    ],
+    "challenges:Underkin - Radiant Vulnerability": [
+      "conditions:Vulnerable",
+      "accents:Radiant",
+      "terms:Accent"
+    ],
+    "challenges:Underkin - Claustrophilic": [
+      "terms:Short Rest"
+    ],
+    "challenges:Underkin - Silver Veins": [],
+    "challenges:Underkin - Silver Haired": [],
+    "challenges:Underkin - Acid-Splashed": [],
+    "challenges:Underkin - Drawn to Song": [
+      "devotions:The Song in Iron",
+      "rituals:Attune",
+      "powers:Healthy"
+    ],
+    "challenges:Underkin - Stoneskin": [
+      "effects:Expose"
+    ],
+    "challenges:Underkin - Favored Gem": [],
+    "challenges:Underkin - Mineral Nourishment": [
+      "resources:Rare Minerals",
+      "terms:Life Points",
+      "resources:Ingots"
+    ],
+    "challenges:Underkin - Way of Stone": [
+      "effects:Slow"
+    ],
+    "challenges:Underkin - From Rock to Rubble to Pebble": [
+      "conditions:Vulnerable",
+      "effects:Wounding",
+      "effects:Shatter",
+      "powers:Disrupt"
     ],
     "classes:Artisan": [
       "skills:Basic Martial Weapons",
@@ -8862,6 +9803,7 @@
       "skills:Advanced Great Weapon Style",
       "skills:Axecraft",
       "skills:Macecraft",
+      "advantages:Lost - Ambidextrous",
       "classes:Artisan",
       "classes:Cleric",
       "classes:Druid",
@@ -9014,6 +9956,7 @@
     "skills:Armor Expertise": [],
     "skills:Two Weapon Style": [
       "skills:Advanced Great Weapon Style",
+      "advantages:Lost - Ambidextrous",
       "classes:Fighter",
       "powers:Fighting Instructor",
       "powers:Way of the Blade",
@@ -9069,6 +10012,12 @@
       "ritual-concepts:Implements: Magical",
       "powers:Waste Not",
       "powers:Well Read",
+      "advantages:Aewen - Deep Reserves",
+      "advantages:Aewen - Arcane Aptitude",
+      "challenges:Aewen - Arcane Glow",
+      "challenges:Aewen - Neglected Conditioning",
+      "advantages:Human - Psionic Cantrip",
+      "challenges:Human - Mundane",
       "powers:Empower Friends",
       "powers:Ritual Affinity",
       "classes:Mage",
@@ -9209,6 +10158,7 @@
       "perks:Contact",
       "perks:Sharp Mind",
       "powers:Well Read",
+      "advantages:Lost - Wisdom of Many",
       "classes:Artisan",
       "powers:Borrow Knowledge",
       "classes:Druid",
@@ -9286,6 +10236,7 @@
     ],
     "skills:Hustle": [],
     "skills:Basic Locks": [
+      "advantages:Ogrim - Bone to Pick",
       "classes:Rogue",
       "powers:What We Do",
       "recipes:Basic Mechanical Lock",
@@ -9313,6 +10264,7 @@
       "archetypes:Support Socialite"
     ],
     "skills:Poisoner": [
+      "advantages:Oaksworn - Nature’s Bite",
       "classes:Rogue",
       "classes:Socialite",
       "recipes:Instant Glue",
@@ -9330,6 +10282,7 @@
       "resources:Bloom",
       "resources:Night Prizes",
       "powers:Waste Not",
+      "advantages:Oaksworn - Natural Knowledge",
       "classes:Artisan",
       "powers:Hunter Gatherer",
       "classes:Druid",
@@ -9348,6 +10301,7 @@
       "archetypes:Crafter Artisan"
     ],
     "skills:Forage III": [
+      "advantages:Oaksworn - Natural Knowledge",
       "powers:Hunter Gatherer"
     ],
     "skills:Scavenge I": [
@@ -9357,6 +10311,7 @@
       "resources:Hide",
       "resources:Harvest",
       "powers:Waste Not",
+      "advantages:Ogrim - Battlefield Vulture",
       "classes:Artisan",
       "powers:Tanner",
       "classes:Druid",
@@ -9373,6 +10328,7 @@
       "archetypes:Crafter Artisan"
     ],
     "skills:Scavenge III": [
+      "advantages:Ogrim - Battlefield Vulture",
       "powers:Tanner"
     ],
     "skills:Prospect I": [
@@ -9383,6 +10339,7 @@
     "skills:Prospect II": [],
     "skills:Prospect III": [
       "skills:Prospect I",
+      "advantages:Underkin - Secrets of Stone",
       "powers:Good Timing"
     ],
     "skills:Apprentice Alchemy": [
@@ -9408,6 +10365,7 @@
       "resources:Enchanted Hyperium",
       "crafting-concepts:The Tinker's Workshop",
       "crafting-concepts:Armor Repair",
+      "advantages:Forged - Mass Production",
       "classes:Artisan",
       "powers:Forgesource Specialist",
       "powers:Armor Upkeep Specialist",
@@ -9476,11 +10434,21 @@
     "skills:Greater Ritual Magic": [
       "powers:Ritual Affinity"
     ],
-    "skills:Mastercrafter": [],
-    "perks:Generous Soul": [],
-    "perks:Greedy Soul": [],
-    "perks:Magical Resilience": [],
-    "perks:Mystic Armorer": [],
+    "skills:Mastercrafter": [
+      "advantages:Underkin - Smiths of Legend"
+    ],
+    "perks:Generous Soul": [
+      "advantages:Oaksworn - Shepherd of Life"
+    ],
+    "perks:Greedy Soul": [
+      "advantages:Human - Heart Full of Greed"
+    ],
+    "perks:Magical Resilience": [
+      "advantages:Aewen - Mystic Resilience"
+    ],
+    "perks:Mystic Armorer": [
+      "advantages:Underkin - Iron Touch"
+    ],
     "perks:Mystic Smith": [],
     "perks:Master Mystic Smith": [],
     "perks:Soothing Touch": [
@@ -9494,20 +10462,27 @@
       "archetypes:Great Weapon Fighter"
     ],
     "perks:Carnal Creature": [
+      "advantages:Human - Won’t Stay Dead",
       "powers:Execute",
       "archetypes:Skirmisher Rogue"
     ],
-    "perks:Cold Dead Hands": [],
+    "perks:Cold Dead Hands": [
+      "advantages:Forged - Resilient Auxiliary Systems"
+    ],
     "perks:Deathgrip": [
+      "advantages:Forged - Resilient Auxiliary Systems",
       "powers:Throat Slit",
       "archetypes:Archer Fighter",
       "archetypes:Skirmisher Rogue"
     ],
-    "perks:Elemental Affinity": [],
+    "perks:Elemental Affinity": [
+      "challenges:Aewen - Accent Incompatibility"
+    ],
     "perks:Hard to Kill": [
       "powers:Execute"
     ],
     "perks:Holding On": [
+      "advantages:Human - Won’t Stay Dead",
       "powers:Throat Slit",
       "archetypes:Defensive Sword + Shield Fighter",
       "archetypes:Skirmisher Rogue"
@@ -9522,6 +10497,7 @@
     ],
     "perks:Unkillable": [],
     "perks:Will to Live": [
+      "advantages:Human - Won’t Stay Dead",
       "archetypes:Defensive Sword + Shield Fighter"
     ],
     "perks:Patron": [
@@ -9531,6 +10507,7 @@
       "devotions:The Witch of Webs",
       "devotions:Devourer",
       "devotions:The Librarian",
+      "advantages:Lost - Close Connection",
       "classes:Sourcerer",
       "rituals:Lesser Consecrate / Lesser Desecrate",
       "rituals:Greater Consecration / Greater Desecration",
@@ -9548,20 +10525,28 @@
     "perks:Gift of Unbreakable Flesh": [],
     "perks:Ultimate Gift": [],
     "perks:Ancestral Relic": [
+      "advantages:Human - Heirloom",
       "archetypes:Great Weapon Fighter"
     ],
     "perks:Ancestral Weapon": [],
     "perks:Bits and Pieces": [
+      "advantages:Forged - Read the Feed",
       "powers:Headliner",
       "archetypes:Mystic Artisan"
     ],
-    "perks:Boon Bonds": [],
+    "perks:Boon Bonds": [
+      "advantages:Forged - Vigilant Attendant"
+    ],
     "perks:Contact": [
       "skills:Hustle",
       "flaws:Mild Allergy",
       "flaws:Severe Allergy",
       "powers:Orderly Conduct",
       "devotions:Mille, Muse of Creation",
+      "challenges:Aewen - Power Shines through the Eyes",
+      "challenges:Forged - Cyber Eye(s)",
+      "challenges:Lost - Visions of Stars",
+      "challenges:Underkin - Ruby Eyes See the Prize",
       "classes:Rogue",
       "powers:Back Alley Deals",
       "classes:Socialite",
@@ -9576,6 +10561,9 @@
       "devotions:Druidism",
       "devotions:Devourer",
       "devotions:The Librarian",
+      "advantages:Lost - Divine Armaments",
+      "advantages:Oaksworn - Natural Healer",
+      "challenges:Oaksworn - One With Nature",
       "powers:Grove",
       "classes:Rogue",
       "classes:Socialite",
@@ -9622,6 +10610,7 @@
     "perks:Insight": [
       "perks:Sight Beyond Sight",
       "perks:Sensitive",
+      "advantages:Forged - Read the Feed",
       "powers:Implicit Truths",
       "archetypes:Form Fighter Druid",
       "archetypes:Mystic Artisan"
@@ -9636,6 +10625,8 @@
     "perks:Othersleep": [],
     "perks:Sight": [
       "devotions:The Witch of Webs",
+      "challenges:Forged - Imprinted",
+      "challenges:Human - Squeamish",
       "powers:Lessons from Scars",
       "powers:Plausible Deniability",
       "rituals:Ritual Trap",
@@ -9643,7 +10634,9 @@
     ],
     "perks:Sight Beyond Sight": [],
     "perks:Sensitive": [
-      "crafting-concepts:Drawing"
+      "crafting-concepts:Drawing",
+      "challenges:Underkin - Sensitive Eyes",
+      "challenges:Underkin - Ruby Eyes See the Prize"
     ],
     "perks:Soothsayer": [
       "archetypes:Mystic Artisan"
@@ -9660,6 +10653,7 @@
       "perks:Restful Home",
       "perks:Lucent Hearth",
       "perks:Experimental Hearth",
+      "advantages:Underkin - Cavern Fortress",
       "classes:Artisan",
       "recipes:Enchant Thrown Weapon",
       "recipes:Enchant Materia",
@@ -9667,38 +10661,65 @@
       "archetypes:Crafter Artisan"
     ],
     "perks:Arcane Hearth": [],
-    "perks:Bolt Hole": [],
+    "perks:Bolt Hole": [
+      "advantages:Underkin - Cavern Fortress"
+    ],
     "perks:Consecrated Hearth": [],
-    "perks:Expanded Hearth": [],
+    "perks:Expanded Hearth": [
+      "advantages:Underkin - Cavern Fortress"
+    ],
     "perks:Arcane/Divine Orchestra": [],
     "perks:Peaceful Hearth": [],
     "perks:Protected Hearth": [],
     "perks:Restful Home": [],
     "perks:Lucent Hearth": [],
     "perks:Experimental Hearth": [],
-    "flaws:Honor Debt": [],
-    "flaws:Indoor Discomfort": [],
+    "flaws:Honor Debt": [
+      "challenges:Human - Communal Debt"
+    ],
+    "flaws:Indoor Discomfort": [
+      "challenges:Ogrim - Restless"
+    ],
     "flaws:Nightmares": [
+      "challenges:Human - Fear Resonance",
+      "challenges:Ogrim - Bone Dreams",
       "powers:Calming Tone"
     ],
-    "flaws:Pliant": [],
+    "flaws:Pliant": [
+      "challenges:Human - Hotheaded"
+    ],
     "flaws:Outdoor Discomfort": [
       "recipes:Euphoria"
     ],
-    "flaws:Fragile Bones": [],
+    "flaws:Fragile Bones": [
+      "challenges:Aewen - Like Attracts Like"
+    ],
     "flaws:Dies Alone": [],
-    "flaws:Divine Vulnerability": [],
-    "flaws:Mild Allergy": [],
+    "flaws:Divine Vulnerability": [
+      "challenges:Ogrim - Divine Distrust"
+    ],
+    "flaws:Mild Allergy": [
+      "challenges:Oaksworn - Metal Ban"
+    ],
     "flaws:Severe Allergy": [],
     "flaws:Shunned Soul": [],
     "flaws:Disquieting Aura": [],
-    "flaws:Torn Soul": [],
-    "flaws:Truthbound": [],
+    "flaws:Torn Soul": [
+      "challenges:Forged - Hybrid Physiology",
+      "challenges:Human - Haggard"
+    ],
+    "flaws:Truthbound": [
+      "challenges:Lost - Something to Prove"
+    ],
     "flaws:Binding Oath of Charity": [],
     "flaws:Binding Oath of Chastity": [],
     "flaws:Binding Oath of Civility": [],
-    "flaws:Binding Oath of Honor": [],
-    "flaws:Binding Oath of Peace": [],
+    "flaws:Binding Oath of Honor": [
+      "challenges:Ogrim - Honorable Warrior"
+    ],
+    "flaws:Binding Oath of Peace": [
+      "challenges:Forged - Zero-Harm Protocol"
+    ],
     "terms:Accent": [
       "skills:Chopper",
       "skills:Flurry of Cuts",
@@ -9722,6 +10743,34 @@
       "powers:Overflowing Energy",
       "powers:Energistic Adaptation",
       "devotions:Senri, Voice of Mercy",
+      "advantages:Aewen - Arcane Aptitude",
+      "advantages:Aewen - Elemental Fortitude",
+      "advantages:Aewen - Elemental Strikes",
+      "advantages:Aewen - Affinity Healing",
+      "advantages:Aewen - Elemental Party Trick",
+      "challenges:Aewen - Elemental Expression",
+      "challenges:Aewen - Power Shines through the Eyes",
+      "challenges:Aewen - Like Attracts Like",
+      "challenges:Aewen - Accent Incompatibility",
+      "challenges:Chimera - Prey Animal",
+      "advantages:Forged - Artificial Anatomy",
+      "challenges:Forged - Backdoor Vulnerability",
+      "challenges:Forged - Fragile Circuitry",
+      "advantages:Human - Mental Bastion",
+      "advantages:Human - Psionic Cantrip",
+      "advantages:Human - Ward Against the Void",
+      "advantages:Human - Adaptive Physiology",
+      "challenges:Human - Fight or Flight",
+      "advantages:Lost - Void Strikes",
+      "advantages:Lost - Void Resistance",
+      "advantages:Lost - Divine Armaments",
+      "advantages:Lost - Divine Magic",
+      "challenges:Oaksworn - Weakened Immune System",
+      "challenges:Oaksworn - Tinderbox",
+      "advantages:Ogrim - Used to It",
+      "challenges:Ogrim - Divine Distrust",
+      "advantages:Underkin - Resistant to Acid",
+      "challenges:Underkin - Radiant Vulnerability",
       "powers:Mechanical Augmentation",
       "powers:Share",
       "powers:Grounded",
@@ -9789,6 +10838,38 @@
       "terms:Challenge",
       "terms:Lineage",
       "devotions:The Witch of Webs",
+      "advantages:Aewen - Arcane Aptitude",
+      "advantages:Aewen - Mystic Resilience",
+      "advantages:Aewen - Elemental Fortitude",
+      "advantages:Chimera - Shifting Form",
+      "advantages:Forged - Artificial Anatomy",
+      "advantages:Forged - Read the Feed",
+      "advantages:Forged - Resilient Auxiliary Systems",
+      "advantages:Forged - Vigilant Attendant",
+      "advantages:Human - Heart Full of Greed",
+      "advantages:Human - Heirloom",
+      "advantages:Human - Mental Bastion",
+      "advantages:Human - Psionic Cantrip",
+      "advantages:Human - Ward Against the Void",
+      "advantages:Human - Adaptive Physiology",
+      "advantages:Human - Won’t Stay Dead",
+      "challenges:Human - Leaky Bucket",
+      "challenges:Human - Mental Overload",
+      "advantages:Lost - Void Resistance",
+      "advantages:Lost - Close Connection",
+      "advantages:Lost - Divine Magic",
+      "advantages:Lost - Ambidextrous",
+      "advantages:Lost - Pick and Choose",
+      "challenges:Lost - Acquired Taste",
+      "challenges:Lost - Additional Lost Life",
+      "challenges:Lost - Unstable Form [Repped][",
+      "advantages:Oaksworn - Nature’s Bite",
+      "advantages:Oaksworn - Shepherd of Life",
+      "advantages:Ogrim - Used to It",
+      "advantages:Ogrim - Bone to Pick",
+      "advantages:Underkin - Iron Touch",
+      "advantages:Underkin - Smiths of Legend",
+      "advantages:Underkin - Cavern Fortress",
       "powers:Headliner",
       "powers:Hidden Weapon",
       "rules-concepts:Character Creation",
@@ -9859,6 +10940,7 @@
       "terms:Lineage",
       "terms:Perk",
       "terms:Skills",
+      "challenges:Lost - Lost Life",
       "powers:Ritual Affinity",
       "powers:The Right Hand",
       "rules-concepts:Building a New Character After Permadeath",
@@ -9868,6 +10950,26 @@
     "terms:Challenge": [
       "terms:Advantage",
       "terms:Lineage",
+      "challenges:Aewen - Like Attracts Like",
+      "advantages:Chimera - Shifting Form",
+      "challenges:Forged - Hybrid Physiology",
+      "challenges:Forged - Zero-Harm Protocol",
+      "challenges:Human - Communal Debt",
+      "challenges:Human - Hotheaded",
+      "challenges:Human - Fear Resonance",
+      "challenges:Human - Haggard",
+      "challenges:Lost - Lost Life",
+      "challenges:Lost - Acquired Taste",
+      "challenges:Lost - Something to Prove",
+      "challenges:Lost - Additional Lost Life",
+      "challenges:Lost - Fragile Form",
+      "challenges:Lost - Unstable Form [Repped][",
+      "challenges:Oaksworn - Metal Ban",
+      "challenges:Ogrim - Never Back Down",
+      "challenges:Ogrim - Honorable Warrior",
+      "challenges:Ogrim - Restless",
+      "challenges:Ogrim - Divine Distrust",
+      "challenges:Ogrim - Bone Dreams",
       "powers:Challenging Shout",
       "rules-concepts:Character Creation"
     ],
@@ -9880,6 +10982,11 @@
       "skills:Advanced Warcasting",
       "skills:Spell Storing",
       "powers:Overflowing Energy",
+      "advantages:Aewen - Arcane Aptitude",
+      "advantages:Human - Psionic Cantrip",
+      "advantages:Human - Natural Affinity",
+      "advantages:Lost - Divine Magic",
+      "advantages:Oaksworn - Strength from Sunlight",
       "powers:Healing Touch",
       "powers:Cantrip Scholar",
       "powers:Cancel",
@@ -10018,7 +11125,8 @@
     "terms:Death-count": [
       "skills:Basic Medicine",
       "terms:Dying",
-      "effects:Stabilize"
+      "effects:Stabilize",
+      "advantages:Forged - Automatic Repair System"
     ],
     "terms:Delivery": [
       "terms:Power",
@@ -10062,6 +11170,8 @@
       "effects:Stabilize",
       "devotions:Senri, Voice of Mercy",
       "devotions:The Howl at the End",
+      "challenges:Aewen - Deathbound",
+      "challenges:Human - Squeamish",
       "powers:Path of Panic",
       "powers:Revivify",
       "powers:Salvation",
@@ -10082,6 +11192,32 @@
       "terms:Challenge",
       "terms:Character Options",
       "terms:Lineage",
+      "advantages:Aewen - Mystic Resilience",
+      "challenges:Aewen - Like Attracts Like",
+      "advantages:Forged - Read the Feed",
+      "advantages:Forged - Resilient Auxiliary Systems",
+      "advantages:Forged - Vigilant Attendant",
+      "challenges:Forged - Hybrid Physiology",
+      "challenges:Forged - Zero-Harm Protocol",
+      "advantages:Human - Heart Full of Greed",
+      "advantages:Human - Heirloom",
+      "advantages:Human - Won’t Stay Dead",
+      "challenges:Human - Communal Debt",
+      "challenges:Human - Fear Resonance",
+      "challenges:Human - Haggard",
+      "advantages:Lost - Close Connection",
+      "advantages:Lost - Ambidextrous",
+      "challenges:Lost - Something to Prove",
+      "advantages:Oaksworn - Nature’s Bite",
+      "advantages:Oaksworn - Shepherd of Life",
+      "challenges:Oaksworn - Metal Ban",
+      "advantages:Ogrim - Bone to Pick",
+      "challenges:Ogrim - Honorable Warrior",
+      "challenges:Ogrim - Restless",
+      "challenges:Ogrim - Bone Dreams",
+      "advantages:Underkin - Iron Touch",
+      "advantages:Underkin - Smiths of Legend",
+      "advantages:Underkin - Cavern Fortress",
       "powers:Refreshing Prayer",
       "powers:Commune with Nature",
       "powers:Arcane Study",
@@ -10163,6 +11299,7 @@
       "conditions:Slept",
       "powers:Mind Wipe",
       "devotions:The Pale Star",
+      "advantages:Lost - Consume Vitality",
       "powers:Eyes of the Crow",
       "powers:Execute",
       "powers:Loot",
@@ -10194,6 +11331,7 @@
       "devotions:Dorne, Bringer of Law",
       "devotions:Filian, Keeper of the Hearth",
       "devotions:Mille, Muse of Creation",
+      "advantages:Aewen - Sigil Quickening",
       "powers:Dig Deep",
       "powers:Weird Wanderings",
       "powers:Empower Friends",
@@ -10247,6 +11385,17 @@
       "effects:Stabilize",
       "conditions:Berserk",
       "conditions:Tainted",
+      "challenges:Aewen - Focal Totem",
+      "advantages:Forged - Automatic Repair System",
+      "advantages:Human - Ward Against the Void",
+      "challenges:Human - Mental Overload",
+      "challenges:Lost - Acquired Taste",
+      "challenges:Lost - Fragile Form",
+      "advantages:Oaksworn - Shine Bright",
+      "advantages:Ogrim - Undeniable Fortitude",
+      "advantages:Ogrim - Thorns",
+      "advantages:Underkin - Blood Money",
+      "challenges:Underkin - Mineral Nourishment",
       "powers:Shield Bearer",
       "powers:Blood Scroll",
       "powers:Treat",
@@ -10299,6 +11448,39 @@
       "terms:Advantage",
       "terms:Challenge",
       "creature-types:Voidborn",
+      "advantages:Aewen - Mystic Resilience",
+      "advantages:Chimera - Shifting Form",
+      "advantages:Forged - Read the Feed",
+      "advantages:Forged - Quickhack",
+      "advantages:Forged - Resilient Auxiliary Systems",
+      "advantages:Forged - Vigilant Attendant",
+      "challenges:Forged - Hybrid Physiology",
+      "challenges:Forged - Zero-Harm Protocol",
+      "advantages:Human - Heart Full of Greed",
+      "advantages:Human - Heirloom",
+      "advantages:Human - Won’t Stay Dead",
+      "challenges:Human - Communal Debt",
+      "challenges:Human - Fear Resonance",
+      "challenges:Human - Haggard",
+      "advantages:Lost - Close Connection",
+      "advantages:Lost - Ambidextrous",
+      "advantages:Lost - Pick and Choose",
+      "challenges:Lost - Lost Life",
+      "challenges:Lost - Something to Prove",
+      "challenges:Lost - Additional Lost Life",
+      "advantages:Oaksworn - Vines",
+      "advantages:Oaksworn - Nature’s Bite",
+      "advantages:Oaksworn - Shepherd of Life",
+      "challenges:Oaksworn - Metal Ban",
+      "challenges:Oaksworn - One With Nature",
+      "advantages:Ogrim - Bone to Pick",
+      "challenges:Ogrim - Honorable Warrior",
+      "challenges:Ogrim - Restless",
+      "challenges:Ogrim - Bone Dreams",
+      "advantages:Underkin - Iron Touch",
+      "advantages:Underkin - Smiths of Legend",
+      "advantages:Underkin - Cavern Fortress",
+      "advantages:Underkin - Strike like a Boulder",
       "powers:Otherworldly Sight",
       "rules-concepts:Character Creation"
     ],
@@ -10332,6 +11514,19 @@
       "powers:Dominating Presence",
       "powers:Non-Aggression Pact",
       "powers:Slippery Tongue",
+      "advantages:Aewen - Elemental Fortitude",
+      "advantages:Forged - Artificial Anatomy",
+      "advantages:Human - Mental Bastion",
+      "advantages:Human - Ward Against the Void",
+      "advantages:Human - Adaptive Physiology",
+      "advantages:Lost - Void Resistance",
+      "challenges:Lost - Acquired Taste",
+      "advantages:Oaksworn - Oak Father’s Aegis",
+      "advantages:Ogrim - Great Endurance",
+      "advantages:Ogrim - Used to It",
+      "advantages:Underkin - Secrets of Stone",
+      "advantages:Underkin - One with Shadows",
+      "advantages:Underkin - Resistant to Acid",
       "powers:Living Iron",
       "powers:Grand Ritualist",
       "powers:A Spoonful of Sugar",
@@ -10552,6 +11747,31 @@
       "terms:Flaw",
       "terms:Lineage",
       "terms:Skills",
+      "advantages:Aewen - Mystic Resilience",
+      "advantages:Forged - Read the Feed",
+      "advantages:Forged - Resilient Auxiliary Systems",
+      "advantages:Forged - Vigilant Attendant",
+      "challenges:Forged - Hybrid Physiology",
+      "challenges:Forged - Zero-Harm Protocol",
+      "advantages:Human - Heart Full of Greed",
+      "advantages:Human - Heirloom",
+      "advantages:Human - Won’t Stay Dead",
+      "challenges:Human - Communal Debt",
+      "challenges:Human - Fear Resonance",
+      "challenges:Human - Haggard",
+      "advantages:Lost - Close Connection",
+      "advantages:Lost - Ambidextrous",
+      "challenges:Lost - Something to Prove",
+      "advantages:Oaksworn - Nature’s Bite",
+      "advantages:Oaksworn - Shepherd of Life",
+      "challenges:Oaksworn - Metal Ban",
+      "advantages:Ogrim - Bone to Pick",
+      "challenges:Ogrim - Honorable Warrior",
+      "challenges:Ogrim - Restless",
+      "challenges:Ogrim - Bone Dreams",
+      "advantages:Underkin - Iron Touch",
+      "advantages:Underkin - Smiths of Legend",
+      "advantages:Underkin - Cavern Fortress",
       "powers:Spirit Guide",
       "powers:Refreshing Prayer",
       "powers:Commune with Nature",
@@ -10627,6 +11847,20 @@
       "powers:Mind Wipe",
       "powers:Tree Teleport",
       "powers:Non-Aggression Pact",
+      "advantages:Aewen - Master of Rites",
+      "advantages:Chimera - Heightened Flight",
+      "advantages:Forged - Mass Production",
+      "advantages:Forged - Self Destruct",
+      "advantages:Human - Rallying Cry",
+      "advantages:Human - Telekinesis",
+      "advantages:Lost - Divine Armaments",
+      "advantages:Oaksworn - Natural Locus of Power",
+      "advantages:Oaksworn - Vines",
+      "advantages:Ogrim - Regeneration",
+      "advantages:Ogrim - Call To Honor",
+      "advantages:Ogrim - Assess Your Foes",
+      "advantages:Ogrim - Great Endurance",
+      "advantages:Underkin - Darksight",
       "powers:Living Iron",
       "powers:Brilliant Thinker",
       "powers:Pragmatist",
@@ -10818,6 +12052,7 @@
       "skills:Forage II",
       "skills:Forage III",
       "terms:Base Class",
+      "challenges:Human - Frail of Body",
       "powers:Hunter",
       "powers:Feral Strength",
       "powers:Fighting Instructor",
@@ -10851,6 +12086,7 @@
       "powers:Disruption",
       "powers:Dissolve",
       "powers:Pulse of Light",
+      "advantages:Ogrim - Great Endurance",
       "powers:Dig Deep",
       "powers:Weird Wanderings",
       "powers:Empower Friends",
@@ -10948,6 +12184,21 @@
       "powers:Tree Teleport",
       "powers:Orderly Conduct",
       "powers:Shadow Step",
+      "advantages:Aewen - Sigil Shield",
+      "advantages:Aewen - Elemental Strikes",
+      "advantages:Chimera - Shifting Form",
+      "advantages:Forged - Sturdy Construction",
+      "challenges:Forged - Imprinted",
+      "challenges:Human - Energy Vampire",
+      "challenges:Human - Hibernator",
+      "advantages:Lost - Ride the Tide of the Mind",
+      "advantages:Oaksworn - Vines",
+      "challenges:Oaksworn - Agoraphilic",
+      "advantages:Ogrim - Undeniable Fortitude",
+      "advantages:Ogrim - Thorns",
+      "advantages:Underkin - Darksight",
+      "advantages:Underkin - Structural Awareness",
+      "challenges:Underkin - Claustrophilic",
       "powers:Grand Ritualist",
       "powers:Mechanical Augmentation",
       "powers:Acid Soak",
@@ -11190,6 +12441,8 @@
       "powers:Disruption",
       "powers:Pulse of Light",
       "powers:Well Read",
+      "advantages:Aewen - Deep Reserves",
+      "advantages:Aewen - Arcane Aptitude",
       "powers:Empower Friends",
       "powers:Refreshing Prayer",
       "powers:Shepherd the Faithful",
@@ -11236,6 +12489,7 @@
       "skills:Extended Capacity - Adept",
       "skills:Extended Capacity - Greater",
       "skills:Additional Cantrip",
+      "advantages:Aewen - Arcane Aptitude",
       "rules-concepts:Spheres of Magic"
     ],
     "terms:Spike Damage": [
@@ -11243,6 +12497,8 @@
       "skills:Quick Shot",
       "skills:Weapon Mastery",
       "terms:Base Class",
+      "advantages:Chimera - Bestial Strength",
+      "advantages:Underkin - Strike like a Boulder",
       "powers:Overcharge",
       "powers:Weapon Upkeep Specialist",
       "powers:Infuse",
@@ -11265,6 +12521,7 @@
       "skills:Polearmcraft",
       "skills:Sweeping Strike",
       "skills:Holding Back the Tide",
+      "advantages:Aewen - Elemental Party Trick",
       "powers:Reinforce Shield",
       "powers:Parry Blow",
       "powers:Disengage",
@@ -11287,6 +12544,9 @@
       "conditions:Berserk",
       "powers:Orderly Conduct",
       "powers:Non-Aggression Pact",
+      "challenges:Human - Hotheaded",
+      "challenges:Human - Fight or Flight",
+      "advantages:Lost - Ride the Tide of the Mind",
       "powers:Betrayal",
       "powers:Stern Willed",
       "powers:Calming Tone",
@@ -11300,6 +12560,8 @@
       "conditions:Berserk",
       "conditions:Charmed",
       "powers:Dominating Presence",
+      "challenges:Human - Hotheaded",
+      "advantages:Lost - Ride the Tide of the Mind",
       "powers:Mesmerize",
       "powers:Share",
       "powers:Quell Beast",
@@ -11326,6 +12588,8 @@
       "powers:Tree Teleport",
       "powers:Non-Aggression Pact",
       "powers:Shadow Step",
+      "advantages:Oaksworn - Natural Healer",
+      "advantages:Underkin - One with Shadows",
       "powers:Antidote",
       "powers:Share",
       "powers:Hiatus",
@@ -11379,6 +12643,7 @@
       "powers:The Balance of Life",
       "devotions:Senri, Voice of Mercy",
       "devotions:The Howl at the End",
+      "challenges:Lost - Divine Tenet",
       "powers:Soulhold Survival",
       "powers:Divine Substitution",
       "powers:Execute",
@@ -11400,6 +12665,8 @@
       "skills:Basic Traps",
       "conditions:Disabled",
       "powers:Poetry in Motion",
+      "advantages:Chimera - Shifting Form",
+      "challenges:Ogrim - Brittle Bones",
       "powers:Disable Undead",
       "powers:Entangling Vines",
       "powers:Fortitude",
@@ -11441,6 +12708,7 @@
       "powers:Disruption",
       "powers:Emotional Attunement",
       "powers:No Stone Unturned",
+      "advantages:Human - Telepathy",
       "powers:Otherworldly Sight",
       "powers:Perspicacity",
       "powers:Triage",
@@ -11490,6 +12758,8 @@
       "conditions:Dominated",
       "powers:Dominating Presence",
       "powers:Non-Aggression Pact",
+      "challenges:Chimera - Prey Animal",
+      "advantages:Lost - Ride the Tide of the Mind",
       "powers:Share",
       "powers:Dominate Creature",
       "powers:Wrest Control",
@@ -11501,6 +12771,10 @@
       "flaws:Severe Allergy",
       "crafting-concepts:Mana Sickness",
       "powers:Disruption",
+      "challenges:Forged - Imprinted",
+      "challenges:Lost - Limited Stores",
+      "challenges:Oaksworn - Mantle of the Great Ray",
+      "challenges:Ogrim - Never Back Down",
       "powers:Antidote",
       "powers:Strange Token",
       "powers:Grit",
@@ -11524,6 +12798,10 @@
       "conditions:Obfuscated",
       "powers:No Stone Unturned",
       "powers:Pulse of Light",
+      "challenges:Forged - Visible Wiring",
+      "challenges:Oaksworn - Chlorophyll Veins",
+      "challenges:Oaksworn - Oakskin",
+      "challenges:Underkin - Stoneskin",
       "powers:Nature’s Embrace",
       "powers:Keen Hearing",
       "powers:Mask of Deception",
@@ -11540,6 +12818,8 @@
       "powers:Tree Teleport",
       "powers:Orderly Conduct",
       "powers:Shadow Step",
+      "advantages:Underkin - Structural Awareness",
+      "advantages:Underkin - One with Shadows",
       "powers:Grand Ritualist",
       "powers:Aegis of the Unknown / Sundering of the Unknown",
       "powers:Reconstitute Summon",
@@ -11704,6 +12984,9 @@
       "terms:Armor",
       "crafting-concepts:Corrupted Alchemy",
       "powers:The Balance of Life",
+      "challenges:Aewen - Accent Incompatibility",
+      "advantages:Forged - Automatic Repair System",
+      "advantages:Ogrim - Rapid Muscle Growth",
       "powers:Kick",
       "powers:Treat",
       "powers:Healing Touch",
@@ -11777,6 +13060,7 @@
     "effects:Imprison": [
       "terms:Conditions",
       "conditions:Imprisoned",
+      "challenges:Lost - Ragdoll",
       "powers:Fortress of Faith",
       "powers:Judgment",
       "powers:Shake It Off II",
@@ -11836,6 +13120,7 @@
       "conditions:Berserk",
       "conditions:Obedient",
       "powers:Non-Aggression Pact",
+      "challenges:Lost - Divine Tenet",
       "powers:Uninterrupted Creativity",
       "powers:Zenith of Knowledge",
       "powers:Augury",
@@ -11853,6 +13138,7 @@
     "effects:Obfuscate": [
       "conditions:Obfuscated",
       "powers:Slippery Tongue",
+      "advantages:Oaksworn - Oak Father’s Aegis",
       "powers:Analysis",
       "powers:Nature’s Embrace",
       "powers:Identify",
@@ -11864,6 +13150,8 @@
     "effects:Piercing": [
       "skills:Flurry of Cuts",
       "conditions:Immunity",
+      "advantages:Forged - Self Destruct",
+      "advantages:Ogrim - Thorns",
       "powers:Retributive Protection",
       "powers:Wall of Steel",
       "powers:Carnate",
@@ -11894,6 +13182,7 @@
     "effects:Provoke": [
       "conditions:Berserk",
       "conditions:Provoked",
+      "challenges:Ogrim - Never Back Down",
       "powers:Harry",
       "powers:Challenging Shout",
       "powers:Sharp Dagger, Sharper Tongue",
@@ -11924,6 +13213,8 @@
       "skills:Holding Back the Tide",
       "skills:Thrown Weaponcraft",
       "conditions:Repelled",
+      "challenges:Human - Fight or Flight",
+      "advantages:Underkin - Juggernaut",
       "powers:Intimidating Spines",
       "powers:Disengage",
       "powers:Stand Ground",
@@ -11937,6 +13228,7 @@
       "perks:Gift of Rebirth",
       "perks:Ultimate Gift",
       "powers:Lifeline",
+      "challenges:Oaksworn - Grovebound",
       "powers:It’s Alive!",
       "powers:Rekindle",
       "powers:Gift of Life",
@@ -11948,6 +13240,9 @@
     "effects:Root": [
       "creature-types:Plant",
       "powers:Poetry in Motion",
+      "challenges:Lost - Ragdoll",
+      "challenges:Ogrim - Honorable Warrior",
+      "advantages:Underkin - Juggernaut",
       "powers:Spirit Speak",
       "powers:Ensnare",
       "powers:Weasel’s Agility",
@@ -11973,6 +13268,12 @@
       "effects:Rebuild",
       "powers:Dissolve",
       "powers:Orderly Conduct",
+      "challenges:Aewen - Focal Totem",
+      "advantages:Forged - Sturdy Construction",
+      "challenges:Forged - Vulnerable Construction",
+      "challenges:Ogrim - Brittle Bones",
+      "advantages:Underkin - Stoneshaper",
+      "challenges:Underkin - From Rock to Rubble to Pebble",
       "powers:Critique Construction",
       "powers:Exploding Arrows",
       "powers:Reinforce Shield",
@@ -12011,6 +13312,7 @@
     "effects:Silence": [
       "conditions:Silenced",
       "powers:Poetry in Motion",
+      "advantages:Underkin - Chorus of the Song",
       "powers:Share",
       "powers:Submerge",
       "powers:Stifle",
@@ -12027,6 +13329,8 @@
       "creature-types:Living",
       "defenses:Protect",
       "powers:Poetry in Motion",
+      "challenges:Human - Squeamish",
+      "challenges:Human - Hibernator",
       "powers:Quell Beast",
       "powers:Blunt End",
       "powers:Concealed Dart",
@@ -12040,6 +13344,9 @@
     "effects:Slow": [
       "skills:Toppling Blows",
       "terms:Short Rest",
+      "challenges:Lost - Acquired Taste",
+      "advantages:Underkin - Juggernaut",
+      "challenges:Underkin - Way of Stone",
       "powers:Mechanical Augmentation",
       "powers:Arboreal Transformation",
       "powers:Frostbite",
@@ -12094,6 +13401,8 @@
       "effects:Imbue",
       "conditions:Immunity",
       "powers:Pyrrhic Strike",
+      "challenges:Forged - Vulnerable Construction",
+      "challenges:Underkin - From Rock to Rubble to Pebble",
       "powers:Acid Soak",
       "powers:Spark of Doom",
       "powers:Heretics’ Brand",
@@ -12161,6 +13470,7 @@
       "powers:Bring Light to the Shadows",
       "powers:Tree Teleport",
       "powers:Shadow Step",
+      "advantages:Underkin - One with Shadows",
       "powers:Spiritual Anchor",
       "powers:Hiatus",
       "powers:Safe Return",
@@ -12203,6 +13513,17 @@
       "defenses:Resist",
       "powers:Energistic Adaptation",
       "powers:Non-Aggression Pact",
+      "advantages:Aewen - Mystic Resilience",
+      "advantages:Aewen - Elemental Fortitude",
+      "advantages:Forged - Artificial Anatomy",
+      "advantages:Human - Mental Bastion",
+      "advantages:Human - Ward Against the Void",
+      "advantages:Human - Adaptive Physiology",
+      "advantages:Lost - Void Resistance",
+      "advantages:Ogrim - Used to It",
+      "advantages:Underkin - Resistant to Acid",
+      "advantages:Underkin - Chorus of the Song",
+      "advantages:Underkin - Juggernaut",
       "powers:Protected Casting",
       "powers:Spiritual Anchor",
       "powers:Curing Prayer",
@@ -12231,6 +13552,18 @@
     "conditions:Tainted": [],
     "conditions:Vulnerable": [
       "powers:Disruption",
+      "challenges:Aewen - Like Attracts Like",
+      "challenges:Chimera - Prey Animal",
+      "challenges:Forged - Backdoor Vulnerability",
+      "challenges:Forged - Fragile Circuitry",
+      "challenges:Lost - Limited Stores",
+      "challenges:Lost - Ragdoll",
+      "challenges:Oaksworn - Weakened Immune System",
+      "challenges:Oaksworn - Tinderbox",
+      "challenges:Ogrim - Never Back Down",
+      "challenges:Ogrim - Divine Distrust",
+      "challenges:Underkin - Radiant Vulnerability",
+      "challenges:Underkin - From Rock to Rubble to Pebble",
       "powers:Carnate"
     ],
     "conditions:Weakened": [
@@ -12243,18 +13576,31 @@
       "skills:Lore",
       "skills:Scavenge I",
       "resources:Hide",
+      "advantages:Chimera - Keen Senses",
+      "challenges:Chimera - Prey Animal",
+      "challenges:Oaksworn - One With Nature",
       "powers:Nature’s Understanding",
       "powers:Quell Beast"
     ],
     "creature-types:Construct": [
       "skills:Lore",
       "resources:Enchanted Hyperium",
+      "advantages:Forged - Automatic Repair System",
+      "advantages:Forged - Resilient Auxiliary Systems",
+      "advantages:Forged - Self Destruct",
+      "advantages:Forged - Vigilant Attendant",
+      "challenges:Forged - Voice Box",
+      "challenges:Forged - Power Source",
+      "challenges:Forged - Imprinted",
+      "challenges:Forged - Literal Bias",
+      "challenges:Forged - Zero-Harm Protocol",
       "powers:Mechanical Augmentation",
       "powers:Arcane Study",
       "powers:Wrest Control",
       "rules-concepts:What is LARP?"
     ],
     "creature-types:Exalted": [
+      "challenges:Lost - Reborn",
       "powers:Otherworldly Sight",
       "powers:Shepherd the Faithful",
       "powers:Expand Focus",
@@ -12273,6 +13619,10 @@
       "devotions:The Mother",
       "devotions:Druidism",
       "devotions:The Divine Bloom",
+      "challenges:Forged - Zero-Harm Protocol",
+      "challenges:Human - Squeamish",
+      "challenges:Lost - Born of the Void",
+      "challenges:Lost - Acquired Taste",
       "powers:Spiritual Defense",
       "powers:Detect Devotion",
       "powers:Gift of Life",
@@ -12287,6 +13637,10 @@
       "terms:Incantation",
       "conditions:Rooted",
       "powers:Tree Teleport",
+      "advantages:Oaksworn - Natural Locus of Power",
+      "advantages:Oaksworn - Strength from Sunlight",
+      "challenges:Oaksworn - Tinderbox",
+      "challenges:Oaksworn - One With Nature",
       "powers:Life Tap",
       "powers:Arboreal Transformation",
       "powers:Raging Blows",
@@ -12349,6 +13703,8 @@
       "rules-concepts:“By My Voice” Delivery"
     ],
     "creature-types:Voidborn": [
+      "challenges:Lost - Born of the Void",
+      "challenges:Lost - Reborn",
       "powers:Otherworldly Sight",
       "powers:Sense Supernatural"
     ],
@@ -12358,6 +13714,7 @@
       "skills:Forage II",
       "skills:Forage III",
       "devotions:The Divine Bloom",
+      "advantages:Oaksworn - Natural Knowledge",
       "powers:Hunter Gatherer",
       "powers:Antidote",
       "powers:Custom Brew",
@@ -12423,6 +13780,7 @@
       "effects:Expose",
       "powers:Pulse of Light",
       "powers:Shadow Step",
+      "advantages:Chimera - Armored Carapace",
       "powers:Tanner",
       "powers:Blood Scroll",
       "powers:Lesser Form of the Hulking Bear",
@@ -12486,6 +13844,7 @@
     "resources:Ingots": [
       "skills:Prospect I",
       "powers:Waste Not",
+      "challenges:Underkin - Mineral Nourishment",
       "powers:Jury Rig",
       "powers:Efficiencies of Scale",
       "powers:It’s Alive!",
@@ -12556,6 +13915,8 @@
       "skills:Forage II",
       "skills:Forage III",
       "powers:Waste Not",
+      "challenges:Human - Leaky Bucket",
+      "advantages:Oaksworn - Natural Knowledge",
       "powers:Forgesource Specialist",
       "powers:Hunter Gatherer",
       "powers:Acid Soak",
@@ -12653,6 +14014,7 @@
       "skills:Prospect II",
       "skills:Prospect III",
       "powers:Waste Not",
+      "challenges:Underkin - Mineral Nourishment",
       "powers:Forgesource Specialist",
       "powers:Good Timing",
       "powers:Aegis of the Unknown / Sundering of the Unknown",
@@ -12738,6 +14100,7 @@
     ],
     "accents:Agony": [
       "skills:Thrown Weaponcraft",
+      "advantages:Ogrim - Used to It",
       "powers:Mechanical Augmentation",
       "powers:Ambush",
       "powers:Pocket Sand",
@@ -12748,6 +14111,9 @@
     ],
     "accents:Acid": [
       "devotions:The Song in Iron",
+      "advantages:Aewen - Arcane Aptitude",
+      "advantages:Human - Psionic Cantrip",
+      "advantages:Underkin - Resistant to Acid",
       "powers:Acid Soak",
       "powers:Infuse",
       "powers:Corrosive Bolt",
@@ -12771,6 +14137,8 @@
       "rules-concepts:Devotions & Divine Beings"
     ],
     "accents:Disease": [
+      "advantages:Forged - Artificial Anatomy",
+      "challenges:Oaksworn - Weakened Immune System",
       "powers:Festering Lash",
       "powers:Nature’s Rebuke",
       "powers:Natural Remedies",
@@ -12803,6 +14171,16 @@
       "powers:Orderly Conduct",
       "powers:Non-Aggression Pact",
       "powers:Slippery Tongue",
+      "challenges:Aewen - Elemental Expression",
+      "advantages:Forged - Analysis Module",
+      "advantages:Human - Psionic Cantrip",
+      "advantages:Human - Natural Affinity",
+      "advantages:Lost - Power from the Gods",
+      "advantages:Lost - Divine Armaments",
+      "advantages:Lost - Close Connection",
+      "advantages:Lost - Divine Magic",
+      "challenges:Lost - Divine Brand",
+      "challenges:Ogrim - Divine Distrust",
       "powers:Empower Friends",
       "powers:Strange Token",
       "classes:Cleric",
@@ -12854,6 +14232,7 @@
     "accents:Fear": [
       "perks:Soothing Touch",
       "perks:Peaceful Hearth",
+      "challenges:Chimera - Prey Animal",
       "powers:Mechanical Augmentation",
       "powers:Intimidating Spines",
       "powers:Share",
@@ -12871,6 +14250,10 @@
       "effects:Imbue",
       "defenses:Protect",
       "devotions:Wildfire",
+      "advantages:Aewen - Arcane Aptitude",
+      "advantages:Human - Psionic Cantrip",
+      "advantages:Human - Adaptive Physiology",
+      "challenges:Oaksworn - Tinderbox",
       "powers:Warming Elixir / Cooling Draught",
       "powers:Exploding Arrows",
       "powers:Infuse",
@@ -12935,6 +14318,7 @@
       "crafting-concepts:Measuring Time & Chants",
       "powers:Dissolve",
       "powers:Pyrrhic Strike",
+      "challenges:Aewen - Like Attracts Like",
       "powers:Fortress of Faith",
       "powers:Bowyer",
       "powers:Disarming Strike",
@@ -12972,6 +14356,9 @@
     ],
     "accents:Ice": [
       "conditions:Immunity",
+      "advantages:Aewen - Arcane Aptitude",
+      "advantages:Human - Psionic Cantrip",
+      "advantages:Human - Adaptive Physiology",
       "powers:Warming Elixir / Cooling Draught",
       "powers:Infuse",
       "powers:Ensnare",
@@ -12995,6 +14382,8 @@
     "accents:Life": [
       "devotions:The Mother",
       "devotions:Dave",
+      "challenges:Lost - Lost Life",
+      "challenges:Lost - Additional Lost Life",
       "powers:Advanced Treatment",
       "powers:Divine Substitution",
       "recipes:Agony Elixir",
@@ -13016,6 +14405,10 @@
     ],
     "accents:Lightning": [
       "powers:Disruption",
+      "advantages:Aewen - Arcane Aptitude",
+      "advantages:Forged - Self Destruct",
+      "challenges:Forged - Fragile Circuitry",
+      "advantages:Human - Psionic Cantrip",
       "powers:Forcefield",
       "powers:Grounded",
       "powers:Infuse",
@@ -13040,6 +14433,9 @@
       "skills:Profession - Journeyman",
       "skills:Profession - Master",
       "powers:Emotional Attunement",
+      "challenges:Forged - Backdoor Vulnerability",
+      "advantages:Human - Telepathy",
+      "advantages:Human - Mental Bastion",
       "powers:Otherworldly Sight",
       "powers:Perspicacity",
       "powers:Analysis",
@@ -13106,6 +14502,7 @@
     ],
     "accents:Poison": [
       "perks:Iron Stomach",
+      "advantages:Forged - Artificial Anatomy",
       "powers:Mechanical Augmentation",
       "powers:Antidote",
       "powers:Treat",
@@ -13142,6 +14539,7 @@
       "rules-concepts:Verbal Delivery"
     ],
     "accents:Radiant": [
+      "challenges:Underkin - Radiant Vulnerability",
       "powers:Accent Substantiation",
       "recipes:Holy Oil",
       "recipes:Lifestrike Sunshine",
@@ -13161,6 +14559,19 @@
     ],
     "accents:Void": [
       "creature-types:Voidborn",
+      "challenges:Aewen - Elemental Expression",
+      "advantages:Human - Ward Against the Void",
+      "challenges:Human - Haggard",
+      "challenges:Human - Fight or Flight",
+      "challenges:Human - Nervous Fidgeting",
+      "advantages:Lost - Creature of Void",
+      "advantages:Lost - Void Strikes",
+      "advantages:Lost - Void Resistance",
+      "challenges:Lost - Scarred by the Void",
+      "challenges:Lost - Visions of Stars",
+      "challenges:Lost - Ragdoll",
+      "challenges:Lost - Something to Prove",
+      "challenges:Lost - Void-filled Gaps",
       "powers:Accent Substantiation"
     ],
     "defenses:Counter": [
@@ -13231,6 +14642,11 @@
       "powers:Orderly Conduct",
       "devotions:The Mother",
       "devotions:The Steed",
+      "advantages:Aewen - Sigil Shield",
+      "advantages:Forged - Sturdy Construction",
+      "advantages:Lost - Ride the Tide of the Mind",
+      "advantages:Ogrim - Undeniable Fortitude",
+      "advantages:Underkin - Structural Awareness",
       "powers:Forcefield",
       "powers:Warming Elixir / Cooling Draught",
       "powers:Reinforce Shield",
@@ -13276,6 +14692,13 @@
       "devotions:Druidism",
       "devotions:The Howl at the End",
       "devotions:The Divine Bloom",
+      "advantages:Aewen - Elemental Fortitude",
+      "advantages:Forged - Artificial Anatomy",
+      "advantages:Human - Mental Bastion",
+      "advantages:Human - Ward Against the Void",
+      "advantages:Human - Adaptive Physiology",
+      "advantages:Lost - Void Resistance",
+      "advantages:Ogrim - Used to It",
       "powers:Bless Shield",
       "powers:Weasel’s Agility",
       "powers:Heroic Save"
@@ -13316,6 +14739,10 @@
       "ritual-concepts:Ritual Point Options",
       "powers:Pyrrhic Strike",
       "powers:Unbreakable",
+      "challenges:Forged - Vulnerable Construction",
+      "challenges:Human - Hotheaded",
+      "challenges:Human - Squeamish",
+      "challenges:Lost - Divine Tenet",
       "powers:Soulhold Survival",
       "powers:Sap of Life",
       "powers:Practiced Sight",
@@ -13332,6 +14759,9 @@
       "effects:Dispel",
       "conditions:Dominated",
       "powers:Non-Aggression Pact",
+      "challenges:Forged - Imprinted",
+      "advantages:Underkin - Chorus of the Song",
+      "advantages:Underkin - Juggernaut",
       "powers:Spiritual Anchor",
       "powers:Heart of the Group",
       "recipes:Absolution"
@@ -13347,6 +14777,8 @@
       "powers:Unbreakable",
       "powers:Slippery Tongue",
       "powers:Shadow Step",
+      "advantages:Ogrim - Great Endurance",
+      "advantages:Underkin - One with Shadows",
       "powers:Forged From Steel",
       "powers:Forgesource Specialist",
       "powers:Good Timing",
@@ -13539,6 +14971,7 @@
       "powers:Emotional Attunement",
       "powers:Mind Wipe",
       "powers:Dominating Presence",
+      "advantages:Human - Telepathy",
       "powers:Otherworldly Sight",
       "powers:Perspicacity",
       "powers:Analysis",
@@ -13581,6 +15014,7 @@
       "crafting-concepts:Formula Types",
       "powers:Waste Not",
       "devotions:The Dancer",
+      "challenges:Lost - Acquired Taste",
       "powers:Create Infusion",
       "powers:Lesser Form of the Hulking Bear",
       "powers:Lesser Form of the Striking Serpent",
@@ -13656,6 +15090,8 @@
     "crafting-concepts:Attunement": [
       "terms:Attune",
       "terms:Signature Item",
+      "advantages:Aewen - Naturally Attuned",
+      "challenges:Human - Utterly Mundane",
       "powers:Custom Creation",
       "recipes:Enchant Talisman (Rod / Orb / Wand / Source)",
       "recipes:Badge of Brilliance",
@@ -13881,6 +15317,7 @@
       "powers:Overflowing Energy",
       "powers:Energistic Adaptation",
       "devotions:Dave",
+      "challenges:Human - Energy Vampire",
       "classes:Mystic",
       "powers:Aegis of the Unknown / Sundering of the Unknown",
       "powers:Infuse",
@@ -13967,6 +15404,7 @@
       "devotions:The Divine Bloom",
       "devotions:The Pale Star",
       "devotions:Devourer",
+      "challenges:Aewen - Arcane Glow",
       "powers:Divine Substitution",
       "powers:Aethereal Fade",
       "recipes:Nyte Tea",
@@ -14005,6 +15443,9 @@
       "devotions:The Divine Bloom",
       "devotions:The Pale Star",
       "devotions:The Librarian",
+      "advantages:Forged - Mass Production",
+      "advantages:Lost - Wisdom of Many",
+      "advantages:Oaksworn - Nature’s Bite",
       "powers:Empower Friends",
       "rituals:Reforge",
       "rituals:Projection",
@@ -14014,6 +15455,7 @@
     ],
     "powers:Well Read": [],
     "domains:Manipulation": [
+      "challenges:Human - Hotheaded",
       "powers:Strange Token",
       "powers:Divine Substitution",
       "powers:Additional Bodyguard",
@@ -14029,6 +15471,11 @@
       "devotions:The Witch of Webs",
       "devotions:The Librarian",
       "devotions:Wildfire",
+      "advantages:Chimera - Shifting Form",
+      "challenges:Forged - Hybrid Physiology",
+      "advantages:Human - Natural Affinity",
+      "advantages:Oaksworn - Nature’s Bite",
+      "challenges:Oaksworn - Symbiotic Growths",
       "powers:Otherworldly Sight",
       "powers:Triage",
       "powers:Mantle of Faith",
@@ -14063,6 +15510,12 @@
       "ritual-concepts:Ritual Point Options",
       "powers:Non-Aggression Pact",
       "devotions:Dorne, Bringer of Law",
+      "challenges:Forged - Imprinted",
+      "advantages:Human - Psionic Cantrip",
+      "challenges:Human - Born Follower",
+      "challenges:Human - Frail of Body",
+      "challenges:Human - Energy Vampire",
+      "challenges:Lost - Unstable Form [Repped][",
       "powers:Divine Substitution",
       "powers:Cancel",
       "powers:Retributive Protection",
@@ -14121,6 +15574,7 @@
       "devotions:The Steed",
       "devotions:Mille, Muse of Creation",
       "devotions:The Song in Iron",
+      "challenges:Human - Nervous Fidgeting",
       "powers:Divine Substitution",
       "powers:Renowned Soldier",
       "powers:Mostly Harmless",
@@ -14140,6 +15594,9 @@
     "devotions:Filian, Keeper of the Hearth": [],
     "devotions:Mille, Muse of Creation": [],
     "devotions:The Song in Iron": [
+      "advantages:Underkin - Iron Touch",
+      "advantages:Underkin - Smiths of Legend",
+      "challenges:Underkin - Drawn to Song",
       "rules-concepts:Devotions & Divine Beings"
     ],
     "devotions:Dave": [
@@ -14147,6 +15604,9 @@
       "rules-concepts:Devotions & Divine Beings"
     ],
     "devotions:The Great Mind": [
+      "advantages:Forged - Read the Feed",
+      "challenges:Forged - Uplink Jack",
+      "challenges:Forged - Backdoor Vulnerability",
       "rules-concepts:Devotions & Divine Beings"
     ],
     "devotions:Druidism": [
@@ -14178,6 +15638,203 @@
     "devotions:The Dancer": [
       "rules-concepts:Devotions & Divine Beings"
     ],
+    "advantages:Aewen - Deep Reserves": [],
+    "advantages:Aewen - Arcane Aptitude": [],
+    "advantages:Aewen - Mystic Resilience": [],
+    "advantages:Aewen - Naturally Attuned": [],
+    "advantages:Aewen - Sigil Shield": [],
+    "advantages:Aewen - Sigil Quickening": [],
+    "advantages:Aewen - Master of Rites": [],
+    "advantages:Aewen - Elemental Fortitude": [],
+    "advantages:Aewen - Elemental Strikes": [],
+    "advantages:Aewen - Affinity Healing": [],
+    "advantages:Aewen - Elemental Party Trick": [],
+    "challenges:Aewen - Mana Lines": [],
+    "challenges:Aewen - Pointed Ears": [],
+    "challenges:Aewen - Arcane Glow": [],
+    "challenges:Aewen - Deathbound": [],
+    "challenges:Aewen - Runic Lattice": [],
+    "challenges:Aewen - Focal Totem": [],
+    "challenges:Aewen - Bugs in the Sigils": [],
+    "challenges:Aewen - Neglected Conditioning": [],
+    "challenges:Aewen - Elemental Expression": [],
+    "challenges:Aewen - Power Shines through the Eyes": [],
+    "challenges:Aewen - Like Attracts Like": [],
+    "challenges:Aewen - Accent Incompatibility": [],
+    "advantages:Chimera - Flight": [],
+    "advantages:Chimera - Heightened Flight": [],
+    "advantages:Chimera - Tough Hide": [],
+    "advantages:Chimera - Armored Carapace": [],
+    "advantages:Chimera - Claws": [],
+    "advantages:Chimera - Shifting Form": [],
+    "advantages:Chimera - Keen Senses": [],
+    "advantages:Chimera - Bestial Strength": [],
+    "challenges:Chimera - Altered Skin": [],
+    "challenges:Chimera - Ears": [],
+    "challenges:Chimera - Fangs": [],
+    "challenges:Chimera - Horns": [],
+    "challenges:Chimera - Tail": [],
+    "challenges:Chimera - Wings": [],
+    "challenges:Chimera - Digitigrade legs": [],
+    "challenges:Chimera - Eyes": [],
+    "challenges:Chimera - Incompatible Vocal Cords": [],
+    "challenges:Chimera - Prey Animal": [],
+    "advantages:Forged - Hardened Plating": [],
+    "advantages:Forged - Sturdy Construction": [],
+    "advantages:Forged - Artificial Anatomy": [],
+    "advantages:Forged - Analysis Module": [],
+    "advantages:Forged - Mass Production": [],
+    "advantages:Forged - Crowdsourced": [],
+    "advantages:Forged - Read the Feed": [],
+    "advantages:Forged - Quickhack": [],
+    "advantages:Forged - Automatic Repair System": [],
+    "advantages:Forged - Resilient Auxiliary Systems": [],
+    "advantages:Forged - Self Destruct": [],
+    "advantages:Forged - Vigilant Attendant": [],
+    "challenges:Forged - Vulnerable Construction": [],
+    "challenges:Forged - Visible Wiring": [],
+    "challenges:Forged - Plating": [],
+    "challenges:Forged - Cyber Eye(s)": [],
+    "challenges:Forged - Hybrid Physiology": [],
+    "challenges:Forged - Uplink Jack": [],
+    "challenges:Forged - Backdoor Vulnerability": [],
+    "challenges:Forged - Fragile Circuitry": [],
+    "challenges:Forged - Soft Life": [],
+    "challenges:Forged - Computational Hallucination": [],
+    "challenges:Forged - Voice Box": [],
+    "challenges:Forged - Power Source": [],
+    "challenges:Forged - Imprinted": [],
+    "challenges:Forged - Literal Bias": [],
+    "challenges:Forged - Zero-Harm Protocol": [],
+    "advantages:Human - Rallying Cry": [],
+    "advantages:Human - Heart Full of Greed": [],
+    "advantages:Human - Environmental Mastery": [],
+    "advantages:Human - Heirloom": [],
+    "advantages:Human - Telepathy": [],
+    "advantages:Human - Telekinesis": [],
+    "advantages:Human - Mental Bastion": [],
+    "advantages:Human - Psionic Cantrip": [],
+    "advantages:Human - Ward Against the Void": [],
+    "advantages:Human - Adaptive Physiology": [],
+    "advantages:Human - Natural Affinity": [],
+    "advantages:Human - Won’t Stay Dead": [],
+    "challenges:Human - Communal Debt": [],
+    "challenges:Human - Hotheaded": [],
+    "challenges:Human - Mundane": [],
+    "challenges:Human - Utterly Mundane": [],
+    "challenges:Human - Squeamish": [],
+    "challenges:Human - Born Follower": [],
+    "challenges:Human - Fear Resonance": [],
+    "challenges:Human - Leaky Bucket": [],
+    "challenges:Human - Mental Overload": [],
+    "challenges:Human - Frail of Body": [],
+    "challenges:Human - Energy Vampire": [],
+    "challenges:Human - Hibernator": [],
+    "challenges:Human - Haggard": [],
+    "challenges:Human - Fight or Flight": [],
+    "challenges:Human - Nervous Fidgeting": [],
+    "advantages:Lost - Consume Vitality": [],
+    "advantages:Lost - Creature of Void": [],
+    "advantages:Lost - Void Strikes": [],
+    "advantages:Lost - Void Resistance": [],
+    "advantages:Lost - Power from the Gods": [],
+    "advantages:Lost - Divine Armaments": [],
+    "advantages:Lost - Close Connection": [],
+    "advantages:Lost - Divine Magic": [],
+    "advantages:Lost - Wisdom of Many": [],
+    "advantages:Lost - Ride the Tide of the Mind": [],
+    "advantages:Lost - Ambidextrous": [],
+    "advantages:Lost - Pick and Choose": [],
+    "challenges:Lost - Born of the Void": [],
+    "challenges:Lost - Scarred by the Void": [],
+    "challenges:Lost - Lost Life": [],
+    "challenges:Lost - Visions of Stars": [],
+    "challenges:Lost - Limited Stores": [],
+    "challenges:Lost - Acquired Taste": [],
+    "challenges:Lost - Reborn": [],
+    "challenges:Lost - Divine Tenet": [],
+    "challenges:Lost - Divine Brand": [],
+    "challenges:Lost - Ragdoll": [],
+    "challenges:Lost - Something to Prove": [],
+    "challenges:Lost - Additional Lost Life": [],
+    "challenges:Lost - Void-filled Gaps": [],
+    "challenges:Lost - Fragile Form": [],
+    "challenges:Lost - Unstable Form [Repped][": [],
+    "advantages:Oaksworn - Natural Locus of Power": [],
+    "advantages:Oaksworn - Natural Knowledge": [],
+    "advantages:Oaksworn - Vines": [],
+    "advantages:Oaksworn - Nature’s Bite": [],
+    "advantages:Oaksworn - Shine Bright": [],
+    "advantages:Oaksworn - Oak Father’s Aegis": [],
+    "advantages:Oaksworn - Shepherd of Life": [],
+    "advantages:Oaksworn - Natural Healer": [],
+    "advantages:Oaksworn - Hardened Flesh": [],
+    "advantages:Oaksworn - Enhanced Hardened Flesh": [],
+    "advantages:Oaksworn - Strength from Sunlight": [],
+    "advantages:Oaksworn - Decompose": [],
+    "challenges:Oaksworn - Symbiotic Growths": [],
+    "challenges:Oaksworn - Metal Ban": [],
+    "challenges:Oaksworn - Agoraphilic": [],
+    "challenges:Oaksworn - Grovebound": [],
+    "challenges:Oaksworn - Mark of Ash’haie": [],
+    "challenges:Oaksworn - Mantle of the Great Ray": [],
+    "challenges:Oaksworn - Oath of Nature’s Protection": [],
+    "challenges:Oaksworn - Weakened Immune System": [],
+    "challenges:Oaksworn - Chlorophyll Veins": [],
+    "challenges:Oaksworn - Oakskin": [],
+    "challenges:Oaksworn - Tinderbox": [],
+    "challenges:Oaksworn - One With Nature": [],
+    "advantages:Ogrim - Regeneration": [],
+    "advantages:Ogrim - Undeniable Fortitude": [],
+    "advantages:Ogrim - Battlefield Vulture": [],
+    "advantages:Ogrim - Rapid Muscle Growth": [],
+    "advantages:Ogrim - Call To Honor": [],
+    "advantages:Ogrim - Assess Your Foes": [],
+    "advantages:Ogrim - Great Endurance": [],
+    "advantages:Ogrim - Bind Oath": [],
+    "advantages:Ogrim - Bone Claws": [],
+    "advantages:Ogrim - Thorns": [],
+    "advantages:Ogrim - Used to It": [],
+    "advantages:Ogrim - Bone to Pick": [],
+    "challenges:Ogrim - Scarring": [],
+    "challenges:Ogrim - Thick Jaw": [],
+    "challenges:Ogrim - Never Back Down": [],
+    "challenges:Ogrim - Claws": [],
+    "challenges:Ogrim - Honorable Warrior": [],
+    "challenges:Ogrim - Tribal Marks": [],
+    "challenges:Ogrim - Restless": [],
+    "challenges:Ogrim - Divine Distrust": [],
+    "challenges:Ogrim - Rib Protrusions": [],
+    "challenges:Ogrim - Joint Spurs": [],
+    "challenges:Ogrim - Brittle Bones": [],
+    "challenges:Ogrim - Bone Dreams": [],
+    "advantages:Underkin - Secrets of Stone": [],
+    "advantages:Underkin - Darksight": [],
+    "advantages:Underkin - Structural Awareness": [],
+    "advantages:Underkin - One with Shadows": [],
+    "advantages:Underkin - Resistant to Acid": [],
+    "advantages:Underkin - Blood Money": [],
+    "advantages:Underkin - Chorus of the Song": [],
+    "advantages:Underkin - Iron Touch": [],
+    "advantages:Underkin - Smiths of Legend": [],
+    "advantages:Underkin - Stoneshaper": [],
+    "advantages:Underkin - Cavern Fortress": [],
+    "advantages:Underkin - Strike like a Boulder": [],
+    "advantages:Underkin - Juggernaut": [],
+    "challenges:Underkin - Sun-deprived": [],
+    "challenges:Underkin - Sensitive Eyes": [],
+    "challenges:Underkin - Ruby Eyes See the Prize": [],
+    "challenges:Underkin - Radiant Vulnerability": [],
+    "challenges:Underkin - Claustrophilic": [],
+    "challenges:Underkin - Silver Veins": [],
+    "challenges:Underkin - Silver Haired": [],
+    "challenges:Underkin - Acid-Splashed": [],
+    "challenges:Underkin - Drawn to Song": [],
+    "challenges:Underkin - Stoneskin": [],
+    "challenges:Underkin - Favored Gem": [],
+    "challenges:Underkin - Mineral Nourishment": [],
+    "challenges:Underkin - Way of Stone": [],
+    "challenges:Underkin - From Rock to Rubble to Pebble": [],
     "classes:Artisan": [
       "classes:Artificer",
       "powers:Living Iron",
@@ -14373,6 +16030,7 @@
       "devotions:Druidism",
       "devotions:The Divine Bloom",
       "devotions:The Librarian",
+      "challenges:Lost - Additional Lost Life",
       "powers:Triage",
       "powers:Rekindle",
       "powers:Headliner",
@@ -14407,6 +16065,7 @@
     "powers:Grounded": [],
     "powers:Hiatus": [],
     "powers:Infuse": [
+      "advantages:Aewen - Affinity Healing",
       "powers:Mechanical Augmentation",
       "powers:Detonate",
       "powers:Corrosive Bolt",
@@ -14553,6 +16212,7 @@
       "accents:Acid",
       "accents:Flame",
       "devotions:The Librarian",
+      "advantages:Oaksworn - Shine Bright",
       "powers:Purifying Flame",
       "recipes:Adderstrike Venom",
       "recipes:Enervation Poison",
@@ -14598,6 +16258,7 @@
     ],
     "powers:Bless Shield": [],
     "powers:Blessing": [
+      "challenges:Aewen - Arcane Glow",
       "powers:Blessing of the Oak",
       "rituals:Bless Food",
       "rituals:Blessing of Faith",
@@ -14607,6 +16268,7 @@
     "powers:Disrupt": [
       "terms:Short Rest",
       "powers:Disruption",
+      "challenges:Underkin - From Rock to Rubble to Pebble",
       "powers:Protected Casting",
       "powers:Throat Shot",
       "rules-concepts:Narrative Hold"
@@ -14630,6 +16292,9 @@
     "classes:Druid": [
       "skills:Peacecaster",
       "powers:Tree Teleport",
+      "advantages:Human - Natural Affinity",
+      "advantages:Oaksworn - Strength from Sunlight",
+      "challenges:Oaksworn - Grovebound",
       "powers:Cantrip Scholar",
       "powers:Commune with Nature",
       "powers:Nature’s Understanding",
@@ -14706,6 +16371,7 @@
     "powers:Grove": [
       "powers:Tree Teleport",
       "devotions:Wildfire",
+      "challenges:Oaksworn - Grovebound",
       "powers:Earth’s Vitality",
       "powers:Lifethrive"
     ],
@@ -14743,6 +16409,7 @@
     ],
     "powers:Life Tap": [
       "skills:Peacecaster",
+      "advantages:Oaksworn - Strength from Sunlight",
       "powers:Blessing of the Oak",
       "powers:Sap of Life",
       "powers:Health of the World",
@@ -14815,6 +16482,7 @@
     "powers:Sprout Wings": [],
     "powers:Weasel’s Agility": [],
     "classes:Fighter": [
+      "advantages:Ogrim - Call To Honor",
       "powers:Utilitarian",
       "powers:Deadly Remnants",
       "powers:Parry Blow",
@@ -14934,6 +16602,7 @@
       "powers:Shake It Off II"
     ],
     "powers:Harry": [
+      "advantages:Ogrim - Call To Honor",
       "archetypes:Defensive Sword + Shield Fighter"
     ],
     "powers:Heroic Save": [],
@@ -14985,6 +16654,7 @@
       "flaws:Mild Allergy",
       "terms:Short Rest",
       "devotions:The Divine Bloom",
+      "advantages:Underkin - Blood Money",
       "powers:Prayer of Rest",
       "powers:Mask Aura",
       "powers:Arcane Bridge",
@@ -15019,6 +16689,8 @@
     "powers:Throat Shot": [],
     "powers:Thick Skin": [],
     "powers:Reinforce": [
+      "advantages:Aewen - Affinity Healing",
+      "challenges:Ogrim - Honorable Warrior",
       "powers:Field Maintenance",
       "recipes:Steel Oil",
       "recipes:Minor Bow Reinforcement",
@@ -15032,7 +16704,9 @@
       "archetypes:Archer Fighter"
     ],
     "powers:Field Maintenance": [],
-    "powers:Healthy": [],
+    "powers:Healthy": [
+      "challenges:Underkin - Drawn to Song"
+    ],
     "powers:Flesh of the Titan": [],
     "classes:Mage": [
       "skills:Advanced Recharge",
@@ -15094,6 +16768,7 @@
     "powers:Ghost Hand": [],
     "powers:Identify": [
       "powers:Well Read",
+      "advantages:Forged - Analysis Module",
       "powers:Gift of Solitude",
       "powers:Improved Identification",
       "recipes:Enchant Materia",
@@ -15441,6 +17116,13 @@
       "devotions:Filian, Keeper of the Hearth",
       "devotions:Mille, Muse of Creation",
       "devotions:The Howl at the End",
+      "challenges:Aewen - Focal Totem",
+      "advantages:Forged - Mass Production",
+      "advantages:Forged - Crowdsourced",
+      "advantages:Forged - Self Destruct",
+      "advantages:Human - Environmental Mastery",
+      "challenges:Human - Utterly Mundane",
+      "advantages:Lost - Wisdom of Many",
       "powers:Protected Casting",
       "powers:Aegis of the Unknown / Sundering of the Unknown",
       "powers:Spark of Doom",
@@ -15996,6 +17678,10 @@
       "terms:Attune",
       "terms:Signature Item",
       "crafting-concepts:Attunement",
+      "advantages:Human - Adaptive Physiology",
+      "challenges:Human - Utterly Mundane",
+      "advantages:Underkin - Structural Awareness",
+      "challenges:Underkin - Drawn to Song",
       "powers:Custom Creation",
       "powers:Grove",
       "powers:Arcane Source",
@@ -16093,6 +17779,7 @@
     ],
     "rules-concepts:Effect Calls": [
       "effects:Wounding",
+      "advantages:Lost - Creature of Void",
       "rules-concepts:Table of Contents"
     ],
     "rules-concepts:Weapon Delivery": [
@@ -16130,6 +17817,9 @@
       "defenses:Reduced",
       "crafting-concepts:Mana Sickness",
       "powers:Disruption",
+      "advantages:Aewen - Master of Rites",
+      "advantages:Chimera - Heightened Flight",
+      "advantages:Forged - Mass Production",
       "powers:Intimidating Spines",
       "powers:Overcharge",
       "powers:Festering Lash",
@@ -16191,6 +17881,9 @@
       "powers:Disruption",
       "powers:Emotional Attunement",
       "powers:Non-Aggression Pact",
+      "challenges:Human - Fight or Flight",
+      "advantages:Oaksworn - Strength from Sunlight",
+      "challenges:Ogrim - Brittle Bones",
       "powers:Acid Soak",
       "powers:Analysis",
       "powers:Combat Analysis",
@@ -16309,6 +18002,7 @@
       "terms:Dying",
       "powers:Dominating Presence",
       "powers:Shadow Step",
+      "advantages:Chimera - Heightened Flight",
       "powers:Hiatus",
       "powers:Battlemind",
       "powers:Heroic Save",
@@ -16334,6 +18028,8 @@
       "powers:Dominating Presence",
       "powers:Non-Aggression Pact",
       "powers:Slippery Tongue",
+      "advantages:Oaksworn - Oak Father’s Aegis",
+      "challenges:Ogrim - Never Back Down",
       "powers:Aegis of the Unknown / Sundering of the Unknown",
       "powers:Dig Deep",
       "powers:Intimidating Spines",
@@ -16465,6 +18161,9 @@
     ],
     "rules-concepts:Blocking Hits": [],
     "rules-concepts:Natural Weapons": [
+      "advantages:Chimera - Claws",
+      "advantages:Ogrim - Bone Claws",
+      "challenges:Ogrim - Claws",
       "powers:Red in Tooth and Claw",
       "powers:Feral Strength"
     ],
@@ -16482,6 +18181,7 @@
       "effects:Shatter",
       "crafting-concepts:Summoned Armor Repair",
       "crafting-concepts:Armor Repair",
+      "advantages:Forged - Hardened Plating",
       "powers:Armor of Faith",
       "powers:Armored Shell",
       "powers:Armored Shell II",
@@ -16506,6 +18206,10 @@
       "perks:Gift of Unbreakable Flesh",
       "terms:Armor",
       "effects:Heal",
+      "advantages:Chimera - Tough Hide",
+      "advantages:Chimera - Armored Carapace",
+      "advantages:Oaksworn - Hardened Flesh",
+      "advantages:Oaksworn - Enhanced Hardened Flesh",
       "powers:Barkskin",
       "powers:Hide of the Rhino",
       "powers:Mountain of Steel",
@@ -16534,6 +18238,7 @@
     ],
     "rules-concepts:Barrier": [
       "effects:Piercing",
+      "advantages:Aewen - Affinity Healing",
       "powers:Reconstitute Summon",
       "powers:Kick",
       "powers:Spiritual Defense",
@@ -16590,6 +18295,16 @@
       "powers:Waste Not",
       "powers:Dissolve",
       "powers:Non-Aggression Pact",
+      "advantages:Aewen - Sigil Quickening",
+      "advantages:Aewen - Elemental Strikes",
+      "challenges:Forged - Soft Life",
+      "advantages:Human - Telepathy",
+      "advantages:Human - Psionic Cantrip",
+      "challenges:Human - Mental Overload",
+      "advantages:Lost - Divine Armaments",
+      "advantages:Oaksworn - Natural Healer",
+      "advantages:Ogrim - Rapid Muscle Growth",
+      "advantages:Ogrim - Great Endurance",
       "powers:Mechanical Augmentation",
       "powers:Dig Deep",
       "powers:Intimidating Spines",
@@ -16677,6 +18392,7 @@
     "rules-concepts:Locks": [
       "skills:Basic Locks",
       "skills:Basic Traps",
+      "advantages:Ogrim - Bone to Pick",
       "powers:Fortress of Faith",
       "powers:Judgment",
       "powers:Rogue’s Touch",
@@ -16691,6 +18407,7 @@
       "skills:Advanced Traps",
       "conditions:Insubstantial",
       "resources:Hide",
+      "advantages:Underkin - Structural Awareness",
       "powers:Trap Recovery",
       "powers:Weasel’s Agility",
       "powers:Knight’s Strength",
@@ -16722,6 +18439,7 @@
     "rules-concepts:Green": [
       "skills:Tracking",
       "devotions:Mille, Muse of Creation",
+      "challenges:Oaksworn - Chlorophyll Veins",
       "powers:Grove",
       "powers:Find the Path",
       "recipes:Vision Valiant",
@@ -16737,6 +18455,7 @@
     ],
     "rules-concepts:Red": [
       "devotions:Senri, Voice of Mercy",
+      "challenges:Underkin - Ruby Eyes See the Prize",
       "powers:Rotten Tomato",
       "recipes:Vision Valiant",
       "recipes:Elemental Protection Potion",
@@ -16756,6 +18475,8 @@
       "skills:Lore",
       "skills:Forage I",
       "resources:Night Prizes",
+      "challenges:Lost - Scarred by the Void",
+      "challenges:Lost - Visions of Stars",
       "recipes:Minor Mana Potion",
       "recipes:Double Brew",
       "recipes:Elemental Protection Potion",
@@ -16792,6 +18513,7 @@
     "rules-concepts:Crafting Process": [
       "crafting-concepts:Summoned Armor Repair",
       "crafting-concepts:Armor Repair",
+      "advantages:Forged - Mass Production",
       "powers:A Spoonful of Sugar",
       "rules-concepts:Dark Territory"
     ],
@@ -16885,6 +18607,9 @@
       "ritual-concepts:Dark Territory Adjustments",
       "ritual-concepts:Automatic Failure",
       "ritual-concepts:Ritual Point Options",
+      "advantages:Aewen - Master of Rites",
+      "challenges:Aewen - Bugs in the Sigils",
+      "challenges:Human - Nervous Fidgeting",
       "powers:Grand Ritualist",
       "powers:Aegis of the Unknown / Sundering of the Unknown",
       "powers:Hiatus",
@@ -16910,6 +18635,8 @@
       "skills:Divine Focus",
       "skills:Lore",
       "powers:Dissolve",
+      "advantages:Human - Psionic Cantrip",
+      "advantages:Lost - Divine Magic",
       "powers:Custom Creation",
       "powers:Spiritual Defense",
       "powers:Refreshing Prayer",
@@ -16966,6 +18693,8 @@
       "perks:Carnal Creature",
       "effects:Revive",
       "defenses:No Effect",
+      "challenges:Aewen - Deathbound",
+      "advantages:Forged - Self Destruct",
       "powers:Gift of Life",
       "powers:Phoenix Reborn",
       "recipes:Eternal Ink",
@@ -17013,6 +18742,7 @@
       "crafting-concepts:Armor Repair",
       "powers:Mind Wipe",
       "powers:Non-Aggression Pact",
+      "advantages:Human - Telepathy",
       "powers:Apt Assistant",
       "powers:Protected Casting",
       "powers:Augury",
@@ -17057,6 +18787,7 @@
     "rules-concepts:Sacrifice": [
       "crafting-concepts:The Enchanting Forge",
       "devotions:The Pale Star",
+      "challenges:Human - Mental Overload",
       "powers:Forged From Steel",
       "powers:Shield Bearer",
       "powers:Acid Soak",
@@ -17108,6 +18839,9 @@
       "terms:Cantrip",
       "terms:Spells",
       "powers:Well Read",
+      "advantages:Aewen - Arcane Aptitude",
+      "challenges:Human - Mundane",
+      "advantages:Lost - Divine Magic",
       "rules-concepts:Spellbook",
       "rules-concepts:Table of Contents"
     ],
@@ -17140,6 +18874,7 @@
       "skills:Fence",
       "perks:Income",
       "perks:Inheritance",
+      "advantages:Underkin - Blood Money",
       "powers:Back Alley Deals",
       "powers:Contract Killing",
       "powers:Size Up",
@@ -18311,6 +20046,170 @@
     "skills:Apprentice Ritual Magic": [
       "skills:Journeyman Ritual Magic"
     ]
+  },
+  "grants": {
+    "advantages:Aewen - Mystic Resilience": [
+      "perks:Magical Resilience"
+    ],
+    "advantages:Forged - Read the Feed": [
+      "perks:Bits and Pieces"
+    ],
+    "advantages:Forged - Vigilant Attendant": [
+      "perks:Boon Bonds"
+    ],
+    "advantages:Human - Heart Full of Greed": [
+      "perks:Greedy Soul"
+    ],
+    "advantages:Human - Heirloom": [
+      "perks:Ancestral Relic"
+    ],
+    "advantages:Lost - Close Connection": [
+      "perks:Patron"
+    ],
+    "advantages:Oaksworn - Nature’s Bite": [
+      "skills:Poisoner"
+    ],
+    "advantages:Oaksworn - Shepherd of Life": [
+      "perks:Generous Soul"
+    ],
+    "advantages:Ogrim - Bone to Pick": [
+      "skills:Basic Locks"
+    ],
+    "advantages:Underkin - Iron Touch": [
+      "perks:Mystic Armorer"
+    ],
+    "advantages:Underkin - Smiths of Legend": [
+      "skills:Mastercrafter"
+    ],
+    "powers:A Spoonful of Sugar": [
+      "skills:Apprentice Alchemy"
+    ],
+    "powers:Adept Ritualist": [
+      "skills:Apprentice Ritual Magic"
+    ],
+    "powers:Shield Bearer": [
+      "skills:Basic Shields"
+    ],
+    "powers:Ritual Affinity": [
+      "skills:Apprentice Ritual Magic"
+    ],
+    "powers:Hunter": [
+      "skills:Projectile Weapons"
+    ],
+    "powers:Linked Armor": [
+      "skills:Medium Armor"
+    ],
+    "powers:Scales of the Serpent": [
+      "skills:Heavy Armor"
+    ],
+    "powers:Back Alley Deals": [
+      "skills:Fence"
+    ],
+    "powers:Implicit Truths": [
+      "perks:Insight"
+    ]
+  },
+  "grantedBy": {
+    "perks:Magical Resilience": [
+      "advantages:Aewen - Mystic Resilience"
+    ],
+    "perks:Bits and Pieces": [
+      "advantages:Forged - Read the Feed"
+    ],
+    "perks:Boon Bonds": [
+      "advantages:Forged - Vigilant Attendant"
+    ],
+    "perks:Greedy Soul": [
+      "advantages:Human - Heart Full of Greed"
+    ],
+    "perks:Ancestral Relic": [
+      "advantages:Human - Heirloom"
+    ],
+    "perks:Patron": [
+      "advantages:Lost - Close Connection"
+    ],
+    "skills:Poisoner": [
+      "advantages:Oaksworn - Nature’s Bite"
+    ],
+    "perks:Generous Soul": [
+      "advantages:Oaksworn - Shepherd of Life"
+    ],
+    "skills:Basic Locks": [
+      "advantages:Ogrim - Bone to Pick"
+    ],
+    "perks:Mystic Armorer": [
+      "advantages:Underkin - Iron Touch"
+    ],
+    "skills:Mastercrafter": [
+      "advantages:Underkin - Smiths of Legend"
+    ],
+    "skills:Apprentice Alchemy": [
+      "powers:A Spoonful of Sugar"
+    ],
+    "skills:Apprentice Ritual Magic": [
+      "powers:Adept Ritualist",
+      "powers:Ritual Affinity"
+    ],
+    "skills:Basic Shields": [
+      "powers:Shield Bearer"
+    ],
+    "skills:Projectile Weapons": [
+      "powers:Hunter"
+    ],
+    "skills:Medium Armor": [
+      "powers:Linked Armor"
+    ],
+    "skills:Heavy Armor": [
+      "powers:Scales of the Serpent"
+    ],
+    "skills:Fence": [
+      "powers:Back Alley Deals"
+    ],
+    "perks:Insight": [
+      "powers:Implicit Truths"
+    ]
+  },
+  "discounts": {
+    "advantages:Forged - Crowdsourced": {
+      "amount": 1,
+      "scope": {
+        "kind": "category",
+        "value": [
+          "Martial",
+          "Medical",
+          "Crafting"
+        ]
+      },
+      "cap": null,
+      "min": 1,
+      "refundIfFree": true,
+      "exclusions": []
+    },
+    "advantages:Human - Environmental Mastery": {
+      "amount": 1,
+      "scope": {
+        "kind": "category",
+        "value": [
+          "Gathering"
+        ]
+      },
+      "cap": null,
+      "min": null,
+      "refundIfFree": true,
+      "exclusions": []
+    },
+    "advantages:Lost - Wisdom of Many": {
+      "amount": 1,
+      "scope": {
+        "kind": "firstN",
+        "value": "Lore",
+        "n": 3
+      },
+      "cap": null,
+      "min": null,
+      "refundIfFree": true,
+      "exclusions": []
+    }
   },
   "archetypeRefs": {
     "archetypes:Defensive Sword + Shield Fighter": {

@@ -7,6 +7,9 @@
 
 import { getClasses } from './validate.js';
 import { ARCHETYPES } from './index.js';
+import {
+  LABEL_FIELD, SCALAR_FIELDS, ITEM_FIELDS, fieldForLabel, cleanItem, splitItems,
+} from './sheet-schema.js';
 
 // BP annotation for any item line, mirroring the archetype source. Pulls the
 // effective cost from the report's byItem map so EVERY section that can carry a
@@ -120,85 +123,8 @@ export function formatCharacterSheet(character, report) {
 // the StarterCharacterSheets layout the export mirrors, so a real character
 // pasted from the source can be validated.
 
-// Section label → character field. Mirrors the export's line() labels and the
-// archetype source headers (some appear with slight variants).
-const LABEL_FIELD = {
-  'Lineage Challenges': 'lineageChallenges',
-  'Lineage Advantages': 'lineageAdvantages',
-  'Life Points': 'lifePoints',
-  'Armor Points': 'armorPoints',
-  'Spikes': 'spikes',
-  'Class Levels': 'classLevels',
-  'Specialization': 'specialization',
-  'Devotion': 'devotion',
-  'Flaws': 'flaws',
-  'Starting Skills (free)': 'startingSkills',
-  'Starting Skills': 'startingSkills',
-  'Divine Domains': 'divineDomains',
-  'Available Devotion Accents': 'devotionAccents',
-  'Purchased Skills': 'purchasedSkills',
-  'Purchased Perks': 'purchasedPerks',
-  'Innate Powers': 'innatePowers',
-  'Utility Powers': 'utilityPowers',
-  'Basic Powers': 'basicPowers',
-  'Advanced Powers': 'advancedPowers',
-  'Veteran Powers': 'veteranPowers',
-  'Class Powers': 'classPowers',
-  'Right Hand Powers': 'rightHandPowers',
-  'Cantrips': 'cantrips',
-  'Novice Spells known': 'noviceSpells',
-  'Novice Spells Known': 'noviceSpells',
-  'Adept Spells known': 'adeptSpells',
-  'Greater Spells known': 'greaterSpells',
-  'Book Spells': 'bookSpells',
-  'Domain Powers': 'domainPowers',
-  'Form Powers': 'formPowers',
-  'Novice Spell-slots': 'noviceSpellSlots',
-  'Adept Spell-slots': 'adeptSpellSlots',
-  'Greater Spell-slots': 'greaterSpellSlots',
-};
-// Fields stored as scalars (not item lists).
-const SCALAR_FIELDS = new Set([
-  'lifePoints', 'armorPoints', 'spikes', 'classLevels', 'specialization',
-  'devotion', 'noviceSpellSlots', 'adeptSpellSlots', 'greaterSpellSlots',
-]);
-// Lineage is special (may carry a "(sublineage)" parenthetical).
-const ITEM_FIELDS = new Set(Object.values(LABEL_FIELD).filter((f) => !SCALAR_FIELDS.has(f) && f !== 'lineage'));
-
-// Strip an item's " - N BP …" / "(+N BP)" annotation back to the canonical name,
-// and capture the BP + grant provenance into parallel sidecars so the validator
-// sees the authored cost and free/granted state. Mirrors the parser's stripping.
-const ITEM_BP = /\s*-\s*(-?\d+)\s*BP\b.*$/i;
-const ITEM_GRANT = /\(\s*from\s+([^)]+)\)/i;                       // "- 0 BP (from Linked Armor)"
-const ITEM_REFUND = /\(\s*(\d+)\s*BP\s+refunded\s+from\s+([^)]+)\)/i; // "(3 BP refunded from X)"
-const ITEM_AWARD = /\(\+(\d+)\s*BP\)/i;                            // flaw "(+1 BP)"
-function cleanItem(raw) {
-  const refundM = raw.match(ITEM_REFUND);
-  const awardM = raw.match(ITEM_AWARD);
-  const grantM = !refundM && raw.match(ITEM_GRANT);
-  const bpM = !refundM && !awardM && raw.match(ITEM_BP);
-  const name = raw
-    .replace(ITEM_REFUND, '').replace(ITEM_AWARD, '').replace(ITEM_GRANT, '')
-    .replace(ITEM_BP, '').trim();
-  // A refund on a (free) starting skill is a discount grant with an amount.
-  const grant = refundM
-    ? { kind: 'discount', amount: parseInt(refundM[1], 10), source: refundM[2].trim() }
-    : grantM ? { kind: 'grant', amount: null, source: grantM[1].trim() } : null;
-  return { name, bp: bpM ? parseInt(bpM[1], 10) : null, grant };
-}
-const splitItems = (v) => v.trim() === 'None' || v.trim() === ''
-  ? [] : v.split(/,\s*/).map((s) => s.trim()).filter(Boolean);
-
-// Look up a field by label, tolerating case and a missing "(free)" suffix so
-// variant sheets ("Starting Skills" / "starting skills (free)") still match.
-function fieldForLabel(label) {
-  if (LABEL_FIELD[label]) return LABEL_FIELD[label];
-  const norm = label.toLowerCase().replace(/\s*\(free\)\s*$/, '').trim();
-  for (const [k, v] of Object.entries(LABEL_FIELD)) {
-    if (k.toLowerCase().replace(/\s*\(free\)\s*$/, '').trim() === norm) return v;
-  }
-  return null;
-}
+// The label→field schema + item-annotation stripping live in sheet-schema.js,
+// shared with the build-time parser so the two can't drift.
 // True for a line that looks like "Label: …" where Label is a known section.
 function labelOf(line) {
   const m = line.match(/^([^:]{1,40}):\s*(.*)$/);
@@ -265,7 +191,23 @@ function parseSheetText(text) {
   }
   if (!Object.keys(character.effectiveBP).length) delete character.effectiveBP;
   if (!Object.keys(character.grants).length) delete character.grants;
+  reconcileDevotion(character);
   return character;
+}
+
+// Devotion has two sources that must agree: an explicit "Devotion:" line and the
+// "Worship - <X>" skill that actually costs BP and gates the domains. Worship is
+// canonical (it's the real game mechanic); the inline line is a convenience that
+// fills in when no Worship skill is present. Mirrors the build-time parser so an
+// imported character resolves its devotion the same way an archetype does.
+function reconcileDevotion(character) {
+  const skills = [...(character.startingSkills || []), ...(character.purchasedSkills || [])];
+  const worship = skills.map((s) => s.match(/^Worship\s*[-–—:]\s*(.+)$/i)).find(Boolean);
+  const worshipDevotion = worship ? worship[1].trim() : null;
+  if (worshipDevotion && character.devotion && character.devotion !== worshipDevotion) {
+    character.devotionWarning = `Devotion mismatch: "${character.devotion}" vs Worship "${worshipDevotion}" — using Worship.`;
+  }
+  if (worshipDevotion) character.devotion = worshipDevotion;
 }
 
 // ─── FORMAT-TOLERANT ENTRY POINT ──────────────────────────────────────────────
