@@ -166,6 +166,30 @@ export function grantedAbilities(character) {
   return { list, bySource };
 }
 
+// Per-level power benefits (kind: per-level tiers). Some powers gain benefits as a
+// CLASS LEVEL rises — "at various Artisan Levels: Level 1 …, Level 3 …" — parsed
+// into `levelBenefits` at build time. For each such power the character owns, mark
+// which entries are ACTIVE given the character's level in that power's gating class
+// (auto-granted, no BP, no error — higher tiers are simply still locked). Returns
+// [{ power, gateClass, benefits: [{ level, text, active }] }].
+export function activePowerBenefits(character) {
+  const levelByClass = Object.fromEntries(getClasses(character).map((c) => [c.name, c.level]));
+  const out = [];
+  for (const field of POWER_SOURCE_FIELDS) {
+    for (const item of (character[field] || [])) {
+      const ent = lookupEntity(`powers:${cleanItemName(item)}`);
+      if (!ent?.levelBenefits) continue;
+      const lvl = levelByClass[ent.levelBenefitClass] ?? characterLevel(character);
+      out.push({
+        power: ent.name,
+        gateClass: ent.levelBenefitClass,
+        benefits: ent.levelBenefits.map((b) => ({ ...b, active: lvl >= b.level })),
+      });
+    }
+  }
+  return out;
+}
+
 // Max divine domains a worshipper may access (per the Worship skill: "up to two").
 export const MAX_DOMAINS = 2;
 
@@ -941,6 +965,7 @@ export function validate(character) {
   const devotion = devotionState(character);
   const lbp = lbpState(character);
   const granted = grantedAbilities(character);
+  const powerBenefits = activePowerBenefits(character);
   const prereqs = checkPrereqs(character);
   const slotsOver = slots.some((s) => s.over);
   // BP used beyond the base allowance, drawn from the bonus pool (clamped ≥0).
@@ -975,6 +1000,7 @@ export function validate(character) {
     devotion,
     lbp,
     grantedAbilities: granted,
+    powerBenefits,
     prereqs,
     belowFloor,
     aboveCap,

@@ -336,6 +336,19 @@ test('tier level gate is hard-enforced (rank 2 below char level 5 is an issue)',
   ok(!at.prereqs.issues.some((i) => i.tier), 'clears at the required level');
 });
 
+// ─── per-level power benefits (Adept Ritualist) ──────────────────────────────
+test('Adept Ritualist level-benefits activate by Artisan class level', () => {
+  const at1 = validate({ classLevels: 'Artisan 1', utilityPowers: ['Adept Ritualist'] });
+  const pb1 = at1.powerBenefits.find((b) => b.power === 'Adept Ritualist');
+  ok(pb1, 'powerBenefits present');
+  eq(pb1.gateClass, 'Artisan', 'gates on Artisan level');
+  eq(pb1.benefits.find((b) => b.level === 1).active, true, 'L1 active at Artisan 1');
+  eq(pb1.benefits.find((b) => b.level === 3).active, false, 'L3 locked at Artisan 1');
+  const at7 = validate({ classLevels: 'Artisan 7', utilityPowers: ['Adept Ritualist'] });
+  const pb7 = at7.powerBenefits.find((b) => b.power === 'Adept Ritualist');
+  ok(pb7.benefits.every((b) => b.active), 'all active at Artisan 7');
+});
+
 // ─── report ───────────────────────────────────────────────────────────────────
 console.log(`\n${passed} passed, ${failures.length} failed`);
 if (failures.length) {

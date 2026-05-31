@@ -542,7 +542,35 @@ function parseProgressionTable(clsStart, clsEnd) {
   return progression;
 }
 
-write('classes.json', parseClasses());
+// Some powers grant benefits that scale with CLASS LEVEL: their description reads
+// "…benefits at various <Class> Levels: • Level 1 - … • Level 3 - …". Parse those
+// "• Level N - …" bullets into a structured `levelBenefits` array so the validator
+// can mark which are active at the character's level in that class (auto-granted,
+// no BP). The gating class is named in the lead-in ("various Artisan Levels").
+const LEVEL_BENEFIT = /•?\s*Level\s+(\d+)\s*[-–—]\s*([^•]+)/g;
+function extractPowerBenefits(power) {
+  const d = power.description || '';
+  if (!/Level\s+\d+\s*[-–—]/.test(d)) return;
+  const gate = d.match(/at\s+various\s+([A-Z][\w]+)\s+Levels/i);
+  const benefits = [];
+  let m;
+  LEVEL_BENEFIT.lastIndex = 0;
+  while ((m = LEVEL_BENEFIT.exec(d))) {
+    benefits.push({ level: parseInt(m[1], 10), text: m[2].trim() });
+  }
+  if (benefits.length) {
+    power.levelBenefits = benefits;
+    power.levelBenefitClass = gate ? gate[1] : null;   // gate on this class's level
+  }
+}
+
+const CLASSES_OUT = parseClasses();
+for (const c of CLASSES_OUT) {
+  for (const arr of Object.values(c)) {
+    if (Array.isArray(arr)) for (const p of arr) if (p && p.description) extractPowerBenefits(p);
+  }
+}
+write('classes.json', CLASSES_OUT);
 
 // ─── SKILLS ───────────────────────────────────────────────────────────────────
 // H1: "Base Skills, Perks, and Flaws" → H1: "Skills" → H2: "Skill Descriptions"

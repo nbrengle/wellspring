@@ -375,6 +375,22 @@
   color: var(--b-text);
   margin: 0;
 }
+/* Per-level power benefits (Adept Ritualist): active tiers in green, locked dimmed. */
+.b-detail-section { margin-top: 0.75rem; }
+.b-detail-section-title {
+  font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.08em;
+  color: var(--b-dim); margin: 0 0 0.35rem;
+}
+.b-level-benefits { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.3rem; }
+.b-level-benefit { display: flex; gap: 0.4rem; align-items: baseline; font-size: 0.8rem; line-height: 1.4; }
+.b-level-benefit.is-locked { opacity: 0.5; }
+.b-level-tag {
+  flex: none; font-size: 0.58rem; font-weight: 700; color: var(--b-green);
+  border: 1px solid rgba(111,191,115,0.4); border-radius: 0.2rem; padding: 0.05rem 0.3rem;
+}
+.b-level-benefit.is-locked .b-level-tag { color: var(--b-dim); border-color: var(--b-border); }
+.b-level-text { color: var(--b-text); }
+.b-level-locked { flex: none; font-size: 0.55rem; text-transform: uppercase; color: var(--b-dim); }
 .b-detail-missing {
   font-size: 0.85rem;
   color: var(--b-dim);

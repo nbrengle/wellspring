@@ -685,7 +685,7 @@ function ArchetypePicker({ onPick, onStartBlank }) {
 // followable links. PICK lists the eligible powers for a slot, each inspectable
 // (with links) and choosable. Both modes share the entity-card renderer.
 
-function DetailPane({ view, onInspect, onBack, onClose }) {
+function DetailPane({ view, report, onInspect, onBack, onClose }) {
   if (!view) {
     return (
       <aside className="b-rail b-rail-right">
@@ -695,7 +695,7 @@ function DetailPane({ view, onInspect, onBack, onClose }) {
       </aside>
     );
   }
-  return <EntityDetail view={view} onInspect={onInspect} onBack={onBack} onClose={onClose} />;
+  return <EntityDetail view={view} report={report} onInspect={onInspect} onBack={onBack} onClose={onClose} />;
 }
 
 // ─── PICKER OVERLAY ───────────────────────────────────────────────────────────
@@ -937,7 +937,7 @@ function PickerOverlay({ spec, character, onClose }) {
 }
 
 // INSPECT mode: one entity, its facts, and followable links.
-function EntityDetail({ view, onInspect, onBack, onClose }) {
+function EntityDetail({ view, report, onInspect, onBack, onClose }) {
   const entity = useResolvedEntity(view.item, view.field, view.resolveType, view.archetypeName);
   const { item, resolveType } = view;
 
@@ -950,7 +950,7 @@ function EntityDetail({ view, onInspect, onBack, onClose }) {
         <p className="b-detail-type">{entity?.type || resolveType}</p>
       </header>
       <div className="b-detail-body">
-        <EntityBody entity={entity} onInspect={onInspect} />
+        <EntityBody entity={entity} report={report} onInspect={onInspect} />
       </div>
     </aside>
   );
@@ -959,13 +959,19 @@ function EntityDetail({ view, onInspect, onBack, onClose }) {
 // The shared reading body for an entity — description, facts, forward + back
 // links. Used by both the rail inspector and the picker's reading pane so the
 // content (and link-following) is identical everywhere.
-function EntityBody({ entity, onInspect }) {
+function EntityBody({ entity, report, onInspect }) {
   if (!entity) {
     return <p className="b-detail-missing">No detail available — this item may be unresolved.</p>;
   }
   // Domains carry no prose in the source — only an accent and a powers list. Show
   // those as content instead of an empty "no description" so the link is useful.
   const domainPowers = entity.type === "domains" ? (entity.powers || []) : null;
+  // Per-level benefits (Adept Ritualist): show each tier with active/locked state
+  // derived from the live report when the character owns it; otherwise list them
+  // by their gating level so the reader sees the progression.
+  const activeBenefits = entity.levelBenefits
+    ? (report?.powerBenefits?.find((b) => b.power === entity.name)?.benefits || entity.levelBenefits)
+    : null;
   return (
     <>
       {entity.description
@@ -974,6 +980,20 @@ function EntityBody({ entity, onInspect }) {
           ? <p className="b-detail-desc">A divine domain{entity.accent ? ` (${entity.accent} accent)` : ""} granting {domainPowers.length} power{domainPowers.length === 1 ? "" : "s"}.</p>
           : <p className="b-detail-missing">No description on record.</p>}
       <DetailFacts entity={entity} />
+      {activeBenefits && (
+        <div className="b-detail-section">
+          <h3 className="b-detail-section-title">Benefits by {entity.levelBenefitClass || "class"} level</h3>
+          <ul className="b-level-benefits">
+            {activeBenefits.map((b) => (
+              <li key={b.level} className={`b-level-benefit ${b.active === false ? "is-locked" : b.active ? "is-active" : ""}`}>
+                <span className="b-level-tag">Lv {b.level}</span>
+                <span className="b-level-text">{b.text}</span>
+                {b.active === false && <span className="b-level-locked">locked</span>}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
       {domainPowers && domainPowers.length > 0 && (
         <LinkList title="Domain powers" tone="purple" onInspect={onInspect}
                   ids={domainPowers.map((p) => `powers:${p.name}`)} />
@@ -1698,7 +1718,7 @@ export default function Builder() {
                     onInspect={handleInspect} onOpenSlot={handleOpenSlot}
                     onOpenAdd={handleOpenAdd} onRemoveEntity={handleRemoveEntity}
                     onSetName={handleSetName} onOpenLineage={() => setLineageOpen(true)} />
-        <DetailPane view={view}
+        <DetailPane view={view} report={report}
                     onInspect={handleInspect}
                     onBack={history.length ? handleBack : null} onClose={handleClose} />
       </div>

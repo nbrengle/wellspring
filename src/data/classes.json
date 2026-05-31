@@ -308,7 +308,22 @@
         "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": "The Artisan gains the Apprentice Ritual Magic skill.",
-        "description": "The Adept Ritualist gains the following benefits at various Artisan Levels: • Level 1 - The Artisan may count as two Participants in Rituals, taking up the available slots and giving benefits. • Level 3 - If the Artisan is acting as a Ritualist, reduce one Basic Resource (Bloom, Hide, Ingots, or Wealth) required for a Ritual to a minimum of 1, once per Long Rest. Place a stand in item if the Resource has a part in the Ritual • Level 7 - As above, the Artisan may count as two Ritualists. They may not perform functions of multiple Ritualists."
+        "description": "The Adept Ritualist gains the following benefits at various Artisan Levels: • Level 1 - The Artisan may count as two Participants in Rituals, taking up the available slots and giving benefits. • Level 3 - If the Artisan is acting as a Ritualist, reduce one Basic Resource (Bloom, Hide, Ingots, or Wealth) required for a Ritual to a minimum of 1, once per Long Rest. Place a stand in item if the Resource has a part in the Ritual • Level 7 - As above, the Artisan may count as two Ritualists. They may not perform functions of multiple Ritualists.",
+        "levelBenefits": [
+          {
+            "level": 1,
+            "text": "The Artisan may count as two Participants in Rituals, taking up the available slots and giving benefits."
+          },
+          {
+            "level": 3,
+            "text": "If the Artisan is acting as a Ritualist, reduce one Basic Resource (Bloom, Hide, Ingots, or Wealth) required for a Ritual to a minimum of 1, once per Long Rest. Place a stand in item if the Resource has a part in the Ritual"
+          },
+          {
+            "level": 7,
+            "text": "As above, the Artisan may count as two Ritualists. They may not perform functions of multiple Ritualists."
+          }
+        ],
+        "levelBenefitClass": "Artisan"
       },
       {
         "name": "Apt Assistant",
