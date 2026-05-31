@@ -2,7 +2,7 @@
   {
     "name": "The Hermetic Laboratory",
     "discipline": "Alchemy",
-    "description": "There will be a designated game space set up as a Hermetic Laboratory. This is where characters will craft all of their alchemy items. The items that will be there and used in different recipes are the following:",
+    "description": "There will be a designated game space set up as a Hermetic Laboratory. This is where characters will craft all of their alchemy items. The items that will be there and used in different recipes are the following: • Large flasks/beakers/glassware to perform tests in • Small vials for final products • Antique Scale • Mortar and Pestle • Hourglass (1 minute) • Small Flame of some sort, candle or otherwise • Retort • Simple Knife for cutting • Cutting Board • Gloves • Tongs (for holding vials over heat) • Ashbin • Simple Salts (with an OOG bag for refilling nearby) • Alchemical Suspension (with an OOG container for refilling nearby) • Water (with an OOG container for refilling nearby) • Eye dropper",
     "tools": [
       "Large flasks/beakers/glassware to perform tests in",
       "Small vials for final products",
@@ -35,7 +35,7 @@
   {
     "name": "Essences",
     "discipline": "Enchanting",
-    "description": "The most important materials for the enchanter are Essences - physical manifestations of the core building blocks of the universe. These Essences can either be immediately used (in Enchanting or other crafting skills) or may be stored for longer periods in Essence Infusions (see Alchemy). There are five types of known essences:",
+    "description": "The most important materials for the enchanter are Essences - physical manifestations of the core building blocks of the universe. These Essences can either be immediately used (in Enchanting or other crafting skills) or may be stored for longer periods in Essence Infusions (see Alchemy). There are five types of known essences: • Weave - raw magic, volatile and awe inspiring. • Energy - electricity, heat, and dissolution. • Thought - mental energy, will, and attention. • Life - representation of life everlasting. • Spirit - the consistency of sentience after life.",
     "tools": [
       "Weave - raw magic, volatile and awe inspiring.",
       "Energy - electricity, heat, and dissolution.",
@@ -82,7 +82,7 @@
   {
     "name": "The Enchanting Forge",
     "discipline": "Enchanting",
-    "description": "In each game, there will be a designated game space setup as an Enchanting Forge. This is where characters will craft their enchantments. The Enchanting Forge has five key components: The Reality Tear is where the enchanter Draws power from the Enchanting Forge. The Circle of Sacrifice is where the enchanter normally sacrifices resources to power their enchantments. The Circle of Assignment is where the enchanter takes soulheld energy and places it into objects. The Circle of Empowerment is where the enchanter empowers objects with powerful energies. The Rune Circle is where enchanters use the Primal Script to scribe powerful enchantments and scrolls. The items that will be there and used in different formulae are the following:",
+    "description": "In each game, there will be a designated game space setup as an Enchanting Forge. This is where characters will craft their enchantments. The Enchanting Forge has five key components: The Reality Tear is where the enchanter Draws power from the Enchanting Forge. The Circle of Sacrifice is where the enchanter normally sacrifices resources to power their enchantments. The Circle of Assignment is where the enchanter takes soulheld energy and places it into objects. The Circle of Empowerment is where the enchanter empowers objects with powerful energies. The Rune Circle is where enchanters use the Primal Script to scribe powerful enchantments and scrolls. The items that will be there and used in different formulae are the following: • The Reality Tear • 5 Essences (one of each type), 1 Unravelling Essence • 3 Circles around the Tear itself • A piece of each of these materials to match the Essences. • Glass • Materia • Quartz • Silver • Wood • Crystals • Resonance Fork • Bell • Foci to represent the elements • Candles - Fire • Sand - Earth • Basin of Water - Water • Breath - Air • Quills • Real Quills • Calligraphy Pens • Heat Source • Paper (different types) • Inks (different types)",
     "tools": [
       "The Reality Tear",
       "5 Essences (one of each type), 1 Unravelling Essence",
@@ -117,7 +117,7 @@
   {
     "name": "The Tinker's Workshop",
     "discipline": "Tinkering",
-    "description": "There will be a designated game space set up as a Tinker's Workshop. This is where characters will craft all of their Tinkered items. The items that will be there and used in different schematics are the following:",
+    "description": "There will be a designated game space set up as a Tinker's Workshop. This is where characters will craft all of their Tinkered items. The items that will be there and used in different schematics are the following: • Anvil - Used to shape hot metal • Awl - Used to punch holes • Bellows - For stoking the Forge • Bucket of Water - To quench metal • Buffing Cloth - To shine or clean materials • Crucible - For holding molten metal • Forge - For heating up metal objects • Hammer - For beating objects into shape • Hourglass (any description of a “turn” signifies one turn of the hourglass, or 1 minute) • Leather Gloves - To prevent burns • Knife - For cutting • Oil - To lubricate items • Small Tools - For intricate work such as screwdrivers, picks, wrenches • Tongs - For holding hot or heating metal • Whetstone - For sharpening edges",
     "tools": [
       "Anvil - Used to shape hot metal",
       "Awl - Used to punch holes",

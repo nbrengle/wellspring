@@ -1729,7 +1729,11 @@
     "modifiers:Subtle": [
       "rules-concepts:Modifiers"
     ],
-    "crafting-concepts:The Hermetic Laboratory": [],
+    "crafting-concepts:The Hermetic Laboratory": [
+      "recipes:Alchemical Suspension",
+      "rules-concepts:Ashbin",
+      "accents:Flame"
+    ],
     "crafting-concepts:Corrupted Alchemy": [
       "skills:Journeyman Alchemy",
       "recipes:Absolution",
@@ -1747,7 +1751,10 @@
       "effects:Drain"
     ],
     "crafting-concepts:Essences": [
-      "recipes:Essence Infusion"
+      "recipes:Essence Infusion",
+      "creature-types:Spirit",
+      "domains:Energy",
+      "accents:Life"
     ],
     "crafting-concepts:Drawing": [
       "crafting-concepts:The Enchanting Forge",
@@ -1787,10 +1794,13 @@
       "rituals:Attune"
     ],
     "crafting-concepts:The Enchanting Forge": [
+      "crafting-concepts:Unravelling Essence",
       "crafting-concepts:Primal Script",
       "rules-concepts:Sacrifice",
+      "crafting-concepts:Essences",
       "crafting-concepts:Formula Types",
-      "domains:Energy"
+      "domains:Energy",
+      "powers:Sources"
     ],
     "crafting-concepts:Summoned Armor Repair": [
       "recipes:Realign Summoned Armor",
@@ -1806,7 +1816,9 @@
       "effects:Mend"
     ],
     "crafting-concepts:The Tinker's Workshop": [
-      "skills:Apprentice Tinkering"
+      "rules-concepts:Turn of the Hourglass",
+      "skills:Apprentice Tinkering",
+      "powers:Burn"
     ],
     "crafting-concepts:Armor Repair": [
       "crafting-concepts:The Tinker's Workshop",
@@ -1842,9 +1854,13 @@
       "terms:Marshal"
     ],
     "ritual-concepts:Beginning the Ritual": [
+      "ritual-concepts:Secondary Ritualist",
+      "ritual-concepts:Primary Ritualist",
+      "rules-concepts:Crafting Process",
       "rules-concepts:Dark Territory",
       "ritual-concepts:Ritual Points",
       "terms:Conditions",
+      "crafting-concepts:Formula Types",
       "terms:Power"
     ],
     "ritual-concepts:Dark Territory Adjustments": [
@@ -1854,25 +1870,43 @@
       "ritual-concepts:Ritualists",
       "rules-concepts:Modifiers",
       "terms:Marshal",
+      "powers:Sources",
       "terms:Power"
     ],
     "ritual-concepts:Automatic Failure": [
+      "ritual-concepts:Secondary Ritualist",
+      "ritual-concepts:Primary Ritualist",
+      "rules-concepts:Crafting Process",
       "rules-concepts:Dark Territory",
       "ritual-concepts:Ritual Points",
-      "terms:Power"
+      "rules-concepts:Duration",
+      "terms:Power",
+      "terms:Focus"
     ],
     "ritual-concepts:Ritual Points": [
+      "ritual-concepts:Secondary Ritualist",
       "ritual-concepts:Primary Ritualist",
+      "ritual-concepts:Participant",
+      "ritual-concepts:Ritualists",
       "rules-concepts:Modifiers",
       "terms:Marshal"
     ],
-    "ritual-concepts:Potential Success": [],
+    "ritual-concepts:Potential Success": [
+      "ritual-concepts:Primary Ritualist",
+      "rules-concepts:Dark Territory",
+      "ritual-concepts:Ritual Points",
+      "rules-concepts:Modifiers",
+      "terms:Marshal"
+    ],
     "ritual-concepts:Ritual Point Options": [
       "ritual-concepts:Primary Ritualist",
       "rules-concepts:Dark Territory",
       "ritual-concepts:Ritual Points",
+      "ritual-concepts:Participant",
       "ritual-concepts:Ritualists",
+      "rules-concepts:Modifiers",
       "terms:Marshal",
+      "rules-concepts:Ashbin",
       "modifiers:Final",
       "domains:Order",
       "devotions:Dave"
@@ -1884,7 +1918,13 @@
     "ritual-concepts:Implements: Magical": [
       "skills:Basic Arcane"
     ],
-    "ritual-concepts:The Lesser Arcana": [],
+    "ritual-concepts:The Lesser Arcana": [
+      "accents:Shadow",
+      "accents:Divine",
+      "resources:Bloom",
+      "domains:Light",
+      "accents:Mind"
+    ],
     "ritual-concepts:The Major Arcana": [
       "ritual-concepts:Ritualists"
     ],
@@ -11832,6 +11872,7 @@
       "perks:Mystic Smith",
       "perks:Gift of Healing",
       "perks:Protected Hearth",
+      "ritual-concepts:Automatic Failure",
       "powers:Emotional Attunement",
       "powers:Perspicacity",
       "powers:Acid Soak",
@@ -12304,6 +12345,7 @@
       "ritual-concepts:How to Request a Marshal",
       "ritual-concepts:Dark Territory Adjustments",
       "ritual-concepts:Ritual Points",
+      "ritual-concepts:Potential Success",
       "ritual-concepts:Ritual Point Options",
       "powers:Analysis",
       "powers:Hiatus",
@@ -14452,6 +14494,7 @@
       "effects:Shatter",
       "conditions:Dominated",
       "defenses:No Effect",
+      "crafting-concepts:Essences",
       "powers:The Balance of Life",
       "devotions:The Song in Iron",
       "devotions:Wildfire",
@@ -14511,6 +14554,7 @@
       "skills:Forage II",
       "skills:Forage III",
       "perks:Manse",
+      "ritual-concepts:The Lesser Arcana",
       "devotions:The Divine Bloom",
       "advantages:Oaksworn - Natural Knowledge",
       "powers:Adept Ritualist",
@@ -14972,6 +15016,7 @@
       "perks:Gift of Unbreakable Flesh",
       "flaws:Divine Vulnerability",
       "terms:Sphere",
+      "ritual-concepts:The Lesser Arcana",
       "powers:Disruption",
       "powers:Waste Not",
       "powers:The Balance of Life",
@@ -15070,6 +15115,7 @@
       "terms:Qualifier",
       "effects:Imbue",
       "defenses:Protect",
+      "crafting-concepts:The Hermetic Laboratory",
       "devotions:Wildfire",
       "advantages:Aewen - Arcane Aptitude",
       "advantages:Human - Psionic Cantrip",
@@ -15209,6 +15255,7 @@
       "rules-concepts:Devotions & Divine Beings"
     ],
     "accents:Life": [
+      "crafting-concepts:Essences",
       "devotions:The Mother",
       "devotions:Dave",
       "challenges:Lost - Lost Life",
@@ -15266,6 +15313,7 @@
       "perks:Gift of Recognition",
       "perks:Heartbond",
       "perks:Medium",
+      "ritual-concepts:The Lesser Arcana",
       "powers:Emotional Attunement",
       "challenges:Forged - Backdoor Vulnerability",
       "advantages:Human - Telepathy",
@@ -15387,6 +15435,7 @@
       "skills:Lore",
       "perks:Will to Live",
       "terms:Accent",
+      "ritual-concepts:The Lesser Arcana",
       "powers:Divine Substitution",
       "classes:Rogue",
       "powers:Retreat",
@@ -15876,6 +15925,7 @@
       "crafting-concepts:Soulholding",
       "crafting-concepts:Unravelling Essence",
       "crafting-concepts:Formula Types",
+      "crafting-concepts:The Enchanting Forge",
       "powers:Waste Not",
       "devotions:The Dancer",
       "challenges:Lost - Acquired Taste",
@@ -15933,6 +15983,7 @@
       "skills:Spell Storing"
     ],
     "crafting-concepts:Unravelling Essence": [
+      "crafting-concepts:The Enchanting Forge",
       "powers:Waste Not",
       "powers:Soulhold Survival",
       "recipes:Delve Reality (Intermediate)"
@@ -15941,6 +15992,7 @@
       "crafting-concepts:Drawing",
       "crafting-concepts:Soulholding",
       "crafting-concepts:The Enchanting Forge",
+      "ritual-concepts:Beginning the Ritual",
       "powers:Blood Scroll",
       "recipes:Essence Infusion",
       "recipes:Copy Formula, Schematic, or Recipe",
@@ -16026,6 +16078,7 @@
       "ritual-concepts:Primary Ritualist",
       "ritual-concepts:Participant",
       "ritual-concepts:Dark Territory Adjustments",
+      "ritual-concepts:Ritual Points",
       "ritual-concepts:Ritual Point Options",
       "ritual-concepts:The Major Arcana",
       "classes:Mystic",
@@ -16048,8 +16101,11 @@
     ],
     "ritual-concepts:Primary Ritualist": [
       "ritual-concepts:Secondary Ritualist",
+      "ritual-concepts:Beginning the Ritual",
       "ritual-concepts:Dark Territory Adjustments",
+      "ritual-concepts:Automatic Failure",
       "ritual-concepts:Ritual Points",
+      "ritual-concepts:Potential Success",
       "ritual-concepts:Ritual Point Options",
       "powers:Grand Ritualist",
       "powers:Hiatus",
@@ -16073,6 +16129,9 @@
     "ritual-concepts:Secondary Ritualist": [
       "ritual-concepts:Ritualists",
       "ritual-concepts:Primary Ritualist",
+      "ritual-concepts:Beginning the Ritual",
+      "ritual-concepts:Automatic Failure",
+      "ritual-concepts:Ritual Points",
       "rituals:Lesser Consecrate / Lesser Desecrate",
       "rituals:Greater Consecration / Greater Desecration"
     ],
@@ -16081,6 +16140,8 @@
       "ritual-concepts:Ritualists",
       "ritual-concepts:Primary Ritualist",
       "ritual-concepts:Secondary Ritualist",
+      "ritual-concepts:Ritual Points",
+      "ritual-concepts:Ritual Point Options",
       "powers:Divine Performance",
       "powers:Non-Aggression Pact",
       "powers:Grand Ritualist",
@@ -16113,6 +16174,7 @@
     "ritual-concepts:Ritual Points": [
       "ritual-concepts:Beginning the Ritual",
       "ritual-concepts:Automatic Failure",
+      "ritual-concepts:Potential Success",
       "ritual-concepts:Ritual Point Options"
     ],
     "ritual-concepts:Potential Success": [],
@@ -16181,6 +16243,7 @@
       "resources:Golden Blossom",
       "accents:Divine",
       "accents:Life",
+      "crafting-concepts:Essences",
       "crafting-concepts:Drawing",
       "crafting-concepts:Measuring Time & Chants",
       "crafting-concepts:The Enchanting Forge",
@@ -16265,6 +16328,7 @@
       "perks:Experimental Hearth",
       "accents:Radiant",
       "crafting-concepts:Measuring Time & Chants",
+      "ritual-concepts:The Lesser Arcana",
       "powers:No Stone Unturned",
       "powers:Bring Light to the Shadows",
       "powers:Pulse of Light",
@@ -17107,6 +17171,7 @@
       "skills:Scavenge I",
       "accents:Acid",
       "accents:Flame",
+      "crafting-concepts:The Tinker's Workshop",
       "devotions:The Librarian",
       "advantages:Oaksworn - Shine Bright",
       "powers:Purifying Flame",
@@ -18019,6 +18084,8 @@
       "conditions:Resistance",
       "resources:Ingots",
       "crafting-concepts:Corrupted Alchemy",
+      "crafting-concepts:The Enchanting Forge",
+      "ritual-concepts:Dark Territory Adjustments",
       "powers:Shadow Step",
       "devotions:Senri, Voice of Mercy",
       "devotions:Dorne, Bringer of Law",
@@ -18315,6 +18382,7 @@
       "recipes:Euphoria"
     ],
     "recipes:Alchemical Suspension": [
+      "crafting-concepts:The Hermetic Laboratory",
       "recipes:Essence Infusion",
       "recipes:Hardening Lacquer",
       "recipes:Healing Draught",
@@ -18734,6 +18802,7 @@
       "defenses:Resist",
       "defenses:Reduced",
       "crafting-concepts:Mana Sickness",
+      "ritual-concepts:Automatic Failure",
       "powers:Disruption",
       "advantages:Aewen - Master of Rites",
       "advantages:Chimera - Heightened Flight",
@@ -19088,6 +19157,8 @@
       "modifiers:Subtle",
       "ritual-concepts:Dark Territory Adjustments",
       "ritual-concepts:Ritual Points",
+      "ritual-concepts:Potential Success",
+      "ritual-concepts:Ritual Point Options",
       "powers:Mind Wipe",
       "powers:Unbreakable",
       "powers:Aegis of the Unknown / Sundering of the Unknown",
@@ -19483,12 +19554,15 @@
     "rules-concepts:Crafting Process": [
       "crafting-concepts:Summoned Armor Repair",
       "crafting-concepts:Armor Repair",
+      "ritual-concepts:Beginning the Ritual",
+      "ritual-concepts:Automatic Failure",
       "advantages:Forged - Mass Production",
       "powers:A Spoonful of Sugar",
       "rules-concepts:Dark Territory"
     ],
     "rules-concepts:Turn of the Hourglass": [
       "crafting-concepts:Summoned Armor Repair",
+      "crafting-concepts:The Tinker's Workshop",
       "crafting-concepts:Armor Repair",
       "recipes:Daggerpoint Cognac",
       "recipes:Essence Infusion",
@@ -19524,6 +19598,8 @@
     ],
     "rules-concepts:Ashbin": [
       "skills:Bookcaster",
+      "crafting-concepts:The Hermetic Laboratory",
+      "ritual-concepts:Ritual Point Options",
       "powers:Forged From Steel",
       "powers:Acid Soak",
       "powers:Antidote",
@@ -19576,6 +19652,7 @@
       "ritual-concepts:Beginning the Ritual",
       "ritual-concepts:Dark Territory Adjustments",
       "ritual-concepts:Automatic Failure",
+      "ritual-concepts:Potential Success",
       "ritual-concepts:Ritual Point Options",
       "advantages:Aewen - Master of Rites",
       "challenges:Aewen - Bugs in the Sigils",

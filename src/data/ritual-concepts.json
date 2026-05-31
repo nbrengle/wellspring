@@ -23,7 +23,7 @@
   },
   {
     "name": "Beginning the Ritual",
-    "description": "If any of the following Conditions are not true then the Ritual cannot begin, and no Powers or Resources are consumed. Should any of these Conditions not be met during the casting in progress, the casting immediately fails, all Resources and Powers used are consumed, any Ritual Points accrued are lost, and Dark Territory is applied with seven points subtracted from the final tally, with any positive result discarded.",
+    "description": "If any of the following Conditions are not true then the Ritual cannot begin, and no Powers or Resources are consumed. Should any of these Conditions not be met during the casting in progress, the casting immediately fails, all Resources and Powers used are consumed, any Ritual Points accrued are lost, and Dark Territory is applied with seven points subtracted from the final tally, with any positive result discarded. • The Formula is present, appropriate to the Casting Location, and vice versa. • The Primary Ritualist and any Secondary Ritualists have the appropriate Skills. • The Primary Ritualist and any Secondary Ritualists are conscious and able to perform the Ritual Process. • The Resources are correct and unexpired. • The Target is valid for the crafting process, and is unexpired.",
     "bullets": [
       "The Formula is present, appropriate to the Casting Location, and vice versa.",
       "The Primary Ritualist and any Secondary Ritualists have the appropriate Skills.",
@@ -34,7 +34,7 @@
   },
   {
     "name": "Dark Territory Adjustments",
-    "description": "The Ritual marshal should take note of the following adjustments to the Dark Territory modifier: Once these have been recorded, the Marshal should notify The Primary Ritualist of the current Dark Territory Modifier and ask if The Primary Ritualist wishes to continue. If The Primary Ritualist assents, the Ritual may proceed. If the Primary Ritualist declines, all Resources are refunded, and any Powers expended are refreshed. Once the Ritual Process is begun, the Marshal should note any failures to follow the process outlined in the Ritual itself, and should add one to the Dark Territory total for each infraction. Additional steps taken by the Ritualist, or improvements or theatrics in addition to the prescribed ritual steps are counted as benefits described later on.",
+    "description": "The Ritual marshal should take note of the following adjustments to the Dark Territory modifier: Once these have been recorded, the Marshal should notify The Primary Ritualist of the current Dark Territory Modifier and ask if The Primary Ritualist wishes to continue. If The Primary Ritualist assents, the Ritual may proceed. If the Primary Ritualist declines, all Resources are refunded, and any Powers expended are refreshed. Once the Ritual Process is begun, the Marshal should note any failures to follow the process outlined in the Ritual itself, and should add one to the Dark Territory total for each infraction. Additional steps taken by the Ritualist, or improvements or theatrics in addition to the prescribed ritual steps are counted as benefits described later on. • Any adjustments to the Dark Territory from anyone Participating in the ritual. • Any adjustments to the Dark Territory from the Environment are recorded. • Any adjustments to the Dark Territory from Plot related sources are recorded. • Any adjustments to the Dark Territory from any other circumstances are recorded.",
     "bullets": [
       "Any adjustments to the Dark Territory from anyone Participating in the ritual.",
       "Any adjustments to the Dark Territory from the Environment are recorded.",
@@ -44,7 +44,7 @@
   },
   {
     "name": "Automatic Failure",
-    "description": "These states cause the ritual to fail, with all Resources and Powers consumed, any Ritual Points accrued are lost, and Dark Territory is applied with thirteen points removed from the final tally, with any positive result discarded.",
+    "description": "These states cause the ritual to fail, with all Resources and Powers consumed, any Ritual Points accrued are lost, and Dark Territory is applied with thirteen points removed from the final tally, with any positive result discarded. • The Primary Ritualist is unable to maintain required Focus for the duration of the ritual Process. • The Primary Ritualist, Secondary Ritualist(s), or the Target uses an Ability or Power other than one notated in the description of the crafting Process, or one that does not have specific verbiage allowing it to be used during a Ritual. • The Primary Ritualist, Secondary Ritualist(s), or the Target leaves the casting area. • The Primary Ritualist, Secondary Ritualist(s), or the Target takes damage not part of the Ritual Process. • The Primary Ritualist or Secondary Ritualist(s) voluntarily or involuntarily cease the Ritual Process without ability that allows them to do so without consequence. • Dark Territory accrued from infractions or mistakes becomes 5 or more.",
     "bullets": [
       "The Primary Ritualist is unable to maintain required Focus for the duration of the ritual Process.",
       "The Primary Ritualist, Secondary Ritualist(s), or the Target uses an Ability or Power other than one notated in the description of the crafting Process, or one that does not have specific verbiage allowing it to be used during a Ritual.",
@@ -56,7 +56,7 @@
   },
   {
     "name": "Ritual Points",
-    "description": "These modifiers allow The Primary Ritualist to modify the card drawn from the Hand. The Ritual Marshal may grant these Ritual Points given the guidance below:",
+    "description": "These modifiers allow The Primary Ritualist to modify the card drawn from the Hand. The Ritual Marshal may grant these Ritual Points given the guidance below: • Including additional Ritualists, known as Secondary Ritualists, one Point for each additional participant with the appropriate Ritual / Enchanting skill level. • Including additional Participants, one Point for every two additional Participants without the appropriate Ritual / Enchanting skill level, up to a maximum of 3 Points. • The Primary Caster adds additional steps to the ritual within the theme of the ritual, or goes above and beyond in the presentation of the ritual process.",
     "bullets": [
       "Including additional Ritualists, known as Secondary Ritualists, one Point for each additional participant with the appropriate Ritual / Enchanting skill level.",
       "Including additional Participants, one Point for every two additional Participants without the appropriate Ritual / Enchanting skill level, up to a maximum of 3 Points.",
@@ -65,14 +65,14 @@
   },
   {
     "name": "Potential Success",
-    "description": "Assuming no failure states are triggered, and the Ritual process is completed, the Ritual is considered a Potential Success.",
+    "description": "Assuming no failure states are triggered, and the Ritual process is completed, the Ritual is considered a Potential Success. • The attending Ritual Marshal calculates any Dark Territory Modifiers and arranges the Deck according to the default suit for the Ritual attempted. The Primary Ritualist is notified of any Ritual Points they have earned, and are given the opportunity to spend Ritual Points on adding Lesser Arcana, Major Arcana, or altering the suit of cards away from the Rituals’ default suit.",
     "bullets": [
       "The attending Ritual Marshal calculates any Dark Territory Modifiers and arranges the Deck according to the default suit for the Ritual attempted. The Primary Ritualist is notified of any Ritual Points they have earned, and are given the opportunity to spend Ritual Points on adding Lesser Arcana, Major Arcana, or altering the suit of cards away from the Rituals’ default suit."
     ]
   },
   {
     "name": "Ritual Point Options",
-    "description": "Note: Upranking the Final Card past the twelfth rank allows the Primary Ritualist to select Lesser and Major Arcana, in that order, if they were purchased prior to the Draw. Once the Draw has occurred, the Hand may not be altered. Example: Chome the High Ritualist of Dave performs a ritual. During this ritual Chome makes 2 mistakes, and also adds 1 Dark Territory using their ability Wrath of Chome. This adds 3 Dark Territory to the ritual. Chome also goes all out on the theatrics, and as a result also earns two Ritual Points. The deck being drawn from is Implements. The Ritual Marshall then asks Chome to draw one card from the Implements deck - and Chome draws the 11th card, the Phylactery. The Ritual Marshall then adds 3 to the drawn card (11), resulting in the number 14. Chome only has 2 Ritual Points, which means they could reduce their end number of 14 down to 12, which would change the outcome from random to The Obelisk. If Chome had earned a 3rd Ritual Point, then they could have reduced the 14 to 11, choosing the Phylactery (11th card). However, they did not - so the end result is the Obelisk (12th card). If Chome had instead only generated one Ritual Point, then the lowest they could have lowered the result was to 13, and as a result a random card would have been drawn from the Hand. The Ritual Marshal draws the Obelisk card, and communicates the success/failure/alteration of the ritual, as determined by the Obelisk.",
+    "description": "Note: Upranking the Final Card past the twelfth rank allows the Primary Ritualist to select Lesser and Major Arcana, in that order, if they were purchased prior to the Draw. Once the Draw has occurred, the Hand may not be altered. Example: Chome the High Ritualist of Dave performs a ritual. During this ritual Chome makes 2 mistakes, and also adds 1 Dark Territory using their ability Wrath of Chome. This adds 3 Dark Territory to the ritual. Chome also goes all out on the theatrics, and as a result also earns two Ritual Points. The deck being drawn from is Implements. The Ritual Marshall then asks Chome to draw one card from the Implements deck - and Chome draws the 11th card, the Phylactery. The Ritual Marshall then adds 3 to the drawn card (11), resulting in the number 14. Chome only has 2 Ritual Points, which means they could reduce their end number of 14 down to 12, which would change the outcome from random to The Obelisk. If Chome had earned a 3rd Ritual Point, then they could have reduced the 14 to 11, choosing the Phylactery (11th card). However, they did not - so the end result is the Obelisk (12th card). If Chome had instead only generated one Ritual Point, then the lowest they could have lowered the result was to 13, and as a result a random card would have been drawn from the Hand. The Ritual Marshal draws the Obelisk card, and communicates the success/failure/alteration of the ritual, as determined by the Obelisk. • Suit Change: 3 Ritual Points • Add Random Lesser Arcana: 3 Ritual Points • Add Random Major Arcana: 5 Ritual Points • The Marshal then shuffles the cards belonging to the adjusted suit, and adds any cards purchased by the Primary Ritualist. This is known as the Hand. • The Primary Ritualist then draws a random card from the Hand, and reveals it to the Ritual Marshal. The Ritual Marshal then adjusts the card’s Rank based on any Dark Territory Modifiers, re-ranking the card up the suit for positive values, and down for negative values. Adjustments that “bottom out” always get the Rank #0 results. • Once adjusted, the Primary Caster may spend any remaining Ritual Points, on a one-for-one basis, to further alter the adjustment value up or down as they see fit. Once all adjustments have been made, the card remaining is termed the Final Card. • If the final ranking exceeds all cards in the Hand, the Ritual Marshal will instead shuffle the entire hand and choose 1 at random to be the Final Card. • The Ritual Marshal should consult the Dark Territory Guidance for the Final Card, and reveal the result of the Final Card to all Participants. Should the result of the Final Card need further explanation, the Ritual Marshal will guide the Participants in what must be done. • If in the case that the result in the Dark Territory Guidance does not appropriately fit the ritual being cast, the Ritual Marshal is given leeway in adjudicating an appropriate result based on the Guidance. In all cases the result of the Dark Territory should be recorded and taken to the Ashbin for logging along with any expended Resources.",
     "bullets": [
       "Suit Change: 3 Ritual Points",
       "Add Random Lesser Arcana: 3 Ritual Points",
@@ -87,7 +87,7 @@
   },
   {
     "name": "Arms: Physical",
-    "description": "Representing the tangible and the practical aspects of life in Wellspring, the concepts are most commonly denoted in the melee weapons of combat. These are sorted into their corresponding ranks, least to greatest.",
+    "description": "Representing the tangible and the practical aspects of life in Wellspring, the concepts are most commonly denoted in the melee weapons of combat. These are sorted into their corresponding ranks, least to greatest. • Cudgel • Hatchet • Dagger • Spear • Flail • Morning Star • Scythe • Sword • Halberd • Rapier • Claymore • Lance",
     "bullets": [
       "Cudgel",
       "Hatchet",
@@ -105,7 +105,7 @@
   },
   {
     "name": "Gems: Mental",
-    "description": "Representing mental clarity, perception, and knowledge, the Mental suit is often correlated with semi-precious and precious gems of ascending value:",
+    "description": "Representing mental clarity, perception, and knowledge, the Mental suit is often correlated with semi-precious and precious gems of ascending value: • Tiger’s Eye • Jade • Amethyst • Topaz • Opal • Obsidian • Ruby • Emerald • Sapphire • Moonstone • Diamond • Wellspring Amber",
     "bullets": [
       "Tiger’s Eye",
       "Jade",
@@ -123,7 +123,7 @@
   },
   {
     "name": "Implements: Magical",
-    "description": "Representing the magical aspects of life in Wellspring, the implements are ranked from the most familiar to the most esoteric, as the arcane or divine power grows in might:",
+    "description": "Representing the magical aspects of life in Wellspring, the implements are ranked from the most familiar to the most esoteric, as the arcane or divine power grows in might: • Potion • Scroll • Wand • Staff • Ring • Amulet • Orb • Tome • Talisman • Diadem • Phylactery • Obelisk",
     "bullets": [
       "Potion",
       "Scroll",
@@ -141,7 +141,7 @@
   },
   {
     "name": "The Lesser Arcana",
-    "description": "This deck shifts the most over time, often with cards being removed or added as civilizations rise and fall. This arrangement is most common in the known worlds of Wellspring today:",
+    "description": "This deck shifts the most over time, often with cards being removed or added as civilizations rise and fall. This arrangement is most common in the known worlds of Wellspring today: • Distant Light • The Keeper of the River • The Lost Child • The Soul Warden • The Blooded Mare • The Barely Divine • The Jailer’s Ballad • The Desperate Plea • The Fractured Mind • The Fungal Bloom • The Shadowed Tome",
     "bullets": [
       "Distant Light",
       "The Keeper of the River",
@@ -158,7 +158,7 @@
   },
   {
     "name": "The Major Arcana",
-    "description": "These cards represent opaque and often confusing concepts, with very little concrete understanding - but they appear to those attempting to scale to the top of what ritualists are capable of:",
+    "description": "These cards represent opaque and often confusing concepts, with very little concrete understanding - but they appear to those attempting to scale to the top of what ritualists are capable of: • The Spread • The Weave • The Wellspring • The Silent Span • The Ouroboros • The Grand Choice",
     "bullets": [
       "The Spread",
       "The Weave",

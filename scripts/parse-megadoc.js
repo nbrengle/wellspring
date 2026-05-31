@@ -1841,7 +1841,10 @@ function parseCraftingConcepts() {
       const prose = subNodes.filter(m => m.type === 'text').map(m => m.text).join(' ');
       const tools = subNodes.filter(m => m.type === 'list').flatMap(m => m.items);
 
-      const concept = { name: n.text, discipline: disc, description: prose };
+      // Fold the list into the description so the detail pane reads complete (the
+      // list usually follows a "…the following:" colon). Keep `tools` for structure.
+      const description = tools.length ? `${prose} ${tools.map((t) => `• ${t}`).join(' ')}`.trim() : prose;
+      const concept = { name: n.text, discipline: disc, description };
       if (tools.length) concept.tools = tools;
       out.push(concept);
       i = cEnd;
@@ -1904,7 +1907,13 @@ function parseRitualConcepts() {
       }
     }
 
-    const concept = { name: n.text, description: prose };
+    // Fold the bullet list into the description so the detail pane reads complete
+    // (the list often follows a "…below:" colon). Keep `bullets` too for any
+    // structured use.
+    const fullDesc = bullets.length
+      ? `${prose} ${bullets.map((b) => `• ${b}`).join(' ')}`.trim()
+      : prose;
+    const concept = { name: n.text, description: fullDesc };
     if (bullets.length) concept.bullets = bullets;
     if (subConcepts.length) concept.subConcepts = subConcepts;
     out.push(concept);
