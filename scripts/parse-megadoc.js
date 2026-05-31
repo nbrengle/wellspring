@@ -778,7 +778,35 @@ function parsePerkFlawList(listH2Text, valueKey) {
   return results.filter(r => r.name && !PERK_HEADER.test(r.name));
 }
 
-write('perks.json', parsePerkFlawList('Perks List', 'cost'));
+// Some perks carry their authoritative rules in a DETAIL sub-section (an H4 whose
+// text matches the perk name) rather than the summary table cell — e.g. "Patron"
+// has a thin cell ("Gains a personal divine patron.") but an H4 "Patron" detail
+// paragraph states the real discount mechanic ("…costs 1 BP less … maximum of 10
+// BP in discounts … Strong Bloodline and Inheritance … cannot be discounted").
+// The linker parses consequences (grants/discounts) from the description, so fold
+// any such detail prose into the matching perk's description. Scoped to Character
+// Options H4s, matched by exact name, appended only when it adds new text.
+function enrichWithDetailSections(results) {
+  const byName = new Map(results.map(r => [r.name, r]));
+  for (let i = charOptionsH1 + 1; i < charOptionsEnd; i++) {
+    const n = nodes[i];
+    if (!(n.type === 'heading' && n.level === 4)) continue;
+    const target = byName.get(n.text.trim());
+    if (!target) continue;
+    const secEnd = nodes.findIndex((m, j) => j > i && m.type === 'heading' && m.level <= 4);
+    const prose = textBetween(i + 1, secEnd === -1 ? charOptionsEnd : secEnd).trim();
+    // Append only the parts not already in the (summary) description, so we don't
+    // duplicate the cell text the detail section may restate.
+    if (prose && !target.description.includes(prose)) {
+      target.description = target.description
+        ? `${target.description} ${prose}`.trim()
+        : prose;
+    }
+  }
+  return results;
+}
+
+write('perks.json', enrichWithDetailSections(parsePerkFlawList('Perks List', 'cost')));
 write('flaws.json', parsePerkFlawList('Flaws List', 'bp'));
 
 // ─── DEVOTIONS ────────────────────────────────────────────────────────────────

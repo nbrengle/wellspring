@@ -357,7 +357,7 @@ function parseGrants(text, grantLookups) {
 // rule: a discount on something already free becomes free BP (refundIfFree).
 //
 // Returns { amount, scope, cap, min, refundIfFree, exclusions } or null. Scope is
-// the structured target: { kind: 'prereq'|'category'|'firstN', value, n? }.
+// the structured target: { kind: 'giftEligible'|'prereq'|'category'|'firstN', value, n? }.
 function parseDiscounts(text, exclusionLookup) {
   if (!text) return null;
   // Must actually be a discount source (not just mention the word in flavor).
@@ -378,11 +378,21 @@ function parseDiscounts(text, exclusionLookup) {
 
   // Scope detection, most specific first.
   let scope = null;
+  // Patron-style opt-in: "Any Perk that doesn't have the <X> prerequisite that is
+  // going to be considered a gift from the <X>" — the player DESIGNATES which
+  // eligible perks become discounted gifts (not the Gifts themselves, which carry
+  // the prerequisite). Distinct from a fixed-category discount.
+  const giftM = text.match(/considered\s+a\s+gift\s+from\s+the\s+([A-Z][\w’'-]+)/i)
+    || text.match(/doesn[’']?t\s+have\s+the\s+([A-Z][\w’'-]+)\s+prerequisite/i);
   const prereqM = text.match(/with\s+the\s+([A-Z][\w’'-]+(?:\s+[A-Z][\w’'-]+){0,3})\s+prerequisite/i);
   const firstNM = text.match(/first\s+(\w+)\s+([A-Z][\w’'-]+)\s+skills?/i);
   const catM = text.match(/(?:on|any)\s+((?:[A-Z][\w’'-]+(?:,?\s+(?:and\s+|or\s+)?)?){1,4})\s+skills?/i);
   const WORD_NUM = { one: 1, two: 2, three: 3, four: 4, five: 5 };
-  if (prereqM) {
+  if (giftM) {
+    // value = the source perk whose gifts are eligible (Patron); target = any perk
+    // the player marks, except those carrying that prereq or listed as exclusions.
+    scope = { kind: "giftEligible", value: giftM[1].trim() };
+  } else if (prereqM) {
     scope = { kind: "prereq", value: prereqM[1].trim() };
   } else if (firstNM) {
     const n = WORD_NUM[firstNM[1].toLowerCase()] || parseInt(firstNM[1], 10) || null;
@@ -393,11 +403,12 @@ function parseDiscounts(text, exclusionLookup) {
   }
   if (!scope) return null;
 
-  // Exclusions: "X and Y cannot be discounted".
+  // Exclusions: "(The) X and Y (Perks) cannot be discounted".
   const exclusions = [];
-  const exM = text.match(/\b([A-Z][\w’'-]+(?:\s+[A-Z][\w’'-]+){0,3}(?:\s+and\s+[A-Z][\w’'-]+(?:\s+[A-Z][\w’'-]+){0,3})?)\s+(?:Perks?\s+)?cannot\s+be\s+discounted/i);
+  const exM = text.match(/\b((?:The\s+)?[A-Z][\w’'-]+(?:\s+[A-Z][\w’'-]+){0,3}(?:\s+and\s+[A-Z][\w’'-]+(?:\s+[A-Z][\w’'-]+){0,3})?)\s+(?:Perks?\s+)?cannot\s+be\s+discounted/i);
   if (exM) {
-    for (const nm of exM[1].split(/\band\b/i).map((s) => s.trim()).filter(Boolean)) {
+    for (let nm of exM[1].split(/\band\b/i).map((s) => s.trim()).filter(Boolean)) {
+      nm = nm.replace(/^The\s+/i, '').replace(/\s+Perks?$/i, '').trim();
       const { entity } = resolve(nm, exclusionLookup);
       if (entity) exclusions.push(entity.id);
     }

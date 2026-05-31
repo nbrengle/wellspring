@@ -465,6 +465,19 @@ function discountApplies(src, item, ent, pos) {
     const target = `perks:${src.scope.value}`;
     return !!pr && (pr.skills?.includes(target) || pr.other?.some((o) => new RegExp(src.scope.value, 'i').test(o)));
   }
+  if (src.scope.kind === 'giftEligible') {
+    // Patron: any PERK the player designates as a gift — i.e. any owned perk that
+    // does NOT already carry the source's prerequisite (those are the Gifts) and
+    // is not excluded. We apply greedily up to the cap (handled by applyDiscounts),
+    // which maximizes the legal benefit. Only perks qualify, never skills.
+    if (!ent || ent.id?.startsWith('skills:')) return false;
+    if (ent.id === `perks:${src.scope.value}`) return false; // not the Patron perk itself
+    const pr = REFS.prereqs?.[ent.id];
+    const target = `perks:${src.scope.value}`;
+    const carriesPrereq = !!pr && (pr.skills?.includes(target)
+      || pr.other?.some((o) => new RegExp(src.scope.value, 'i').test(o)));
+    return !carriesPrereq;
+  }
   return false;
 }
 

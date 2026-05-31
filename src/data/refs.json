@@ -552,9 +552,13 @@
       "classes:Crafter"
     ],
     "perks:Generous Soul": [
+      "terms:Life Points",
       "terms:Long Rest",
+      "rules-concepts:Sacrifice",
       "effects:Revive",
-      "accents:Divine"
+      "accents:Divine",
+      "domains:Energy",
+      "domains:Order"
     ],
     "perks:Greedy Soul": [
       "rituals:Attune"
@@ -569,13 +573,25 @@
       "effects:Mend"
     ],
     "perks:Mystic Smith": [
+      "rules-concepts:“Quick X” Count",
+      "perks:Mystic Armorer",
+      "terms:Focus",
+      "accents:Force",
+      "rules-concepts:Spikes",
       "effects:Mend"
     ],
     "perks:Master Mystic Smith": [
+      "perks:Mystic Smith",
       "effects:Mend",
-      "terms:Armor"
+      "terms:Armor",
+      "terms:Power"
     ],
     "perks:Soothing Touch": [
+      "rules-concepts:“Quick X” Count",
+      "flaws:Disquieting Aura",
+      "terms:Conditions",
+      "terms:Accent",
+      "effects:Root",
       "effects:Cure",
       "accents:Fear"
     ],
@@ -583,18 +599,29 @@
       "terms:Advantage"
     ],
     "perks:Bloody Minded": [
+      "conditions:Resistance",
+      "terms:Long Rest",
       "defenses:Resist",
       "effects:Charm"
     ],
     "perks:Carnal Creature": [
       "rules-concepts:“Slow X” Count",
-      "rules-concepts:Spirit Form"
+      "rules-concepts:Spirit Form",
+      "domains:Knowledge",
+      "creature-types:Spirit"
     ],
     "perks:Cold Dead Hands": [
+      "rules-concepts:“Quick X” Count",
+      "effects:Disable",
+      "effects:Disarm",
+      "rules-concepts:Duration",
+      "terms:Count",
       "terms:Dying",
       "conditions:Slept"
     ],
     "perks:Deathgrip": [
+      "flaws:Dies Alone",
+      "terms:Conditions",
       "terms:Dying"
     ],
     "perks:Elemental Affinity": [
@@ -604,10 +631,12 @@
     ],
     "perks:Hard to Kill": [
       "rules-concepts:“Slow X” Count",
+      "terms:Life Points",
       "terms:Dying"
     ],
     "perks:Holding On": [
-      "rules-concepts:Deathblows"
+      "rules-concepts:Deathblows",
+      "terms:Dying"
     ],
     "perks:Iron Stomach": [
       "terms:Long Rest",
@@ -617,123 +646,286 @@
     "perks:Quick Healing": [
       "terms:Life Points",
       "terms:Short Rest",
+      "creature-types:Living",
+      "creature-types:Undead",
       "effects:Heal"
     ],
     "perks:Toughness": [
       "terms:Life Points"
     ],
     "perks:Unkillable": [
+      "terms:Death-count",
       "terms:Life Points",
+      "perks:Holding On",
       "effects:Stabilize",
       "terms:Long Rest",
+      "rules-concepts:Deathblows",
       "terms:Dying"
     ],
     "perks:Will to Live": [
+      "terms:Incantation",
+      "terms:Life Points",
+      "terms:Delivery",
+      "rules-concepts:Duration",
+      "terms:Refresh",
+      "terms:Accent",
+      "accents:Shadow",
+      "terms:Dying",
       "effects:Death",
-      "modifiers:Final"
+      "modifiers:Final",
+      "terms:Perk",
+      "modifiers:Self"
     ],
-    "perks:Patron": [],
+    "perks:Patron": [
+      "perks:Strong Bloodline",
+      "perks:Inheritance",
+      "accents:Divine",
+      "terms:Perk"
+    ],
     "perks:Gift of Hateful Retribution": [
-      "rules-concepts:Deathblows"
+      "rules-concepts:Character Creation",
+      "rules-concepts:Deathblows",
+      "perks:Patron",
+      "terms:Accent",
+      "accents:Divine",
+      "terms:Perk",
+      "domains:War"
     ],
     "perks:Gift of Healing": [
-      "terms:Life Points"
-    ],
-    "perks:Gift of Rebirth": [
-      "effects:Revive"
-    ],
-    "perks:Gift of Recognition": [
-      "perks:Patron"
-    ],
-    "perks:Gift of Unbreakable Flesh": [
-      "rules-concepts:Natural Armor",
-      "perks:Patron"
-    ],
-    "perks:Ultimate Gift": [
-      "effects:Revive",
+      "rules-concepts:“Quick X” Count",
+      "terms:Life Points",
+      "perks:Patron",
+      "terms:Focus",
       "effects:Heal"
     ],
-    "perks:Ancestral Relic": [],
-    "perks:Ancestral Weapon": [],
+    "perks:Gift of Rebirth": [
+      "terms:Life Points",
+      "rules-concepts:Spirit Form",
+      "perks:Patron",
+      "effects:Revive",
+      "terms:Dying",
+      "accents:Agony"
+    ],
+    "perks:Gift of Recognition": [
+      "effects:Discern",
+      "perks:Patron",
+      "accents:Mind"
+    ],
+    "perks:Gift of Unbreakable Flesh": [
+      "rules-concepts:Character Creation",
+      "rules-concepts:Natural Armor",
+      "terms:Build Points",
+      "rules-concepts:Armor Points",
+      "perks:Patron",
+      "effects:Heal",
+      "effects:Mend",
+      "accents:Divine",
+      "powers:Sources",
+      "terms:Perk"
+    ],
+    "perks:Ultimate Gift": [
+      "rules-concepts:Short",
+      "conditions:Insubstantial",
+      "rules-concepts:Spirit Form",
+      "perks:Patron",
+      "effects:Revive",
+      "creature-types:Spirit",
+      "effects:Grant",
+      "effects:Heal"
+    ],
+    "perks:Ancestral Relic": [
+      "perks:Cold Dead Hands",
+      "perks:Patron",
+      "powers:Treat",
+      "terms:Perk"
+    ],
+    "perks:Ancestral Weapon": [
+      "perks:Cold Dead Hands",
+      "perks:Ancestral Relic",
+      "terms:Life Points",
+      "terms:Long Rest",
+      "effects:Disable",
+      "effects:Shatter",
+      "defenses:Resist",
+      "terms:Dying",
+      "powers:Treat",
+      "terms:Perk"
+    ],
     "perks:Bits and Pieces": [
       "terms:Long Rest",
-      "skills:Lore"
+      "skills:Lore",
+      "rules-concepts:Blue"
     ],
     "perks:Boon Bonds": [
       "terms:Long Rest",
       "skills:Diagnose",
+      "powers:Share",
+      "terms:Perk",
       "effects:Cure"
     ],
     "perks:Contact": [
+      "rules-concepts:Wealth",
       "skills:Lore"
     ],
-    "perks:Connections": [],
-    "perks:Draconic Heritage": [
-      "terms:Advantage"
+    "perks:Connections": [
+      "terms:Perk"
     ],
-    "perks:Famous": [],
+    "perks:Draconic Heritage": [
+      "rules-concepts:Character Creation",
+      "domains:Expression",
+      "terms:Advantage",
+      "terms:Short Rest",
+      "conditions:Resistance",
+      "terms:Long Rest",
+      "terms:Qualifier",
+      "accents:Lightning",
+      "defenses:Counter",
+      "terms:Packet",
+      "defenses:Protect",
+      "terms:Accent",
+      "terms:Power",
+      "defenses:Resist",
+      "accents:Flame",
+      "terms:Perk",
+      "accents:Acid",
+      "accents:Void",
+      "accents:Ice"
+    ],
+    "perks:Famous": [
+      "terms:Power Phrases",
+      "perks:Minor Fame",
+      "domains:Knowledge"
+    ],
     "perks:Heartbond": [
       "terms:Perk"
     ],
     "perks:Income": [
-      "rules-concepts:Wealth"
+      "rules-concepts:Wealth",
+      "perks:Title",
+      "terms:Perk"
     ],
     "perks:Inheritance": [
-      "rules-concepts:Wealth"
+      "perks:Patron",
+      "rules-concepts:Wealth",
+      "terms:Perk"
     ],
-    "perks:Manse": [],
+    "perks:Manse": [
+      "resources:Rare Minerals",
+      "resources:Night Prizes",
+      "resources:Harvest",
+      "rules-concepts:Wealth",
+      "resources:Bloom",
+      "resources:Ingots",
+      "resources:Hide"
+    ],
     "perks:Minor Fame": [
-      "perks:Famous"
+      "domains:Knowledge",
+      "perks:Famous",
+      "accents:Flame",
+      "terms:Perk"
     ],
-    "perks:Title": [],
+    "perks:Title": [
+      "perks:Connections",
+      "perks:Famous",
+      "perks:Income",
+      "perks:Manse",
+      "terms:Perk"
+    ],
     "perks:Sharp Mind": [
       "skills:Library Use",
       "skills:Lore"
     ],
     "perks:Strong Bloodline": [
+      "terms:Build Points",
       "terms:Advantage",
-      "terms:Lineage"
+      "terms:Lineage",
+      "perks:Patron"
     ],
     "perks:Fortunate Finder": [
-      "terms:Long Rest",
       "skills:Scavenge I",
-      "skills:Forage I"
+      "terms:Long Rest",
+      "skills:Forage I",
+      "terms:Perk"
     ],
     "perks:Insight": [
-      "terms:Long Rest"
+      "terms:Incantation",
+      "terms:Short Rest",
+      "terms:Long Rest",
+      "rules-concepts:Devotions & Divine Beings",
+      "terms:Marshal",
+      "domains:Light",
+      "terms:Perk"
     ],
     "perks:Medium": [
-      "creature-types:Spirit"
+      "terms:Life Points",
+      "domains:Knowledge",
+      "rules-concepts:Sacrifice",
+      "perks:Contact",
+      "effects:Discern",
+      "creature-types:Spirit",
+      "modifiers:Subtle",
+      "powers:Share",
+      "accents:Mind"
     ],
-    "perks:Othersleep": [],
-    "perks:Sight": [],
+    "perks:Othersleep": [
+      "rules-concepts:Out-of-Game",
+      "rules-concepts:White Halo",
+      "effects:Sleep",
+      "perks:Sight",
+      "terms:Perk"
+    ],
+    "perks:Sight": [
+      "rules-concepts:White Halo",
+      "rules-concepts:Red"
+    ],
     "perks:Sight Beyond Sight": [
-      "perks:Insight"
+      "rules-concepts:White Halo",
+      "perks:Insight",
+      "perks:Sight",
+      "rules-concepts:Red"
     ],
     "perks:Sensitive": [
-      "perks:Insight"
+      "perks:Sight Beyond Sight",
+      "perks:Insight",
+      "modifiers:Subtle"
     ],
-    "perks:Soothsayer": [],
+    "perks:Soothsayer": [
+      "crafting-concepts:Drawing",
+      "effects:Sleep"
+    ],
     "perks:Strong Spirit": [
+      "rules-concepts:“Slow X” Count",
+      "perks:Contact",
       "creature-types:Spirit"
     ],
     "perks:Hearth": [
-      "terms:Perk"
+      "terms:Long Rest",
+      "effects:Sleep",
+      "creature-types:Living",
+      "terms:Perk",
+      "domains:Order"
     ],
     "perks:Arcane Hearth": [
+      "perks:Consecrated Hearth",
+      "crafting-concepts:Drawing",
+      "skills:Basic Arcane",
+      "perks:Hearth",
+      "domains:Energy"
+    ],
+    "perks:Bolt Hole": [
+      "rules-concepts:“Slow X” Count",
+      "conditions:Insubstantial",
+      "terms:Long Rest",
+      "perks:Hearth",
+      "effects:Dispel"
+    ],
+    "perks:Consecrated Hearth": [
       "skills:Basic Arcane",
       "perks:Hearth"
     ],
-    "perks:Bolt Hole": [
-      "conditions:Insubstantial",
-      "terms:Long Rest",
-      "perks:Hearth"
-    ],
-    "perks:Consecrated Hearth": [
-      "perks:Hearth"
-    ],
     "perks:Expanded Hearth": [
-      "perks:Hearth"
+      "perks:Hearth",
+      "effects:Sleep"
     ],
     "perks:Arcane/Divine Orchestra": [
       "perks:Hearth"
@@ -742,25 +934,38 @@
       "terms:Short Rest",
       "defenses:Protect",
       "perks:Hearth",
+      "effects:Grant",
+      "domains:Peace",
       "accents:Fear"
     ],
     "perks:Protected Hearth": [
+      "rules-concepts:“Quick X” Count",
+      "terms:Focus",
+      "terms:Refresh",
       "perks:Hearth",
       "rules-concepts:Spikes"
     ],
     "perks:Restful Home": [
+      "terms:Short Rest",
+      "terms:Conditions",
       "terms:Long Rest",
       "effects:Taint",
       "powers:Rest",
       "perks:Hearth"
     ],
     "perks:Lucent Hearth": [
+      "perks:Consecrated Hearth",
       "rules-concepts:Dark Territory",
+      "creature-types:Construct",
+      "rules-concepts:Devotions & Divine Beings",
       "perks:Hearth"
     ],
     "perks:Experimental Hearth": [
       "rules-concepts:Dark Territory",
-      "perks:Hearth"
+      "perks:Arcane Hearth",
+      "creature-types:Construct",
+      "perks:Hearth",
+      "domains:Light"
     ],
     "flaws:Honor Debt": [],
     "flaws:Indoor Discomfort": [
@@ -10008,6 +10213,7 @@
       "skills:Advanced Recharge",
       "skills:Lore",
       "perks:Arcane Hearth",
+      "perks:Consecrated Hearth",
       "terms:Sphere",
       "ritual-concepts:Implements: Magical",
       "powers:Waste Not",
@@ -10447,9 +10653,12 @@
       "advantages:Aewen - Mystic Resilience"
     ],
     "perks:Mystic Armorer": [
+      "perks:Mystic Smith",
       "advantages:Underkin - Iron Touch"
     ],
-    "perks:Mystic Smith": [],
+    "perks:Mystic Smith": [
+      "perks:Master Mystic Smith"
+    ],
     "perks:Master Mystic Smith": [],
     "perks:Soothing Touch": [
       "classes:Artisan",
@@ -10467,6 +10676,8 @@
       "archetypes:Skirmisher Rogue"
     ],
     "perks:Cold Dead Hands": [
+      "perks:Ancestral Relic",
+      "perks:Ancestral Weapon",
       "advantages:Forged - Resilient Auxiliary Systems"
     ],
     "perks:Deathgrip": [
@@ -10482,6 +10693,7 @@
       "powers:Execute"
     ],
     "perks:Holding On": [
+      "perks:Unkillable",
       "advantages:Human - Won’t Stay Dead",
       "powers:Throat Slit",
       "archetypes:Defensive Sword + Shield Fighter",
@@ -10501,8 +10713,15 @@
       "archetypes:Defensive Sword + Shield Fighter"
     ],
     "perks:Patron": [
+      "perks:Gift of Hateful Retribution",
+      "perks:Gift of Healing",
+      "perks:Gift of Rebirth",
       "perks:Gift of Recognition",
       "perks:Gift of Unbreakable Flesh",
+      "perks:Ultimate Gift",
+      "perks:Ancestral Relic",
+      "perks:Inheritance",
+      "perks:Strong Bloodline",
       "devotions:The Song in Iron",
       "devotions:The Witch of Webs",
       "devotions:Devourer",
@@ -10525,6 +10744,7 @@
     "perks:Gift of Unbreakable Flesh": [],
     "perks:Ultimate Gift": [],
     "perks:Ancestral Relic": [
+      "perks:Ancestral Weapon",
       "advantages:Human - Heirloom",
       "archetypes:Great Weapon Fighter"
     ],
@@ -10539,6 +10759,8 @@
     ],
     "perks:Contact": [
       "skills:Hustle",
+      "perks:Medium",
+      "perks:Strong Spirit",
       "flaws:Mild Allergy",
       "flaws:Severe Allergy",
       "powers:Orderly Conduct",
@@ -10558,6 +10780,7 @@
     ],
     "perks:Connections": [
       "skills:Lore",
+      "perks:Title",
       "devotions:Druidism",
       "devotions:Devourer",
       "devotions:The Librarian",
@@ -10573,35 +10796,44 @@
     ],
     "perks:Draconic Heritage": [],
     "perks:Famous": [
-      "perks:Minor Fame"
+      "perks:Minor Fame",
+      "perks:Title"
     ],
     "perks:Heartbond": [],
     "perks:Income": [
       "skills:Profession - Apprentice",
       "skills:Profession - Journeyman",
       "skills:Profession - Master",
+      "perks:Title",
       "defenses:Altered",
       "defenses:No Effect",
       "powers:Tax Evasion",
       "archetypes:Support Socialite"
     ],
-    "perks:Inheritance": [],
+    "perks:Inheritance": [
+      "perks:Patron"
+    ],
     "perks:Manse": [
+      "perks:Title",
       "powers:Tax Evasion",
       "archetypes:Support Socialite"
     ],
     "perks:Minor Fame": [
+      "perks:Famous",
       "powers:Renowned Soldier",
       "classes:Socialite"
     ],
     "perks:Title": [
       "skills:Lore",
+      "perks:Income",
       "classes:Socialite"
     ],
     "perks:Sharp Mind": [
       "archetypes:Utility Mage"
     ],
-    "perks:Strong Bloodline": [],
+    "perks:Strong Bloodline": [
+      "perks:Patron"
+    ],
     "perks:Fortunate Finder": [
       "powers:Expert Craft",
       "archetypes:Artificer Artisan",
@@ -10624,6 +10856,8 @@
     ],
     "perks:Othersleep": [],
     "perks:Sight": [
+      "perks:Othersleep",
+      "perks:Sight Beyond Sight",
       "devotions:The Witch of Webs",
       "challenges:Forged - Imprinted",
       "challenges:Human - Squeamish",
@@ -10632,7 +10866,9 @@
       "rituals:Ritual Trap",
       "archetypes:Utility Mage"
     ],
-    "perks:Sight Beyond Sight": [],
+    "perks:Sight Beyond Sight": [
+      "perks:Sensitive"
+    ],
     "perks:Sensitive": [
       "crafting-concepts:Drawing",
       "challenges:Underkin - Sensitive Eyes",
@@ -10660,11 +10896,16 @@
       "rituals:Bless Food",
       "archetypes:Crafter Artisan"
     ],
-    "perks:Arcane Hearth": [],
+    "perks:Arcane Hearth": [
+      "perks:Experimental Hearth"
+    ],
     "perks:Bolt Hole": [
       "advantages:Underkin - Cavern Fortress"
     ],
-    "perks:Consecrated Hearth": [],
+    "perks:Consecrated Hearth": [
+      "perks:Arcane Hearth",
+      "perks:Lucent Hearth"
+    ],
     "perks:Expanded Hearth": [
       "advantages:Underkin - Cavern Fortress"
     ],
@@ -10694,7 +10935,9 @@
     "flaws:Fragile Bones": [
       "challenges:Aewen - Like Attracts Like"
     ],
-    "flaws:Dies Alone": [],
+    "flaws:Dies Alone": [
+      "perks:Deathgrip"
+    ],
     "flaws:Divine Vulnerability": [
       "challenges:Ogrim - Divine Distrust"
     ],
@@ -10703,7 +10946,9 @@
     ],
     "flaws:Severe Allergy": [],
     "flaws:Shunned Soul": [],
-    "flaws:Disquieting Aura": [],
+    "flaws:Disquieting Aura": [
+      "perks:Soothing Touch"
+    ],
     "flaws:Torn Soul": [
       "challenges:Forged - Hybrid Physiology",
       "challenges:Human - Haggard"
@@ -10728,6 +10973,10 @@
       "skills:Chronic Hobbyist",
       "skills:Profession - Journeyman",
       "skills:Profession - Master",
+      "perks:Soothing Touch",
+      "perks:Will to Live",
+      "perks:Gift of Hateful Retribution",
+      "perks:Draconic Heritage",
       "flaws:Fragile Bones",
       "flaws:Divine Vulnerability",
       "terms:Power",
@@ -10935,6 +11184,8 @@
     ],
     "terms:Build Points": [
       "skills:Mastercrafter",
+      "perks:Gift of Unbreakable Flesh",
+      "perks:Strong Bloodline",
       "terms:Challenge",
       "terms:Flaw",
       "terms:Lineage",
@@ -11027,6 +11278,9 @@
     ],
     "terms:Casting Class": [],
     "terms:Conditions": [
+      "perks:Soothing Touch",
+      "perks:Deathgrip",
+      "perks:Restful Home",
       "flaws:Disquieting Aura",
       "terms:Effects",
       "effects:Berserk",
@@ -11094,6 +11348,7 @@
     ],
     "terms:Count": [
       "skills:Spell Storing",
+      "perks:Cold Dead Hands",
       "powers:Apt Assistant",
       "powers:Analysis",
       "powers:Combat Analysis",
@@ -11124,11 +11379,13 @@
     "terms:Dead": [],
     "terms:Death-count": [
       "skills:Basic Medicine",
+      "perks:Unkillable",
       "terms:Dying",
       "effects:Stabilize",
       "advantages:Forged - Automatic Repair System"
     ],
     "terms:Delivery": [
+      "perks:Will to Live",
       "terms:Power",
       "effects:Expose",
       "effects:Grant",
@@ -11164,7 +11421,11 @@
       "perks:Cold Dead Hands",
       "perks:Deathgrip",
       "perks:Hard to Kill",
+      "perks:Holding On",
       "perks:Unkillable",
+      "perks:Will to Live",
+      "perks:Gift of Rebirth",
+      "perks:Ancestral Weapon",
       "flaws:Dies Alone",
       "terms:Life Points",
       "effects:Stabilize",
@@ -11229,6 +11490,9 @@
     "terms:Focus": [
       "skills:Projectile Weapons",
       "skills:Spell Storing",
+      "perks:Mystic Smith",
+      "perks:Gift of Healing",
+      "perks:Protected Hearth",
       "powers:Emotional Attunement",
       "powers:Perspicacity",
       "powers:Acid Soak",
@@ -11324,6 +11588,8 @@
     "terms:Incantation": [
       "skills:Bookcaster",
       "skills:Spell Storing",
+      "perks:Will to Live",
+      "perks:Insight",
       "terms:Call",
       "terms:Focus",
       "terms:Power",
@@ -11371,10 +11637,16 @@
       "rules-concepts:Incanting"
     ],
     "terms:Life Points": [
+      "perks:Generous Soul",
+      "perks:Hard to Kill",
       "perks:Quick Healing",
       "perks:Toughness",
       "perks:Unkillable",
+      "perks:Will to Live",
       "perks:Gift of Healing",
+      "perks:Gift of Rebirth",
+      "perks:Ancestral Weapon",
+      "perks:Medium",
       "terms:Armor",
       "terms:Death-count",
       "terms:Dying",
@@ -11490,12 +11762,16 @@
       "skills:Advanced Traps",
       "skills:Prospect I",
       "perks:Generous Soul",
+      "perks:Bloody Minded",
       "perks:Iron Stomach",
       "perks:Unkillable",
+      "perks:Ancestral Weapon",
       "perks:Bits and Pieces",
       "perks:Boon Bonds",
+      "perks:Draconic Heritage",
       "perks:Fortunate Finder",
       "perks:Insight",
+      "perks:Hearth",
       "perks:Bolt Hole",
       "perks:Restful Home",
       "terms:Dawn",
@@ -11666,6 +11942,7 @@
     ],
     "terms:Marshal": [
       "skills:Lore",
+      "perks:Insight",
       "conditions:Flying",
       "ritual-concepts:Primary Ritualist",
       "ritual-concepts:How to Request a Marshal",
@@ -11697,6 +11974,7 @@
       "skills:Warcaster",
       "skills:Spell Storing",
       "perks:Magical Resilience",
+      "perks:Draconic Heritage",
       "terms:Delivery",
       "terms:Materia",
       "conditions:Drained",
@@ -11739,7 +12017,23 @@
       "rules-concepts:Incanting"
     ],
     "terms:Perk": [
+      "perks:Will to Live",
+      "perks:Patron",
+      "perks:Gift of Hateful Retribution",
+      "perks:Gift of Unbreakable Flesh",
+      "perks:Ancestral Relic",
+      "perks:Ancestral Weapon",
+      "perks:Boon Bonds",
+      "perks:Connections",
+      "perks:Draconic Heritage",
       "perks:Heartbond",
+      "perks:Income",
+      "perks:Inheritance",
+      "perks:Minor Fame",
+      "perks:Title",
+      "perks:Fortunate Finder",
+      "perks:Insight",
+      "perks:Othersleep",
       "perks:Hearth",
       "terms:Advantage",
       "terms:Build Points",
@@ -11805,6 +12099,8 @@
       "skills:Worship",
       "skills:Divine Favor",
       "skills:Divine Focus",
+      "perks:Master Mystic Smith",
+      "perks:Draconic Heritage",
       "flaws:Indoor Discomfort",
       "flaws:Outdoor Discomfort",
       "terms:Armor",
@@ -12009,6 +12305,7 @@
       "rules-concepts:Wealth"
     ],
     "terms:Power Phrases": [
+      "perks:Famous",
       "rules-concepts:Clarify",
       "rules-concepts:Table of Contents"
     ],
@@ -12060,6 +12357,7 @@
       "rules-concepts:Armor Points"
     ],
     "terms:Qualifier": [
+      "perks:Draconic Heritage",
       "terms:Dying",
       "terms:Helpless",
       "effects:Expose",
@@ -12079,6 +12377,8 @@
       "skills:Shield Expertise",
       "skills:Axecraft",
       "skills:Concurrent Meditation",
+      "perks:Will to Live",
+      "perks:Protected Hearth",
       "terms:Long Rest",
       "terms:Power",
       "effects:Rebuild",
@@ -12169,7 +12469,10 @@
       "skills:Advanced Medicine",
       "perks:Magical Resilience",
       "perks:Quick Healing",
+      "perks:Draconic Heritage",
+      "perks:Insight",
       "perks:Peaceful Hearth",
+      "perks:Restful Home",
       "flaws:Shunned Soul",
       "terms:Refresh",
       "effects:Imbue",
@@ -12663,6 +12966,8 @@
     "effects:Disable": [
       "skills:Great Weapons",
       "skills:Basic Traps",
+      "perks:Cold Dead Hands",
+      "perks:Ancestral Weapon",
       "conditions:Disabled",
       "powers:Poetry in Motion",
       "advantages:Chimera - Shifting Form",
@@ -12685,6 +12990,7 @@
       "skills:Polearmcraft",
       "skills:Basic Traps",
       "skills:Advanced Traps",
+      "perks:Cold Dead Hands",
       "powers:Orderly Conduct",
       "powers:Shield Bearer",
       "powers:Burn",
@@ -12704,6 +13010,8 @@
       "skills:Profession - Journeyman",
       "skills:Profession - Master",
       "skills:Advanced Traps",
+      "perks:Gift of Recognition",
+      "perks:Medium",
       "conditions:Obfuscated",
       "powers:Disruption",
       "powers:Emotional Attunement",
@@ -12740,6 +13048,7 @@
       "powers:Whispers of the Unseen"
     ],
     "effects:Dispel": [
+      "perks:Bolt Hole",
       "conditions:Insubstantial",
       "powers:Bring Light to the Shadows",
       "powers:Magekey",
@@ -12809,6 +13118,8 @@
       "rules-concepts:“By My Voice” Delivery"
     ],
     "effects:Grant": [
+      "perks:Ultimate Gift",
+      "perks:Peaceful Hearth",
       "terms:Effects",
       "effects:Dispel",
       "conditions:Immunity",
@@ -12979,6 +13290,8 @@
       "skills:Peacecaster",
       "skills:Advanced Peacecasting",
       "perks:Quick Healing",
+      "perks:Gift of Healing",
+      "perks:Gift of Unbreakable Flesh",
       "perks:Ultimate Gift",
       "flaws:Torn Soul",
       "terms:Armor",
@@ -13084,6 +13397,7 @@
       "perks:Mystic Armorer",
       "perks:Mystic Smith",
       "perks:Master Mystic Smith",
+      "perks:Gift of Unbreakable Flesh",
       "effects:Heal",
       "effects:Shatter",
       "crafting-concepts:Summoned Armor Repair",
@@ -13238,6 +13552,7 @@
       "recipes:Lifestrike Sunshine"
     ],
     "effects:Root": [
+      "perks:Soothing Touch",
       "creature-types:Plant",
       "powers:Poetry in Motion",
       "challenges:Lost - Ragdoll",
@@ -13264,6 +13579,7 @@
       "skills:Bowcraft",
       "skills:Denting Blows",
       "skills:Shattering Toss",
+      "perks:Ancestral Weapon",
       "effects:Mend",
       "effects:Rebuild",
       "powers:Dissolve",
@@ -13325,6 +13641,10 @@
       "recipes:Enchant Glowstone"
     ],
     "effects:Sleep": [
+      "perks:Othersleep",
+      "perks:Soothsayer",
+      "perks:Hearth",
+      "perks:Expanded Hearth",
       "terms:Effects",
       "creature-types:Living",
       "defenses:Protect",
@@ -13465,6 +13785,7 @@
     "conditions:Imprisoned": [],
     "conditions:Intoxicated": [],
     "conditions:Insubstantial": [
+      "perks:Ultimate Gift",
       "perks:Bolt Hole",
       "creature-types:Spirit",
       "powers:Bring Light to the Shadows",
@@ -13509,7 +13830,9 @@
       "powers:Calming Tone"
     ],
     "conditions:Resistance": [
+      "perks:Bloody Minded",
       "perks:Elemental Affinity",
+      "perks:Draconic Heritage",
       "defenses:Resist",
       "powers:Energistic Adaptation",
       "powers:Non-Aggression Pact",
@@ -13584,6 +13907,8 @@
     ],
     "creature-types:Construct": [
       "skills:Lore",
+      "perks:Lucent Hearth",
+      "perks:Experimental Hearth",
       "resources:Enchanted Hyperium",
       "advantages:Forged - Automatic Repair System",
       "advantages:Forged - Resilient Auxiliary Systems",
@@ -13608,6 +13933,8 @@
     ],
     "creature-types:Living": [
       "skills:Basic Medicine",
+      "perks:Quick Healing",
+      "perks:Hearth",
       "effects:Shatter",
       "creature-types:Animal",
       "creature-types:Plant",
@@ -13651,6 +13978,8 @@
       "rules-concepts:Incanting"
     ],
     "creature-types:Spirit": [
+      "perks:Carnal Creature",
+      "perks:Ultimate Gift",
       "perks:Medium",
       "perks:Strong Spirit",
       "terms:Dead",
@@ -13687,6 +14016,7 @@
       "rules-concepts:Resurrection"
     ],
     "creature-types:Undead": [
+      "perks:Quick Healing",
       "terms:Qualifier",
       "effects:Revive",
       "effects:Shatter",
@@ -13713,6 +14043,7 @@
       "skills:Forage I",
       "skills:Forage II",
       "skills:Forage III",
+      "perks:Manse",
       "devotions:The Divine Bloom",
       "advantages:Oaksworn - Natural Knowledge",
       "powers:Hunter Gatherer",
@@ -13776,6 +14107,7 @@
     "resources:Hide": [
       "skills:Bookcaster",
       "skills:Scavenge I",
+      "perks:Manse",
       "terms:Armor",
       "effects:Expose",
       "powers:Pulse of Light",
@@ -13843,6 +14175,7 @@
     ],
     "resources:Ingots": [
       "skills:Prospect I",
+      "perks:Manse",
       "powers:Waste Not",
       "challenges:Underkin - Mineral Nourishment",
       "powers:Jury Rig",
@@ -13914,6 +14247,7 @@
       "skills:Forage I",
       "skills:Forage II",
       "skills:Forage III",
+      "perks:Manse",
       "powers:Waste Not",
       "challenges:Human - Leaky Bucket",
       "advantages:Oaksworn - Natural Knowledge",
@@ -13962,6 +14296,7 @@
     ],
     "resources:Harvest": [
       "skills:Scavenge I",
+      "perks:Manse",
       "powers:Forgesource Specialist",
       "powers:Exploding Arrows",
       "powers:Smuggler’s Powdercase",
@@ -14013,6 +14348,7 @@
       "skills:Prospect I",
       "skills:Prospect II",
       "skills:Prospect III",
+      "perks:Manse",
       "powers:Waste Not",
       "challenges:Underkin - Mineral Nourishment",
       "powers:Forgesource Specialist",
@@ -14100,6 +14436,7 @@
     ],
     "accents:Agony": [
       "skills:Thrown Weaponcraft",
+      "perks:Gift of Rebirth",
       "advantages:Ogrim - Used to It",
       "powers:Mechanical Augmentation",
       "powers:Ambush",
@@ -14110,6 +14447,7 @@
       "recipes:Agony Elixir"
     ],
     "accents:Acid": [
+      "perks:Draconic Heritage",
       "devotions:The Song in Iron",
       "advantages:Aewen - Arcane Aptitude",
       "advantages:Human - Psionic Cantrip",
@@ -14155,6 +14493,9 @@
       "skills:Lore",
       "skills:Research",
       "perks:Generous Soul",
+      "perks:Patron",
+      "perks:Gift of Hateful Retribution",
+      "perks:Gift of Unbreakable Flesh",
       "flaws:Divine Vulnerability",
       "terms:Sphere",
       "powers:Disruption",
@@ -14245,6 +14586,8 @@
       "recipes:Euphoria"
     ],
     "accents:Flame": [
+      "perks:Draconic Heritage",
+      "perks:Minor Fame",
       "terms:Accent",
       "terms:Qualifier",
       "effects:Imbue",
@@ -14314,6 +14657,7 @@
       "skills:Denting Blows",
       "skills:Holding Back the Tide",
       "skills:Shattering Toss",
+      "perks:Mystic Smith",
       "flaws:Fragile Bones",
       "crafting-concepts:Measuring Time & Chants",
       "powers:Dissolve",
@@ -14355,6 +14699,7 @@
       "powers:Restful Prison"
     ],
     "accents:Ice": [
+      "perks:Draconic Heritage",
       "conditions:Immunity",
       "advantages:Aewen - Arcane Aptitude",
       "advantages:Human - Psionic Cantrip",
@@ -14404,6 +14749,7 @@
       "rules-concepts:Devotions & Divine Beings"
     ],
     "accents:Lightning": [
+      "perks:Draconic Heritage",
       "powers:Disruption",
       "advantages:Aewen - Arcane Aptitude",
       "advantages:Forged - Self Destruct",
@@ -14432,6 +14778,8 @@
       "skills:Chronic Hobbyist",
       "skills:Profession - Journeyman",
       "skills:Profession - Master",
+      "perks:Gift of Recognition",
+      "perks:Medium",
       "powers:Emotional Attunement",
       "challenges:Forged - Backdoor Vulnerability",
       "advantages:Human - Telepathy",
@@ -14548,6 +14896,7 @@
     ],
     "accents:Shadow": [
       "skills:Lore",
+      "perks:Will to Live",
       "terms:Accent",
       "powers:Divine Substitution",
       "classes:Rogue",
@@ -14558,6 +14907,7 @@
       "rules-concepts:Devotions & Divine Beings"
     ],
     "accents:Void": [
+      "perks:Draconic Heritage",
       "creature-types:Voidborn",
       "challenges:Aewen - Elemental Expression",
       "advantages:Human - Ward Against the Void",
@@ -14581,6 +14931,7 @@
       "skills:Polearmcraft",
       "perks:Magical Resilience",
       "perks:Iron Stomach",
+      "perks:Draconic Heritage",
       "terms:Prevented",
       "defenses:Protect",
       "modifiers:Final",
@@ -14636,6 +14987,7 @@
       "rituals:Bless Food"
     ],
     "defenses:Protect": [
+      "perks:Draconic Heritage",
       "perks:Peaceful Hearth",
       "effects:Grant",
       "modifiers:Final",
@@ -14684,6 +15036,8 @@
     ],
     "defenses:Resist": [
       "perks:Bloody Minded",
+      "perks:Ancestral Weapon",
+      "perks:Draconic Heritage",
       "terms:Prevented",
       "conditions:Resistance",
       "modifiers:Final",
@@ -14768,6 +15122,7 @@
     ],
     "modifiers:Obvious": [],
     "modifiers:Self": [
+      "perks:Will to Live",
       "powers:Overflowing Energy",
       "powers:Energistic Adaptation",
       "powers:Poetry in Motion",
@@ -14967,6 +15322,8 @@
       "skills:Profession - Journeyman",
       "skills:Profession - Master",
       "skills:Advanced Traps",
+      "perks:Medium",
+      "perks:Sensitive",
       "effects:Discern",
       "powers:Emotional Attunement",
       "powers:Mind Wipe",
@@ -15056,6 +15413,8 @@
     ],
     "crafting-concepts:Drawing": [
       "skills:Prospect I",
+      "perks:Soothsayer",
+      "perks:Arcane Hearth",
       "powers:Divine Performance",
       "powers:Commune with Nature",
       "powers:Life Tap",
@@ -15306,6 +15665,8 @@
     ],
     "powers:Pyrrhic Strike": [],
     "domains:Energy": [
+      "perks:Generous Soul",
+      "perks:Arcane Hearth",
       "creature-types:Exalted",
       "resources:Golden Blossom",
       "accents:Divine",
@@ -15376,6 +15737,7 @@
     "powers:Overflowing Energy": [],
     "powers:Energistic Adaptation": [],
     "domains:Expression": [
+      "perks:Draconic Heritage",
       "accents:Divine",
       "powers:Divine Performance",
       "powers:Divine Substitution",
@@ -15389,6 +15751,8 @@
       "archetypes:Balanced Cleric"
     ],
     "domains:Light": [
+      "perks:Insight",
+      "perks:Experimental Hearth",
       "accents:Radiant",
       "crafting-concepts:Measuring Time & Chants",
       "powers:No Stone Unturned",
@@ -15435,6 +15799,10 @@
       "skills:Profession - Apprentice",
       "skills:Profession - Journeyman",
       "skills:Profession - Master",
+      "perks:Carnal Creature",
+      "perks:Famous",
+      "perks:Minor Fame",
+      "perks:Medium",
       "terms:Marshal",
       "ritual-concepts:Gems: Mental",
       "powers:Well Read",
@@ -15505,6 +15873,8 @@
     "domains:Order": [
       "skills:Forage I",
       "skills:Prospect I",
+      "perks:Generous Soul",
+      "perks:Hearth",
       "terms:Incantation",
       "crafting-concepts:Measuring Time & Chants",
       "ritual-concepts:Ritual Point Options",
@@ -15547,6 +15917,7 @@
     ],
     "powers:Orderly Conduct": [],
     "domains:Peace": [
+      "perks:Peaceful Hearth",
       "powers:Non-Aggression Pact",
       "powers:Divine Substitution",
       "powers:Commission of Protection",
@@ -15571,6 +15942,7 @@
     "powers:Shadow Step": [],
     "domains:War": [
       "skills:Research",
+      "perks:Gift of Hateful Retribution",
       "devotions:The Steed",
       "devotions:Mille, Muse of Creation",
       "devotions:The Song in Iron",
@@ -16027,6 +16399,8 @@
       "archetypes:Artificer Artisan"
     ],
     "powers:Share": [
+      "perks:Boon Bonds",
+      "perks:Medium",
       "devotions:Druidism",
       "devotions:The Divine Bloom",
       "devotions:The Librarian",
@@ -16041,6 +16415,8 @@
     "powers:Trap Recovery": [],
     "powers:Treat": [
       "skills:Basic Medicine",
+      "perks:Ancestral Relic",
+      "perks:Ancestral Weapon",
       "flaws:Fragile Bones",
       "flaws:Divine Vulnerability",
       "flaws:Binding Oath of Civility",
@@ -17098,6 +17474,7 @@
       "skills:Parrying Dagger",
       "skills:Advanced Recharge",
       "skills:Peacecaster",
+      "perks:Gift of Unbreakable Flesh",
       "flaws:Torn Soul",
       "terms:Accent",
       "terms:Selective Immunity",
@@ -17804,6 +18181,8 @@
     "rules-concepts:Duration": [
       "skills:Fence",
       "skills:Prospect I",
+      "perks:Cold Dead Hands",
+      "perks:Will to Live",
       "terms:Call",
       "terms:Count",
       "terms:Long Rest",
@@ -17875,6 +18254,11 @@
       "skills:Scavenge I",
       "skills:Scavenge II",
       "skills:Scavenge III",
+      "perks:Mystic Smith",
+      "perks:Soothing Touch",
+      "perks:Cold Dead Hands",
+      "perks:Gift of Healing",
+      "perks:Protected Hearth",
       "terms:Count",
       "conditions:Berserk",
       "crafting-concepts:Mana Sickness",
@@ -17996,6 +18380,8 @@
       "skills:Prospect I",
       "perks:Carnal Creature",
       "perks:Hard to Kill",
+      "perks:Strong Spirit",
+      "perks:Bolt Hole",
       "terms:Count",
       "terms:Dead",
       "terms:Death-count",
@@ -18024,6 +18410,7 @@
     ],
     "rules-concepts:Short": [
       "skills:Holding Back the Tide",
+      "perks:Ultimate Gift",
       "effects:Imbue",
       "powers:Dominating Presence",
       "powers:Non-Aggression Pact",
@@ -18150,6 +18537,9 @@
       "rules-concepts:Table of Contents"
     ],
     "rules-concepts:Character Creation": [
+      "perks:Gift of Hateful Retribution",
+      "perks:Gift of Unbreakable Flesh",
+      "perks:Draconic Heritage",
       "rules-concepts:Table of Contents"
     ],
     "rules-concepts:No Tests of Strength": [],
@@ -18174,6 +18564,7 @@
       "skills:Heavy Armor",
       "skills:Ironclad Armor",
       "skills:Armor Expertise",
+      "perks:Gift of Unbreakable Flesh",
       "terms:Repped Armor",
       "effects:Mend",
       "effects:Piercing",
@@ -18287,6 +18678,7 @@
       "skills:Thrown Weaponcraft",
       "skills:Shattering Toss",
       "skills:Divine Favor",
+      "perks:Mystic Smith",
       "perks:Protected Hearth",
       "flaws:Indoor Discomfort",
       "flaws:Outdoor Discomfort",
@@ -18454,6 +18846,8 @@
       "recipes:Elemental Protection Potion"
     ],
     "rules-concepts:Red": [
+      "perks:Sight",
+      "perks:Sight Beyond Sight",
       "devotions:Senri, Voice of Mercy",
       "challenges:Underkin - Ruby Eyes See the Prize",
       "powers:Rotten Tomato",
@@ -18474,6 +18868,7 @@
     "rules-concepts:Blue": [
       "skills:Lore",
       "skills:Forage I",
+      "perks:Bits and Pieces",
       "resources:Night Prizes",
       "challenges:Lost - Scarred by the Void",
       "challenges:Lost - Visions of Stars",
@@ -18620,6 +19015,7 @@
     "rules-concepts:Stabilized": [],
     "rules-concepts:Deathblows": [
       "perks:Holding On",
+      "perks:Unkillable",
       "perks:Gift of Hateful Retribution",
       "conditions:Berserk",
       "powers:The Balance of Life",
@@ -18634,6 +19030,8 @@
       "skills:Worship",
       "skills:Divine Focus",
       "skills:Lore",
+      "perks:Insight",
+      "perks:Lucent Hearth",
       "powers:Dissolve",
       "advantages:Human - Psionic Cantrip",
       "advantages:Lost - Divine Magic",
@@ -18662,6 +19060,7 @@
       "rules-concepts:Character Creation"
     ],
     "rules-concepts:Out-of-Game": [
+      "perks:Othersleep",
       "terms:Call",
       "terms:Power Words",
       "effects:Expose",
@@ -18691,6 +19090,8 @@
     ],
     "rules-concepts:Spirit Form": [
       "perks:Carnal Creature",
+      "perks:Gift of Rebirth",
+      "perks:Ultimate Gift",
       "effects:Revive",
       "defenses:No Effect",
       "challenges:Aewen - Deathbound",
@@ -18705,6 +19106,9 @@
       "rules-concepts:Table of Contents"
     ],
     "rules-concepts:White Halo": [
+      "perks:Othersleep",
+      "perks:Sight",
+      "perks:Sight Beyond Sight",
       "powers:Smuggler’s Powdercase",
       "recipes:Vision Valiant"
     ],
@@ -18785,6 +19189,8 @@
     ],
     "rules-concepts:Power Requirements": [],
     "rules-concepts:Sacrifice": [
+      "perks:Generous Soul",
+      "perks:Medium",
       "crafting-concepts:The Enchanting Forge",
       "devotions:The Pale Star",
       "challenges:Human - Mental Overload",
@@ -18872,8 +19278,10 @@
       "skills:Profession - Journeyman",
       "skills:Profession - Master",
       "skills:Fence",
+      "perks:Contact",
       "perks:Income",
       "perks:Inheritance",
+      "perks:Manse",
       "advantages:Underkin - Blood Money",
       "powers:Back Alley Deals",
       "powers:Contract Killing",
@@ -20048,6 +20456,9 @@
     ]
   },
   "grants": {
+    "perks:Sharp Mind": [
+      "skills:Library Use"
+    ],
     "advantages:Aewen - Mystic Resilience": [
       "perks:Magical Resilience"
     ],
@@ -20110,6 +20521,9 @@
     ]
   },
   "grantedBy": {
+    "skills:Library Use": [
+      "perks:Sharp Mind"
+    ],
     "perks:Magical Resilience": [
       "advantages:Aewen - Mystic Resilience"
     ],
@@ -20170,6 +20584,20 @@
     ]
   },
   "discounts": {
+    "perks:Patron": {
+      "amount": 1,
+      "scope": {
+        "kind": "giftEligible",
+        "value": "Patron"
+      },
+      "cap": 10,
+      "min": 1,
+      "refundIfFree": true,
+      "exclusions": [
+        "perks:Strong Bloodline",
+        "perks:Inheritance"
+      ]
+    },
     "advantages:Forged - Crowdsourced": {
       "amount": 1,
       "scope": {
