@@ -40,6 +40,23 @@ function freqMult(refresh) {
   return 1;                              // unknown/none → neutral
 }
 
+// Tier multiplier — cantrips are weak despite spammability; higher tiers hit
+// harder (per user feedback). Defaults to 1 for unlisted tiers.
+const tierMult = (tier) => EFFECT_WEIGHTS.tierMultiplier?.[tier] ?? 1;
+
+// Accent-availability penalty — an effect gated behind a rare accent (Divine needs
+// a devotion; Void/Radiant/etc. uncommon) is less practical. Scan the power's text
+// for the rarest accent it invokes and take that penalty (per user feedback).
+const ACCENT_RARITY = EFFECT_WEIGHTS.accentRarity || {};
+function accentPenalty(text) {
+  let mult = 1;
+  for (const [accent, m] of Object.entries(ACCENT_RARITY)) {
+    if (accent === '_comment') continue;
+    if (new RegExp(`\\b${accent}\\b`).test(text || '') && m < mult) mult = m;
+  }
+  return mult;
+}
+
 // The effect-ish entities an ability invokes, with the per-effect weight.
 function effectHits(entityId) {
   const hits = [];
@@ -71,9 +88,12 @@ function classPowers(cls) {
       const id = `powers:${p.name}`;
       const hits = effectHits(id);
       if (!hits.length) continue;
+      const accentText = [p.description, p.call, p.effect, p.accent].filter(Boolean).join(' ');
       out.push({
         name: p.name, tier, refresh: p.refresh || p.refreshes || 'None',
-        hits, score: rawPower(id) * freqMult(p.refresh || p.refreshes),
+        hits,
+        // effect-power × frequency × tier × accent-availability.
+        score: rawPower(id) * freqMult(p.refresh || p.refreshes) * tierMult(tier) * accentPenalty(accentText),
         topEffects: hits.sort((a, b) => b.w - a.w).map((h) => h.name),
       });
     }

@@ -1,5 +1,17 @@
 {
-  "_comment": "Power weight (0-5) per effect / condition / defense, used by power-search to score how strong a power/perk/skill is by the effects it delivers. SEEDED WITH GUESSES — correct them. 0 = irrelevant/weak, 5 = game-warping. The search sums weights of the effect-ish entities each ability mentions (REFS.mentions).",
+  "_comment": "Power weight (0-5) per effect / condition / defense, used by power-search to score how strong a power/perk/skill is by the effects it delivers. SEEDED WITH GUESSES — correct them. 0 = irrelevant/weak, 5 = game-warping. The search sums weights of the effect-ish entities each ability mentions (REFS.mentions), times a tier multiplier (cantrips are weak), times an accent-availability penalty (effects gated behind rare accents are less practical).",
+  "tierMultiplier": {
+    "_comment": "Multiplies a power's effect-score by its tier. Cantrips are weak despite being spammable; higher tiers hit harder. Tune freely.",
+    "cantrips": 0.4, "noviceSpells": 1, "adeptSpells": 1.3, "greaterSpells": 1.6,
+    "innate": 1, "utility": 1, "basic": 1, "advanced": 1.2, "veteran": 1.4,
+    "classSkills": 1, "rightHandPowers": 1, "SubPower": 1
+  },
+  "accentRarity": {
+    "_comment": "Penalty multiplier when a power's text invokes this accent — rare/gated accents (Divine needs a devotion; Arcane/Void are uncommon) make the effect less practical. 1 = common/no penalty, lower = rarer.",
+    "Divine": 0.6, "Void": 0.6, "Radiant": 0.7, "Shadow": 0.7,
+    "Acid": 0.9, "Flame": 0.9, "Ice": 0.9, "Lightning": 0.9,
+    "Agony": 1, "Disease": 1, "Fear": 1, "Force": 1, "Life": 1, "Mind": 1, "Poison": 1
+  },
   "effects": {
     "Berserk": 2, "Charm": 3, "Cure": 3, "Death": 5, "Disable": 4, "Disarm": 2,
     "Discern": 1, "Dispel": 3, "Dominate": 5, "Drain": 3, "Expose": 2, "Grant": 1,

@@ -9,6 +9,12 @@ are user-tunable in `src/data/effect-weights.json`.
 > These are an analysis aid, not gospel: scores derive from TEXT (an ability that
 > *mentions* an effect — even "cures Charm" — counts it), and from the current
 > seed weights. Tune the weights, then re-run, to sharpen.
+>
+> Score = Σ(effect-weight) × frequency(refresh) × **tierMultiplier** × **accentPenalty**.
+> Per user feedback: cantrips are down-weighted (×0.4) since they're weak despite
+> being spammable, and effects gated behind rare accents (Divine ×0.6, Void/Radiant
+> /Shadow lower) are discounted as less practical. Both tables are tunable in
+> `effect-weights.json` (tierMultiplier, accentRarity).
 
 ## Standout legal builds (level 10)
 
