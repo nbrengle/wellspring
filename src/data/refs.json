@@ -771,8 +771,16 @@
       "rules-concepts:Blue"
     ],
     "perks:Boon Bonds": [
+      "terms:Life Points",
+      "terms:Conditions",
       "terms:Long Rest",
+      "effects:Dominate",
       "skills:Diagnose",
+      "effects:Berserk",
+      "effects:Charm",
+      "effects:Discern",
+      "effects:Heal",
+      "modifiers:Subtle",
       "powers:Share",
       "terms:Perk",
       "effects:Cure"
@@ -811,7 +819,18 @@
       "domains:Knowledge"
     ],
     "perks:Heartbond": [
-      "terms:Perk"
+      "perks:Generous Soul",
+      "terms:Life Points",
+      "terms:Conditions",
+      "rules-concepts:Sacrifice",
+      "rules-concepts:Duration",
+      "effects:Berserk",
+      "effects:Charm",
+      "effects:Discern",
+      "effects:Heal",
+      "modifiers:Subtle",
+      "terms:Perk",
+      "accents:Mind"
     ],
     "perks:Income": [
       "rules-concepts:Wealth",
@@ -10939,6 +10958,7 @@
       "advantages:Underkin - Smiths of Legend"
     ],
     "perks:Generous Soul": [
+      "perks:Heartbond",
       "advantages:Oaksworn - Shepherd of Life"
     ],
     "perks:Greedy Soul": [
@@ -11588,6 +11608,8 @@
       "skills:Diagnose",
       "perks:Soothing Touch",
       "perks:Deathgrip",
+      "perks:Boon Bonds",
+      "perks:Heartbond",
       "perks:Restful Home",
       "flaws:Disquieting Aura",
       "terms:Effects",
@@ -11968,6 +11990,8 @@
       "perks:Gift of Healing",
       "perks:Gift of Rebirth",
       "perks:Ancestral Weapon",
+      "perks:Boon Bonds",
+      "perks:Heartbond",
       "perks:Medium",
       "terms:Armor",
       "terms:Death-count",
@@ -13210,6 +13234,8 @@
       "recipes:High Quality Mining Pick"
     ],
     "effects:Berserk": [
+      "perks:Boon Bonds",
+      "perks:Heartbond",
       "flaws:Disquieting Aura",
       "conditions:Berserk",
       "powers:Orderly Conduct",
@@ -13225,6 +13251,8 @@
     ],
     "effects:Charm": [
       "perks:Bloody Minded",
+      "perks:Boon Bonds",
+      "perks:Heartbond",
       "flaws:Pliant",
       "flaws:Disquieting Aura",
       "conditions:Berserk",
@@ -13389,6 +13417,8 @@
       "skills:Profession - Master",
       "skills:Advanced Traps",
       "perks:Gift of Recognition",
+      "perks:Boon Bonds",
+      "perks:Heartbond",
       "perks:Medium",
       "conditions:Obfuscated",
       "powers:Disruption",
@@ -13443,6 +13473,7 @@
       "rules-concepts:Summoned Armor"
     ],
     "effects:Dominate": [
+      "perks:Boon Bonds",
       "conditions:Berserk",
       "conditions:Dominated",
       "powers:Dominating Presence",
@@ -13679,6 +13710,8 @@
       "perks:Gift of Healing",
       "perks:Gift of Unbreakable Flesh",
       "perks:Ultimate Gift",
+      "perks:Boon Bonds",
+      "perks:Heartbond",
       "flaws:Torn Soul",
       "terms:Armor",
       "crafting-concepts:Corrupted Alchemy",
@@ -15231,6 +15264,7 @@
       "skills:Profession - Journeyman",
       "skills:Profession - Master",
       "perks:Gift of Recognition",
+      "perks:Heartbond",
       "perks:Medium",
       "powers:Emotional Attunement",
       "challenges:Forged - Backdoor Vulnerability",
@@ -15792,6 +15826,8 @@
       "skills:Profession - Journeyman",
       "skills:Profession - Master",
       "skills:Advanced Traps",
+      "perks:Boon Bonds",
+      "perks:Heartbond",
       "perks:Medium",
       "perks:Sensitive",
       "effects:Discern",
@@ -18685,6 +18721,7 @@
       "skills:Prospect I",
       "perks:Cold Dead Hands",
       "perks:Will to Live",
+      "perks:Heartbond",
       "terms:Call",
       "terms:Count",
       "terms:Long Rest",
@@ -19733,6 +19770,7 @@
     "rules-concepts:Power Requirements": [],
     "rules-concepts:Sacrifice": [
       "perks:Generous Soul",
+      "perks:Heartbond",
       "perks:Medium",
       "crafting-concepts:The Enchanting Forge",
       "devotions:The Pale Star",

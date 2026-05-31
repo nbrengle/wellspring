@@ -891,7 +891,12 @@ function enrichWithDetailSections(results) {
     const target = byName.get(n.text.trim());
     if (!target) continue;
     const secEnd = nodes.findIndex((m, j) => j > i && m.type === 'heading' && m.level <= 4);
-    const prose = textBetween(i + 1, secEnd === -1 ? charOptionsEnd : secEnd).trim();
+    // Gather text + table cells + list items: a perk's detail benefits may follow
+    // a "…certain benefits:" colon as extra <td> cells (Boon Bonds, Heartbond) or
+    // a <ul> — textBetween (text-only) would drop them.
+    const prose = nodes.slice(i + 1, secEnd === -1 ? charOptionsEnd : secEnd)
+      .flatMap((m) => m.type === 'list' ? m.items : (m.type === 'text' || m.type === 'cell') ? [m.text] : [])
+      .filter(Boolean).join(' ').trim();
     // Append only the parts not already in the (summary) description, so we don't
     // duplicate the cell text the detail section may restate.
     if (prose && !target.description.includes(prose)) {
