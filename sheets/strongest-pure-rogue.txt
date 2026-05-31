@@ -1,0 +1,18 @@
+Strongest Pure Rogue
+Lineage: None
+Lineage Challenges: None
+Lineage Advantages: None
+Life Points: —
+Armor Points: —
+Spikes: —
+Class Levels: Rogue 10
+Flaws: None
+Starting Skills (free): None
+Purchased Skills: None
+Purchased Perks: None
+Utility Powers: Rogue’s Touch, Catfall, Throat Slit
+Basic Powers: Scarper, Concealed Dart, Waylay, Quick Nap
+Advanced Powers: Flat Catch, Precision Throws, Gut Shot
+
+Build Points: 0 / 21
+✓ Legal build

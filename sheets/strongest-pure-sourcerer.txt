@@ -1,0 +1,20 @@
+Strongest Pure Sourcerer
+Lineage: None
+Lineage Challenges: None
+Lineage Advantages: None
+Life Points: —
+Armor Points: —
+Spikes: —
+Class Levels: Sourcerer 10
+Flaws: None
+Starting Skills (free): None
+Purchased Skills: None
+Purchased Perks: None
+Cantrips: Whispers of the Unseen, Energy Shield, Circle of Four, Infuriate, Mass Flux
+Novice Spells known: Spirit Link, Destructive Resonance, Melt, Iron Maiden, Aethereal Fade
+Adept Spells known: Spirit Chalice, Breach Teleport, Smothering Ash
+Novice Spell-slots: 6
+Adept Spell-slots: 5
+
+Build Points: 0 / 21
+✓ Legal build

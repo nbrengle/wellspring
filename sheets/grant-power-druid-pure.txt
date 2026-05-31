@@ -1,0 +1,20 @@
+Grant Power Druid (pure)
+Lineage: None
+Lineage Challenges: None
+Lineage Advantages: None
+Life Points: —
+Armor Points: —
+Spikes: —
+Class Levels: Druid 10
+Flaws: None
+Starting Skills (free): None
+Purchased Skills: None
+Purchased Perks: None
+Cantrips: Natural Remedies, Antitoxin, Care for the Fallen, Life Tap, Nettles and Barbs
+Novice Spells known: Lesser Form of the Striking Serpent, Lesser Form of the Hulking Bear, Lesser Form of the Hunting Panther
+Adept Spells known: Form of the Hunting Panther, Form of the Striking Serpent, Form of the Hulking Bear, Thorns of Ruin, Weasel’s Agility
+Novice Spell-slots: 6
+Adept Spell-slots: 5
+
+Build Points: 0 / 21
+✓ Legal build

@@ -1,0 +1,20 @@
+Strongest Pure Cleric
+Lineage: None
+Lineage Challenges: None
+Lineage Advantages: None
+Life Points: —
+Armor Points: —
+Spikes: —
+Class Levels: Cleric 10
+Flaws: None
+Starting Skills (free): None
+Purchased Skills: None
+Purchased Perks: None
+Cantrips: Curing Prayer, Blade Blessing, Shield of Devotion, Revivify, Devotion’s Strike
+Novice Spells known: Spirit Speak, Fortress of Faith
+Adept Spells known: Bless Shield, Divine Armor, Judgment, Safe Return, Minor Circle, Retributive Protection
+Novice Spell-slots: 6
+Adept Spell-slots: 5
+
+Build Points: 0 / 21
+✓ Legal build

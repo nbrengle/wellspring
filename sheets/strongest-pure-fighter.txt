@@ -1,0 +1,18 @@
+Strongest Pure Fighter
+Lineage: None
+Lineage Challenges: None
+Lineage Advantages: None
+Life Points: —
+Armor Points: —
+Spikes: —
+Class Levels: Fighter 10
+Flaws: None
+Starting Skills (free): None
+Purchased Skills: None
+Purchased Perks: None
+Utility Powers: Fortitude, Shoulder, Execute
+Basic Powers: Heroic Save, Grit, Disengage, Stifle
+Advanced Powers: Stand Ground, Shake It Off II, Rest
+
+Build Points: 0 / 21
+✓ Legal build

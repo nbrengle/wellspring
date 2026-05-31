@@ -1,0 +1,19 @@
+Grant Engine (Druid-Sourcerer)
+Lineage: None
+Lineage Challenges: None
+Lineage Advantages: None
+Life Points: —
+Armor Points: —
+Spikes: —
+Class Levels: Druid 5 / Sourcerer 5
+Flaws: None
+Starting Skills (free): None
+Purchased Skills: None
+Purchased Perks: None
+Cantrips: Natural Remedies, Antitoxin, Care for the Fallen, Whispers of the Unseen, Energy Shield, Circle of Four
+Novice Spells known: Lesser Form of the Striking Serpent, Spirit Link, Destructive Resonance, Melt
+Adept Spells known: Form of the Hunting Panther, Form of the Striking Serpent, Form of the Hulking Bear, Thorns of Ruin, Spirit Chalice, Breach Teleport
+Novice Spell-slots: 10
+
+Build Points: 0 / 21
+✓ Legal build

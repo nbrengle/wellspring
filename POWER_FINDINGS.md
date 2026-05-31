@@ -29,10 +29,16 @@ Sourcerer appears in every top pair: its spell list is the densest effect engine
 co-occurring effects (Counter + Dominate + Obey + Cure + Protect …), i.e. the most
 *flexible* toolkit rather than a one-trick specialist.
 
-## Economy exploit found (validator gap, not a build)
-Flaws award BP **uncapped** in the validator — 19 flaws = +44 BP. The rules cap
-flaw award at **5 BP**. A character can currently farm far more bonus BP than legal.
-→ Worth a validator fix (cap flaw award at 5).
+## Economy exploit found (validator gap, not a build) — FIXED
+Flaws used to award BP uncapped (19 flaws = +44 BP) vs the rules' 5-BP cap.
+**Fixed** in #62 (commit `0559af2`): `computeSpend` now clamps the flaw award to
+`MAX_FLAW_BP = 5` and surfaces `flawCapped` for the UI.
+
+## Importable sheets
+`scripts/build-sheets.mjs` turns these standouts (+ the strongest pure build per
+class) into importable character sheets in `sheets/*.txt` — paste any into the
+builder's Import. Regenerate with:
+`node --import ./scripts/register-json.mjs scripts/build-sheets.mjs`
 
 ## To refine
 1. Tune `effect-weights.json` (the rankings hinge on it).

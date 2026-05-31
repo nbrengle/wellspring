@@ -1,0 +1,19 @@
+Protect Wall (Cleric-Sourcerer)
+Lineage: None
+Lineage Challenges: None
+Lineage Advantages: None
+Life Points: —
+Armor Points: —
+Spikes: —
+Class Levels: Cleric 5 / Sourcerer 5
+Flaws: None
+Starting Skills (free): None
+Purchased Skills: None
+Purchased Perks: None
+Cantrips: Curing Prayer, Blade Blessing, Shield of Devotion, Whispers of the Unseen, Energy Shield, Circle of Four
+Novice Spells known: Spirit Speak, Fortress of Faith, Spirit Link, Destructive Resonance, Melt
+Adept Spells known: Bless Shield, Divine Armor, Judgment, Spirit Chalice, Breach Teleport
+Novice Spell-slots: 10
+
+Build Points: 0 / 21
+✓ Legal build

@@ -1,0 +1,21 @@
+Swiss Army (Artisan-Sourcerer)
+Lineage: None
+Lineage Challenges: None
+Lineage Advantages: None
+Life Points: —
+Armor Points: —
+Spikes: —
+Class Levels: Artisan 5 / Sourcerer 5
+Flaws: None
+Starting Skills (free): None
+Purchased Skills: None
+Purchased Perks: None
+Utility Powers: Shield Bearer, Tanner, Mechanical Augmentation
+Basic Powers: Share, Antidote, Kick, Critique Construction
+Cantrips: Whispers of the Unseen, Energy Shield, Circle of Four
+Novice Spells known: Spirit Link, Destructive Resonance, Melt
+Adept Spells known: Spirit Chalice, Breach Teleport
+Novice Spell-slots: 5
+
+Build Points: 0 / 21
+✓ Legal build

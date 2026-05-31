@@ -1,0 +1,20 @@
+Strongest Pure Mage
+Lineage: None
+Lineage Challenges: None
+Lineage Advantages: None
+Life Points: —
+Armor Points: —
+Spikes: —
+Class Levels: Mage 10
+Flaws: None
+Starting Skills (free): None
+Purchased Skills: None
+Purchased Perks: None
+Cantrips: Ghost Hand, Identify, Force Shield, Stop, Fumble
+Novice Spells known: Carnate, Magekey, Town Portal, Bolster Shield
+Adept Spells known: Elemental Survival, Dispel Magic, Spell Absorption, Betrayal
+Novice Spell-slots: 6
+Adept Spell-slots: 5
+
+Build Points: 0 / 21
+✓ Legal build
