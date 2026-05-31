@@ -1,0 +1,22 @@
+{
+  "_comment": "Power weight (0-5) per effect / condition / defense, used by power-search to score how strong a power/perk/skill is by the effects it delivers. SEEDED WITH GUESSES — correct them. 0 = irrelevant/weak, 5 = game-warping. The search sums weights of the effect-ish entities each ability mentions (REFS.mentions).",
+  "effects": {
+    "Berserk": 2, "Charm": 3, "Cure": 3, "Death": 5, "Disable": 4, "Disarm": 2,
+    "Discern": 1, "Dispel": 3, "Dominate": 5, "Drain": 3, "Expose": 2, "Grant": 1,
+    "Grant Power": 3, "Heal": 3, "Imbue": 2, "Imprison": 4, "Intoxicate": 2,
+    "Mend": 1, "Obey": 4, "Obfuscate": 2, "Piercing": 3, "Provoke": 2, "Rebuild": 1,
+    "Repel": 2, "Revive": 5, "Root": 3, "Shatter": 2, "Silence": 4, "Sleep": 4,
+    "Slow": 2, "Stabilize": 1, "Taint": 2, "Weakness": 3, "Wounding": 3
+  },
+  "conditions": {
+    "Berserk": 2, "Charmed": 3, "Disabled": 4, "Dominated": 5, "Drained": 3,
+    "Flying": 2, "Immunity": 5, "Imprisoned": 4, "Intoxicated": 2, "Insubstantial": 3,
+    "Obedient": 4, "Obfuscated": 2, "Provoked": 2, "Repelled": 2, "Resistance": 4,
+    "Rooted": 3, "Silenced": 4, "Slept": 4, "Slowed": 2, "Tainted": 2,
+    "Vulnerable": 3, "Weakened": 3
+  },
+  "defenses": {
+    "Counter": 3, "Protect": 3, "Resist": 4, "Altered": 1, "Reduced": 2,
+    "Immune": 5, "No Effect": 4
+  }
+}

@@ -131,7 +131,7 @@
         "requirement": "Artisan Level 2",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Artisan gains a Living Iron pool equal to 3 x Artisan’s Class Level. This pool resets every Long Rest. The Artisan may subtract from their Living Iron pool when the power is used to Mend armor (Physical, Summoned, or Natural) up to the Artisan’s class-level. Example: A 4th level Artisan has 12 total points of Mending per Long Rests, and can Mend up to 4 points per use of the Power. Artificers gain additional points to their Living Iron pool based on the amounts below. Artisans that are Artificers gain bonuses based on how many tagged [Artificer] powers they have from all their classes."
+        "description": "The Artisan gains a Living Iron pool equal to 3 x Artisan’s Class Level. This pool resets every Long Rest. The Artisan may subtract from their Living Iron pool when the power is used to Mend armor (Physical, Summoned, or Natural) up to the Artisan’s class-level. Example: A 4th level Artisan has 12 total points of Mending per Long Rests, and can Mend up to 4 points per use of the Power. Artificers gain additional points to their Living Iron pool based on the amounts below. Artisans that are Artificers gain bonuses based on how many tagged [Artificer] powers they have from all their classes. • 5+         [Artificer] Artisan Powers - Living Iron pool is 4 x Artisan’s Class levels • 7+         [Artificer] Artisan Powers - Living Iron pool is 5 x Artisan's Class levels • 10+         [Artificer] Artisan Powers - Living Iron pool is 6 x Artisan's Class levels • 15+         [Artificer] Artisan Powers - Living Iron pool is 7 x Artisan's Class levels"
       },
       {
         "name": "Brilliant Thinker",
@@ -169,7 +169,7 @@
         "requirement": "Artisan Level 4Skills and Options: The Artisan gains one of the following skills for free based on their Specialization when they attain level 4 Artisan (this one time skill bonus does not change if their Specialization later changes). The Artisan must have the prerequisites for this skill and if they do not then they may instead take the Apprentice or Basic level of the skill.",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": ""
+        "description": "• Artificer- Basic Shields (4), Basic Traps (5), Medium Armor (4) • Crafter- Journeyman Alchemy (4), Journeyman Enchanting (4), Journeyman Tinkering (4) • Mystic- Advanced Medicine (4), [Journeyman Ritual Magic (2) AND Ritual Lore (2)]"
       },
       {
         "name": "Pragmatist",
@@ -207,7 +207,7 @@
         "requirement": "Artisan Level 7",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "Mystics gain the ability to modify the Dark Territory of any ritual they are a Participant or Ritualist of, increasing or decreasing it by up to 1 if they are a Participant or up to 2 if they are the Ritualist. Additionally, after completing a ritual successfully, the Mystic gains 5 points of Summoned Armor that last for a Short Rest. Artisans that are of the Specialization Mystic may Grant each Participant of a ritual where they are the Primary Ritualist a number of Counters to Damage that do not interrupt the ritual when used. The Call for this Counter is “Counter, Grand Ritualist.” The Artisan may do this once per Long Rest. These Counters last until the next Short Rest, the end of the Ritual or until used whichever is first. The ritualist must explain these counters expire after the ritual has been completed."
+        "description": "Mystics gain the ability to modify the Dark Territory of any ritual they are a Participant or Ritualist of, increasing or decreasing it by up to 1 if they are a Participant or up to 2 if they are the Ritualist. Additionally, after completing a ritual successfully, the Mystic gains 5 points of Summoned Armor that last for a Short Rest. Artisans that are of the Specialization Mystic may Grant each Participant of a ritual where they are the Primary Ritualist a number of Counters to Damage that do not interrupt the ritual when used. The Call for this Counter is “Counter, Grand Ritualist.” The Artisan may do this once per Long Rest. These Counters last until the next Short Rest, the end of the Ritual or until used whichever is first. The ritualist must explain these counters expire after the ritual has been completed. • 5+         [Mystic] Artisan Powers: Short Grant 1 Counter to Damage • 8+         [Mystic] Artisan powers: Short Grant 2 Counter to Damage • 11+         [Mystic] Artisan powers: Short Grant 3 Counter to Damage • 15+         [Mystic] Artisan Powers: Short Grant 4 Counter to Damage"
       },
       {
         "name": "Technical Expertise",
@@ -245,7 +245,7 @@
         "requirement": "Artisan Level 9",
         "prerequisites": null,
         "skillsAndOptions": "The Artisan gains a rank of the Fortunate Finder Character Option.",
-        "description": "If the Artisan meets the following criteria: Then the Artisan also gains one of the following for free:"
+        "description": "If the Artisan meets the following criteria: • Artisan is the Crafter Specialization • At least 7 [Crafter] tagged Powers (Basic, Advanced, Veteran, Utility) • Possesses the prerequisite Journeyman Skill Then the Artisan also gains one of the following for free: • Greater Alchemy (5) • Greater Enchanting (5) • Greater Tinkering (5)"
       },
       {
         "name": "Opus",
@@ -308,7 +308,7 @@
         "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": "The Artisan gains the Apprentice Ritual Magic skill.",
-        "description": "The Adept Ritualist gains the following benefits at various Artisan Levels:"
+        "description": "The Adept Ritualist gains the following benefits at various Artisan Levels: • Level 1 - The Artisan may count as two Participants in Rituals, taking up the available slots and giving benefits. • Level 3 - If the Artisan is acting as a Ritualist, reduce one Basic Resource (Bloom, Hide, Ingots, or Wealth) required for a Ritual to a minimum of 1, once per Long Rest. Place a stand in item if the Resource has a part in the Ritual • Level 7 - As above, the Artisan may count as two Ritualists. They may not perform functions of multiple Ritualists."
       },
       {
         "name": "Apt Assistant",
@@ -350,7 +350,7 @@
         "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": "The Artisan gains the Apprentice Enchanting (3) skill.",
-        "description": "This Power has two uses which may be used separately or simultaneously. The Artisan spends a few seconds focusing on the item to alter its structure, allowing them to add or alter Attunement requirements. Item Requirements: Power Use #1 - Add Attunement After focusing, the Artisan may add any kind of Attunement requirement. Examples include something as specific as “Can only be Attuned to Teo Trastvara” and as generic as “Can only be Attuned to a worshiper of The Steed”. Attunement is not lost if the required trait changes (such as converting to a different Devotion). Power Use #2 - Add Limitation After focusing, the Artisan may add a specific limitation to an item’s activation and use. This limitation might be “Can only be activated by Humans” or “To activate the item, the character must yell ‘I love soup!’” Limitations requiring abusive or non-consensual behavior immediately fail. For either use of this Power, the item’s card must be updated with the information."
+        "description": "This Power has two uses which may be used separately or simultaneously. The Artisan spends a few seconds focusing on the item to alter its structure, allowing them to add or alter Attunement requirements. Item Requirements: • Crafted by the Artisan • Has a card • Requires Attunement Power Use #1 - Add Attunement After focusing, the Artisan may add any kind of Attunement requirement. Examples include something as specific as “Can only be Attuned to Teo Trastvara” and as generic as “Can only be Attuned to a worshiper of The Steed”. Attunement is not lost if the required trait changes (such as converting to a different Devotion). Power Use #2 - Add Limitation After focusing, the Artisan may add a specific limitation to an item’s activation and use. This limitation might be “Can only be activated by Humans” or “To activate the item, the character must yell ‘I love soup!’” Limitations requiring abusive or non-consensual behavior immediately fail. For either use of this Power, the item’s card must be updated with the information."
       },
       {
         "name": "Forged From Steel",
@@ -625,7 +625,7 @@
         "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Artisan gains the Basic Medicine and Diagnose Skills. The Artisan has seen their fair share of combat and served as a healer. Quickly diagnosing what is wrong and how to best handle the situation has become second nature. The Artisan has more questions they may ask when using Diagnose, honing their perception to uncover personality secrets based on physical observations. The wording need not be exact but the question must stay true to the spirit:"
+        "description": "The Artisan gains the Basic Medicine and Diagnose Skills. The Artisan has seen their fair share of combat and served as a healer. Quickly diagnosing what is wrong and how to best handle the situation has become second nature. The Artisan has more questions they may ask when using Diagnose, honing their perception to uncover personality secrets based on physical observations. The wording need not be exact but the question must stay true to the spirit: • Are you currently in a heightened state of emotion/stress? • Are you under the effects of mind-altering substances? • Have you been in Spirit Form in the last 12 hours? • Have you ever had your memory altered? • Are you possessed or controlled? • What is your profession/class?"
       }
     ],
     "basic": [
@@ -985,7 +985,7 @@
         "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "An Artisan can take an existing potion (any quaffed liquid created with alchemy or tagged quaffed liquid found in the world) and add a little kick to it. After spending a minute or so adding to, mixing, and enhancing the potion, they may choose one of three benefits that will take place when the potion is imbibed: No Potion can be Kicked more than once. The Kick effect should be added to the information card for the item if it has one. If there is no information card, either one must be made, or only the Artisan can get the Kick effects."
+        "description": "An Artisan can take an existing potion (any quaffed liquid created with alchemy or tagged quaffed liquid found in the world) and add a little kick to it. After spending a minute or so adding to, mixing, and enhancing the potion, they may choose one of three benefits that will take place when the potion is imbibed: • Heal 1 • Grant 1 Barrier • Intoxicate No Potion can be Kicked more than once. The Kick effect should be added to the information card for the item if it has one. If there is no information card, either one must be made, or only the Artisan can get the Kick effects."
       },
       {
         "name": "Mesmerize",
@@ -1369,7 +1369,7 @@
         "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Artisan gains additional benefits each time they use a Craft of Apprentice level or higher (ie: Supervise Armor Mending would not trigger this Power)."
+        "description": "The Artisan gains additional benefits each time they use a Craft of Apprentice level or higher (ie: Supervise Armor Mending would not trigger this Power). • Each time the Artisan completes a Tinkering Plan, they gain 3 to their Living Iron pool. This has no effect if the Artisan already has more points in their Living Iron Pool than their reset number. • Each time the Artisan completes an Enchanting Ritual, they may gain a Protect vs Packets. • Each time the Artisan completes an Alchemy Craft, they gain the ability to reduce a Quick 100 Count to a Quick 30 Count once. The Artisan can only have one instance of this active at a time. • Each time the Artisan Mends at least 5 Armor at a time, they may also “Grant 2 Barrier” to the person whose armor was Mended."
       },
       {
         "name": "Reinforce Shield",
@@ -1539,7 +1539,7 @@
         "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "After completing a Ritual where the Artisan Mystic is the Primary Ritualist, the Artisan may ask one of the following questions of the Marshal guiding the ritual, which the Marshal should attempt to answer honestly: Or instead, the Ritualist may target one of the ritual’s Participants with a verbal Obey Effect:"
+        "description": "After completing a Ritual where the Artisan Mystic is the Primary Ritualist, the Artisan may ask one of the following questions of the Marshal guiding the ritual, which the Marshal should attempt to answer honestly: • “What is the effect of the next card in the deck (either higher or lower)?” • “What downsides to this ritual being cast may I not have considered that you can think of?” • “Provide me a potentially helpful cryptic phrase, vision, or short story.” Or instead, the Ritualist may target one of the ritual’s Participants with a verbal Obey Effect: • Short Obey by Mind, “Tell me one of your most important secrets that I do not know.” • Long Obey by Mind, “Tell no one of this Ritual or what took place here.”"
       }
     ],
     "veteran": [],
@@ -2865,7 +2865,7 @@
         "requirement": "Druid Level 2",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "This power allows the character to determine if a targeted creature is a beast of nature, and its intent. The power lasts until the Druid moves their right foot or takes a Short Rest, whichever comes first. Until it ends, the Druid can ask any of the following questions as often as desired of any number of targets that they can see, but may only ask each target each question once."
+        "description": "This power allows the character to determine if a targeted creature is a beast of nature, and its intent. The power lasts until the Druid moves their right foot or takes a Short Rest, whichever comes first. Until it ends, the Druid can ask any of the following questions as often as desired of any number of targets that they can see, but may only ask each target each question once. • Do you have the Animal Type? • What kind of Animal are you? • Why are you here? • What are you feeling? • Do you mean me harm? • What is one of your Vulnerabilities?"
       },
       {
         "name": "Message of the Flowers",
@@ -2941,7 +2941,7 @@
         "requirement": "Druid Level 10",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Druid can create a special area that is their grove. To do this, the Druid should do a small sanctification rite of their choosing, role-playing creating a connection with the grove for at least a minute. The grove will last until the beginning of the next Event (even if the Druid is not in attendance). The area must either be marked off with a border of green material (rope, engineering tape, etc.) not to exceed 100 ft long, or be an obvious area (such as an actual clearing). The area may not have any permanent structures in it but may overlap with Druid groves that already exist, as long as the other Grove’s owner consents. The area should have some natural significance or beauty; just putting it on the lawn in front of the Tavern may cause Staff to claim the Grove is defunct. The Druid must provide an easily visible item card for the grove, indicating that it is a special place, its effects, the name of the Druid who created it, and any others presently attuned to it, which must be posted somewhere easily visible in the center of the grove itself. The grove has a number of properties:"
+        "description": "The Druid can create a special area that is their grove. To do this, the Druid should do a small sanctification rite of their choosing, role-playing creating a connection with the grove for at least a minute. The grove will last until the beginning of the next Event (even if the Druid is not in attendance). The area must either be marked off with a border of green material (rope, engineering tape, etc.) not to exceed 100 ft long, or be an obvious area (such as an actual clearing). The area may not have any permanent structures in it but may overlap with Druid groves that already exist, as long as the other Grove’s owner consents. The area should have some natural significance or beauty; just putting it on the lawn in front of the Tavern may cause Staff to claim the Grove is defunct. The Druid must provide an easily visible item card for the grove, indicating that it is a special place, its effects, the name of the Druid who created it, and any others presently attuned to it, which must be posted somewhere easily visible in the center of the grove itself. The grove has a number of properties: • The plants and vegetation there grow particularly well, as if perfectly watered with plenty of sunlight. • Plants and small animals within the grove are cheered, and generally feel safe and happy. • Plants and small animals within the grove are unusually hardy and difficult to be blighted, diseased, or harmed by outside magic. • The area is considered a Natural Locus, and should be conspicuously noted as such on the card. • Once ever, when the Druid discorporates, they may Resurrect with 1 Life Point at their Grove instead of moving to the Spirit River. • While within the Grove, the Druid may deliver the Cure effect at-will via Touch. If this is used to cure the Taint condition, this ability is suppressed until the druid takes a Short Rest."
       }
     ],
     "utility": [],
@@ -3296,7 +3296,7 @@
         "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "This Spell can only be cast while out of combat. The Druid is inhabited by the essence of the Bear Spirit. Powerful and capable of taking enormous punishment, the Bear can ride any front line. While in the Lesser Form of the Hulking Bear, the character cannot cast Spells of any kind or use physical or summoned armor, but can activate the Powers of items and can cast the Hide Cantrip, but no others. The Druid has the following benefits: The Bear has the following additional abilities:"
+        "description": "This Spell can only be cast while out of combat. The Druid is inhabited by the essence of the Bear Spirit. Powerful and capable of taking enormous punishment, the Bear can ride any front line. While in the Lesser Form of the Hulking Bear, the character cannot cast Spells of any kind or use physical or summoned armor, but can activate the Powers of items and can cast the Hide Cantrip, but no others. The Druid has the following benefits: • +1 Maximum Life Points. • 4 points of Natural Armor. • May manifest and Wield up to two Natural Short weapons proficiently. The Bear has the following additional abilities: • Expend a Novice Spell-Slot to Counter a damaging Weapon attack. The Call is “Counter, Bearhide!”. • Expend a Novice Spell-Slot to do a Weapon attack that does “Quick Provoke [No Accent/by Force]” • Expend a Novice Spell-Slot to Heal themself for 3 Life Points. The Call is “Heal 3”."
       },
       {
         "name": "Lesser Form of the Striking Serpent",
@@ -3317,7 +3317,7 @@
         "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "This Spell can only be cast while out of combat. The Druid is inhabited by the essence of the venomous snake, giving them speed and poisonous power. The serpent is a predator, striking hard and cruel. While in the Lesser Form of the Striking Serpent, the character cannot cast Spells of any kind, but can activate the Powers of items and can cast the Nettles and Barbs Cantrip, but no others. The Druid has the following benefits: The Serpent has the following additional abilities:"
+        "description": "This Spell can only be cast while out of combat. The Druid is inhabited by the essence of the venomous snake, giving them speed and poisonous power. The serpent is a predator, striking hard and cruel. While in the Lesser Form of the Striking Serpent, the character cannot cast Spells of any kind, but can activate the Powers of items and can cast the Nettles and Barbs Cantrip, but no others. The Druid has the following benefits: • +1 Base Spike Damage. • May manifest and Wield up to two Natural Short weapons proficiently. • May add the “Poison” Accent to any Claw Weapon attack that does not have an Accent. The Serpent has the following additional abilities: • Expend a Novice Spell-Slot to make a Weapon attack that does “Wounding 3 by Poison” • Expend a Novice Spell-Slot to make a Verbal attack that does “[Name or Description] Quick Slow by Fear” • Expend a Novice Spell-Slot to make a Weapon attack that does “Quick Disable [Left/Right Arm] by Poison”"
       },
       {
         "name": "Lesser Form of the Hunting Panther",
@@ -3338,7 +3338,7 @@
         "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "This Spell can only be cast while out of combat. The Druid is inhabited by the essence of the panther, the perfect predator. The panther is darkness and shadow, slipping in for the kill. While in the Lesser Form of the Hunting Panther, the character cannot cast Spells of any kind, but can activate the Powers of items and can cast the Enchanted Thorn Cantrip, but no others. The Druid has the following benefits: The Panther has the following additional abilities:"
+        "description": "This Spell can only be cast while out of combat. The Druid is inhabited by the essence of the panther, the perfect predator. The panther is darkness and shadow, slipping in for the kill. While in the Lesser Form of the Hunting Panther, the character cannot cast Spells of any kind, but can activate the Powers of items and can cast the Enchanted Thorn Cantrip, but no others. The Druid has the following benefits: • +1 Base Spike Damage. • May manifest and Wield up to two Natural Short weapons proficiently. • May Counter the Damage and Effects caused by a fall by Sacrificing 2 Life Points and Calling “Counter, Catfall”. The Panther has the following additional abilities: • Expend a Spell-Slot to make a Weapon attack from behind that does 5 per Tier expended. • Expend a Novice Spell-Slot to make a Weapon attack that does “Short Slow by Agony” • Expend a Novice Spell-Slot to make a Weapon attack that does “Quick Root”"
       },
       {
         "name": "Arboreal Transformation",
@@ -3665,7 +3665,7 @@
         "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "This Spell can only be cast while out of combat. The Druid is inhabited by the essence of the Bear Spirit. Powerful and capable of taking enormous punishment, the Bear can ride any front line. While in the Form of the Hulking Bear, the character cannot cast Spells of any kind or use physical or summoned armor, but can activate the Powers of items and can cast the Hide Cantrip, but no others. The Druid has the following benefits: The Bear has the following additional abilities:"
+        "description": "This Spell can only be cast while out of combat. The Druid is inhabited by the essence of the Bear Spirit. Powerful and capable of taking enormous punishment, the Bear can ride any front line. While in the Form of the Hulking Bear, the character cannot cast Spells of any kind or use physical or summoned armor, but can activate the Powers of items and can cast the Hide Cantrip, but no others. The Druid has the following benefits: • +3 Life Points • 5 points of Natural Armor • May manifest and Wield up to two Natural Short or Long weapons proficiently. • May add the “Force” Accent to any Claw Weapon attack that does not have an Accent. The Bear has the following additional abilities: • Expend a Novice Spell-Slot to Counter a damaging Weapon attack. The Call is “Counter: Bearhide!”. • Expend a Novice Spell-Slot to Heal themself for 3 Life Points. The Call is “Heal 3”. • Expend a Novice Spell-Slot to do a Weapon attack that does “Quick Provoke [No Accent/by Force]” • Expend an Adept Spell-Slot to Grant themself +1 Bonus Spike Damage until they leave the Form. • Expend an Adept Spell-Slot to Cure themself of one Condition. The Call for this is Cure [Condition] and the Bear can do this while unable to speak, but not while unable to use Powers."
       },
       {
         "name": "Form of the Striking Serpent",
@@ -3686,7 +3686,7 @@
         "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "This Spell can only be cast while out of combat. The Druid is inhabited by the essence of the venomous snake, giving them speed and poisonous power. The serpent is a predator, striking hard and cruel. While in the Form of the Striking Serpent, the character cannot cast Spells of any kind, but can activate the Powers of items and can cast the Nettles and Barbs Cantrip, but no others. The Druid has the following benefits: The Serpent has the following additional abilities:"
+        "description": "This Spell can only be cast while out of combat. The Druid is inhabited by the essence of the venomous snake, giving them speed and poisonous power. The serpent is a predator, striking hard and cruel. While in the Form of the Striking Serpent, the character cannot cast Spells of any kind, but can activate the Powers of items and can cast the Nettles and Barbs Cantrip, but no others. The Druid has the following benefits: • +1 Base Spike Damage. • +2 Base Maximum Spikes. • May manifest and Wield up to two Natural Short weapons proficiently. • May add the Serpent Accents to any Claw Weapon attack that does not have an Accent. • Serpent Accents: [Poison, Fear] The Serpent has the following additional abilities: • Expend a Novice Spell-Slot to make a Weapon attack that does “Wounding 4 by [Serpent Accent].” • Expend a Novice Spell-Slot to make a Verbal attack that does “Quick Slow by [Serpent Accent].” • Expend a Novice Spell-Slot to make a Weapon attack that does “Quick Disable [Arm] by [Serpent Accent].” • Expend a Novice Spell-Slot to Refresh one Spike by Calling “Refresh Spike.” • Expend an Adept Spell-Slot to do a Weapon attack that does “Taint by [Serpent Accent].” • Expend an Adept Spell-Slot to do a Weapon attack that does “Quick Drain by [Serpent Accent].”"
       },
       {
         "name": "Form of the Hunting Panther",
@@ -3707,7 +3707,7 @@
         "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "This Spell can only be cast while out of combat. The Druid is inhabited by the essence of the panther, the perfect predator. The panther is darkness and shadow, slipping in for the kill. While in the Form of the Hunting Panther, the character cannot cast Spells of any kind, but can activate the Powers of items and can cast the Enchanted Thorn Cantrip, but no others. The Druid has the following benefits: The Panther has the following additional abilities:"
+        "description": "This Spell can only be cast while out of combat. The Druid is inhabited by the essence of the panther, the perfect predator. The panther is darkness and shadow, slipping in for the kill. While in the Form of the Hunting Panther, the character cannot cast Spells of any kind, but can activate the Powers of items and can cast the Enchanted Thorn Cantrip, but no others. The Druid has the following benefits: • +2 Base Spike Damage. • May manifest and Wield up to two Natural Short weapons proficiently. • May Counter the Damage and Effects caused by a fall by sacrificing 1 Life Point and Calling “Counter, Catfall.” • Gain the benefits of the Adept Druid Spell Eyes of the Crow. • May do a Weapon attack at-will that does “Death to Helpless.” • May add the Panther Accents to any Claw Weapon attack Accent or substitute another existing accent on a Claw Weapon attack. • Panther Accents: [Disease, Agony] The Panther has the following additional abilities: • Expend a Spell-Slot to make a Weapon attack from behind that does 5 per Tier expended. • Expend a Novice Spell-Slot to make a Weapon attack that does “Quick Slow by [Panther Accent]” • Expend a Novice Spell-Slot to make a Weapon attack that does “Quick Root” • Expend an Adept Spell-Slot to do a Weapon attack that does “Silence by [Panther Accent]” • Expend an Adept Spell-Slot to Counter a Weapon or Packet attack by Calling “Counter, Dodge”"
       },
       {
         "name": "Curse the Despoiler",
@@ -4170,7 +4170,7 @@
         "requirement": "Fighter Level 10",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "At the beginning of an Event, and after finishing a Long Rest, the Fighter may choose one of the following bonuses that last until the next Long Rest:"
+        "description": "At the beginning of an Event, and after finishing a Long Rest, the Fighter may choose one of the following bonuses that last until the next Long Rest: • While wielding a Melee Weapon with one hand, you may add the Piercing effect to any Spike attack once per Short Rest and increase the Base Spike Damage of that attack by 3. • While Wielding a Great Weapon in both hands, you may add +1 to your Melee Base Damage. • While Wielding a Projectile Weapon, you may add the Wounding Effect to your normal shots that utilize the Aiming mechanic, these shots also gain +1 Base Damage. • While Wielding a Shield, you gain a Counter vs Shatter after completing a Short Rest. The Call is “Counter, Warrior Spirit.” Additionally, the Fighter gains +1 Maximum Health, physical Armor Point, and Natural Armor Point."
       }
     ],
     "utility": [
@@ -5613,7 +5613,7 @@
         "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "See Magic gives the Mage the ability to detect magical emanations from enchantments, active spells (including summoned armor), or magical items. Once cast, the Mage can ask any or all of the following questions of as many targets as desired. The Mage can do this until they cast another spell, says anything that is not one of the questions, takes damage, takes an Effect, or completes a Short Rest:"
+        "description": "See Magic gives the Mage the ability to detect magical emanations from enchantments, active spells (including summoned armor), or magical items. Once cast, the Mage can ask any or all of the following questions of as many targets as desired. The Mage can do this until they cast another spell, says anything that is not one of the questions, takes damage, takes an Effect, or completes a Short Rest: • “What non-Inherent Conditions do you have?” • “How many points of summoned armor do you have?” • “What items are you carrying that are magical?” • “What was the last spell you cast?” • “Are you a Construct?”"
       },
       {
         "name": "Stop",
@@ -6054,7 +6054,7 @@
         "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "This powerful spell can be used to end the duration of many Spells or Powers, including Spells like Elemental Node or protective circles. It can be used in one of the following ways: Note: Dispel Magic may have other specific uses."
+        "description": "This powerful spell can be used to end the duration of many Spells or Powers, including Spells like Elemental Node or protective circles. It can be used in one of the following ways: • Harm Constructs: “Piercing 3 to Construct.” If the caster expends a Spike an additional Spell-Packet is charged. • Dispel any of the following: “Dispel Protects”, “Dispel Summoned Armor”, “Dispel Barrier”, or a specific Condition: “Dispel [Condition].” • Dispel all Conditions caused by a specific Accent: “Dispel [Accent].” • Break any circle represented by a cord, rope, or the like: “Dispel Circle.” Note: Dispel Magic may have other specific uses."
       },
       {
         "name": "Dominate Creature",
@@ -6111,7 +6111,7 @@
         "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "Elemental Survival must be cast focusing on one of the Elemental Cornerstones (Fire, Air, Water, Earth). The caster designates 3 targets to gain traits based on the plane chosen. The character cannot be affected by this spell more than once at a time, even if a different plane is chosen. Enhancement: Greater Slot: The Spell’s Duration changes to be Long Rest."
+        "description": "Elemental Survival must be cast focusing on one of the Elemental Cornerstones (Fire, Air, Water, Earth). The caster designates 3 targets to gain traits based on the plane chosen. The character cannot be affected by this spell more than once at a time, even if a different plane is chosen. • Air: The character is unaffected by high winds, including natural tornadoes and the like. The character is unaffected by natural lightning strikes and can see normally through clouds and the dust caused by weather. The character has resistance to Lightning and resistance to falling damage a number of times equal to their Maximum Life Points. • Fire: The character takes no damage from normal fire or heat, and can breathe and see normally in smoky environments. The character has resistance to Flame a number of times equal to their Maximum Life Points. • Earth: The character can pass through some rock and stone (the player can touch stone for a Focus Quick 10 then meld into or out of it, becoming Insubstantial and inherently Slowed while in this state). The character has resistance to Acid a number of times equal to their Maximum Life Points. • Water: The character can walk normally on icy surfaces and can breathe normally underwater. The character will suffer no ill effects from being in deep water and can see normally underwater, even in almost total darkness. The character has resistance to Ice a number of times equal to their Maximum Life Points. Enhancement: Greater Slot: The Spell’s Duration changes to be Long Rest."
       },
       {
         "name": "Gift of Solitude",
@@ -7722,7 +7722,7 @@
         "requirement": "Socialite Level 10",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "After a pep talk of thirty seconds or more, the encouraging words of the Socialite lift the target's spirit, mend their wounds, and cure their ailments. The target receives all the following benefits:"
+        "description": "After a pep talk of thirty seconds or more, the encouraging words of the Socialite lift the target's spirit, mend their wounds, and cure their ailments. The target receives all the following benefits: • Heal to Full • Cure All Conditions • Refresh Spikes • Refresh one Power with a Refresh of Short or Long Rest (Note: this cannot be used on Powers that themselves have the Refresh effect)."
       }
     ],
     "utility": [
@@ -7743,7 +7743,7 @@
         "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Socialite bestows a few words of encouragement and some tips on how to improve the quality during a Crafter’s process. The Crafter (who cannot be the Socialite) is able to improve their Plan with a minor boon from the list below. Each ability can only be used once per craft, and the effect only lasts til the end of the Event. As part of the RP, the exact benefit and its duration must be explained."
+        "description": "The Socialite bestows a few words of encouragement and some tips on how to improve the quality during a Crafter’s process. The Crafter (who cannot be the Socialite) is able to improve their Plan with a minor boon from the list below. Each ability can only be used once per craft, and the effect only lasts til the end of the Event. As part of the RP, the exact benefit and its duration must be explained. • Ritual/Enchantment: As a Participant, add or remove one Dark Territory • Weapon:  +1 Bonus Spike Damage to one attack per Short Rest. Ability is lost if the weapon changes hands • Armor/Shield: The wielder may call “Resist Shatter” once • Trap/Damage Dealing Alchemy: The damage of the item(s) is doubled • Healing Item: The healing effect of the crafted item is increased by +3"
       },
       {
         "name": "Headliner",
@@ -7781,7 +7781,7 @@
         "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "By book education or more practical means, the Socialite is familiar with the ways of many puzzles. The Socialite gains the Insight Perk. In addition, whenever the Socialite uses Insight, they can ask these two specific additional questions of a nearby Marshal:"
+        "description": "By book education or more practical means, the Socialite is familiar with the ways of many puzzles. The Socialite gains the Insight Perk. In addition, whenever the Socialite uses Insight, they can ask these two specific additional questions of a nearby Marshal: • “Is there a timer that resets their work, time limit on the puzzle, or other practical timed aspect to the situation?” • “Is an action we are about to take likely to end disastrously?”"
       },
       {
         "name": "It’s Who You Know",
@@ -7838,7 +7838,7 @@
         "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Socialite gains 4 Wealth per Event at Logistics check-in. Additionally, the Socialite can serve as an intermediary between two combatants who wish to beat each other to a pulp. The Socialite declares the fight and ensures everyone knows the rules. Once the two duelists accept the duel, the Pit Master has a few Instructions to give. This need not be verbatim: “Instruction to [Names of Duelists]: You will be unable to use Powers or make attacks on anyone but each other until this duel ends. The duel ends when I declare a winner, when one of you takes damage or an Effect from someone not in this duel, or one of you admit defeat to the other. When the duel ends, you will have all the same Powers, Life Points, and Armor Points you have right now, regardless of what is used during the duel; only expended Resources will remain expended.” The duel is declared by the Socialite with the following example calls at thematically appropriate moments: If the Socialite knows that the duel has ended, they must inform the duelists."
+        "description": "The Socialite gains 4 Wealth per Event at Logistics check-in. Additionally, the Socialite can serve as an intermediary between two combatants who wish to beat each other to a pulp. The Socialite declares the fight and ensures everyone knows the rules. Once the two duelists accept the duel, the Pit Master has a few Instructions to give. This need not be verbatim: “Instruction to [Names of Duelists]: You will be unable to use Powers or make attacks on anyone but each other until this duel ends. The duel ends when I declare a winner, when one of you takes damage or an Effect from someone not in this duel, or one of you admit defeat to the other. When the duel ends, you will have all the same Powers, Life Points, and Armor Points you have right now, regardless of what is used during the duel; only expended Resources will remain expended.” The duel is declared by the Socialite with the following example calls at thematically appropriate moments: • “I declare this duel honorable and just!” • “Duelists, are you ready?” • “Fight!” • “Winner!” If the Socialite knows that the duel has ended, they must inform the duelists."
       },
       {
         "name": "Safebox",
@@ -7857,7 +7857,7 @@
         "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "After a few moments of tinkering the Socialite can trigger a container to become a Safebox the next time it is closed. A Safebox’s contents are generally unreachable unless all parties involved in its creation agree that it should be opened. Certain Powers (Item Disjunction, etc) will get past the safeguards. The Safebox’s maximum dimensions are 2’x2’x3’. The Safebox needs to be created with an Item Info Card containing the following:"
+        "description": "After a few moments of tinkering the Socialite can trigger a container to become a Safebox the next time it is closed. A Safebox’s contents are generally unreachable unless all parties involved in its creation agree that it should be opened. Certain Powers (Item Disjunction, etc) will get past the safeguards. The Safebox’s maximum dimensions are 2’x2’x3’. The Safebox needs to be created with an Item Info Card containing the following: • The Safebox becomes a box if Item Disjunction is used on it. • The Safebox gains Inherent Shatter immunity. • Two people (one of them may be the Socialite) present during its creation must be listed on the card • Add a Black Key marker and write “Only opens once all listed parties touch the box at the same time and say ‘Open.’”"
       },
       {
         "name": "Sources",
@@ -7973,7 +7973,7 @@
         "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "Keen observations about individuals reveal hidden information to a Socialite. When out of combat and within conversational distance, the Socialite may Subtly Discern a number of the following questions equal to their Class Levels in Socialite per Long Rest:"
+        "description": "Keen observations about individuals reveal hidden information to a Socialite. When out of combat and within conversational distance, the Socialite may Subtly Discern a number of the following questions equal to their Class Levels in Socialite per Long Rest: • “Have you killed a living creature in the last hour?” • “Do you think of yourself as a generally honest person?” • “Where did you most recently come from?” • “In which Base Class do you have the most levels?” • “What are your Professions?” • “What Civilization are you from?” • “What Devotion do you follow?”"
       },
       {
         "name": "Diplomatic Immunity",
@@ -8049,7 +8049,7 @@
         "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "A group trusts their Heart and can be emboldened by their words. The Heart may speak to each individual in their Group once per Long Rest and give them a special boon. Each individual can only be given the boon once per Long Rest. The Socialite may choose from the following three options: The accompanying roleplay must be a suitably motivating activity such as a rousing speech, back and forth discussion of battle tactics, a sermon, an assurance of purpose, a hug (remember physical consent rules), or a heart to heart where the Socialite gushes about how much the person means to them."
+        "description": "A group trusts their Heart and can be emboldened by their words. The Heart may speak to each individual in their Group once per Long Rest and give them a special boon. Each individual can only be given the boon once per Long Rest. The Socialite may choose from the following three options: • “Imbue Weapon with Wounding 3, and Refresh one Basic or Advanced Long Rest Power.” (Note: this cannot be used on Powers that themselves have the Refresh effect). • “Imbue Packet with Wounding 5, and Refresh one Novice or Adept Spell-Slot.” • “Grant 3 Barrier” The accompanying roleplay must be a suitably motivating activity such as a rousing speech, back and forth discussion of battle tactics, a sermon, an assurance of purpose, a hug (remember physical consent rules), or a heart to heart where the Socialite gushes about how much the person means to them."
       },
       {
         "name": "Intoxicating Aura",
@@ -8182,7 +8182,7 @@
         "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "A Heart may engage a member of their Group in a long conversation for a few minutes, after which they may inquire into their wellbeing and determine how to be a supportive force in their life. The target must engage with the Socialite, otherwise this Power cannot be used, otherwise they may be asked any or all of the questions below: The Socialite may choose to either Heal the target for 5 or Cure all Conditions on the target at the conclusion of their talk, at which point the Power is exhausted until the character’s next long rest."
+        "description": "A Heart may engage a member of their Group in a long conversation for a few minutes, after which they may inquire into their wellbeing and determine how to be a supportive force in their life. The target must engage with the Socialite, otherwise this Power cannot be used, otherwise they may be asked any or all of the questions below: • Are you under the effects of any Charm, Dominate, or Obey Effects, and if so which ones? • “Have you lied to me in the last five minutes?” • Is this your true form? • “Are you under the effects of any curses, if so which ones? • “How are you feeling generally? • Is there anything you wish you could tell me about, but haven't out of fear, social pressure, or desire to not be a burden to me and if so what is it?” The Socialite may choose to either Heal the target for 5 or Cure all Conditions on the target at the conclusion of their talk, at which point the Power is exhausted until the character’s next long rest."
       },
       {
         "name": "Sizing Up the Opposition",
@@ -8201,7 +8201,7 @@
         "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "“Our waitress is left-handed and the Legionnaire sitting up at the counter weighs two hundred fifteen pounds and knows how to handle himself.” Socialites rely on their wit and observation to survive, and have learned to uncover threats. Once an opponent has been identified they can be negotiated with. Socialites may ask one of the below questions once per Individual per Short Rest after the Focus is completed:"
+        "description": "“Our waitress is left-handed and the Legionnaire sitting up at the counter weighs two hundred fifteen pounds and knows how to handle himself.” Socialites rely on their wit and observation to survive, and have learned to uncover threats. Once an opponent has been identified they can be negotiated with. Socialites may ask one of the below questions once per Individual per Short Rest after the Focus is completed: • Do you intend to harm us? • Are you willing to negotiate a peaceful resolution? • Will you accept a bribe?"
       },
       {
         "name": "Time to Go",
@@ -8260,7 +8260,7 @@
         "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "When pressed into combat, the Socialite is best able to serve while heavily guarded and calling the shots from the back. Their quick wit and observant nature are cornerstones of the Socialite’s battlefield prowess. Weaving inspiring words to benefit their allies is what they do best. The Socialite may use the following abilities to grant boons to their allies. The Socialite must Focus for a Quick Count of 100 to grant each one and the Socialite cannot grant themself boons. Once the first boon is granted, the Socialite may grant additional boons at-will (with a Focus Quick 100 Count) until they take a Rest or  become Helpless."
+        "description": "When pressed into combat, the Socialite is best able to serve while heavily guarded and calling the shots from the back. Their quick wit and observant nature are cornerstones of the Socialite’s battlefield prowess. Weaving inspiring words to benefit their allies is what they do best. The Socialite may use the following abilities to grant boons to their allies. The Socialite must Focus for a Quick Count of 100 to grant each one and the Socialite cannot grant themself boons. • “Imbue Weapon with 3” • “Mend 3 Armor” • “Heal 1” • “Grant Protect vs Packets” • “Grant Protect vs [Mind/Fear]” Once the first boon is granted, the Socialite may grant additional boons at-will (with a Focus Quick 100 Count) until they take a Rest or  become Helpless."
       },
       {
         "name": "Enticing Opulence",
@@ -8431,7 +8431,7 @@
         "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Socialite may place a contract on a named individual by going to the Plot Staff and paying a bounty of 25 Wealth to make a 50 Wealth bounty (Staff will provide the other 25). This bounty will be held in escrow by Plot Staff, and may be added to by characters and NPCs as outlined below. Until the end of the Event, any character who knows about the bounty may provide proof to the Plot Staff of the death of the target, and collect the bounty. For this bounty to be active, the Socialite must post the individual’s name, likeness, and description in at least three conspicuous locations, as well as giving instructions for collecting the bounty and the requirement for proof. If members of Staff notice that the posters have been gone for a reasonable amount of time without being replaced, they can decide to cancel the bounty, and the Socialite may return to Staff to collect the original ante’d wealth. Another Socialite with Mark for Death may pay 5 Wealth to add an additional 10 to a Bounty other than their own, without expending their power by visiting Plot and naming the specific Bounty they wish to add their name to. However, they must also conspicuously add their name to each of the three posters of the original Bounty before doing so."
+        "description": "The Socialite may place a contract on a named individual by going to the Plot Staff and paying a bounty of 25 Wealth to make a 50 Wealth bounty (Staff will provide the other 25). This bounty will be held in escrow by Plot Staff, and may be added to by characters and NPCs as outlined below. Until the end of the Event, any character who knows about the bounty may provide proof to the Plot Staff of the death of the target, and collect the bounty. • The Socialite may call “Counter, Death Mark” if they are attacked (damage or Effects) by the bounty’s target. They can do this once per Short Rest. For this bounty to be active, the Socialite must post the individual’s name, likeness, and description in at least three conspicuous locations, as well as giving instructions for collecting the bounty and the requirement for proof. If members of Staff notice that the posters have been gone for a reasonable amount of time without being replaced, they can decide to cancel the bounty, and the Socialite may return to Staff to collect the original ante’d wealth. Another Socialite with Mark for Death may pay 5 Wealth to add an additional 10 to a Bounty other than their own, without expending their power by visiting Plot and naming the specific Bounty they wish to add their name to. However, they must also conspicuously add their name to each of the three posters of the original Bounty before doing so."
       },
       {
         "name": "Method Acting",
@@ -8488,7 +8488,7 @@
         "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "After spending at least twenty minutes preparing for hosting a party in a specific location, the Socialite gains special powers for the event that will go away only when the party ends or the Socialite leaves the party location. The Socialite can use any of the following at-will (all effects are “by Mind”): The Socialite can also do a number of effects from the following list equal to their Socialite-level per party: As long as the party has lasted at least 45 minutes, the Socialite can do the following once: As long as the party has lasted at least 20 minutes, and is then interrupted, the Socialite can do the following once:"
+        "description": "After spending at least twenty minutes preparing for hosting a party in a specific location, the Socialite gains special powers for the event that will go away only when the party ends or the Socialite leaves the party location. The Socialite can use any of the following at-will (all effects are “by Mind”): • “It can be believed that your drink is now alcoholic.” • Touch: One beverage. • “It can be believed that you are now totally sober.” • Touch: One individual. • “[Name or Description] Obey by Mind: Leave this venue and do not return for one hour.” • Verbal: One Individual • An Individual may only be targeted by this effect once per party. • “By My Voice, Expose Intoxicated” • Intoxication is up to the player and could be in any form of inebriation. • Voice: All who can hear. • “[Name or Description] Subtle Discern by Mind: Do you mean imminent harm to anyone here?” • Verbal: One Individual • “[Name or Description] Long Obey by Mind: If you have had any food or drink from this party, you may not initiate harm to anyone at this party while you are here.” • Verbal: One Individual The Socialite can also do a number of effects from the following list equal to their Socialite-level per party: • “[Name or Description] Short Sleep by Mind” • Verbal: Individual. • “[Name or Description] Heal to Full by Mind” • Verbal: Individual. • “By My Voice, Heal 1 to Dying by Mind” • Verbal: By My Voice. • “[Name or Description] Grant Protect vs Weapon Damage” • Verbal: Individual • “[Name or Description] Grant Protect vs Packet Effect” • Verbal: Individual • “[Name or Description] Grant Protect vs Verbal or Voice” • Verbal: Individual As long as the party has lasted at least 45 minutes, the Socialite can do the following once: • “By My Voice to Party Guests: Heal to Full by Mind” As long as the party has lasted at least 20 minutes, and is then interrupted, the Socialite can do the following once: • “By My Voice to Party Guests: Grant Three Barrier by Mind”"
       },
       {
         "name": "Peacebind",
@@ -8624,7 +8624,7 @@
         "requirement": "Socialite Level 7",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "Whether walking the lines before a battle, delving into a dungeon, or starting off a council meeting, Socialites know how to inspire allies. The Socialite should give a speech lasting at least two minutes. It may include tactical or strategic information, but it must also attempt to inspire and motivate. This speech is an Incantation, so the Socialite cannot move their foot, must have one hand free, and cannot be disturbed while giving it (or else begin again). Once that rousing speech is completed, the Socialite can inspire individuals who listened to the speech. For each individual who the Socialite believes was motivated by the speech, the Socialite can give them a few individual words of encouragement, and give one of the following boons by Touch: The Socialite may give themself any or all of these boons upon completion of the speech."
+        "description": "Whether walking the lines before a battle, delving into a dungeon, or starting off a council meeting, Socialites know how to inspire allies. The Socialite should give a speech lasting at least two minutes. It may include tactical or strategic information, but it must also attempt to inspire and motivate. This speech is an Incantation, so the Socialite cannot move their foot, must have one hand free, and cannot be disturbed while giving it (or else begin again). Once that rousing speech is completed, the Socialite can inspire individuals who listened to the speech. For each individual who the Socialite believes was motivated by the speech, the Socialite can give them a few individual words of encouragement, and give one of the following boons by Touch: • “Short Grant 1 Bonus Maximum Spike” • “Short Grant 5 Barrier by Mind” • “Grant Protect vs Packets by Mind” The Socialite may give themself any or all of these boons upon completion of the speech."
       },
       {
         "name": "Utilitarian",
@@ -9414,7 +9414,7 @@
         "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "This power taps into the innate understanding of the flows of the magic common to Sourcerers. The Sourcerer may ask each of these questions of a target per cast, but must recast to repeat a question."
+        "description": "This power taps into the innate understanding of the flows of the magic common to Sourcerers. The Sourcerer may ask each of these questions of a target per cast, but must recast to repeat a question. • What is [another] one of your Vulnerabilities? • What is [another] one of your Resistances? • What is your Spike Damage?"
       }
     ],
     "noviceSpells": [
@@ -9587,7 +9587,7 @@
         "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Sourcerer charges two Spell-Packets that can do one of three things. The Spell-Packets need not have the same Call: Enhancement: Expend a Spike: The caster may also choose “Shatter Physical Armor by Acid”"
+        "description": "The Sourcerer charges two Spell-Packets that can do one of three things. The Spell-Packets need not have the same Call: • “Dispel All Barrier by Acid” • “Dispel All Protects by Acid” • “Wounding 3 by Acid” Enhancement: Expend a Spike: The caster may also choose “Shatter Physical Armor by Acid”"
       },
       {
         "name": "Primal Ray",

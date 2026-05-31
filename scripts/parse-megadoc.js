@@ -277,8 +277,12 @@ const STAT_TWO = /^(Target|Delivery|Accent):\s*(.+?)\s{2,}(Duration|Refresh|Effe
 const statKey = l => l.toLowerCase().replace(/^incant$/, 'incantation').replace(/\s+/g, '_').replace(/s$/, '');
 
 function parsePowerNodes(powerNodes) {
-  // powerNodes: array of text nodes belonging to one power (after its heading node)
-  const lines = powerNodes.map(n => n.text).filter(Boolean);
+  // powerNodes: text + list nodes belonging to one power (after its heading node).
+  // A `list` node's items are flattened to bullet lines ("• …") so a power's
+  // level/benefit list survives into the description instead of being dropped.
+  const lines = powerNodes
+    .flatMap(n => n.type === 'list' ? n.items.map(it => `• ${it}`) : [n.text])
+    .filter(Boolean);
   const fields = {};
   let descStart = 0;
 
@@ -327,8 +331,12 @@ function parsePowersInRange(start, end) {
     const n = nodes[i];
     if (n.type === 'heading' && (n.level === 4 || n.level === 5) && POWER_HEADER.test(n.text)) {
       const bodyEnd = nodes.findIndex((m, j) => j > i && m.type === 'heading');
+      // Keep `list` nodes alongside `text`: a power's benefits often follow a
+      // "…at various Levels:" colon as a <ul> (Adept Ritualist, Druid Forms). They
+      // are separate nodes the walker captured; dropping them here is what left
+      // those descriptions truncated at the colon.
       const bodyNodes = nodes.slice(i + 1, bodyEnd === -1 ? end : Math.min(bodyEnd, end))
-        .filter(m => m.type === 'text');
+        .filter(m => m.type === 'text' || m.type === 'list');
       const { name, tier, tags, maxRanks, cost } = parsePowerHeading(n.text);
       const { fields, description } = parsePowerNodes(bodyNodes);
       powers.push({
