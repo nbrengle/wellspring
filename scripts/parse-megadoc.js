@@ -683,6 +683,9 @@ function parseSkills() {
       const descParts = [];
 
       for (const bn of bodyNodes) {
+        // Flatten <ul> list nodes into bullet lines so a skill's trailing list
+        // (Bowmaster's "additional effects by aiming: • …") isn't dropped.
+        if (bn.type === 'list') { for (const it of bn.items) descParts.push(`• ${it}`); continue; }
         if (bn.type !== 'text') continue;
         const t = bn.text;
         const cm = t.match(/^Cost:\s*(\d+)/);

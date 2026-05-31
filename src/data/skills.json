@@ -205,7 +205,7 @@
     "prereq": "Quick Shot, 10 levels in Martial Classes",
     "ranks": null,
     "category": "Martial",
-    "description": "When the character spends a Quick 10 aiming with a projectile weapon, they may choose to do one of the following:"
+    "description": "When the character spends a Quick 10 aiming with a projectile weapon, they may choose to do one of the following: • Add one to their Base Damage for that shot. • Expend a Spike to deliver a Disable Effect. This is called as “Disable [Limb]” where the limb called must be the one struck by the projectile. In the case of held objects, the limb holding the object must be called. Torso hits will allow the character to call any limb they wish."
   },
   {
     "name": "Daggercraft",
@@ -550,7 +550,7 @@
     "prereq": "None",
     "ranks": null,
     "category": "Medical",
-    "description": "The character has some basic understanding of the way living creatures work and has some minor skill in the healing arts. By spending a Quick 100 tending to an individual, that individual, if dying, will become stable. The character’s death-count will not stop or pause while being tended to, so the target may die during the count. The character using this skill should role-play checking and binding wounds, and overall treating the character (please remember not to touch other players without explicit previous consent). The character using Basic Medicine may use any of the following at-will delivered by Touch:"
+    "description": "The character has some basic understanding of the way living creatures work and has some minor skill in the healing arts. By spending a Quick 100 tending to an individual, that individual, if dying, will become stable. The character’s death-count will not stop or pause while being tended to, so the target may die during the count. The character using this skill should role-play checking and binding wounds, and overall treating the character (please remember not to touch other players without explicit previous consent). The character using Basic Medicine may use any of the following at-will delivered by Touch: • “Discern: Are you currently at max Life Points?” • “Discern: Are you Dying?” • “Discern: Are you Dead?”"
   },
   {
     "name": "Diagnose",
@@ -558,7 +558,7 @@
     "prereq": "Basic Medicine",
     "ranks": null,
     "category": "Medical",
-    "description": "With only a glance, the trained character can tell the extent of someone’s wounds. At-will the character can give a person a quick look over while within Touch range and then ask:"
+    "description": "With only a glance, the trained character can tell the extent of someone’s wounds. At-will the character can give a person a quick look over while within Touch range and then ask: • Discern: What non-Inherent Conditions do you have currently? • Discern: How many Life Points are you down? • Discern: Are you sick? • Discern: Are you diseased? • Discern: Are you Living? • Discern: Did you take damage that was from a sharp instrument? • Discern: Did you take damage from a blunt instrument? • Discern to Corpse: Are you 5th level or lower?"
   },
   {
     "name": "Advanced Medicine",
@@ -566,7 +566,7 @@
     "prereq": "Basic Medicine",
     "ranks": null,
     "category": "Medical",
-    "description": "The character has a number of techniques at their disposal to help those around them. The character can perform any of the following actions by spending a Slow 60 out of combat tending to another (these cannot be performed on the character themself). These can be done as part of a Short Rest."
+    "description": "The character has a number of techniques at their disposal to help those around them. The character can perform any of the following actions by spending a Slow 60 out of combat tending to another (these cannot be performed on the character themself). These can be done as part of a Short Rest. • Cure Disabled [one limb] • Cure Weakened • Cure Slept"
   },
   {
     "name": "Combat Medic",
