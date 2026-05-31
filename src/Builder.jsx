@@ -773,9 +773,20 @@ const refreshBucket = (c) => {
   if (r.includes("immediate")) return "Immediate";
   return c.refresh;
 };
+// The effect-ish entities (effects / conditions / defenses) a candidate invokes,
+// from the reference graph — what the ability actually DOES. Used to group/sort
+// abilities by effect (e.g. "show me everything that Heals / Protects / Counters").
+function candidateEffects(c) {
+  const id = `${/powers/.test(c.tierList || "") || c.tier ? "powers" : c.cat ? "skills" : "powers"}:${c.name}`;
+  const refs = (REFS.mentions && (REFS.mentions[`powers:${c.name}`] || REFS.mentions[id])) || [];
+  return refs.filter((t) => /^(effects|conditions|defenses):/.test(t)).map((t) => t.slice(t.indexOf(":") + 1));
+}
+const primaryEffect = (c) => candidateEffects(c)[0] || "—";
+
 const GROUP_AXES = {
   category: { label: "Category", fn: (c) => c.cat || c.tierList || "Other" },
   refresh: { label: "Refresh", fn: refreshBucket },
+  effect: { label: "Effect", fn: primaryEffect },
   alphabetical: { label: "A–Z", fn: (c) => (c.name[0] || "#").toUpperCase() },
   cost: { label: "Cost", fn: (c) => (typeof c.cost === "number" ? `${c.cost} BP` : "—") },
 };
@@ -816,7 +827,9 @@ function PickerOverlay({ spec, character, onClose }) {
     // Sort items within each group.
     const cmp = sortMode === "cost"
       ? (a, b) => (a.cost ?? 999) - (b.cost ?? 999) || a.name.localeCompare(b.name)
-      : (a, b) => a.name.localeCompare(b.name);
+      : sortMode === "effect"
+        ? (a, b) => candidateEffects(b).length - candidateEffects(a).length || a.name.localeCompare(b.name)
+        : (a, b) => a.name.localeCompare(b.name);
     for (const [, cs] of entries) cs.sort(cmp);
     // Alphabetical group-by also sorts the group headers A–Z.
     if (groupMode === "alphabetical") entries.sort((a, b) => a[0].localeCompare(b[0]));
@@ -868,6 +881,7 @@ function PickerOverlay({ spec, character, onClose }) {
                   <select className="b-picker-sortsel" value={sortMode} onChange={(e) => setSortMode(e.target.value)}>
                     <option value="name">A–Z</option>
                     <option value="cost">Cost</option>
+                    <option value="effect">Effect richness</option>
                   </select>
                 </label>
                 <label className="b-picker-toggle">
