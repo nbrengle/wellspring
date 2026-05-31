@@ -5598,7 +5598,7 @@
         "requirement": "Mage Level 4",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": ""
+        "description": "When the Replicate Enhancement Innate Power is used, the Mage may choose to reduce the number of targets by one and instead place the additional charge granted into a Spell-Packet. This allows the Mage to retain the charge for later use, or deliver the charge at range."
       },
       {
         "name": "Cantrip Scholar",

@@ -350,13 +350,20 @@ function parsePowersInRange(start, end) {
     const isSub = n.type === 'heading' && (n.level === 4 || n.level === 5)
       && !POWER_HEADER.test(n.text) && subNames.has(n.text.trim());
     if (n.type === 'heading' && (n.level === 4 || n.level === 5) && (POWER_HEADER.test(n.text) || isSub)) {
-      const bodyEnd = nodes.findIndex((m, j) => j > i && m.type === 'heading');
+      // A power's body ends at the next REAL heading. Some source paragraphs are
+      // mis-styled as <h4> (a long sentence, no [Tier] tag, not a sub-power) — e.g.
+      // Arcane Charge's whole description. Don't let those bound the body; treat
+      // them as prose so the description isn't lost.
+      const isProseHeading = (m) => m.type === 'heading' && !POWER_HEADER.test(m.text)
+        && !subNames.has(m.text.trim()) && m.text.length > 60 && /[.”]$/.test(m.text);
+      const bodyEnd = nodes.findIndex((m, j) => j > i && m.type === 'heading' && !isProseHeading(m));
       // Keep `list` nodes alongside `text`: a power's benefits often follow a
       // "…at various Levels:" colon as a <ul> (Adept Ritualist, Druid Forms). They
       // are separate nodes the walker captured; dropping them here is what left
-      // those descriptions truncated at the colon.
+      // those descriptions truncated at the colon. Prose headings → text too.
       const bodyNodes = nodes.slice(i + 1, bodyEnd === -1 ? end : Math.min(bodyEnd, end))
-        .filter(m => m.type === 'text' || m.type === 'list');
+        .filter(m => m.type === 'text' || m.type === 'list' || isProseHeading(m))
+        .map(m => isProseHeading(m) ? { type: 'text', text: m.text } : m);
       // Sub-powers have no tier tag; mark them so they're identifiable + parseable.
       const parsed = parsePowerHeading(n.text);
       const { name, tags, maxRanks, cost } = parsed;

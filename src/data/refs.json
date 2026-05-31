@@ -5702,6 +5702,8 @@
       "accents:Ice"
     ],
     "powers:Arcane Charge": [
+      "powers:Replicate Enhancement",
+      "terms:Power",
       "modifiers:Self",
       "classes:Mage"
     ],
@@ -12539,6 +12541,7 @@
       "powers:Arcane Study",
       "powers:Arcane Barrier",
       "powers:Channel the Arcane",
+      "powers:Arcane Charge",
       "powers:Freeze",
       "powers:Mage Power",
       "powers:Town Portal",
@@ -17584,6 +17587,7 @@
       "archetypes:Utility Mage"
     ],
     "powers:Replicate Enhancement": [
+      "powers:Arcane Charge",
       "powers:Mage Mend",
       "archetypes:Utility Mage"
     ],
