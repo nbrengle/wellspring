@@ -11,8 +11,8 @@ Starting Skills (free): None
 Purchased Skills: None
 Purchased Perks: Generous Soul - 4 BP, Hard to Kill - 1 BP, Quick Healing - 2 BP, Toughness - 4 BP, Unkillable - 3 BP, Will to Live - 1 BP, Patron - 4 BP, Gift of Healing - 1 BP, Gift of Rebirth - 2 BP, Gift of Unbreakable Flesh, Ancestral Weapon - 3 BP, Boon Bonds - 1 BP, Heartbond - 2 BP, Sharp Mind - 2 BP, Expanded Hearth - 1 BP
 Cantrips: Whispers of the Unseen, Energy Shield, Circle of Four, Infuriate, Mass Flux
-Novice Spells known: Spirit Link, Destructive Resonance, Melt, Iron Maiden, Aethereal Fade
-Adept Spells known: Spirit Chalice, Breach Teleport, Smothering Ash
+Novice Spells known: Spirit Link, Destructive Resonance, Melt
+Adept Spells known: Spirit Chalice, Breach Teleport, Smothering Ash, Bonesplinter, Arcane Backlash
 Novice Spell-slots: 6
 Adept Spell-slots: 5
 

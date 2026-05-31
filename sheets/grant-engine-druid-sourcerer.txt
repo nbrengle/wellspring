@@ -11,8 +11,8 @@ Starting Skills (free): None
 Purchased Skills: None
 Purchased Perks: Generous Soul - 4 BP, Hard to Kill - 1 BP, Quick Healing - 2 BP, Toughness - 4 BP, Unkillable - 3 BP, Will to Live - 1 BP, Patron - 4 BP, Gift of Healing - 1 BP, Gift of Rebirth - 2 BP, Gift of Unbreakable Flesh, Ancestral Weapon - 3 BP, Boon Bonds - 1 BP, Heartbond - 2 BP, Sharp Mind - 2 BP, Expanded Hearth - 1 BP
 Cantrips: Natural Remedies, Antitoxin, Care for the Fallen, Whispers of the Unseen, Energy Shield, Circle of Four
-Novice Spells known: Lesser Form of the Striking Serpent, Spirit Link, Destructive Resonance, Melt
-Adept Spells known: Form of the Hunting Panther, Form of the Striking Serpent, Form of the Hulking Bear, Thorns of Ruin, Spirit Chalice, Breach Teleport
+Novice Spells known: Spirit Link, Destructive Resonance, Melt
+Adept Spells known: Form of the Hunting Panther, Form of the Striking Serpent, Form of the Hulking Bear, Thorns of Ruin, Weasel’s Agility, Spirit Chalice, Breach Teleport
 Novice Spell-slots: 10
 
 Build Points: 31 / 21 (+10 bonus BP)

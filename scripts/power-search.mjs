@@ -19,87 +19,10 @@ import {
 import {
   ALL_SKILLS, ALL_PERKS, ALL_FLAWS, REFS, LINEAGES, CLASS_POWERS, lookupEntity,
 } from '../src/data/index.js';
-import EFFECT_WEIGHTS from '../src/data/effect-weights.json' with { type: 'json' };
+import { classPowers, freqMult } from './effect-score.mjs';
 
-// ── effect-power scoring ──────────────────────────────────────────────────────
-// Power isn't in a perk's BP cost — it's in the EFFECTS it delivers, how OFTEN it
-// can deliver them (refresh), and how those effects CHAIN. The user scores
-// effects/conditions/defenses (effect-weights.json); we propagate via the graph.
-const WEIGHT = { effects: EFFECT_WEIGHTS.effects, conditions: EFFECT_WEIGHTS.conditions, defenses: EFFECT_WEIGHTS.defenses };
-
-// Frequency multiplier from a power's `refresh`. Steep, per the user: a spammable
-// effect is worth far more than a once-per-event one. Multi-valued refresh strings
-// ("Short Rest, Focus Quick 30") take the most generous (highest) tier present.
-function freqMult(refresh) {
-  const r = String(refresh || '').toLowerCase();
-  if (/at[- ]?will|immediate|instantaneous|quick|focus/.test(r)) return 3;
-  if (/short rest/.test(r)) return 2;
-  if (/spell/.test(r)) return 1.5;       // costs a spell-slot — repeatable while slots last
-  if (/long rest/.test(r)) return 1;
-  if (/event|special|once/.test(r)) return 0.5;
-  return 1;                              // unknown/none → neutral
-}
-
-// Tier multiplier — cantrips are weak despite spammability; higher tiers hit
-// harder (per user feedback). Defaults to 1 for unlisted tiers.
-const tierMult = (tier) => EFFECT_WEIGHTS.tierMultiplier?.[tier] ?? 1;
-
-// Accent-availability penalty — an effect gated behind a rare accent (Divine needs
-// a devotion; Void/Radiant/etc. uncommon) is less practical. Scan the power's text
-// for the rarest accent it invokes and take that penalty (per user feedback).
-const ACCENT_RARITY = EFFECT_WEIGHTS.accentRarity || {};
-function accentPenalty(text) {
-  let mult = 1;
-  for (const [accent, m] of Object.entries(ACCENT_RARITY)) {
-    if (accent === '_comment') continue;
-    if (new RegExp(`\\b${accent}\\b`).test(text || '') && m < mult) mult = m;
-  }
-  return mult;
-}
-
-// The effect-ish entities an ability invokes, with the per-effect weight.
-function effectHits(entityId) {
-  const hits = [];
-  for (const t of REFS.mentions[entityId] || []) {
-    const [type, name] = [t.slice(0, t.indexOf(':')), t.slice(t.indexOf(':') + 1)];
-    const w = (WEIGHT[type] && WEIGHT[type][name]) || 0;
-    if (w > 0) hits.push({ id: t, name, w });
-  }
-  return hits;
-}
-
-// Raw (frequency-unweighted) effect-power of an ability.
-function rawPower(entityId) {
-  return effectHits(entityId).reduce((s, h) => s + h.w, 0);
-}
-
-// Frequency-weighted power of a POWER (perks/skills have no refresh → ×1).
-function abilityPower(entityId, refresh) {
-  return rawPower(entityId) * freqMult(refresh);
-}
-// ── per-class power index ─────────────────────────────────────────────────────
-// Every power a class can hold, with its refresh (for frequency) and a scored
-// effect profile. We score POWER LOADOUTS, since that's where effects live.
-function classPowers(cls) {
-  const out = [];
-  for (const [tier, arr] of Object.entries(CLASS_POWERS[cls] || {})) {
-    if (!Array.isArray(arr)) continue;
-    for (const p of arr) {
-      const id = `powers:${p.name}`;
-      const hits = effectHits(id);
-      if (!hits.length) continue;
-      const accentText = [p.description, p.call, p.effect, p.accent].filter(Boolean).join(' ');
-      out.push({
-        name: p.name, tier, refresh: p.refresh || p.refreshes || 'None',
-        hits,
-        // effect-power × frequency × tier × accent-availability.
-        score: rawPower(id) * freqMult(p.refresh || p.refreshes) * tierMult(tier) * accentPenalty(accentText),
-        topEffects: hits.sort((a, b) => b.w - a.w).map((h) => h.name),
-      });
-    }
-  }
-  return out;
-}
+// Effect-power scoring lives in scripts/effect-score.mjs (shared with the build
+// generator so they can't drift). See that module for the model.
 
 // ── synergy from co-mention ───────────────────────────────────────────────────
 // "Effects that trigger others" — inferred (per user) from co-occurrence: effects

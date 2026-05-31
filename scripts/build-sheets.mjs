@@ -10,37 +10,14 @@ import { fileURLToPath } from 'node:url';
 import { validate, grantedAbilities } from '../src/data/validate.js';
 import { formatCharacterSheet } from '../src/data/sheet.js';
 import { CLASS_POWERS, REFS, ALL_PERKS, LINEAGES, lookupEntity } from '../src/data/index.js';
-import EFFECT_WEIGHTS from '../src/data/effect-weights.json' with { type: 'json' };
+import { classPowers, rawPower } from './effect-score.mjs';
 
 const OUT = join(dirname(fileURLToPath(import.meta.url)), '..', 'sheets');
 mkdirSync(OUT, { recursive: true });
 
-// ── effect-power scoring (mirrors power-search) ───────────────────────────────
-const WEIGHT = { effects: EFFECT_WEIGHTS.effects, conditions: EFFECT_WEIGHTS.conditions, defenses: EFFECT_WEIGHTS.defenses };
-const freqMult = (r0) => {
-  const r = String(r0 || '').toLowerCase();
-  if (/at[- ]?will|immediate|instantaneous|quick|focus/.test(r)) return 3;
-  if (/short rest/.test(r)) return 2;
-  if (/spell/.test(r)) return 1.5;
-  if (/long rest/.test(r)) return 1;
-  if (/event|special|once/.test(r)) return 0.5;
-  return 1;
-};
-const rawPower = (id) => (REFS.mentions[id] || [])
-  .reduce((s, t) => { const [ty, n] = [t.slice(0, t.indexOf(':')), t.slice(t.indexOf(':') + 1)]; return s + ((WEIGHT[ty] && WEIGHT[ty][n]) || 0); }, 0);
-
-// Every power a class can hold, scored by frequency-weighted effect power.
-function classPowers(cls) {
-  const out = [];
-  for (const [tier, arr] of Object.entries(CLASS_POWERS[cls] || {})) {
-    if (!Array.isArray(arr)) continue;
-    for (const p of arr) {
-      const score = rawPower(`powers:${p.name}`) * freqMult(p.refresh);
-      if (score > 0) out.push({ name: p.name, tier, score });
-    }
-  }
-  return out;
-}
+// Effect-power scoring (incl. cantrip/accent weighting) is shared with
+// power-search via scripts/effect-score.mjs — using it here means the generated
+// builds rank powers exactly like the search does.
 
 // Which character field a power's tier fills (so the sheet lists it correctly).
 const TIER_FIELD = {
