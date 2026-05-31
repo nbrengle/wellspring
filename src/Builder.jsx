@@ -786,8 +786,12 @@ function PickerOverlay({ spec, character, onClose }) {
   const [query, setQuery] = useState("");
   const [hideLocked, setHideLocked] = useState(false);
   const [selected, setSelected] = useState(candidates[0]?.name || null);
-  // Group/sort controls: "default" uses the spec's grouping; others use GROUP_AXES.
-  const [groupMode, setGroupMode] = useState("default");
+  // Group/sort controls. Default grouping is by REFRESH when the candidates carry
+  // a refresh (powers/spells) — that's the most useful axis and the old separate
+  // "Default" option just duplicated it; otherwise fall back to category (skills,
+  // perks, which have no refresh).
+  const hasRefresh = candidates.some((c) => c.refresh && c.refresh !== "None");
+  const [groupMode, setGroupMode] = useState(hasRefresh ? "refresh" : "category");
   const [sortMode, setSortMode] = useState("name"); // "name" | "cost"
   // Local reading stack: empty → reading the selected candidate; pushing an
   // entity id lets the user follow links without leaving the picker.
@@ -800,7 +804,7 @@ function PickerOverlay({ spec, character, onClose }) {
     let list = candidates;
     if (q) list = list.filter((c) => c.name.toLowerCase().includes(q) || (c.desc || "").toLowerCase().includes(q));
     const decorated = list.map((c) => ({ ...c, locked: lockedOf(c.name) }));
-    const keyFn = groupMode === "default" ? groupBy : GROUP_AXES[groupMode].fn;
+    const keyFn = (GROUP_AXES[groupMode] || GROUP_AXES.category).fn;
     const buckets = new Map();
     for (const c of decorated) {
       const k = keyFn(c);
@@ -857,7 +861,6 @@ function PickerOverlay({ spec, character, onClose }) {
               <div className="b-picker-sortrow">
                 <label className="b-picker-sortlabel">Group
                   <select className="b-picker-sortsel" value={groupMode} onChange={(e) => setGroupMode(e.target.value)}>
-                    <option value="default">Default</option>
                     {Object.entries(GROUP_AXES).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
                   </select>
                 </label>
