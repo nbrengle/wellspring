@@ -10,6 +10,13 @@ const DATA = join(dirname(fileURLToPath(import.meta.url)), '..', 'src', 'data');
 const read = (f) => JSON.parse(readFileSync(join(DATA, f), 'utf8'));
 const MEGADOC = readFileSync(join(DATA, '..', '..', 'Wellspring MegaDoc.txt'), 'utf8');
 
+// Every power name (incl. extracted sub-powers), so "refs X Power below" can tell
+// an UNextracted sub-power (real gap) from one that now exists (handled).
+const POWER_NAMES = new Set();
+for (const c of read('classes.json')) {
+  for (const arr of Object.values(c)) if (Array.isArray(arr)) for (const p of arr) if (p && p.name) POWER_NAMES.add(p.name);
+}
+
 // Which files hold described entities, and how to get [name, description, extra].
 // Powers live nested inside classes; everything else is a flat array.
 function* entities() {
@@ -41,9 +48,13 @@ const CHECKS = [
   // EMPTY — has no description at all (multiclassGrants are skill refs, exempt).
   (e) => (!e.desc.trim() && !/multiclassGrants/.test(e.type) && e.file !== 'domains') ? 'EMPTY description' : null,
   // DANGLING COLON — ends on a colon (a list/table the parser likely dropped).
-  // Suppress benign trailing labels that legitimately precede a non-text element
-  // (an image / sigil in the source), e.g. devotions' "Example Sigil:".
-  (e) => (/[:：]\s*$/.test(e.desc.trim()) && !/\b(Example Sigil|Example|Sigil|e\.g\.)\s*[:：]\s*$/i.test(e.desc.trim()))
+  // Suppress benign trailing labels that legitimately precede a NON-TEXT element
+  // the builder can't show anyway: a sigil/example image (devotions' "Example
+  // Sigil:"), or a figure/diagram referenced "here:"/"for reference:" (concepts
+  // like Drawing, Primal Script).
+  (e) => (/[:：]\s*$/.test(e.desc.trim())
+    && !/\b(Example Sigil|Example|Sigil|e\.g\.)\s*[:：]\s*$/i.test(e.desc.trim())
+    && !/\b(here|for reference|below|presented|shown|as follows)\s*[:：]\s*$/i.test(e.desc.trim()))
     ? 'ends with ":" (dropped list?)' : null,
   // PROMISES MORE — "following"/"below"/"at various levels" but text looks cut off.
   (e) => /\b(the following|listed below|as follows|at various .* levels)\s*[:.]?\s*$/i.test(e.desc.trim()) ? 'promises a list that isn\'t there' : null,
@@ -53,10 +64,13 @@ const CHECKS = [
     if (toks.length >= 6 && toks.filter((t) => /^[\d-]+$/.test(t)).length / toks.length > 0.4) return 'looks like a stat-table fragment';
     return null;
   },
-  // DANGLING REFERENCE — names a sub-power "X Power below" that isn't its own entity.
+  // DANGLING REFERENCE — names a sub-power "X Power below" that ISN'T its own
+  // entity yet. Once extracted (#53), the name is in POWER_NAMES → not a gap.
   (e) => {
-    const m = e.desc.match(/\b([A-Z][\w’' ]+?)\s+Power\s+below\b/);
-    return m ? `refs "${m[1].trim()} Power below" (likely an unextracted sub-power)` : null;
+    const m = e.desc.match(/\bthe\s+([A-Z][\w’' ]+?)\s+Power\s+below\b/);
+    if (!m) return null;
+    const name = m[1].trim();
+    return POWER_NAMES.has(name) ? null : `refs "${name} Power below" (unextracted sub-power)`;
   },
   // VERY SHORT — suspiciously terse for a described entity (skills/perks excepted: many are 1-liners).
   (e) => (e.desc.trim().length > 0 && e.desc.trim().length < 15 && /classes/.test(e.file)) ? `very short (${e.desc.trim().length} chars)` : null,
