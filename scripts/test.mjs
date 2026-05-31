@@ -319,6 +319,23 @@ test('finite-ranks "Extended Capacity - Novice x2" stays one rank-2 row (not exp
   eq(c.purchasedSkills.length, 1, 'single row');
 });
 
+// ─── tiered perks: cumulative cost + hard-enforced per-tier level gate ────────
+test('Draconic Heritage rank 2 costs cumulative tier sum (2+3=5)', () => {
+  const c = { classLevels: 'Mage 5', purchasedPerks: ['Draconic Heritage'], ranks: { purchasedPerks: [2] } };
+  eq(computeSpend(c).byItem['purchasedPerks:Draconic Heritage'].cost, 5, 'tiers 1+2');
+});
+test('Draconic Heritage rank 4 costs 2+3+4+5 = 14 (not base×4)', () => {
+  const c = { classLevels: 'Mage 15', purchasedPerks: ['Draconic Heritage'], ranks: { purchasedPerks: [4] } };
+  eq(computeSpend(c).byItem['purchasedPerks:Draconic Heritage'].cost, 14, 'all four tiers');
+});
+test('tier level gate is hard-enforced (rank 2 below char level 5 is an issue)', () => {
+  const below = validate({ classLevels: 'Mage 4', purchasedPerks: ['Draconic Heritage'], ranks: { purchasedPerks: [2] } });
+  ok(below.prereqs.issues.some((i) => /tier 2 requires character level 5/.test(i.text || '')), 'gated');
+  ok(!below.valid, 'invalid below the gate');
+  const at = validate({ classLevels: 'Mage 5', purchasedPerks: ['Draconic Heritage'], ranks: { purchasedPerks: [2] } });
+  ok(!at.prereqs.issues.some((i) => i.tier), 'clears at the required level');
+});
+
 // ─── report ───────────────────────────────────────────────────────────────────
 console.log(`\n${passed} passed, ${failures.length} failed`);
 if (failures.length) {

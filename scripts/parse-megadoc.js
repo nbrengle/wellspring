@@ -806,7 +806,37 @@ function enrichWithDetailSections(results) {
   return results;
 }
 
-write('perks.json', enrichWithDetailSections(parsePerkFlawList('Perks List', 'cost')));
+// A few perks are TIERED: their detail prose carries a "Cost / Character Level /
+// Ability" table where each row is one purchasable tier (e.g. Draconic Heritage:
+// 2/2, 3/5, 4/10, 5/15). Each tier costs its own (non-uniform) BP, is gated on a
+// character level, and requires all previous tiers. Parse that table into a
+// structured `tiers: [{ cost, level, ability }]` so the validator can price
+// cumulatively and gate per tier, instead of the flat rank×cost model.
+function extractTiers(results) {
+  // Table tail begins after the "Cost Character Level Ability" header; rows are
+  // "<cost> <level> <ability…>" until the next "<num> <num>" row or end.
+  const HEADER = /Cost\s+Character\s+Level\s+Ability\s+/i;
+  const ROW = /(\d+)\s+(\d+)\s+(.+?)(?=\s+\d+\s+\d+\s|$)/gs;
+  for (const r of results) {
+    const m = r.description && r.description.match(HEADER);
+    if (!m) continue;
+    const tail = r.description.slice(m.index + m[0].length);
+    const tiers = [];
+    let row;
+    ROW.lastIndex = 0;
+    while ((row = ROW.exec(tail))) {
+      tiers.push({ cost: +row[1], level: +row[2], ability: row[3].trim() });
+    }
+    if (tiers.length > 1) {
+      r.tiers = tiers;
+      // The base `cost` is tier 1's cost (the flat field still reflects entry price).
+      r.cost = tiers[0].cost;
+    }
+  }
+  return results;
+}
+
+write('perks.json', extractTiers(enrichWithDetailSections(parsePerkFlawList('Perks List', 'cost'))));
 write('flaws.json', parsePerkFlawList('Flaws List', 'bp'));
 
 // ─── DEVOTIONS ────────────────────────────────────────────────────────────────

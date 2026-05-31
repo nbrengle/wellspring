@@ -269,7 +269,29 @@
     "ranks": null,
     "prereq": null,
     "category": "Social/Background",
-    "description": "Has dragon ancestors that give advantages based on level. Cost: 2 Prerequisites: Must be taken at Character Creation. How exactly a mortal ends up with a draconic heritage is a matter of fierce debate (and more than a few romance novels). While the truth of how this occurs remains tightly veiled, it cannot be denied that some family trees have common expressions of dragon-like traits. While those people can’t travel through the void of space like their distant ancestors, other draconic traits do appear. When this Perk is taken, the player chooses one draconic Accent: Acid, Flame, Ice, or Lightning. For each perk tier below, after the first, the character pays additional BP. Each level of the Perk requires that all previous levels have been purchased. Characters may only purchase each tier once, but may purchase later tiers once they have attained the appropriate character levels. Cost Character Level Ability 2 2 The character can counter one attack from their chosen draconic Accent by calling “Counter, Draconic Heritage. They can do this once per Short Rest. The character is affected by Powers that affect Dragons, ie: Calls that have the “to Dragon” Qualifier. 3 5 The character can use a breath weapon once per Long Rest. As a Verbal, this will do three damage, plus the number of Draconic Heritage perks taken (including this one), to one target that the character could strike with a melee weapon. The damage will have the appropriate Accent. The Call is “[Name or Description] [X] by [Accent]. 4 10 The dragon’s natural magical resistance expresses itself. After completing a Short Rest, the character automatically gains a Protect vs Packets. This Protect lasts until it is used or until the character completes a Short Rest. 5 15 The character may choose to Resist effects from their chosen Element. They may do this at will."
+    "description": "Has dragon ancestors that give advantages based on level. Cost: 2 Prerequisites: Must be taken at Character Creation. How exactly a mortal ends up with a draconic heritage is a matter of fierce debate (and more than a few romance novels). While the truth of how this occurs remains tightly veiled, it cannot be denied that some family trees have common expressions of dragon-like traits. While those people can’t travel through the void of space like their distant ancestors, other draconic traits do appear. When this Perk is taken, the player chooses one draconic Accent: Acid, Flame, Ice, or Lightning. For each perk tier below, after the first, the character pays additional BP. Each level of the Perk requires that all previous levels have been purchased. Characters may only purchase each tier once, but may purchase later tiers once they have attained the appropriate character levels. Cost Character Level Ability 2 2 The character can counter one attack from their chosen draconic Accent by calling “Counter, Draconic Heritage. They can do this once per Short Rest. The character is affected by Powers that affect Dragons, ie: Calls that have the “to Dragon” Qualifier. 3 5 The character can use a breath weapon once per Long Rest. As a Verbal, this will do three damage, plus the number of Draconic Heritage perks taken (including this one), to one target that the character could strike with a melee weapon. The damage will have the appropriate Accent. The Call is “[Name or Description] [X] by [Accent]. 4 10 The dragon’s natural magical resistance expresses itself. After completing a Short Rest, the character automatically gains a Protect vs Packets. This Protect lasts until it is used or until the character completes a Short Rest. 5 15 The character may choose to Resist effects from their chosen Element. They may do this at will.",
+    "tiers": [
+      {
+        "cost": 2,
+        "level": 2,
+        "ability": "The character can counter one attack from their chosen draconic Accent by calling “Counter, Draconic Heritage. They can do this once per Short Rest. The character is affected by Powers that affect Dragons, ie: Calls that have the “to Dragon” Qualifier."
+      },
+      {
+        "cost": 3,
+        "level": 5,
+        "ability": "The character can use a breath weapon once per Long Rest. As a Verbal, this will do three damage, plus the number of Draconic Heritage perks taken (including this one), to one target that the character could strike with a melee weapon. The damage will have the appropriate Accent. The Call is “[Name or Description] [X] by [Accent]."
+      },
+      {
+        "cost": 4,
+        "level": 10,
+        "ability": "The dragon’s natural magical resistance expresses itself. After completing a Short Rest, the character automatically gains a Protect vs Packets. This Protect lasts until it is used or until the character completes a Short Rest."
+      },
+      {
+        "cost": 5,
+        "level": 15,
+        "ability": "The character may choose to Resist effects from their chosen Element. They may do this at will."
+      }
+    ]
   },
   {
     "name": "Famous",

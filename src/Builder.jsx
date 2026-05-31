@@ -122,8 +122,11 @@ function validityReasons(report) {
     if (s.over) out.push(`${s.label}: ${s.used}/${s.allowed} (over by ${s.used - s.allowed})`);
   }
   for (const iss of report.prereqs?.issues || []) {
+    // Tier/level-gate issues carry a ready `text` ("tier 2 requires character
+    // level 5") with no missing-skill lists; prereq issues carry missing/anyOf.
+    if (iss.text && !iss.missing) { out.push(`${iss.item}: ${iss.text}`); continue; }
     const need = [
-      ...iss.missing.map((m) => m.name),
+      ...(iss.missing || []).map((m) => m.name),
       ...(iss.anyOf || []).map((g) => g.map((m) => m.name).join(" or ")),
     ].join(", ");
     out.push(`${iss.item} needs: ${need}`);

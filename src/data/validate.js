@@ -423,6 +423,15 @@ function effectiveCost(item, field, character, idx, granted) {
   // authored agree without a guard.)
   if (typeof authored === 'number') return { cost: authored, base, grant, rank };
 
+  // Tiered perks (Draconic Heritage) have NON-uniform per-tier costs — rank N is
+  // the cumulative sum of the first N tiers, not base×N.
+  if (Array.isArray(ent?.tiers) && ent.tiers.length) {
+    const n = Math.min(rank, ent.tiers.length);
+    const full = ent.tiers.slice(0, n).reduce((s, t) => s + (t.cost || 0), 0);
+    if (grant?.kind === 'grant') return { cost: 0, base, grant, rank };
+    return { cost: full, base, grant: grant || null, rank };
+  }
+
   // Otherwise derive: entity cost × rank, then apply grant/discount.
   const full = base * rank;
   if (grant) {
@@ -866,8 +875,25 @@ export function checkPrereqs(character) {
   const issues = [];
   const notes = [];
   const seen = new Set();
+  const charLevel = characterLevel(character);
 
   for (const field of ENTITY_FIELDS) {
+    (character[field] || []).forEach((item, idx) => {
+      const id = resolveId(item, field, character);
+      // Tiered perks (Draconic Heritage): each purchased tier requires a minimum
+      // CHARACTER level (tier 2 → lvl 5, …). Hard-enforced — buying tier N below
+      // its level is an issue. Checked per-occurrence (uses the item's rank), so
+      // it runs before the `seen` de-dupe below.
+      const tEnt = lookupEntity(id) || lookupEntity(`${entityType(field)}:${bareSkill(cleanItemName(item))}`);
+      if (Array.isArray(tEnt?.tiers) && tEnt.tiers.length) {
+        const rank = Math.min(rankOf(character, field, idx), tEnt.tiers.length);
+        const need = tEnt.tiers[rank - 1]?.level || 0;
+        if (need > charLevel) {
+          issues.push({ id, item, field, tierLevel: need, tier: rank,
+            text: `tier ${rank} requires character level ${need}` });
+        }
+      }
+    });
     for (const item of character[field] || []) {
       const id = resolveId(item, field, character);
       if (seen.has(id)) continue;
