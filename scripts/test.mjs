@@ -379,6 +379,23 @@ test('a power that grants a sub-power surfaces it as a free granted ability', ()
   ok(g.list.some((x) => x.ability === 'powers:Curious Balm' && x.source === 'Strange Token'), 'Curious Balm granted by Strange Token');
 });
 
+// ─── base stats from the level table + numeric power/perk/lineage mods ────────
+test('base Life Points / Spikes come from the level table', () => {
+  const s4 = validate({ classLevels: 'Fighter 4' }).stats;
+  eq(s4.lifePoints, 3, 'L4 = 3 LP'); eq(s4.spikes, 2, 'L4 = 2 spikes');
+  const s10 = validate({ classLevels: 'Fighter 10' }).stats;
+  eq(s10.lifePoints, 4, 'L10 = 4 LP'); eq(s10.spikes, 3, 'L10 = 3 spikes');
+});
+test('Toughness adds +1 max Life Point (counted once, not per phrasing)', () => {
+  const s = validate({ classLevels: 'Fighter 4', purchasedPerks: ['Toughness'] }).stats;
+  eq(s.baseLifePoints, 3, 'base 3'); eq(s.lifePoints, 4, '3 + 1');
+  eq(s.mods.sources.filter((x) => x.name === 'Toughness').length, 1, 'one source, no double-count');
+});
+test('Natural Armor lineage advantage adds Natural Armor', () => {
+  const s = validate({ classLevels: 'Druid 10', lineage: 'Oaksworn', lineageAdvantages: ['Hardened Flesh (Dryad)'] }).stats;
+  eq(s.naturalArmor, 2, '+2 Natural Armor from Hardened Flesh');
+});
+
 // ─── report ───────────────────────────────────────────────────────────────────
 console.log(`\n${passed} passed, ${failures.length} failed`);
 if (failures.length) {

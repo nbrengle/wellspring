@@ -224,9 +224,15 @@ function IdentityRail({ character, report, onClickField, onRestart,
                     onClear={onClearDevotion} onInspect={() => onClickField("devotion")} />
 
       <div className="b-stat-strip">
-        <Stat label="Life" title="Life Points" value={report.stats?.lifePoints ?? character.lifePoints ?? "—"} />
-        <Stat label="Spikes" title="Maximum Spikes" value={report.stats?.spikes ?? character.spikes ?? "—"} />
+        <Stat label="Life" title={statTitle(report.stats, "lifePoints", "Life Points")}
+              value={report.stats?.lifePoints ?? character.lifePoints ?? "—"} />
+        <Stat label="Spikes" title={statTitle(report.stats, "spikes", "Maximum Spikes")}
+              value={report.stats?.spikes ?? character.spikes ?? "—"} />
         <Stat label="Max Armor" title="Maximum Armor Points" value={character.armorPoints?.replace(/\s*\(.+\)/, "") ?? "—"} />
+        {report.stats?.naturalArmor > 0 && (
+          <Stat label="Nat. Armor" title={statTitle(report.stats, "naturalArmor", "Natural Armor")}
+                value={report.stats.naturalArmor} />
+        )}
       </div>
 
       {report.spellSlots && <SpellSlotStrip slots={report.spellSlots} />}
@@ -771,6 +777,17 @@ function candidateEffects(c) {
   return refs.filter((t) => /^(effects|conditions|defenses):/.test(t)).map((t) => t.slice(t.indexOf(":") + 1));
 }
 const primaryEffect = (c) => candidateEffects(c)[0] || "—";
+
+// Tooltip for a stat: the base plus any modifiers and where they came from, so a
+// boosted value (e.g. Life 4 from level + Toughness) explains itself on hover.
+function statTitle(stats, key, label) {
+  const srcs = (stats?.mods?.sources || []).filter((s) => s.stat === key);
+  if (!srcs.length) return label;
+  const baseKey = key === "lifePoints" ? "baseLifePoints" : key === "spikes" ? "baseSpikes" : null;
+  const base = baseKey != null ? stats[baseKey] : 0;
+  const parts = srcs.map((s) => `+${s.n} ${s.name}`);
+  return `${label}: ${base ? `${base} base ` : ""}${parts.join(", ")}`;
+}
 
 const SPELL_TIER_BUCKET = { noviceSpells: "Novice", adeptSpells: "Adept", greaterSpells: "Greater", cantrips: "Cantrip" };
 const GROUP_AXES = {

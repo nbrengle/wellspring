@@ -871,20 +871,95 @@ export function spellSlots(character) {
 // { lifePoints, spikes } as display strings/numbers, falling back to the stored
 // values when no numeric base is available.
 const BASE_LEVEL = 4;
-export function levelStats(character) {
-  const level = characterLevel(character);
-  const rowFor = (l) => LEVEL_TABLE.find((r) => r.level === l);
-  const base = rowFor(BASE_LEVEL);
-  const cur = rowFor(level);
-
-  const scale = (storedVal, key) => {
-    const stored = parseInt(String(storedVal), 10);
-    if (Number.isNaN(stored) || !base || !cur) return storedVal ?? '—';
-    return stored + ((cur[key] ?? 0) - (base[key] ?? 0));
+export // Numeric character-creation stat modifiers from owned powers/perks/lineage
+// advantages. ONLY permanent max-stat boosts count — anchored on "max/maximum"
+// for Life Points and the "Natural Armor" noun — so in-play effects ("heal 1 LP",
+// "Refresh 3 Spikes", a 6-second count) are NOT mistaken for build stats. Returns
+// { lifePoints, spikes, naturalArmor, armor, sources: [{name, stat, n}] }.
+const NUM = (w) => /^\d+$/.test(w) ? parseInt(w, 10) : (w.toLowerCase() === 'one' ? 1 : 0);
+const STAT_PATTERNS = [
+  // "+1 Life Point to max" / "adds 1 Life Point to their maximum" / "1 maximum Life Point"
+  { stat: 'lifePoints', re: /(?:\+?(\d+)|\bone)\s+(?:maximum\s+)?Life\s+Points?\s+to\s+(?:their\s+)?max(?:imum)?/gi },
+  { stat: 'lifePoints', re: /(?:additional\s+)?(?:\+?(\d+)|\bone)\s+maximum\s+Life\s+Points?/gi },
+  { stat: 'lifePoints', re: /(?:adds?|gains?)\s+(?:\+?(\d+)|\bone)\s+Life\s+Points?\s+to\s+(?:their\s+)?max(?:imum)?/gi },
+  // "gain N Natural Armor" / "N points of Natural Armor" / "increases to N" (Natural Armor)
+  { stat: 'naturalArmor', re: /(?:gains?|grant(?:ing|s)?)\s+(?:\+?(\d+)|\bone|three|two)\s+(?:points?\s+of\s+)?Natural\s+Armor/gi },
+  { stat: 'naturalArmor', re: /(\d+)\s+points?\s+of\s+Natural\s+Armor/gi },
+  // "+1 physical Armor Point" (Warrior Spirit) — explicit max armor boost.
+  { stat: 'armor', re: /\+?(\d+)\s+(?:physical\s+)?Armor\s+Points?\b/gi },
+  // "+N Maximum Spike(s)" — permanent spike boost (not "Refresh N Spikes").
+  { stat: 'spikes', re: /(?:\+?(\d+)|\bone)\s+(?:Bonus\s+)?Maximum\s+Spikes?\b/gi },
+];
+const WORD_N = { one: 1, two: 2, three: 3 };
+function statMods(character) {
+  const mods = { lifePoints: 0, spikes: 0, naturalArmor: 0, armor: 0 };
+  const sources = [];
+  // Per entity, take the FIRST match per stat. The patterns are alternate
+  // phrasings of the same boost (Toughness says it two ways), so summing every
+  // pattern hit would multi-count one boost. One entity → at most one boost per
+  // stat (none in the source grant two of the same stat).
+  const scan = (name, text) => {
+    if (!text) return;
+    const seen = new Set();
+    for (const { stat, re } of STAT_PATTERNS) {
+      if (seen.has(stat)) continue;
+      re.lastIndex = 0;
+      const m = re.exec(text);
+      if (!m) continue;
+      const w = m[1] || (m[0].match(/\b(one|two|three)\b/i) || [])[1] || '0';
+      const n = NUM(w) || WORD_N[String(w).toLowerCase()] || 0;
+      if (n > 0) { mods[stat] += n; sources.push({ name, stat, n }); seen.add(stat); }
+    }
   };
+  // Owned perks.
+  for (const item of (character.purchasedPerks || [])) {
+    const e = lookupEntity(`perks:${cleanItemName(item)}`); scan(e?.name || item, e?.description);
+  }
+  // Chosen lineage advantages (their stored desc carries the boost text).
+  if (character.lineage) {
+    const lin = LINEAGES[character.lineage];
+    for (const name of (character.lineageAdvantages || [])) {
+      const a = (lin?.advantages || []).find((x) => x.name === name || x.baseName === name);
+      if (a) scan(a.baseName || a.name, a.desc || a.description);
+    }
+  }
+  // Owned/selected powers (innate-at-level + slotted).
+  for (const { name: cls } of getClasses(character)) {
+    for (const p of (CLASS_POWERS[cls]?.innate || [])) scan(p.name, p.description);
+  }
+  for (const field of POWER_SOURCE_FIELDS) {
+    for (const item of (character[field] || [])) {
+      const e = lookupEntity(`powers:${cleanItemName(item)}`); scan(e?.name || item, e?.description);
+    }
+  }
+  return { ...mods, sources };
+}
+
+// Base character stats. Life Points and Spikes come straight from the level table
+// for the character's level (the rules' baseline). An authored sheet may store an
+// explicit value that already bakes in bonuses — when present, honor it as the
+// base. Numeric power/perk/lineage modifiers are layered on top (statMods).
+// Returns { lifePoints, spikes, baseLifePoints, baseSpikes, mods } so the UI can
+// show the total and explain it.
+function levelStats(character) {
+  const level = characterLevel(character);
+  const row = LEVEL_TABLE.find((r) => r.level === level)
+    || LEVEL_TABLE.find((r) => r.level === Math.min(level, LEVEL_TABLE[LEVEL_TABLE.length - 1].level))
+    || {};
+  // Base from the table; an explicit stored value (authored sheet) overrides it.
+  const storedLp = parseInt(String(character.lifePoints), 10);
+  const storedSp = parseInt(String(character.spikes), 10);
+  const baseLp = Number.isNaN(storedLp) ? (row.lp ?? 0) : storedLp;
+  const baseSp = Number.isNaN(storedSp) ? (row.spikes ?? 0) : storedSp;
+
+  const mods = statMods(character);
   return {
-    lifePoints: scale(character.lifePoints, 'lp'),
-    spikes: scale(character.spikes, 'spikes'),
+    baseLifePoints: baseLp, baseSpikes: baseSp,
+    lifePoints: baseLp + (mods.lifePoints || 0),
+    spikes: baseSp + (mods.spikes || 0),
+    armor: mods.armor || 0,
+    naturalArmor: mods.naturalArmor || 0,
+    mods,
   };
 }
 
