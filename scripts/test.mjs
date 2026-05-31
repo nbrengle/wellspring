@@ -359,6 +359,15 @@ test('Expert Craft build-time choice grants the selected skill at 0 BP', () => {
   eq(eff.grant.source, 'Expert Craft', 'attributed to Expert Craft');
 });
 
+// ─── flaw BP award capped at 5 (rules limit) ─────────────────────────────────
+test('flaw BP award is capped at 5 (extra flaws give no more BP)', () => {
+  const manyFlaws = ['Binding Oath of Charity', 'Binding Oath of Peace', 'Torn Soul']; // 5+5+4 = 14 raw
+  const s = computeSpend({ classLevels: 'Fighter 10', flaws: manyFlaws });
+  eq(s.awarded, 5, 'awarded clamped to 5');
+  ok(s.rawAwarded > 5, 'rawAwarded reflects the uncapped sum');
+  ok(s.flawCapped, 'flawCapped flagged');
+});
+
 // ─── report ───────────────────────────────────────────────────────────────────
 console.log(`\n${passed} passed, ${failures.length} failed`);
 if (failures.length) {

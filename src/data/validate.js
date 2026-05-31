@@ -15,6 +15,9 @@ import { LEVEL_TABLE, lookupEntity, REFS, CLASS_POWER_SLOTS, CLASS_POWERS, CLASS
 // "up to 10 awarded LBP").
 export const MAX_LBP = 10;
 
+// Max BP a character can be awarded from flaws (MegaDoc: "up to 5 awarded BP").
+export const MAX_FLAW_BP = 5;
+
 // Normalize a sublineage label to its base name. The data is inconsistent: a
 // sublineage may appear as "Accented (Any Accent…)" on a challenge but just
 // "Accented" on an advantage. Compare on the part before " (" so the same
@@ -644,13 +647,17 @@ export function computeSpend(character) {
     }
   });
 
-  let awarded = 0;
+  // Flaws award BP, but the rules cap the total awarded at MAX_FLAW_BP ("up to 5
+  // awarded BP"). Sum each flaw's value for the per-item chips, then clamp the
+  // total that actually offsets spend (extra flaws give roleplay, not more BP).
+  let rawAwarded = 0;
   for (const item of character.flaws || []) {
     const ent = lookupEntity(`flaws:${item}`);
     const bp = typeof ent?.bp === 'number' ? ent.bp : parseInt(String(ent?.bp), 10) || 0;
     byItem[`flaws:${item}`] = { cost: -bp, base: -bp, grant: null };
-    awarded += bp;
+    rawAwarded += bp;
   }
+  const awarded = Math.min(rawAwarded, MAX_FLAW_BP);
 
   // Discount sources (Patron, Technarchist, etc.) reduce matching item costs in
   // place; a discount on an already-free item becomes free BP instead. Recompute
@@ -665,7 +672,8 @@ export function computeSpend(character) {
   }
 
   return {
-    spent, awarded, refunded, discountFreeBP, discountsApplied,
+    spent, awarded, rawAwarded, flawCapped: rawAwarded > MAX_FLAW_BP,
+    refunded, discountFreeBP, discountsApplied,
     net: spent - awarded - refunded - discountFreeBP, byItem,
   };
 }

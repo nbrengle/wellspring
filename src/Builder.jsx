@@ -368,7 +368,7 @@ function BudgetMeter({ report }) {
         <span className="b-budget-label">Build Points</span>
         <span className="b-budget-nums">
           <strong>{spend.net}</strong> / {budget}
-          {spend.awarded > 0 && <span className="b-budget-flaws"> (+{spend.awarded} from flaws)</span>}
+          {spend.awarded > 0 && <span className="b-budget-flaws"> (+{spend.awarded} from flaws{spend.flawCapped ? ", capped at 5" : ""})</span>}
           {report.freeBP > 0 && <span className="b-budget-flaws"> (incl. +{report.freeBP} free BP)</span>}
         </span>
       </div>
