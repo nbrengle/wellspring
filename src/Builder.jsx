@@ -707,7 +707,8 @@ function DetailPane({ view, report, choices, onSetChoice, onInspect, onBack, onC
 //
 // A spec is:
 //   { kind, entityType, title, subtitle, candidates: [{name, desc, cat, ...}],
-//     groupBy(candidate)→string, taken: Set, onChoose(name) }
+//     taken: Set, onChoose(name) }
+// Grouping/sorting is driven by GROUP_AXES + the picker's mode, not the spec.
 
 // Build a picker spec for filling a power SLOT.
 function powerPickerSpec(slot, character) {
@@ -718,17 +719,6 @@ function powerPickerSpec(slot, character) {
   // known Spell of any Tier" each level — Known Spells are which spells you CAN
   // cast, Spell-Slots are how many times. So all learnable tiers are offered.
   const candidates = eligiblePowers(cls, category);
-  const byTier = { noviceSpells: "Novice", adeptSpells: "Adept", greaterSpells: "Greater", cantrips: "Cantrip" };
-  const groupBy = category === "spellsKnown"
-    ? (p) => byTier[p.tierList] || "Other"
-    : (p) => {                       // group martial powers by refresh cadence
-        const r = (p.refresh || "").toLowerCase();
-        if (!r || r === "none" || r === "passive") return "Passive";
-        if (r.includes("long")) return "Long Rest";
-        if (r.includes("short")) return "Short Rest";
-        if (r.includes("immediate")) return "Immediate";
-        return p.refresh;
-      };
   // For spells-known, a pick is stored in the field matching its OWN tier
   // (noviceSpells/adeptSpells/greaterSpells), not a single field — so the right
   // tier's count is tracked. Map candidate name → its tier field.
@@ -744,7 +734,7 @@ function powerPickerSpec(slot, character) {
     kind: "power", entityType: "powers",
     title: `Choose a ${label} power`,
     subtitle: `${candidates.length} options for ${cls}`,
-    candidates, groupBy,
+    candidates,
     taken: new Set(takenFields.flatMap((f) => character[f] || [])),
     onChoose: (name) => slot.onChoose(name, fieldFor(name)),
   };
@@ -757,7 +747,6 @@ function entityPickerSpec({ kind, entityType, candidates, title, taken, onChoose
     kind, entityType, title,
     subtitle: `${candidates.length} options`,
     candidates,
-    groupBy: (c) => c.cat || "Other",
     taken, onChoose,
   };
 }
@@ -783,7 +772,9 @@ function candidateEffects(c) {
 }
 const primaryEffect = (c) => candidateEffects(c)[0] || "—";
 
+const SPELL_TIER_BUCKET = { noviceSpells: "Novice", adeptSpells: "Adept", greaterSpells: "Greater", cantrips: "Cantrip" };
 const GROUP_AXES = {
+  tier: { label: "Tier", fn: (c) => SPELL_TIER_BUCKET[c.tierList] || c.tier || "—" },
   category: { label: "Category", fn: (c) => c.cat || c.tierList || "Other" },
   refresh: { label: "Refresh", fn: refreshBucket },
   effect: { label: "Effect", fn: primaryEffect },
@@ -792,17 +783,17 @@ const GROUP_AXES = {
 };
 
 function PickerOverlay({ spec, character, onClose }) {
-  const { entityType, title, subtitle, candidates, groupBy, taken, onChoose } = spec;
+  const { entityType, title, subtitle, candidates, taken, onChoose } = spec;
 
   const [query, setQuery] = useState("");
   const [hideLocked, setHideLocked] = useState(false);
   const [selected, setSelected] = useState(candidates[0]?.name || null);
-  // Group/sort controls. Default grouping is by REFRESH when the candidates carry
-  // a refresh (powers/spells) — that's the most useful axis and the old separate
-  // "Default" option just duplicated it; otherwise fall back to category (skills,
-  // perks, which have no refresh).
+  // Group/sort controls. Default grouping is context-aware (the old separate
+  // "Default" option just duplicated this): spells group by TIER, other powers by
+  // REFRESH cadence, skills/perks (no refresh) by category.
+  const isSpells = candidates.some((c) => c.tierList && SPELL_TIER_BUCKET[c.tierList]);
   const hasRefresh = candidates.some((c) => c.refresh && c.refresh !== "None");
-  const [groupMode, setGroupMode] = useState(hasRefresh ? "refresh" : "category");
+  const [groupMode, setGroupMode] = useState(isSpells ? "tier" : hasRefresh ? "refresh" : "category");
   const [sortMode, setSortMode] = useState("name"); // "name" | "cost"
   // Local reading stack: empty → reading the selected candidate; pushing an
   // entity id lets the user follow links without leaving the picker.
@@ -834,7 +825,7 @@ function PickerOverlay({ spec, character, onClose }) {
     // Alphabetical group-by also sorts the group headers A–Z.
     if (groupMode === "alphabetical") entries.sort((a, b) => a[0].localeCompare(b[0]));
     return entries;
-  }, [candidates, query, hideLocked, character, groupBy, entityType, groupMode, sortMode]);
+  }, [candidates, query, hideLocked, character, entityType, groupMode, sortMode]);
 
   const readingEntity = useMemo(() => {
     if (readStack.length) return lookupEntity(readStack[readStack.length - 1]);
