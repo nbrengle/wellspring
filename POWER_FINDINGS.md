@@ -43,8 +43,12 @@ Flaws used to award BP uncapped (19 flaws = +44 BP) vs the rules' 5-BP cap.
 ## Importable sheets
 `scripts/build-sheets.mjs` turns these standouts (+ the strongest pure build per
 class) into importable character sheets in `sheets/*.txt` — paste any into the
-builder's Import. Regenerate with:
+builder's Import. Each is a FULL optimized character, not just a spell list: it
+fills power slots by effect-score, picks a lineage + sublineage (challenges fund
+advantages that grant free abilities/stats), and spends the whole BP budget on the
+highest-value perks (grants/stat-boosts) — staying legal. Regenerate with:
 `node --import ./scripts/register-json.mjs scripts/build-sheets.mjs`
+All 13 validate and round-trip through Import.
 
 ## To refine
 1. Tune `effect-weights.json` (the rankings hinge on it).

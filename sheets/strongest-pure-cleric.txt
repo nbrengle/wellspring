@@ -1,20 +1,20 @@
 Strongest Pure Cleric
-Lineage: None
-Lineage Challenges: None
-Lineage Advantages: None
-Life Points: —
+Lineage: Forged
+Lineage Challenges: Vulnerable Construction, Visible Wiring [Repped], Plating [Repped], Cyber Eye(s) [Repped], Hybrid Physiology, Voice Box [Repped] (Construct), Power Source [Repped] (Construct), Imprinted (Construct), Literal Bias (Construct), Zero-Harm Protocol (Construct)
+Lineage Advantages: Vigilant Attendant (Construct)
+Life Points: 5
 Armor Points: —
-Spikes: —
+Spikes: 3
 Class Levels: Cleric 10
 Flaws: None
 Starting Skills (free): None
 Purchased Skills: None
-Purchased Perks: None
+Purchased Perks: Generous Soul - 4 BP, Hard to Kill - 1 BP, Quick Healing - 2 BP, Toughness - 4 BP, Unkillable - 3 BP, Will to Live - 1 BP, Patron - 4 BP, Gift of Healing - 1 BP, Gift of Rebirth - 2 BP, Gift of Unbreakable Flesh, Ancestral Weapon - 3 BP, Boon Bonds - 1 BP, Heartbond - 2 BP, Sharp Mind - 2 BP, Expanded Hearth - 1 BP
 Cantrips: Curing Prayer, Blade Blessing, Shield of Devotion, Revivify, Devotion’s Strike
 Novice Spells known: Spirit Speak, Fortress of Faith
 Adept Spells known: Bless Shield, Divine Armor, Judgment, Safe Return, Minor Circle, Retributive Protection
 Novice Spell-slots: 6
 Adept Spell-slots: 5
 
-Build Points: 0 / 21
+Build Points: 31 / 21 (+10 bonus BP)
 ✓ Legal build
