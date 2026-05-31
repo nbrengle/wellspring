@@ -6,9 +6,10 @@
 // the source archetype format.
 
 import { getClasses } from './validate.js';
-import { ARCHETYPES } from './index.js';
+import { ARCHETYPES, UNLIMITED_SKILLS } from './index.js';
 import {
   LABEL_FIELD, SCALAR_FIELDS, ITEM_FIELDS, fieldForLabel, cleanItem, splitItems,
+  expandInstances, CHOICE_DEFAULTS,
 } from './sheet-schema.js';
 
 // BP annotation for any item line, mirroring the archetype source. Pulls the
@@ -163,8 +164,12 @@ function parseSheetText(text) {
     if (SCALAR_FIELDS.has(field)) { character[field] = valueStr || null; return; }
     if (!ITEM_FIELDS.has(field)) return;
     // Items can be inline (comma-separated after the label) AND/OR on the lines
-    // that follow the label until the next section — gather both.
-    const items = [...splitItems(valueStr), ...extraItems].map(cleanItem);
+    // that follow the label until the next section — gather both. Expand "Skill
+    // xN" on unlimited-ranks skills into N distinct instances first (mirrors the
+    // build-time parser), so a hand-typed "Lore x2" imports like a generated sheet.
+    const items = [...splitItems(valueStr), ...extraItems]
+      .flatMap((raw) => expandInstances(raw, (b) => UNLIMITED_SKILLS.has(b), CHOICE_DEFAULTS))
+      .map(cleanItem);
     character[field] = items.map((it) => it.name);
     if (items.some((it) => it.bp != null)) character.effectiveBP[field] = items.map((it) => it.bp);
     if (items.some((it) => it.grant)) character.grants[field] = items.map((it) => it.grant);

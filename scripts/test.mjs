@@ -295,6 +295,30 @@ test('Patron discounts gift-eligible perks by 1, excludes Strong Bloodline + Gif
   eq(s.byItem['purchasedPerks:Strong Bloodline'].cost, 3, 'Strong Bloodline excluded');
 });
 
+// ─── xN on unlimited-ranks skills → distinct instances, not rank N ────────────
+test('import expands "Lore x2" into two distinct Lore instances', () => {
+  const c = parseCharacterSheet('M\nClass Levels: Mage 4\nPurchased Skills: Lore x2');
+  eq(c.purchasedSkills.length, 2, 'two rows');
+  ok(c.purchasedSkills[0] !== c.purchasedSkills[1], 'distinct subjects');
+  ok(c.purchasedSkills.every((n) => /^Lore \(/.test(n)), 'both parameterized Lore');
+});
+test('import expands "Bookcaster x3" into three distinct instances', () => {
+  const c = parseCharacterSheet('M\nClass Levels: Mage 4\nPurchased Skills: Bookcaster x3');
+  eq(c.purchasedSkills.length, 3, 'three rows');
+  eq(new Set(c.purchasedSkills).size, 3, 'all distinct');
+});
+test('two Lores under Sharp Mind cost 1 each (per-instance discount), net 2', () => {
+  const c = parseCharacterSheet('M\nClass Levels: Mage 4\nPurchased Perks: Sharp Mind\nPurchased Skills: Lore x2');
+  const s = computeSpend(c);
+  const lores = Object.keys(s.byItem).filter((k) => /purchasedSkills:Lore/.test(k));
+  eq(lores.length, 2, 'two distinct byItem keys');
+  lores.forEach((k) => eq(s.byItem[k].cost, 1, `${k} discounted to 1`));
+});
+test('finite-ranks "Extended Capacity - Novice x2" stays one rank-2 row (not expanded)', () => {
+  const c = parseCharacterSheet('M\nClass Levels: Mage 4\nPurchased Skills: Extended Capacity - Novice x2');
+  eq(c.purchasedSkills.length, 1, 'single row');
+});
+
 // ─── report ───────────────────────────────────────────────────────────────────
 console.log(`\n${passed} passed, ${failures.length} failed`);
 if (failures.length) {

@@ -37,8 +37,18 @@ export function lbpState(character) {
   const challenges = chosenC.map((n) => findIn(lin.challenges, n)).filter(Boolean);
   const advantages = chosenA.map((n) => findIn(lin.advantages, n)).filter(Boolean);
 
+  // Perks that modify the LBP economy (Strong Bloodline: +3 LBP, cap 10→13). Sum
+  // any the character owns; the highest stated newMax raises the challenge cap.
+  const lbpB = REFS.lbpBonuses || {};
+  let bonusLbp = 0, cap = MAX_LBP;
+  for (const name of (character.purchasedPerks || [])) {
+    const b = lbpB[`perks:${cleanItemName(name)}`];
+    if (b) { bonusLbp += b.extra || 0; if (b.newMax) cap = Math.max(cap, b.newMax); }
+  }
+
   const rawAwarded = challenges.reduce((s, c) => s + (c.lbp || 0), 0);
-  const awarded = Math.min(rawAwarded, MAX_LBP);
+  // Challenge LBP is capped; the perk bonus is granted on top of the cap.
+  const awarded = Math.min(rawAwarded, cap) + bonusLbp;
   const spent = advantages.reduce((s, a) => s + (a.lbp || 0), 0);
 
   // Sublineage scoping: all chosen non-"General" items must share ONE sublineage
@@ -62,7 +72,7 @@ export function lbpState(character) {
     advantages: lin.advantages,
     chosenChallenges: challenges,
     chosenAdvantages: advantages,
-    awarded, rawAwarded, capped: rawAwarded > MAX_LBP,
+    awarded, rawAwarded, cap, bonusLbp, capped: rawAwarded > cap,
     spent, remaining: awarded - spent,
     overspent: spent > awarded,
     mixedSublineage,
@@ -407,7 +417,10 @@ function effectiveCost(item, field, character, idx, granted) {
   const rank = rankOf(character, field, idx);
 
   // Trust the author's stated cost when present — it already reflects the full
-  // rank (the "x2" suffix was on the same authored line).
+  // rank. (Discounts are applied uniformly by applyDiscounts; authored costs that
+  // pre-bake a discount are no longer special-cased — unlimited-ranks skills are
+  // expanded into per-instance rows whose costs derive cleanly, so derived and
+  // authored agree without a guard.)
   if (typeof authored === 'number') return { cost: authored, base, grant, rank };
 
   // Otherwise derive: entity cost × rank, then apply grant/discount.
@@ -458,6 +471,10 @@ function discountApplies(src, item, ent, pos) {
     // Target named by skill prefix ("Lore"), limited to the first N purchased.
     return new RegExp(`^${src.scope.value}\\b`, 'i').test(cleanItemName(item))
       && (src.scope.n == null || pos < src.scope.n);
+  }
+  if (src.scope.kind === 'skillRanks') {
+    // Every rank of one named skill is discounted (Sharp Mind → Lore). No limit.
+    return new RegExp(`^${src.scope.value}\\b`, 'i').test(cleanItemName(item));
   }
   if (src.scope.kind === 'prereq') {
     // Item lists the source's named perk as a prerequisite (e.g. Patron Gifts).
@@ -510,8 +527,12 @@ function applyDiscounts(character, byItem) {
       const reducible = Math.max(0, eff.cost - min);
       const cut = Math.min(src.amount, reducible, room);
       if (cut <= 0) {
-        // Item already at/below min (e.g. free-granted) → refund as free BP.
-        if (eff.cost <= min && src.refundIfFree) {
+        // The "discount on something you already have → free BP" rule applies only
+        // when the item is free because it was GRANTED (a redundant grant), not
+        // when a normal purchase merely sits at the min cost. Requiring an actual
+        // grant avoids refunding a paid-but-cheap skill twice (which broke the
+        // export→import round-trip: a "- 1 BP" Lore re-read as cost-at-min).
+        if (eff.cost === 0 && eff.grant?.kind === 'grant' && src.refundIfFree) {
           const refund = Math.min(src.amount, room);
           freeBP += refund;
           used.set(src.id, (used.get(src.id) || 0) + refund);

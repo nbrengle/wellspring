@@ -513,12 +513,14 @@
         null,
         null,
         null,
+        null,
         null
       ],
       "purchasedSkills": [
         0,
         2,
-        2
+        null,
+        null
       ],
       "purchasedPerks": [
         2,
@@ -551,6 +553,7 @@
         null,
         null,
         null,
+        null,
         null
       ],
       "purchasedSkills": [
@@ -561,12 +564,8 @@
           "sourceRole": "innate power"
         },
         null,
-        {
-          "kind": "discount",
-          "amount": null,
-          "source": "Sharp Mind",
-          "sourceRole": null
-        }
+        null,
+        null
       ],
       "purchasedPerks": [
         {
@@ -603,13 +602,15 @@
         1,
         1,
         1,
-        2,
+        1,
+        1,
         2
       ],
       "purchasedSkills": [
         1,
         1,
-        2
+        1,
+        1
       ],
       "purchasedPerks": [
         1,
@@ -648,13 +649,15 @@
       "Basic Arcane",
       "Lore (Historical)",
       "Library Use",
-      "Bookcaster",
+      "Bookcaster (Magekey)",
+      "Bookcaster (Mask Aura)",
       "Extended Capacity - Novice"
     ],
     "purchasedSkills": [
       "Apprentice Ritual Magic",
       "Arcane Charge",
-      "Lore (Historical)"
+      "Lore (Historical)",
+      "Lore (Arcane)"
     ],
     "purchasedPerks": [
       "Sharp Mind",

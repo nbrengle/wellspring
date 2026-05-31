@@ -96,6 +96,38 @@ export function cleanItem(raw) {
   return { name, bp: bpM ? parseInt(bpM[1], 10) : null, grant };
 }
 
+// Concrete default subjects for instance-based "(your choice)" skills, an ordered
+// list per base skill so the i-th instance gets a distinct value (collisions would
+// otherwise overwrite each other downstream). Shared by the build-time parser and
+// the runtime importer so an expanded "Lore x2" looks identical from either path.
+export const CHOICE_DEFAULTS = {
+  Lore: ['Historical', 'Arcane', 'Religious', 'Nature', 'Political', 'Monstrous'],
+  Bookcaster: ['Magekey', 'Mask Aura', 'Identify', 'Cancel', 'Stop', 'Mageskin'],
+  'Divine Favor': ['Blessing', 'Protection', 'Guidance'],
+  Profession: ['Smith', 'Cook', 'Tailor'],
+  Patron: ['a Patron'],
+  'Favored Form': ['Hunting Panther'],
+  'Chronic Hobbyist': ['Cooking', 'Brewing', 'Gardening'],
+};
+
+// "Skill xN" on an UNLIMITED-ranks skill means N separate instances, not rank N
+// (Lore, Bookcaster, …). Expand a raw item string into an array of per-instance
+// strings, mirroring the build-time parser so a hand-typed/pasted "Lore x2"
+// imports the same as a generated sheet. `isUnlimited(baseName)` tells whether the
+// skill is instance-based; for non-unlimited skills the xN is left intact (rank).
+// Distinct subjects are appended so instances don't collide downstream.
+const XN_RE = /\s*x\s*(\d+)\b/i;
+export function expandInstances(raw, isUnlimited, choiceDefaults = {}) {
+  const m = raw.match(XN_RE);
+  const count = m ? parseInt(m[1], 10) : 1;
+  const base = raw.replace(XN_RE, '').split(/\s*-\s*|\s*\(/)[0].trim();
+  if (count <= 1 || !isUnlimited(base)) return [raw];
+  const stripped = raw.replace(XN_RE, '').replace(/\s*\(your choice\)/i, '').trim();
+  const defs = choiceDefaults[base];
+  return Array.from({ length: count }, (_, k) =>
+    defs ? `${base} (${defs[k % defs.length]})` : (/\(/.test(stripped) ? stripped : `${base} (${k + 1})`));
+}
+
 // "None"/empty → []; otherwise comma-split into trimmed item strings.
 export const splitItems = (v) =>
   (v.trim() === 'None' || v.trim() === '')

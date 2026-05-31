@@ -12,7 +12,7 @@
 import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
-import { LABEL_FIELD } from '../src/data/sheet-schema.js';
+import { LABEL_FIELD, CHOICE_DEFAULTS } from '../src/data/sheet-schema.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
@@ -30,6 +30,18 @@ if (existsSync(CLASSES_JSON)) {
   const classes = JSON.parse(readFileSync(CLASSES_JSON, 'utf8'));
   for (const c of classes) {
     CLASS_SPECS[c.name] = (c.specializations || []).map((s) => s.name);
+  }
+}
+
+// Skills with `ranks: "unlimited"` (Lore, Bookcaster, Divine Favor) are NOT
+// leveled — "Skill xN" means N SEPARATE skill instances (each a distinct subject /
+// spell), not rank N of one skill. We expand those into N rows; everything else
+// keeps `xN` = rank N. Sourced from skills.json so the rule is data-driven.
+const SKILLS_JSON = join(ROOT, 'src', 'data', 'skills.json');
+const UNLIMITED_SKILLS = new Set();
+if (existsSync(SKILLS_JSON)) {
+  for (const s of JSON.parse(readFileSync(SKILLS_JSON, 'utf8'))) {
+    if (String(s.ranks).toLowerCase() === 'unlimited') UNLIMITED_SKILLS.add(s.name);
   }
 }
 
@@ -152,30 +164,26 @@ function parseRank(s) {
 }
 
 // "(your choice)" is a parameter placeholder the author leaves for the player. For
-// a complete starter we pick a reasonable concrete value and keep the
-// PARAMETERIZED form (e.g. "Lore (your choice)" → "Lore (Historical)"), which
-// still resolves to the base entity (skills:Lore). Defaults per base skill:
-const CHOICE_DEFAULTS = {
-  Lore: 'Historical',
-  Profession: 'Smith',
-  Patron: 'a Patron',
-  'Favored Form': 'Hunting Panther',
-  'Chronic Hobbyist': 'Cooking',
-};
-// Replace a "(your choice)" parameter with a concrete default based on the base
-// skill name (the text before the first parameter / tier marker).
-function concretizeChoice(s) {
+// a complete starter we pick a reasonable concrete value (CHOICE_DEFAULTS, shared
+// from sheet-schema.js) and keep the PARAMETERIZED form (e.g. "Lore (your choice)"
+// → "Lore (Historical)"), which still resolves to the base entity (skills:Lore).
+// Instance i takes the i-th value so an expanded "Lore x2" becomes two DIFFERENT
+// Lores (collisions would otherwise overwrite each other in the by-item map).
+// The base skill name of an item line (leading words before " - ", " x", " (").
+function baseSkillName(s) {
+  return s.replace(RANK_RE, '').split(/\s*-\s*|\s*\(/)[0].trim();
+}
+// Replace a "(your choice)" parameter with the `instance`-th concrete default for
+// the base skill (default 0). If no mapped default, drop the placeholder.
+function concretizeChoice(s, instance = 0) {
   if (!/\(your choice\)/i.test(s)) return s;
-  // Base = leading words before " - ", " x", or " (".
-  const base = s.replace(RANK_RE, '').split(/\s*-\s*|\s*\(/)[0].trim();
-  const choice = CHOICE_DEFAULTS[base];
-  // Replace the "(your choice)" token specifically; if we have no mapped default,
-  // drop the particle rather than leave the placeholder.
+  const defaults = CHOICE_DEFAULTS[baseSkillName(s)];
+  const choice = defaults ? defaults[instance % defaults.length] : null;
   return s.replace(/\s*\(your choice\)/i, choice ? ` (${choice})` : '');
 }
 
-const stripNotes = (s) =>
-  concretizeChoice(s)
+const stripNotes = (s, instance = 0) =>
+  concretizeChoice(s, instance)
     .replace(BOOKKEEPING_NOTE, '')
     .replace(BP_SUFFIX, '')
     .replace(RANK_RE, '')
@@ -248,12 +256,40 @@ function parseArchetype(start, end) {
   // Append a raw item line to the current section list, splitting off the
   // trailing "- N BP" cost, the "(from X)" provenance note, and the "xN" rank
   // multiplier into index-aligned sidecars before storing the cleaned name.
+  //
+  // For UNLIMITED-ranks skills (Lore, Bookcaster, …), "xN" means N SEPARATE
+  // instances, not rank N — so expand into N distinct rows, each with its own
+  // concrete subject. Per-instance cost is left to the validator to DERIVE (base
+  // minus any discount source the character owns), so we store effectiveBP: null
+  // and drop the authored discount note (the engine applies it once per instance —
+  // keeping the note too would double-count). Genuine ranked skills keep one row
+  // with ranks: N and their authored cost.
+  const pushOne = (name, bp, grant, rank) => {
+    currentList.push(name);
+    (archetype.effectiveBP[currentField] ||= []).push(bp);
+    (archetype.grants[currentField] ||= []).push(grant);
+    (archetype.ranks[currentField] ||= []).push(rank);
+  };
   const pushItem = (rawLine) => {
     if (!currentList) return;
-    currentList.push(stripNotes(rawLine));
-    (archetype.effectiveBP[currentField] ||= []).push(parseBPSuffix(rawLine));
-    (archetype.grants[currentField] ||= []).push(parseProvenance(rawLine));
-    (archetype.ranks[currentField] ||= []).push(parseRank(rawLine));
+    const count = parseRank(rawLine);
+    const base = baseSkillName(stripNotes(rawLine));
+    if (count > 1 && UNLIMITED_SKILLS.has(base)) {
+      for (let k = 0; k < count; k++) {
+        let name = stripNotes(rawLine, k);
+        // Give each instance a distinct concrete subject so they don't collide in
+        // the validator's by-item map. "(your choice)" was already concretized by
+        // stripNotes; for skills without that token (e.g. Bookcaster picks a
+        // spell), append the k-th default here.
+        if (!/\(/.test(name) && CHOICE_DEFAULTS[base]) {
+          const d = CHOICE_DEFAULTS[base];
+          name = `${name} (${d[k % d.length]})`;
+        }
+        pushOne(name, null, null, 1);  // derive cost per instance
+      }
+      return;
+    }
+    pushOne(stripNotes(rawLine), parseBPSuffix(rawLine), parseProvenance(rawLine), count);
   };
 
   while (i < end) {

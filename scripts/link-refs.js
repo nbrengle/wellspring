@@ -360,14 +360,16 @@ function parseGrants(text, grantLookups) {
 // the structured target: { kind: 'giftEligible'|'prereq'|'category'|'firstN', value, n? }.
 function parseDiscounts(text, exclusionLookup) {
   if (!text) return null;
-  // Must actually be a discount source (not just mention the word in flavor).
-  if (!/\bdiscount(?:ed|s)?\b|\bBP\s+less\b|\bless\s+BP\b/i.test(text)) return null;
+  // Must actually be a discount source (not just mention the word in flavor). The
+  // doc phrases BP discounts as "BP less", "less BP", or — for skills — "point(s)
+  // less" (e.g. Sharp Mind: "Lore ranks cost 1 point less").
+  if (!/\bdiscount(?:ed|s)?\b|\bBP\s+less\b|\bless\s+BP\b|\bpoints?\s+less\b/i.test(text)) return null;
 
-  // Amount: "1 BP less" / "N BP discount" / "discounted by N BP" → default 1.
-  const amtM = text.match(/(\d+)\s*BP\s+less/i)
+  // Amount: "1 BP/point less" / "N BP discount" / "discounted by N BP" → default 1.
+  const amtM = text.match(/(\d+)\s*(?:BP|points?)\s+less/i)
     || text.match(/(\d+)\s*BP\s+discount/i)
     || text.match(/discount(?:ed)?\s+(?:by\s+)?(\d+)\s*BP/i)
-    || (/\bone\s+less\s+BP\b/i.test(text) ? [null, "1"] : null);
+    || (/\bone\s+less\s+(?:BP|point)\b/i.test(text) ? [null, "1"] : null);
   if (!amtM) return null;
   const amount = parseInt(amtM[1], 10);
 
@@ -386,12 +388,17 @@ function parseDiscounts(text, exclusionLookup) {
     || text.match(/doesn[’']?t\s+have\s+the\s+([A-Z][\w’'-]+)\s+prerequisite/i);
   const prereqM = text.match(/with\s+the\s+([A-Z][\w’'-]+(?:\s+[A-Z][\w’'-]+){0,3})\s+prerequisite/i);
   const firstNM = text.match(/first\s+(\w+)\s+([A-Z][\w’'-]+)\s+skills?/i);
+  // "<Skill> ranks cost N less" — every rank of one named skill is discounted
+  // (Sharp Mind: "Lore ranks cost 1 point less"). Distinct from firstN (no limit).
+  const ranksM = text.match(/\b([A-Z][\w’'-]+)\s+ranks?\s+cost\s+\d+\s+(?:point|BP)s?\s+less/i);
   const catM = text.match(/(?:on|any)\s+((?:[A-Z][\w’'-]+(?:,?\s+(?:and\s+|or\s+)?)?){1,4})\s+skills?/i);
   const WORD_NUM = { one: 1, two: 2, three: 3, four: 4, five: 5 };
   if (giftM) {
     // value = the source perk whose gifts are eligible (Patron); target = any perk
     // the player marks, except those carrying that prereq or listed as exclusions.
     scope = { kind: "giftEligible", value: giftM[1].trim() };
+  } else if (ranksM) {
+    scope = { kind: "skillRanks", value: ranksM[1].trim() };
   } else if (prereqM) {
     scope = { kind: "prereq", value: prereqM[1].trim() };
   } else if (firstNM) {
@@ -542,9 +549,21 @@ const grantTargetLookups = {
 // Exclusions ("Strong Bloodline and Inheritance cannot be discounted") name perks.
 const exclusionLookup = grantTargetLookups.perk;
 
+// A few perks modify the Lineage Build Point economy directly: "gain N additional
+// Lineage Build Points … increases the maximum to M" (Strong Bloodline). Capture
+// the extra LBP and the new cap so the validator's lbpState can honor it.
+function parseLbpBonus(text) {
+  if (!text) return null;
+  const extraM = text.match(/gain\s+(\d+)\s+additional\s+Lineage Build Points/i);
+  if (!extraM) return null;
+  const maxM = text.match(/(?:increases?|raises?)\s+the\s+maximum\s+to\s+(\d+)/i);
+  return { extra: parseInt(extraM[1], 10), newMax: maxM ? parseInt(maxM[1], 10) : null };
+}
+
 const grants = {};
 const grantedBy = {};
 const discounts = {};
+const lbpBonuses = {};
 for (const e of registry) {
   const g = parseGrants(e.body, grantTargetLookups).filter((id) => id !== e.id);
   if (g.length) {
@@ -553,6 +572,8 @@ for (const e of registry) {
   }
   const d = parseDiscounts(e.body, exclusionLookup);
   if (d) discounts[e.id] = d;
+  const lb = parseLbpBonus(e.body);
+  if (lb) lbpBonuses[e.id] = lb;
 }
 for (const id of Object.keys(grantedBy)) grantedBy[id] = [...new Set(grantedBy[id])];
 
@@ -643,6 +664,7 @@ const result = {
   grants,
   grantedBy,
   discounts,
+  lbpBonuses,
   archetypeRefs,
 };
 

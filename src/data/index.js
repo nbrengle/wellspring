@@ -60,6 +60,13 @@ export const ALL_SKILLS = skillsJson.map(s => ({
   desc: s.description,
 }));
 
+// Skills with unlimited ranks are instance-based: "Skill xN" means N separate
+// skills (each a distinct subject), not rank N. Single source of truth for the
+// rule, shared by the importer's xN expansion.
+export const UNLIMITED_SKILLS = new Set(
+  skillsJson.filter(s => String(s.ranks).toLowerCase() === 'unlimited').map(s => s.name)
+);
+
 // Perk categories in the source use "Social/Background"; the UI groups under
 // "Social". Normalize here so the UI's category list matches.
 const PERK_CAT = { 'Social/Background': 'Social' };

@@ -20598,6 +20598,17 @@
         "perks:Inheritance"
       ]
     },
+    "perks:Sharp Mind": {
+      "amount": 1,
+      "scope": {
+        "kind": "skillRanks",
+        "value": "Lore"
+      },
+      "cap": null,
+      "min": 1,
+      "refundIfFree": true,
+      "exclusions": []
+    },
     "advantages:Forged - Crowdsourced": {
       "amount": 1,
       "scope": {
@@ -20637,6 +20648,12 @@
       "min": null,
       "refundIfFree": true,
       "exclusions": []
+    }
+  },
+  "lbpBonuses": {
+    "perks:Strong Bloodline": {
+      "extra": 3,
+      "newMax": 13
     }
   },
   "archetypeRefs": {
