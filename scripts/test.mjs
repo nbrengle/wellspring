@@ -368,6 +368,17 @@ test('flaw BP award is capped at 5 (extra flaws give no more BP)', () => {
   ok(s.flawCapped, 'flawCapped flagged');
 });
 
+// ─── sub-power extraction + grant (Strange Token → Curious Balm) ──────────────
+test('inline sub-powers are extracted as entities', () => {
+  ok(lookupEntity('powers:Curious Balm'), 'Curious Balm exists');
+  ok(lookupEntity('powers:Holy Rest'), 'Holy Rest exists');
+  ok(lookupEntity('powers:Curious Balm').effect, 'sub-power carries its stat block (effect)');
+});
+test('a power that grants a sub-power surfaces it as a free granted ability', () => {
+  const g = grantedAbilities({ classLevels: 'Artisan 10', advancedPowers: ['Strange Token'] });
+  ok(g.list.some((x) => x.ability === 'powers:Curious Balm' && x.source === 'Strange Token'), 'Curious Balm granted by Strange Token');
+});
+
 // ─── report ───────────────────────────────────────────────────────────────────
 console.log(`\n${passed} passed, ${failures.length} failed`);
 if (failures.length) {

@@ -331,11 +331,23 @@ function parsePrereq(prereqText, skillForms) {
 // Parse the explicit "gains/adds the <Name> <Perk|Power|Skill>" form and resolve
 // <Name> against the matching type's lookup. Conservative: only the explicit
 // noun-tagged form, so prose like "gains 3 points of Natural Armor" stays prose.
-const GRANT_RE = /\b(?:gains?|adds?|learns?|receives?)\s+(?:the\s+|one\s+|a\s+)?([A-Z][\w’'-]+(?:\s+[A-Z][\w’'-]+){0,3})\s+(Perk|Power|Skill)\b/gi;
+const GRANT_RE = /\b(?:gains?|adds?|learns?|receives?|granted)\s+(?:the\s+|one\s+|a\s+|all\s+the\s+)?([A-Z][\w’'-]+(?:\s+[A-Z][\w’'-]+){0,3})\s+(Perk|Power|Skill)\b/gi;
+// "Grant Power: X" (a power's Call that bestows the sub-power X) — X is a power.
+const GRANT_POWER_CALL = /\bGrant Power:\s*([A-Z][\w’'-]+(?:\s+[A-Z][\w’'-]+){0,3})/g;
+// "the X Power below" — the unambiguous sub-power marker (any surrounding verb).
+// The name may contain lowercase connectors (Save *the* Day), so allow them mid-name.
+const GRANT_BELOW = /\bthe\s+([A-Z][\w’'-]+(?:\s+(?:[A-Z][\w’'-]+|the|of|and|to|a))*)\s+Power\s+below\b/g;
 function parseGrants(text, grantLookups) {
   if (!text) return [];
   const out = new Set();
   let m;
+  for (const RE of [GRANT_POWER_CALL, GRANT_BELOW]) {
+    RE.lastIndex = 0;
+    while ((m = RE.exec(text))) {
+      const { entity } = resolve(m[1].trim(), grantLookups.power);
+      if (entity) out.add(entity.id);
+    }
+  }
   GRANT_RE.lastIndex = 0;
   while ((m = GRANT_RE.exec(text))) {
     const name = m[1].trim();

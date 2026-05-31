@@ -272,6 +272,21 @@ const POWER_HEADER = new RegExp(
   TIER_PATTERN.source + String.raw`(\s*\[[^\]]+\])*\s*(-\s*\d+\s*BP)?\s*(\(\d+\))?\s*$`
 );
 
+// SUB-POWERS: some powers grant a named sub-power ("Grant Power: Curious Balm",
+// "the Holy Rest Power below") that has its OWN H4/H5 heading + stat block but NO
+// [Tier] tag, so POWER_HEADER rejects it and its block is orphaned. Collect those
+// granted names up front so parsePowersInRange can promote the matching heading to
+// a real (parseable) power. Built lazily from all nodes on first use.
+let _subPowerNames = null;
+function subPowerNames() {
+  if (_subPowerNames) return _subPowerNames;
+  _subPowerNames = new Set();
+  const text = nodes.filter((n) => n.type === 'text').map((n) => n.text).join(' ');
+  for (const m of text.matchAll(/Grant Power:\s*([A-Z][\w’' ]+?)\s*(?:[”"”,]|$)/g)) _subPowerNames.add(m[1].trim());
+  for (const m of text.matchAll(/\bthe\s+([A-Z][\w’' ]+?)\s+Power\s+below\b/g)) _subPowerNames.add(m[1].trim());
+  return _subPowerNames;
+}
+
 const STAT_FIELD = /^(Incantation|Incant|Call|Target|Duration|Delivery|Refresh|Accent|Effect|Requirement|Prerequisites?|Skills and Options):\s*(.*)$/;
 const STAT_TWO = /^(Target|Delivery|Accent):\s*(.+?)\s{2,}(Duration|Refresh|Effect):\s*(.+)$/;
 const statKey = l => l.toLowerCase().replace(/^incant$/, 'incantation').replace(/\s+/g, '_').replace(/s$/, '');
@@ -326,10 +341,15 @@ function parsePowerHeading(text) {
 // Each power heading is followed by text nodes until the next heading of any level.
 function parsePowersInRange(start, end) {
   const powers = [];
+  const subNames = subPowerNames();
   let i = start;
   while (i < end) {
     const n = nodes[i];
-    if (n.type === 'heading' && (n.level === 4 || n.level === 5) && POWER_HEADER.test(n.text)) {
+    // A power heading is either tier-tagged (POWER_HEADER) OR a granted SUB-POWER
+    // whose bare name appears in a "Grant Power: X" / "X Power below" reference.
+    const isSub = n.type === 'heading' && (n.level === 4 || n.level === 5)
+      && !POWER_HEADER.test(n.text) && subNames.has(n.text.trim());
+    if (n.type === 'heading' && (n.level === 4 || n.level === 5) && (POWER_HEADER.test(n.text) || isSub)) {
       const bodyEnd = nodes.findIndex((m, j) => j > i && m.type === 'heading');
       // Keep `list` nodes alongside `text`: a power's benefits often follow a
       // "…at various Levels:" colon as a <ul> (Adept Ritualist, Druid Forms). They
@@ -337,7 +357,10 @@ function parsePowersInRange(start, end) {
       // those descriptions truncated at the colon.
       const bodyNodes = nodes.slice(i + 1, bodyEnd === -1 ? end : Math.min(bodyEnd, end))
         .filter(m => m.type === 'text' || m.type === 'list');
-      const { name, tier, tags, maxRanks, cost } = parsePowerHeading(n.text);
+      // Sub-powers have no tier tag; mark them so they're identifiable + parseable.
+      const parsed = parsePowerHeading(n.text);
+      const { name, tags, maxRanks, cost } = parsed;
+      const tier = isSub ? 'SubPower' : parsed.tier;
       const { fields, description } = parsePowerNodes(bodyNodes);
       powers.push({
         name, tier, tags, maxRanks, cost,

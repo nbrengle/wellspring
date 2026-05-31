@@ -1269,6 +1269,25 @@
         "description": "The Artisan can prepare a weapon to ignite and explode, by preparing strange fuses, oils, and other ingredients. After the Artisan spends a Quick Count of 100 in deep Focus, role-playing this preparation, the character is ready to detonate their weapon. At any time the target chooses, a melee weapon can be ignited to use the Explosive Impact Power below. This should be explained to the target while the preparations are being made. Note: The Role-Playing of this Power may include props or equipment given to the target, or infusing the character’s limb with bizarre oils; the exact details are up to the Artisan."
       },
       {
+        "name": "Explosive Impact",
+        "tier": "SubPower",
+        "tags": [],
+        "maxRanks": 1,
+        "cost": null,
+        "incantation": null,
+        "call": "“Wounding 8 by Flame”, “Shatter Weapon Final to Self”",
+        "target": "Individual, Self",
+        "duration": "Instantaneous",
+        "delivery": "Weapon, Verbal",
+        "refresh": "None",
+        "accent": "Flame",
+        "effect": "Wounding, Shatter",
+        "requirement": null,
+        "prerequisites": null,
+        "skillsAndOptions": null,
+        "description": "A melee weapon can be used to deliver a Wounding Effect for 8 points of Flame damage. This will, unfortunately, also cause the weapon to Shatter. This should be explained to the target while the weapon is being prepared."
+      },
+      {
         "name": "Efficiencies of Scale",
         "tier": "Advanced",
         "tags": [
@@ -1521,6 +1540,25 @@
         "prerequisites": null,
         "skillsAndOptions": null,
         "description": "Through prayers to a Divine Being, energy manipulation, or binding of minor spirits, the Mystic energizes up to six objects with power that may be gifted to others. When bestowed to another, the Mystic explains the token’s healing properties, and how they are used. The bound powers are non-transferrable, and cannot be regifted. Such power comes with a price, and the life given will take something in return, causing the recipient to be drained until they complete a Short Rest. The recipients are granted the Curious Balm Power below:"
+      },
+      {
+        "name": "Curious Balm",
+        "tier": "SubPower",
+        "tags": [],
+        "maxRanks": 1,
+        "cost": null,
+        "incantation": "Quick 100",
+        "call": "“Heal 1”, “Short Drain”",
+        "target": "Self",
+        "duration": "Until Used (Long Rest), Instantaneous, Short Rest",
+        "delivery": "None",
+        "refresh": "None",
+        "accent": "None",
+        "effect": "Heal, Drain",
+        "requirement": null,
+        "prerequisites": null,
+        "skillsAndOptions": null,
+        "description": "By using the small token that they were given by the Artisan, the character gains the ability to Heal herself for 1 point before the next time they complete a Long Rest. This healing takes a Quick Count of 100, but can be done while the character is dying. After the healing is complete, the character is drained until they complete a Short Rest."
       },
       {
         "name": "Studied Focus",
@@ -2481,6 +2519,25 @@
         "prerequisites": null,
         "skillsAndOptions": null,
         "description": "This spell can only be cast out of combat on a willing target and the Cleric cannot cast it on themself, nor can they cast it on someone they believe already has the Holy Rest Power. Once the Incantation and explanation are complete, the recipient is granted the Holy Rest Power below:"
+      },
+      {
+        "name": "Holy Rest",
+        "tier": "SubPower",
+        "tags": [],
+        "maxRanks": 1,
+        "cost": null,
+        "incantation": null,
+        "call": "“Heal 1 by [Devotion Accent]”",
+        "target": "Self",
+        "duration": "Instantaneous",
+        "delivery": "None",
+        "refresh": "None",
+        "accent": "[Devotion Accent]",
+        "effect": "Heal",
+        "requirement": null,
+        "prerequisites": null,
+        "skillsAndOptions": null,
+        "description": "After the character has been Dying for at least a Slow Count of 120, they can Heal themself for 1 Life Point even if unconscious or Dying. Note: This Power can be used at any time after the user has been Dying for at least 120 seconds. The character will have the Power until it is used."
       },
       {
         "name": "Rekindle",
@@ -6267,6 +6324,25 @@
         "description": "The caster may identify up to three individuals who are given the Gift of Solitude may, up to three times before completing a Short Rest, verbally repel nearby attackers, giving them room to breathe. The target receives the Alone But Not Lonely Power below:"
       },
       {
+        "name": "Alone But Not Lonely",
+        "tier": "SubPower",
+        "tags": [],
+        "maxRanks": 1,
+        "cost": null,
+        "incantation": "None",
+        "call": "“[Name or Description]: Quick Repel by Force”",
+        "target": "Individual",
+        "duration": "Quick",
+        "delivery": "Verbal",
+        "refresh": "None",
+        "accent": "Force",
+        "effect": "Repel",
+        "requirement": null,
+        "prerequisites": null,
+        "skillsAndOptions": null,
+        "description": "Through manipulations of Force, the targets of this power are kept at bay for a short while. “Quick Repel by Force.” This power may be used up to three times before being expended, however, all remaining charges are lost if the wielder of this power completes a Short Rest."
+      },
+      {
         "name": "Harden Gear",
         "tier": "Adept",
         "tags": [],
@@ -8852,6 +8928,25 @@
         "description": "After speaking for a few moments with their Bodyguard, the Socialite may ask them “Subtle Discern by Mind: Would you save me if I were in danger?” If the response is yes, the Socialite may Grant them the Save the Day Power below by explaining the Power to them."
       },
       {
+        "name": "Save the Day",
+        "tier": "SubPower",
+        "tags": [],
+        "maxRanks": 1,
+        "cost": null,
+        "incantation": "None",
+        "call": "“[Name or Description] Quick Provoke by Fear”",
+        "target": "Individual",
+        "duration": "Instantaneous",
+        "delivery": "Verbal",
+        "refresh": "Focus Quick 100",
+        "accent": "Fear",
+        "effect": "Provoke",
+        "requirement": null,
+        "prerequisites": null,
+        "skillsAndOptions": null,
+        "description": "The recollection of their oath fuels the Bodyguard with strength to protect the Socialite, albeit in their own way. The Bodyguard may Call “[Name or Description], Quick Provoke by Fear” on any Target who seems to be within melee range of the Socialite."
+      },
+      {
         "name": "It's Not Safe to Go Alone",
         "tier": "Class",
         "tags": [
@@ -8976,6 +9071,25 @@
         "prerequisites": null,
         "skillsAndOptions": null,
         "description": "Bodyguards aren’t particularly useful if they cannot defend the Socialite. The pair are used to taking advantage of the Socialite’s quick diversions to sneak weapons into places they are normally forbidden. To use this Power, the Socialite must give the Bodyguard a brightly colored cloth to attach or tie to a weapon. At this time, the Power should be explained to the Bodyguard."
+      },
+      {
+        "name": "Concealed Weapon",
+        "tier": "SubPower",
+        "tags": [],
+        "maxRanks": 1,
+        "cost": null,
+        "incantation": "None",
+        "call": "“By My Voice Long Obey by Mind: Ignore the [color] flagged weapon.”",
+        "target": "Individuals",
+        "duration": "Long Rest",
+        "delivery": "Voice",
+        "refresh": "None",
+        "accent": "Mind",
+        "effect": "ObeyThe Bodyguard may use “By My Voice Long Obey by Mind: Ignore the [color] flagged weapon.” The Bodyguard cannot use, or allow others to use, the weapon in combat until the flag has been removed.",
+        "requirement": null,
+        "prerequisites": null,
+        "skillsAndOptions": null,
+        "description": ""
       },
       {
         "name": "Rousing Inspiration",

@@ -1,6 +1,6 @@
 {
   "generatedFrom": "src/data/*.json",
-  "entities": 1341,
+  "entities": 1347,
   "mentions": {
     "skills:Basic Martial Weapons": [
       "terms:Proficiency"
@@ -3731,6 +3731,7 @@
     ],
     "powers:Detonate": [
       "rules-concepts:“Quick X” Count",
+      "powers:Explosive Impact",
       "effects:Grant Power",
       "terms:Short Rest",
       "powers:Infuse",
@@ -3739,6 +3740,13 @@
       "terms:Focus",
       "terms:Power",
       "effects:Imbue"
+    ],
+    "powers:Explosive Impact": [
+      "effects:Wounding",
+      "effects:Shatter",
+      "accents:Flame",
+      "modifiers:Final",
+      "modifiers:Self"
     ],
     "powers:Efficiencies of Scale": [
       "recipes:Night Prize Essence",
@@ -3877,6 +3885,7 @@
     ],
     "powers:Strange Token": [
       "domains:Manipulation",
+      "powers:Curious Balm",
       "effects:Grant Power",
       "terms:Short Rest",
       "terms:Long Rest",
@@ -3885,8 +3894,19 @@
       "accents:Divine",
       "domains:Energy",
       "classes:Mystic",
-      "terms:Power",
-      "powers:Balm"
+      "terms:Power"
+    ],
+    "powers:Curious Balm": [
+      "rules-concepts:“Quick X” Count",
+      "rules-concepts:Short",
+      "terms:Short Rest",
+      "terms:Long Rest",
+      "effects:Drain",
+      "classes:Artisan",
+      "terms:Count",
+      "terms:Dying",
+      "effects:Heal",
+      "modifiers:Self"
     ],
     "powers:Studied Focus": [
       "terms:Base Class",
@@ -4283,11 +4303,22 @@
     "powers:Prayer of Rest": [
       "terms:Incantation",
       "effects:Grant Power",
+      "powers:Holy Rest",
       "rules-concepts:Devotions & Divine Beings",
       "terms:Accent",
       "classes:Cleric",
+      "terms:Power"
+    ],
+    "powers:Holy Rest": [
+      "rules-concepts:“Slow X” Count",
+      "terms:Life Points",
+      "rules-concepts:Devotions & Divine Beings",
+      "terms:Accent",
+      "terms:Count",
+      "terms:Dying",
       "terms:Power",
-      "powers:Rest"
+      "effects:Heal",
+      "modifiers:Self"
     ],
     "powers:Rekindle": [
       "terms:Life Points",
@@ -5972,11 +6003,19 @@
     ],
     "powers:Gift of Solitude": [
       "rules-concepts:Short",
+      "powers:Alone But Not Lonely",
       "effects:Grant Power",
       "terms:Short Rest",
       "powers:Identify",
       "terms:Power",
       "effects:Repel"
+    ],
+    "powers:Alone But Not Lonely": [
+      "rules-concepts:“Quick X” Count",
+      "domains:Manipulation",
+      "terms:Short Rest",
+      "effects:Repel",
+      "accents:Force"
     ],
     "powers:Harden Gear": [
       "effects:Shatter",
@@ -7100,6 +7139,7 @@
     "powers:Holding Out For a Hero": [
       "rules-concepts:Short",
       "powers:The Right Hand",
+      "powers:Save the Day",
       "effects:Grant Power",
       "terms:Short Rest",
       "terms:Long Rest",
@@ -7109,6 +7149,13 @@
       "terms:Power",
       "effects:Grant",
       "accents:Mind"
+    ],
+    "powers:Save the Day": [
+      "rules-concepts:“Quick X” Count",
+      "classes:Socialite",
+      "effects:Provoke",
+      "terms:Focus",
+      "accents:Fear"
     ],
     "powers:It's Not Safe to Go Alone": [
       "powers:The Right Hand",
@@ -7150,12 +7197,19 @@
       "terms:Power"
     ],
     "powers:Hidden Weapon": [
+      "powers:Concealed Weapon",
       "powers:The Right Hand",
       "effects:Grant Power",
       "terms:Advantage",
       "terms:Long Rest",
       "classes:Socialite",
       "terms:Power"
+    ],
+    "powers:Concealed Weapon": [
+      "rules-concepts:Long",
+      "terms:Long Rest",
+      "effects:Obey",
+      "accents:Mind"
     ],
     "powers:Rousing Inspiration": [
       "powers:The Right Hand",
@@ -11257,6 +11311,7 @@
       "powers:Shield of Devotion",
       "powers:Faith’s Lash",
       "powers:Prayer of Rest",
+      "powers:Holy Rest",
       "powers:Lesser Form of the Hulking Bear",
       "powers:Lesser Form of the Striking Serpent",
       "powers:Form of the Hulking Bear",
@@ -11596,7 +11651,9 @@
       "powers:Infuse",
       "powers:Perfect Practice",
       "powers:Spark of Doom",
+      "powers:Curious Balm",
       "powers:Studied Process",
+      "powers:Holy Rest",
       "powers:Battlemind",
       "powers:Shake It Off I",
       "powers:Archer’s Eye",
@@ -11672,8 +11729,10 @@
       "devotions:The Howl at the End",
       "challenges:Aewen - Deathbound",
       "challenges:Human - Squeamish",
+      "powers:Curious Balm",
       "powers:Path of Panic",
       "powers:Revivify",
+      "powers:Holy Rest",
       "powers:Salvation",
       "powers:Care for the Fallen",
       "powers:Rest",
@@ -11774,6 +11833,7 @@
       "powers:Battlefield Commander",
       "powers:Grace Under Duress",
       "powers:Commission of Protection",
+      "powers:Save the Day",
       "powers:Rise Above This",
       "powers:This Is My Bodyguard",
       "powers:Enduring Source",
@@ -11917,6 +11977,7 @@
       "powers:Revivify",
       "powers:Benediction",
       "powers:Heal",
+      "powers:Holy Rest",
       "powers:Rekindle",
       "powers:Gift of Life",
       "powers:Salvation",
@@ -12075,6 +12136,7 @@
       "powers:Hiatus",
       "powers:Spark of Doom",
       "powers:Strange Token",
+      "powers:Curious Balm",
       "powers:Zenith of Knowledge",
       "powers:It’s Alive!",
       "powers:Refreshing Prayer",
@@ -12155,6 +12217,7 @@
       "powers:Magical Empowerment",
       "powers:Training Regiment",
       "powers:Hidden Weapon",
+      "powers:Concealed Weapon",
       "powers:Third Hand",
       "powers:Guard and Savior",
       "powers:Internal Battery",
@@ -12450,6 +12513,7 @@
       "powers:Cantrip Scholar",
       "powers:Greater Healing Touch",
       "powers:Prayer of Rest",
+      "powers:Holy Rest",
       "powers:Gift of Life",
       "powers:Minor Circle",
       "powers:Commune with Nature",
@@ -12788,6 +12852,7 @@
       "powers:Spark of Doom",
       "powers:Spiritual Defense",
       "powers:Strange Token",
+      "powers:Curious Balm",
       "powers:Uninterrupted Creativity",
       "powers:Zenith of Knowledge",
       "powers:Refreshing Prayer",
@@ -12874,6 +12939,7 @@
       "powers:Elemental Node",
       "powers:Elemental Survival",
       "powers:Gift of Solitude",
+      "powers:Alone But Not Lonely",
       "powers:Hush",
       "powers:Spell Absorption",
       "powers:Succumb",
@@ -13375,6 +13441,7 @@
       "challenges:Ogrim - Never Back Down",
       "powers:Antidote",
       "powers:Strange Token",
+      "powers:Curious Balm",
       "powers:Form of the Striking Serpent",
       "powers:Grit",
       "powers:Shake It Off II",
@@ -13595,11 +13662,13 @@
       "advantages:Ogrim - Rapid Muscle Growth",
       "powers:Kick",
       "powers:Treat",
+      "powers:Curious Balm",
       "powers:Healing Touch",
       "powers:Path of Panic",
       "powers:Revivify",
       "powers:Benediction",
       "powers:Heal",
+      "powers:Holy Rest",
       "powers:Judgment",
       "powers:Salvation",
       "powers:Care for the Fallen",
@@ -13745,6 +13814,7 @@
       "powers:Method Acting",
       "powers:Party Planner",
       "powers:Peacebind",
+      "powers:Concealed Weapon",
       "powers:This Is My Bodyguard",
       "powers:Flee",
       "powers:Spirit Link"
@@ -13805,6 +13875,7 @@
       "powers:Challenging Shout",
       "powers:Sharp Dagger, Sharper Tongue",
       "powers:Calming Tone",
+      "powers:Save the Day",
       "powers:Infuriate"
     ],
     "effects:Rebuild": [
@@ -13838,6 +13909,7 @@
       "powers:Stand Ground",
       "powers:Revulsion",
       "powers:Gift of Solitude",
+      "powers:Alone But Not Lonely",
       "powers:Mostly Harmless"
     ],
     "effects:Revive": [
@@ -13897,6 +13969,7 @@
       "advantages:Underkin - Stoneshaper",
       "challenges:Underkin - From Rock to Rubble to Pebble",
       "powers:Critique Construction",
+      "powers:Explosive Impact",
       "powers:Exploding Arrows",
       "powers:Reinforce Shield",
       "powers:Deadly Remnants",
@@ -14042,6 +14115,7 @@
       "challenges:Forged - Vulnerable Construction",
       "challenges:Underkin - From Rock to Rubble to Pebble",
       "powers:Acid Soak",
+      "powers:Explosive Impact",
       "powers:Spark of Doom",
       "powers:Heretics’ Brand",
       "powers:Bless Shield",
@@ -14922,6 +14996,7 @@
       "powers:Battlefield Commander",
       "powers:Grace Under Duress",
       "powers:Liquid Courage",
+      "powers:Save the Day",
       "powers:This Is My Bodyguard",
       "powers:Accent Substantiation",
       "recipes:Euphoria"
@@ -14939,6 +15014,7 @@
       "advantages:Human - Adaptive Physiology",
       "challenges:Oaksworn - Tinderbox",
       "powers:Warming Elixir / Cooling Draught",
+      "powers:Explosive Impact",
       "powers:Exploding Arrows",
       "powers:Infuse",
       "powers:Burn",
@@ -15028,6 +15104,7 @@
       "powers:Shred",
       "powers:Adept Mage Power",
       "powers:Disintegrate Item",
+      "powers:Alone But Not Lonely",
       "powers:Harden Gear",
       "powers:Mageblast",
       "powers:Rebuild",
@@ -15191,6 +15268,7 @@
       "powers:Inspirational Leader",
       "powers:Holding Out For a Hero",
       "powers:Steel Yourself",
+      "powers:Concealed Weapon",
       "powers:Accent Substantiation",
       "powers:Startle"
     ],
@@ -15455,6 +15533,7 @@
       "challenges:Human - Hotheaded",
       "challenges:Human - Squeamish",
       "challenges:Lost - Divine Tenet",
+      "powers:Explosive Impact",
       "powers:Soulhold Survival",
       "powers:Sap of Life",
       "powers:Practiced Sight",
@@ -15505,12 +15584,14 @@
       "powers:Combat Analysis",
       "powers:Overcharge",
       "powers:Weird Wanderings",
+      "powers:Explosive Impact",
       "powers:Efficiencies of Scale",
       "powers:Grounded",
       "powers:Hiatus",
       "powers:Perfect Practice",
       "powers:Soulhold Survival",
       "powers:Spiritual Defense",
+      "powers:Curious Balm",
       "powers:Refreshing Prayer",
       "powers:Ritual Affinity",
       "powers:Shield of Faith",
@@ -15526,6 +15607,7 @@
       "powers:Faith’s Lash",
       "powers:Fortress of Faith",
       "powers:Blade Guard",
+      "powers:Holy Rest",
       "powers:Blessing",
       "powers:Divine Armor",
       "powers:Minor Circle",
@@ -16189,6 +16271,7 @@
       "challenges:Human - Hotheaded",
       "powers:Strange Token",
       "powers:Divine Substitution",
+      "powers:Alone But Not Lonely",
       "powers:Additional Bodyguard",
       "powers:Additional Source",
       "rules-concepts:Devotions & Divine Beings"
@@ -16635,6 +16718,7 @@
       "powers:Soulhold Survival",
       "powers:Spark of Doom",
       "powers:Spiritual Defense",
+      "powers:Curious Balm",
       "powers:Studied Focus",
       "powers:Uninterrupted Creativity",
       "powers:Zenith of Knowledge",
@@ -16800,6 +16884,9 @@
     "powers:Weird Wanderings": [],
     "powers:Advanced Treatment": [],
     "powers:Detonate": [],
+    "powers:Explosive Impact": [
+      "powers:Detonate"
+    ],
     "powers:Efficiencies of Scale": [],
     "powers:Empower Friends": [],
     "powers:Exploding Arrows": [],
@@ -16829,6 +16916,9 @@
     "powers:Spark of Doom": [],
     "powers:Spiritual Defense": [],
     "powers:Strange Token": [],
+    "powers:Curious Balm": [
+      "powers:Strange Token"
+    ],
     "powers:Studied Focus": [],
     "powers:Uninterrupted Creativity": [],
     "powers:Zenith of Knowledge": [],
@@ -16991,6 +17081,9 @@
     "powers:Intercession": [],
     "powers:Blade Guard": [],
     "powers:Prayer of Rest": [],
+    "powers:Holy Rest": [
+      "powers:Prayer of Rest"
+    ],
     "powers:Rekindle": [
       "archetypes:Balanced Cleric"
     ],
@@ -17178,7 +17271,6 @@
       "powers:Life Tap"
     ],
     "powers:Balm": [
-      "powers:Strange Token",
       "archetypes:Healer Druid"
     ],
     "powers:Barkskin": [
@@ -17398,7 +17490,6 @@
       "terms:Short Rest",
       "devotions:The Divine Bloom",
       "advantages:Underkin - Blood Money",
-      "powers:Prayer of Rest",
       "powers:Mask Aura",
       "powers:Arcane Bridge",
       "powers:Deflect Projectile",
@@ -17572,6 +17663,9 @@
     ],
     "powers:Elemental Survival": [],
     "powers:Gift of Solitude": [],
+    "powers:Alone But Not Lonely": [
+      "powers:Gift of Solitude"
+    ],
     "powers:Harden Gear": [],
     "powers:Hush": [],
     "powers:Improved Identification": [],
@@ -17806,6 +17900,7 @@
       "powers:Inspirational Leader",
       "powers:Commission of Protection",
       "powers:Holding Out For a Hero",
+      "powers:Save the Day",
       "powers:It's Not Safe to Go Alone",
       "powers:Magical Empowerment",
       "powers:Rise Above This",
@@ -17974,6 +18069,9 @@
     "powers:Holding Out For a Hero": [
       "archetypes:Support Socialite"
     ],
+    "powers:Save the Day": [
+      "powers:Holding Out For a Hero"
+    ],
     "powers:It's Not Safe to Go Alone": [],
     "powers:Magical Empowerment": [],
     "powers:Rise Above This": [],
@@ -17982,6 +18080,9 @@
     ],
     "powers:Training Regiment": [],
     "powers:Hidden Weapon": [],
+    "powers:Concealed Weapon": [
+      "powers:Hidden Weapon"
+    ],
     "powers:Rousing Inspiration": [],
     "powers:Third Hand": [],
     "powers:Guard and Savior": [],
@@ -18649,6 +18750,7 @@
       "powers:Infuse",
       "powers:Perfect Practice",
       "powers:Spark of Doom",
+      "powers:Curious Balm",
       "powers:Studied Process",
       "powers:Revivify",
       "powers:Shield of Devotion",
@@ -18687,6 +18789,7 @@
       "powers:Freeze",
       "powers:Ruinous Curse",
       "powers:Elemental Survival",
+      "powers:Alone But Not Lonely",
       "powers:Deflect Projectile",
       "powers:Loot",
       "powers:Sinister Strike",
@@ -18706,6 +18809,7 @@
       "powers:Grace Under Duress",
       "powers:Let’s You and Them Fight",
       "powers:Commission of Protection",
+      "powers:Save the Day",
       "powers:Rise Above This",
       "powers:This Is My Bodyguard",
       "powers:Enduring Source",
@@ -18769,6 +18873,7 @@
       "powers:Shadow Step",
       "advantages:Chimera - Heightened Flight",
       "powers:Hiatus",
+      "powers:Holy Rest",
       "powers:Battlemind",
       "powers:Heroic Save",
       "powers:Rest",
@@ -18804,6 +18909,7 @@
       "powers:Overcharge",
       "powers:Spiritual Anchor",
       "powers:Advanced Treatment",
+      "powers:Curious Balm",
       "powers:Uninterrupted Creativity",
       "powers:Zenith of Knowledge",
       "powers:Faith’s Lash",
@@ -18881,6 +18987,7 @@
       "powers:Party Planner",
       "powers:Peacebind",
       "powers:The Right Hand",
+      "powers:Concealed Weapon",
       "powers:Guard and Savior",
       "powers:Immortal Focus",
       "rituals:Health to the Company"
@@ -19451,6 +19558,7 @@
       "powers:Faith’s Lash",
       "powers:Heretics’ Brand",
       "powers:Prayer of Rest",
+      "powers:Holy Rest",
       "powers:Rekindle",
       "powers:Punish",
       "powers:Safe Return",
@@ -20908,8 +21016,17 @@
     "powers:Shield Bearer": [
       "skills:Basic Shields"
     ],
+    "powers:Detonate": [
+      "powers:Explosive Impact"
+    ],
+    "powers:Strange Token": [
+      "powers:Curious Balm"
+    ],
     "powers:Ritual Affinity": [
       "skills:Apprentice Ritual Magic"
+    ],
+    "powers:Prayer of Rest": [
+      "powers:Holy Rest"
     ],
     "powers:Hunter": [
       "skills:Projectile Weapons"
@@ -20920,11 +21037,20 @@
     "powers:Scales of the Serpent": [
       "skills:Heavy Armor"
     ],
+    "powers:Gift of Solitude": [
+      "powers:Alone But Not Lonely"
+    ],
     "powers:Back Alley Deals": [
       "skills:Fence"
     ],
     "powers:Implicit Truths": [
       "perks:Insight"
+    ],
+    "powers:Holding Out For a Hero": [
+      "powers:Save the Day"
+    ],
+    "powers:Hidden Weapon": [
+      "powers:Concealed Weapon"
     ]
   },
   "grantedBy": {
@@ -20974,6 +21100,15 @@
     "skills:Basic Shields": [
       "powers:Shield Bearer"
     ],
+    "powers:Explosive Impact": [
+      "powers:Detonate"
+    ],
+    "powers:Curious Balm": [
+      "powers:Strange Token"
+    ],
+    "powers:Holy Rest": [
+      "powers:Prayer of Rest"
+    ],
     "skills:Projectile Weapons": [
       "powers:Hunter"
     ],
@@ -20983,11 +21118,20 @@
     "skills:Heavy Armor": [
       "powers:Scales of the Serpent"
     ],
+    "powers:Alone But Not Lonely": [
+      "powers:Gift of Solitude"
+    ],
     "skills:Fence": [
       "powers:Back Alley Deals"
     ],
     "perks:Insight": [
       "powers:Implicit Truths"
+    ],
+    "powers:Save the Day": [
+      "powers:Holding Out For a Hero"
+    ],
+    "powers:Concealed Weapon": [
+      "powers:Hidden Weapon"
     ]
   },
   "discounts": {
