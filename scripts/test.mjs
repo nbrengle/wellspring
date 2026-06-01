@@ -56,6 +56,13 @@ for (const a of ARCHETYPES) {
   });
 }
 
+test('wealth + resources round-trip through the text sheet', () => {
+  const c = { archetypeName: 'x', classLevels: 'Fighter 4', wealth: '12', resources: 'A horse, a debt to House Varn' };
+  const rt = parseCharacterSheet(formatCharacterSheet(c, validate(c)));
+  eq(rt.wealth, '12', 'wealth preserved');
+  eq(rt.resources, 'A horse, a debt to House Varn', 'resources preserved');
+});
+
 // ─── format-tolerant import (real HTML source) ────────────────────────────────
 test('import the raw StarterCharacterSheets.html → first character is legal', () => {
   const html = readFileSync(new URL('../StarterCharacterSheets.html', import.meta.url), 'utf8');

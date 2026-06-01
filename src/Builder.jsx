@@ -23,6 +23,9 @@ import "./Builder.css";
 // A character is a flat object that mirrors the archetype shape so loading
 // from an archetype is a direct copy. Anything missing means "no choice yet".
 
+// Default starting Wealth (MegaDoc: "all characters start with 8 Wealth").
+const DEFAULT_WEALTH = 8;
+
 const EMPTY_CHARACTER = {
   name: "",
   archetypeName: null,       // which archetype this was loaded from (for the badge)
@@ -34,6 +37,8 @@ const EMPTY_CHARACTER = {
   lifePoints: null,
   armorPoints: null,
   spikes: null,
+  wealth: null,              // null → DEFAULT_WEALTH (8); perks/sheet may set it
+  resources: null,           // free-form, from the sheet
   startingSkills: [],
   purchasedSkills: [],
   purchasedPerks: [],
@@ -256,6 +261,14 @@ function IdentityRail({ character, report, onClickField, onRestart,
             : (physStr || "Physical Armor Points");
           return <Stat label="Armor" title={tip} value={value} />;
         })()}
+        <Stat label="Wealth"
+              title="Starting Wealth (default 8; perks may raise it). Spent on gear between events."
+              value={character.wealth ?? DEFAULT_WEALTH} />
+        {character.resources && (
+          <Stat label="Resources"
+                title="Resources available to the character (free-form; from the sheet)."
+                value={character.resources} />
+        )}
       </div>
 
       {report.spellSlots && <SpellSlotStrip slots={report.spellSlots} />}

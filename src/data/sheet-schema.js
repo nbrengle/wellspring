@@ -18,6 +18,8 @@ export const LABEL_FIELD = {
   'Life Points': 'lifePoints',
   'Armor Points': 'armorPoints',
   'Spikes': 'spikes',
+  'Wealth': 'wealth',
+  'Resources': 'resources',
   'Class Levels': 'classLevels',
   'Specialization': 'specialization',
   'Devotion': 'devotion',
@@ -53,6 +55,7 @@ export const LABEL_FIELD = {
 // Fields holding a single scalar value rather than a list of items.
 export const SCALAR_FIELDS = new Set([
   'lineage', 'sublineage', 'lifePoints', 'armorPoints', 'spikes', 'classLevels',
+  'wealth', 'resources',
   'specialization', 'devotion', 'noviceSpellSlots', 'adeptSpellSlots', 'greaterSpellSlots',
 ]);
 

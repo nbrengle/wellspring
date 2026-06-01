@@ -76,6 +76,8 @@ export function formatCharacterSheet(character, report) {
   line('Life Points', report.stats?.lifePoints ?? character.lifePoints ?? '—');
   line('Armor Points', character.armorPoints ?? '—');
   line('Spikes', report.stats?.spikes ?? character.spikes ?? '—');
+  line('Wealth', character.wealth ?? 8);
+  if (character.resources) line('Resources', character.resources);
   line('Class Levels', classes.length ? classes.map((c) => `${c.name} ${c.level}`).join(' / ') : 'None');
   if (character.specialization) line('Specialization', character.specialization);
   if (character.devotion) line('Devotion', character.devotion);

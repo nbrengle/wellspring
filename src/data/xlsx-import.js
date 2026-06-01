@@ -49,6 +49,8 @@ export function parseXlsxCharacter(arrayBuffer) {
   const lp = after(/life points/i); if (lp) character.lifePoints = lp;
   const sp = after(/^spikes/i); if (sp) character.spikes = sp;
   const ap = after(/armor points/i); if (ap) character.armorPoints = ap;
+  const wealth = after(/^wealth:?$/i); if (wealth) character.wealth = wealth;
+  const resources = after(/^resources:?$/i); if (resources) character.resources = resources;
 
   // Classes: rows under the "Class" / "Level" header — "<Class>  <Level>" pairs.
   const classes = readClasses(grid, clean);
