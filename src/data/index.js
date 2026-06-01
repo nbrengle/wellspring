@@ -41,10 +41,16 @@ import advancementJson from './advancement.json';
 import deathDyingJson from './death-and-dying.json';
 import wealthJson from './wealth.json';
 import powersJson from './powers.json';
+import metaJson from './meta.json';
 import devotionsBeingsJson from './devotions-divine-beings.json';
 import introductionJson from './introduction.json';
 
 export const LEVEL_TABLE = levelTableJson;
+
+// Build/source provenance shown publicly in the footer: the app's alpha version
+// and the MegaDoc sync date the data was generated from. Edit src/data/meta.json
+// when re-syncing the doc.
+export const META = metaJson;
 
 // ─── SKILLS / PERKS / FLAWS ───────────────────────────────────────────────────
 // UI expects { name, cost, cat, prereq, ranks, desc }.

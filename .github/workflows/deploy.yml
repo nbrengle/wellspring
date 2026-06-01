@@ -1,9 +1,13 @@
-# Build the Vite site and deploy it to GitHub Pages on every push to main.
-# No gh-pages branch or extra dependency — uses the official Pages actions.
+# CI + deploy. The `build` job (test + Vite build) runs on every PR and on push
+# to main — it's the required status check for branch protection. The `deploy`
+# job publishes dist/ to GitHub Pages, but ONLY on push to main (never on a PR),
+# so PRs are verified without deploying. No gh-pages branch or extra dependency.
 name: Deploy to GitHub Pages
 
 on:
   push:
+    branches: [main]
+  pull_request:
     branches: [main]
   workflow_dispatch:
 
@@ -37,6 +41,8 @@ jobs:
 
   deploy:
     needs: build
+    # Only publish from main — PRs run `build` for verification but never deploy.
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment:
       name: github-pages
