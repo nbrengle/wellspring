@@ -229,25 +229,22 @@ function IdentityRail({ character, report, onClickField, onRestart,
         <Stat label="Spikes" title={statTitle(report.stats, "spikes", "Maximum Spikes")}
               value={report.stats?.spikes ?? character.spikes ?? "—"} />
         {(() => {
-          // Armor is two distinct kinds: PHYSICAL (worn — from the armorPoints
-          // field, often a "N (caveats)" string) and NATURAL (from perks/lineage,
-          // e.g. Hardened Flesh +2, or Gift of Unbreakable Flesh's variable amount).
-          // Show each so a character whose armor is natural isn't shown as "—".
+          // ONE armor stat, so the kinds stay together and read cleanly. Armor has
+          // two sources: PHYSICAL (worn — the armorPoints field, often "N (caveats)")
+          // and NATURAL (perks/lineage — Hardened Flesh +2, or Gift of Unbreakable
+          // Flesh's variable amount). Show "<phys> + <nat>" and explain in the tooltip.
           const physStr = character.armorPoints ? String(character.armorPoints) : "";
-          const physNum = physStr.match(/^\s*(\d+)/)?.[1];
+          const phys = physStr.match(/^\s*(\d+)/)?.[1] ?? (physStr ? physStr.replace(/\s*\(.+\)/, "") : "0");
           const natFixed = report.stats?.naturalArmor || 0;
           const natNotes = (report.stats?.mods?.notes || []).filter((n) => n.stat === "naturalArmor");
-          const natValue = natFixed > 0 ? `+${natFixed}` : natNotes.length ? "var" : null;
-          const natTitle = natFixed > 0
-            ? statTitle(report.stats, "naturalArmor", "Natural Armor")
-            : natNotes.length ? `Natural Armor (variable): ${natNotes.map((n) => n.name).join(", ")}` : "Natural Armor";
-          return (
-            <>
-              <Stat label="Phys. Armor" title={physStr ? `Physical Armor — ${physStr}` : "Physical Armor Points"}
-                    value={physNum ?? physStr.replace(/\s*\(.+\)/, "") ?? "—"} />
-              {natValue != null && <Stat label="Nat. Armor" title={natTitle} value={natValue} />}
-            </>
-          );
+          const natPart = natFixed > 0 ? `+${natFixed}` : natNotes.length ? "+※" : "";   // ※ = variable
+          const value = natPart ? `${phys} ${natPart}` : phys;
+          const tip = [
+            physStr ? `Physical: ${physStr}` : `Physical: ${phys}`,
+            natFixed > 0 ? `Natural: +${natFixed} (${(report.stats.mods.sources || []).filter((s) => s.stat === "naturalArmor").map((s) => s.name).join(", ")})`
+              : natNotes.length ? `Natural: variable, from ${natNotes.map((n) => n.name).join(", ")}` : null,
+          ].filter(Boolean).join(" · ");
+          return <Stat label="Armor" title={tip} value={value} />;
         })()}
       </div>
 
