@@ -76,6 +76,13 @@ test('budget: 9 at level 4, +2 per level (extrapolated below 4)', () => {
   eq(budgetFor(4), 9, 'L4'); eq(budgetFor(5), 11, 'L5');
   eq(budgetFor(3), 7, 'L3'); eq(budgetFor(1), 3, 'L1');
 });
+test('approved backstory adds +2 BP to the budget', () => {
+  const base = validate({ archetypeName: 'x', classes: [{ name: 'Fighter', level: 4 }] });
+  const boon = validate({ archetypeName: 'x', classes: [{ name: 'Fighter', level: 4 }], backstoryApproved: true });
+  eq(boon.budget, base.budget + 2, 'budget +2');
+  eq(boon.backstoryBP, 2, 'backstoryBP reported');
+  eq(base.backstoryBP, 0, 'no backstory by default');
+});
 test('sub-level-4 is invalid (belowFloor)', () => {
   const r = validate({ archetypeName: 'x', classes: [{ name: 'Fighter', level: 1 }] });
   ok(r.belowFloor, 'belowFloor'); ok(!r.valid, 'invalid below floor'); eq(r.level, 1, 'level');

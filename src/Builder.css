@@ -455,6 +455,11 @@
 .b-budget.is-over .b-budget-fill { background: var(--b-red); }
 .b-budget-foot { margin: 0.35rem 0 0; font-size: 0.7rem; color: var(--b-muted); }
 .b-budget.is-over .b-budget-foot { color: var(--b-red); }
+.b-budget-backstory {
+  display: flex; align-items: center; gap: 0.4rem;
+  margin-top: 0.45rem; font-size: 0.72rem; color: var(--b-muted); cursor: pointer;
+}
+.b-budget-backstory input { cursor: pointer; }
 
 /* ─── SLOT BLOCKS ─────────────────────────────────────────────────────── */
 .b-slot-block { margin-bottom: 0.9rem; }

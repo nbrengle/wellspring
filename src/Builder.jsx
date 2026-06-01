@@ -188,7 +188,8 @@ function Tag({ label, tone = "amber" }) {
 // budget meter so spend is always visible.
 function IdentityRail({ character, report, onClickField, onRestart,
                        onSetClassLevel, onRemoveClass, onAddClass,
-                       onPickDevotion, onToggleDomain, onClearDevotion, onOpenLineage }) {
+                       onPickDevotion, onToggleDomain, onClearDevotion, onOpenLineage,
+                       onToggleBackstory }) {
   const classes = getClasses(character);
   return (
     <aside className="b-rail b-rail-left">
@@ -259,7 +260,7 @@ function IdentityRail({ character, report, onClickField, onRestart,
 
       {report.spellSlots && <SpellSlotStrip slots={report.spellSlots} />}
 
-      {character.archetypeName && <BudgetMeter report={report} />}
+      {character.archetypeName && <BudgetMeter report={report} character={character} onToggleBackstory={onToggleBackstory} />}
 
       <button className="b-restart" onClick={onRestart}>
         <span className="b-restart-icon">↺</span> Start over
@@ -387,7 +388,7 @@ function SpellSlotStrip({ slots }) {
 }
 
 // Live BP meter: a bar that fills with spend and turns red when over budget.
-function BudgetMeter({ report }) {
+function BudgetMeter({ report, character, onToggleBackstory }) {
   const { spend, budget, remaining, overBudget } = report;
   const pct = budget ? Math.min(100, (spend.net / budget) * 100) : 0;
   return (
@@ -398,6 +399,7 @@ function BudgetMeter({ report }) {
           <strong>{spend.net}</strong> / {budget}
           {spend.awarded > 0 && <span className="b-budget-flaws"> (+{spend.awarded} from flaws{spend.flawCapped ? ", capped at 5" : ""})</span>}
           {report.freeBP > 0 && <span className="b-budget-flaws"> (incl. +{report.freeBP} free BP)</span>}
+          {report.backstoryBP > 0 && <span className="b-budget-flaws"> (incl. +{report.backstoryBP} backstory)</span>}
         </span>
       </div>
       <div className="b-budget-bar"><div className="b-budget-fill" style={{ width: `${pct}%` }} /></div>
@@ -406,6 +408,12 @@ function BudgetMeter({ report }) {
           ? `${-remaining} BP over budget`
           : `${remaining} BP remaining`}
       </p>
+      {onToggleBackstory && (
+        <label className="b-budget-backstory" title="Approved backstories grant +2 BP (submit to the plot team).">
+          <input type="checkbox" checked={!!character?.backstoryApproved} onChange={onToggleBackstory} />
+          <span>Approved backstory <span className="b-budget-flaws">+2 BP</span></span>
+        </label>
+      )}
     </div>
   );
 }
@@ -1583,6 +1591,10 @@ export default function Builder() {
     setCharacter((c) => ({ ...c, devotion: null, divineDomains: [], domainPowers: [] }));
   }, []);
 
+  const handleToggleBackstory = useCallback(() => {
+    setCharacter((c) => ({ ...c, backstoryApproved: !c.backstoryApproved }));
+  }, []);
+
   // ─── LINEAGE ─────────────────────────────────────────────────────────────
   const [lineageOpen, setLineageOpen] = useState(false);
 
@@ -1872,7 +1884,8 @@ export default function Builder() {
                       onSetClassLevel={handleSetClassLevel} onRemoveClass={handleRemoveClass}
                       onAddClass={handleOpenClassPicker}
                       onPickDevotion={handlePickDevotion} onToggleDomain={handleToggleDomain}
-                      onClearDevotion={handleClearDevotion} onOpenLineage={() => setLineageOpen(true)} />
+                      onClearDevotion={handleClearDevotion} onOpenLineage={() => setLineageOpen(true)}
+                      onToggleBackstory={handleToggleBackstory} />
         <BuildSheet character={character} report={report} view={view}
                     onPickArchetype={handlePickArchetype} onStartBlank={handleStartBlank}
                     onInspect={handleInspect} onOpenSlot={handleOpenSlot}

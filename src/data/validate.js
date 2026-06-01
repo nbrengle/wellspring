@@ -18,6 +18,10 @@ export const MAX_LBP = 10;
 // Max BP a character can be awarded from flaws (MegaDoc: "up to 5 awarded BP").
 export const MAX_FLAW_BP = 5;
 
+// BP granted for a plot-team-approved backstory (MegaDoc: "Approved backstories
+// provide the character with 2 additional BP").
+export const BACKSTORY_BP = 2;
+
 // Normalize a sublineage label to its base name. The data is inconsistent: a
 // sublineage may appear as "Accented (Any Accent…)" on a challenge but just
 // "Accented" on an advantage. Compare on the part before " (" so the same
@@ -1065,7 +1069,11 @@ export function validate(character) {
   // it's correct for any character (built, imported, or hand-edited).
   const mcGrants = multiclassGrants(character);
   const freeBP = mcGrants.freeBP;
-  const budget = budgetFor(level) + freeBP;
+  // "Approved backstories provide the character with 2 additional BP." Opt-in
+  // (plot-team approval), so it's a flag on the character that lifts the base
+  // budget by a fixed +2 rather than free spend.
+  const backstoryBP = character.backstoryApproved ? BACKSTORY_BP : 0;
+  const budget = budgetFor(level) + freeBP + backstoryBP;
   const bonusBudget = bonusBudgetFor(level);
   const maxBudget = budget + bonusBudget;
   const spend = computeSpend(character);
@@ -1095,6 +1103,7 @@ export function validate(character) {
     level,
     budget,
     freeBP,
+    backstoryBP,
     multiclassGrants: mcGrants,
     bonusBudget,
     maxBudget,
