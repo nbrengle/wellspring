@@ -982,6 +982,29 @@ function EntityDetail({ view, report, choices, onSetChoice, onInspect, onBack, o
   );
 }
 
+// Render a description legibly: split off any "• " bullet list into a real list,
+// and break the prose into paragraphs at natural boundaries ("Note:",
+// "Enhancement:", "Spike:", numbered/lettered sub-points) so it doesn't read as one
+// dense block. Plain prose with none of these stays a single paragraph.
+function DescriptionBlock({ text }) {
+  const [lead, ...bulletParts] = String(text).split(/\s*•\s+/);
+  const bullets = bulletParts.map((b) => b.trim()).filter(Boolean);
+  // Break the lead prose before inline labels that start a new idea.
+  const paras = lead
+    .split(/(?=\b(?:Note|Enhancement|Spike|Special|Cost|Restriction|Requirement|Prerequisite)s?:)/)
+    .map((s) => s.trim()).filter(Boolean);
+  return (
+    <div className="b-detail-desc">
+      {paras.map((p, i) => <p key={i} className="b-detail-para">{p}</p>)}
+      {bullets.length > 0 && (
+        <ul className="b-detail-bullets">
+          {bullets.map((b, i) => <li key={i}>{b}</li>)}
+        </ul>
+      )}
+    </div>
+  );
+}
+
 // The shared reading body for an entity — description, facts, forward + back
 // links. Used by both the rail inspector and the picker's reading pane so the
 // content (and link-following) is identical everywhere.
@@ -1001,7 +1024,7 @@ function EntityBody({ entity, report, choices, onSetChoice, onInspect }) {
   return (
     <>
       {entity.description
-        ? <p className="b-detail-desc">{entity.description}</p>
+        ? <DescriptionBlock text={entity.description} />
         : domainPowers
           ? <p className="b-detail-desc">A divine domain{entity.accent ? ` (${entity.accent} accent)` : ""} granting {domainPowers.length} power{domainPowers.length === 1 ? "" : "s"}.</p>
           : <p className="b-detail-missing">No description on record.</p>}

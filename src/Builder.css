@@ -98,12 +98,21 @@
 }
 
 /* ─── RAILS ───────────────────────────────────────────────────────────── */
+/* Both rails stick to the top and scroll independently of the middle sheet, so
+   the identity rail and the detail/info panel stay in view while you browse and
+   select — no scrolling back up to read what you just picked. (top = the 4rem
+   top bar.) */
 .b-rail {
   background: var(--b-panel);
   padding: 1.25rem;
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  position: sticky;
+  top: 4rem;
+  align-self: start;
+  max-height: calc(100vh - 4rem);
+  overflow-y: auto;
 }
 .b-rail-left { border-right: 1px solid var(--b-border); }
 .b-rail-right { border-left: 1px solid var(--b-border); }
@@ -371,10 +380,19 @@
 }
 .b-detail-desc {
   font-size: 0.9rem;
-  line-height: 1.5;
+  line-height: 1.55;
   color: var(--b-text);
   margin: 0;
 }
+/* Description broken into paragraphs + a bullet list for legibility (#68). */
+.b-detail-para { margin: 0 0 0.6rem; }
+.b-detail-para:last-child { margin-bottom: 0; }
+.b-detail-bullets {
+  margin: 0.5rem 0 0; padding-left: 1.1rem; display: flex; flex-direction: column; gap: 0.3rem;
+}
+.b-detail-bullets li { line-height: 1.45; }
+/* Separate the facts block from the prose above it. */
+.b-facts { margin-top: 0.75rem !important; padding-top: 0.6rem; border-top: 1px solid var(--b-border); }
 /* Per-level power benefits (Adept Ritualist): active tiers in green, locked dimmed. */
 .b-detail-section { margin-top: 0.75rem; }
 .b-detail-section-title {
