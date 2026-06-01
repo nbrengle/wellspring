@@ -622,12 +622,12 @@ export function computeSpend(character) {
       spent += eff.cost;
     });
   }
-  // BP-bought powers: count only those the author marked with an effectiveBP
-  // (a slot-filled power has no authored cost and is validated against slots).
-  // effectiveCost trusts that authored value, so just use it.
+  // BP-bought powers. Class Powers (classSkills tier) are ALWAYS purchased, so
+  // derive their cost from the entity even without an authored effectiveBP. Domain/
+  // form powers may be slot-filled, so for those count only the author-marked ones.
   for (const field of BP_POWER_FIELDS) {
     (character[field] || []).forEach((item, idx) => {
-      if (character.effectiveBP?.[field]?.[idx] == null) return;
+      if (field !== 'classPowers' && character.effectiveBP?.[field]?.[idx] == null) return;
       const eff = effectiveCost(item, field, character, idx, granted);
       byItem[`${field}:${item}`] = eff;
       spent += eff.cost;

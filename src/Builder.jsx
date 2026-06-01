@@ -519,6 +519,17 @@ function BuildSheet({ character, report, view, onPickArchetype, onStartBlank, on
         </Section>
       )}
 
+      {/* Class Powers — BP-bought class abilities ("Class Skills"), available from
+          any class the character has levels in (like Domain Powers, but class-gated). */}
+      {getClasses(character).length > 0 && (
+        <Section title="Class Powers" tone="purple" onAdd={() => onOpenAdd("classPower")}>
+          <EditableRows
+            items={character.classPowers || []} field="classPowers" resolveType="powers" report={report}
+            onClick={onInspect} isFocused={isFocused}
+            removable={() => true} onRemove={(i) => onRemoveEntity("classPowers", i)} />
+        </Section>
+      )}
+
       {report.slots.length > 0 && (
         <Section title="Powers" tone="purple">
           {report.slots.map((slot) => (
@@ -1790,6 +1801,21 @@ export default function Builder() {
         kind: "domainPower", entityType: "powers", candidates: eligible, title: "Add a domain power",
         taken: new Set(character.domainPowers || []),
         onChoose: (name) => handleAddEntity("domainPowers", name),
+      }));
+      return;
+    }
+    if (kind === "classPower") {
+      // Class Skills from every class the character has levels in (rule: "Class
+      // Skills from any Class you have taken levels in"), tagged by class.
+      const eligible = getClasses(character).flatMap((c) =>
+        (eligiblePowers(c.name, "classSkills") || []).map((p) => ({
+          name: p.name, desc: p.description || p.desc || "", cat: c.name,
+          cost: p.cost, refresh: p.refresh,
+        })));
+      setPicking(entityPickerSpec({
+        kind: "classPower", entityType: "powers", candidates: eligible, title: "Add a class power",
+        taken: new Set(character.classPowers || []),
+        onChoose: (name) => handleAddEntity("classPowers", name),
       }));
       return;
     }

@@ -396,6 +396,16 @@ test('Natural Armor lineage advantage adds Natural Armor', () => {
   eq(s.naturalArmor, 2, '+2 Natural Armor from Hardened Flesh');
 });
 
+// ─── Class Powers (classSkills) are buyable + cost BP ─────────────────────────
+test('Class Powers are eligible per class and cost their BP', () => {
+  const mage = eligiblePowers('Mage', 'classSkills');
+  ok(mage.length >= 3, 'Mage has class skills');
+  ok(mage.some((p) => p.name === 'Arcane Charge'), 'Arcane Charge is offered');
+  const s = computeSpend({ classLevels: 'Mage 10', classPowers: ['Cantrip Scholar'] });
+  eq(s.byItem['classPowers:Cantrip Scholar'].cost, 4, 'Cantrip Scholar costs 4 BP');
+  eq(s.net, 4, 'counted in spend');
+});
+
 // ─── report ───────────────────────────────────────────────────────────────────
 console.log(`\n${passed} passed, ${failures.length} failed`);
 if (failures.length) {

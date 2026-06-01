@@ -167,6 +167,10 @@ export const SLOT_POWER_LISTS = {
   veteran: ['veteran'],
   cantrips: ['cantrips'],
   spellsKnown: ['noviceSpells', 'adeptSpells', 'greaterSpells'],
+  // Class Skills aren't slot-filled — they're BP-PURCHASED (like Domain Powers),
+  // gated by having levels in the class. Mapped here so eligiblePowers can list
+  // them for the purchase picker.
+  classSkills: ['classSkills'],
 };
 
 // The powers a character may choose to fill a given slot category, i.e. every
