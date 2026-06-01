@@ -104,18 +104,14 @@ export function formatCharacterSheet(character, report) {
   }
 
   // ── Build summary footer (not in the source, but useful on an export) ──
+  // Just the BP tally — the legal/illegal VERDICT is a live judgment of the
+  // builder UI, not part of the character sheet, so it's intentionally omitted
+  // here (it doesn't belong in the exported/imported document).
   lines.push('');
   const { spend, budget } = report;
   lines.push(`Build Points: ${spend.net} / ${budget}` +
     (spend.awarded > 0 ? ` (+${spend.awarded} from flaws)` : '') +
     (report.usesBonus ? ` (+${report.bonusUsed} bonus BP)` : ''));
-  const flags = [];
-  if (report.belowFloor) flags.push(`below level ${report.legalMinLevel}`);
-  if (report.aboveCap) flags.push(`above level ${report.levelCap} cap`);
-  if (report.overBudget) flags.push('over budget');
-  if (report.slotsOver) flags.push('power slots exceeded');
-  if (report.prereqs.issues.length) flags.push(`${report.prereqs.issues.length} unmet prereq(s)`);
-  lines.push(report.valid && !flags.length ? '✓ Legal build' : `⚠ ${flags.join('; ') || 'check build'}`);
 
   return lines.join('\n');
 }

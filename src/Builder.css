@@ -79,6 +79,10 @@
   cursor: pointer;
 }
 .b-topbar-btn:hover { border-color: var(--b-amber-deep); color: var(--b-amber); }
+.b-topbar-btn.is-copied {
+  border-color: var(--b-teal); color: var(--b-teal);
+  background: rgba(79, 184, 168, 0.12);
+}
 
 /* ─── COLUMNS ─────────────────────────────────────────────────────────── */
 .b-cols {
@@ -176,6 +180,42 @@
 }
 .b-stat-val { font-size: 1.1rem; font-weight: 700; color: var(--b-amber); }
 .b-stat-label { font-size: 0.58rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--b-dim); white-space: nowrap; }
+
+/* Interactive stat: clickable tile that opens a source breakdown popover. */
+.b-stat-interactive { position: relative; padding: 0; }
+.b-stat-btn {
+  width: 100%; background: transparent; border: none; cursor: pointer;
+  padding: 0.5rem 0.3rem; display: flex; flex-direction: column; align-items: center;
+  font: inherit; border-radius: 0.375rem;
+}
+.b-stat-btn:hover { background: rgba(255,255,255,0.03); }
+.b-stat-interactive.is-open { border-color: var(--b-amber-deep); }
+.b-stat-caret { opacity: 0.5; font-size: 0.6rem; }
+.b-stat-pop {
+  position: absolute; top: calc(100% + 0.3rem); left: 0; right: 0; z-index: 20;
+  min-width: 12rem; background: var(--b-panel); border: 1px solid var(--b-border-2);
+  border-radius: 0.5rem; padding: 0.6rem 0.7rem; box-shadow: 0 8px 24px rgba(0,0,0,0.45);
+  text-align: left;
+}
+.b-stat-pop-x {
+  position: absolute; top: 0.2rem; right: 0.35rem; background: none; border: none;
+  color: var(--b-dim); font-size: 1.1rem; cursor: pointer; line-height: 1; padding: 0.1rem;
+}
+.b-stat-pop-x:hover { color: var(--b-amber); }
+.b-stat-pop-title {
+  margin: 0 0 0.4rem; font-size: 0.6rem; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--b-muted);
+}
+.b-stat-pop-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.2rem; }
+.b-stat-pop-row { display: flex; justify-content: space-between; gap: 0.6rem; align-items: baseline; font-size: 0.78rem; }
+.b-stat-pop-name { color: var(--b-text); }
+.b-stat-pop-link {
+  background: none; border: none; padding: 0; cursor: pointer; font: inherit;
+  color: var(--b-blue, #7fa8d8); text-align: left; text-decoration: underline dotted;
+}
+.b-stat-pop-link:hover { color: var(--b-amber); }
+.b-stat-pop-n { flex: none; color: var(--b-amber); font-variant-numeric: tabular-nums; }
+.b-stat-pop-note { color: var(--b-dim); font-size: 0.68rem; }
 
 .b-restart {
   margin-top: auto;
@@ -342,17 +382,23 @@
   max-width: 16rem;
   font-style: italic;
 }
-.b-detail-header { display: flex; flex-direction: column; gap: 0.25rem; position: relative; }
+.b-detail-header { display: flex; flex-direction: column; gap: 0.25rem; }
+/* Nav row holds back (left) + close (right) above the title, so neither
+   overlaps the entity name. */
+.b-detail-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 1.25rem;
+  margin-bottom: 0.1rem;
+}
 .b-detail-close {
-  position: absolute;
-  top: -0.5rem;
-  right: -0.5rem;
   background: transparent;
   border: none;
   color: var(--b-dim);
   font-size: 1.5rem;
   cursor: pointer;
-  padding: 0.25rem 0.5rem;
+  padding: 0.1rem 0.35rem;
   line-height: 1;
 }
 .b-detail-close:hover { color: var(--b-amber); }
@@ -362,7 +408,6 @@
   font-weight: 600;
   color: var(--b-amber);
   margin: 0;
-  padding-right: 1.5rem;
 }
 .b-detail-type {
   font-size: 0.65rem;
@@ -377,6 +422,13 @@
   gap: 1rem;
   margin-top: 0.75rem;
 }
+/* Inline concept reference inside a description: hover for a blurb, click to
+   inspect. Styled as a subtle dotted-underline link so prose stays readable. */
+.b-concept {
+  background: none; border: none; padding: 0; margin: 0; font: inherit; cursor: pointer;
+  color: var(--b-blue, #6fa8d9); text-decoration: underline dotted; text-underline-offset: 2px;
+}
+.b-concept:hover { color: var(--b-amber); text-decoration-style: solid; }
 .b-detail-desc {
   font-size: 0.9rem;
   line-height: 1.55;
@@ -508,9 +560,8 @@
 
 /* ─── DETAIL: FACTS + LINKS ───────────────────────────────────────────── */
 .b-detail-back {
-  position: absolute; top: -0.5rem; left: -0.25rem;
   background: transparent; border: none; color: var(--b-muted);
-  font-size: 0.75rem; cursor: pointer; padding: 0.25rem;
+  font-size: 0.75rem; cursor: pointer; padding: 0.25rem 0;
 }
 .b-detail-back:hover { color: var(--b-amber); }
 .b-facts { display: flex; flex-direction: column; gap: 0.3rem; margin: 0; }
@@ -803,6 +854,12 @@
 .b-row-disc { color: var(--b-green); margin-left: 0.3rem; }
 /* Lineage summary on the main sheet: an advantage with its granted abilities
    nested beneath it (indented, dimmed connector ↳). */
+.b-lin-subhead {
+  margin: 0.5rem 0 0.25rem; font-size: 0.62rem; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--b-muted);
+}
+.b-lin-subhead:first-child { margin-top: 0; }
+.b-lin-subhead-note { color: var(--b-dim); font-weight: 400; text-transform: none; letter-spacing: 0; }
 .b-lin-adv-group { display: flex; flex-direction: column; gap: 0.25rem; }
 .b-lin-grant-row { margin-left: 1.1rem; opacity: 0.92; }
 .b-lin-grant-row .b-row-name { color: var(--b-dim); }
@@ -816,6 +873,19 @@
 /* Rank multiplier badge on a row name (e.g. "Bookcaster ×2") */
 .b-row-rank { color: var(--b-amber); font-size: 0.72rem; margin-left: 0.35rem; opacity: 0.85; }
 .b-row-role { opacity: 0.7; font-style: italic; }
+
+/* Provenance badges on a row: "from class" (free class grant) and the owning
+   class name on a class power, so class-granted items read as such (#5). */
+.b-row-badge {
+  flex: none; font-size: 0.58rem; letter-spacing: 0.06em; text-transform: uppercase;
+  border-radius: 0.2rem; padding: 0.1rem 0.4rem; border: 1px solid transparent;
+}
+.b-badge-granted {
+  color: var(--b-teal); background: rgba(79,184,168,0.13); border-color: rgba(79,184,168,0.3);
+}
+.b-badge-class {
+  color: var(--b-purple); background: rgba(176,143,208,0.13); border-color: rgba(176,143,208,0.3);
+}
 
 /* Spell-tier badges (picker rows + sheet slot rows) */
 /* Tier badges take their color from the shared --b-tier variable set by the

@@ -122,7 +122,7 @@ function validityReasons(report) {
   const out = [];
   if (report.belowFloor) out.push(`Below the level-${report.legalMinLevel} minimum`);
   if (report.aboveCap) out.push(`Above the level-${report.levelCap} cap (Advanced Classes pending)`);
-  if (report.overBudget) out.push(`Over budget by ${report.spend.net - report.maxBudget} BP`);
+  if (report.overBudget) out.push(`Over budget by ${report.spend.net - report.budget} BP`);
   for (const s of report.slots || []) {
     if (s.over) out.push(`${s.label}: ${s.used}/${s.allowed} (over by ${s.used - s.allowed})`);
   }
@@ -140,6 +140,7 @@ function validityReasons(report) {
   if (lbp) {
     if (lbp.overspent) out.push(`Lineage: ${lbp.spent - lbp.awarded} LBP overspent`);
     if (lbp.mixedSublineage) out.push("Lineage: items from more than one sublineage");
+    if (lbp.needsSublineage) out.push(`Lineage: select the ${lbp.requiredSublineages.join("/")} sublineage to take its items`);
     if (lbp.missingRequired?.length) out.push(`Lineage: missing required ${lbp.missingRequired.map((c) => c.baseName).join(", ")}`);
   }
   return out;
@@ -194,7 +195,7 @@ function Tag({ label, tone = "amber" }) {
 function IdentityRail({ character, report, onClickField, onRestart,
                        onSetClassLevel, onRemoveClass, onAddClass,
                        onPickDevotion, onToggleDomain, onClearDevotion, onOpenLineage,
-                       onToggleBackstory }) {
+                       onToggleBackstory, onInspect }) {
   const classes = getClasses(character);
   return (
     <aside className="b-rail b-rail-left">
@@ -230,40 +231,55 @@ function IdentityRail({ character, report, onClickField, onRestart,
                     onClear={onClearDevotion} onInspect={() => onClickField("devotion")} />
 
       <div className="b-stat-strip">
-        <Stat label="Life" title={statTitle(report.stats, "lifePoints", "Life Points")}
-              value={report.stats?.lifePoints ?? character.lifePoints ?? "—"} />
-        <Stat label="Spikes" title={statTitle(report.stats, "spikes", "Maximum Spikes")}
-              value={report.stats?.spikes ?? character.spikes ?? "—"} />
+        <StatWithSources label="Life" title={statTitle(report.stats, "lifePoints", "Life Points")}
+              value={report.stats?.lifePoints ?? character.lifePoints ?? "—"}
+              base={report.stats?.baseLifePoints} baseLabel={`level ${report.level} base`}
+              sources={statSources(report.stats, "lifePoints")} onInspect={onInspect} />
+        <StatWithSources label="Spikes" title={statTitle(report.stats, "spikes", "Maximum Spikes")}
+              value={report.stats?.spikes ?? character.spikes ?? "—"}
+              base={report.stats?.baseSpikes} baseLabel={`level ${report.level} base`}
+              sources={statSources(report.stats, "spikes")} onInspect={onInspect} />
         {(() => {
           // Per the Stacking Armor rule, physical / summoned / natural armor do NOT
           // stack — a character with more than one type must CHOOSE one to benefit
           // from; the rest grant 0. So show the BEST usable value (not a sum) with
-          // its type, and note the alternative in the tooltip.
+          // its type, and break down both options in the popover.
           const physStr = character.armorPoints ? String(character.armorPoints) : "";
           const phys = parseInt(physStr.match(/^\s*(\d+)/)?.[1] ?? "0", 10);
           const natFixed = report.stats?.naturalArmor || 0;
           const natNotes = (report.stats?.mods?.notes || []).filter((n) => n.stat === "naturalArmor");
-          const natSources = (report.stats?.mods?.sources || []).filter((s) => s.stat === "naturalArmor").map((s) => s.name);
+          const natSrcRows = statSources(report.stats, "naturalArmor");
           const hasNat = natFixed > 0 || natNotes.length > 0;
-          // Headline: the larger of physical vs natural (variable natural is shown
-          // as best-available when it beats physical / when there's no physical).
           let value, type;
           if (hasNat && (natFixed > phys || (natNotes.length && phys === 0))) {
             value = natFixed > 0 ? String(natFixed) : "※"; type = "natural";
           } else {
             value = String(phys); type = phys > 0 ? "physical" : "—";
           }
-          const tipParts = [`Physical ${phys}`];
-          if (natFixed > 0) tipParts.push(`Natural ${natFixed} (${natSources.join(", ")})`);
-          else if (natNotes.length) tipParts.push(`Natural variable, from ${natNotes.map((n) => n.name).join(", ")}`);
           const tip = hasNat
-            ? `Armor doesn't stack — pick one. ${tipParts.join(" · ")}. Showing best (${type}).`
+            ? `Armor doesn't stack — pick one. Showing best (${type}).`
             : (physStr || "Physical Armor Points");
-          return <Stat label="Armor" title={tip} value={value} />;
+          // Breakdown rows: physical (when any) + each natural-armor source +
+          // variable-natural notes. Headline shows the best; the list shows all.
+          const sources = [];
+          if (phys > 0) sources.push({ name: "Physical armor", n: phys, note: type === "physical" ? "in use" : "not in use" });
+          for (const s of natSrcRows) sources.push({ ...s, note: `natural${type === "natural" ? ", in use" : ""}` });
+          for (const n of natNotes) sources.push({ name: n.name, n: 0, note: "natural, variable", type: sourceType(n.name) });
+          return <StatWithSources label="Armor" title={tip} value={value} sources={sources} onInspect={onInspect} />;
         })()}
-        <Stat label="Wealth"
-              title="Starting Wealth (default 8; perks may raise it). Spent on gear between events."
-              value={character.wealth ?? DEFAULT_WEALTH} />
+        {(() => {
+          // Wealth = point-in-time total at the FIRST event: starting Wealth plus
+          // per-game/event income and one-time first-event grants (report.wealth).
+          const w = report.wealth || { base: character.wealth ?? DEFAULT_WEALTH, income: 0, total: character.wealth ?? DEFAULT_WEALTH, sources: [] };
+          const tip = w.income > 0
+            ? `Wealth at your first event: ${w.base} starting + ${w.income} from sources = ${w.total}.`
+            : "Wealth at your first event (default 8 starting; perks/professions add income).";
+          return <StatWithSources label="Wealth" title={tip}
+                       value={w.income > 0 ? `${w.total}` : w.base}
+                       base={w.base} baseLabel="starting"
+                       sources={w.sources.map((s) => ({ name: s.name, n: s.n, note: s.note, type: sourceType(s.name) }))}
+                       onInspect={onInspect} />;
+        })()}
         {character.resources && (
           <Stat label="Resources"
                 title="Resources available to the character (free-form; from the sheet)."
@@ -376,6 +392,49 @@ function Stat({ label, value, title }) {
   );
 }
 
+// A stat with a clickable source breakdown. When `sources` is non-empty the tile
+// becomes a button that toggles a popover listing each contributing source (base
+// + each modifier), every named source clickable to inspect it in the detail
+// pane. Falls back to a plain Stat (with the title tooltip) when there's nothing
+// to break down. `sources` is [{ name, n, note?, type? }]; `base` is the unmodified
+// starting value shown as the first line.
+function StatWithSources({ label, value, title, base, baseLabel = "base", sources = [], onInspect }) {
+  const [open, setOpen] = useState(false);
+  const hasBreakdown = sources.length > 0;
+  if (!hasBreakdown) return <Stat label={label} value={value} title={title} />;
+  return (
+    <div className={`b-stat b-stat-interactive ${open ? "is-open" : ""}`}>
+      <button className="b-stat-btn" onClick={() => setOpen((o) => !o)}
+              title={title} aria-expanded={open} aria-label={`${label} breakdown`}>
+        <span className="b-stat-val">{value}</span>
+        <span className="b-stat-label">{label} <span className="b-stat-caret">ⓘ</span></span>
+      </button>
+      {open && (
+        <div className="b-stat-pop" role="dialog" aria-label={`${label} sources`}>
+          <button className="b-stat-pop-x" aria-label="Close" onClick={() => setOpen(false)}>×</button>
+          <h4 className="b-stat-pop-title">{label} breakdown</h4>
+          <ul className="b-stat-pop-list">
+            {base != null && (
+              <li className="b-stat-pop-row">
+                <span className="b-stat-pop-name">{baseLabel}</span>
+                <span className="b-stat-pop-n">{base}</span>
+              </li>
+            )}
+            {sources.map((s, i) => (
+              <li key={`${s.name}-${i}`} className="b-stat-pop-row">
+                {s.type && onInspect
+                  ? <button className="b-stat-pop-link" onClick={() => { onInspect(s.name, null, s.type); setOpen(false); }}>{s.name}</button>
+                  : <span className="b-stat-pop-name">{s.name}</span>}
+                <span className="b-stat-pop-n">{s.n >= 0 ? `+${s.n}` : s.n}{s.note ? <span className="b-stat-pop-note"> {s.note}</span> : null}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // Caster-only spell-slot capacity per tier (Novice / Adept / Greater). Read-only
 // — slots are per-rest capacity, not build-time choices. Tiers with 0 slots are
 // dimmed rather than hidden so the progression is legible.
@@ -448,10 +507,36 @@ function LineageSummary({ character, report, onInspect, onOpenLineage }) {
     if (g.sourceKind !== "advantage") continue;
     (grantedBySource[g.source] = grantedBySource[g.source] || []).push(g);
   }
+  // Chosen Challenges (lineage Flaws that AWARD LBP) — previously only shown in
+  // the lineage panel, never on the sheet (#3). Surface them here alongside the
+  // Advantages they pay for.
+  const challenges = lbp?.chosenChallenges || [];
   const title = `Lineage — ${character.lineage}${character.sublineage ? ` · ${character.sublineage}` : ""}`;
   return (
     <Section title={title} tone="green" onAdd={onOpenLineage}>
-      {chosen.length === 0 && <p className="b-empty">No advantages chosen yet.</p>}
+      {challenges.length === 0 && chosen.length === 0 && (
+        <p className="b-empty">No challenges or advantages chosen yet.</p>
+      )}
+      {challenges.length > 0 && (
+        <>
+          <h3 className="b-lin-subhead">Challenges <span className="b-lin-subhead-note">award LBP</span></h3>
+          <ul className="b-rows">
+            {challenges.map((ch, i) => {
+              const name = ch.baseName || ch.name;
+              return (
+                <li key={`ch-${i}-${name}`} className="b-row b-lin-adv-row">
+                  <button className="b-row-name" onClick={() => onInspect(name, "lineageChallenges", "flaws")}>{name}</button>
+                  {ch.required && <span className="b-row-badge b-badge-granted">required</span>}
+                  <span className="b-row-bp is-award">+{ch.lbp} LBP</span>
+                </li>
+              );
+            })}
+          </ul>
+        </>
+      )}
+      {chosen.length > 0 && (
+        <h3 className="b-lin-subhead">Advantages <span className="b-lin-subhead-note">spend LBP</span></h3>
+      )}
       <ul className="b-rows">
         {chosen.map((adv, i) => {
           const name = adv.baseName || adv.name;
@@ -485,11 +570,12 @@ function BuildSheet({ character, report, view, onPickArchetype, onStartBlank, on
   const isFocused = (item, field) =>
     view?.mode === "inspect" && view.item === item && view.field === field;
 
-  // Skills shown = starting (class-granted) + multiclass-granted (derived) +
-  // purchased. Only purchased ones are removable. The granted ones are derived
-  // from the class list (report.multiclassGrants), never stored on the character.
-  const grantedSkills = (report.multiclassGrants?.skills || []).map((g) => g.name);
-  const freeCount = character.startingSkills.length + grantedSkills.length;
+  // Items are rendered by their RESOLVED kind (report.owned), not by the storage
+  // field they happen to sit in — so a perk filed under startingSkills (Socialite's
+  // Contact) shows under Perks, and a class power filed under purchasedSkills shows
+  // under Class Powers (and isn't buyable twice). Provenance drives the badge:
+  // class-granted items are free + non-removable; purchased ones cost BP.
+  const owned = report.owned || { skills: [], perks: [], classPowers: [] };
 
   return (
     <main className="b-sheet">
@@ -510,19 +596,13 @@ function BuildSheet({ character, report, view, onPickArchetype, onStartBlank, on
       </header>
 
       <Section title="Skills" tone="amber" onAdd={() => onOpenAdd("skill")}>
-        <EditableRows
-          items={[...character.startingSkills, ...grantedSkills, ...character.purchasedSkills]}
-          field="purchasedSkills" resolveType="skills" report={report}
-          onClick={onInspect} isFocused={isFocused}
-          removable={(i) => i >= freeCount}
-          onRemove={(i) => onRemoveEntity("purchasedSkills", i - freeCount)} />
+        <ClassifiedRows rows={owned.skills} resolveType="skills" report={report}
+          onClick={onInspect} isFocused={isFocused} onRemove={onRemoveEntity} />
       </Section>
 
       <Section title="Perks" tone="teal" onAdd={() => onOpenAdd("perk")}>
-        <EditableRows
-          items={character.purchasedPerks} field="purchasedPerks" resolveType="perks" report={report}
-          onClick={onInspect} isFocused={isFocused}
-          removable={() => true} onRemove={(i) => onRemoveEntity("purchasedPerks", i)} />
+        <ClassifiedRows rows={owned.perks} resolveType="perks" report={report}
+          onClick={onInspect} isFocused={isFocused} onRemove={onRemoveEntity} />
       </Section>
 
       <LineageSummary character={character} report={report} onInspect={onInspect} onOpenLineage={onOpenLineage} />
@@ -541,13 +621,13 @@ function BuildSheet({ character, report, view, onPickArchetype, onStartBlank, on
       )}
 
       {/* Class Powers — BP-bought class abilities ("Class Skills"), available from
-          any class the character has levels in (like Domain Powers, but class-gated). */}
+          any class the character has levels in (like Domain Powers, but class-gated).
+          Rows come from report.owned.classPowers, which unions the dedicated
+          classPowers field with any class powers misfiled into the skill lists. */}
       {getClasses(character).length > 0 && (
         <Section title="Class Powers" tone="purple" onAdd={() => onOpenAdd("classPower")}>
-          <EditableRows
-            items={character.classPowers || []} field="classPowers" resolveType="powers" report={report}
-            onClick={onInspect} isFocused={isFocused}
-            removable={() => true} onRemove={(i) => onRemoveEntity("classPowers", i)} />
+          <ClassifiedRows rows={owned.classPowers} resolveType="powers" report={report}
+            onClick={onInspect} isFocused={isFocused} onRemove={onRemoveEntity} showClass />
         </Section>
       )}
 
@@ -678,6 +758,79 @@ function SlotBlock({ slot, character, onInspect, onOpenSlot, isFocused, pickClas
   );
 }
 
+// The BP cost / award / free-grant / discount badge for one item's resolved cost
+// entry (report.spend.byItem[...]). Shared by EditableRows and ClassifiedRows so
+// every list annotates cost identically.
+function CostBadge({ cost }) {
+  if (!cost) return null;
+  if (cost.cost < 0) return <span className="b-row-bp is-award">+{-cost.cost} BP</span>;
+  if (!(cost.base > 0)) return null;
+  if (cost.cost === 0 && cost.grant?.source) {
+    const role = grantSourceRole(cost.grant);
+    return (
+      <span className="b-row-bp is-free" title={`Granted by ${cost.grant.source}${role ? ` (${role})` : ""}`}>
+        free · {cost.grant.source}{role && <span className="b-row-role"> ({role})</span>}
+      </span>
+    );
+  }
+  if (cost.discount) {
+    return (
+      <span className="b-row-bp is-discounted"
+            title={`${cost.base} BP, discounted ${cost.discount.amount} by ${cost.discount.source}`}>
+        {cost.cost} BP <span className="b-row-disc">−{cost.discount.amount} · {cost.discount.source}</span>
+      </span>
+    );
+  }
+  return <span className={`b-row-bp ${cost.cost === 0 ? "is-free" : ""}`}>{cost.cost === 0 ? "free" : `${cost.cost} BP`}</span>;
+}
+
+// Render pre-classified rows (report.owned.skills / perks / classPowers). Each row
+// carries its own backing { name, field, index, source, grantedBy, cls } so it
+// inspects, costs, and removes against the RIGHT storage field regardless of which
+// section it's shown in. Class-granted rows (source 'class') get a "from class"
+// badge (#5) and aren't removable; rows with index < 0 are derived (multiclass
+// grants) and aren't stored, so also non-removable.
+function ClassifiedRows({ rows, resolveType, report, onClick, isFocused, onRemove, showClass }) {
+  if (!rows || rows.length === 0) return <p className="b-empty">none</p>;
+  return (
+    <ul className="b-rows">
+      {rows.map((row) => {
+        const { name, field, index, source, grantedBy, cls } = row;
+        const cost = report?.spend.byItem[`${field}:${name}`];
+        const fromClass = source === "class";
+        const canRemove = !fromClass && index >= 0;
+        const rank = cost?.rank || 1;
+        return (
+          <li key={`${field}-${index}-${name}`} className={`b-row ${isFocused(name, field) ? "is-focused" : ""}`}>
+            <button className="b-row-name" onClick={() => onClick(name, field, resolveType)}>
+              {name}{rank > 1 && <span className="b-row-rank">×{rank}</span>}
+            </button>
+            {showClass && cls && <span className="b-row-badge b-badge-class">{cls}</span>}
+            {fromClass
+              ? (() => {
+                  // Name the granting class when known (#16): a multiclass grant
+                  // names that class; a primary-class grant names the primary.
+                  const src = grantedBy || cls;
+                  return (
+                    <span className="b-row-badge b-badge-granted"
+                          title={grantedBy ? `Granted free by your ${grantedBy} multi-class`
+                            : src ? `Granted free by your ${src} class` : "Granted free by your class"}>
+                      {src ? `from ${src}` : "from class"}
+                    </span>
+                  );
+                })()
+              : <CostBadge cost={cost} />}
+            {canRemove && (
+              <button className="b-row-remove" title="Remove" aria-label={`Remove ${name}`}
+                      onClick={() => onRemove(field, index)}>×</button>
+            )}
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
 // Render items as full-width rows (matching the power slot rows): click the name
 // to inspect, a BP cost / award badge, and a remove (×) on removable items.
 // `removable(i)` / `onRemove(i)` operate on the rendered index; the parent maps
@@ -691,34 +844,13 @@ function EditableRows({ items, field, onClick, isFocused, resolveType, report, r
       {items.map((item, i) => {
         const cost = report?.spend.byItem[`${field}:${item}`];
         const canRemove = removable ? removable(i) : false;
-        const isAward = cost && cost.cost < 0; // flaws award BP
         const rank = cost?.rank || 1;
         return (
           <li key={`${field}-${i}-${item}`} className={`b-row ${isFocused(item, field) ? "is-focused" : ""}`}>
             <button className="b-row-name" onClick={() => onClick(item, field, resolveType)}>
               {item}{rank > 1 && <span className="b-row-rank">×{rank}</span>}
             </button>
-            {isAward && <span className="b-row-bp is-award">+{-cost.cost} BP</span>}
-            {!isAward && cost && cost.base > 0 && (
-              cost.cost === 0 && cost.grant?.source
-                ? (() => {
-                    const role = grantSourceRole(cost.grant);
-                    return (
-                      <span className="b-row-bp is-free"
-                            title={`Granted by ${cost.grant.source}${role ? ` (${role})` : ""}`}>
-                        free · {cost.grant.source}{role && <span className="b-row-role"> ({role})</span>}
-                      </span>
-                    );
-                  })()
-                : cost.discount
-                  ? <span className="b-row-bp is-discounted"
-                          title={`${cost.base} BP, discounted ${cost.discount.amount} by ${cost.discount.source}`}>
-                      {cost.cost} BP <span className="b-row-disc">−{cost.discount.amount} · {cost.discount.source}</span>
-                    </span>
-                  : <span className={`b-row-bp ${cost.cost === 0 ? "is-free" : ""}`}>
-                      {cost.cost === 0 ? "free" : `${cost.cost} BP`}
-                    </span>
-            )}
+            <CostBadge cost={cost} />
             {canRemove && (
               <button className="b-row-remove" title="Remove" aria-label={`Remove ${item}`} onClick={() => onRemove(i)}>×</button>
             )}
@@ -872,6 +1004,23 @@ const primaryEffect = (c) => candidateEffects(c)[0] || "—";
 
 // Tooltip for a stat: the base plus any modifiers and where they came from, so a
 // boosted value (e.g. Life 4 from level + Toughness) explains itself on hover.
+// Resolve the entity type of a stat/wealth source name (perk / power / skill /
+// advantage) so its breakdown row can be made clickable. Returns null when the
+// name doesn't resolve (then the row renders as plain text).
+function sourceType(name) {
+  const clean = String(name).replace(/\s*\([^)]*\)\s*$/, "").trim();
+  for (const t of ["powers", "perks", "skills"]) {
+    if (lookupEntity(`${t}:${clean}`)) return t;
+  }
+  return null;
+}
+// Decorate stat-mod sources for one stat key with a clickable type.
+function statSources(stats, key) {
+  return (stats?.mods?.sources || [])
+    .filter((s) => s.stat === key)
+    .map((s) => ({ name: s.name, n: s.n, type: sourceType(s.name) }));
+}
+
 function statTitle(stats, key, label) {
   const srcs = (stats?.mods?.sources || []).filter((s) => s.stat === key);
   if (!srcs.length) return label;
@@ -1062,8 +1211,12 @@ function EntityDetail({ view, report, choices, onSetChoice, onInspect, onBack, o
   return (
     <aside className="b-rail b-rail-right">
       <header className="b-detail-header">
-        <button className="b-detail-close" aria-label="Close" onClick={onClose}>×</button>
-        {onBack && <button className="b-detail-back" onClick={onBack}>‹ back</button>}
+        <div className="b-detail-nav">
+          {onBack
+            ? <button className="b-detail-back" onClick={onBack}>‹ back</button>
+            : <span />}
+          <button className="b-detail-close" aria-label="Close" onClick={onClose}>×</button>
+        </div>
         <h2 className="b-detail-title">{entity?.name || item}</h2>
         <p className="b-detail-type">{entity?.type || resolveType}</p>
       </header>
@@ -1074,11 +1227,80 @@ function EntityDetail({ view, report, choices, onSetChoice, onInspect, onBack, o
   );
 }
 
+// Build the set of referenced game-concept TERMS for an entity, from its
+// reference graph (REFS.mentions + prereqs + unlocks). Each term is { name, id,
+// type, summary } where summary is a short blurb for the hover tooltip. Sorted
+// longest-name-first so multi-word terms ("Long Rest") win over substrings
+// ("Rest") when matching. Self-references and overly generic 1-char names are
+// dropped. (#13)
+function conceptTerms(entity) {
+  if (!entity?.id) return [];
+  const ids = new Set([
+    ...(REFS.mentions[entity.id] || []),
+    ...((REFS.prereqs[entity.id]?.skills) || []),
+    ...((REFS.prereqs[entity.id]?.anyOf || []).flat()),
+    ...(REFS.unlocks[entity.id] || []),
+  ]);
+  const terms = [];
+  for (const id of ids) {
+    if (id === entity.id) continue;
+    const ent = lookupEntity(id);
+    if (!ent?.name || ent.name.length < 3) continue;
+    if (ent.name.toLowerCase() === (entity.name || "").toLowerCase()) continue;
+    const summary = ent.summary || ent.description || ent.definition || "";
+    terms.push({ name: ent.name, id, type: id.slice(0, id.indexOf(":")), summary: String(summary).slice(0, 240) });
+  }
+  // De-dupe by lowercased name (different ids, same display term), longest first.
+  const seen = new Set();
+  return terms
+    .sort((a, b) => b.name.length - a.name.length)
+    .filter((t) => { const k = t.name.toLowerCase(); return seen.has(k) ? false : seen.add(k); });
+}
+
+// Render text with referenced concept names turned into hoverable + clickable
+// chips (#13). `terms` come from conceptTerms(entity). A match is wrapped in a
+// <button> carrying the term's summary as a native tooltip and inspecting the
+// concept on click. Matching is case-insensitive on word boundaries, longest
+// term first, each distinct term linked only on its FIRST occurrence to keep the
+// prose readable. Returns an array of strings + elements for inline rendering.
+function linkifyConcepts(text, terms, onInspect, keyPrefix) {
+  if (!terms.length || !onInspect) return [text];
+  // One alternation of all term names, escaped, longest-first (terms already
+  // sorted that way). Capture group so split keeps the matches.
+  const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const re = new RegExp(`\\b(${terms.map((t) => esc(t.name)).join("|")})\\b`, "gi");
+  const byName = new Map(terms.map((t) => [t.name.toLowerCase(), t]));
+  const linked = new Set();
+  const out = [];
+  let last = 0, m, n = 0;
+  while ((m = re.exec(text))) {
+    const term = byName.get(m[0].toLowerCase());
+    if (!term) continue;
+    if (m.index > last) out.push(text.slice(last, m.index));
+    if (linked.has(term.name.toLowerCase())) {
+      out.push(m[0]); // already linked once — leave subsequent mentions plain
+    } else {
+      linked.add(term.name.toLowerCase());
+      out.push(
+        <button key={`${keyPrefix}-${n++}`} className="b-concept"
+                title={term.summary ? `${term.name} — ${term.summary}` : term.name}
+                onClick={() => onInspect(term.name, null, term.type)}>
+          {m[0]}
+        </button>
+      );
+    }
+    last = m.index + m[0].length;
+  }
+  if (last < text.length) out.push(text.slice(last));
+  return out;
+}
+
 // Render a description legibly: split off any "• " bullet list into a real list,
 // and break the prose into paragraphs at natural boundaries ("Note:",
 // "Enhancement:", "Spike:", numbered/lettered sub-points) so it doesn't read as one
-// dense block. Plain prose with none of these stays a single paragraph.
-function DescriptionBlock({ text }) {
+// dense block. Referenced concepts are linkified (hover for a blurb, click to
+// inspect) when `terms` + `onInspect` are supplied.
+function DescriptionBlock({ text, terms = [], onInspect }) {
   const [lead, ...bulletParts] = String(text).split(/\s*•\s+/);
   const bullets = bulletParts.map((b) => b.trim()).filter(Boolean);
   // Break the lead prose before inline labels that start a new idea.
@@ -1087,10 +1309,10 @@ function DescriptionBlock({ text }) {
     .map((s) => s.trim()).filter(Boolean);
   return (
     <div className="b-detail-desc">
-      {paras.map((p, i) => <p key={i} className="b-detail-para">{p}</p>)}
+      {paras.map((p, i) => <p key={i} className="b-detail-para">{linkifyConcepts(p, terms, onInspect, `p${i}`)}</p>)}
       {bullets.length > 0 && (
         <ul className="b-detail-bullets">
-          {bullets.map((b, i) => <li key={i}>{b}</li>)}
+          {bullets.map((b, i) => <li key={i}>{linkifyConcepts(b, terms, onInspect, `b${i}`)}</li>)}
         </ul>
       )}
     </div>
@@ -1113,10 +1335,12 @@ function EntityBody({ entity, report, choices, onSetChoice, onInspect }) {
   const activeBenefits = entity.levelBenefits
     ? (report?.powerBenefits?.find((b) => b.power === entity.name)?.benefits || entity.levelBenefits)
     : null;
+  // Referenced concepts to linkify inside the description (#13).
+  const terms = conceptTerms(entity);
   return (
     <>
       {entity.description
-        ? <DescriptionBlock text={entity.description} />
+        ? <DescriptionBlock text={entity.description} terms={terms} onInspect={onInspect} />
         : domainPowers
           ? <p className="b-detail-desc">A divine domain{entity.accent ? ` (${entity.accent} accent)` : ""} granting {domainPowers.length} power{domainPowers.length === 1 ? "" : "s"}.</p>
           : <p className="b-detail-missing">No description on record.</p>}
@@ -1178,6 +1402,9 @@ function EntityBody({ entity, report, choices, onSetChoice, onInspect }) {
 function DetailFacts({ entity }) {
   if (!entity) return null;
   const facts = [];
+  // Parameterized skills (Lore (Historical), Profession (Smith)) resolve to the
+  // base skill; surface the chosen area so the reader sees what was picked.
+  if (entity.parameter) facts.push([entity.baseName === "Lore" ? "Area" : "Choice", entity.parameter]);
   if (typeof entity.cost === "number") facts.push(["Cost", `${entity.cost} BP`]);
   else if (entity.cost && /^var/i.test(String(entity.cost))) facts.push(["Cost", "Variable"]);
   if (entity.prereq && entity.prereq !== "None") facts.push(["Prereq", entity.prereq]);
@@ -1430,6 +1657,7 @@ function LineagePanel({ character, report, onSetLineage, onSetSublineage, onTogg
               <p className="b-lin-flag">
                 {lbp.overspent && `Over by ${lbp.spent - lbp.awarded} LBP. `}
                 {lbp.mixedSublineage && "Items from more than one sublineage. "}
+                {lbp.needsSublineage && `Select the ${lbp.requiredSublineages.join("/")} sublineage above to take its Challenges/Advantages. `}
                 {lbp.missingRequired.length > 0 && `Required: ${lbp.missingRequired.map((c) => c.baseName).join(", ")}.`}
               </p>
             )}
@@ -1882,25 +2110,29 @@ export default function Builder() {
         })));
       setPicking(entityPickerSpec({
         kind: "classPower", entityType: "powers", candidates: eligible, title: "Add a class power",
-        taken: new Set(character.classPowers || []),
+        // Mark taken from the classified bucket so a class power misfiled into the
+        // skill lists still reads as already-owned and can't be bought twice (#4).
+        taken: new Set((report.owned?.classPowers || []).map((r) => r.name)),
         onChoose: (name) => handleAddEntity("classPowers", name),
       }));
       return;
     }
+    // Taken-sets read from the classified buckets (report.owned), not the raw
+    // fields, so items resolve to their true kind across mis-filed storage.
     const config = {
       skill: { field: "purchasedSkills", entityType: "skills", candidates: ALL_SKILLS, title: "Add a skill",
-               takenFrom: (c) => [...(c.startingSkills || []), ...(c.purchasedSkills || [])] },
+               taken: (report.owned?.skills || []).map((r) => r.name) },
       perk:  { field: "purchasedPerks", entityType: "perks", candidates: ALL_PERKS, title: "Add a perk",
-               takenFrom: (c) => c.purchasedPerks || [] },
+               taken: (report.owned?.perks || []).map((r) => r.name) },
       flaw:  { field: "flaws", entityType: "flaws", candidates: ALL_FLAWS, title: "Add a flaw",
-               takenFrom: (c) => c.flaws || [] },
+               taken: (character.flaws || []) },
     }[kind];
     setPicking(entityPickerSpec({
       kind, entityType: config.entityType, candidates: config.candidates, title: config.title,
-      taken: new Set(config.takenFrom(character)),
+      taken: new Set(config.taken),
       onChoose: (name) => handleAddEntity(config.field, name),
     }));
-  }, [character, handleAddEntity, report.devotion]);
+  }, [character, handleAddEntity, report.devotion, report.owned]);
 
   const handleBack = useCallback(() => {
     setHistory((h) => {
@@ -1941,7 +2173,7 @@ export default function Builder() {
                       onAddClass={handleOpenClassPicker}
                       onPickDevotion={handlePickDevotion} onToggleDomain={handleToggleDomain}
                       onClearDevotion={handleClearDevotion} onOpenLineage={() => setLineageOpen(true)}
-                      onToggleBackstory={handleToggleBackstory} />
+                      onToggleBackstory={handleToggleBackstory} onInspect={handleInspect} />
         <BuildSheet character={character} report={report} view={view}
                     onPickArchetype={handlePickArchetype} onStartBlank={handleStartBlank}
                     onInspect={handleInspect} onOpenSlot={handleOpenSlot}
@@ -1972,6 +2204,12 @@ export default function Builder() {
 
 function BTopBar({ character, report, onLevelChange, onExport }) {
   const level = character.archetypeName ? characterLevel(character) : null;
+  const [linkCopied, setLinkCopied] = useState(false);
+  const copyShareLink = () => {
+    navigator.clipboard?.writeText(window.location.href);
+    setLinkCopied(true);
+    setTimeout(() => setLinkCopied(false), 1500);
+  };
   return (
     <header className="b-topbar">
       <div className="b-topbar-brand">
@@ -2006,8 +2244,8 @@ function BTopBar({ character, report, onLevelChange, onExport }) {
       </div>
       <div className="b-topbar-actions">
         <button className="b-topbar-btn" onClick={onExport}>Export / Import</button>
-        <button className="b-topbar-btn" onClick={() => navigator.clipboard?.writeText(window.location.href)}>
-          Copy share link
+        <button className={`b-topbar-btn ${linkCopied ? "is-copied" : ""}`} onClick={copyShareLink}>
+          {linkCopied ? "Link copied!" : "Copy share link"}
         </button>
       </div>
     </header>

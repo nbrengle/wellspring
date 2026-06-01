@@ -51,6 +51,23 @@ export const LEVEL_TABLE = levelTableJson;
 
 const cleanPrereq = p => (!p || p === 'None' ? null : p);
 
+// Perk / flaw descriptions are stored as "<one-line table summary>. Cost: N
+// Prerequisites: X <full description>" — the leading summary + Cost/Prereq
+// boilerplate is the at-a-glance table row, duplicated in front of the real
+// prose. Split them so the UI can show the FULL description (not the summary)
+// while keeping the summary available as a tagline. When the boilerplate isn't
+// present the whole string is the body and there's no separate summary.
+// Returns { summary, body }.
+export function splitDescription(text) {
+  const s = String(text || '');
+  // Match: summary up to the first "Cost:"/"Prerequisites:" marker, the
+  // Cost/Prereq boilerplate, then the body starting at the next capitalized word.
+  const m = s.match(/^(.*?)\s*(?:Cost:\s*[^]*?)?Prerequisites?:\s*[^.]*?\s+([A-Z][^]*)$/);
+  if (m) return { summary: m[1].trim(), body: m[2].trim() };
+  return { summary: '', body: s.trim() };
+}
+const descBody = text => splitDescription(text).body;
+
 export const ALL_SKILLS = skillsJson.map(s => ({
   name: s.name,
   cost: s.cost,
@@ -77,7 +94,8 @@ export const ALL_PERKS = perksJson.map(p => ({
   ranks: p.ranks,
   cat: PERK_CAT[p.category] || p.category,
   prereq: cleanPrereq(p.prereq),
-  desc: p.description,
+  desc: descBody(p.description),
+  summary: splitDescription(p.description).summary,
 }));
 
 export const ALL_FLAWS = flawsJson.map(f => ({
@@ -89,7 +107,8 @@ export const ALL_FLAWS = flawsJson.map(f => ({
   ranks: f.ranks,
   cat: f.category,
   prereq: cleanPrereq(f.prereq),
-  desc: f.description,
+  desc: descBody(f.description),
+  summary: splitDescription(f.description).summary,
 }));
 
 // ─── CLASSES ──────────────────────────────────────────────────────────────────
@@ -277,16 +296,23 @@ export const REFS = refsJson;
 // Lookup by entity id, e.g. "skills:Basic Faith" → { type, name, description, ... }.
 // Used by the detail pane when an item card is clicked.
 const ENTITY_INDEX = new Map();
-const indexCollection = (items, type, nameKey = 'name', extra = e => ({})) => {
+// `splitDesc` (perks/flaws): strip the duplicated table-summary + Cost/Prereq
+// boilerplate so the detail pane shows the full prose, keeping the summary as a
+// separate field. Skills aren't split (no boilerplate) but parameterized ones
+// are resolved on lookup (see lookupEntity).
+const indexCollection = (items, type, { nameKey = 'name', extra = e => ({}), splitDesc = false } = {}) => {
   for (const e of items) {
     const name = e[nameKey];
     if (!name) continue;
-    ENTITY_INDEX.set(`${type}:${name}`, { id: `${type}:${name}`, type, name, ...e, ...extra(e) });
+    const desc = splitDesc && e.description
+      ? (() => { const { summary, body } = splitDescription(e.description); return { description: body, summary }; })()
+      : {};
+    ENTITY_INDEX.set(`${type}:${name}`, { id: `${type}:${name}`, type, name, ...e, ...desc, ...extra(e) });
   }
 };
 indexCollection(skillsJson, 'skills');
-indexCollection(perksJson, 'perks');
-indexCollection(flawsJson, 'flaws');
+indexCollection(perksJson, 'perks', { splitDesc: true });
+indexCollection(flawsJson, 'flaws', { splitDesc: true });
 indexCollection(devotionsJson, 'devotions');
 indexCollection(domainsJson, 'domains');
 indexCollection(craftingJson, 'recipes');
@@ -375,7 +401,20 @@ export const lookupEntity = (id) => {
   if (!id) return null;
   const direct = ENTITY_INDEX.get(id);
   if (direct) return direct;
+  const type = id.slice(0, id.indexOf(':'));
   const name = id.slice(id.indexOf(':') + 1);
   const byName = NAME_INDEX.get(canon(name));
-  return byName ? ENTITY_INDEX.get(byName) : null;
+  if (byName) return ENTITY_INDEX.get(byName);
+  // Parameterized skills carry a trailing "(value)" the base skill doesn't —
+  // "Lore (Historical)" → the Lore skill, "Profession - Apprentice (Smith)" →
+  // Profession - Apprentice. Resolve to the base entity but keep the chosen
+  // parameter visible (name + a `parameter` field) so the detail pane shows the
+  // base skill's full description with the picked area called out.
+  const paramMatch = name.match(/^(.*?)\s*\(([^()]*)\)\s*$/);
+  if (paramMatch) {
+    const base = ENTITY_INDEX.get(`${type}:${paramMatch[1].trim()}`)
+      || (NAME_INDEX.get(canon(paramMatch[1])) && ENTITY_INDEX.get(NAME_INDEX.get(canon(paramMatch[1]))));
+    if (base) return { ...base, name, baseName: base.name, parameter: paramMatch[2].trim() };
+  }
+  return null;
 };

@@ -223,6 +223,24 @@ test('sublineage: mixing two sublineages is flagged', () => {
   const s = validate({ lineage: 'Aewen', lineageChallenges: [accC.name, shornC.name], lineageAdvantages: [] }).lbp;
   ok(s.mixedSublineage, 'two sublineages flagged as mixed');
 });
+test('sublineage: an optional sublineage item requires selecting that sublineage (#2)', () => {
+  // A Human taking a Psionic challenge (its downside) without committing to the
+  // Psionic sublineage is illegal — being psionic is a sublineage commitment.
+  const psiCh = LINEAGES.Human.challenges.find((c) => /psionic/i.test(c.sublineage || ''));
+  const without = validate({ lineage: 'Human', lineageChallenges: [psiCh.name], lineageAdvantages: [] }).lbp;
+  ok(without.needsSublineage, 'flags missing sublineage selection');
+  ok(!without.valid, 'invalid without the sublineage selected');
+  const withSub = validate({ lineage: 'Human', sublineage: 'Psionic', lineageChallenges: [psiCh.name], lineageAdvantages: [] }).lbp;
+  ok(!withSub.needsSublineage && withSub.valid, 'valid once Psionic is selected');
+});
+test('sublineage: a REQUIRED sublineage-tagged challenge does NOT force a selection', () => {
+  // Aewen's required challenge is tagged to a default presentation; taking it
+  // shouldn't demand a sublineage pick.
+  const a = LINEAGES.Aewen;
+  const req = a.challenges.find((c) => c.required);
+  const s = validate({ lineage: 'Aewen', lineageChallenges: [req.name], lineageAdvantages: [] }).lbp;
+  ok(!s.needsSublineage, 'required challenge does not trigger needsSublineage');
+});
 
 // ─── devotions ────────────────────────────────────────────────────────────────
 test('all 18 devotions carry domains', () => {

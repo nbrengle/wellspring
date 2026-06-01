@@ -60,12 +60,26 @@ export function lbpState(character) {
 
   // Sublineage scoping: all chosen non-"General" items must share ONE sublineage
   // (normalized, since the data tags it inconsistently), and — when the character
-  // has picked a sublineage — must match that one.
+  // has picked a sublineage — must match that one. REQUIRED challenges are
+  // mandatory baseline costume regardless of sublineage choice, so they're
+  // excluded from the commitment check below (some lineages tag a required
+  // challenge to a default presentation).
   const subs = new Set([...challenges, ...advantages]
+    .map((x) => subKey(x.sublineage)).filter((s) => s && s !== 'general'));
+  const optionalSubs = new Set([...challenges, ...advantages]
+    .filter((x) => !x.required)
     .map((x) => subKey(x.sublineage)).filter((s) => s && s !== 'general'));
   const pickedSub = character.sublineage ? subKey(character.sublineage) : null;
   const mixedSublineage = subs.size > 1
     || (pickedSub && [...subs].some((s) => s !== pickedSub));
+
+  // A sublineage is a COMMITMENT: any OPTIONAL chosen item tagged to a sublineage
+  // (e.g. a Psionic challenge, which represents being psionic) requires that the
+  // character has actually SELECTED that sublineage. Without this, a Human could
+  // take Psionic challenges (their downside) for LBP without committing to Psionic
+  // at all (#2). Flags sublineages owned-but-not-selected.
+  const needsSublineage = !pickedSub && optionalSubs.size > 0;
+  const requiredSublineages = needsSublineage ? [...optionalSubs] : [];
 
   // Required challenges the character hasn't taken (some lineages mandate them).
   const missingRequired = lin.challenges
@@ -83,8 +97,10 @@ export function lbpState(character) {
     spent, remaining: awarded - spent,
     overspent: spent > awarded,
     mixedSublineage,
+    needsSublineage,
+    requiredSublineages,
     missingRequired,
-    valid: spent <= awarded && !mixedSublineage && !missingRequired.length,
+    valid: spent <= awarded && !mixedSublineage && !needsSublineage && !missingRequired.length,
   };
 }
 
@@ -382,6 +398,104 @@ export function multiclassGrants(character) {
     }
   });
   return { skills, freeBP, freeBPItems };
+}
+
+// ─── OWNED-ITEM CLASSIFICATION ─────────────────────────────────────────────
+// The sheet's lists conflate kinds: an archetype's `startingSkills` may contain a
+// PERK (Socialite's Contact), and `purchasedSkills` may contain CLASS POWERS
+// (Socialite's "The Right Hand", a classSkills-tier power). Rendering by the list
+// an item sits in then mis-shows it (a perk as a skill) and double-counts it (a
+// class power that's also buyable in Class Powers). This resolves each item to
+// its TRUE entity type and routes it to the right bucket, so the UI renders by
+// kind, not by storage field. Provenance ("granted by class" vs "purchased") is
+// tracked for badges. Returns:
+//   { skills:[{name,field,index,source}], perks:[…], classPowers:[…],
+//     misfiled:{ field → Set(index) } }   // indices to suppress from raw rendering
+//
+// `source`: 'class' for first-class startingSkills + multiclass grants (free),
+// 'purchased' otherwise. classPowers carry their owning class in `cls`.
+const CLASS_POWER_TIERS = new Set(['Class', 'classSkills']);
+
+export function classifyOwnedItems(character) {
+  const skills = [];
+  const perks = [];
+  const classPowers = [];
+  const misfiled = {};
+  const classNames = new Set(getClasses(character).map((c) => c.name));
+  // Starting skills / class-granted perks come from the PRIMARY (first) class, so
+  // a "from class" badge can name it (#16).
+  const primary = getClasses(character)[0]?.name || null;
+  const flag = (field, index) => { (misfiled[field] = misfiled[field] || new Set()).add(index); };
+
+  // Resolve an item to its real entity (type-prefixed by its storage field first,
+  // then by a free lookup across powers/perks/skills so a misfiled item resolves).
+  const resolve = (item, field) => {
+    const byField = lookupEntity(resolveId(item, field, character))
+      || lookupEntity(`${entityType(field)}:${bareSkill(cleanItemName(item))}`);
+    if (byField && byField.type === entityType(field)) return byField;
+    const clean = cleanItemName(item);
+    return lookupEntity(`powers:${clean}`) || lookupEntity(`perks:${clean}`)
+      || lookupEntity(`skills:${clean}`) || byField;
+  };
+
+  const classify = (field, source) => {
+    (character[field] || []).forEach((item, index) => {
+      const ent = resolve(item, field);
+      const t = ent?.type;
+      // A class power (classSkills/Class tier) belonging to one of the character's
+      // classes → route to classPowers and suppress from the skills list.
+      if (t === 'powers' && CLASS_POWER_TIERS.has(ent.tier)
+          && (!ent.parentClass || classNames.has(ent.parentClass))) {
+        classPowers.push({ name: item, field, index, source, cls: ent.parentClass || null });
+        flag(field, index);
+        return;
+      }
+      if (t === 'perks') {
+        perks.push({ name: item, field, index, source, cls: source === 'class' ? primary : null });
+        if (field !== 'purchasedPerks') flag(field, index);
+        return;
+      }
+      // Genuine skill (or unresolved → treat as skill, its storage field).
+      skills.push({ name: item, field, index, source, cls: source === 'class' ? primary : null });
+    });
+  };
+
+  // First class grants startingSkills for free; purchased ones cost BP.
+  classify('startingSkills', 'class');
+  classify('purchasedSkills', 'purchased');
+  classify('purchasedPerks', 'purchased');
+  // Class powers stored in their own field are class powers by definition — add
+  // directly (no re-routing) so the Class Powers section is the union of the
+  // dedicated field and any class powers misfiled into the skill lists above.
+  (character.classPowers || []).forEach((item, index) => {
+    const ent = lookupEntity(`powers:${cleanItemName(item)}`);
+    classPowers.push({ name: item, field: 'classPowers', index, source: 'purchased', cls: ent?.parentClass || null });
+  });
+  // Multiclass-granted skills are free class features.
+  for (const g of multiclassGrants(character).skills) {
+    skills.push({ name: g.name, field: 'multiclassGrant', index: -1, source: 'class', grantedBy: g.source });
+  }
+  // De-dupe by canonical name within each bucket: the same item can be listed in
+  // more than one storage field (Socialite's Contact lands in both startingSkills
+  // and purchasedPerks). Keep the FIRST occurrence, preferring a class grant over a
+  // purchase so it renders free; flag the later copies as misfiled so they don't
+  // render (or get bought) twice.
+  const dedupe = (rows) => {
+    const seen = new Map();
+    const out = [];
+    // Class-granted first so the free copy wins.
+    for (const r of [...rows].sort((a, b) => (a.source === 'class' ? 0 : 1) - (b.source === 'class' ? 0 : 1))) {
+      const key = bareSkill(cleanItemName(r.name)).toLowerCase();
+      if (seen.has(key)) { if (r.index >= 0) flag(r.field, r.index); continue; }
+      seen.set(key, true);
+      out.push(r);
+    }
+    return out;
+  };
+  return {
+    skills: dedupe(skills), perks: dedupe(perks), classPowers: dedupe(classPowers),
+    misfiled,
+  };
 }
 
 // ─── CRAFTING / RITUAL CAPABILITY ──────────────────────────────────────────
@@ -929,6 +1043,88 @@ export function spellSlots(character) {
   return total;
 }
 
+// Default starting Wealth (MegaDoc: "all characters start with 8 Wealth").
+export const DEFAULT_WEALTH = 8;
+
+// Per-game/per-event Wealth income from owned perks/skills/powers, on top of the
+// starting Wealth. Several Socialite features and the Income/Manse/Profession
+// perks grant recurring Wealth; the Wealth strip otherwise ignored them (#7).
+// Recurring-income phrasings are scanned data-driven:
+//   "<N> Wealth at the beginning of (every|each) game"   (Income, Profession)
+//   "gains <N> Wealth per Event"                          (Pit Master)
+//   Manse: "Alternatively, <N> Wealth"                    (the cash option)
+//   Tax Evasion: "+3 Wealth per rank of Profession, +2 each for Manse & Income"
+// One-time / spend amounts (Inheritance's lump sum, bounty costs) are NOT income
+// and are skipped. Returns { base, income, total, sources:[{name,n,note}] }.
+function scanWealthIncome(name, text) {
+  if (!text) return null;
+  // "<N> Wealth at the beginning of each/every game" or "<N> Wealth per Event".
+  const recurring = text.match(/(\d+)\s*Wealth\s+(?:at the beginning of (?:each|every)\s+(?:game|event)|per\s+Event)/i);
+  if (recurring) return { n: parseInt(recurring[1], 10) };
+  // Manse: the cash alternative to resources ("Alternatively, N Wealth").
+  if (/\bManse\b/i.test(name)) {
+    const alt = text.match(/Alternatively,?\s*(\d+)\s*Wealth/i);
+    if (alt) return { n: parseInt(alt[1], 10), note: 'or resources' };
+  }
+  // One-time starting grants that land AT THE FIRST EVENT count toward the
+  // point-in-time total (Inheritance: "adds 100 Wealth at the beginning of their
+  // first Event" / "one-time sum of money: N Wealth"). Recurring patterns above
+  // win first, so this only catches genuine one-time first-event sums.
+  const firstEvent = text.match(/(\d+)\s*Wealth\s+at the beginning of (?:their\s+)?first\s+Event/i)
+    || text.match(/one-time\s+sum[^.]*?(\d+)\s*Wealth/i);
+  if (firstEvent) return { n: parseInt(firstEvent[1], 10), note: 'one-time, first event' };
+  return null;
+}
+
+export function wealthState(character) {
+  const base = character.wealth != null && character.wealth !== ''
+    ? (parseInt(String(character.wealth), 10) || DEFAULT_WEALTH)
+    : DEFAULT_WEALTH;
+  const sources = [];
+  let income = 0;
+  const add = (name, n, note) => { if (n > 0) { income += n; sources.push({ name, n, note }); } };
+
+  // Owned skills (Profession ranks) + perks (Income, Manse).
+  const owned = classifyOwnedItems(character);
+  const ownedPerkNames = new Set();
+  for (const r of [...owned.skills, ...owned.perks]) {
+    const ent = lookupEntity(`${entityType(r.field) === 'perks' ? 'perks' : 'skills'}:${bareSkill(cleanItemName(r.name))}`)
+      || lookupEntity(`perks:${cleanItemName(r.name)}`) || lookupEntity(`skills:${cleanItemName(r.name)}`);
+    if (ent?.type === 'perks') ownedPerkNames.add(ent.name);
+    const w = scanWealthIncome(ent?.name || r.name, ent?.description);
+    if (w) add(ent?.name || r.name, w.n, w.note);
+  }
+  // Owned/selected powers (Pit Master, etc.) + innate at level.
+  const ownedPowerNames = new Set();
+  for (const { name: cls } of getClasses(character)) {
+    for (const p of (CLASS_POWERS[cls]?.innate || [])) {
+      ownedPowerNames.add(p.name);
+      const w = scanWealthIncome(p.name, p.description); if (w) add(p.name, w.n, w.note);
+    }
+  }
+  for (const field of POWER_SOURCE_FIELDS) {
+    for (const item of (character[field] || [])) {
+      const ent = lookupEntity(`powers:${cleanItemName(item)}`);
+      if (!ent) continue;
+      ownedPowerNames.add(ent.name);
+      const w = scanWealthIncome(ent.name, ent.description); if (w) add(ent.name, w.n, w.note);
+    }
+  }
+
+  // Tax Evasion (Socialite): "+3 Wealth for every rank of Profession, +2 each for
+  // Manse and Income". Computed from what the character actually owns.
+  if (ownedPowerNames.has('Tax Evasion')) {
+    const profRanks = [...owned.skills, ...owned.perks]
+      .filter((r) => /^Profession\b/i.test(cleanItemName(r.name))).length;
+    let bonus = profRanks * 3;
+    if (ownedPerkNames.has('Manse')) bonus += 2;
+    if (ownedPerkNames.has('Income')) bonus += 2;
+    if (bonus > 0) add('Tax Evasion', bonus, 'from Profession/Manse/Income');
+  }
+
+  return { base, income, total: base + income, sources };
+}
+
 // Level-scaled stats. Archetype LP/spikes are authored at the starter level (4)
 // and already include class/lineage bonuses, so we keep that base and apply the
 // LEVEL-TABLE DELTA between level 4 and the character's current level. Returns
@@ -1140,16 +1336,23 @@ export function validate(character) {
   const slots = computeSlots(character);
   const spellSlotCounts = spellSlots(character);
   const stats = levelStats(character);
+  const wealth = wealthState(character);
   const devotion = devotionState(character);
   const lbp = lbpState(character);
   const granted = grantedAbilities(character);
   const crafting = craftingCapability(character);
+  const owned = classifyOwnedItems(character);
   const powerBenefits = activePowerBenefits(character);
   const prereqs = checkPrereqs(character);
   const slotsOver = slots.some((s) => s.over);
   // BP used beyond the base allowance, drawn from the bonus pool (clamped ≥0).
   const bonusUsed = Math.max(0, spend.net - budget);
-  const overBudget = spend.net > maxBudget;          // exceeds even base+bonus
+  // A build is over budget when spend exceeds the DISPLAYED cap — i.e. the base
+  // budget (incl. free + backstory BP). "Bonus BP" is earned in play and saved,
+  // not a creation-time allowance, so spending past the shown 9/9 is illegal even
+  // if it's within base+bonus. (The rules say "Spend your BP, or save it for
+  // later" — under-spend is fine; over-spend past the cap is not.)
+  const overBudget = spend.net > budget;
   // Characters below the campaign's documented floor (level 4) are buildable but
   // not legal play — flagged so the UI can mark them invalid with a reason.
   const belowFloor = level < LEGAL_MIN_LEVEL;
@@ -1177,10 +1380,12 @@ export function validate(character) {
     slotsOver,
     spellSlots: spellSlotCounts,
     stats,
+    wealth,
     devotion,
     lbp,
     grantedAbilities: granted,
     crafting,
+    owned,
     powerBenefits,
     prereqs,
     belowFloor,
