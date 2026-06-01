@@ -1,6 +1,5 @@
-/* Builder.css — single-page character creator. Same palette as CharacterCreator
-   but a tri-pane layout: identity rail (left), build sheet (center), detail
-   pane (right). Class prefix is `b-` to avoid collision with the wizard CSS. */
+/* Builder.css — single-page character creator. Tri-pane layout: identity rail
+   (left), build sheet (center), detail pane (right). Class prefix is `b-`. */
 
 .b-root {
   --b-bg: #14110d;
