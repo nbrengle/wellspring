@@ -229,21 +229,30 @@ function IdentityRail({ character, report, onClickField, onRestart,
         <Stat label="Spikes" title={statTitle(report.stats, "spikes", "Maximum Spikes")}
               value={report.stats?.spikes ?? character.spikes ?? "—"} />
         {(() => {
-          // ONE armor stat, so the kinds stay together and read cleanly. Armor has
-          // two sources: PHYSICAL (worn — the armorPoints field, often "N (caveats)")
-          // and NATURAL (perks/lineage — Hardened Flesh +2, or Gift of Unbreakable
-          // Flesh's variable amount). Show "<phys> + <nat>" and explain in the tooltip.
+          // Per the Stacking Armor rule, physical / summoned / natural armor do NOT
+          // stack — a character with more than one type must CHOOSE one to benefit
+          // from; the rest grant 0. So show the BEST usable value (not a sum) with
+          // its type, and note the alternative in the tooltip.
           const physStr = character.armorPoints ? String(character.armorPoints) : "";
-          const phys = physStr.match(/^\s*(\d+)/)?.[1] ?? (physStr ? physStr.replace(/\s*\(.+\)/, "") : "0");
+          const phys = parseInt(physStr.match(/^\s*(\d+)/)?.[1] ?? "0", 10);
           const natFixed = report.stats?.naturalArmor || 0;
           const natNotes = (report.stats?.mods?.notes || []).filter((n) => n.stat === "naturalArmor");
-          const natPart = natFixed > 0 ? `+${natFixed}` : natNotes.length ? "+※" : "";   // ※ = variable
-          const value = natPart ? `${phys} ${natPart}` : phys;
-          const tip = [
-            physStr ? `Physical: ${physStr}` : `Physical: ${phys}`,
-            natFixed > 0 ? `Natural: +${natFixed} (${(report.stats.mods.sources || []).filter((s) => s.stat === "naturalArmor").map((s) => s.name).join(", ")})`
-              : natNotes.length ? `Natural: variable, from ${natNotes.map((n) => n.name).join(", ")}` : null,
-          ].filter(Boolean).join(" · ");
+          const natSources = (report.stats?.mods?.sources || []).filter((s) => s.stat === "naturalArmor").map((s) => s.name);
+          const hasNat = natFixed > 0 || natNotes.length > 0;
+          // Headline: the larger of physical vs natural (variable natural is shown
+          // as best-available when it beats physical / when there's no physical).
+          let value, type;
+          if (hasNat && (natFixed > phys || (natNotes.length && phys === 0))) {
+            value = natFixed > 0 ? String(natFixed) : "※"; type = "natural";
+          } else {
+            value = String(phys); type = phys > 0 ? "physical" : "—";
+          }
+          const tipParts = [`Physical ${phys}`];
+          if (natFixed > 0) tipParts.push(`Natural ${natFixed} (${natSources.join(", ")})`);
+          else if (natNotes.length) tipParts.push(`Natural variable, from ${natNotes.map((n) => n.name).join(", ")}`);
+          const tip = hasNat
+            ? `Armor doesn't stack — pick one. ${tipParts.join(" · ")}. Showing best (${type}).`
+            : (physStr || "Physical Armor Points");
           return <Stat label="Armor" title={tip} value={value} />;
         })()}
       </div>
