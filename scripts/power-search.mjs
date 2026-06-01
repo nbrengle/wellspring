@@ -90,6 +90,45 @@ function bestLoadout(classLevels) {
 const PAIRS = comentionPairs();
 const BASE_CLASSES = Object.keys(CLASS_POWERS).filter((c) => (CLASS_POWERS[c].innate || CLASS_POWERS[c].utility || CLASS_POWERS[c].basic || CLASS_POWERS[c].cantrips));
 
+// What KIND of build is this, from its dominant effect — so the rationale can say
+// what it actually does in play (survivability / control / offense / support).
+const EFFECT_ROLE = {
+  Protect: 'survivability', Resist: 'survivability', Counter: 'survivability', Immunity: 'survivability', Cure: 'sustain/cleanse',
+  Heal: 'sustain', Revive: 'sustain', Grant: 'support/buff', 'Grant Power': 'support/buff', Imbue: 'support/buff',
+  Death: 'offense', Wounding: 'offense', Piercing: 'offense', Shatter: 'offense', Drain: 'offense',
+  Dominate: 'control', Obey: 'control', Charm: 'control', Silence: 'control', Sleep: 'control', Imprison: 'control', Root: 'control', Disable: 'control',
+};
+const REFRESH_NOTE = (r) => {
+  const s = String(r || '').toLowerCase();
+  if (/at[- ]?will|immediate|focus|quick/.test(s)) return 'at-will / near-constant';
+  if (/short rest/.test(s)) return 'every Short Rest (fast)';
+  if (/spell/.test(s)) return 'per spell-slot (repeatable)';
+  if (/long rest/.test(s)) return 'once per Long Rest';
+  return 'situational';
+};
+
+// Prose rationale for WHY a build is strong: its dominant effect + how it spams it,
+// the heaviest-hitting powers, and the synergy web. (#70)
+function rationale(b) {
+  const role = EFFECT_ROLE[b.topEffect] || 'mixed';
+  // How does it spam its top effect? List the powers that deliver it + their refresh.
+  const spammers = b.picked
+    .filter((p) => p.hits.some((h) => h.name === b.topEffect))
+    .sort((x, y) => y.score - x.score);
+  const spamLine = spammers.slice(0, 3)
+    .map((p) => `${p.name} (${REFRESH_NOTE(p.refresh)})`).join(', ');
+  // Top raw contributors overall.
+  const top = b.picked.slice().sort((x, y) => y.score - x.score).slice(0, 4)
+    .map((p) => `${p.name} [${p.topEffects.slice(0, 3).join('/')}]`).join('; ');
+  // Synergy: distinct effects the loadout fields together (breadth).
+  const distinctEffects = new Set(b.picked.flatMap((p) => p.topEffects)).size;
+  const lines = [];
+  lines.push(`Role: **${role}**. Concentrates on **${b.topEffect}** (score ${b.concentration}) — delivered by ${spamLine || 'multiple powers'}, so it can apply that effect repeatedly rather than once per event.`);
+  lines.push(`Heaviest powers: ${top}.`);
+  lines.push(`Breadth: fields ${distinctEffects} distinct effects (synergy ${b.synergy}) — ${b.synergy > 250 ? 'a wide, flexible toolkit' : b.synergy > 150 ? 'solid cross-coverage' : 'focused rather than broad'}.`);
+  return lines;
+}
+
 // ── report ────────────────────────────────────────────────────────────────────
 console.log('═══ Power-search probe — strongest legal loadouts by EFFECT power ═══\n');
 console.log('Scoring: Σ(effect-weight × frequency) + concentration (spam-one-effect) + co-mention synergy.');
@@ -123,4 +162,12 @@ console.log(`★ Strongest overall: ${champ.classLevels}  (total ${champ.total},
 console.log('  loadout:');
 for (const p of champ.picked.sort((a, b) => b.score - a.score).slice(0, 10)) {
   console.log(`    ${p.name.padEnd(26)} [${p.tier}/${p.refresh}]  effects: ${p.topEffects.join(', ')}  (score ${Math.round(p.score)})`);
+}
+
+// 4. WHY each standout is strong — prose rationale (#70).
+console.log('\n═══ Why these are strong ═══');
+const standouts = [...pairBuilds.slice(0, 3), ...singles.slice(0, 2)];
+for (const b of standouts) {
+  console.log(`\n● ${b.classLevels}`);
+  for (const line of rationale(b)) console.log(`  ${line}`);
 }

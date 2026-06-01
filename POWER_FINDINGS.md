@@ -16,24 +16,53 @@ are user-tunable in `src/data/effect-weights.json`.
 > /Shadow lower) are discounted as less practical. Both tables are tunable in
 > `effect-weights.json` (tierMultiplier, accentRarity).
 
-## Standout legal builds (level 10)
+## Standout legal builds (level 10) — and WHY they're strong
 
-**Strongest single class — Druid 10** (power 231, spams "Grant Power" ×36).
-Druid's Form powers + spells stack Grant/Heal effects; the recovered Form
-descriptions (previously dropped) are what pushed it to the top.
+`power-search.mjs` prints a "Why these are strong" section explaining each in
+depth: its role, the effect it concentrates on + how it refreshes that effect, its
+heaviest powers, and its breadth. The current standouts (post cantrip/accent
+weighting):
 
-**Strongest multi-class — Druid 5 / Sourcerer 5** (single-power total 321) and
-**Cleric 5 / Sourcerer 5** (concentration 41 on "Protect" — a survivability wall).
-Sourcerer appears in every top pair: its spell list is the densest effect engine.
+### Multi-class (5/5) — the top builds
 
-**Best "one-effect specialist" (your archetype):**
-- **Cleric/Sourcerer → Protect** (concentration 41) — near-unkillable, refreshes Protects constantly.
-- **Druid/Sourcerer → Grant Power** (41) — buff/enable engine.
-- **Fighter/Socialite → Cure** (39) — cleanse spam.
+**Artisan 5 / Sourcerer 5 — power 281, synergy 393 (the most flexible).**
+Role: survivability/toolbox. Concentrates on **Counter** (26), delivered by Spirit
+Link (per spell-slot), Shield Bearer (at-will), and Tanner (at-will) — so it
+answers a lot of incoming effects. Heaviest powers: Share (Dominate/Obedient/
+Silence), Spirit Chalice (Death/Grant Power), Spirit Link (Disable/Obey/Counter).
+Fields **31 distinct effects** — the widest web, a do-anything kit rather than a
+one-trick.
 
-**Highest synergy — Artisan 5 / Sourcerer 5** (synergy 378): the widest web of
-co-occurring effects (Counter + Dominate + Obey + Cure + Protect …), i.e. the most
-*flexible* toolkit rather than a one-trick specialist.
+**Socialite 5 / Sourcerer 5 — power 285, synergy 361.**
+Role: sustain/cleanse. Concentrates on **Cure** (26) via Soothe (at-will), Time to
+Go and Calming Tone (both every Short Rest) — near-constant condition removal,
+backed by Sourcerer's offensive spell breadth (30 distinct effects).
+
+**Druid 5 / Socialite 5 — power 309, synergy 297.**
+Role: sustain. Spams **Cure** (35), highest concentration of the pairs — Soothe
+(at-will) + the Druid Forms (per spell-slot) stack Cure/Grant Power/Heal. A
+resilient support anchor.
+
+### Single class
+
+**Druid 10 — power 235, spams "Grant Power" (36).** A buff/enable engine: the Form
+powers + spells stack Grant/Grant Power/Heal. (The recovered Form descriptions,
+previously dropped, are what surfaced this.)
+
+**Artisan 10 — power 230, spams "Counter" (21), synergy 245.** Survivability via
+Shield Bearer/Tanner (at-will Counters) + Perfect Practice/Reinforce Shield
+(Protect); solid cross-coverage at 25 effects.
+
+**Socialite 10 — power 197, spams "Obey" (24), synergy 267.** Control: Soothe +
+Peacebind apply Obey at-will; the widest single-class effect web (267 synergy).
+
+### How to read this
+- **Concentration** = how hard it can spam ONE effect (weighted by refresh) — the
+  "good at one thing, refreshes it easily" axis you asked for.
+- **Synergy** = breadth, how many co-occurring effects it fields — flexibility.
+- **Role** is inferred from the dominant effect (Protect/Resist/Counter →
+  survivability, Cure/Heal → sustain, Dominate/Obey → control, Death/Wounding →
+  offense, Grant → support).
 
 ## Economy exploit found (validator gap, not a build) — FIXED
 Flaws used to award BP uncapped (19 flaws = +44 BP) vs the rules' 5-BP cap.
