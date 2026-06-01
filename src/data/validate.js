@@ -540,16 +540,16 @@ function discountApplies(src, item, ent, pos) {
   }
   if (src.scope.kind === 'giftEligible') {
     // Patron: any PERK the player designates as a gift — i.e. any owned perk that
-    // does NOT already carry the source's prerequisite (those are the Gifts) and
-    // is not excluded. We apply greedily up to the cap (handled by applyDiscounts),
-    // which maximizes the legal benefit. Only perks qualify, never skills.
+    // does NOT already carry the source's prerequisite (the actual Gifts list
+    // Patron as a prereq and are EXCLUDED) and is not excluded. Greedy up to the
+    // cap (handled by applyDiscounts). Only perks qualify, never skills.
     if (!ent || ent.id?.startsWith('skills:')) return false;
     if (ent.id === `perks:${src.scope.value}`) return false; // not the Patron perk itself
-    const pr = REFS.prereqs?.[ent.id];
-    const target = `perks:${src.scope.value}`;
-    const carriesPrereq = !!pr && (pr.skills?.includes(target)
-      || pr.other?.some((o) => new RegExp(src.scope.value, 'i').test(o)));
-    return !carriesPrereq;
+    // Perk prereqs live on the entity's own `prereq` field (REFS.prereqs is skills
+    // only) — a perk that requires Patron IS a Gift, so it's not gift-ELIGIBLE.
+    const prereqText = String(ent.prereq || ent.prerequisites || '');
+    if (new RegExp(`\\b${src.scope.value}\\b`, 'i').test(prereqText)) return false;
+    return true;
   }
   return false;
 }
