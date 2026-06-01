@@ -84,6 +84,21 @@
   background: rgba(79, 184, 168, 0.12);
 }
 
+/* Public provenance footer (alpha version + MegaDoc sync date). */
+.b-footer {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem;
+  padding: 0.6rem 1rem; border-top: 1px solid var(--b-border);
+  font-size: 0.68rem; color: var(--b-dim); background: var(--b-panel);
+}
+.b-footer-alpha {
+  text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700;
+  color: var(--b-amber); border: 1px solid rgba(184,130,31,0.4);
+  background: rgba(184,130,31,0.12); border-radius: 0.2rem; padding: 0.05rem 0.4rem;
+}
+.b-footer-ver { color: var(--b-muted); font-variant-numeric: tabular-nums; }
+.b-footer-sep { opacity: 0.5; }
+.b-footer-note { font-style: italic; }
+
 /* ─── COLUMNS ─────────────────────────────────────────────────────────── */
 .b-cols {
   display: grid;

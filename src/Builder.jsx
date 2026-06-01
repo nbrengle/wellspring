@@ -13,7 +13,7 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import {
   ARCHETYPES, REFS, lookupEntity, LEVEL_TABLE,
   eligiblePowers, ALL_SKILLS, ALL_PERKS, ALL_FLAWS,
-  CLASS_POWER_SLOTS, CLASSES, DEVOTIONS, DOMAINS, LINEAGES,
+  CLASS_POWER_SLOTS, CLASSES, DEVOTIONS, DOMAINS, LINEAGES, META,
 } from "./data/index.js";
 import { validate, characterLevel, prereqStatus, pickClass, getClasses, MAX_DOMAINS, subKey } from "./data/validate.js";
 import { formatCharacterSheet, parseCharacterSheet } from "./data/sheet.js";
@@ -2198,7 +2198,25 @@ export default function Builder() {
           onSetLineage={handleSetLineage} onSetSublineage={handleSetSublineage}
           onToggle={handleToggleLineageItem} onClose={() => setLineageOpen(false)} />
       )}
+      <SiteFooter />
     </div>
+  );
+}
+
+// Public provenance footer: the alpha app version + the MegaDoc sync date the
+// data was generated from, so players know how current the rules data is.
+function SiteFooter() {
+  return (
+    <footer className="b-footer">
+      <span className="b-footer-alpha">Alpha</span>
+      <span className="b-footer-ver">v{META.appVersion}</span>
+      <span className="b-footer-sep">·</span>
+      <span className="b-footer-sync">
+        Rules data synced from the {META.sourceDoc} ({META.sourceVersion}) on {META.sourceSyncedLabel}
+      </span>
+      <span className="b-footer-sep">·</span>
+      <span className="b-footer-note">Unofficial fan tool — verify against the current rules.</span>
+    </footer>
   );
 }
 
