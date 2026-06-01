@@ -567,7 +567,45 @@ function BuildSheet({ character, report, view, onPickArchetype, onStartBlank, on
           onClick={onInspect} isFocused={isFocused}
           removable={() => true} onRemove={(i) => onRemoveEntity("flaws", i)} />
       </Section>
+
+      {report.crafting?.any && (
+        <CraftingSection crafting={report.crafting} onInspect={onInspect} />
+      )}
     </main>
+  );
+}
+
+// What the character can MAKE, derived from their crafting / Ritual Magic skills
+// (report.crafting). Read-only: each discipline lists every recipe it unlocks
+// (highest owned tier subsumes lower), grouped by tier; each recipe opens its full
+// detail (materials, process, effect) in the inspector. No book needed.
+function CraftingSection({ crafting, onInspect }) {
+  const groups = [
+    ...crafting.crafting.map((c) => ({
+      key: c.discipline, label: `${c.discipline} — ${c.tier}`,
+      resolveType: "recipes", recipes: c.recipes,
+    })),
+    ...(crafting.rituals ? [{
+      key: "Rituals", label: `Rituals — ${crafting.rituals.tier} Ritual Magic`,
+      resolveType: "rituals", recipes: crafting.rituals.recipes,
+    }] : []),
+  ];
+  return (
+    <Section title="Can Craft" tone="teal">
+      {groups.map((g) => (
+        <div key={g.key} className="b-craft-group">
+          <h3 className="b-craft-head">{g.label} <span className="b-craft-count">{g.recipes.length}</span></h3>
+          <ul className="b-craft-list">
+            {g.recipes.map((r) => (
+              <li key={r.name} className="b-craft-row">
+                <button className="b-row-name" onClick={() => onInspect(r.name, null, g.resolveType)}>{r.name}</button>
+                <span className="b-craft-tier">{r.tier}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </Section>
   );
 }
 
@@ -1145,6 +1183,11 @@ function DetailFacts({ entity }) {
   if (entity.prereq && entity.prereq !== "None") facts.push(["Prereq", entity.prereq]);
   if (entity.prerequisites && entity.prerequisites !== "None") facts.push(["Prereq", entity.prerequisites]);
   if (entity.tier) facts.push(["Tier", entity.tier]);
+  if (entity.discipline) facts.push(["Discipline", entity.discipline]);
+  if (entity.materials) facts.push(["Materials", entity.materials]);
+  if (entity.application) facts.push(["Application", entity.application]);
+  if (entity.components) facts.push(["Components", entity.components]);
+  if (entity.ritualists) facts.push(["Ritualists", String(entity.ritualists)]);
   if (entity.refresh && entity.refresh !== "None") facts.push(["Refresh", entity.refresh]);
   if (entity.call && entity.call !== "None") facts.push(["Call", entity.call]);
   if (entity.effect) facts.push(["Effect", entity.effect]);

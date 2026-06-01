@@ -56,6 +56,24 @@ for (const a of ARCHETYPES) {
   });
 }
 
+test('crafting capability: owned skill unlocks its discipline; tiers nest', () => {
+  const appr = validate({ archetypeName: 'x', classLevels: 'Artisan 4', purchasedSkills: ['Apprentice Alchemy'] }).crafting;
+  ok(appr.any, 'has capability');
+  const al = appr.crafting.find((c) => c.discipline === 'Alchemy');
+  eq(al.tier, 'Apprentice', 'apprentice tier');
+  ok(al.recipes.every((r) => r.tier === 'Apprentice'), 'only apprentice recipes');
+
+  const greater = validate({ archetypeName: 'x', classLevels: 'Artisan 10', purchasedSkills: ['Greater Tinkering'] }).crafting;
+  const tk = greater.crafting.find((c) => c.discipline === 'Tinkering');
+  eq(tk.tier, 'Greater', 'greater tier');
+  ok(tk.recipes.some((r) => r.tier === 'Apprentice') && tk.recipes.some((r) => r.tier === 'Greater'), 'nests lower tiers');
+
+  const rit = validate({ archetypeName: 'x', classLevels: 'Artisan 4', purchasedSkills: ['Journeyman Ritual Magic'] }).crafting;
+  eq(rit.rituals.tier, 'Journeyman', 'ritual tier');
+  ok(rit.rituals.count > 0, 'has rituals');
+
+  ok(!validate({ archetypeName: 'x', classLevels: 'Fighter 4' }).crafting.any, 'non-crafter has none');
+});
 test('wealth + resources round-trip through the text sheet', () => {
   const c = { archetypeName: 'x', classLevels: 'Fighter 4', wealth: '12', resources: 'A horse, a debt to House Varn' };
   const rt = parseCharacterSheet(formatCharacterSheet(c, validate(c)));

@@ -780,6 +780,22 @@
   background: rgba(184,130,31,0.15); border-radius: 0.2rem; padding: 0.1rem 0.4rem;
 }
 .b-row-bp.is-free { color: var(--b-green); background: rgba(111,191,115,0.15); }
+
+/* Crafting / rituals capability ("Can Craft") */
+.b-craft-group { display: flex; flex-direction: column; gap: 0.1rem; }
+.b-craft-group + .b-craft-group { margin-top: 0.5rem; }
+.b-craft-head {
+  margin: 0; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em;
+  color: var(--b-muted); display: flex; align-items: center; gap: 0.4rem;
+}
+.b-craft-count {
+  font-size: 0.62rem; color: var(--b-teal, #4fb0a8);
+  background: rgba(79,176,168,0.15); border-radius: 0.2rem; padding: 0.05rem 0.35rem;
+}
+.b-craft-list { list-style: none; margin: 0; padding: 0; }
+.b-craft-row { display: flex; align-items: center; gap: 0.5rem; }
+.b-craft-row .b-row-name { padding: 0.25rem 0; font-size: 0.82rem; }
+.b-craft-tier { flex: none; font-size: 0.62rem; color: var(--b-dim); }
 .b-row-bp.is-award { color: var(--b-green); background: rgba(111,191,115,0.15); }
 .b-row-bp.is-cost { color: var(--b-amber); background: rgba(184,130,31,0.15); }
 /* Discounted item: shows the reduced price + the "−N · source" that cut it. */

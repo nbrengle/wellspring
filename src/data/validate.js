@@ -9,7 +9,7 @@
 // Pure functions, no React, so the UI calls them in a useMemo and they stay
 // unit-testable. The character shape is the flat object from Builder.jsx.
 
-import { LEVEL_TABLE, lookupEntity, REFS, CLASS_POWER_SLOTS, CLASS_POWERS, CLASS_PROGRESSION, SPELLCASTERS, DEVOTIONS, DOMAINS, CLASSES, LINEAGES } from './index.js';
+import { LEVEL_TABLE, lookupEntity, REFS, CLASS_POWER_SLOTS, CLASS_POWERS, CLASS_PROGRESSION, SPELLCASTERS, DEVOTIONS, DOMAINS, CLASSES, LINEAGES, CRAFTING, RITUALS } from './index.js';
 
 // Max Lineage Build Points a character can be awarded from challenges (MegaDoc:
 // "up to 10 awarded LBP").
@@ -382,6 +382,66 @@ export function multiclassGrants(character) {
     }
   });
   return { skills, freeBP, freeBPItems };
+}
+
+// ─── CRAFTING / RITUAL CAPABILITY ──────────────────────────────────────────
+// What a character can MAKE, derived purely from the crafting/ritual skills they
+// own. Crafting tiers nest (Greater requires Journeyman requires Apprentice — see
+// REFS.prereqs), so the highest owned tier in a discipline unlocks that tier and
+// every tier below it. Ritual Magic gates the ritual recipe list the same way.
+const CRAFT_TIER_RANK = { Apprentice: 1, Journeyman: 2, Greater: 3 };
+// Discipline name (as it appears on recipes) ⇐ the skill-name stem that grants it.
+const CRAFT_DISCIPLINES = { Alchemy: 'Alchemy', Tinkering: 'Tinkering', Enchanting: 'Enchanting' };
+
+// Every skill the character possesses (starting + purchased + granted), bare of
+// any "(parameter)" suffix. Shared basis for capability checks.
+export function ownedSkillNames(character) {
+  const names = new Set([
+    ...(character.startingSkills || []),
+    ...(character.purchasedSkills || []),
+  ].map(bareSkill));
+  for (const g of grantedAbilities(character).list) {
+    if (g.abilityType === 'skills') names.add(bareSkill(g.abilityName));
+  }
+  // Multiclass auto-granted skills count too.
+  for (const s of multiclassGrants(character).skills) names.add(bareSkill(s.name));
+  return names;
+}
+
+// Returns { crafting: [{ discipline, tier, count, recipes:[...] }], rituals:
+// { tier, recipes:[...] }|null, any: bool }. `tier` is the HIGHEST unlocked
+// (subsumes lower); recipes lists every makeable recipe at or below that tier.
+export function craftingCapability(character) {
+  const owned = ownedSkillNames(character);
+  const topTier = (stem) => {
+    let best = 0;
+    for (const t of ['Apprentice', 'Journeyman', 'Greater']) {
+      if (owned.has(`${t} ${stem}`)) best = Math.max(best, CRAFT_TIER_RANK[t]);
+    }
+    return best; // 0 = none
+  };
+
+  const crafting = [];
+  for (const [discipline, stem] of Object.entries(CRAFT_DISCIPLINES)) {
+    const rank = topTier(stem);
+    if (!rank) continue;
+    const tier = Object.keys(CRAFT_TIER_RANK).find((t) => CRAFT_TIER_RANK[t] === rank);
+    const recipes = CRAFTING.filter((r) => r.discipline === discipline
+      && CRAFT_TIER_RANK[r.tier] <= rank)
+      .map((r) => ({ name: r.name, tier: r.tier }));
+    crafting.push({ discipline, tier, count: recipes.length, recipes });
+  }
+
+  const ritualRank = topTier('Ritual Magic');
+  let rituals = null;
+  if (ritualRank) {
+    const tier = Object.keys(CRAFT_TIER_RANK).find((t) => CRAFT_TIER_RANK[t] === ritualRank);
+    const recipes = RITUALS.filter((r) => CRAFT_TIER_RANK[r.tier] <= ritualRank)
+      .map((r) => ({ name: r.name, tier: r.tier }));
+    rituals = { tier, count: recipes.length, recipes };
+  }
+
+  return { crafting, rituals, any: crafting.length > 0 || !!rituals };
 }
 
 // Total Character Level = sum of all class levels (per the rules, BP and stats
@@ -1083,6 +1143,7 @@ export function validate(character) {
   const devotion = devotionState(character);
   const lbp = lbpState(character);
   const granted = grantedAbilities(character);
+  const crafting = craftingCapability(character);
   const powerBenefits = activePowerBenefits(character);
   const prereqs = checkPrereqs(character);
   const slotsOver = slots.some((s) => s.over);
@@ -1119,6 +1180,7 @@ export function validate(character) {
     devotion,
     lbp,
     grantedAbilities: granted,
+    crafting,
     powerBenefits,
     prereqs,
     belowFloor,
