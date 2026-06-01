@@ -1340,9 +1340,27 @@ function ExportImportPanel({ character, report, onImport, onClose }) {
   const exported = useMemo(() => formatCharacterSheet(character, report), [character, report]);
   const [draft, setDraft] = useState("");
   const [copied, setCopied] = useState(false);
+  // A parsed character from an uploaded .xlsx (takes precedence over pasted text).
+  const [xlsx, setXlsx] = useState(null);  // { parsed } | { error } | null
 
-  // Live preview of pasted text: parse + validate without committing.
+  // Read + parse an uploaded .xlsx Basic Sheet into a character (lazy-load the
+  // parser so the xlsx lib isn't pulled in until someone actually uploads).
+  const onFile = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const buf = await file.arrayBuffer();
+      const { parseXlsxCharacter } = await import("./data/xlsx-import.js");
+      setXlsx({ parsed: parseXlsxCharacter(buf) });
+    } catch (err) {
+      setXlsx({ error: String(err.message || err) });
+    }
+  };
+
+  // Live preview: an uploaded spreadsheet wins; otherwise the pasted text.
   const preview = useMemo(() => {
+    if (xlsx?.error) return { error: xlsx.error };
+    if (xlsx?.parsed) return { parsed: xlsx.parsed, report: validate(xlsx.parsed) };
     const text = draft.trim();
     if (!text) return null;
     try {
@@ -1351,7 +1369,7 @@ function ExportImportPanel({ character, report, onImport, onClose }) {
     } catch (e) {
       return { error: String(e) };
     }
-  }, [draft]);
+  }, [draft, xlsx]);
 
   const copy = () => {
     navigator.clipboard?.writeText(exported);
@@ -1407,8 +1425,13 @@ function ExportImportPanel({ character, report, onImport, onClose }) {
                 {validityReasons(preview.report).map((r, i) => <li key={i}>{r}</li>)}
               </ul>
             )}
-            <textarea className="b-export-text" placeholder="Paste a character sheet — plain text, the HTML export, or a spreadsheet copy…"
-                      value={draft} onChange={(e) => setDraft(e.target.value)} />
+            <label className="b-import-file">
+              <input type="file" accept=".xlsx" onChange={onFile} />
+              ⬆ Upload an .xlsx character sheet
+            </label>
+            {xlsx?.parsed && <p className="b-import-filenote">Loaded from spreadsheet — clear the field below to re-upload.</p>}
+            <textarea className="b-export-text" placeholder="…or paste a character sheet — plain text, the HTML export, or a spreadsheet copy…"
+                      value={draft} onChange={(e) => { setDraft(e.target.value); if (xlsx) setXlsx(null); }} />
             {preview?.error && <p className="b-export-err">Couldn’t parse: {preview.error}</p>}
             <button className="b-read-choose" disabled={!preview || preview.error}
                     onClick={() => onImport(preview.parsed)}>

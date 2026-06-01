@@ -632,6 +632,15 @@
 }
 .b-read-choose:hover:not(:disabled) { background: rgba(176,143,208,0.32); }
 .b-read-choose:disabled { opacity: 0.5; cursor: default; }
+/* .xlsx upload control in the import panel */
+.b-import-file {
+  display: block; cursor: pointer; font-size: 0.85rem; color: var(--b-teal);
+  border: 1px dashed rgba(79,184,168,0.5); border-radius: 0.45rem;
+  padding: 0.6rem; text-align: center; margin-bottom: 0.5rem;
+}
+.b-import-file:hover { background: rgba(79,184,168,0.1); }
+.b-import-file input { display: none; }
+.b-import-filenote { font-size: 0.72rem; color: var(--b-green); margin: 0 0 0.5rem; }
 .b-read-head .b-detail-back { position: static; display: inline-block; margin-bottom: 0.3rem; }
 
 @media (max-width: 720px) {
