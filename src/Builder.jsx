@@ -228,11 +228,27 @@ function IdentityRail({ character, report, onClickField, onRestart,
               value={report.stats?.lifePoints ?? character.lifePoints ?? "—"} />
         <Stat label="Spikes" title={statTitle(report.stats, "spikes", "Maximum Spikes")}
               value={report.stats?.spikes ?? character.spikes ?? "—"} />
-        <Stat label="Max Armor" title="Maximum Armor Points" value={character.armorPoints?.replace(/\s*\(.+\)/, "") ?? "—"} />
-        {report.stats?.naturalArmor > 0 && (
-          <Stat label="Nat. Armor" title={statTitle(report.stats, "naturalArmor", "Natural Armor")}
-                value={report.stats.naturalArmor} />
-        )}
+        {(() => {
+          // Armor is two distinct kinds: PHYSICAL (worn — from the armorPoints
+          // field, often a "N (caveats)" string) and NATURAL (from perks/lineage,
+          // e.g. Hardened Flesh +2, or Gift of Unbreakable Flesh's variable amount).
+          // Show each so a character whose armor is natural isn't shown as "—".
+          const physStr = character.armorPoints ? String(character.armorPoints) : "";
+          const physNum = physStr.match(/^\s*(\d+)/)?.[1];
+          const natFixed = report.stats?.naturalArmor || 0;
+          const natNotes = (report.stats?.mods?.notes || []).filter((n) => n.stat === "naturalArmor");
+          const natValue = natFixed > 0 ? `+${natFixed}` : natNotes.length ? "var" : null;
+          const natTitle = natFixed > 0
+            ? statTitle(report.stats, "naturalArmor", "Natural Armor")
+            : natNotes.length ? `Natural Armor (variable): ${natNotes.map((n) => n.name).join(", ")}` : "Natural Armor";
+          return (
+            <>
+              <Stat label="Phys. Armor" title={physStr ? `Physical Armor — ${physStr}` : "Physical Armor Points"}
+                    value={physNum ?? physStr.replace(/\s*\(.+\)/, "") ?? "—"} />
+              {natValue != null && <Stat label="Nat. Armor" title={natTitle} value={natValue} />}
+            </>
+          );
+        })()}
       </div>
 
       {report.spellSlots && <SpellSlotStrip slots={report.spellSlots} />}
