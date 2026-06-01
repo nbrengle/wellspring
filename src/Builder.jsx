@@ -914,6 +914,7 @@ function PickerOverlay({ spec, character, onClose }) {
                             <span className="b-picker-row-name">{c.name}</span>
                             {spellTierKey(c) && <span className={`b-picker-row-tier b-tier-${spellTierKey(c)}`}>{spellTierLabel(c)}</span>}
                             {typeof c.cost === "number" && c.cost > 0 && <span className="b-picker-row-cost">{c.cost} BP</span>}
+                            {typeof c.cost === "string" && /^var/i.test(c.cost) && <span className="b-picker-row-cost">Var BP</span>}
                             {typeof c.bp === "number" && c.bp > 0 && <span className="b-picker-row-cost is-award">+{c.bp} BP</span>}
                             {c.locked && <span className="b-picker-row-tag b-locked">locked</span>}
                             {isTaken && <span className="b-picker-row-tag b-chosen">chosen</span>}
@@ -1063,6 +1064,7 @@ function DetailFacts({ entity }) {
   if (!entity) return null;
   const facts = [];
   if (typeof entity.cost === "number") facts.push(["Cost", `${entity.cost} BP`]);
+  else if (entity.cost && /^var/i.test(String(entity.cost))) facts.push(["Cost", "Variable"]);
   if (entity.prereq && entity.prereq !== "None") facts.push(["Prereq", entity.prereq]);
   if (entity.prerequisites && entity.prerequisites !== "None") facts.push(["Prereq", entity.prerequisites]);
   if (entity.tier) facts.push(["Tier", entity.tier]);

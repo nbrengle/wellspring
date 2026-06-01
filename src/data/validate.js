@@ -894,6 +894,7 @@ const WORD_N = { one: 1, two: 2, three: 3 };
 function statMods(character) {
   const mods = { lifePoints: 0, spikes: 0, naturalArmor: 0, armor: 0 };
   const sources = [];
+  const notes = [];   // contextual/variable boosts with no fixed number (display only)
   // Per entity, take the FIRST match per stat. The patterns are alternate
   // phrasings of the same boost (Toughness says it two ways), so summing every
   // pattern hit would multi-count one boost. One entity → at most one boost per
@@ -909,6 +910,12 @@ function statMods(character) {
       const w = m[1] || (m[0].match(/\b(one|two|three)\b/i) || [])[1] || '0';
       const n = NUM(w) || WORD_N[String(w).toLowerCase()] || 0;
       if (n > 0) { mods[stat] += n; sources.push({ name, stat, n }); seen.add(stat); }
+    }
+    // Variable/contextual Natural Armor with NO fixed number (Gift of Unbreakable
+    // Flesh: "Gains Natural Armor from Patron"). Record as a display note so the
+    // rail can show it even though the amount is variable.
+    if (!seen.has('naturalArmor') && /\bgains?\b[^.]*\bNatural Armor\b/i.test(text)) {
+      notes.push({ name, stat: 'naturalArmor', text: 'variable' });
     }
   };
   // Owned perks.
@@ -932,7 +939,7 @@ function statMods(character) {
       const e = lookupEntity(`powers:${cleanItemName(item)}`); scan(e?.name || item, e?.description);
     }
   }
-  return { ...mods, sources };
+  return { ...mods, sources, notes };
 }
 
 // Base character stats. Life Points and Spikes come straight from the level table
