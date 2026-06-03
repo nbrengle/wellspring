@@ -17,11 +17,10 @@ const getBuildVersion = () => {
   return `${baseVer}+local.${dateStr}`;
 };
 
+// Set it on process.env so Vite loads it automatically into import.meta.env!
+process.env.VITE_APP_VERSION = getBuildVersion();
+
 export default defineConfig({
   plugins: [react()],
   base: '/wellspring/',
-  define: {
-    __APP_VERSION__: JSON.stringify(getBuildVersion()),
-  }
 })
-
