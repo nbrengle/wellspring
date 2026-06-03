@@ -495,6 +495,16 @@ test('sub-powers are filtered out of eligiblePowers', () => {
   ok(clericSpells.some(p => p.name === 'Prayer of Rest'), 'Prayer of Rest (Novice) is offered');
 });
 
+test('directly selecting a sub-power fails validation', () => {
+  const c = {
+    classLevels: 'Cleric 4',
+    noviceSpells: ['Holy Rest']
+  };
+  const r = validate(c);
+  ok(!r.valid, 'Character with sub-power directly selected is invalid');
+  ok(r.prereqs.issues.some(i => i.item === 'Holy Rest' && i.text.includes('is a sub-power')), 'Validation flags Holy Rest');
+});
+
 
 // ─── report ───────────────────────────────────────────────────────────────────
 console.log(`\n${passed} passed, ${failures.length} failed`);
