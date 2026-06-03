@@ -53,7 +53,10 @@ export const EVENTS_TABLE = eventsTableJson;
 // Build/source provenance shown publicly in the footer: the app's alpha version
 // and the MegaDoc sync date the data was generated from. Edit src/data/meta.json
 // when re-syncing the doc.
-export const META = metaJson;
+export const META = {
+  ...metaJson,
+  appVersion: typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : metaJson.appVersion,
+};
 
 // ─── SKILLS / PERKS / FLAWS ───────────────────────────────────────────────────
 // UI expects { name, cost, cat, prereq, ranks, desc }.
