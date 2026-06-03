@@ -1,29 +1,22 @@
-# CI + deploy. The `build` job (test + Vite build) runs on every PR and on push
-# to main — it's the required status check for branch protection. The `deploy`
-# job publishes dist/ to GitHub Pages, but ONLY on push to main (never on a PR),
-# so PRs are verified without deploying. No gh-pages branch or extra dependency.
+# CD (Continuous Deployment): Publishes dist/ to GitHub Pages on push to main (e.g. merge of PR).
 name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: ["**"]
-  pull_request:
-    branches: ["**"]
+    branches: [main]
   workflow_dispatch:
 
-# Allow the workflow to publish to Pages.
 permissions:
   contents: read
   pages: write
   id-token: write
 
-# Cancel in-progress runs on the same branch to save Actions minutes.
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  group: pages
+  cancel-in-progress: false
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -38,19 +31,5 @@ jobs:
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
-
-  deploy:
-    needs: build
-    # Only publish from main — PRs run `build` for verification but never deploy.
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    # Serialized Pages deployment to prevent race conditions.
-    concurrency:
-      group: pages
-      cancel-in-progress: false
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
       - id: deployment
         uses: actions/deploy-pages@v4
