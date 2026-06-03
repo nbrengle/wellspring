@@ -489,6 +489,12 @@ test('Class Powers are eligible per class and cost their BP', () => {
   eq(s.byItem['classPowers:Cantrip Scholar'].cost, 4, 'Cantrip Scholar costs 4 BP');
   eq(s.net, 4, 'counted in spend');
 });
+test('sub-powers are filtered out of eligiblePowers', () => {
+  const clericSpells = eligiblePowers('Cleric', 'spellsKnown');
+  ok(!clericSpells.some(p => p.name === 'Holy Rest'), 'Holy Rest (SubPower) is not offered directly');
+  ok(clericSpells.some(p => p.name === 'Prayer of Rest'), 'Prayer of Rest (Novice) is offered');
+});
+
 
 // ─── report ───────────────────────────────────────────────────────────────────
 console.log(`\n${passed} passed, ${failures.length} failed`);
