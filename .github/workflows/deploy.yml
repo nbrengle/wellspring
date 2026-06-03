@@ -8,6 +8,7 @@ on:
   push:
     branches: ["**"]
   pull_request:
+    branches: ["**"]
   workflow_dispatch:
 
 # Allow the workflow to publish to Pages.
@@ -16,10 +17,10 @@ permissions:
   pages: write
   id-token: write
 
-# One deploy at a time; let an in-progress run finish rather than cancel it.
+# Cancel in-progress runs on the same branch to save Actions minutes.
 concurrency:
-  group: pages
-  cancel-in-progress: false
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
@@ -43,6 +44,10 @@ jobs:
     # Only publish from main — PRs run `build` for verification but never deploy.
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    # Serialized Pages deployment to prevent race conditions.
+    concurrency:
+      group: pages
+      cancel-in-progress: false
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
