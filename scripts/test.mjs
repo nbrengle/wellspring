@@ -57,7 +57,7 @@ for (const a of ARCHETYPES) {
 }
 
 test('crafting capability: owned skill unlocks its discipline; tiers nest', () => {
-  const appr = validate({ archetypeName: 'x', classLevels: 'Artisan 4', purchasedSkills: ['Apprentice Alchemy'] }).crafting;
+  const appr = validate({ archetypeName: 'x', classLevels: 'Artisan 3', purchasedSkills: ['Apprentice Alchemy'] }).crafting;
   ok(appr.any, 'has capability');
   const al = appr.crafting.find((c) => c.discipline === 'Alchemy');
   eq(al.tier, 'Apprentice', 'apprentice tier');
@@ -107,6 +107,40 @@ test('approved backstory adds +2 BP to the budget', () => {
   eq(boon.budget, base.budget + 2, 'budget +2');
   eq(boon.backstoryBP, 2, 'backstoryBP reported');
   eq(base.backstoryBP, 0, 'no backstory by default');
+});
+
+test('dynamic minimum event floor gates belowFloor validation and budgetFor', () => {
+  // Default is Event 1 -> Floor 4
+  const r1 = validate({ classes: [{ name: 'Fighter', level: 4 }] });
+  ok(!r1.belowFloor, 'L4 is legal for Event 1');
+
+  // Event 3 -> Floor 6
+  const r3 = validate({ currentEvent: 3, classes: [{ name: 'Fighter', level: 4 }] });
+  ok(r3.belowFloor, 'L4 is belowFloor for Event 3');
+  eq(r3.legalMinLevel, 6, 'legalMinLevel is 6 for Event 3');
+  eq(r3.budget, 9, 'extrapolated budget for L4 at Event 3 floor (13 - 2 * (6-4))');
+});
+
+test('extraMaxBP increases budget and roundtrips', () => {
+  const c = { classes: [{ name: 'Fighter', level: 4 }], extraMaxBP: 3 };
+  const r = validate(c);
+  eq(r.budget, 9 + 3, 'budget increased by 3');
+
+  const sheet = formatCharacterSheet(c, r);
+  ok(sheet.includes('Build Points: 0 / 12 (+3 extra BP)'), 'BP line formatted with extra BP');
+
+  const imported = parseCharacterSheet(sheet);
+  eq(imported.extraMaxBP, 3, 'imported extra BP');
+  eq(imported.currentEvent, undefined, 'imported event default');
+});
+
+test('currentEvent roundtrips', () => {
+  const c = { classes: [{ name: 'Fighter', level: 6 }], currentEvent: 3 };
+  const r = validate(c);
+  const sheet = formatCharacterSheet(c, r);
+  ok(sheet.includes('Active Event: 3'), 'sheet prints Active Event');
+  const imported = parseCharacterSheet(sheet);
+  eq(imported.currentEvent, 3, 'imported event');
 });
 test('sub-level-4 is invalid (belowFloor)', () => {
   const r = validate({ archetypeName: 'x', classes: [{ name: 'Fighter', level: 1 }] });

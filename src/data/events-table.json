@@ -1,0 +1,62 @@
+[
+  {
+    "event": 1,
+    "level": 4,
+    "bp": 9
+  },
+  {
+    "event": 2,
+    "level": 5,
+    "bp": 11
+  },
+  {
+    "event": 3,
+    "level": 6,
+    "bp": 13
+  },
+  {
+    "event": 4,
+    "level": 6,
+    "bp": 13
+  },
+  {
+    "event": 5,
+    "level": 7,
+    "bp": 15
+  },
+  {
+    "event": 6,
+    "level": 8,
+    "bp": 17
+  },
+  {
+    "event": 7,
+    "level": 8,
+    "bp": 17
+  },
+  {
+    "event": 8,
+    "level": 9,
+    "bp": 19
+  },
+  {
+    "event": 9,
+    "level": 9,
+    "bp": 19
+  },
+  {
+    "event": 10,
+    "level": 10,
+    "bp": 21
+  },
+  {
+    "event": 11,
+    "level": 10,
+    "bp": 21
+  },
+  {
+    "event": 12,
+    "level": 11,
+    "bp": 23
+  }
+]

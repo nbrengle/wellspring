@@ -5,6 +5,7 @@
 // occasional inserted row. Returns the same flat character shape parseCharacterSheet
 // produces, so it flows through the existing import → validate → load path.
 import * as XLSX from 'xlsx';
+import { cleanItem } from './sheet-schema.js';
 
 // Read a workbook (ArrayBuffer) → character. Throws on a non-Wellspring sheet.
 export function parseXlsxCharacter(arrayBuffer) {
@@ -83,18 +84,41 @@ export function parseXlsxCharacter(arrayBuffer) {
     domainPowers: [/purchased domain powers/i],
   };
   for (const [field, labels] of Object.entries(lists)) {
-    const items = readColumnList(grid, labels, clean);
-    if (items.length) character[field] = items;
+    const rawItems = readColumnList(grid, labels, clean);
+    if (rawItems.length) {
+      const items = [];
+      const costs = [];
+      const grants = [];
+      for (const raw of rawItems) {
+        const cleaned = cleanItem(raw);
+        items.push(cleaned.name);
+        costs.push(cleaned.bp);
+        grants.push(cleaned.grant);
+      }
+      character[field] = items;
+      if (costs.some(c => c !== null)) {
+        character.effectiveBP = character.effectiveBP || {};
+        character.effectiveBP[field] = costs;
+      }
+      if (grants.some(g => g !== null)) {
+        character.grants = character.grants || {};
+        character.grants[field] = grants;
+      }
+    }
   }
 
   // Challenges / Advantages: two-column tables (Name + Award/Cost).
   const challenges = readNamedTable(grid, /^challenges$/i, clean);
-  if (challenges.length) character.lineageChallenges = challenges;
+  if (challenges.length) {
+    character.lineageChallenges = challenges.map(c => cleanItem(c).name);
+  }
   const advantages = readNamedTable(grid, /^advantages$/i, clean);
-  if (advantages.length) character.lineageAdvantages = advantages;
+  if (advantages.length) {
+    character.lineageAdvantages = advantages.map(a => cleanItem(a).name);
+  }
 
-  if (!Object.keys(character.effectiveBP).length) delete character.effectiveBP;
-  if (!Object.keys(character.grants).length) delete character.grants;
+  if (character.effectiveBP && !Object.keys(character.effectiveBP).length) delete character.effectiveBP;
+  if (character.grants && !Object.keys(character.grants).length) delete character.grants;
   return character;
 }
 
@@ -187,4 +211,183 @@ function findLabelFrom(grid, re, fromRow, nearCol) {
     }
   }
   return null;
+}
+
+// ─── XLSX EXPORTER ────────────────────────────────────────────────────────────
+
+function bpSuffix(name, field, report) {
+  const e = report?.spend.byItem[`${field}:${name}`];
+  if (!e) return '';
+  if (e.cost < 0) {
+    return e.grant?.source ? ` (${-e.cost} BP refunded from ${e.grant.source})` : ` (+${-e.cost} BP)`;
+  }
+  if (e.cost === 0 && e.grant?.source) return ` - 0 BP (from ${e.grant.source})`;
+  if (e.cost > 0) return ` - ${e.cost} BP`;
+  if (e.base > 0) return ` - 0 BP`;
+  return '';
+}
+
+export function buildXlsxCharacter(character, report) {
+  const data = [];
+  data.push(["Character Name", character.name || ""]);
+  data.push(["Life Points", character.lifePoints || report?.stats?.lifePoints || ""]);
+  data.push(["Spikes", character.spikes || report?.stats?.spikes || ""]);
+  data.push(["Armor Points", character.armorPoints || report?.stats?.armorPoints || ""]);
+  data.push(["Wealth", character.wealth || ""]);
+  data.push(["Resources", character.resources || ""]);
+  data.push([]);
+
+  // Class Levels
+  data.push(["Class", "Level"]);
+  const classLevels = character.classLevels || "";
+  const parts = classLevels.split("/").map(p => p.trim()).filter(Boolean);
+  for (const part of parts) {
+    const match = part.match(/^(.*?)\s+(\d+)$/);
+    if (match) {
+      data.push([match[1], parseInt(match[2], 10)]);
+    }
+  }
+  data.push([]);
+
+  // Lineage
+  data.push(["Lineage:", character.lineage || ""]);
+  data.push(["Sub-Lineage (if any)", character.sublineage || ""]);
+  data.push([]);
+
+  // Devotion & Domains
+  data.push(["Devotion", character.devotion || ""]);
+  data.push(["Domain 1", "Domain 2", "Domain 3", "Domain 4"]);
+  const domains = character.divineDomains || [];
+  data.push([domains[0] || "", domains[1] || "", domains[2] || "", domains[3] || ""]);
+  data.push([]);
+
+  // Challenges
+  data.push(["Challenges"]);
+  data.push(["Name", "Award", "Notes"]);
+  for (const ch of (character.lineageChallenges || [])) {
+    data.push([ch, "", ""]);
+  }
+  data.push([]);
+
+  // Advantages
+  data.push(["Advantages"]);
+  data.push(["Name", "Cost", "Notes"]);
+  for (const adv of (character.lineageAdvantages || [])) {
+    data.push([adv, "", ""]);
+  }
+  data.push([]);
+
+  // Partition startingSkills and purchasedPerks
+  const owned = report?.owned || { skills: [], perks: [], classPowers: [] };
+  
+  // Starting/free skills & perks to export under "Starting/Free Skills:"
+  const startingSkillsSet = new Set(character.startingSkills || []);
+  for (const pk of owned.perks) {
+    if (pk.source === 'class') {
+      startingSkillsSet.add(pk.name);
+    }
+  }
+  const startingSkillsToExport = Array.from(startingSkillsSet);
+
+  // Purchased perks: only those with source !== 'class'
+  const purchasedPerksSet = new Set();
+  for (const pk of owned.perks) {
+    if (pk.source !== 'class') {
+      purchasedPerksSet.add(pk.name);
+    }
+  }
+  const purchasedPerksToExport = Array.from(purchasedPerksSet);
+
+  // Purchased skills: combine purchasedSkills and classPowers
+  const purchasedSkillsToExport = Array.from(new Set([
+    ...(character.purchasedSkills || []),
+    ...(character.classPowers || [])
+  ]));
+
+  // Lists
+  data.push(["Starting/Free Skills:"]);
+  data.push(["Name"]);
+  for (const item of startingSkillsToExport) {
+    const suffix = bpSuffix(item, 'startingSkills', report);
+    data.push([`${item}${suffix}`]);
+  }
+  data.push([]);
+
+  data.push(["Purchased Skills:"]);
+  data.push(["Name"]);
+  for (const item of purchasedSkillsToExport) {
+    let suffix = bpSuffix(item, 'purchasedSkills', report);
+    if (!suffix) suffix = bpSuffix(item, 'classPowers', report);
+    data.push([`${item}${suffix}`]);
+  }
+  data.push([]);
+
+  data.push(["Perks:"]);
+  data.push(["Name"]);
+  for (const item of purchasedPerksToExport) {
+    const suffix = bpSuffix(item, 'purchasedPerks', report);
+    data.push([`${item}${suffix}`]);
+  }
+  data.push([]);
+
+  data.push(["Flaws:"]);
+  data.push(["Name"]);
+  for (const item of (character.flaws || [])) {
+    const suffix = bpSuffix(item, 'flaws', report);
+    data.push([`${item}${suffix}`]);
+  }
+  data.push([]);
+
+  data.push(["Utility Powers/Cantrips:"]);
+  data.push(["Name"]);
+  const utilityPowersToExport = Array.from(new Set([
+    ...(character.utilityPowers || []),
+    ...(character.cantrips || [])
+  ]));
+  for (const item of utilityPowersToExport) {
+    let suffix = bpSuffix(item, 'utilityPowers', report);
+    if (!suffix) suffix = bpSuffix(item, 'cantrips', report);
+    data.push([`${item}${suffix}`]);
+  }
+  data.push([]);
+
+  data.push(["Basic Powers/Known Spells:"]);
+  data.push(["Name"]);
+  const basicPowersToExport = Array.from(new Set([
+    ...(character.basicPowers || []),
+    ...(character.noviceSpells || []),
+    ...(character.adeptSpells || []),
+    ...(character.greaterSpells || [])
+  ]));
+  for (const item of basicPowersToExport) {
+    let suffix = bpSuffix(item, 'basicPowers', report);
+    if (!suffix) suffix = bpSuffix(item, 'noviceSpells', report);
+    if (!suffix) suffix = bpSuffix(item, 'adeptSpells', report);
+    if (!suffix) suffix = bpSuffix(item, 'greaterSpells', report);
+    data.push([`${item}${suffix}`]);
+  }
+  data.push([]);
+
+  data.push(["Innate Powers:"]);
+  data.push(["Name"]);
+  for (const item of (character.innatePowers || [])) {
+    const suffix = bpSuffix(item, 'innatePowers', report);
+    data.push([`${item}${suffix}`]);
+  }
+  data.push([]);
+
+  data.push(["Purchased Domain Powers:"]);
+  data.push(["Name"]);
+  for (const item of (character.domainPowers || [])) {
+    const suffix = bpSuffix(item, 'domainPowers', report);
+    data.push([`${item}${suffix}`]);
+  }
+  data.push([]);
+
+  // Create workbook & worksheet
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.aoa_to_sheet(data);
+  XLSX.utils.book_append_sheet(wb, ws, "Basic Sheet");
+  
+  return XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
 }

@@ -37,6 +37,32 @@ export function accentPenalty(text) {
   return mult;
 }
 
+// Duration / usability penalty — how long a power takes to USE. Combat is
+// real-time, so a long setup makes an otherwise-spammable effect impractical
+// mid-fight (Soothe is an at-will Cure but needs a multi-minute conversation).
+// "Quick N" is an IN-COMBAT timed count (N seconds): only mildly penalized,
+// scaling with N (longer = worse). "Out of combat" / minute-scale setups are
+// penalized hardest. Returns the SINGLE harshest applicable factor. Tunable in
+// effect-weights.json → durationPenalty.
+const DUR = EFFECT_WEIGHTS.durationPenalty || {};
+export function durationPenalty(text) {
+  const t = String(text || '');
+  let mult = 1;
+  const take = (m) => { if (typeof m === 'number' && m < mult) mult = m; };
+  // Hardest: explicitly out of combat (can't be cast/used in a fight at all).
+  if (/out(side)? of combat|may not be used in combat|cannot be (used|cast)[^.]*in combat/i.test(t)) take(DUR.outOfCombat);
+  // Minute-scale setup (e.g. "a long conversation for a few minutes").
+  if (/\b(a few|several|couple of|\d+)\s+minutes?\b|long conversation/i.test(t)) take(DUR.minutes);
+  // "Quick N" — in-combat count; longer counts are worse.
+  for (const m of t.matchAll(/Quick (\d+)/gi)) {
+    const n = +m[1];
+    take(n >= 100 ? DUR.quick100 : n >= 30 ? DUR.quick30 : DUR.quick10);
+  }
+  // Sub-minute spoken/held setup ("spend ten seconds…").
+  if (/\b(ten|twenty|thirty|\d+)\s+seconds?\b/i.test(t)) take(DUR.seconds);
+  return mult;
+}
+
 // The effect-ish entities an ability invokes, with per-effect weight.
 export function effectHits(entityId) {
   const hits = [];
@@ -54,10 +80,16 @@ export const rawPower = (entityId) => effectHits(entityId).reduce((s, h) => s + 
 // Frequency-weighted power (perks/skills have no refresh → ×1).
 export const abilityPower = (entityId, refresh) => rawPower(entityId) * freqMult(refresh);
 
-// Full power score for a class power object: effect × frequency × tier × accent.
+// Full power score: effect × frequency × tier × accent × duration. Duration
+// down-weights powers that take a long real-time setup to use (combat is real
+// time, so a multi-minute Cure is far less useful than the refresh implies).
 export function powerScore(p, tier) {
-  const accentText = [p.description, p.call, p.effect, p.accent].filter(Boolean).join(' ');
-  return rawPower(`powers:${p.name}`) * freqMult(p.refresh || p.refreshes) * tierMult(tier) * accentPenalty(accentText);
+  const text = [p.desc, p.description, p.call, p.effect, p.accent].filter(Boolean).join(' ');
+  return rawPower(`powers:${p.name}`)
+    * freqMult(p.refresh || p.refreshes)
+    * tierMult(tier)
+    * accentPenalty(text)
+    * durationPenalty(text);
 }
 
 // Every power a class can hold, with its refresh, effect hits, and full score.

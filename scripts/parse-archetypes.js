@@ -206,7 +206,7 @@ const stripNotes = (s, instance = 0) =>
 const INLINE_FIELD_NAMES = new Set([
   'lineage', 'lineageChallenges', 'lineageAdvantages', 'lifePoints', 'armorPoints',
   'spikes', 'classLevels', 'specialization', 'devotion', 'flaws', 'divineDomains',
-  'devotionAccents', 'noviceSpellSlots', 'adeptSpellSlots', 'greaterSpellSlots',
+  'devotionAccents',
 ]);
 const SECTION_FIELDS = Object.fromEntries(
   Object.entries(LABEL_FIELD).filter(([, f]) => !INLINE_FIELD_NAMES.has(f)),

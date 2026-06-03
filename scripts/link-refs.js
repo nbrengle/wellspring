@@ -357,6 +357,22 @@ function parseGrants(text, grantLookups) {
     const { entity } = resolve(name, lookup);
     if (entity) out.add(entity.id);
   }
+
+  // Dynamic check for name followed by parenthesized number in description containing gains/free/choose
+  if (/\b(gains?|adds?|learns?|receives?|granted|free|choose)\b/i.test(text)) {
+    const PAREN_NUM_RE = /\b([A-Z][\w’'-]+(?:\s+(?:[A-Z][\w’'-]+|of|the|and|to|a|in)){0,4})\s*\((\d+)\)/g;
+    PAREN_NUM_RE.lastIndex = 0;
+    while ((m = PAREN_NUM_RE.exec(text))) {
+      const name = m[1].trim();
+      for (const type of ["perk", "skill", "power"]) {
+        const { entity } = resolve(name, grantLookups[type]);
+        if (entity) {
+          out.add(entity.id);
+          break;
+        }
+      }
+    }
+  }
   return [...out];
 }
 
@@ -370,20 +386,28 @@ function parseGrants(text, grantLookups) {
 //
 // Returns { amount, scope, cap, min, refundIfFree, exclusions } or null. Scope is
 // the structured target: { kind: 'giftEligible'|'prereq'|'category'|'firstN', value, n? }.
-function parseDiscounts(text, exclusionLookup) {
+function parseDiscounts(text, exclusionLookup, grantLookups) {
   if (!text) return null;
   // Must actually be a discount source (not just mention the word in flavor). The
   // doc phrases BP discounts as "BP less", "less BP", or — for skills — "point(s)
-  // less" (e.g. Sharp Mind: "Lore ranks cost 1 point less").
-  if (!/\bdiscount(?:ed|s)?\b|\bBP\s+less\b|\bless\s+BP\b|\bpoints?\s+less\b/i.test(text)) return null;
+  // less" (e.g. Sharp Mind: "Lore ranks cost 1 point less") or "reduced by".
+  if (!/\bdiscount(?:ed|s)?\b|\bBP\s+less\b|\bless\s+BP\b|\bpoints?\s+less\b|\breduced\s+by\b/i.test(text)) return null;
 
-  // Amount: "1 BP/point less" / "N BP discount" / "discounted by N BP" → default 1.
+  // Amount: "1 BP/point less" / "N BP discount" / "discounted by N BP" / "reduced by [word/number]" → default 1.
   const amtM = text.match(/(\d+)\s*(?:BP|points?)\s+less/i)
     || text.match(/(\d+)\s*BP\s+discount/i)
     || text.match(/discount(?:ed)?\s+(?:by\s+)?(\d+)\s*BP/i)
+    || text.match(/reduced\s+by\s+(\d+|one|two|three|four|five)/i)
     || (/\bone\s+less\s+(?:BP|point)\b/i.test(text) ? [null, "1"] : null);
   if (!amtM) return null;
-  const amount = parseInt(amtM[1], 10);
+
+  let amount;
+  if (/one/i.test(amtM[1])) amount = 1;
+  else if (/two/i.test(amtM[1])) amount = 2;
+  else if (/three/i.test(amtM[1])) amount = 3;
+  else if (/four/i.test(amtM[1])) amount = 4;
+  else if (/five/i.test(amtM[1])) amount = 5;
+  else amount = parseInt(amtM[1], 10);
 
   const cap = (text.match(/maximum\s+of\s+(\d+)\s*BP\s+in\s+discounts/i) || [])[1];
   const min = (text.match(/minimum\s+(?:cost\s+)?of\s+(\d+)/i) || [])[1];
@@ -420,6 +444,20 @@ function parseDiscounts(text, exclusionLookup) {
     const cats = catM[1].split(/,|\band\b|\bor\b/i).map((s) => s.trim()).filter(Boolean);
     scope = { kind: "category", value: cats };
   }
+
+  // Fallback: check if the text mentions a specific known skill name (e.g. Poisoner → Apprentice Alchemy)
+  if (!scope && grantLookups) {
+    const skills = registry.filter((e) => e.type === "skills");
+    for (const sk of skills) {
+      const escaped = sk.name.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+      const re = new RegExp(`\\b${escaped}\\b`, 'i');
+      if (re.test(text)) {
+        scope = { kind: "skillRanks", value: sk.name };
+        break;
+      }
+    }
+  }
+
   if (!scope) return null;
 
   // Exclusions: "(The) X and Y (Perks) cannot be discounted".
@@ -582,7 +620,7 @@ for (const e of registry) {
     grants[e.id] = g;
     for (const t of g) (grantedBy[t] = grantedBy[t] || []).push(e.id);
   }
-  const d = parseDiscounts(e.body, exclusionLookup);
+  const d = parseDiscounts(e.body, exclusionLookup, grantTargetLookups);
   if (d) discounts[e.id] = d;
   const lb = parseLbpBonus(e.body);
   if (lb) lbpBonuses[e.id] = lb;
@@ -677,17 +715,14 @@ const result = {
   grantedBy,
   discounts,
   lbpBonuses,
-  archetypeRefs,
 };
 
 writeFileSync(join(DATA, "refs.json"), JSON.stringify(result, null, 2));
 
 const totalRefs = Object.values(mentions).reduce((a, r) => a + r.length, 0);
 const totalPrereqEdges = Object.values(prereqs).reduce((a, p) => a + p.skills.length, 0);
-const totalArchetypeRefs = Object.values(archetypeRefs).reduce(
-  (a, fields) => a + Object.values(fields).reduce((b, ids) => b + ids.length, 0), 0);
 const totalGrants = Object.values(grants).reduce((a, g) => a + g.length, 0);
-console.log(`  ${registry.length} entities, ${totalRefs} body references, ${totalPrereqEdges} prereq edges, ${totalArchetypeRefs} archetype refs`);
+console.log(`  ${registry.length} entities, ${totalRefs} body references, ${totalPrereqEdges} prereq edges`);
 console.log(`  ${totalGrants} bestowal edges, ${Object.keys(discounts).length} discount sources`);
 if (archetypeDrift.length) {
   console.log(`  ${archetypeDrift.length} archetype refs resolved via drift fallback (see validate-archetypes for detail).`);

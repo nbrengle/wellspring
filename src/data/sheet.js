@@ -19,11 +19,20 @@ import {
 function bpSuffix(name, field, report) {
   const e = report?.spend.byItem[`${field}:${name}`];
   if (!e) return '';
+  const CLASSES_SET = new Set(['Artisan', 'Cleric', 'Druid', 'Fighter', 'Mage', 'Rogue', 'Socialite', 'Sourcerer']);
   // Flaws award BP; a starting-skill refund is also a negative cost on a free item.
   if (e.cost < 0) {
-    return e.grant?.source ? ` (${-e.cost} BP refunded from ${e.grant.source})` : ` (+${-e.cost} BP)`;
+    if (e.grant?.source && CLASSES_SET.has(e.grant.source)) {
+      return ` (${e.grant.source.toUpperCase()} +${-e.cost}BP)`;
+    }
+    return e.grant?.source ? ` (${-e.cost} BP refunded from ${e.grant.source})` : ` (+${-e.cost}BP)`;
   }
-  if (e.cost === 0 && e.grant?.source) return ` - 0 BP (from ${e.grant.source})`;
+  if (e.cost === 0 && e.grant?.source) {
+    if (CLASSES_SET.has(e.grant.source)) {
+      return ` (${e.grant.source.toUpperCase()})`;
+    }
+    return ` - 0 BP (from ${e.grant.source})`;
+  }
   if (e.cost > 0) return ` - ${e.cost} BP`;
   if (e.base > 0) return ` - 0 BP`;
   return '';
@@ -81,6 +90,7 @@ export function formatCharacterSheet(character, report) {
   line('Class Levels', classes.length ? classes.map((c) => `${c.name} ${c.level}`).join(' / ') : 'None');
   if (character.specialization) line('Specialization', character.specialization);
   if (character.devotion) line('Devotion', character.devotion);
+  if (character.currentEvent) line('Active Event', character.currentEvent);
   line('Flaws', joinItems(character.flaws, 'flaws', report));
 
   // ── Skills / perks ── (starting skills may carry a refund annotation)
@@ -111,6 +121,7 @@ export function formatCharacterSheet(character, report) {
   const { spend, budget } = report;
   lines.push(`Build Points: ${spend.net} / ${budget}` +
     (spend.awarded > 0 ? ` (+${spend.awarded} from flaws)` : '') +
+    (character.extraMaxBP > 0 ? ` (+${character.extraMaxBP} extra BP)` : '') +
     (report.usesBonus ? ` (+${report.bonusUsed} bonus BP)` : ''));
 
   return lines.join('\n');
@@ -176,6 +187,13 @@ function parseSheetText(text) {
   for (; i < rows.length; i++) {
     const r = rows[i];
     if (!r) continue;
+    if (r.startsWith("Build Points:")) {
+      const match = r.match(/\+(\d+)\s*(?:extra|service\/extra)\s*BP/i);
+      if (match) {
+        character.extraMaxBP = parseInt(match[1], 10);
+      }
+      continue;
+    }
     const lab = labelOf(r);
     if (!lab) continue;
     // Collect following item lines for this section (the source lists each
@@ -194,6 +212,9 @@ function parseSheetText(text) {
   }
   if (!Object.keys(character.effectiveBP).length) delete character.effectiveBP;
   if (!Object.keys(character.grants).length) delete character.grants;
+  if (character.currentEvent) {
+    character.currentEvent = parseInt(character.currentEvent, 10) || 1;
+  }
   reconcileDevotion(character);
   return character;
 }

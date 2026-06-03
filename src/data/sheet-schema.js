@@ -23,6 +23,8 @@ export const LABEL_FIELD = {
   'Class Levels': 'classLevels',
   'Specialization': 'specialization',
   'Devotion': 'devotion',
+  'Active Event': 'currentEvent',
+  'Event': 'currentEvent',
   'Flaws': 'flaws',
   'Starting Skills (free)': 'startingSkills',
   'Starting Skills': 'startingSkills',
@@ -47,16 +49,13 @@ export const LABEL_FIELD = {
   'Book Spells': 'bookSpells',
   'Domain Powers': 'domainPowers',
   'Form Powers': 'formPowers',
-  'Novice Spell-slots': 'noviceSpellSlots',
-  'Adept Spell-slots': 'adeptSpellSlots',
-  'Greater Spell-slots': 'greaterSpellSlots',
 };
 
 // Fields holding a single scalar value rather than a list of items.
 export const SCALAR_FIELDS = new Set([
   'lineage', 'sublineage', 'lifePoints', 'armorPoints', 'spikes', 'classLevels',
   'wealth', 'resources',
-  'specialization', 'devotion', 'noviceSpellSlots', 'adeptSpellSlots', 'greaterSpellSlots',
+  'specialization', 'devotion', 'currentEvent',
 ]);
 
 // Fields holding a list of item names (skills/powers/etc.). Lineage is scalar,
@@ -77,10 +76,10 @@ export function fieldForLabel(label) {
 }
 
 // Item-annotation patterns. An item name may carry "- N BP", a grant note
-// "(from X)", a refund "(N BP refunded from X)", or a flaw award "(+N BP)".
+// "(from X)" / "(X)", a refund "(N BP refunded from X)" / "(X +NBP)", or a flaw award "(+N BP)".
 const ITEM_BP = /\s*-\s*(-?\d+)\s*BP\b.*$/i;
-const ITEM_GRANT = /\(\s*from\s+([^)]+)\)/i;
-const ITEM_REFUND = /\(\s*(\d+)\s*BP\s+refunded\s+from\s+([^)]+)\)/i;
+const ITEM_GRANT = /\(\s*(?:(?:from\s+([^)]+))|(Artisan|Cleric|Druid|Fighter|Mage|Rogue|Socialite|Sourcerer))\s*\)/i;
+const ITEM_REFUND = /\(\s*(?:(?:(\d+)\s*BP\s+refunded\s+from\s+([^)]+))|(?:(Artisan|Cleric|Druid|Fighter|Mage|Rogue|Socialite|Sourcerer)\s*\+(\d+)\s*BP))\)/i;
 const ITEM_AWARD = /\(\+(\d+)\s*BP\)/i;
 
 // Split an annotated item into its canonical name + parsed annotations:
@@ -93,9 +92,21 @@ export function cleanItem(raw) {
   const name = raw
     .replace(ITEM_REFUND, '').replace(ITEM_AWARD, '').replace(ITEM_GRANT, '')
     .replace(ITEM_BP, '').trim();
-  const grant = refundM
-    ? { kind: 'discount', amount: parseInt(refundM[1], 10), source: refundM[2].trim() }
-    : grantM ? { kind: 'grant', amount: null, source: grantM[1].trim() } : null;
+  
+  let grant = null;
+  if (refundM) {
+    if (refundM[1] !== undefined) {
+      // old format: (2 BP refunded from Rogue)
+      grant = { kind: 'discount', amount: parseInt(refundM[1], 10), source: refundM[2].trim() };
+    } else {
+      // new format: (ROGUE +2BP)
+      grant = { kind: 'discount', amount: parseInt(refundM[4], 10), source: refundM[3].trim() };
+    }
+  } else if (grantM) {
+    const src = grantM[1] !== undefined ? grantM[1] : grantM[2];
+    grant = { kind: 'grant', amount: null, source: src.trim() };
+  }
+  
   return { name, bp: bpM ? parseInt(bpM[1], 10) : null, grant };
 }
 

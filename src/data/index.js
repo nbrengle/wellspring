@@ -10,6 +10,7 @@ import flawsJson from './flaws.json';
 import devotionsJson from './devotions.json';
 import lineagesJson from './lineages.json';
 import levelTableJson from './level-table.json';
+import eventsTableJson from './events-table.json';
 import domainsJson from './domains.json';
 import craftingJson from './crafting-recipes.json';
 import ritualsJson from './ritual-recipes.json';
@@ -46,6 +47,8 @@ import devotionsBeingsJson from './devotions-divine-beings.json';
 import introductionJson from './introduction.json';
 
 export const LEVEL_TABLE = levelTableJson;
+export const EVENTS_TABLE = eventsTableJson;
+
 
 // Build/source provenance shown publicly in the footer: the app's alpha version
 // and the MegaDoc sync date the data was generated from. Edit src/data/meta.json
@@ -408,15 +411,50 @@ export const lookupEntity = (id) => {
   const direct = ENTITY_INDEX.get(id);
   if (direct) return direct;
   const type = id.slice(0, id.indexOf(':'));
-  const name = id.slice(id.indexOf(':') + 1);
+  let name = id.slice(id.indexOf(':') + 1);
+
+  // Map sheet aliases to canonical reference names
+  const normalizedLower = name.trim().toLowerCase();
+  if (normalizedLower.startsWith("apprentice profession")) {
+    name = name.replace(/apprentice profession/i, "Profession - Apprentice");
+  } else if (normalizedLower.startsWith("journeyman profession")) {
+    name = name.replace(/journeyman profession/i, "Profession - Journeyman");
+  } else if (normalizedLower.startsWith("master profession")) {
+    name = name.replace(/master profession/i, "Profession - Master");
+  }
+
   const byName = NAME_INDEX.get(canon(name));
   if (byName) return ENTITY_INDEX.get(byName);
+
+  // Try stripping trailing rank (Roman numeral or digit) if we missed
+  const ROMAN_MAP = {
+    i: 1, ii: 2, iii: 3, iv: 4, v: 5, vi: 6, vii: 7, viii: 8, ix: 9, x: 10,
+    xi: 11, xii: 12, xiii: 13, xiv: 14, xv: 15
+  };
+  const romanMatch = name.trim().match(/^(.*?)\s+([IVXLCDM]+)$/i);
+  if (romanMatch && ROMAN_MAP[romanMatch[2].toLowerCase()]) {
+    const stripped = romanMatch[1].trim();
+    const byStrippedName = NAME_INDEX.get(canon(stripped));
+    if (byStrippedName) return ENTITY_INDEX.get(byStrippedName);
+  }
+  const digitMatch = name.trim().match(/^(.*?)\s+(\d+)$/);
+  if (digitMatch) {
+    const stripped = digitMatch[1].trim();
+    const byStrippedName = NAME_INDEX.get(canon(stripped));
+    if (byStrippedName) return ENTITY_INDEX.get(byStrippedName);
+  }
   // Parameterized skills carry a trailing "(value)" the base skill doesn't —
   // "Lore (Historical)" → the Lore skill, "Profession - Apprentice (Smith)" →
   // Profession - Apprentice. Resolve to the base entity but keep the chosen
   // parameter visible (name + a `parameter` field) so the detail pane shows the
   // base skill's full description with the picked area called out.
-  const paramMatch = name.match(/^(.*?)\s*\(([^()]*)\)\s*$/);
+  let paramMatch = name.match(/^(.*?)\s*\(([^()]*)\)\s*$/);
+  if (!paramMatch) {
+    const dashIdx = name.indexOf(' - ');
+    if (dashIdx > 0) {
+      paramMatch = [name, name.slice(0, dashIdx).trim(), name.slice(dashIdx + 3).trim()];
+    }
+  }
   if (paramMatch) {
     const base = ENTITY_INDEX.get(`${type}:${paramMatch[1].trim()}`)
       || (NAME_INDEX.get(canon(paramMatch[1])) && ENTITY_INDEX.get(NAME_INDEX.get(canon(paramMatch[1]))));
