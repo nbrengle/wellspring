@@ -9,7 +9,7 @@
 // Pure functions, no React, so the UI calls them in a useMemo and they stay
 // unit-testable. The character shape is the flat object from Builder.jsx.
 
-import { LEVEL_TABLE, lookupEntity, REFS, CLASS_POWER_SLOTS, CLASS_POWERS, CLASS_PROGRESSION, SPELLCASTERS, DEVOTIONS, DOMAINS, CLASSES, LINEAGES, CRAFTING, RITUALS } from './index.js';
+import { LEVEL_TABLE, lookupEntity, REFS, CLASS_POWER_SLOTS, CLASS_POWERS, CLASS_PROGRESSION, SPELLCASTERS, DEVOTIONS, DOMAINS, CLASSES, LINEAGES, CRAFTING, RITUALS, EVENTS_TABLE } from './index.js';
 
 // Max Lineage Build Points a character can be awarded from challenges (MegaDoc:
 // "up to 10 awarded LBP").
@@ -132,9 +132,11 @@ export function ownedGrantSources(character) {
     sources.push({ id: `perks:${base}`, name: base, kind: 'perk' });
   }
   // Class innate powers the character has at level (automatic features).
-  for (const { name: cls } of getClasses(character)) {
+  for (const { name: cls, level } of getClasses(character)) {
     for (const p of (CLASS_POWERS[cls]?.innate || [])) {
-      sources.push({ id: `powers:${p.name}`, name: p.name, kind: 'feature' });
+      if (level >= requiredLevel(p)) {
+        sources.push({ id: `powers:${p.name}`, name: p.name, kind: 'feature' });
+      }
     }
   }
   // Powers the character has actually selected into slots (any tier) — a chosen
@@ -169,6 +171,8 @@ export function grantedAbilities(character) {
   const list = [];
   const bySource = {};
   for (const src of sources) {
+    const ent = lookupEntity(src.id);
+    if (ent?.chooseOne?.kind === 'build') continue;
     const targets = grants[src.id];
     if (!targets) continue;
     for (const ability of targets) {
@@ -271,10 +275,8 @@ export function devotionState(character) {
 // free; only purchased skills/perks spend BP.
 const BP_FIELDS = ['purchasedSkills', 'purchasedPerks'];
 
-// Power fields that can hold BP-bought powers (domain powers, class-skill powers
-// taken with BP rather than a slot). A power here counts toward BP only when the
-// archetype's authored effectiveBP marks it as a purchase — slot-filled powers
-// carry no effectiveBP and are validated against slots instead.
+// Power fields that hold BP-bought powers (domain powers, class-skill powers, and
+// form powers). Powers listed in these fields are evaluated for BP cost.
 const BP_POWER_FIELDS = ['domainPowers', 'classPowers', 'formPowers'];
 
 // Power fields grouped by the slot category they consume. Innate/class/right-
@@ -308,29 +310,14 @@ function entityType(field) {
   return 'powers';
 }
 
-// Archetype item names carry a display suffix like " - 5 BP" that isn't part of
+// Character sheet item names carry a display suffix like " - 5 BP" that isn't part of
 // the canonical entity name. Strip it so name-based lookups resolve.
 export function cleanItemName(item) {
   return item.replace(/\s*-\s*\d+\s*BP$/i, '').trim();
 }
 
-// Resolve a character item to its canonical entity id. When the character came
-// from an archetype, the archetypeRefs id list is index-aligned with the source
-// item array — so match by position (the names differ because of the BP suffix /
-// "(your choice)" parameter text). Otherwise fall back to type:cleanName.
-//
-// `archetypeName` is set by the UI's loadArchetype; a raw archetype object only
-// has `name`. Accept either so validating a raw archetype matches the live app.
+// Resolve a character item to its canonical entity id (type:cleanName).
 function resolveId(item, field, character) {
-  const archetypeName = character?.archetypeName || character?.name;
-  if (archetypeName) {
-    const ids = REFS.archetypeRefs[`archetypes:${archetypeName}`]?.[field];
-    const src = character[field];
-    if (ids && Array.isArray(src)) {
-      const idx = src.indexOf(item);
-      if (idx >= 0 && ids[idx]) return ids[idx];
-    }
-  }
   return `${entityType(field)}:${cleanItemName(item)}`;
 }
 
@@ -369,7 +356,7 @@ const bareSkill = (s) => String(s).replace(/\s*\([^)]*\)\s*$/, '').trim();
 // same rule drives both the forward path (materialize grants when a class is
 // added) and the reflective path (validate). Each class AFTER the first grants
 // its Multi-Class Skills; a granted skill the character already has instead
-// yields free BP equal to its cost ("Redundant Skills and Discounts" rule).
+// awards "free BP" equal to its cost (the "multiclass discount").
 // Returns { skills:[{name,source}], freeBP, freeBPItems:[{skill,source,bp}] }.
 // `skills` are the genuinely-new free skills; the caller decides whether to
 // display/merge them. Nothing here is cached on the character.
@@ -420,6 +407,7 @@ export function classifyOwnedItems(character) {
   const skills = [];
   const perks = [];
   const classPowers = [];
+  const innatePowers = [];
   const misfiled = {};
   const classNames = new Set(getClasses(character).map((c) => c.name));
   // Starting skills / class-granted perks come from the PRIMARY (first) class, so
@@ -471,10 +459,22 @@ export function classifyOwnedItems(character) {
     const ent = lookupEntity(`powers:${cleanItemName(item)}`);
     classPowers.push({ name: item, field: 'classPowers', index, source: 'purchased', cls: ent?.parentClass || null });
   });
+
+  // Innate powers are free class-granted powers.
+  (character.innatePowers || []).forEach((item, index) => {
+    const ent = lookupEntity(`powers:${cleanItemName(item)}`);
+    innatePowers.push({ name: item, field: 'innatePowers', index, source: 'class', cls: ent?.parentClass || null });
+  });
+
+  const mcGrants = multiclassGrants(character);
   // Multiclass-granted skills are free class features.
-  for (const g of multiclassGrants(character).skills) {
+  for (const g of mcGrants.skills) {
     skills.push({ name: g.name, field: 'multiclassGrant', index: -1, source: 'class', grantedBy: g.source });
   }
+  for (const g of mcGrants.freeBPItems) {
+    skills.push({ name: g.skill, field: 'multiclassGrant', index: -1, source: 'class', grantedBy: g.source, refundedBP: g.bp });
+  }
+
   // De-dupe by canonical name within each bucket: the same item can be listed in
   // more than one storage field (Socialite's Contact lands in both startingSkills
   // and purchasedPerks). Keep the FIRST occurrence, preferring a class grant over a
@@ -485,7 +485,9 @@ export function classifyOwnedItems(character) {
     const out = [];
     // Class-granted first so the free copy wins.
     for (const r of [...rows].sort((a, b) => (a.source === 'class' ? 0 : 1) - (b.source === 'class' ? 0 : 1))) {
-      const key = bareSkill(cleanItemName(r.name)).toLowerCase();
+      const key = r.refundedBP
+        ? `${bareSkill(cleanItemName(r.name)).toLowerCase()}:refund:${r.grantedBy || ''}`
+        : bareSkill(cleanItemName(r.name)).toLowerCase();
       if (seen.has(key)) { if (r.index >= 0) flag(r.field, r.index); continue; }
       seen.set(key, true);
       out.push(r);
@@ -494,6 +496,7 @@ export function classifyOwnedItems(character) {
   };
   return {
     skills: dedupe(skills), perks: dedupe(perks), classPowers: dedupe(classPowers),
+    innatePowers: dedupe(innatePowers),
     misfiled,
   };
 }
@@ -567,6 +570,14 @@ export function characterLevel(character) {
   return classes.reduce((sum, c) => sum + (c.level || 0), 0);
 }
 
+export { EVENTS_TABLE };
+
+export function getLegalMinLevel(character) {
+  const evtNum = character?.currentEvent || 1;
+  const evt = EVENTS_TABLE.find(e => e.event === evtNum);
+  return evt ? evt.level : 4;
+}
+
 // The lowest level the level table documents — the legal campaign floor (4).
 export const LEGAL_MIN_LEVEL = LEVEL_TABLE.length
   ? Math.min(...LEVEL_TABLE.map((l) => l.level)) : 4;
@@ -578,11 +589,11 @@ export const LEVEL_CAP = 10;
 // Base Build Points from the level table (9 at level 4). Below the table's floor
 // the rule is "2 BP per level", so we extrapolate down (L3=7, L2=5, L1=3) rather
 // than report 0 — even though such a character is flagged below-floor / invalid.
-export function budgetFor(level) {
+export function budgetFor(level, legalMinLevel = 4) {
   const row = LEVEL_TABLE.find((l) => l.level === level);
   if (row) return row.bp;
-  const floor = LEVEL_TABLE.find((l) => l.level === LEGAL_MIN_LEVEL);
-  if (floor && level < LEGAL_MIN_LEVEL) return Math.max(0, floor.bp - 2 * (LEGAL_MIN_LEVEL - level));
+  const floor = LEVEL_TABLE.find((l) => l.level === legalMinLevel);
+  if (floor && level < legalMinLevel) return Math.max(0, floor.bp - 2 * (legalMinLevel - level));
   return 0;
 }
 
@@ -605,9 +616,43 @@ export function bonusBudgetFor(level) {
 //   discount without amount  → entity cost (the discount amount is unknown; the
 //                              author's effectiveBP, if any, already reflects it)
 // Returns { cost, base, grant } so the UI can show "was N, now M (from X)".
+const ROMAN_MAP = {
+  i: 1, ii: 2, iii: 3, iv: 4, v: 5, vi: 6, vii: 7, viii: 8, ix: 9, x: 10,
+  xi: 11, xii: 12, xiii: 13, xiv: 14, xv: 15
+};
+function parseTrailingRank(name) {
+  if (!name) return 1;
+  const clean = String(name).trim();
+  const digitMatch = clean.match(/\s+(\d+)$/);
+  if (digitMatch) return parseInt(digitMatch[1], 10);
+  const romanMatch = clean.match(/\s+([IVXLCDM]+)$/i);
+  if (romanMatch) {
+    const val = ROMAN_MAP[romanMatch[1].toLowerCase()];
+    if (val) return val;
+  }
+  return 1;
+}
+
 // Rank (purchase count) of an item, default 1. "Foo x2" → 2.
 function rankOf(character, field, idx) {
-  return character.ranks?.[field]?.[idx] || 1;
+  const item = character[field]?.[idx];
+  if (!item) return 1;
+  const baseRank = character.ranks?.[field]?.[idx] || 1;
+  if (baseRank > 1) return baseRank;
+
+  const parsed = parseTrailingRank(item);
+  if (parsed > 1) {
+    const ent = lookupEntity(resolveId(item, field, character))
+      || lookupEntity(`${entityType(field)}:${bareSkill(cleanItemName(item))}`);
+    if (ent && ent.name) {
+      const canonicalParsed = parseTrailingRank(ent.name);
+      if (canonicalParsed === parsed) {
+        return 1;
+      }
+    }
+    return parsed;
+  }
+  return 1;
 }
 
 // Index the character's granted abilities by target entity id → granting source
@@ -646,7 +691,7 @@ function effectiveCost(item, field, character, idx, granted) {
   // pre-bake a discount are no longer special-cased — unlimited-ranks skills are
   // expanded into per-instance rows whose costs derive cleanly, so derived and
   // authored agree without a guard.)
-  if (typeof authored === 'number') return { cost: authored, base, grant, rank };
+  if (typeof authored === 'number') return { cost: authored, base, grant, rank, authored: true };
 
   // Tiered perks (Draconic Heritage) have NON-uniform per-tier costs — rank N is
   // the cumulative sum of the first N tiers, not base×N.
@@ -687,6 +732,14 @@ export function discountSources(character) {
   }
   for (const name of (character?.purchasedPerks || [])) {
     const id = `perks:${cleanItemName(name)}`;
+    if (D[id]) out.push({ id, name: cleanItemName(name), ...D[id] });
+  }
+  for (const name of (character?.purchasedSkills || [])) {
+    const id = `skills:${cleanItemName(name)}`;
+    if (D[id]) out.push({ id, name: cleanItemName(name), ...D[id] });
+  }
+  for (const name of (character?.startingSkills || [])) {
+    const id = `skills:${cleanItemName(name)}`;
     if (D[id]) out.push({ id, name: cleanItemName(name), ...D[id] });
   }
   return out;
@@ -745,6 +798,7 @@ function applyDiscounts(character, byItem) {
   let freeBP = 0;
   const applied = [];
   for (const [key, eff] of Object.entries(byItem)) {
+    if (eff.authored) continue;
     const sep = key.indexOf(':');
     const field = key.slice(0, sep);
     const item = key.slice(sep + 1);
@@ -800,12 +854,10 @@ export function computeSpend(character) {
       spent += eff.cost;
     });
   }
-  // BP-bought powers. Class Powers (classSkills tier) are ALWAYS purchased, so
-  // derive their cost from the entity even without an authored effectiveBP. Domain/
-  // form powers may be slot-filled, so for those count only the author-marked ones.
+  // BP-bought powers. Class Powers, Domain Powers, and Form Powers are always
+  // evaluated for cost via effectiveCost.
   for (const field of BP_POWER_FIELDS) {
     (character[field] || []).forEach((item, idx) => {
-      if (field !== 'classPowers' && character.effectiveBP?.[field]?.[idx] == null) return;
       const eff = effectiveCost(item, field, character, idx, granted);
       byItem[`${field}:${item}`] = eff;
       spent += eff.cost;
@@ -1019,19 +1071,7 @@ export function spellSlots(character) {
   const casters = getClasses(character).filter((c) => SPELLCASTERS.has(c.name));
   if (!casters.length) return null; // not a caster
 
-  // Prefer explicit archetype counts when present (single-class starter sheets).
-  const fromArchetype = {
-    novice: character.noviceSpellSlots,
-    adept: character.adeptSpellSlots,
-    greater: character.greaterSpellSlots,
-  };
-  if (casters.length === 1
-      && [fromArchetype.novice, fromArchetype.adept, fromArchetype.greater].some((v) => v != null)) {
-    const num = (v) => (v == null ? 0 : parseInt(v, 10) || 0);
-    return { novice: num(fromArchetype.novice), adept: num(fromArchetype.adept), greater: num(fromArchetype.greater) };
-  }
-
-  // Otherwise sum each caster class's progression "N/N/N" slots at its own level.
+  // Sum each caster class's progression "N/N/N" slots at its own level.
   const total = { novice: 0, adept: 0, greater: 0 };
   for (const { name, level } of casters) {
     const str = progressionRow(name, level)?.slots;
@@ -1040,6 +1080,22 @@ export function spellSlots(character) {
       total.novice += n; total.adept += a; total.greater += g;
     }
   }
+
+  // Scan starting and purchased skills for permanent spell slot grants.
+  for (const field of ['startingSkills', 'purchasedSkills']) {
+    (character[field] || []).forEach((item, idx) => {
+      const ent = lookupEntity(resolveId(item, field, character))
+        || lookupEntity(`skills:${cleanItemName(item)}`);
+      const rank = rankOf(character, field, idx);
+      if (ent?.description) {
+        const m = ent.description.match(/\badditional\s+(Novice|Adept|Greater)\s+spell-?slot/i);
+        if (m) {
+          total[m[1].toLowerCase()] += rank;
+        }
+      }
+    });
+  }
+
   return total;
 }
 
@@ -1320,6 +1376,7 @@ export function checkPrereqs(character) {
 // base+bonus is a hard overage.
 export function validate(character) {
   const level = characterLevel(character);
+  const legalMinLevel = getLegalMinLevel(character);
   // Base budget plus DERIVED "free BP" (redundant multiclass grants award free BP
   // equal to the skill's cost). Derived from the classes, not a cached field, so
   // it's correct for any character (built, imported, or hand-edited).
@@ -1329,7 +1386,8 @@ export function validate(character) {
   // (plot-team approval), so it's a flag on the character that lifts the base
   // budget by a fixed +2 rather than free spend.
   const backstoryBP = character.backstoryApproved ? BACKSTORY_BP : 0;
-  const budget = budgetFor(level) + freeBP + backstoryBP;
+  const extraMaxBP = character.extraMaxBP || 0;
+  const budget = budgetFor(level, legalMinLevel) + freeBP + backstoryBP + extraMaxBP;
   const bonusBudget = bonusBudgetFor(level);
   const maxBudget = budget + bonusBudget;
   const spend = computeSpend(character);
@@ -1353,9 +1411,9 @@ export function validate(character) {
   // if it's within base+bonus. (The rules say "Spend your BP, or save it for
   // later" — under-spend is fine; over-spend past the cap is not.)
   const overBudget = spend.net > budget;
-  // Characters below the campaign's documented floor (level 4) are buildable but
+  // Characters below the campaign's documented floor are buildable but
   // not legal play — flagged so the UI can mark them invalid with a reason.
-  const belowFloor = level < LEGAL_MIN_LEVEL;
+  const belowFloor = level < legalMinLevel;
   // Total level above the current play cap (10). Not enforced — just flagged —
   // since the only path past 10 is Advanced Classes, which aren't published yet.
   const aboveCap = level > LEVEL_CAP;
@@ -1391,7 +1449,7 @@ export function validate(character) {
     belowFloor,
     aboveCap,
     beyondProgression,
-    legalMinLevel: LEGAL_MIN_LEVEL,
+    legalMinLevel,
     levelCap: LEVEL_CAP,
     valid: !prereqs.issues.length && !overBudget && !slotsOver && !belowFloor
       && (!lbp || lbp.valid),

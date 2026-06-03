@@ -9,13 +9,14 @@
 // which doubles as the entity inspector so you can follow a power's links
 // (prereqs / unlocks / mentions) while deciding.
 
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import {
   ARCHETYPES, REFS, lookupEntity, LEVEL_TABLE,
   eligiblePowers, ALL_SKILLS, ALL_PERKS, ALL_FLAWS,
   CLASS_POWER_SLOTS, CLASSES, DEVOTIONS, DOMAINS, LINEAGES, META,
+  CLASS_POWERS,
 } from "./data/index.js";
-import { validate, characterLevel, prereqStatus, pickClass, getClasses, MAX_DOMAINS, subKey } from "./data/validate.js";
+import { validate, characterLevel, prereqStatus, pickClass, getClasses, MAX_DOMAINS, subKey, EVENTS_TABLE } from "./data/validate.js";
 import { formatCharacterSheet, parseCharacterSheet } from "./data/sheet.js";
 import "./Builder.css";
 
@@ -25,6 +26,84 @@ import "./Builder.css";
 
 // Default starting Wealth (MegaDoc: "all characters start with 8 Wealth").
 const DEFAULT_WEALTH = 8;
+
+const BASE_STARTING_SKILLS = {
+  Artisan: ["Basic Martial Weapons", "Short Weapons", "Basic Armor"],
+  Cleric: ["Basic Faith", "Worship", "Basic Martial Weapons", "Basic Armor"],
+  Druid: ["Basic Martial Weapons", "Profession - Apprentice (your choice)", "Basic Faith"],
+  Fighter: ["Basic Martial Weapons", "Basic Shields", "Basic Armor", "Light Armor"],
+  Mage: ["Basic Arcane", "Library Use", "Bookcaster", "Bookcaster"],
+  Rogue: ["Basic Martial Weapons", "Thrown Weapons", "Basic Armor", "Light Armor"],
+  Socialite: ["Basic Martial Weapons", "Library Use", "Poisoner", "Basic Armor"],
+  Sourcerer: ["Basic Arcane", "Warcaster"]
+};
+const PARAMETER_SUGGESTIONS = {
+  "Lore": ["Historical", "Nature", "Noble", "Religious", "Ritual", "Shadow", "Arcane"],
+  "Worship": ["The Mother", "The Steed", "Senri, Voice of Mercy", "Dorne, Bringer of Law", "Filian, Keeper of the Hearth", "Mille, Muse of Creation", "The Song in Iron", "Dave", "The Great Mind", "Druidism", "The Howl at the End", "The Divine Bloom", "The Witch of Webs", "The Pale Star", "Devourer", "The Librarian", "Wildfire", "The Dancer"],
+  "Patron": ["The Mother", "The Steed", "Senri, Voice of Mercy", "Dorne, Bringer of Law", "Filian, Keeper of the Hearth", "Mille, Muse of Creation", "The Song in Iron", "Dave", "The Great Mind", "Druidism", "The Howl at the End", "The Divine Bloom", "The Witch of Webs", "The Pale Star", "Devourer", "The Librarian", "Wildfire", "The Dancer"],
+  "Profession - Apprentice": ["Smith", "Carpenter", "Tailor", "Mason", "Hunter", "Scribe", "Herbalist", "Undertaker", "Merchant", "Charlatan", "Chirurgeon", "Teacher", "Soldier", "Sailor", "Wagoneer"],
+  "Profession - Journeyman": ["Smith", "Carpenter", "Tailor", "Mason", "Hunter", "Scribe", "Herbalist", "Undertaker", "Merchant", "Charlatan", "Chirurgeon", "Teacher", "Soldier", "Sailor", "Wagoneer"],
+  "Profession - Master": ["Smith", "Carpenter", "Tailor", "Mason", "Hunter", "Scribe", "Herbalist", "Undertaker", "Merchant", "Charlatan", "Chirurgeon", "Teacher", "Soldier", "Sailor", "Wagoneer"],
+  "Chronic Hobbyist": ["Cooking", "Brewing", "Gardening", "Smith", "Carpenter", "Tailor", "Mason", "Hunter", "Scribe", "Herbalist", "Undertaker", "Merchant", "Charlatan", "Chirurgeon", "Teacher", "Soldier", "Sailor", "Wagoneer"],
+  "Bookcaster": ["Magekey", "Mask Aura", "Identify", "Cancel", "Stop", "Mageskin"],
+  "Favored Form": ["Hunting Panther", "Hulking Bear", "Striking Serpent"]
+};
+
+function formatParameterizedName(baseName, parameter, originalName) {
+  if (!parameter) return baseName;
+  if (originalName) {
+    if (originalName.includes(" - ")) {
+      return `${baseName} - ${parameter}`;
+    }
+    if (originalName.includes("(")) {
+      return `${baseName} (${parameter})`;
+    }
+  }
+  return `${baseName} (${parameter})`;
+}
+
+function applyClassStartingAbilities(character, className, level = 1) {
+  const isPrimary = character.classes?.[0]?.name === className;
+  const skillsToAdd = isPrimary ? (BASE_STARTING_SKILLS[className] || []) : [];
+  const nextStarting = [...(character.startingSkills || [])];
+  for (const s of skillsToAdd) {
+    if (!nextStarting.includes(s)) nextStarting.push(s);
+  }
+
+  // Gather active innate powers from ALL classes on the character
+  const activeInnateNames = new Set();
+  for (const c of character.classes || []) {
+    const innate = CLASS_POWERS[c.name]?.innate || [];
+    for (const p of innate) {
+      const reqMatch = String(p.requirement || p.tier || '').match(/\b(?:L|level)\s*(\d+)\b/i)
+        || String(p.prereq || p.prerequisites || '').match(/\b(?:L|level)\s*(\d+)\b/i);
+      const reqLvl = reqMatch ? parseInt(reqMatch[1], 10) : 1;
+      const effectiveLvl = c.name === className ? level : c.level;
+      if (effectiveLvl >= reqLvl) {
+        activeInnateNames.add(p.name);
+      }
+    }
+  }
+
+  const allClassInnateNames = new Set(
+    (character.classes || []).flatMap(c => (CLASS_POWERS[c.name]?.innate || []).map(p => p.name))
+  );
+
+  // Keep user-added innate powers (which are not class-innate)
+  // and add all active class-innate powers.
+  const nextInnate = (character.innatePowers || []).filter(name => !allClassInnateNames.has(name));
+  for (const name of activeInnateNames) {
+    if (!nextInnate.includes(name)) {
+      nextInnate.push(name);
+    }
+  }
+
+  return {
+    ...character,
+    startingSkills: nextStarting,
+    innatePowers: nextInnate,
+  };
+}
 
 const EMPTY_CHARACTER = {
   name: "",
@@ -195,7 +274,7 @@ function Tag({ label, tone = "amber" }) {
 function IdentityRail({ character, report, onClickField, onRestart,
                        onSetClassLevel, onRemoveClass, onAddClass,
                        onPickDevotion, onToggleDomain, onClearDevotion, onOpenLineage,
-                       onToggleBackstory, onInspect }) {
+                       onToggleBackstory, onInspect, onSetEvent, onSetExtraBP }) {
   const classes = getClasses(character);
   return (
     <aside className="b-rail b-rail-left">
@@ -205,6 +284,25 @@ function IdentityRail({ character, report, onClickField, onRestart,
           <p className="b-rail-sub">Based on <em>{character.archetypeName}</em></p>
         )}
       </header>
+
+      {/* Event Selector card */}
+      <div className="b-id-card is-set">
+        <span className="b-id-icon">📅</span>
+        <span className="b-id-body">
+          <span className="b-id-label">Active Campaign Event</span>
+          <select
+            className="b-event-select"
+            value={character.currentEvent || 1}
+            onChange={(e) => onSetEvent && onSetEvent(parseInt(e.target.value, 10))}
+          >
+            {EVENTS_TABLE.map((evt) => (
+              <option key={evt.event} value={evt.event}>
+                Event {evt.event} (Level Floor {evt.level})
+              </option>
+            ))}
+          </select>
+        </span>
+      </div>
 
       <ClassCard classes={classes} spec={character.specialization}
                  onSetLevel={onSetClassLevel} onRemove={onRemoveClass} onAdd={onAddClass}
@@ -289,7 +387,7 @@ function IdentityRail({ character, report, onClickField, onRestart,
 
       {report.spellSlots && <SpellSlotStrip slots={report.spellSlots} />}
 
-      {character.archetypeName && <BudgetMeter report={report} character={character} onToggleBackstory={onToggleBackstory} />}
+      <BudgetMeter report={report} character={character} onToggleBackstory={onToggleBackstory} onSetExtraBP={onSetExtraBP} />
 
       <button className="b-restart" onClick={onRestart}>
         <span className="b-restart-icon">↺</span> Start over
@@ -460,9 +558,18 @@ function SpellSlotStrip({ slots }) {
 }
 
 // Live BP meter: a bar that fills with spend and turns red when over budget.
-function BudgetMeter({ report, character, onToggleBackstory }) {
+function BudgetMeter({ report, character, onToggleBackstory, onSetExtraBP }) {
   const { spend, budget, remaining, overBudget } = report;
   const pct = budget ? Math.min(100, (spend.net / budget) * 100) : 0;
+
+  const refundsByClass = {};
+  if (report.multiclassGrants?.freeBPItems) {
+    for (const item of report.multiclassGrants.freeBPItems) {
+      const clsName = item.source;
+      refundsByClass[clsName] = (refundsByClass[clsName] || 0) + item.bp;
+    }
+  }
+
   return (
     <div className={`b-budget ${overBudget ? "is-over" : ""}`}>
       <div className="b-budget-head">
@@ -470,8 +577,11 @@ function BudgetMeter({ report, character, onToggleBackstory }) {
         <span className="b-budget-nums">
           <strong>{spend.net}</strong> / {budget}
           {spend.awarded > 0 && <span className="b-budget-flaws"> (+{spend.awarded} from flaws{spend.flawCapped ? ", capped at 5" : ""})</span>}
-          {report.freeBP > 0 && <span className="b-budget-flaws"> (incl. +{report.freeBP} free BP)</span>}
-          {report.backstoryBP > 0 && <span className="b-budget-flaws"> (incl. +{report.backstoryBP} backstory)</span>}
+          {Object.entries(refundsByClass).map(([clsName, amount]) => (
+            amount > 0 && <span key={clsName} className="b-budget-flaws"> +{amount} {clsName}</span>
+          ))}
+          {report.backstoryBP > 0 && <span className="b-budget-flaws"> +{report.backstoryBP} backstory</span>}
+          {character.extraMaxBP > 0 && <span className="b-budget-flaws"> +{character.extraMaxBP} extra</span>}
         </span>
       </div>
       <div className="b-budget-bar"><div className="b-budget-fill" style={{ width: `${pct}%` }} /></div>
@@ -480,12 +590,27 @@ function BudgetMeter({ report, character, onToggleBackstory }) {
           ? `${-remaining} BP over budget`
           : `${remaining} BP remaining`}
       </p>
-      {onToggleBackstory && (
-        <label className="b-budget-backstory" title="Approved backstories grant +2 BP (submit to the plot team).">
-          <input type="checkbox" checked={!!character?.backstoryApproved} onChange={onToggleBackstory} />
-          <span>Approved backstory <span className="b-budget-flaws">+2 BP</span></span>
-        </label>
-      )}
+      <div className="b-budget-extra-row">
+        {onToggleBackstory && (
+          <label className="b-budget-backstory" title="Approved backstories grant +2 BP (submit to the plot team).">
+            <input type="checkbox" checked={!!character?.backstoryApproved} onChange={onToggleBackstory} />
+            <span>Approved backstory <span className="b-budget-flaws">+2 BP</span></span>
+          </label>
+        )}
+        {onSetExtraBP && (
+          <div className="b-budget-extra-control" title="Add extra Build Points (e.g. from service points, NPC shifts, or donations).">
+            <span>Extra BP:</span>
+            <input
+              type="number"
+              className="b-extra-bp-input"
+              value={character.extraMaxBP || 0}
+              min="0"
+              max="100"
+              onChange={(e) => onSetExtraBP(Math.max(0, parseInt(e.target.value, 10) || 0))}
+            />
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -575,7 +700,7 @@ function BuildSheet({ character, report, view, onPickArchetype, onStartBlank, on
   // Contact) shows under Perks, and a class power filed under purchasedSkills shows
   // under Class Powers (and isn't buyable twice). Provenance drives the badge:
   // class-granted items are free + non-removable; purchased ones cost BP.
-  const owned = report.owned || { skills: [], perks: [], classPowers: [] };
+  const owned = report.owned || { skills: [], perks: [], classPowers: [], innatePowers: [] };
 
   return (
     <main className="b-sheet">
@@ -631,6 +756,13 @@ function BuildSheet({ character, report, view, onPickArchetype, onStartBlank, on
         </Section>
       )}
 
+      {/* Innate Powers — free class features granted automatically by class levels. */}
+      {owned.innatePowers && owned.innatePowers.length > 0 && (
+        <Section title="Innate Powers" tone="purple">
+          <ClassifiedRows rows={owned.innatePowers} resolveType="powers" report={report}
+            onClick={onInspect} isFocused={isFocused} onRemove={onRemoveEntity} showClass />
+        </Section>
+      )}
       {report.slots.length > 0 && (
         <Section title="Powers" tone="purple">
           {report.slots.map((slot) => (
@@ -795,28 +927,35 @@ function ClassifiedRows({ rows, resolveType, report, onClick, isFocused, onRemov
   return (
     <ul className="b-rows">
       {rows.map((row) => {
-        const { name, field, index, source, grantedBy, cls } = row;
+        const { name, field, index, source, grantedBy, cls, refundedBP } = row;
         const cost = report?.spend.byItem[`${field}:${name}`];
         const fromClass = source === "class";
         const canRemove = !fromClass && index >= 0;
         const rank = cost?.rank || 1;
         return (
-          <li key={`${field}-${index}-${name}`} className={`b-row ${isFocused(name, field) ? "is-focused" : ""}`}>
+          <li key={`${field}-${index}-${name}-${grantedBy || cls || ''}`} className={`b-row ${isFocused(name, field) ? "is-focused" : ""}`}>
             <button className="b-row-name" onClick={() => onClick(name, field, resolveType)}>
               {name}{rank > 1 && <span className="b-row-rank">×{rank}</span>}
             </button>
-            {showClass && cls && <span className="b-row-badge b-badge-class">{cls}</span>}
+            {showClass && cls && !fromClass && <span className="b-row-badge b-badge-class">{cls.toUpperCase()}</span>}
             {fromClass
               ? (() => {
-                  // Name the granting class when known (#16): a multiclass grant
-                  // names that class; a primary-class grant names the primary.
                   const src = grantedBy || cls;
                   return (
-                    <span className="b-row-badge b-badge-granted"
-                          title={grantedBy ? `Granted free by your ${grantedBy} multi-class`
-                            : src ? `Granted free by your ${src} class` : "Granted free by your class"}>
-                      {src ? `from ${src}` : "from class"}
-                    </span>
+                    <>
+                      {src && (
+                        <span className="b-row-badge b-badge-granted"
+                              title={grantedBy ? `Granted free by your ${grantedBy} multi-class`
+                                : `Granted free by your ${src} class`}>
+                          {src.toUpperCase()}
+                        </span>
+                      )}
+                      {refundedBP ? (
+                        <span className="b-row-badge b-badge-refund" title="Redundant grant refunded as free BP">
+                          +{refundedBP} BP
+                        </span>
+                      ) : null}
+                    </>
                   );
                 })()
               : <CostBadge cost={cost} />}
@@ -915,7 +1054,7 @@ function ArchetypePicker({ onPick, onStartBlank }) {
 // followable links. PICK lists the eligible powers for a slot, each inspectable
 // (with links) and choosable. Both modes share the entity-card renderer.
 
-function DetailPane({ view, report, choices, onSetChoice, onInspect, onBack, onClose }) {
+function DetailPane({ view, report, choices, onSetChoice, onUpdateParameter, onInspect, onBack, onClose }) {
   if (!view) {
     return (
       <aside className="b-rail b-rail-right">
@@ -925,7 +1064,7 @@ function DetailPane({ view, report, choices, onSetChoice, onInspect, onBack, onC
       </aside>
     );
   }
-  return <EntityDetail view={view} report={report} choices={choices} onSetChoice={onSetChoice} onInspect={onInspect} onBack={onBack} onClose={onClose} />;
+  return <EntityDetail view={view} report={report} choices={choices} onSetChoice={onSetChoice} onUpdateParameter={onUpdateParameter} onInspect={onInspect} onBack={onBack} onClose={onClose} />;
 }
 
 // ─── PICKER OVERLAY ───────────────────────────────────────────────────────────
@@ -1204,8 +1343,8 @@ function PickerOverlay({ spec, character, onClose }) {
 }
 
 // INSPECT mode: one entity, its facts, and followable links.
-function EntityDetail({ view, report, choices, onSetChoice, onInspect, onBack, onClose }) {
-  const entity = useResolvedEntity(view.item, view.field, view.resolveType, view.archetypeName);
+function EntityDetail({ view, report, choices, onSetChoice, onUpdateParameter, onInspect, onBack, onClose }) {
+  const entity = useResolvedEntity(view.item, view.field, view.resolveType);
   const { item, resolveType } = view;
 
   return (
@@ -1221,7 +1360,7 @@ function EntityDetail({ view, report, choices, onSetChoice, onInspect, onBack, o
         <p className="b-detail-type">{entity?.type || resolveType}</p>
       </header>
       <div className="b-detail-body">
-        <EntityBody entity={entity} report={report} choices={choices} onSetChoice={onSetChoice} onInspect={onInspect} />
+        <EntityBody entity={entity} view={view} report={report} choices={choices} onSetChoice={onSetChoice} onUpdateParameter={onUpdateParameter} onInspect={onInspect} />
       </div>
     </aside>
   );
@@ -1322,7 +1461,86 @@ function DescriptionBlock({ text, terms = [], onInspect }) {
 // The shared reading body for an entity — description, facts, forward + back
 // links. Used by both the rail inspector and the picker's reading pane so the
 // content (and link-following) is identical everywhere.
-function EntityBody({ entity, report, choices, onSetChoice, onInspect }) {
+function ParameterEditor({ baseName, entity, view, onUpdateParameter }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [filter, setFilter] = useState(entity.parameter || "");
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    setFilter(entity.parameter || "");
+  }, [entity.parameter]);
+
+  useEffect(() => {
+    const handleOutsideClick = (e) => {
+      if (containerRef.current && !containerRef.current.contains(e.target)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleOutsideClick);
+    return () => document.removeEventListener("mousedown", handleOutsideClick);
+  }, []);
+
+  const suggestions = PARAMETER_SUGGESTIONS[baseName] || [];
+  const isSearching = isOpen && filter !== entity.parameter;
+  const filtered = isSearching
+    ? suggestions.filter(opt => opt.toLowerCase().includes(filter.toLowerCase()))
+    : suggestions;
+
+  return (
+    <div className="b-detail-section b-parameter-editor" ref={containerRef}>
+      <h3 className="b-detail-section-title">
+        {baseName === "Lore" ? "Customize Area" : "Customize Choice"}
+      </h3>
+      <div className="b-combobox">
+        <div className="b-combobox-input-wrapper">
+          <input
+            type="text"
+            className="b-parameter-input"
+            placeholder={baseName === "Lore" ? "Enter area..." : "Enter choice..."}
+            value={filter}
+            onFocus={() => setIsOpen(true)}
+            onChange={(e) => {
+              const val = e.target.value;
+              setFilter(val);
+              const newName = formatParameterizedName(baseName, val, entity.name);
+              onUpdateParameter(view.field, entity.name, newName);
+            }}
+          />
+          <button
+            type="button"
+            className="b-combobox-toggle"
+            aria-label="Toggle suggestions"
+            onClick={() => setIsOpen(!isOpen)}
+          >
+            {isOpen ? "▲" : "▼"}
+          </button>
+        </div>
+        {isOpen && filtered.length > 0 && (
+          <ul className="b-combobox-list">
+            {filtered.map((opt) => (
+              <li key={opt}>
+                <button
+                  type="button"
+                  className="b-combobox-option"
+                  onClick={() => {
+                    setFilter(opt);
+                    const newName = formatParameterizedName(baseName, opt, entity.name);
+                    onUpdateParameter(view.field, entity.name, newName);
+                    setIsOpen(false);
+                  }}
+                >
+                  {opt}
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function EntityBody({ entity, view, report, choices, onSetChoice, onUpdateParameter, onInspect }) {
   if (!entity) {
     return <p className="b-detail-missing">No detail available — this item may be unresolved.</p>;
   }
@@ -1337,6 +1555,8 @@ function EntityBody({ entity, report, choices, onSetChoice, onInspect }) {
     : null;
   // Referenced concepts to linkify inside the description (#13).
   const terms = conceptTerms(entity);
+  const baseName = entity.baseName || entity.name;
+  const isParamEditable = !!(onUpdateParameter && view?.field && view.field !== "multiclassGrant" && PARAMETER_SUGGESTIONS[baseName]);
   return (
     <>
       {entity.description
@@ -1344,7 +1564,15 @@ function EntityBody({ entity, report, choices, onSetChoice, onInspect }) {
         : domainPowers
           ? <p className="b-detail-desc">A divine domain{entity.accent ? ` (${entity.accent} accent)` : ""} granting {domainPowers.length} power{domainPowers.length === 1 ? "" : "s"}.</p>
           : <p className="b-detail-missing">No description on record.</p>}
-      <DetailFacts entity={entity} />
+      <DetailFacts entity={entity} isEditable={isParamEditable} />
+      {isParamEditable && (
+        <ParameterEditor
+          baseName={baseName}
+          entity={entity}
+          view={view}
+          onUpdateParameter={onUpdateParameter}
+        />
+      )}
       {activeBenefits && (
         <div className="b-detail-section">
           <h3 className="b-detail-section-title">Benefits by {entity.levelBenefitClass || "class"} level</h3>
@@ -1399,12 +1627,12 @@ function EntityBody({ entity, report, choices, onSetChoice, onInspect }) {
 }
 
 // The labeled fact rows (cost / prereq / tier / call / effect), shown compactly.
-function DetailFacts({ entity }) {
+function DetailFacts({ entity, isEditable }) {
   if (!entity) return null;
   const facts = [];
   // Parameterized skills (Lore (Historical), Profession (Smith)) resolve to the
   // base skill; surface the chosen area so the reader sees what was picked.
-  if (entity.parameter) facts.push([entity.baseName === "Lore" ? "Area" : "Choice", entity.parameter]);
+  if (entity.parameter && !isEditable) facts.push([entity.baseName === "Lore" ? "Area" : "Choice", entity.parameter]);
   if (typeof entity.cost === "number") facts.push(["Cost", `${entity.cost} BP`]);
   else if (entity.cost && /^var/i.test(String(entity.cost))) facts.push(["Cost", "Variable"]);
   if (entity.prereq && entity.prereq !== "None") facts.push(["Prereq", entity.prereq]);
@@ -1503,24 +1731,23 @@ function BackLinks({ entity, onInspect }) {
   );
 }
 
-// Resolve the entity an item refers to, preferring the archetype's ref ids
-// (index-aligned with the source list) and falling back to a name lookup.
-function useResolvedEntity(item, field, resolveType, archetypeName) {
+// Resolve the entity an item refers to, using name-based lookup.
+function useResolvedEntity(item, field, resolveType) {
   return useMemo(() => {
     if (!item) return null;
-    if (archetypeName && field) {
-      const ids = REFS.archetypeRefs[`archetypes:${archetypeName}`]?.[field];
-      const archetype = ARCHETYPES.find((a) => a.name === archetypeName);
-      const src = archetype?.[field];
-      if (ids && src) {
-        const idx = src.indexOf(item);
-        if (idx >= 0 && ids[idx]) return lookupEntity(ids[idx]);
-      }
+    let type = resolveType;
+    if (!type && field) {
+      if (field === 'flaws') type = 'flaws';
+      else if (field.endsWith('Skills')) type = 'skills';
+      else if (field.endsWith('Perks')) type = 'perks';
+      else type = 'powers';
     }
-    // Fallback: type-prefixed lookup. resolveType may be a concrete type
-    // ("powers") or a field-ish hint; try it directly.
-    return resolveType ? lookupEntity(`${resolveType}:${item}`) : null;
-  }, [item, field, resolveType, archetypeName]);
+    const resolved = type ? lookupEntity(`${type}:${item}`) : null;
+    if (resolved) {
+      return { ...resolved, name: item };
+    }
+    return null;
+  }, [item, field, resolveType]);
 }
 
 // ─── LINEAGE PANEL ────────────────────────────────────────────────────────────
@@ -1725,14 +1952,26 @@ function ExportImportPanel({ character, report, onImport, onClose }) {
     navigator.clipboard?.writeText(exported);
     setCopied(true); setTimeout(() => setCopied(false), 1500);
   };
-  const download = () => {
-    const blob = new Blob([exported], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
+  const [xlsxError, setXlsxError] = useState(null);
+  const safeName = (ext) => `${(character.name || character.archetypeName || "character").replace(/[^\w]+/g, "-")}.${ext}`;
+  const downloadBlob = (data, type, ext) => {
+    const url = URL.createObjectURL(new Blob([data], { type }));
     const a = document.createElement("a");
-    a.href = url;
-    a.download = `${(character.name || character.archetypeName || "character").replace(/[^\w]+/g, "-")}.txt`;
-    a.click();
+    a.href = url; a.download = safeName(ext); a.click();
     URL.revokeObjectURL(url);
+  };
+  const download = () => downloadBlob(exported, "text/plain", "txt");
+  // Export an .xlsx Basic Sheet (lazy-load the xlsx lib only when used, matching
+  // the import path). Round-trips back through the .xlsx importer.
+  const downloadXlsx = async () => {
+    try {
+      setXlsxError(null);
+      const { buildXlsxCharacter } = await import("./data/xlsx-import.js");
+      downloadBlob(buildXlsxCharacter(character, report),
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "xlsx");
+    } catch (err) {
+      setXlsxError(String(err.message || err));
+    }
   };
 
   useEffect(() => {
@@ -1756,8 +1995,10 @@ function ExportImportPanel({ character, report, onImport, onClose }) {
               <div className="b-export-actions">
                 <button className="b-topbar-btn" onClick={copy}>{copied ? "Copied!" : "Copy"}</button>
                 <button className="b-topbar-btn" onClick={download}>Download .txt</button>
+                <button className="b-topbar-btn" onClick={downloadXlsx}>Download .xlsx</button>
               </div>
             </div>
+            {xlsxError && <p className="b-export-err">Couldn’t build .xlsx: {xlsxError}</p>}
             <textarea className="b-export-text" readOnly aria-label="Exported character sheet" value={exported} />
           </div>
           {/* IMPORT */}
@@ -1842,11 +2083,23 @@ export default function Builder() {
       taken: new Set(character.devotion ? [character.devotion] : []),
       onChoose: (name) => {
         const dev = DEVOTIONS.find((d) => d.name === name);
-        setCharacter((c) => ({
-          ...c, devotion: name,
-          // Keep only domains the new devotion actually has.
-          divineDomains: (c.divineDomains || []).filter((dn) => dev?.domains.includes(dn)),
-        }));
+        setCharacter((c) => {
+          const updateWorship = (list) => {
+            return list.map(s => {
+              if (/^worship\b/i.test(s)) {
+                return formatParameterizedName("Worship", name, s);
+              }
+              return s;
+            });
+          };
+          return {
+            ...c,
+            devotion: name,
+            divineDomains: (c.divineDomains || []).filter((dn) => dev?.domains.includes(dn)),
+            startingSkills: updateWorship(c.startingSkills || []),
+            purchasedSkills: updateWorship(c.purchasedSkills || []),
+          };
+        });
         setPicking(null);
       },
     }));
@@ -1872,11 +2125,51 @@ export default function Builder() {
   }, []);
 
   const handleClearDevotion = useCallback(() => {
-    setCharacter((c) => ({ ...c, devotion: null, divineDomains: [], domainPowers: [] }));
+    setCharacter((c) => {
+      const clearWorship = (list) => {
+        return list.map(s => {
+          if (/^worship\b/i.test(s)) {
+            return "Worship";
+          }
+          return s;
+        });
+      };
+      return {
+        ...c,
+        devotion: null,
+        divineDomains: [],
+        domainPowers: [],
+        startingSkills: clearWorship(c.startingSkills || []),
+        purchasedSkills: clearWorship(c.purchasedSkills || []),
+      };
+    });
   }, []);
 
   const handleToggleBackstory = useCallback(() => {
     setCharacter((c) => ({ ...c, backstoryApproved: !c.backstoryApproved }));
+  }, []);
+
+  const handleSetEvent = useCallback((eventNum) => {
+    setCharacter((c) => {
+      const next = { ...c, currentEvent: eventNum };
+      const levelFloor = EVENTS_TABLE.find((e) => e.event === eventNum)?.level || 4;
+      const classes = getClasses(next);
+      if (classes.length === 1) {
+        // Character is single-classed, so we can cleanly level them up to the floor!
+        const primary = classes[0];
+        if (primary.level < levelFloor) {
+          const nextClasses = [{ name: primary.name, level: levelFloor }];
+          let updated = { ...next, classes: nextClasses };
+          updated = applyClassStartingAbilities(updated, primary.name, levelFloor);
+          return updated;
+        }
+      }
+      return next;
+    });
+  }, []);
+
+  const handleSetExtraBP = useCallback((bp) => {
+    setCharacter((c) => ({ ...c, extraMaxBP: bp }));
   }, []);
 
   // ─── LINEAGE ─────────────────────────────────────────────────────────────
@@ -1922,11 +2215,12 @@ export default function Builder() {
       kind: "class", entityType: "classes", candidates,
       title: "Start blank — choose your class", taken: new Set(),
       onChoose: (name) => {
-        setCharacter({
+        const char = {
           ...EMPTY_CHARACTER,
           archetypeName: "Custom Build",
           classes: [{ name, level: 1 }],
-        });
+        };
+        setCharacter(applyClassStartingAbilities(char, name, 1));
         setView(null); setHistory([]); setPicking(null);
       },
     }));
@@ -1944,6 +2238,66 @@ export default function Builder() {
       };
     });
   }, [character.archetypeName]);
+
+  const handleUpdateParameter = useCallback((field, oldName, newName) => {
+    setCharacter((c) => {
+      const list = c[field] || [];
+      const idx = list.indexOf(oldName);
+      if (idx < 0) return c;
+      const next = [...list];
+      next[idx] = newName;
+      
+      let nextChar = { ...c, [field]: next };
+
+      // Two-way sync: if we are updating a Worship skill parameter, update character devotion
+      let baseName = "";
+      let paramVal = "";
+      let paramMatch = newName.match(/^(.*?)\s*\(([^()]*)\)\s*$/);
+      if (!paramMatch) {
+        const dashIdx = newName.indexOf(' - ');
+        if (dashIdx > 0) {
+          baseName = newName.slice(0, dashIdx).trim();
+          paramVal = newName.slice(dashIdx + 3).trim();
+        } else {
+          baseName = newName.trim();
+        }
+      } else {
+        baseName = paramMatch[1].trim();
+        paramVal = paramMatch[2].trim();
+      }
+
+      if (baseName === "Worship") {
+        if (!paramVal) {
+          nextChar.devotion = null;
+          nextChar.divineDomains = [];
+          nextChar.domainPowers = [];
+        } else {
+          const dev = DEVOTIONS.find(d =>
+            d.name.toLowerCase() === paramVal.toLowerCase() ||
+            d.name.toLowerCase().startsWith(paramVal.toLowerCase()) ||
+            paramVal.toLowerCase().startsWith(d.name.toLowerCase())
+          );
+          const canonicalDevName = dev ? dev.name : paramVal;
+          nextChar.devotion = canonicalDevName;
+          if (dev) {
+            nextChar.divineDomains = (c.divineDomains || []).filter((dn) => dev.domains.includes(dn));
+            // Keep only domain powers of remaining domains
+            const remainingDomains = nextChar.divineDomains;
+            nextChar.domainPowers = (c.domainPowers || []).filter((p) => {
+              const basePower = p.replace(/\s*\(.+\)$/, "");
+              return remainingDomains.some(dn => {
+                const dom = DOMAINS.find(x => x.name === dn);
+                return dom?.powers.some(x => x.name === basePower || x.name === p);
+              });
+            });
+          }
+        }
+      }
+
+      return nextChar;
+    });
+    setView((v) => v ? { ...v, item: newName } : null);
+  }, []);
 
   // Commit a power pick, tagged with the slot's class. When flatIndex >= 0 it
   // replaces (swap); otherwise it appends. `fieldOverride` lets the spells-known
@@ -2033,7 +2387,13 @@ export default function Builder() {
       const others = c.classes.filter((x) => x.name !== className)
         .reduce((n, x) => n + x.level, 0);
       const lvl = Math.max(1, Math.min(MAX_LEVEL - others, level));
-      return { ...c, classes: c.classes.map((x) => x.name === className ? { ...x, level: lvl } : x) };
+      const nextClasses = c.classes.map((x) => x.name === className ? { ...x, level: lvl } : x);
+      let updated = { ...c, classes: nextClasses };
+      const primary = nextClasses[0];
+      if (primary) {
+        updated = applyClassStartingAbilities(updated, primary.name, primary.level);
+      }
+      return updated;
     });
   }, []);
 
@@ -2044,7 +2404,14 @@ export default function Builder() {
     setCharacter((c0) => {
       const c = toClassesForm(c0);
       if (c.classes.some((x) => x.name === className)) return c0;
-      return { ...c, classes: [...c.classes, { name: className, level: 1 }] };
+      const nextClasses = [...c.classes, { name: className, level: 1 }];
+      let updated = { ...c, classes: nextClasses };
+      const primary = nextClasses[0];
+      if (primary) {
+        updated = applyClassStartingAbilities(updated, primary.name, primary.level);
+      }
+      updated = applyClassStartingAbilities(updated, className, 1);
+      return updated;
     });
     setPicking(null);
   }, []);
@@ -2069,7 +2436,12 @@ export default function Builder() {
           next.powerClass[field] = keep.map((k) => c.powerClass[field][k.i]);
         }
       }
-      return next;
+      const primary = classes[0];
+      let updated = next;
+      if (primary) {
+        updated = applyClassStartingAbilities(updated, primary.name, primary.level);
+      }
+      return updated;
     });
   }, []);
 
@@ -2173,7 +2545,8 @@ export default function Builder() {
                       onAddClass={handleOpenClassPicker}
                       onPickDevotion={handlePickDevotion} onToggleDomain={handleToggleDomain}
                       onClearDevotion={handleClearDevotion} onOpenLineage={() => setLineageOpen(true)}
-                      onToggleBackstory={handleToggleBackstory} onInspect={handleInspect} />
+                      onToggleBackstory={handleToggleBackstory} onInspect={handleInspect}
+                      onSetEvent={handleSetEvent} onSetExtraBP={handleSetExtraBP} />
         <BuildSheet character={character} report={report} view={view}
                     onPickArchetype={handlePickArchetype} onStartBlank={handleStartBlank}
                     onInspect={handleInspect} onOpenSlot={handleOpenSlot}
@@ -2181,6 +2554,7 @@ export default function Builder() {
                     onSetName={handleSetName} onOpenLineage={() => setLineageOpen(true)} />
         <DetailPane view={view} report={report}
                     choices={character.choices} onSetChoice={handleSetChoice}
+                    onUpdateParameter={handleUpdateParameter}
                     onInspect={handleInspect}
                     onBack={history.length ? handleBack : null} onClose={handleClose} />
       </div>

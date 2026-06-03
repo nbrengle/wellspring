@@ -1224,6 +1224,31 @@ function parseLevelTable() {
 
 write('level-table.json', parseLevelTable());
 
+console.log('\nParsing events table...');
+
+function parseEventsTable() {
+  // Under "Advancement" H1 → "Level Floor" H2
+  const advH1 = findHeading('Advancement', 1);
+  const tableH = nodes.findIndex((n, i) =>
+    i > advH1 && n.type === 'heading' && n.level === 2 && n.text === 'Level Floor'
+  );
+  if (tableH === -1) return [];
+  const tableEnd = nodes.findIndex((n, i) => i > tableH && n.type === 'heading' && n.level <= 2);
+  const texts = nodes.slice(tableH + 1, tableEnd === -1 ? nodes.length : tableEnd)
+    .filter(n => n.type === 'text').map(n => n.text);
+
+  const HEADER = /^(Event Number|Level Floor|Starting BP)$/i;
+  const nums = texts.filter(v => /^\d+$/.test(v) && !HEADER.test(v)).map(Number);
+  const rows = [];
+  for (let i = 0; i + 2 < nums.length; i += 3) {
+    rows.push({ event: nums[i], level: nums[i+1], bp: nums[i+2] });
+  }
+  return rows;
+}
+
+write('events-table.json', parseEventsTable());
+
+
 // ─── CRAFTING RECIPES ─────────────────────────────────────────────────────────
 // Each recipe is an H3 "Name [Tier Discipline Recipe/Formula/Schematic]".
 // Fields are text nodes following the heading.

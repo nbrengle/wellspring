@@ -6,6 +6,15 @@
     "innate": 1, "utility": 1, "basic": 1, "advanced": 1.2, "veteran": 1.4,
     "classSkills": 1, "rightHandPowers": 1, "SubPower": 1
   },
+  "durationPenalty": {
+    "_comment": "Penalty multiplier for how long a power takes to USE. Combat is real-time, so a long setup makes an otherwise-spammable effect impractical mid-fight (e.g. Soothe is an at-will Cure but needs a multi-minute conversation). 1 = instant/no penalty, lower = slower. 'Quick N' is an IN-COMBAT timed count (N seconds), so it is only mildly penalized and scales with N (longer = worse); 'out of combat' / minute-scale setups are penalized hardest. Tune freely.",
+    "outOfCombat": 0.25,
+    "minutes": 0.35,
+    "quick100": 0.7,
+    "quick30": 0.9,
+    "quick10": 1,
+    "seconds": 0.9
+  },
   "accentRarity": {
     "_comment": "Penalty multiplier when a power's text invokes this accent — rare/gated accents (Divine needs a devotion; Arcane/Void are uncommon) make the effect less practical. 1 = common/no penalty, lower = rarer.",
     "Divine": 0.6, "Void": 0.6, "Radiant": 0.7, "Shadow": 0.7,

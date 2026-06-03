@@ -335,7 +335,6 @@
       "Revivify",
       "Devotion’s Strike"
     ],
-    "noviceSpellSlots": "5",
     "noviceSpells": [
       "Cure",
       "Heretic’s Brand",
@@ -413,7 +412,6 @@
       "Hide",
       "Festering Lash"
     ],
-    "noviceSpellSlots": "5",
     "noviceSpells": [
       "Barkskin",
       "Lesser Form of the Hulking Bear",
@@ -495,7 +493,6 @@
       "Care for the Fallen",
       "Life Tap"
     ],
-    "noviceSpellSlots": "4",
     "noviceSpells": [
       "Balm",
       "Blessing of the Oak",
@@ -673,7 +670,6 @@
       "Identify",
       "Stop"
     ],
-    "noviceSpellSlots": "6",
     "noviceSpells": [
       "Carnate",
       "Freeze",
