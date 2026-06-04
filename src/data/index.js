@@ -55,7 +55,7 @@ export const EVENTS_TABLE = eventsTableJson;
 // when re-syncing the doc.
 export const META = {
   ...metaJson,
-  appVersion: typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : metaJson.appVersion,
+  appVersion: (typeof import.meta.env !== 'undefined' && import.meta.env.VITE_APP_VERSION) || metaJson.appVersion,
 };
 
 // ─── SKILLS / PERKS / FLAWS ───────────────────────────────────────────────────
