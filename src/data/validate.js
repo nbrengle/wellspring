@@ -154,6 +154,7 @@ export function ownedGrantSources(character) {
 const POWER_SOURCE_FIELDS = [
   'innatePowers', 'utilityPowers', 'basicPowers', 'advancedPowers',
   'veteranPowers', 'classPowers', 'rightHandPowers', 'domainPowers', 'formPowers',
+  'cantrips', 'noviceSpells', 'adeptSpells', 'greaterSpells', 'bookSpells',
 ];
 
 // Named abilities the character GAINS FOR FREE from a source they own — a lineage

@@ -763,6 +763,7 @@ function BuildSheet({ character, report, view, onPickArchetype, onStartBlank, on
             onClick={onInspect} isFocused={isFocused} onRemove={onRemoveEntity} showClass />
         </Section>
       )}
+
       {report.slots.length > 0 && (
         <Section title="Powers" tone="purple">
           {report.slots.map((slot) => (
@@ -1557,6 +1558,13 @@ function EntityBody({ entity, view, report, choices, onSetChoice, onUpdateParame
   const terms = conceptTerms(entity);
   const baseName = entity.baseName || entity.name;
   const isParamEditable = !!(onUpdateParameter && view?.field && view.field !== "multiclassGrant" && PARAMETER_SUGGESTIONS[baseName]);
+  const grantedSubPowers = useMemo(() => {
+    if (!entity?.id) return [];
+    const targets = REFS.grants?.[entity.id] || [];
+    return targets
+      .map((id) => lookupEntity(id))
+      .filter((sub) => sub && sub.tier === "SubPower");
+  }, [entity]);
   return (
     <>
       {entity.description
@@ -1619,6 +1627,22 @@ function EntityBody({ entity, view, report, choices, onSetChoice, onUpdateParame
       {domainPowers && domainPowers.length > 0 && (
         <LinkList title="Domain powers" tone="purple" onInspect={onInspect}
                   ids={domainPowers.map((p) => `powers:${p.name}`)} />
+      )}
+      {grantedSubPowers.length > 0 && (
+        <div className="b-detail-subpowers">
+          {grantedSubPowers.map((sub) => {
+            const subTerms = conceptTerms(sub);
+            return (
+              <div key={sub.id} className="b-detail-section b-detail-subpower-inline">
+                <h3 className="b-detail-section-title">Granted Power: {sub.name}</h3>
+                <DetailFacts entity={sub} isEditable={false} />
+                {sub.description && (
+                  <DescriptionBlock text={sub.description} terms={subTerms} onInspect={onInspect} />
+                )}
+              </div>
+            );
+          })}
+        </div>
       )}
       <ForwardLinks entity={entity} onInspect={onInspect} />
       <BackLinks entity={entity} onInspect={onInspect} />

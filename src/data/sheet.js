@@ -105,6 +105,7 @@ export function formatCharacterSheet(character, report) {
     if (character[field]?.length) line(label, joinItems(character[field], field, report));
   }
 
+
   // ── Spell slots (casters), shown like the source's "Novice Spell-slots: N" ──
   if (report.spellSlots) {
     const { novice, adept, greater } = report.spellSlots;

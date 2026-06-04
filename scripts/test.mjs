@@ -505,6 +505,15 @@ test('directly selecting a sub-power fails validation', () => {
   ok(r.prereqs.issues.some(i => i.item === 'Holy Rest' && i.text.includes('is a sub-power')), 'Validation flags Holy Rest');
 });
 
+test('selecting parent power grants sub-powers correctly', () => {
+  const c = {
+    classLevels: 'Cleric 4',
+    noviceSpells: ['Prayer of Rest']
+  };
+  const r = validate(c);
+  ok(r.grantedAbilities.list.some(g => g.abilityName === 'Holy Rest' && g.source === 'Prayer of Rest'), 'Holy Rest is granted by Prayer of Rest');
+});
+
 
 // ─── report ───────────────────────────────────────────────────────────────────
 console.log(`\n${passed} passed, ${failures.length} failed`);
