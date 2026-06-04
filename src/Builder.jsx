@@ -41,7 +41,9 @@ const PARAMETER_SUGGESTIONS = {
   "Profession - Master": ["Smith", "Carpenter", "Tailor", "Mason", "Hunter", "Scribe", "Herbalist", "Undertaker", "Merchant", "Charlatan", "Chirurgeon", "Teacher", "Soldier", "Sailor", "Wagoneer"],
   "Chronic Hobbyist": ["Cooking", "Brewing", "Gardening", "Smith", "Carpenter", "Tailor", "Mason", "Hunter", "Scribe", "Herbalist", "Undertaker", "Merchant", "Charlatan", "Chirurgeon", "Teacher", "Soldier", "Sailor", "Wagoneer"],
   "Bookcaster": ["Magekey", "Mask Aura", "Identify", "Cancel", "Stop", "Mageskin"],
-  "Favored Form": ["Hunting Panther", "Hulking Bear", "Striking Serpent"]
+  "Favored Form": ["Hunting Panther", "Hulking Bear", "Striking Serpent"],
+  "Mild Allergy": ["Cloth", "Copper", "Gold", "Harvest", "Hide", "Ingot", "Iron", "Leather", "Materia", "Night Prize", "Other Common Allergen", "Other Uncommon Allergen", "Rare Minerals", "Scale", "Silver"],
+  "Severe Allergy": ["Cloth", "Copper", "Gold", "Harvest", "Hide", "Ingot", "Iron", "Leather", "Materia", "Night Prize", "Other Common Allergen", "Other Uncommon Allergen", "Rare Minerals", "Scale", "Silver"]
 };
 
 function formatParameterizedName(baseName, parameter, originalName) {
@@ -1759,6 +1761,15 @@ function DetailFacts({ entity, isEditable }) {
   if (entity.parameter && !isEditable) facts.push([entity.baseName === "Lore" ? "Area" : "Choice", entity.parameter]);
   if (typeof entity.cost === "number") facts.push(["Cost", `${entity.cost} BP`]);
   else if (entity.cost && /^var/i.test(String(entity.cost))) facts.push(["Cost", "Variable"]);
+  if (typeof entity.bp === "number" || typeof entity.bp === "string") {
+    let val = entity.bp;
+    if (entity.parameter && (entity.baseName === "Mild Allergy" || entity.baseName === "Severe Allergy")) {
+      const common = ["cloth", "iron", "leather", "materia", "other common allergen"];
+      const isCommon = common.includes(String(entity.parameter).toLowerCase().trim());
+      val = entity.baseName === "Mild Allergy" ? (isCommon ? 2 : 1) : (isCommon ? 3 : 2);
+    }
+    facts.push(["Award", `${val} BP`]);
+  }
   if (entity.prereq && entity.prereq !== "None") facts.push(["Prereq", entity.prereq]);
   if (entity.prerequisites && entity.prerequisites !== "None") facts.push(["Prereq", entity.prerequisites]);
   if (entity.tier) facts.push(["Tier", entity.tier]);
