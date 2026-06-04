@@ -483,18 +483,25 @@ export default function RecipeChecker({ onClose }) {
               <div className="b-recipe-scrollable-content">
                 <div className="b-recipe-search-bar">
                   <label>Select Ingredient or Component</label>
-                  <input 
-                    type="text"
+                  <select
                     className="b-parameter-input b-calc-select"
-                    placeholder="Enter resource name (e.g. Ingot, Alchemical Salts)..."
                     value={selectedReverseResource}
                     onChange={(e) => setSelectedReverseResource(e.target.value)}
-                    list="resource-datalist"
-                  />
-                  <datalist id="resource-datalist">
-                    {STANDARD_RESOURCES.map(r => <option key={r} value={r} />)}
-                    {Array.from(REVERSE_LOOKUP.keys()).map(r => <option key={r} value={r} />)}
-                  </datalist>
+                  >
+                    <optgroup label="Standard Resources">
+                      {STANDARD_RESOURCES.map(r => (
+                        <option key={r} value={r}>{r}</option>
+                      ))}
+                    </optgroup>
+                    <optgroup label="All Ingredients">
+                      {Array.from(REVERSE_LOOKUP.keys())
+                        .filter(r => !STANDARD_RESOURCES.includes(r))
+                        .sort()
+                        .map(r => (
+                          <option key={r} value={r}>{r}</option>
+                        ))}
+                    </optgroup>
+                  </select>
                 </div>
 
                 <div className="b-calc-section">
