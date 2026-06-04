@@ -901,6 +901,25 @@
 .b-badge-class {
   color: var(--b-purple); background: rgba(176,143,208,0.13); border-color: rgba(176,143,208,0.3);
 }
+/* Specialty qualifier appended to a class grant badge ("DRUID · BUDDING WISDOM") */
+.b-badge-spec { opacity: 0.75; font-weight: 400; }
+
+/* Starting-specialty pickers (the class's "choose one" blocks, made explicit) */
+.b-spec-hint {
+  margin: 0 0 0.7rem; font-size: 0.78rem; color: var(--b-muted); line-height: 1.4;
+}
+.b-spec-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.6rem; }
+.b-spec-row { display: flex; flex-direction: column; gap: 0.25rem; }
+.b-spec-label {
+  font-size: 0.62rem; letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--b-amber); font-weight: 600;
+}
+.b-spec-select {
+  font-family: inherit; font-size: 0.85rem; background: var(--b-panel-2);
+  color: var(--b-text); border: 1px solid var(--b-border); border-radius: 0.375rem;
+  padding: 0.3rem 0.45rem; width: 100%;
+}
+.b-spec-select:focus { outline: none; border-color: var(--b-amber-deep); }
 
 /* Spell-tier badges (picker rows + sheet slot rows) */
 /* Tier badges take their color from the shared --b-tier variable set by the
@@ -1167,6 +1186,46 @@
 }
 .b-extra-bp-input:focus {
   outline: none; border-color: var(--b-amber-deep);
+}
+
+/* Rank adjustment controls inside list rows */
+.b-row-rank-adjust {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: var(--b-panel-3, rgba(255,255,255,0.05));
+  border-radius: 0.25rem;
+  padding: 0.1rem 0.2rem;
+  flex: none;
+}
+.b-rank-btn {
+  background: transparent;
+  border: none;
+  color: var(--b-text);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.85rem;
+  line-height: 1;
+  padding: 0.1rem 0.35rem;
+  border-radius: 0.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.b-rank-btn:hover:not(:disabled) {
+  background: var(--b-border);
+  color: var(--b-amber);
+}
+.b-rank-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+.b-rank-val {
+  font-size: 0.8rem;
+  font-weight: 600;
+  min-width: 0.75rem;
+  text-align: center;
+  color: var(--b-amber);
 }
 
 /* Sub-powers rendered inline inside parent details */

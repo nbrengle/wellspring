@@ -14,9 +14,13 @@ import {
   ARCHETYPES, REFS, lookupEntity, LEVEL_TABLE,
   eligiblePowers, ALL_SKILLS, ALL_PERKS, ALL_FLAWS,
   CLASS_POWER_SLOTS, CLASSES, DEVOTIONS, DOMAINS, LINEAGES, META,
-  CLASS_POWERS,
+  CLASS_POWERS, UNLIMITED_SKILLS,
 } from "./data/index.js";
-import { validate, characterLevel, prereqStatus, pickClass, getClasses, MAX_DOMAINS, subKey, EVENTS_TABLE } from "./data/validate.js";
+import { validate, characterLevel, prereqStatus, pickClass, getClasses, MAX_DOMAINS, subKey, EVENTS_TABLE, getMaxRanks, bareSkill, cleanItemName } from "./data/validate.js";
+import {
+  STARTING_CHOICES_CONFIG, hasStartingChoices,
+  reconcileStartingChoices, rebuildStartingSkills,
+} from "./data/starting-choices.js";
 import { formatCharacterSheet, parseCharacterSheet } from "./data/sheet.js";
 import "./Builder.css";
 
@@ -27,16 +31,6 @@ import "./Builder.css";
 // Default starting Wealth (MegaDoc: "all characters start with 8 Wealth").
 const DEFAULT_WEALTH = 8;
 
-const BASE_STARTING_SKILLS = {
-  Artisan: ["Basic Martial Weapons", "Short Weapons", "Basic Armor"],
-  Cleric: ["Basic Faith", "Worship", "Basic Martial Weapons", "Basic Armor"],
-  Druid: ["Basic Martial Weapons", "Profession - Apprentice (your choice)", "Basic Faith"],
-  Fighter: ["Basic Martial Weapons", "Basic Shields", "Basic Armor", "Light Armor"],
-  Mage: ["Basic Arcane", "Library Use", "Bookcaster", "Bookcaster"],
-  Rogue: ["Basic Martial Weapons", "Thrown Weapons", "Basic Armor", "Light Armor"],
-  Socialite: ["Basic Martial Weapons", "Library Use", "Poisoner", "Basic Armor"],
-  Sourcerer: ["Basic Arcane", "Warcaster"]
-};
 const PARAMETER_SUGGESTIONS = {
   "Lore": ["Historical", "Nature", "Noble", "Religious", "Ritual", "Shadow", "Arcane"],
   "Worship": ["The Mother", "The Steed", "Senri, Voice of Mercy", "Dorne, Bringer of Law", "Filian, Keeper of the Hearth", "Mille, Muse of Creation", "The Song in Iron", "Dave", "The Great Mind", "Druidism", "The Howl at the End", "The Divine Bloom", "The Witch of Webs", "The Pale Star", "Devourer", "The Librarian", "Wildfire", "The Dancer"],
@@ -62,17 +56,29 @@ function formatParameterizedName(baseName, parameter, originalName) {
   return `${baseName} (${parameter})`;
 }
 
+
 function applyClassStartingAbilities(character, className, level = 1) {
-  const isPrimary = character.classes?.[0]?.name === className;
-  const skillsToAdd = isPrimary ? (BASE_STARTING_SKILLS[className] || []) : [];
-  const nextStarting = [...(character.startingSkills || [])];
-  for (const s of skillsToAdd) {
-    if (!nextStarting.includes(s)) nextStarting.push(s);
+  const isPrimary = getClasses(character)[0]?.name === className;
+
+  let nextCharacter = { ...character };
+  if (isPrimary) {
+    // Specialty choices drive the primary class's starting skills the same way for
+    // every build. If the choices sidecar is missing or stale for this class —
+    // true for fresh blank builds AND archetype-loaded characters (which ship a
+    // flat skill list with no sidecar) — infer it: reconcile against the shipped
+    // skills, falling back to the class default when nothing matches.
+    const expectedKeys = (STARTING_CHOICES_CONFIG[className] || []).map((c) => c.id);
+    const hasAllExpected = expectedKeys.every((k) => character.startingChoices?.[k] !== undefined);
+    const hasOnlyExpected = Object.keys(character.startingChoices || {}).every((k) => expectedKeys.includes(k));
+    if (!character.startingChoices || !hasAllExpected || !hasOnlyExpected) {
+      nextCharacter.startingChoices = reconcileStartingChoices(character, className);
+    }
+    nextCharacter = rebuildStartingSkills(nextCharacter, className);
   }
 
   // Gather active innate powers from ALL classes on the character
   const activeInnateNames = new Set();
-  for (const c of character.classes || []) {
+  for (const c of nextCharacter.classes || []) {
     const innate = CLASS_POWERS[c.name]?.innate || [];
     for (const p of innate) {
       const reqMatch = String(p.requirement || p.tier || '').match(/\b(?:L|level)\s*(\d+)\b/i)
@@ -86,23 +92,20 @@ function applyClassStartingAbilities(character, className, level = 1) {
   }
 
   const allClassInnateNames = new Set(
-    (character.classes || []).flatMap(c => (CLASS_POWERS[c.name]?.innate || []).map(p => p.name))
+    (nextCharacter.classes || []).flatMap(c => (CLASS_POWERS[c.name]?.innate || []).map(p => p.name))
   );
 
   // Keep user-added innate powers (which are not class-innate)
   // and add all active class-innate powers.
-  const nextInnate = (character.innatePowers || []).filter(name => !allClassInnateNames.has(name));
+  const nextInnate = (nextCharacter.innatePowers || []).filter(name => !allClassInnateNames.has(name));
   for (const name of activeInnateNames) {
     if (!nextInnate.includes(name)) {
       nextInnate.push(name);
     }
   }
 
-  return {
-    ...character,
-    startingSkills: nextStarting,
-    innatePowers: nextInnate,
-  };
+  nextCharacter.innatePowers = nextInnate;
+  return nextCharacter;
 }
 
 const EMPTY_CHARACTER = {
@@ -142,6 +145,15 @@ function loadArchetype(archetype) {
   if (archetype.grants) c.grants = archetype.grants;
   if (archetype.effectiveBP) c.effectiveBP = archetype.effectiveBP;
   if (archetype.ranks) c.ranks = archetype.ranks;
+  // Make the archetype's implicit specialty choices explicit: reconcile the
+  // shipped starting skills against the choice config and tag each skill with the
+  // specialty that grants it, so the dropdowns show the baked-in pick and the
+  // build sheet badges each granted item — same as a from-scratch build.
+  const primary = getClasses(c)[0]?.name;
+  if (primary && hasStartingChoices(primary)) {
+    c.startingChoices = reconcileStartingChoices(c, primary);
+    return rebuildStartingSkills(c, primary, c.startingChoices);
+  }
   return c;
 }
 
@@ -688,7 +700,60 @@ function LineageSummary({ character, report, onInspect, onOpenLineage }) {
   );
 }
 
-function BuildSheet({ character, report, view, onPickArchetype, onStartBlank, onInspect, onOpenSlot, onOpenAdd, onRemoveEntity, onSetName, onOpenLineage }) {
+// Starting-choice pickers. Every class's "Starting Skills" entry includes one or
+// more named "Choose one of the following" blocks — Druid's "Budding Wisdom",
+// Artisan's "Productive Equipment" / "The Land Provides" / "A Path Unfolds", etc.
+// These are the class's specialty choices; a class may have SEVERAL, so each is
+// labelled with its own name from the sheet rather than a single generic
+// "specialty". An archetype already made these choices implicitly; this surfaces
+// them as dropdowns so the choice is explicit and editable — the same control
+// whether the character was built from scratch or loaded from an archetype.
+// Changing a dropdown grants that option's abilities (routed to their right
+// section by the validator's classification) and badges each granted item with its
+// "<Class> · <Choice>" provenance. Renders nothing for classes with no choice
+// blocks.
+function StartingChoicesSection({ character, onSetSpecialty }) {
+  const primary = getClasses(character)[0]?.name;
+  const configs = (primary && STARTING_CHOICES_CONFIG[primary]) || [];
+  // Current selection per block: the recorded choice, else reconcile it from the
+  // (possibly archetype-supplied) starting skills so an unmodified archetype shows
+  // its baked-in pick as selected.
+  const selected = useMemo(() => {
+    if (!primary || !configs.length) return {};
+    const have = character.startingChoices && Object.keys(character.startingChoices).length;
+    return have ? character.startingChoices : reconcileStartingChoices(character, primary);
+  }, [character.startingChoices, character.startingSkills, character.ranks?.startingSkills, primary, configs.length]);
+
+  if (!primary || !configs.length) return null;
+
+  return (
+    <Section title="Starting Choices" tone="amber">
+      <p className="b-spec-hint">
+        Your {primary} made {configs.length > 1 ? `${configs.length} choices` : "a choice"} at
+        character creation. Change one to swap the free abilities it grants.
+      </p>
+      <ul className="b-spec-list">
+        {configs.map((conf) => (
+          <li key={conf.id} className="b-spec-row">
+            <label className="b-spec-label" htmlFor={`spec-${conf.id}`}>{conf.label}</label>
+            <select
+              id={`spec-${conf.id}`}
+              className="b-spec-select"
+              value={selected[conf.id] ?? conf.options[0]?.label ?? ""}
+              onChange={(e) => onSetSpecialty(conf.id, e.target.value)}
+            >
+              {conf.options.map((opt) => (
+                <option key={opt.label} value={opt.label}>{opt.label}</option>
+              ))}
+            </select>
+          </li>
+        ))}
+      </ul>
+    </Section>
+  );
+}
+
+function BuildSheet({ character, report, view, onPickArchetype, onStartBlank, onInspect, onOpenSlot, onOpenAdd, onRemoveEntity, onSetName, onOpenLineage, onSetRank, onSetSpecialty }) {
   if (!character.archetypeName) {
     return <ArchetypePicker onPick={onPickArchetype} onStartBlank={onStartBlank} />;
   }
@@ -720,14 +785,16 @@ function BuildSheet({ character, report, view, onPickArchetype, onStartBlank, on
         </p>
       </header>
 
+      <StartingChoicesSection character={character} onSetSpecialty={onSetSpecialty} />
+
       <Section title="Skills" tone="amber" onAdd={() => onOpenAdd("skill")}>
         <ClassifiedRows rows={owned.skills} resolveType="skills" report={report}
-          onClick={onInspect} isFocused={isFocused} onRemove={onRemoveEntity} />
+          onClick={onInspect} isFocused={isFocused} onRemove={onRemoveEntity} onSetRank={onSetRank} character={character} />
       </Section>
 
       <Section title="Perks" tone="teal" onAdd={() => onOpenAdd("perk")}>
         <ClassifiedRows rows={owned.perks} resolveType="perks" report={report}
-          onClick={onInspect} isFocused={isFocused} onRemove={onRemoveEntity} />
+          onClick={onInspect} isFocused={isFocused} onRemove={onRemoveEntity} onSetRank={onSetRank} character={character} />
       </Section>
 
       <LineageSummary character={character} report={report} onInspect={onInspect} onOpenLineage={onOpenLineage} />
@@ -741,7 +808,7 @@ function BuildSheet({ character, report, view, onPickArchetype, onStartBlank, on
           <EditableRows
             items={character.domainPowers} field="domainPowers" resolveType="powers" report={report}
             onClick={onInspect} isFocused={isFocused}
-            removable={() => true} onRemove={(i) => onRemoveEntity("domainPowers", i)} />
+            removable={() => true} onRemove={(i) => onRemoveEntity("domainPowers", i)} onSetRank={onSetRank} character={character} />
         </Section>
       )}
 
@@ -752,7 +819,7 @@ function BuildSheet({ character, report, view, onPickArchetype, onStartBlank, on
       {getClasses(character).length > 0 && (
         <Section title="Class Powers" tone="purple" onAdd={() => onOpenAdd("classPower")}>
           <ClassifiedRows rows={owned.classPowers} resolveType="powers" report={report}
-            onClick={onInspect} isFocused={isFocused} onRemove={onRemoveEntity} showClass />
+            onClick={onInspect} isFocused={isFocused} onRemove={onRemoveEntity} showClass onSetRank={onSetRank} character={character} />
         </Section>
       )}
 
@@ -760,7 +827,7 @@ function BuildSheet({ character, report, view, onPickArchetype, onStartBlank, on
       {owned.innatePowers && owned.innatePowers.length > 0 && (
         <Section title="Innate Powers" tone="purple">
           <ClassifiedRows rows={owned.innatePowers} resolveType="powers" report={report}
-            onClick={onInspect} isFocused={isFocused} onRemove={onRemoveEntity} showClass />
+            onClick={onInspect} isFocused={isFocused} onRemove={onRemoveEntity} showClass onSetRank={onSetRank} character={character} />
         </Section>
       )}
 
@@ -778,7 +845,7 @@ function BuildSheet({ character, report, view, onPickArchetype, onStartBlank, on
         <EditableRows
           items={character.flaws} field="flaws" resolveType="flaws" report={report}
           onClick={onInspect} isFocused={isFocused}
-          removable={() => true} onRemove={(i) => onRemoveEntity("flaws", i)} />
+          removable={() => true} onRemove={(i) => onRemoveEntity("flaws", i)} onSetRank={onSetRank} character={character} />
       </Section>
 
       {report.crafting?.any && (
@@ -923,20 +990,36 @@ function CostBadge({ cost }) {
 // section it's shown in. Class-granted rows (source 'class') get a "from class"
 // badge (#5) and aren't removable; rows with index < 0 are derived (multiclass
 // grants) and aren't stored, so also non-removable.
-function ClassifiedRows({ rows, resolveType, report, onClick, isFocused, onRemove, showClass }) {
+function ClassifiedRows({ rows, resolveType, report, onClick, isFocused, onRemove, showClass, onSetRank, character }) {
   if (!rows || rows.length === 0) return <p className="b-empty">none</p>;
   return (
     <ul className="b-rows">
       {rows.map((row) => {
-        const { name, field, index, source, grantedBy, cls, refundedBP } = row;
-        const cost = report?.spend.byItem[`${field}:${name}`];
+        const { name, field, index, source, grantedBy, cls, refundedBP, specialty, floor } = row;
+        const costKey = field === 'startingSkills' ? `${field}:${index}:${name}` : `${field}:${name}`;
+        const cost = report?.spend.byItem[costKey];
         const fromClass = source === "class";
         const canRemove = !fromClass && index >= 0;
-        const rank = cost?.rank || 1;
+        // Prefer the resolved cost's rank; free class grants carry no cost entry,
+        // so fall back to the stored rank so a granted "x2" (e.g. Extended Capacity
+        // - Novice x2) still shows its ×2 multiplier.
+        const rank = cost?.rank || (index >= 0 ? character.ranks?.[field]?.[index] : null) || 1;
+
+        const baseName = bareSkill(cleanItemName(name));
+        const maxR = getMaxRanks(name, field, character);
+        // A granted starting skill with a free floor below its max can be bought UP
+        // on the same row: the floor stays free, ranks above it cost BP. The minus
+        // button stops at the floor (you can't drop the free grant).
+        const grantedFloor = floor || 0;
+        const canBuyUp = fromClass && grantedFloor > 0 && maxR > grantedFloor
+          && !UNLIMITED_SKILLS.has(baseName);
+        const rankFloor = canBuyUp ? grantedFloor : 1;
+        const hasRanks = (canRemove || canBuyUp) && maxR > 1 && !UNLIMITED_SKILLS.has(baseName);
+
         return (
           <li key={`${field}-${index}-${name}-${grantedBy || cls || ''}`} className={`b-row ${isFocused(name, field) ? "is-focused" : ""}`}>
-            <button className="b-row-name" onClick={() => onClick(name, field, resolveType)}>
-              {name}{rank > 1 && <span className="b-row-rank">×{rank}</span>}
+            <button className="b-row-name" onClick={() => onClick(name, field, resolveType, null, index)}>
+              {name}{rank > 1 && !hasRanks && <span className="b-row-rank">×{rank}</span>}
             </button>
             {showClass && cls && !fromClass && <span className="b-row-badge b-badge-class">{cls.toUpperCase()}</span>}
             {fromClass
@@ -946,9 +1029,10 @@ function ClassifiedRows({ rows, resolveType, report, onClick, isFocused, onRemov
                     <>
                       {src && (
                         <span className="b-row-badge b-badge-granted"
-                              title={grantedBy ? `Granted free by your ${grantedBy} multi-class`
+                              title={specialty ? `Granted free by your ${src}'s "${specialty}" starting choice`
+                                : grantedBy ? `Granted free by your ${grantedBy} multi-class`
                                 : `Granted free by your ${src} class`}>
-                          {src.toUpperCase()}
+                          {src.toUpperCase()}{specialty && <span className="b-badge-spec"> · {specialty}</span>}
                         </span>
                       )}
                       {refundedBP ? (
@@ -956,10 +1040,20 @@ function ClassifiedRows({ rows, resolveType, report, onClick, isFocused, onRemov
                           +{refundedBP} BP
                         </span>
                       ) : null}
+                      {/* Paid ranks above the free granted floor show their BP cost
+                          alongside the "free" grant badge. */}
+                      {canBuyUp && cost?.paidRanks > 0 && <CostBadge cost={cost} />}
                     </>
                   );
                 })()
               : <CostBadge cost={cost} />}
+            {hasRanks && onSetRank && (
+              <div className="b-row-rank-adjust">
+                <button className="b-rank-btn" type="button" onClick={() => onSetRank(field, index, rank - 1)} disabled={rank <= rankFloor}>-</button>
+                <span className="b-rank-val">{rank}</span>
+                <button className="b-rank-btn" type="button" onClick={() => onSetRank(field, index, rank + 1)} disabled={rank >= maxR}>+</button>
+              </div>
+            )}
             {canRemove && (
               <button className="b-row-remove" title="Remove" aria-label={`Remove ${name}`}
                       onClick={() => onRemove(field, index)}>×</button>
@@ -975,7 +1069,7 @@ function ClassifiedRows({ rows, resolveType, report, onClick, isFocused, onRemov
 // to inspect, a BP cost / award badge, and a remove (×) on removable items.
 // `removable(i)` / `onRemove(i)` operate on the rendered index; the parent maps
 // that to the right backing list.
-function EditableRows({ items, field, onClick, isFocused, resolveType, report, removable, onRemove }) {
+function EditableRows({ items, field, onClick, isFocused, resolveType, report, removable, onRemove, onSetRank, character }) {
   if (!items || items.length === 0) {
     return <p className="b-empty">none</p>;
   }
@@ -985,10 +1079,15 @@ function EditableRows({ items, field, onClick, isFocused, resolveType, report, r
         const cost = report?.spend.byItem[`${field}:${item}`];
         const canRemove = removable ? removable(i) : false;
         const rank = cost?.rank || 1;
+
+        const baseName = bareSkill(cleanItemName(item));
+        const maxR = getMaxRanks(item, field, character);
+        const hasRanks = canRemove && maxR > 1 && !UNLIMITED_SKILLS.has(baseName);
+
         return (
           <li key={`${field}-${i}-${item}`} className={`b-row ${isFocused(item, field) ? "is-focused" : ""}`}>
-            <button className="b-row-name" onClick={() => onClick(item, field, resolveType)}>
-              {item}{rank > 1 && <span className="b-row-rank">×{rank}</span>}
+            <button className="b-row-name" onClick={() => onClick(item, field, resolveType, null, i)}>
+              {item}{rank > 1 && !hasRanks && <span className="b-row-rank">×{rank}</span>}
             </button>
             <CostBadge cost={cost} />
             {canRemove && (
@@ -1235,7 +1334,7 @@ function PickerOverlay({ spec, character, onClose }) {
   const readBack = () => setReadStack((s) => s.slice(0, -1));
   const isFollowing = readStack.length > 0;
   const selectedLocked = selected && lockedOf(selected);
-  const selectedTaken = selected && taken.has(selected);
+  const selectedTaken = selected && taken.has(selected) && !UNLIMITED_SKILLS.has(selected);
 
   useEffect(() => {
     const onKey = (e) => { if (e.key === "Escape") onClose(); };
@@ -1504,7 +1603,7 @@ function ParameterEditor({ baseName, entity, view, onUpdateParameter }) {
               const val = e.target.value;
               setFilter(val);
               const newName = formatParameterizedName(baseName, val, entity.name);
-              onUpdateParameter(view.field, entity.name, newName);
+              onUpdateParameter(view.field, entity.name, newName, view.index);
             }}
           />
           <button
@@ -1526,7 +1625,7 @@ function ParameterEditor({ baseName, entity, view, onUpdateParameter }) {
                   onClick={() => {
                     setFilter(opt);
                     const newName = formatParameterizedName(baseName, opt, entity.name);
-                    onUpdateParameter(view.field, entity.name, newName);
+                    onUpdateParameter(view.field, entity.name, newName, view.index);
                     setIsOpen(false);
                   }}
                 >
@@ -2252,21 +2351,21 @@ export default function Builder() {
 
   // Inspect an entity. `slot` (optional) carries the pick context so the
   // inspector can offer "Choose this power". Pushes current view onto history.
-  const handleInspect = useCallback((item, field, resolveType, slot = null) => {
+  const handleInspect = useCallback((item, field, resolveType, slot = null, index = null) => {
     setView((cur) => {
       if (cur) setHistory((h) => [...h, cur]);
       return {
         mode: "inspect", item, field, resolveType,
         archetypeName: character.archetypeName,
-        category: slot?.category, index: slot?.index, choosable: !!slot,
+        category: slot?.category, index: index !== null ? index : slot?.index, choosable: !!slot,
       };
     });
   }, [character.archetypeName]);
 
-  const handleUpdateParameter = useCallback((field, oldName, newName) => {
+  const handleUpdateParameter = useCallback((field, oldName, newName, index = null) => {
     setCharacter((c) => {
       const list = c[field] || [];
-      const idx = list.indexOf(oldName);
+      const idx = index !== null && index >= 0 ? index : list.indexOf(oldName);
       if (idx < 0) return c;
       const next = [...list];
       next[idx] = newName;
@@ -2368,8 +2467,14 @@ export default function Builder() {
   const handleAddEntity = useCallback((field, name) => {
     setCharacter((c) => {
       const list = c[field] || [];
-      if (list.includes(name)) return c;
-      return { ...c, [field]: [...list, name] };
+      if (list.includes(name) && !UNLIMITED_SKILLS.has(name)) return c;
+      const next = [...list, name];
+      const nextRanks = { ...(c.ranks || {}) };
+      const rList = [...(nextRanks[field] || [])];
+      while (rList.length < list.length) rList.push(1);
+      rList.push(1);
+      nextRanks[field] = rList;
+      return { ...c, [field]: next, ranks: nextRanks };
     });
     setPicking(null);
   }, []);
@@ -2379,7 +2484,46 @@ export default function Builder() {
     setCharacter((c) => {
       const next = [...(c[field] || [])];
       next.splice(index, 1);
-      return { ...c, [field]: next };
+      const nextRanks = { ...(c.ranks || {}) };
+      if (nextRanks[field]) {
+        const rList = [...nextRanks[field]];
+        rList.splice(index, 1);
+        nextRanks[field] = rList;
+      }
+      return { ...c, [field]: next, ranks: nextRanks };
+    });
+  }, []);
+
+  // Set the rank of an item in a list by index.
+  const handleSetRank = useCallback((field, index, nextRank) => {
+    setCharacter((c) => {
+      const nextRanks = { ...(c.ranks || {}) };
+      const rList = [...(nextRanks[field] || [])];
+      const listLen = c[field]?.length || 0;
+      while (rList.length < listLen) rList.push(1);
+      rList[index] = nextRank;
+      nextRanks[field] = rList;
+      return { ...c, ranks: nextRanks };
+    });
+  }, []);
+
+  // Change a starting-specialty choice (e.g. Druid's "Budding Wisdom"). Records the
+  // picked option label, then rebuilds the primary class's starting skills so the
+  // newly-granted skills appear (routed to their right section by the validator's
+  // classification) and the deselected option's skills drop. Works identically for
+  // a from-scratch build and an archetype-loaded one — the archetype just supplied
+  // the initial skills, and the dropdown's current value was reconciled from them.
+  const handleSetSpecialty = useCallback((choiceId, optionLabel) => {
+    setCharacter((c) => {
+      const primary = getClasses(c)[0]?.name;
+      if (!primary) return c;
+      // Start from the current choices, reconciling first if none are recorded yet
+      // (archetype just loaded) so the OTHER blocks keep their existing selections.
+      const base = c.startingChoices && Object.keys(c.startingChoices).length
+        ? c.startingChoices
+        : reconcileStartingChoices(c, primary);
+      const nextChoices = { ...base, [choiceId]: optionLabel };
+      return rebuildStartingSkills(c, primary, nextChoices);
     });
   }, []);
 
@@ -2517,7 +2661,7 @@ export default function Builder() {
     // fields, so items resolve to their true kind across mis-filed storage.
     const config = {
       skill: { field: "purchasedSkills", entityType: "skills", candidates: ALL_SKILLS, title: "Add a skill",
-               taken: (report.owned?.skills || []).map((r) => r.name) },
+               taken: (report.owned?.skills || []).map((r) => r.name).filter(name => !UNLIMITED_SKILLS.has(bareSkill(cleanItemName(name)))) },
       perk:  { field: "purchasedPerks", entityType: "perks", candidates: ALL_PERKS, title: "Add a perk",
                taken: (report.owned?.perks || []).map((r) => r.name) },
       flaw:  { field: "flaws", entityType: "flaws", candidates: ALL_FLAWS, title: "Add a flaw",
@@ -2575,7 +2719,8 @@ export default function Builder() {
                     onPickArchetype={handlePickArchetype} onStartBlank={handleStartBlank}
                     onInspect={handleInspect} onOpenSlot={handleOpenSlot}
                     onOpenAdd={handleOpenAdd} onRemoveEntity={handleRemoveEntity}
-                    onSetName={handleSetName} onOpenLineage={() => setLineageOpen(true)} />
+                    onSetName={handleSetName} onOpenLineage={() => setLineageOpen(true)}
+                    onSetRank={handleSetRank} onSetSpecialty={handleSetSpecialty} />
         <DetailPane view={view} report={report}
                     choices={character.choices} onSetChoice={handleSetChoice}
                     onUpdateParameter={handleUpdateParameter}
@@ -2588,7 +2733,18 @@ export default function Builder() {
       {exportOpen && (
         <ExportImportPanel
           character={character} report={report}
-          onImport={(c) => { setCharacter(c); setExportOpen(false); setView(null); setHistory([]); }}
+          onImport={(c) => {
+            let prepared = { ...c };
+            const primary = getClasses(prepared)[0]?.name;
+            if (primary && hasStartingChoices(primary)) {
+              prepared.startingChoices = reconcileStartingChoices(prepared, primary);
+              prepared = rebuildStartingSkills(prepared, primary, prepared.startingChoices);
+            }
+            setCharacter(prepared);
+            setExportOpen(false);
+            setView(null);
+            setHistory([]);
+          }}
           onClose={() => setExportOpen(false)} />
       )}
       {lineageOpen && (

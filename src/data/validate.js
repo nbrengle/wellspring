@@ -9,7 +9,8 @@
 // Pure functions, no React, so the UI calls them in a useMemo and they stay
 // unit-testable. The character shape is the flat object from Builder.jsx.
 
-import { LEVEL_TABLE, lookupEntity, REFS, CLASS_POWER_SLOTS, CLASS_POWERS, CLASS_PROGRESSION, SPELLCASTERS, DEVOTIONS, DOMAINS, CLASSES, LINEAGES, CRAFTING, RITUALS, EVENTS_TABLE } from './index.js';
+import { LEVEL_TABLE, lookupEntity, REFS, CLASS_POWER_SLOTS, CLASS_POWERS, CLASS_PROGRESSION, SPELLCASTERS, DEVOTIONS, DOMAINS, CLASSES, LINEAGES, CRAFTING, RITUALS, EVENTS_TABLE, UNLIMITED_SKILLS } from './index.js';
+import { startingSkillGrants } from './starting-choices.js';
 
 // Max Lineage Build Points a character can be awarded from challenges (MegaDoc:
 // "up to 10 awarded LBP").
@@ -351,7 +352,7 @@ export function primaryClass(character) {
 }
 
 // Strip a trailing "(parameter)" from a skill name for ownership comparison.
-const bareSkill = (s) => String(s).replace(/\s*\([^)]*\)\s*$/, '').trim();
+export const bareSkill = (s) => String(s).replace(/\s*\([^)]*\)\s*$/, '').trim();
 
 // DERIVED multi-class grants — a pure function of the character's classes, so the
 // same rule drives both the forward path (materialize grants when a class is
@@ -427,25 +428,38 @@ export function classifyOwnedItems(character) {
       || lookupEntity(`skills:${clean}`) || byField;
   };
 
+  // A starting skill granted by a specialty choice (Druid's "Budding Wisdom", …)
+  // carries that block's label as provenance. DERIVED from the class config +
+  // chosen options (not a persisted sidecar), so badges work on imported / hash-
+  // loaded characters too, not only freshly-rebuilt ones.
+  const specialtyByIndex = startingSkillGrants(character).specialty;
+  const startFloors = startingSkillGrants(character).floor;
+  const specialtyOf = (field, index) =>
+    field === 'startingSkills' ? (specialtyByIndex[index] || null) : null;
+  const floorOf = (field, index) =>
+    field === 'startingSkills' ? (startFloors[index] || 0) : 0;
+
   const classify = (field, source) => {
     (character[field] || []).forEach((item, index) => {
       const ent = resolve(item, field);
       const t = ent?.type;
+      const specialty = specialtyOf(field, index);
+      const floor = floorOf(field, index);
       // A class power (classSkills/Class tier) belonging to one of the character's
       // classes → route to classPowers and suppress from the skills list.
       if (t === 'powers' && CLASS_POWER_TIERS.has(ent.tier)
           && (!ent.parentClass || classNames.has(ent.parentClass))) {
-        classPowers.push({ name: item, field, index, source, cls: ent.parentClass || null });
+        classPowers.push({ name: item, field, index, source, cls: ent.parentClass || null, specialty, floor });
         flag(field, index);
         return;
       }
       if (t === 'perks') {
-        perks.push({ name: item, field, index, source, cls: source === 'class' ? primary : null });
+        perks.push({ name: item, field, index, source, cls: source === 'class' ? primary : null, specialty, floor });
         if (field !== 'purchasedPerks') flag(field, index);
         return;
       }
       // Genuine skill (or unresolved → treat as skill, its storage field).
-      skills.push({ name: item, field, index, source, cls: source === 'class' ? primary : null });
+      skills.push({ name: item, field, index, source, cls: source === 'class' ? primary : null, specialty, floor });
     });
   };
 
@@ -482,16 +496,36 @@ export function classifyOwnedItems(character) {
   // purchase so it renders free; flag the later copies as misfiled so they don't
   // render (or get bought) twice.
   const dedupe = (rows) => {
-    const seen = new Map();
+    const seen = new Set();
     const out = [];
     // Class-granted first so the free copy wins.
     for (const r of [...rows].sort((a, b) => (a.source === 'class' ? 0 : 1) - (b.source === 'class' ? 0 : 1))) {
-      const key = r.refundedBP
-        ? `${bareSkill(cleanItemName(r.name)).toLowerCase()}:refund:${r.grantedBy || ''}`
-        : bareSkill(cleanItemName(r.name)).toLowerCase();
-      if (seen.has(key)) { if (r.index >= 0) flag(r.field, r.index); continue; }
-      seen.set(key, true);
-      out.push(r);
+      const baseName = bareSkill(cleanItemName(r.name));
+      const baseKey = baseName.toLowerCase();
+      const cleanName = cleanItemName(r.name).toLowerCase();
+      const isInstance = UNLIMITED_SKILLS.has(baseName);
+
+      if (isInstance) {
+        const hasParam = cleanName.includes('(');
+        if (hasParam) {
+          if (seen.has(cleanName)) {
+            if (r.index >= 0) flag(r.field, r.index);
+            continue;
+          }
+          seen.add(cleanName);
+        }
+        out.push(r);
+      } else {
+        const key = r.refundedBP
+          ? `${baseKey}:refund:${r.grantedBy || ''}`
+          : baseKey;
+        if (seen.has(key)) {
+          if (r.index >= 0) flag(r.field, r.index);
+          continue;
+        }
+        seen.add(key);
+        out.push(r);
+      }
     }
     return out;
   };
@@ -624,6 +658,8 @@ const ROMAN_MAP = {
 function parseTrailingRank(name) {
   if (!name) return 1;
   const clean = String(name).trim();
+  const xMatch = clean.match(/\s+x\s*(\d+)$/i);
+  if (xMatch) return parseInt(xMatch[1], 10);
   const digitMatch = clean.match(/\s+(\d+)$/);
   if (digitMatch) return parseInt(digitMatch[1], 10);
   const romanMatch = clean.match(/\s+([IVXLCDM]+)$/i);
@@ -638,7 +674,7 @@ function parseTrailingRank(name) {
 function rankOf(character, field, idx) {
   const item = character[field]?.[idx];
   if (!item) return 1;
-  const baseRank = character.ranks?.[field]?.[idx] || 1;
+  const baseRank = character.ranks?.[field]?.[idx];
   if (baseRank > 1) return baseRank;
 
   const parsed = parseTrailingRank(item);
@@ -652,6 +688,24 @@ function rankOf(character, field, idx) {
       }
     }
     return parsed;
+  }
+  return baseRank !== undefined ? baseRank : 1;
+}
+
+// Get the maximum ranks of an entity dynamically by querying the database/entity index.
+export function getMaxRanks(name, field, character) {
+  const type = entityType(field);
+  const cleanName = cleanItemName(name);
+  const ent = lookupEntity(resolveId(name, field, character))
+    || lookupEntity(`${type}:${cleanName}`)
+    || lookupEntity(`${type}:${bareSkill(cleanName)}`);
+  if (!ent) return 1;
+  const maxR = ent.maxRanks ?? ent.ranks;
+  if (maxR === 'unlimited') return Infinity;
+  if (typeof maxR === 'number') return maxR;
+  if (typeof maxR === 'string') {
+    const val = parseInt(maxR, 10);
+    if (!isNaN(val)) return val;
   }
   return 1;
 }
@@ -800,9 +854,9 @@ function applyDiscounts(character, byItem) {
   const applied = [];
   for (const [key, eff] of Object.entries(byItem)) {
     if (eff.authored) continue;
-    const sep = key.indexOf(':');
-    const field = key.slice(0, sep);
-    const item = key.slice(sep + 1);
+    const parts = key.split(':');
+    const field = parts[0];
+    const item = parts.length === 3 ? parts[2] : parts[1];
     if (field !== 'purchasedSkills' && field !== 'purchasedPerks' && field !== 'startingSkills') continue;
     const ent = lookupEntity(resolveId(item, field, character)) || lookupEntity(`skills:${cleanItemName(item)}`);
     const catKey = ent?.category || cleanItemName(item).split(' ')[0];
@@ -869,12 +923,39 @@ export function computeSpend(character) {
   // "Apprentice Tinkering (-3 BP refunded from Forgesource Specialist)". The
   // skill stays free; the refund reduces total spend. (Discounts on starting
   // skills are refunds; grants on them are just "free" and add nothing.)
+  // Free granted rank floor per starting-skill index — DERIVED from the class
+  // config + chosen options, so it survives import / round-trip (not a persisted
+  // sidecar). A finite multi-rank starting skill (e.g. the Mage specialty's
+  // "Extended Capacity - Novice x2", max 4) is free up to its floor; ranks bought
+  // ABOVE the floor cost BP at the entity's per-rank price. Keyed by index here so
+  // two same-named rows can't collide (the byItem map is keyed by name, so we sum
+  // excess into `spent` directly rather than re-reading byItem by name later).
+  const startFloors = startingSkillGrants(character).floor;
   let refunded = 0;
+  let startingExcess = 0;
   (character.startingSkills || []).forEach((item, idx) => {
     const grant = character.grants?.startingSkills?.[idx];
     if (grant?.kind === 'discount' && grant.amount) {
-      byItem[`startingSkills:${item}`] = { cost: -grant.amount, base: 0, grant };
+      byItem[`startingSkills:${idx}:${item}`] = { cost: -grant.amount, base: 0, grant };
       refunded += grant.amount;
+      return;
+    }
+    const floor = startFloors[idx];
+    const total = rankOf(character, 'startingSkills', idx);
+    const ent = lookupEntity(resolveId(item, 'startingSkills', character))
+      || lookupEntity(`skills:${bareSkill(cleanItemName(item))}`);
+    const base = typeof ent?.cost === 'number' ? ent.cost : 0;
+    if (floor && total > floor) {
+      const extra = total - floor;
+      const cost = base * extra;
+      byItem[`startingSkills:${idx}:${item}`] = {
+        cost, base, grant: null, rank: total, freeRanks: floor, paidRanks: extra,
+      };
+      startingExcess += cost;
+    } else {
+      byItem[`startingSkills:${idx}:${item}`] = {
+        cost: 0, base, grant: null, rank: total, freeRanks: floor || 1, paidRanks: 0,
+      };
     }
   });
 
@@ -894,7 +975,7 @@ export function computeSpend(character) {
   // place; a discount on an already-free item becomes free BP instead. Recompute
   // `spent` from the adjusted costs so totals reflect the discounts.
   const { freeBP: discountFreeBP, applied: discountsApplied } = applyDiscounts(character, byItem);
-  spent = 0;
+  spent = startingExcess;  // paid ranks above a starting skill's free floor (see above)
   for (const field of [...BP_FIELDS, ...BP_POWER_FIELDS]) {
     (character[field] || []).forEach((item) => {
       const eff = byItem[`${field}:${item}`];

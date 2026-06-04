@@ -5,7 +5,7 @@
 // and reusable for copy / download / print. The output round-trips visually with
 // the source archetype format.
 
-import { getClasses } from './validate.js';
+import { getClasses, bareSkill, cleanItemName } from './validate.js';
 import { ARCHETYPES, UNLIMITED_SKILLS } from './index.js';
 import {
   LABEL_FIELD, SCALAR_FIELDS, ITEM_FIELDS, fieldForLabel, cleanItem, splitItems,
@@ -16,8 +16,19 @@ import {
 // effective cost from the report's byItem map so EVERY section that can carry a
 // cost (purchased skills/perks, BP-bought powers, refund-bearing starting skills,
 // flaws) round-trips. Returns '' when the item has no cost/grant of note.
-function bpSuffix(name, field, report) {
-  const e = report?.spend.byItem[`${field}:${name}`];
+function bpSuffix(name, field, report, idx) {
+  let e = null;
+  if (field === 'startingSkills') {
+    if (idx !== undefined) {
+      e = report?.spend.byItem[`startingSkills:${idx}:${name}`];
+    }
+    if (!e) {
+      const match = Object.keys(report?.spend.byItem || {}).find(k => k.startsWith('startingSkills:') && k.endsWith(`:${name}`));
+      if (match) e = report.spend.byItem[match];
+    }
+  } else {
+    e = report?.spend.byItem[`${field}:${name}`];
+  }
   if (!e) return '';
   const CLASSES_SET = new Set(['Artisan', 'Cleric', 'Druid', 'Fighter', 'Mage', 'Rogue', 'Socialite', 'Sourcerer']);
   // Flaws award BP; a starting-skill refund is also a negative cost on a free item.
@@ -42,7 +53,20 @@ function bpSuffix(name, field, report) {
 // each item's BP suffix when a field/report is given.
 function joinItems(items, field, report) {
   if (!items || !items.length) return 'None';
-  return items.map((n) => `${n}${field ? bpSuffix(n, field, report) : ''}`).join(', ');
+  return items.map((n, i) => {
+    let costInfo = null;
+    if (field === 'startingSkills') {
+      costInfo = report?.spend.byItem[`startingSkills:${i}:${n}`];
+    } else {
+      costInfo = report?.spend.byItem[`${field}:${n}`];
+    }
+    const rank = costInfo?.rank || 1;
+    const baseName = bareSkill(cleanItemName(n));
+    const showRank = rank > 1 && !UNLIMITED_SKILLS.has(baseName);
+    const nameCleaned = n.replace(/\s*x\s*\d+\b/i, '');
+    const nameWithRank = showRank ? `${nameCleaned} x${rank}` : nameCleaned;
+    return `${nameWithRank}${field ? bpSuffix(n, field, report, i) : ''}`;
+  }).join(', ');
 }
 
 // Power/spell sections in source order. These carry no BP suffix in the source
