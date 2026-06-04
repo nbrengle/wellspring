@@ -22,6 +22,7 @@ import {
   reconcileStartingChoices, rebuildStartingSkills,
 } from "./data/starting-choices.js";
 import { formatCharacterSheet, parseCharacterSheet } from "./data/sheet.js";
+import RulesExplorer from "./RulesExplorer.jsx";
 import "./Builder.css";
 
 // ─── CHARACTER STATE ────────────────────────────────────────────────────────
@@ -1642,7 +1643,7 @@ function ParameterEditor({ baseName, entity, view, onUpdateParameter }) {
   );
 }
 
-function EntityBody({ entity, view, report, choices, onSetChoice, onUpdateParameter, onInspect }) {
+export function EntityBody({ entity, view, report, choices, onSetChoice, onUpdateParameter, onInspect }) {
   if (!entity) {
     return <p className="b-detail-missing">No detail available — this item may be unresolved.</p>;
   }
@@ -2172,6 +2173,7 @@ function ExportImportPanel({ character, report, onImport, onClose }) {
 // ─── ROOT COMPONENT ─────────────────────────────────────────────────────────
 
 export default function Builder() {
+  const [mode, setMode] = useState("builder"); // "builder" | "explorer"
   const [character, setCharacter] = useState(() => readFromHash() || EMPTY_CHARACTER);
   // view: null | {mode:'inspect', item, field, resolveType, archetypeName, category?, index?, choosable?}
   // The rail detail pane is inspect-only now; picking happens in a full-screen
@@ -2715,29 +2717,33 @@ export default function Builder() {
 
   return (
     <div className="b-root">
-      <BTopBar character={character} report={report} onLevelChange={handleLevelChange}
+      <BTopBar mode={mode} setMode={setMode} character={character} report={report} onLevelChange={handleLevelChange}
                onExport={() => setExportOpen(true)} />
-      <div className="b-cols">
-        <IdentityRail character={character} report={report}
-                      onClickField={handleClickIdentityField} onRestart={handleRestart}
-                      onSetClassLevel={handleSetClassLevel} onRemoveClass={handleRemoveClass}
-                      onAddClass={handleOpenClassPicker}
-                      onPickDevotion={handlePickDevotion} onToggleDomain={handleToggleDomain}
-                      onClearDevotion={handleClearDevotion} onOpenLineage={() => setLineageOpen(true)}
-                      onToggleBackstory={handleToggleBackstory} onInspect={handleInspect}
-                      onSetEvent={handleSetEvent} onSetExtraBP={handleSetExtraBP} />
-        <BuildSheet character={character} report={report} view={view}
-                    onPickArchetype={handlePickArchetype} onStartBlank={handleStartBlank}
-                    onInspect={handleInspect} onOpenSlot={handleOpenSlot}
-                    onOpenAdd={handleOpenAdd} onRemoveEntity={handleRemoveEntity}
-                    onSetName={handleSetName} onOpenLineage={() => setLineageOpen(true)}
-                    onSetRank={handleSetRank} onSetSpecialty={handleSetSpecialty} />
-        <DetailPane view={view} report={report}
-                    choices={character.choices} onSetChoice={handleSetChoice}
-                    onUpdateParameter={handleUpdateParameter}
-                    onInspect={handleInspect}
-                    onBack={history.length ? handleBack : null} onClose={handleClose} />
-      </div>
+      {mode === "explorer" ? (
+        <RulesExplorer onClose={() => setMode("builder")} />
+      ) : (
+        <div className="b-cols">
+          <IdentityRail character={character} report={report}
+                        onClickField={handleClickIdentityField} onRestart={handleRestart}
+                        onSetClassLevel={handleSetClassLevel} onRemoveClass={handleRemoveClass}
+                        onAddClass={handleOpenClassPicker}
+                        onPickDevotion={handlePickDevotion} onToggleDomain={handleToggleDomain}
+                        onClearDevotion={handleClearDevotion} onOpenLineage={() => setLineageOpen(true)}
+                        onToggleBackstory={handleToggleBackstory} onInspect={handleInspect}
+                        onSetEvent={handleSetEvent} onSetExtraBP={handleSetExtraBP} />
+          <BuildSheet character={character} report={report} view={view}
+                      onPickArchetype={handlePickArchetype} onStartBlank={handleStartBlank}
+                      onInspect={handleInspect} onOpenSlot={handleOpenSlot}
+                      onOpenAdd={handleOpenAdd} onRemoveEntity={handleRemoveEntity}
+                      onSetName={handleSetName} onOpenLineage={() => setLineageOpen(true)}
+                      onSetRank={handleSetRank} onSetSpecialty={handleSetSpecialty} />
+          <DetailPane view={view} report={report}
+                      choices={character.choices} onSetChoice={handleSetChoice}
+                      onUpdateParameter={handleUpdateParameter}
+                      onInspect={handleInspect}
+                      onBack={history.length ? handleBack : null} onClose={handleClose} />
+        </div>
+      )}
       {picking && (
         <PickerOverlay spec={picking} character={character} onClose={() => setPicking(null)} />
       )}
@@ -2785,7 +2791,7 @@ function SiteFooter() {
   );
 }
 
-function BTopBar({ character, report, onLevelChange, onExport }) {
+function BTopBar({ mode, setMode, character, report, onLevelChange, onExport }) {
   const level = character.archetypeName ? characterLevel(character) : null;
   const [linkCopied, setLinkCopied] = useState(false);
   const copyShareLink = () => {
@@ -2797,10 +2803,18 @@ function BTopBar({ character, report, onLevelChange, onExport }) {
     <header className="b-topbar">
       <div className="b-topbar-brand">
         <span className="b-topbar-title">Wellspring</span>
-        <span className="b-topbar-sub">Character Builder</span>
+        <span className="b-topbar-sub">{mode === "explorer" ? "Rules Explorer" : "Character Builder"}</span>
+      </div>
+      <div className="b-topbar-tabs">
+        <button className={`b-topbar-tab ${mode === "builder" ? "is-active" : ""}`} onClick={() => setMode("builder")}>
+          Character Creator
+        </button>
+        <button className={`b-topbar-tab ${mode === "explorer" ? "is-active" : ""}`} onClick={() => setMode("explorer")}>
+          Rules Explorer
+        </button>
       </div>
       <div className="b-topbar-stats">
-        {level && (
+        {mode === "builder" && level && (
           <>
             <span className="b-topbar-stat b-level">
               Level
@@ -2826,10 +2840,16 @@ function BTopBar({ character, report, onLevelChange, onExport }) {
         )}
       </div>
       <div className="b-topbar-actions">
-        <button className="b-topbar-btn" onClick={onExport}>Export / Import</button>
-        <button className={`b-topbar-btn ${linkCopied ? "is-copied" : ""}`} onClick={copyShareLink}>
-          {linkCopied ? "Link copied!" : "Copy share link"}
-        </button>
+        {mode === "builder" ? (
+          <>
+            <button className="b-topbar-btn" onClick={onExport}>Export / Import</button>
+            <button className={`b-topbar-btn ${linkCopied ? "is-copied" : ""}`} onClick={copyShareLink}>
+              {linkCopied ? "Link copied!" : "Copy share link"}
+            </button>
+          </>
+        ) : (
+          <span />
+        )}
       </div>
     </header>
   );
