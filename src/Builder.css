@@ -48,6 +48,34 @@
   z-index: 50;
 }
 .b-topbar-brand { display: flex; flex-direction: column; }
+.b-topbar-tabs {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  margin-left: 2rem;
+  margin-right: auto;
+}
+.b-topbar-tab {
+  background: transparent;
+  border: none;
+  color: var(--b-muted);
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 500;
+  padding: 0.4rem 0.8rem;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.b-topbar-tab:hover {
+  color: var(--b-text);
+  background: rgba(255, 255, 255, 0.03);
+}
+.b-topbar-tab.is-active {
+  color: var(--b-amber);
+  background: rgba(229, 169, 59, 0.1);
+  font-weight: 600;
+}
 .b-topbar-title {
   font-family: "Cinzel", serif;
   font-weight: 700;
