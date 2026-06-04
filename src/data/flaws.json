@@ -5,7 +5,7 @@
     "ranks": null,
     "prereq": null,
     "category": "Personal",
-    "description": "Has a debt that must be repaid."
+    "description": "Has a debt that must be repaid. Prerequisites: None Award: 1 or 2 The character has a debt of honor or blood that must be repaid. Perhaps the character’s life or family was saved by another. Perhaps, in a time of need, a favor was provided. Whatever the debt, it is one that hangs over the character and can be collected upon at any time. If the debt is one that can be paid by a single favor, it is worth 1 point. If the debt is one that is perhaps impossible to fully pay off, it is worth 2. Note: This debt must be to an NPC or other plot driven entity to qualify and must be approved by Staff. Honor debts to PCs (only) do not qualify."
   },
   {
     "name": "Indoor Discomfort",
@@ -13,7 +13,7 @@
     "ranks": null,
     "prereq": null,
     "category": "Personal",
-    "description": "-1 Spike and Power damage while inside."
+    "description": "-1 Spike and Power damage while inside. Prerequisites: None Award: 1 While the character is indoors, they suffer a -1 to their Spike Damage (to a minimum of 1) and a -1 to all Power damage (to a minimum of 1)."
   },
   {
     "name": "Nightmares",
@@ -21,7 +21,7 @@
     "ranks": null,
     "prereq": null,
     "category": "Personal",
-    "description": "Has penalties after an in-game event causes nightmares."
+    "description": "Has penalties after an in-game event causes nightmares. Prerequisites: None Award: 3 The character is prone to awful nightmares. If they experience anything terrifying to the character (in the judgment of the player), or is affected (un-Countered and un-Resisted) by any Powers with the Fear Accent, they will suffer awful repercussions after their next Long Rest. They will take a -1 penalty to their Spike damage (minimum 0) and number of Spikes (minimum 0), and in addition, will lose access to one spell-slot from each tier that they have access to. These penalties will last until the end of their next Long Rest after they are applied."
   },
   {
     "name": "Pliant",
@@ -29,7 +29,7 @@
     "ranks": null,
     "prereq": null,
     "category": "Personal",
-    "description": "Vulnerability to Charm effects."
+    "description": "Vulnerability to Charm effects. Prerequisites: None Award: 2 The character may be cursed or may inherit this Flaw from their parents, or they may have been trained to accept commands, especially magical ones. Either way, the character has a vulnerability to Charm effects and treats it as Final."
   },
   {
     "name": "Outdoor Discomfort",
@@ -37,7 +37,7 @@
     "ranks": null,
     "prereq": null,
     "category": "Personal",
-    "description": "-1 Spike and Power damage while outdoors."
+    "description": "-1 Spike and Power damage while outdoors. Prerequisites: None Award: 3 While the character is outdoors, they suffer a -1 to their Spike damage (to a minimum of 1) and a -1 to all Power damage (to a minimum of 1)."
   },
   {
     "name": "Fragile Bones",
@@ -45,7 +45,7 @@
     "ranks": null,
     "prereq": null,
     "category": "Physical",
-    "description": "Treats Effects with Force Accent as Final."
+    "description": "Treats Effects with Force Accent as Final. Award: 3 Prerequisites: None The character is Inherently Vulnerable to physical forces and therefore treats all Effects with the Force Accent as Final."
   },
   {
     "name": "Dies Alone",
@@ -53,7 +53,7 @@
     "ranks": null,
     "prereq": null,
     "category": "Physical",
-    "description": "Unconscious and cannot call out when dying."
+    "description": "Unconscious and cannot call out when dying. Award: 2 Prerequisites: None While the character is dying, they are totally unconscious, and cannot speak, call out, or experience anything going on around them."
   },
   {
     "name": "Divine Vulnerability",
@@ -61,7 +61,7 @@
     "ranks": null,
     "prereq": null,
     "category": "Physical",
-    "description": "Treats Effects with Divine Accent as Final."
+    "description": "Treats Effects with Divine Accent as Final. Award: 3 Prerequisites: None The character is Inherently Vulnerable to divine magic and therefore treats all Effects with the Divine accent as Final."
   },
   {
     "name": "Mild Allergy",
@@ -69,7 +69,7 @@
     "ranks": null,
     "prereq": null,
     "category": "Physical",
-    "description": "Minor allergy to gold, silver, iron, magic or other substances. Cannot rest or heal efficiently while in contact."
+    "description": "Minor allergy to gold, silver, iron, magic or other substances. Cannot rest or heal efficiently while in contact. Award: 1 or 2 Prerequisites: None The character has a supernatural allergy to gold, silver, iron, magic, or other substances which must be approved by Staff. While in contact with the substance, the character cannot benefit from a Short or Long Rest and all Healing sources will Heal only 1 point. The character will feel twitchy, nauseous, headachy, or paranoid (or any combination of these) while touching the material in question and should role play as such. Cloth will not stop these symptoms, but leather or thicker substances will. 2 points are awarded for materials that are likely to be very common such as leather, iron, and materia. 1 point is awarded for materials that are less likely to be common or a hindrance, such as gold, silver, or any of the Resources. No points will be awarded for materials that are unlikely to be encountered, or will rarely cause a hindrance. Standard Allergens and Awards: Cloth - 2 BP Copper - 1 BP Gold - 1 BP Harvest - 1 BP Hide - 1 BP Ingot - 1 BP Iron - 2 BP Leather - 2 BP Materia  - 2 BP Night Prize - 1 BP Other Common Allergen  - 2 BP Other Uncommon Allergen - 1 BP Rare Minerals - 1 BP Scale - 1 BP Silver - 1 BP"
   },
   {
     "name": "Severe Allergy",
@@ -77,7 +77,7 @@
     "ranks": null,
     "prereq": null,
     "category": "Physical",
-    "description": "Severe allergy to gold, silver, iron, magic or other substances. Suffers severe pain and Drained while in contact."
+    "description": "Severe allergy to gold, silver, iron, magic or other substances. Suffers severe pain and Drained while in contact. Award: 2 or 3 Prerequisites: None The character has a supernatural allergy to gold, silver, iron, magic, or other substances which must be approved by Staff. Each time the character goes from not touching an object made of the material to touching it with skin, it will cause Piercing 1 by Agony (even cloth will prevent this damage). So a character with a gold ring would take the damage each time it was put on, as well as each time they touched a gold coin (even if the ring remained on). While in contact with the substance, even through cloth, the character cannot benefit from a Short or Long Rest or Healing and will have the Drained Condition. The character will feel severely ill, feel burning pain, or have severe migraines and difficulty thinking (or any combination of these) while touching the material in question and should role play it as such. Cloth will not stop these symptoms but leather or thicker substances will. Weapons that are not obviously made of some other material are considered to be iron, and attacks from are considered to be “hitting skin” if they damage Life Points. 3 points are awarded for materials that are likely to be very common such as leather, iron, and materia. 2 points are awarded for materials that are less likely to be common or a hindrance, such as gold, silver, or any of the Resources. No points will be awarded for materials that are unlikely to be encountered, or will rarely cause a hindrance such as butter, horse hair, or werewolf skin. Standard Allergens and Awards: Cloth - 3 BP Copper - 2 BP Gold - 2 BP Harvest - 2 BP Hide - 2 BP Ingot - 2 BP Iron - 3 BP Leather - 3 BP Materia  - 3 BP Night Prize - 2 BP Other Common Allergen  - 3 BP Other Uncommon Allergen - 2 BP Rare Minerals - 2 BP Scale - 2 BP Silver - 2 BP"
   },
   {
     "name": "Shunned Soul",
@@ -85,7 +85,7 @@
     "ranks": null,
     "prereq": null,
     "category": "Spiritual",
-    "description": "While on Consecrated Ground, cannot benefit from Short Rests."
+    "description": "While on Consecrated Ground, cannot benefit from Short Rests. Award: 1 Prerequisites: None While the character is on Consecrated Ground, or in a Consecrated Building, they cannot benefit from Short Rests."
   },
   {
     "name": "Disquieting Aura",
@@ -93,7 +93,7 @@
     "ranks": null,
     "prereq": null,
     "category": "Spiritual",
-    "description": "Cannot Cure Berserk, Charmed, or Repelled Conditions."
+    "description": "Cannot Cure Berserk, Charmed, or Repelled Conditions. Award: 1 Prerequisites: None The character has a strange aura that makes them difficult to be around. Others may or may not sense it, but the character cannot successfully Cure Berserk, Charmed, or Repelled Conditions because their natural aura gets in the way."
   },
   {
     "name": "Torn Soul",
@@ -101,7 +101,7 @@
     "ranks": null,
     "prereq": null,
     "category": "Spiritual",
-    "description": "Only ever heals 1 point from any source of Healing."
+    "description": "Only ever heals 1 point from any source of Healing. Award: 4 Prerequisites: None Because the character’s soul is rent and in tatters, it does not soak up positive energy the way others’ can. The character only Heals 1 point from any source of Healing."
   },
   {
     "name": "Truthbound",
@@ -109,7 +109,7 @@
     "ranks": null,
     "prereq": null,
     "category": "Spiritual",
-    "description": "Cannot speak lies nor deceive others. Takes Final Damage if they speak a lie."
+    "description": "Cannot speak lies nor deceive others. Takes Final Damage if they speak a lie. Award: 2 Prerequisites: None For whatever reason, the character is bound to speak no lies. It may be a curse, or divine intervention, or a magical promise that has become binding. This means that the character is incapable of speaking a statement that they believe is false for the purposes of deceiving another. Written falsehoods are not covered by this Flaw, nor are spoken jokes and jests not meant to be taken seriously. If the player realizes that their character has lied, the character immediately takes Final damage equal to their Life Point total and they begin dying."
   },
   {
     "name": "Binding Oath of Charity",
@@ -117,7 +117,7 @@
     "ranks": null,
     "prereq": null,
     "category": "Oaths",
-    "description": "Swears Oath to protect and champion the poor and oppressed. Cannot keep goods other than for survival."
+    "description": "Swears Oath to protect and champion the poor and oppressed. Cannot keep goods other than for survival. Award: 5 Prerequisites: None At some time in the past, the character made a binding oath of charity. The reasons for this oath, and for its powerfully magical binding, are up to the player. The character is required to obey the strictures as best as they can, and should the player realize that the character has broken the rules, they will lose access to their highest level Powers and will take a 1 point penalty to their maximum Life Point total. These will last until the character feels they have atoned for their failures in-game. Binding Oaths that are imposed by Staff require Staff approval for atonement. The Oath of Charity is as follows: You will be charitable, keeping only the minimum arms and armor needed to do good deeds, and enough wealth for austere survival. All else will be given to those less fortunate. You will give your time and your blood for the protection of those who cannot protect themselves as well. You will be the champion of the poor and the oppressed."
   },
   {
     "name": "Binding Oath of Chastity",
@@ -125,7 +125,7 @@
     "ranks": null,
     "prereq": null,
     "category": "Oaths",
-    "description": "Swears Oath to not have sexual or romantic relationships with others."
+    "description": "Swears Oath to not have sexual or romantic relationships with others. Award: 1 Prerequisites: None At some time in the past, the character made a binding oath of chastity. The reasons for this oath, and for its powerfully magical binding, are up to the player. The character is required to obey the strictures as best as they can, and should the player realize that the character has broken the rules, they will lose access to their highest level Powers and will take a 1 point penalty to their maximum Life Point total. These will last until the character feels they have atoned for their failures in-game. Binding Oaths that are imposed by Staff require Staff approval for atonement. The Oath of Chastity is as follows: You may not have romantic or sexual relationships with any individual. You may not take part in romantic or sexual situations or conversations and must excuse yourself from these kinds of experiences. You will retain a chaste demeanor, refraining from “dirty” jokes and other kinds of prurient enjoyment and behavior."
   },
   {
     "name": "Binding Oath of Civility",
@@ -133,7 +133,7 @@
     "ranks": null,
     "prereq": null,
     "category": "Oaths",
-    "description": "Swears Oath to treat others with respect and civility."
+    "description": "Swears Oath to treat others with respect and civility. Award: 2 Prerequisites: None At some time in the past, the character made a binding oath of civility. The reasons for this oath, and for its powerfully magical binding, are up to the player. The character is required to obey the strictures as best as they can, and should the player realize that the character has broken the rules, they will lose access to their highest level Powers and will take a 1 point penalty to their maximum Life Point total. These will last until the character feels they have atoned for their failures in-game. Binding Oaths that are imposed by Staff require Staff approval for atonement. The Oath of Civility is as follows: You will never speak ill of others. You will not let it slide when such things are said of others. You will show all living creatures respect and politeness."
   },
   {
     "name": "Binding Oath of Honor",
@@ -141,7 +141,7 @@
     "ranks": null,
     "prereq": null,
     "category": "Oaths",
-    "description": "Swears Oath to be fair in your dealings, to not cheat, and to be honorable in your actions."
+    "description": "Swears Oath to be fair in your dealings, to not cheat, and to be honorable in your actions. Award: 2 Prerequisites: None At some time in the past, the character made a binding oath of honor. The reasons for this oath, and for its powerfully magical binding, are up to the player. The character is required to obey the strictures as best as they can, and should the player realize that the character has broken the rules, they will lose access to their highest level Powers and will take a 1 point penalty to their Maximum Life Point total. These will last until the character feels they have atoned for their failures in-game. Binding Oaths that are imposed by Staff require Staff approval for atonement. The Oath of Honor is as follows: You will never break your word. You will never cheat in any contest, nor use deception or trickery to win. You will never attack those who are unaware, from behind, nor take unfair advantage."
   },
   {
     "name": "Binding Oath of Peace",
@@ -149,6 +149,6 @@
     "ranks": null,
     "prereq": null,
     "category": "Oaths",
-    "description": "Swears Oath to not end life, to prevent other lives from being ended and to only fight in self-defense."
+    "description": "Swears Oath to not end life, to prevent other lives from being ended and to only fight in self-defense. Award: 5 Prerequisites: None At some time in the past, the character made a binding oath of peace. The reasons for this oath, and for its powerfully magical binding, are up to the player. The character is required to obey the strictures as best as they can, and should the player realize that the character has broken the rules, they will lose access to their highest level Powers and will take a 1 point penalty to their maximum Life Point total. These will last until the character feels they have atoned for their failures in-game. Binding Oaths that are imposed by Staff require Staff approval for atonement. The Oath of Peace is as follows: You will not intentionally end any sentient life. You will not attack another sentient creature except in self defense You will not allow a life to be ended."
   }
 ]

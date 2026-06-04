@@ -888,7 +888,8 @@ function enrichWithDetailSections(results) {
   for (let i = charOptionsH1 + 1; i < charOptionsEnd; i++) {
     const n = nodes[i];
     if (!(n.type === 'heading' && n.level === 4)) continue;
-    const target = byName.get(n.text.trim());
+    const cleanHeading = n.text.replace(/\s*\(\d+\)\s*$/, '').trim();
+    const target = byName.get(cleanHeading);
     if (!target) continue;
     const secEnd = nodes.findIndex((m, j) => j > i && m.type === 'heading' && m.level <= 4);
     // Gather text + table cells + list items: a perk's detail benefits may follow
@@ -939,7 +940,7 @@ function extractTiers(results) {
 }
 
 write('perks.json', extractTiers(enrichWithDetailSections(parsePerkFlawList('Perks List', 'cost'))));
-write('flaws.json', parsePerkFlawList('Flaws List', 'bp'));
+write('flaws.json', enrichWithDetailSections(parsePerkFlawList('Flaws List', 'bp')));
 
 // ─── DEVOTIONS ────────────────────────────────────────────────────────────────
 // Each devotion is an H1. Content is text nodes with bullet lists for tenets.
