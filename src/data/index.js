@@ -165,6 +165,7 @@ function powerEntry(p) {
     call: p.call ?? null,
     effect: p.effect ?? null,
     incantation: p.incantation ?? null,
+    maxRanks: p.maxRanks ?? 1,
   };
 }
 
@@ -406,6 +407,41 @@ for (const [id, ent] of ENTITY_INDEX) {
   if (!NAME_INDEX.has(key)) NAME_INDEX.set(key, id);
 }
 
+// Name-variant aliases the source prose uses that differ from an entity's real
+// name in ways canon() (which only folds punctuation / plurals) can't bridge.
+// Two kinds:
+//   • PATTERN — a transform applied to the matching prefix/shape (handles the
+//     parameterized Profession tiers and the "Lore: X" / "Lore [X]" → "Lore (X)"
+//     re-bracketing the MegaDoc's Starting Skills lists use).
+//   • EXACT — whole-name substitutions for skills the doc spells differently
+//     ("Scavenge" → "Scavenge I", "Basic Lock Skill" → "Basic Locks").
+// Add a row here rather than special-casing a call site, so every resolver
+// (reconcile, cost, links) gets the alias.
+const ALIAS_PATTERNS = [
+  [/^apprentice profession\b/i, () => 'Profession - Apprentice'],
+  [/^journeyman profession\b/i, () => 'Profession - Journeyman'],
+  [/^master profession\b/i, () => 'Profession - Master'],
+  // "Lore: Nature" / "Lore [Shadow]" → "Lore (Nature)" / "Lore (Shadow)"
+  [/^lore(?::\s*\[?|\s+\[)([^\]]+)\]?$/i, (m) => `Lore (${m[1]})`],
+];
+const ALIAS_EXACT = {
+  'scavenge': 'Scavenge I',
+  'basic lock skill': 'Basic Locks',
+  'basic trap skill': 'Basic Traps',
+  'bits & pieces': 'Bits and Pieces',
+  'two-weapon style': 'Two Weapon Style',
+  'ritual lore': 'Lore (Ritual)',
+};
+function applySkillAlias(name) {
+  const lower = name.trim().toLowerCase();
+  if (ALIAS_EXACT[lower]) return ALIAS_EXACT[lower];
+  for (const [re, fn] of ALIAS_PATTERNS) {
+    const m = name.match(re);
+    if (m) return name.replace(re, fn(m));
+  }
+  return name;
+}
+
 // Lookup by entity id, e.g. "skills:Basic Faith" → { type, name, description, ... }.
 // Falls back to a canonical-name match across all types when the exact id misses,
 // so reference links resolve despite linker/file namespace differences.
@@ -416,20 +452,24 @@ export const lookupEntity = (id) => {
   const type = id.slice(0, id.indexOf(':'));
   let name = id.slice(id.indexOf(':') + 1);
 
-  // Map sheet aliases to canonical reference names
-  const normalizedLower = name.trim().toLowerCase();
-  if (normalizedLower.startsWith("apprentice profession")) {
-    name = name.replace(/apprentice profession/i, "Profession - Apprentice");
-  } else if (normalizedLower.startsWith("journeyman profession")) {
-    name = name.replace(/journeyman profession/i, "Profession - Journeyman");
-  } else if (normalizedLower.startsWith("master profession")) {
-    name = name.replace(/master profession/i, "Profession - Master");
-  }
+  // Map sheet / MegaDoc-prose name variants to their canonical entity names.
+  // These are spellings the source uses that don't match the entity's real name
+  // (beyond the punctuation/plural folding canon() already does) — e.g. the doc
+  // writes "Basic Lock Skill" but the skill is "Basic Locks", or "Lore: Nature"
+  // for "Lore (Nature)". Centralized so reconcile, cost, and link resolution all
+  // share one alias table instead of ad-hoc per-call-site fixes.
+  name = applySkillAlias(name);
 
   const byName = NAME_INDEX.get(canon(name));
   if (byName) return ENTITY_INDEX.get(byName);
 
   // Try stripping trailing rank (Roman numeral or digit) if we missed
+  const xMatch = name.trim().match(/^(.*?)\s+x\s*(\d+)$/i);
+  if (xMatch) {
+    const stripped = xMatch[1].trim();
+    const byStrippedName = NAME_INDEX.get(canon(stripped));
+    if (byStrippedName) return ENTITY_INDEX.get(byStrippedName);
+  }
   const ROMAN_MAP = {
     i: 1, ii: 2, iii: 3, iv: 4, v: 5, vi: 6, vii: 7, viii: 8, ix: 9, x: 10,
     xi: 11, xii: 12, xiii: 13, xiv: 14, xv: 15

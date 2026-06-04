@@ -215,8 +215,19 @@ function findLabelFrom(grid, re, fromRow, nearCol) {
 
 // ─── XLSX EXPORTER ────────────────────────────────────────────────────────────
 
-function bpSuffix(name, field, report) {
-  const e = report?.spend.byItem[`${field}:${name}`];
+function bpSuffix(name, field, report, idx) {
+  let e = null;
+  if (field === 'startingSkills') {
+    if (idx !== undefined) {
+      e = report?.spend.byItem[`startingSkills:${idx}:${name}`];
+    }
+    if (!e) {
+      const match = Object.keys(report?.spend.byItem || {}).find(k => k.startsWith('startingSkills:') && k.endsWith(`:${name}`));
+      if (match) e = report.spend.byItem[match];
+    }
+  } else {
+    e = report?.spend.byItem[`${field}:${name}`];
+  }
   if (!e) return '';
   if (e.cost < 0) {
     return e.grant?.source ? ` (${-e.cost} BP refunded from ${e.grant.source})` : ` (+${-e.cost} BP)`;

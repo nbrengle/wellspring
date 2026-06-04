@@ -12,12 +12,18 @@
 import {
   validate, getClasses, characterLevel, budgetFor, computeSlots, spellSlots,
   devotionState, prereqStatus, LEVEL_CAP, LEGAL_MIN_LEVEL,
-  grantedAbilities, computeSpend, discountSources,
+  grantedAbilities, computeSpend, discountSources, getMaxRanks, bareSkill, cleanItemName
 } from '../src/data/validate.js';
 import { formatCharacterSheet, parseCharacterSheet } from '../src/data/sheet.js';
 import { readFileSync } from 'node:fs';
 import { lookupEntity, eligiblePowers, DEVOTIONS, DOMAINS, REFS, CLASSES, LINEAGES } from '../src/data/index.js';
+import {
+  hasStartingChoices, reconcileStartingChoices, rebuildStartingSkills,
+  STARTING_CHOICES_CONFIG, optionSkills, resolveSkill,
+  configSkillKeys, sourceStartingSkillKeys,
+} from '../src/data/starting-choices.js';
 import ARCHETYPES from '../src/data/archetypes.json' with { type: 'json' };
+import CLASSES_JSON from '../src/data/classes.json' with { type: 'json' };
 
 // ─── tiny harness ─────────────────────────────────────────────────────────────
 let passed = 0;
@@ -488,6 +494,317 @@ test('Class Powers are eligible per class and cost their BP', () => {
   const s = computeSpend({ classLevels: 'Mage 10', classPowers: ['Cantrip Scholar'] });
   eq(s.byItem['classPowers:Cantrip Scholar'].cost, 4, 'Cantrip Scholar costs 4 BP');
   eq(s.net, 4, 'counted in spend');
+});
+
+// ─── multi-rank skills, perks, class powers, and instance-based skills ────────
+test('getMaxRanks returns correct limits from JSON metadata', () => {
+  eq(getMaxRanks('Spell-Scholar', 'purchasedSkills'), 12, 'Spell-Scholar max ranks');
+  eq(getMaxRanks('Bookcaster', 'purchasedSkills'), Infinity, 'Bookcaster max ranks');
+  eq(getMaxRanks('Agile Learner', 'purchasedSkills'), 3, 'Agile Learner max ranks');
+  eq(getMaxRanks('Custom Brew', 'classPowers'), 3, 'Custom Brew class power max ranks');
+});
+
+test('ranks: computeSpend calculates correctly for multi-rank skills', () => {
+  const c = {
+    classLevels: 'Mage 4',
+    purchasedSkills: ['Spell-Scholar'],
+    ranks: { purchasedSkills: [3] }
+  };
+  const s = computeSpend(c);
+  eq(s.byItem['purchasedSkills:Spell-Scholar'].cost, 12, 'Spell-Scholar rank 3 costs 4 * 3 = 12');
+});
+
+test('dedupe: unlimited-ranks (instance-based) skills are not collapsed', () => {
+  const c = {
+    classLevels: 'Mage 4',
+    purchasedSkills: ['Bookcaster (Identify)', 'Bookcaster (Mageskin)'],
+    ranks: { purchasedSkills: [1, 1] }
+  };
+  const r = validate(c);
+  eq(r.spend.net, 2, 'Two instances of Bookcaster cost 1 each, net 2 BP');
+  // Verify both instances are kept in the owned skills list
+  const ownedSkills = r.owned.skills.map(s => s.name);
+  ok(ownedSkills.includes('Bookcaster (Identify)'), 'Includes Identify');
+  ok(ownedSkills.includes('Bookcaster (Mageskin)'), 'Includes Mageskin');
+});
+
+test('dedupe: class starting Bookcaster skills + additional purchased Bookcaster', () => {
+  const c = {
+    classes: [{ name: 'Mage', level: 4 }], // starts with Bookcaster, Bookcaster
+    startingSkills: ['Bookcaster (Magekey)', 'Bookcaster (Mask Aura)'],
+    purchasedSkills: ['Bookcaster (Identify)'],
+    ranks: { startingSkills: [1, 1], purchasedSkills: [1] }
+  };
+  const r = validate(c);
+  // Mage starting Bookcaster is free. Purchased Bookcaster should cost 1 BP.
+  eq(r.spend.byItem['purchasedSkills:Bookcaster (Identify)'].cost, 1, 'Purchased Bookcaster costs 1 BP');
+  eq(r.spend.net, 1, 'Total spend net should be 1 BP (purchased Bookcaster)');
+});
+
+test('export/import: round-tripping with ranks and instances preserves rank & parameters', () => {
+  const c = {
+    classLevels: 'Mage 5',
+    purchasedSkills: ['Spell-Scholar', 'Bookcaster (Identify)', 'Bookcaster (Mageskin)'],
+    ranks: { purchasedSkills: [3, 1, 1] }
+  };
+  const orig = validate(c);
+  const sheet = formatCharacterSheet(c, orig);
+  ok(sheet.includes('Spell-Scholar x3 - 12 BP'), 'Prints rank and total BP for Spell-Scholar');
+  ok(sheet.includes('Bookcaster (Identify) - 1 BP'), 'Prints Bookcaster (Identify)');
+  ok(sheet.includes('Bookcaster (Mageskin) - 1 BP'), 'Prints Bookcaster (Mageskin)');
+
+  const rt = parseCharacterSheet(sheet);
+  // Verify parsed array matches
+  eq(rt.purchasedSkills.length, 3, 'rt three purchased skills');
+  ok(rt.purchasedSkills.includes('Spell-Scholar x3'), 'rt includes Spell-Scholar with rank string suffix');
+  
+  const rtValidated = validate(rt);
+  eq(rtValidated.spend.net, orig.spend.net, 'round-trip spend net');
+  eq(rtValidated.spend.byItem['purchasedSkills:Spell-Scholar x3'].rank, 3, 'round-trip Spell-Scholar rank');
+  eq(rtValidated.spend.byItem['purchasedSkills:Bookcaster (Identify)'].rank, 1, 'round-trip Bookcaster (Identify) rank');
+});
+
+// ─── starting-choice config integrity ─────────────────────────────────────────
+// STARTING_CHOICES_CONFIG is curated (hand-transcribed from each class's prose
+// "Starting Skills" entry, which is too irregular to parse reliably). These guard
+// against the config silently drifting from reality:
+
+// Every skill named in the config must resolve to a real entity — catches typos /
+// alias drift (this is what caught "Bits & Pieces" vs the real "Bits and Pieces").
+test('every starting-choice config skill resolves to an entity', () => {
+  for (const [cls, blocks] of Object.entries(STARTING_CHOICES_CONFIG)) {
+    for (const block of blocks) {
+      for (const s of block.options.flatMap(optionSkills)) {
+        ok(resolveSkill(s.name), `${cls} / ${block.label}: "${s.name}" must resolve`);
+      }
+    }
+  }
+});
+
+// Structural integrity: every configured class is real, block ids are unique, and
+// option labels within a block are unique (labels key the recorded choice + drive
+// the dropdown, so collisions would make a choice ambiguous).
+test('starting-choice config is structurally sound', () => {
+  const classNames = new Set(CLASSES_JSON.map((c) => c.name));
+  for (const [cls, blocks] of Object.entries(STARTING_CHOICES_CONFIG)) {
+    ok(classNames.has(cls), `${cls} is a real class`);
+    const ids = blocks.map((b) => b.id);
+    eq(new Set(ids).size, ids.length, `${cls} block ids unique`);
+    for (const block of blocks) {
+      ok(block.options.length >= 2, `${cls} / ${block.label} offers a real choice (≥2 options)`);
+      const labels = block.options.map((o) => o.label);
+      eq(new Set(labels).size, labels.length, `${cls} / ${block.label} option labels unique`);
+    }
+  }
+});
+
+// SOURCE-DRIFT GUARD: every skill the curated config can grant must actually be
+// referenced by that class's "Starting Skills" prose in classes.json. This is the
+// loud-failure tripwire for the curated config falling out of sync with the doc:
+// if a future MegaDoc edit removes/renames a skill, the config keeps offering it
+// and THIS test fails, naming the class + skill. (We assert config ⊆ source, not
+// equality — the prose mentions fixed grants too, and is too irregular to segment
+// into "only the choice skills"; see DOC_EDITS_WANTED.md #12.)
+//
+// EXEMPTIONS: a few Artisan skills are mentioned in the prose but in a form the
+// resolution sweep can't reconstruct contiguously — "Bits & Pieces" (the `&`
+// splits the name inside a bracket list), "Apprentice Profession" (split by "&
+// Journeyman"), and "Lore (Ritual)" (written "Ritual Lore" inside a bundle). These
+// are the exact irregularities logged in DOC_EDITS_WANTED.md #12; each is verified
+// to at least appear by base word in the prose, so the exemption can't hide a typo.
+const SOURCE_COVERAGE_EXEMPT = {
+  Artisan: new Set(),
+};
+test('curated config skills are all referenced by the source prose', () => {
+  for (const cls of Object.keys(STARTING_CHOICES_CONFIG)) {
+    const source = sourceStartingSkillKeys(cls);
+    const exempt = SOURCE_COVERAGE_EXEMPT[cls] || new Set();
+    for (const k of configSkillKeys(cls)) {
+      ok(source.has(k) || exempt.has(k),
+        `${cls}: config grants "${k}" but the Starting Skills prose doesn't — config drifted from the doc?`);
+    }
+  }
+});
+
+// ─── starting choices (specialty dropdowns) ───────────────────────────────────
+// The class's "Choose one of the following" blocks, surfaced as editable dropdowns
+// that work identically for from-scratch and archetype-loaded builds.
+
+// Mirror Builder.loadArchetype's specialty step: reconcile the archetype's shipped
+// starting skills onto the choice blocks, then rebuild so each grant is tagged.
+function loadWithChoices(a) {
+  const c = fromArchetype(a);
+  const primary = getClasses(c)[0]?.name;
+  if (primary && hasStartingChoices(primary)) {
+    c.startingChoices = reconcileStartingChoices(c, primary);
+    return rebuildStartingSkills(c, primary, c.startingChoices);
+  }
+  return c;
+}
+
+// Every archetype must still be a legal 9-BP build when loaded THROUGH the
+// reconcile+rebuild path (not just from its raw shipped skills) — i.e. making the
+// implicit choices explicit must not change the build's legality or cost.
+for (const a of ARCHETYPES) {
+  test(`archetype "${a.name}" stays 9 BP + legal through specialty reconcile`, () => {
+    const r = validate(loadWithChoices(a));
+    eq(r.spend.net, 9, 'BP after reconcile');
+    ok(r.valid, `legal after reconcile (flags: ${JSON.stringify(validityFlags(r))})`);
+  });
+}
+function validityFlags(r) {
+  return { over: r.overBudget, slots: r.slotsOver, prereq: r.prereqs.issues.length, below: r.belowFloor };
+}
+
+// Changing a choice that pins a CONCRETE parameter (the Lore dropdown selects
+// "Lore (Arcane)") must update the granted skill's parameter — not keep the old
+// subject. But a player-chosen value on a PLACEHOLDER grant ("(your choice)")
+// must survive a rebuild triggered by an unrelated choice.
+test('switching a parameterized choice updates the subject; player picks survive', () => {
+  const mage = (lore) => rebuildStartingSkills({ classes: [{ name: 'Mage', level: 4 }] }, 'Mage',
+    { startingLore: lore, magicalSpecialty: 'Additional Cantrip' });
+  let c = mage('Historical');
+  ok(c.startingSkills.includes('Lore (Historical)'), 'starts Historical');
+  c = rebuildStartingSkills(c, 'Mage', { ...c.startingChoices, startingLore: 'Arcane' });
+  ok(c.startingSkills.includes('Lore (Arcane)'), 'updates to Arcane');
+  ok(!c.startingSkills.includes('Lore (Historical)'), 'old subject dropped');
+
+  // Druid's base "Profession - Apprentice (your choice)" is a placeholder; a
+  // player setting it to (Smith) must survive an unrelated survival-choice swap.
+  let d = rebuildStartingSkills({ classes: [{ name: 'Druid', level: 4 }] }, 'Druid',
+    { druidSurvival: 'Forage I', druidBuddingWisdom: 'Peacecaster, Basic Medicine' });
+  const pi = d.startingSkills.findIndex((s) => /^Profession - Apprentice/.test(s));
+  d.startingSkills[pi] = 'Profession - Apprentice (Smith)';
+  d = rebuildStartingSkills(d, 'Druid', { ...d.startingChoices, druidSurvival: 'Scavenge I' });
+  ok(d.startingSkills.includes('Profession - Apprentice (Smith)'), 'player profession pick preserved');
+});
+
+// Reconcile resolves the implicit choice for every block of every archetype (no
+// block left at an arbitrary default when the skills actually determine it).
+test('reconcile picks a concrete option for each archetype choice block', () => {
+  const expectations = {
+    'Healer Druid': { druidSurvival: 'Forage I', druidBuddingWisdom: 'Peacecaster, Basic Medicine' },
+    'Form Fighter Druid': { druidSurvival: 'Scavenge I', druidBuddingWisdom: 'Extended Capacity - Novice, Lore (Nature)' },
+    'Utility Mage': { magicalSpecialty: 'Extended Capacity - Novice x2' },
+    // Artisan has THREE blocks; the shared-skill assignment must not collide
+    // (Productive=Enchanting, Path=Ritual — not both claiming the same skill).
+    'Mystic Artisan': { artisanProductive: 'Apprentice Enchanting', artisanPath: 'Apprentice Crafting (Ritual)' },
+    'Artificer Artisan': { artisanProductive: 'Apprentice Tinkering', artisanPath: 'Apprentice & Journeyman Profession' },
+  };
+  for (const [name, want] of Object.entries(expectations)) {
+    const a = ARCHETYPES.find((x) => x.name === name);
+    const choices = reconcileStartingChoices(fromArchetype(a), getClasses(a)[0].name);
+    for (const [id, label] of Object.entries(want)) {
+      eq(choices[id], label, `${name}.${id}`);
+    }
+  }
+});
+
+// Changing a choice swaps the granted skills: the old option's skills leave and
+// the new option's arrive. (Uses a from-scratch Druid so no PURCHASED skill
+// depends on the swapped-away option — see the prereq-cascade note below.)
+test('changing a Druid choice swaps its granted skills', () => {
+  const blank = rebuildStartingSkills(
+    { classes: [{ name: 'Druid', level: 4 }] }, 'Druid',
+    { druidSurvival: 'Forage I', druidBuddingWisdom: 'Peacecaster, Basic Medicine' });
+  ok(blank.startingSkills.some((s) => bareSkill(cleanItemName(s)) === 'Peacecaster'), 'starts with Peacecaster');
+
+  const swapped = rebuildStartingSkills(blank, 'Druid',
+    { ...blank.startingChoices, druidBuddingWisdom: 'Short Weapons, Two Weapon Style' });
+  const names = swapped.startingSkills.map((s) => bareSkill(cleanItemName(s)));
+  ok(names.includes('Short Weapons') && names.includes('Two Weapon Style'), 'gains the new option');
+  ok(!names.includes('Peacecaster') && !names.includes('Basic Medicine'), 'drops the old option');
+});
+
+// Swapping AWAY a specialty whose granted skill a PURCHASED skill depends on
+// correctly invalidates the build (the dependent purchase loses its prerequisite).
+// Healer Druid buys Diagnose + Combat Medic, both gated on the specialty's free
+// Basic Medicine — drop it and the prereqs break, as they should.
+test('swapping away a depended-on specialty skill surfaces the broken prereq', () => {
+  const base = loadWithChoices(ARCHETYPES.find((x) => x.name === 'Healer Druid'));
+  ok(validate(base).valid, 'archetype starts legal');
+  const swapped = rebuildStartingSkills(base, 'Druid',
+    { ...base.startingChoices, druidBuddingWisdom: 'Short Weapons, Two Weapon Style' });
+  const r = validate(swapped);
+  ok(!r.valid, 'illegal after dropping Basic Medicine');
+  ok(r.prereqs.issues.some((i) => i.item === 'Diagnose'), 'Diagnose prereq flagged');
+});
+
+// Each choice-granted starting skill is tagged with the block that granted it, so
+// the build sheet can badge it "<Class> · <Choice>".
+test('rebuild tags granted skills with their choice-block provenance', () => {
+  const a = ARCHETYPES.find((x) => x.name === 'Healer Druid');
+  const c = loadWithChoices(a);
+  const sources = Object.values(c.specialtySources || {});
+  ok(sources.includes('Budding Wisdom'), 'Budding Wisdom grant tagged');
+  ok(sources.includes('Gathering Choice'), 'Gathering Choice grant tagged');
+  // A FIXED base grant (Basic Faith) carries no specialty tag.
+  const faithIdx = c.startingSkills.findIndex((s) => bareSkill(cleanItemName(s)) === 'Basic Faith');
+  ok(faithIdx >= 0 && !c.specialtySources[faithIdx], 'fixed base grant is untagged');
+});
+
+// A granted "xN" specialty skill is stored once with its rank in the ranks
+// sidecar (not as N rows), so the build sheet can show its ×N multiplier even
+// though free class grants carry no per-item cost entry to read the rank from.
+test('granted "x2" specialty skill records rank 2 on a single row', () => {
+  const c = rebuildStartingSkills({ classes: [{ name: 'Mage', level: 4 }] }, 'Mage',
+    { startingLore: 'Historical', magicalSpecialty: 'Extended Capacity - Novice x2' });
+  const idxs = c.startingSkills
+    .map((s, i) => ({ i, base: bareSkill(cleanItemName(s)) }))
+    .filter((x) => x.base === 'Extended Capacity - Novice');
+  eq(idxs.length, 1, 'stored as a single row, not two');
+  eq(c.ranks.startingSkills[idxs[0].i], 2, 'rank 2 recorded');
+  // …and it still drives the +2 spellsKnown slot bonus mechanically.
+  eq(validate(c).slots.find((s) => s.category === 'spellsKnown').bonus, 2, 'x2 grants +2 spellsKnown');
+});
+
+// A finite multi-rank starting skill can be bought ABOVE its free granted floor:
+// the floor stays free, each extra rank costs the entity's per-rank price, and the
+// extra ranks still drive the skill's mechanical bonus. The bought-up rank also
+// survives a rebuild (e.g. when an unrelated specialty changes).
+test('buying a granted skill above its free floor bills only the excess', () => {
+  const setRank = (c, field, index, n) => {
+    const ranks = { ...(c.ranks || {}) };
+    const list = [...(ranks[field] || [])];
+    while (list.length < (c[field]?.length || 0)) list.push(1);
+    list[index] = n;
+    return { ...c, ranks: { ...ranks, [field]: list } };
+  };
+  let c = rebuildStartingSkills({ classes: [{ name: 'Mage', level: 4 }] }, 'Mage',
+    { startingLore: 'Historical', magicalSpecialty: 'Extended Capacity - Novice x2' });
+  const i = c.startingSkills.findIndex((s) => /Extended Capacity/.test(s));
+  eq(c.grantedRanks[i], 2, 'free floor is 2');
+
+  // Floor: free.
+  eq(validate(c).spend.net, 0, 'floor costs nothing');
+
+  // Rank 3: one paid rank @ 3 BP; bonus rises to 3.
+  let r = validate(setRank(c, 'startingSkills', i, 3));
+  eq(r.spend.byItem[`startingSkills:${i}:Extended Capacity - Novice`].cost, 3, 'rank 3 bills 1 extra rank');
+  eq(r.slots.find((s) => s.category === 'spellsKnown').bonus, 3, 'rank 3 grants +3 spellsKnown');
+
+  // Rank 4 (max): two paid ranks @ 3 BP.
+  eq(validate(setRank(c, 'startingSkills', i, 4)).spend.net, 6, 'rank 4 bills 2 extra ranks');
+
+  // Dropping back to the floor is free again.
+  eq(validate(setRank(c, 'startingSkills', i, 2)).spend.net, 0, 'back to floor is free');
+
+  // A rebuild preserves the bought-up rank and the floor.
+  const rebuilt = rebuildStartingSkills(setRank(c, 'startingSkills', i, 3), 'Mage', c.startingChoices);
+  eq(rebuilt.ranks.startingSkills[i], 3, 'bought-up rank preserved through rebuild');
+  eq(rebuilt.grantedRanks[i], 2, 'free floor preserved through rebuild');
+});
+
+// A starting skill unrelated to any choice block (or a non-conforming archetype
+// skill) is never silently dropped by a rebuild.
+test('rebuild preserves starting skills unrelated to the choices', () => {
+  const c = {
+    classes: [{ name: 'Druid', level: 4 }],
+    startingSkills: ['Basic Martial Weapons', 'Basic Faith', 'Forage I', 'Peacecaster', 'Basic Medicine', 'Lockpicking Improv'],
+    startingChoices: { druidSurvival: 'Forage I', druidBuddingWisdom: 'Peacecaster, Basic Medicine' },
+  };
+  const rebuilt = rebuildStartingSkills(c, 'Druid', c.startingChoices);
+  ok(rebuilt.startingSkills.includes('Lockpicking Improv'), 'unrelated manual skill preserved');
 });
 
 // ─── report ───────────────────────────────────────────────────────────────────

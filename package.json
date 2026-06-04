@@ -11,7 +11,7 @@
     "link": "node scripts/link-refs.js",
     "link:audit": "node scripts/link-audit.js",
     "doc:feedback": "node scripts/doc-feedback.js",
-    "test": "node --import ./scripts/register-json.mjs scripts/test.mjs",
+    "test": "node --import ./scripts/register-json.mjs scripts/test.mjs && node scripts/test-browser.mjs",
     "shot": "node scripts/shot.mjs"
   },
   "dependencies": {
