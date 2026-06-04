@@ -1169,5 +1169,28 @@
   outline: none; border-color: var(--b-amber-deep);
 }
 
-
-
+/* Sub-powers rendered inline inside parent details */
+.b-detail-subpowers {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+.b-detail-subpower-inline {
+  background: rgba(255, 255, 255, 0.015);
+  border: 1px solid var(--b-border);
+  border-radius: 0.5rem;
+  padding: 0.8rem;
+}
+.b-detail-subpower-inline .b-detail-section-title {
+  color: var(--b-purple);
+  font-size: 0.72rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  text-transform: none;
+  letter-spacing: normal;
+}
+.b-detail-subpower-inline .b-facts {
+  margin-top: 0.4rem !important;
+  padding-top: 0.4rem;
+}
