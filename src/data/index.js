@@ -322,7 +322,7 @@ const indexCollection = (items, type, { nameKey = 'name', extra = e => ({}), spl
     const desc = splitDesc && e.description
       ? (() => { const { summary, body } = splitDescription(e.description); return { description: body, summary }; })()
       : {};
-    ENTITY_INDEX.set(`${type}:${name}`, { id: `${type}:${name}`, type, name, ...e, ...desc, ...extra(e) });
+    ENTITY_INDEX.set(`${type}:${name}`, { ...e, ...desc, ...extra(e), id: `${type}:${name}`, type, name });
   }
 };
 indexCollection(skillsJson, 'skills');
@@ -333,17 +333,17 @@ indexCollection(domainsJson, 'domains');
 indexCollection(craftingJson, 'recipes');
 indexCollection(ritualsJson, 'rituals');
 for (const c of classesJson) {
-  ENTITY_INDEX.set(`classes:${c.name}`, { id: `classes:${c.name}`, type: 'classes', ...c });
+  ENTITY_INDEX.set(`classes:${c.name}`, { ...c, id: `classes:${c.name}`, type: 'classes' });
   for (const s of (c.specializations || [])) {
-    ENTITY_INDEX.set(`classes:${s.name}`, { id: `classes:${s.name}`, type: 'classes', parentClass: c.name, ...s });
+    ENTITY_INDEX.set(`classes:${s.name}`, { ...s, id: `classes:${s.name}`, type: 'classes', parentClass: c.name });
   }
   const TIERS = ['innate','utility','basic','advanced','veteran','classSkills','rightHandPowers','cantrips','noviceSpells','adeptSpells','greaterSpells'];
   for (const t of TIERS) for (const p of (c[t] || [])) {
-    ENTITY_INDEX.set(`powers:${p.name}`, { id: `powers:${p.name}`, type: 'powers', parentClass: c.name, tier: t, ...p });
+    ENTITY_INDEX.set(`powers:${p.name}`, { tier: t, ...p, id: `powers:${p.name}`, type: 'powers', parentClass: c.name });
   }
 }
 for (const d of domainsJson) for (const p of (d.powers || [])) {
-  ENTITY_INDEX.set(`powers:${p.name}`, { id: `powers:${p.name}`, type: 'powers', domain: d.name, ...p });
+  ENTITY_INDEX.set(`powers:${p.name}`, { ...p, id: `powers:${p.name}`, type: 'powers', domain: d.name });
 }
 
 // ─── CONCEPT / GLOSSARY INDEX ──────────────────────────────────────────────────
@@ -360,7 +360,7 @@ const indexConcepts = (items, type, { nameKey = 'name', descKey = 'description' 
     const id = `${type}:${name}`;
     // Don't clobber a richer earlier entry (e.g. a real skill) with a concept.
     if (!ENTITY_INDEX.has(id)) {
-      ENTITY_INDEX.set(id, { id, type, name, description, ...e });
+      ENTITY_INDEX.set(id, { ...e, id, type, name, description });
     }
     // Many rules entries nest named sub-concepts (e.g. Spellcasting > Spellbook,
     // Delivery > Weapon Delivery). Index those under the same type so refs to the
@@ -507,3 +507,5 @@ export const lookupEntity = (id) => {
   }
   return null;
 };
+
+export const getAllEntities = () => Array.from(ENTITY_INDEX.values());
