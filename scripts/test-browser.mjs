@@ -112,7 +112,7 @@ async function run() {
     console.log("Testing switching back to Character Creator...");
     await page.click('button:has-text("Character Creator")');
     await page.waitForSelector('.b-sheet-title');
-    
+
     console.log("✓ Browser integration test passed successfully!");
   } catch (err) {
     console.error("FAIL: Browser test encountered an error:", err);
