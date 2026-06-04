@@ -458,6 +458,20 @@ test('flaw BP award is capped at 5 (extra flaws give no more BP)', () => {
   ok(s.flawCapped, 'flawCapped flagged');
 });
 
+test('allergy flaws calculate awards dynamically based on parameter', () => {
+  const s1 = computeSpend({ classLevels: 'Fighter 10', flaws: ['Mild Allergy (Iron)'] });
+  eq(s1.rawAwarded, 2, 'common mild allergy awards 2 BP');
+
+  const s2 = computeSpend({ classLevels: 'Fighter 10', flaws: ['Mild Allergy (Gold)'] });
+  eq(s2.rawAwarded, 1, 'uncommon mild allergy awards 1 BP');
+
+  const s3 = computeSpend({ classLevels: 'Fighter 10', flaws: ['Severe Allergy (Iron)'] });
+  eq(s3.rawAwarded, 3, 'common severe allergy awards 3 BP');
+
+  const s4 = computeSpend({ classLevels: 'Fighter 10', flaws: ['Severe Allergy (Gold)'] });
+  eq(s4.rawAwarded, 2, 'uncommon severe allergy awards 2 BP');
+});
+
 // ─── sub-power extraction + grant (Strange Token → Curious Balm) ──────────────
 test('inline sub-powers are extracted as entities', () => {
   ok(lookupEntity('powers:Curious Balm'), 'Curious Balm exists');
