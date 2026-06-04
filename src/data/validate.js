@@ -155,6 +155,7 @@ export function ownedGrantSources(character) {
 const POWER_SOURCE_FIELDS = [
   'innatePowers', 'utilityPowers', 'basicPowers', 'advancedPowers',
   'veteranPowers', 'classPowers', 'rightHandPowers', 'domainPowers', 'formPowers',
+  'cantrips', 'noviceSpells', 'adeptSpells', 'greaterSpells', 'bookSpells',
 ];
 
 // Named abilities the character GAINS FOR FREE from a source they own — a lineage
@@ -1429,6 +1430,13 @@ export function checkPrereqs(character) {
       const id = resolveId(item, field, character);
       if (seen.has(id)) continue;
       seen.add(id);
+      const ent = lookupEntity(id) || lookupEntity(`${entityType(field)}:${bareSkill(cleanItemName(item))}`);
+      if (ent && ent.tier === 'SubPower') {
+        issues.push({
+          id, item, field,
+          text: `${ent.name} is a sub-power and cannot be selected directly.`,
+        });
+      }
       const pr = REFS.prereqs[id];
       if (!pr) continue;
 

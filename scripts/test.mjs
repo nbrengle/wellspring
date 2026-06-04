@@ -495,6 +495,31 @@ test('Class Powers are eligible per class and cost their BP', () => {
   eq(s.byItem['classPowers:Cantrip Scholar'].cost, 4, 'Cantrip Scholar costs 4 BP');
   eq(s.net, 4, 'counted in spend');
 });
+test('sub-powers are filtered out of eligiblePowers', () => {
+  const clericSpells = eligiblePowers('Cleric', 'spellsKnown');
+  ok(!clericSpells.some(p => p.name === 'Holy Rest'), 'Holy Rest (SubPower) is not offered directly');
+  ok(clericSpells.some(p => p.name === 'Prayer of Rest'), 'Prayer of Rest (Novice) is offered');
+});
+
+test('directly selecting a sub-power fails validation', () => {
+  const c = {
+    classLevels: 'Cleric 4',
+    noviceSpells: ['Holy Rest']
+  };
+  const r = validate(c);
+  ok(!r.valid, 'Character with sub-power directly selected is invalid');
+  ok(r.prereqs.issues.some(i => i.item === 'Holy Rest' && i.text.includes('is a sub-power')), 'Validation flags Holy Rest');
+});
+
+test('selecting parent power grants sub-powers correctly', () => {
+  const c = {
+    classLevels: 'Cleric 4',
+    noviceSpells: ['Prayer of Rest']
+  };
+  const r = validate(c);
+  ok(r.grantedAbilities.list.some(g => g.abilityName === 'Holy Rest' && g.source === 'Prayer of Rest'), 'Holy Rest is granted by Prayer of Rest');
+});
+
 
 // ─── multi-rank skills, perks, class powers, and instance-based skills ────────
 test('getMaxRanks returns correct limits from JSON metadata', () => {

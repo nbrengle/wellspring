@@ -213,7 +213,9 @@ export function eligiblePowers(className, category) {
   const lists = SLOT_POWER_LISTS[category];
   const byTier = CLASS_POWERS[className];
   if (!lists || !byTier) return [];
-  return lists.flatMap(tier => (byTier[tier] || []).map(p => ({ ...p, tierList: tier })));
+  return lists.flatMap(tier => (byTier[tier] || [])
+    .filter(p => p.tier !== 'SubPower')
+    .map(p => ({ ...p, tierList: tier })));
 }
 
 // Power-slot counts at the starting level come from the progression table's
