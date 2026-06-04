@@ -15,6 +15,7 @@ import {
   grantedAbilities, computeSpend, discountSources, getMaxRanks, bareSkill, cleanItemName
 } from '../src/data/validate.js';
 import { formatCharacterSheet, parseCharacterSheet } from '../src/data/sheet.js';
+import { solveCrafting } from '../src/data/recipe-solver.js';
 import { readFileSync } from 'node:fs';
 import { lookupEntity, eligiblePowers, DEVOTIONS, DOMAINS, REFS, CLASSES, LINEAGES } from '../src/data/index.js';
 import {
@@ -830,6 +831,32 @@ test('rebuild preserves starting skills unrelated to the choices', () => {
   };
   const rebuilt = rebuildStartingSkills(c, 'Druid', c.startingChoices);
   ok(rebuilt.startingSkills.includes('Lockpicking Improv'), 'unrelated manual skill preserved');
+});
+
+test('recipe solver resolves recursive and alternative recipes', () => {
+  const inventory = {
+    'Bloom': 5,
+    'Ingot': 1
+  };
+
+  // 1. Direct crafting of Alcohol (needs 1 Bloom)
+  let res = solveCrafting('Alcohol', 1, inventory);
+  ok(res.success, 'can craft Alcohol');
+  eq(res.inventory.Bloom, 4, 'deducts 1 Bloom');
+
+  // 2. Disjunctive crafting of Alchemical Suspension (needs 1 Bloom or 1 Night Prize or 1 Harvest)
+  res = solveCrafting('Alchemical Suspension', 1, inventory);
+  ok(res.success, 'can craft Alchemical Suspension from Bloom');
+  eq(res.inventory.Bloom, 4, 'deducts 1 Bloom for suspension');
+
+  // 3. Disjunctive crafting of Alchemical Salts (needs 1 Ingot or 1 Hide or 1 Rare Mineral)
+  res = solveCrafting('Alchemical Salts', 1, inventory);
+  ok(res.success, 'can craft Alchemical Salts from Ingot');
+  eq(res.inventory.Ingot, 0, 'deducts 1 Ingot for salts');
+
+  // 4. Crafting fails when ingredients are missing
+  res = solveCrafting('Adderstrike Venom', 1, inventory);
+  ok(!res.success, 'cannot craft Adderstrike Venom without Night Prizes');
 });
 
 // ─── report ───────────────────────────────────────────────────────────────────
