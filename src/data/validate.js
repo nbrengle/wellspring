@@ -965,7 +965,16 @@ export function computeSpend(character) {
   let rawAwarded = 0;
   for (const item of character.flaws || []) {
     const ent = lookupEntity(`flaws:${item}`);
-    const bp = typeof ent?.bp === 'number' ? ent.bp : parseInt(String(ent?.bp), 10) || 0;
+    let bp = 0;
+    if (ent) {
+      if (ent.baseName === "Mild Allergy" || ent.baseName === "Severe Allergy") {
+        const common = ["cloth", "iron", "leather", "materia", "other common allergen"];
+        const isCommon = common.includes(String(ent.parameter || "").toLowerCase().trim());
+        bp = ent.baseName === "Mild Allergy" ? (isCommon ? 2 : 1) : (isCommon ? 3 : 2);
+      } else {
+        bp = typeof ent.bp === 'number' ? ent.bp : parseInt(String(ent.bp), 10) || 0;
+      }
+    }
     byItem[`flaws:${item}`] = { cost: -bp, base: -bp, grant: null };
     rawAwarded += bp;
   }

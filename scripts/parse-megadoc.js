@@ -888,20 +888,35 @@ function enrichWithDetailSections(results) {
   for (let i = charOptionsH1 + 1; i < charOptionsEnd; i++) {
     const n = nodes[i];
     if (!(n.type === 'heading' && n.level === 4)) continue;
-    const target = byName.get(n.text.trim());
+    const cleanHeading = n.text.replace(/\s*\(\d+\)\s*$/, '').trim();
+    const target = byName.get(cleanHeading);
     if (!target) continue;
     const secEnd = nodes.findIndex((m, j) => j > i && m.type === 'heading' && m.level <= 4);
-    // Gather text + table cells + list items: a perk's detail benefits may follow
-    // a "…certain benefits:" colon as extra <td> cells (Boon Bonds, Heartbond) or
-    // a <ul> — textBetween (text-only) would drop them.
+    // Gather text + table cells + list items: preserve paragraphs by joining with \n\n.
+    // Detect list items in disguise (like "Cloth - 2 BP") and format them with bullets.
     const prose = nodes.slice(i + 1, secEnd === -1 ? charOptionsEnd : secEnd)
-      .flatMap((m) => m.type === 'list' ? m.items : (m.type === 'text' || m.type === 'cell') ? [m.text] : [])
-      .filter(Boolean).join(' ').trim();
+      .map((m) => {
+        if (m.type === 'list') {
+          return m.items.map(item => `• ${item}`).join('\n');
+        }
+        if (m.type === 'text' || m.type === 'cell') {
+          const t = m.text.trim();
+          // Detect pseudo-lists to render as bullet points
+          if (/^.+?\s*-\s*\d+\s*BP$/i.test(t)) {
+            return `• ${t}`;
+          }
+          return t;
+        }
+        return '';
+      })
+      .filter(Boolean)
+      .join('\n\n')
+      .trim();
     // Append only the parts not already in the (summary) description, so we don't
     // duplicate the cell text the detail section may restate.
     if (prose && !target.description.includes(prose)) {
       target.description = target.description
-        ? `${target.description} ${prose}`.trim()
+        ? `${target.description}\n\n${prose}`.trim()
         : prose;
     }
   }
@@ -939,7 +954,7 @@ function extractTiers(results) {
 }
 
 write('perks.json', extractTiers(enrichWithDetailSections(parsePerkFlawList('Perks List', 'cost'))));
-write('flaws.json', parsePerkFlawList('Flaws List', 'bp'));
+write('flaws.json', enrichWithDetailSections(parsePerkFlawList('Flaws List', 'bp')));
 
 // ─── DEVOTIONS ────────────────────────────────────────────────────────────────
 // Each devotion is an H1. Content is text nodes with bullet lists for tenets.

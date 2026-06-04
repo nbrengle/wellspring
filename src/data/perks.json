@@ -5,7 +5,7 @@
     "ranks": null,
     "prereq": null,
     "category": "Mystical",
-    "description": "Once per Long Rest can Revive by Divine but takes damage. Cost: 5 Prerequisites: None The character has a power within them that can be manifested in a single blast of strong healing energy. Once per Long Rest, the character can sacrifice life-force in order to Revive to another at Touch Range. To do this, they should call “Revive by Divine” and then immediately drop to zero life points."
+    "description": "Once per Long Rest can Revive by Divine but takes damage.\n\nCost: 5\n\nPrerequisites: None\n\nThe character has a power within them that can be manifested in a single blast of strong healing energy. Once per Long Rest, the character can sacrifice life-force in order to Revive to another at Touch Range. To do this, they should call “Revive by Divine” and then immediately drop to zero life points."
   },
   {
     "name": "Greedy Soul",
@@ -13,7 +13,7 @@
     "ranks": null,
     "prereq": null,
     "category": "Mystical",
-    "description": "Character can attune four magical items at a time, instead of just three. Cost: 3 Prerequisites: None The character can attune four magic items at a time, rather than just three."
+    "description": "Character can attune four magical items at a time, instead of just three.\n\nCost: 3\n\nPrerequisites: None\n\nThe character can attune four magic items at a time, rather than just three."
   },
   {
     "name": "Magical Resilience",
@@ -21,7 +21,7 @@
     "ranks": null,
     "prereq": null,
     "category": "Mystical",
-    "description": "After Short Rest, gains Counter vs. Packets. Cost: 6 Prerequisites: None The character is naturally repellant to magic. The Character gains a Counter vs Packets once per Short Rest. The call is “Counter, Magical Resilience.”"
+    "description": "After Short Rest, gains Counter vs. Packets.\n\nCost: 6\n\nPrerequisites: None\n\nThe character is naturally repellant to magic. The Character gains a Counter vs Packets once per Short Rest. The call is “Counter, Magical Resilience.”"
   },
   {
     "name": "Mystic Armorer",
@@ -29,7 +29,7 @@
     "ranks": 3,
     "prereq": "Basic Arcane, Basic Faith, or Apprentice Enchanting",
     "category": "Mystical",
-    "description": "Can Mend Physical Armor to Full in a Q100."
+    "description": "Can Mend Physical Armor to Full in a Q100.\n\nCost: 3\n\nRanks: 3\n\nPrerequisites: Basic Arcane, Basic Faith, or Apprentice Enchanting\n\nThe character can Focus for a Quick 100 to Mend their or another character’s physical armor within Touch range to full Armor Points. This can be done once per Long Rest. The Call for this is “Mend Physical Armor to Full.”"
   },
   {
     "name": "Mystic Smith",
@@ -37,7 +37,7 @@
     "ranks": null,
     "prereq": "Mystic Armorer",
     "category": "Mystical",
-    "description": "Can Mend 2 points of another character’s armor. Cost: 5 Prerequisites: Mystic Armorer The Character may Focus Quick 100 to and spend a Spike to Mend another character's armor for 2 points. The appropriate call for this is “Mend 2 by Force.“"
+    "description": "Can Mend 2 points of another character’s armor.\n\nCost: 5\n\nPrerequisites: Mystic Armorer\n\nThe Character may Focus Quick 100 to and spend a Spike to Mend another character's armor for 2 points. The appropriate call for this is “Mend 2 by Force.“"
   },
   {
     "name": "Master Mystic Smith",
@@ -45,7 +45,7 @@
     "ranks": null,
     "prereq": "Mystic Smith",
     "category": "Mystical",
-    "description": "When Mending Armor, increases Armor Mending by +1. Cost: 3 Prerequisites: Mystic Smith When the character uses a Power that produces the Mending effect, they may increase the Mending done by 1."
+    "description": "When Mending Armor, increases Armor Mending by +1.\n\nCost: 3\n\nPrerequisites: Mystic Smith\n\nWhen the character uses a Power that produces the Mending effect, they may increase the Mending done by 1."
   },
   {
     "name": "Soothing Touch",
@@ -53,7 +53,7 @@
     "ranks": null,
     "prereq": null,
     "category": "Mystical",
-    "description": "At will can Cure Fear on Q100. Cost: 1 Prerequisites: None The character has a soul rooted in calm solemnity. At-will, the character can reach out to another, speaking soothing words and narrating images of placidity and tranquility. After doing this for a Quick 100, the character may call “Cure Fear”, curing the character of any Conditions that were applied with the Fear Accent. This cannot be taken along with Disquieting Aura."
+    "description": "At will can Cure Fear on Q100.\n\nCost: 1\n\nPrerequisites: None\n\nThe character has a soul rooted in calm solemnity. At-will, the character can reach out to another, speaking soothing words and narrating images of placidity and tranquility. After doing this for a Quick 100, the character may call “Cure Fear”, curing the character of any Conditions that were applied with the Fear Accent. This cannot be taken along with Disquieting Aura."
   },
   {
     "name": "Agility",
@@ -61,7 +61,7 @@
     "ranks": null,
     "prereq": null,
     "category": "Physical",
-    "description": "Gains advantage on physical feats of agility. Cost: 2 Prerequisites: None The character is naturally agile and well-balanced. In any repped situation where the character might lose their balance or fall, or would generally be saved by agility, they should be given the widest possible interpretation. For example, if jumping from column to column, they only get the tips of their toes onto the column. This would normally cause a fall, but because the character is agile, they are judged to have managed the jump. This will not make impossible things possible, or outright break rules for physical obstacles."
+    "description": "Gains advantage on physical feats of agility.\n\nCost: 2\n\nPrerequisites: None\n\nThe character is naturally agile and well-balanced. In any repped situation where the character might lose their balance or fall, or would generally be saved by agility, they should be given the widest possible interpretation. For example, if jumping from column to column, they only get the tips of their toes onto the column. This would normally cause a fall, but because the character is agile, they are judged to have managed the jump. This will not make impossible things possible, or outright break rules for physical obstacles."
   },
   {
     "name": "Bloody Minded",
@@ -69,7 +69,7 @@
     "ranks": null,
     "prereq": null,
     "category": "Physical",
-    "description": "Character can resist a number of Charm Effects equal to their level. Cost: 3 Prerequisites: None The character has Resistance to Charm Effects. This will last until the character has resisted a number of these Effects equal to their character level. After that they are affected by them normally until they complete a Long Rest."
+    "description": "Character can resist a number of Charm Effects equal to their level.\n\nCost: 3\n\nPrerequisites: None\n\nThe character has Resistance to Charm Effects. This will last until the character has resisted a number of these Effects equal to their character level. After that they are affected by them normally until they complete a Long Rest."
   },
   {
     "name": "Carnal Creature",
@@ -77,7 +77,7 @@
     "ranks": null,
     "prereq": null,
     "category": "Physical",
-    "description": "Character may choose to hold off taking Spirit Form until they have been dead for a Slow 300. Cost: 1 Prerequisites: None The character has little desire to give up their body, and can remain dead for a Slow 300 before discorporating, rather than the normal 180. Any time after 180, they can let go and discorporate. This can be guided by player knowledge of what is occurring, as their Spirit gets some sort of sense of their surroundings after the initial Slow 180."
+    "description": "Character may choose to hold off taking Spirit Form until they have been dead for a Slow 300.\n\nCost: 1\n\nPrerequisites: None\n\nThe character has little desire to give up their body, and can remain dead for a Slow 300 before discorporating, rather than the normal 180. Any time after 180, they can let go and discorporate. This can be guided by player knowledge of what is occurring, as their Spirit gets some sort of sense of their surroundings after the initial Slow 180."
   },
   {
     "name": "Cold Dead Hands",
@@ -85,7 +85,7 @@
     "ranks": null,
     "prereq": null,
     "category": "Physical",
-    "description": "Weapons cannot be taken when Slept, Dying or Dead. Cost: 3 Prerequisites: None The character will not involuntarily let go of their own possessions at any time, even when Slept, Dying, or even Dead. The player should call “Cold Dead Hands” whenever someone tries to remove a possession from the character's hand. If the character’s arm is Disabled, they will not release their possessions (although they cannot use them or block with them). If the character’s weapon is Disarmed, the character will take a Disable Effect to that limb instead of the same Duration as was Called for the Disarm (or a Quick Count of 30 if no duration is Called)"
+    "description": "Weapons cannot be taken when Slept, Dying or Dead.\n\nCost: 3\n\nPrerequisites: None\n\nThe character will not involuntarily let go of their own possessions at any time, even when Slept, Dying, or even Dead. The player should call “Cold Dead Hands” whenever someone tries to remove a possession from the character's hand. If the character’s arm is Disabled, they will not release their possessions (although they cannot use them or block with them). If the character’s weapon is Disarmed, the character will take a Disable Effect to that limb instead of the same Duration as was Called for the Disarm (or a Quick Count of 30 if no duration is Called)"
   },
   {
     "name": "Deathgrip",
@@ -93,7 +93,7 @@
     "ranks": null,
     "prereq": null,
     "category": "Physical",
-    "description": "While Dying, can crawl and hold objects. Cost: 1 Prerequisites: None When the character has the Dying Condition, they can crawl slowly, and even hold objects. Normally characters who are dying can perform no actions other than calling out for help. This cannot be taken along with Dies Alone."
+    "description": "While Dying, can crawl and hold objects.\n\nCost: 1\n\nPrerequisites: None\n\nWhen the character has the Dying Condition, they can crawl slowly, and even hold objects. Normally characters who are dying can perform no actions other than calling out for help. This cannot be taken along with Dies Alone."
   },
   {
     "name": "Elemental Affinity",
@@ -101,7 +101,7 @@
     "ranks": 2,
     "prereq": null,
     "category": "Physical",
-    "description": "Attune to an element. Gain Resistance to that Element and Final to the opposite."
+    "description": "Attune to an element. Gain Resistance to that Element and Final to the opposite.\n\nCost: 4\n\nRanks: 2\n\nPrerequisites: None\n\nOnce per Long Rest, the character can focus for a Quick 100 to infuse themself with elemental energy. The element they can attune to is determined when the Perk is taken and must be chosen from Flame, Ice, Lightning, or Acid. The attunement only lasts until the end of the next Short Rest. While attuned, the character may resist a number of elemental effects of their chosen element equal to their Life Point Maximum per Event. In addition, they are able to alter the Accent of any elemental power they use to the chosen accent. However, they are unable to use powers with the opposition Accent.\n\nThey also become Vulnerable to the opposite element, and take Effects from that element as Final. Flame and Ice are opposites, as are Lightning and Acid. This Perk can be taken up to twice, and each time the character may choose any element they desire, although they may not to attune to more than one element at a time."
   },
   {
     "name": "Hard to Kill",
@@ -109,7 +109,7 @@
     "ranks": null,
     "prereq": null,
     "category": "Physical",
-    "description": "Slow 300 rather than 180 while Dying. Cost: 1 Prerequisites: None After being dropped to 0 Life Points, the character has a Slow 300 before they die, rather than the normal Slow 180."
+    "description": "Slow 300 rather than 180 while Dying.\n\nCost: 1\n\nPrerequisites: None\n\nAfter being dropped to 0 Life Points, the character has a Slow 300 before they die, rather than the normal Slow 180."
   },
   {
     "name": "Holding On",
@@ -117,7 +117,7 @@
     "ranks": null,
     "prereq": null,
     "category": "Physical",
-    "description": "After Deathblow, it takes 30 seconds to die. Cost: 1 Prerequisites: None By pure willpower, the character holds on to life, even in the face of certain death. After being Deathblowed, rather than dying in 10 seconds, the character has 30 seconds before they die."
+    "description": "After Deathblow, it takes 30 seconds to die.\n\nCost: 1\n\nPrerequisites: None\n\nBy pure willpower, the character holds on to life, even in the face of certain death. After being Deathblowed, rather than dying in 10 seconds, the character has 30 seconds before they die."
   },
   {
     "name": "Iron Stomach",
@@ -125,7 +125,7 @@
     "ranks": null,
     "prereq": null,
     "category": "Physical",
-    "description": "Once per Long Rest, Counter an ingested Poison. Cost: 2 Prerequisites: None Once per Long Rest, the character can Counter the effects of an ingested Poison. They should call “Counter, Iron Stomach” when this occurs."
+    "description": "Once per Long Rest, Counter an ingested Poison.\n\nCost: 2\n\nPrerequisites: None\n\nOnce per Long Rest, the character can Counter the effects of an ingested Poison. They should call “Counter, Iron Stomach” when this occurs."
   },
   {
     "name": "Quick Healing",
@@ -133,7 +133,7 @@
     "ranks": null,
     "prereq": null,
     "category": "Physical",
-    "description": "Heals 1 Life Point after each Short Rest. Cost: 3 Prerequisites: None The character Heals 1 Life Point at the end of each Short Rest. This will heal Undead as well as the Living."
+    "description": "Heals 1 Life Point after each Short Rest.\n\nCost: 3\n\nPrerequisites: None\n\nThe character Heals 1 Life Point at the end of each Short Rest. This will heal Undead as well as the Living."
   },
   {
     "name": "Toughness",
@@ -141,7 +141,7 @@
     "ranks": null,
     "prereq": null,
     "category": "Physical",
-    "description": "Adds +1 Life Point to max. Cost: 5 Prerequisites: None The character is harder to kill and adds 1 Life Point to their maximum."
+    "description": "Adds +1 Life Point to max.\n\nCost: 5\n\nPrerequisites: None\n\nThe character is harder to kill and adds 1 Life Point to their maximum."
   },
   {
     "name": "Unkillable",
@@ -149,7 +149,7 @@
     "ranks": null,
     "prereq": "Holding On",
     "category": "Physical",
-    "description": "Once per Long Rest, instead of Dying, stabilizes at zero Life Points. Cost: 4 Prerequisites: Holding On Once per Long Rest, when the character has finished a death-count (including a shortened one after a Deathblow) and should die, they will instead stabilize at zero Life Points."
+    "description": "Once per Long Rest, instead of Dying, stabilizes at zero Life Points.\n\nCost: 4\n\nPrerequisites: Holding On\n\nOnce per Long Rest, when the character has finished a death-count (including a shortened one after a Deathblow) and should die, they will instead stabilize at zero Life Points."
   },
   {
     "name": "Will to Live",
@@ -157,7 +157,7 @@
     "ranks": null,
     "prereq": null,
     "category": "Physical",
-    "description": "Converts a Death Effect to Final Damage once per Event. Cost: 1 Prerequisites: None Incantation: None Call: “Altered, Will to Live” Target: Self                                        Duration: Instantaneous Delivery: None                                Refresh: Event Accent: None                                        Effect: Altered Keeping a white-knuckle grip on life, the character can, once per Event, take ten points of Final damage instead of a Death Effect. For Example: Tristan is struck with a spell-packet and the attacking creature Calls “Death by Shadow. Instead of dying immediately, Tristan uses this Perk and takes ten points of Final damage. This blows through his Life Points, causing him to be dying, but he is not dead yet."
+    "description": "Converts a Death Effect to Final Damage once per Event.\n\nCost: 1\n\nPrerequisites: None\n\nIncantation: None\n\nCall: “Altered, Will to Live”\n\nTarget: Self                                        Duration: Instantaneous\n\nDelivery: None                                Refresh: Event\n\nAccent: None                                        Effect: Altered\n\nKeeping a white-knuckle grip on life, the character can, once per Event, take ten points of Final damage instead of a Death Effect.\n\nFor Example: Tristan is struck with a spell-packet and the attacking creature Calls “Death by Shadow. Instead of dying immediately, Tristan uses this Perk and takes ten points of Final damage. This blows through his Life Points, causing him to be dying, but he is not dead yet."
   },
   {
     "name": "Patron",
@@ -165,7 +165,7 @@
     "ranks": null,
     "prereq": null,
     "category": "Patron",
-    "description": "Gains a personal divine patron. Cost: 4 Prerequisites: None The character is under the personal patronage of a powerful Divine Being, or one of their emissaries or heralds. The character has some sort of relationship with their Patron, whether it be servile, romantic, or purely business. The character can never refuse a request by that patron without losing this Perk. The character has a relationship with this Patron and can make requests or prayers to it, although there is no necessity that they be answered or honored. Most other Perks can be purchased more cheaply if they are granted (and thus revocable) by the Patron. Any Perk that doesn’t have the Patron prerequisite that is going to be considered a gift from the Patron costs 1 BP less (to a minimum of 1). The Patron perk may provide a maximum of 10 BP in discounts. The Strong Bloodline and Inheritance Perks cannot be discounted this way."
+    "description": "Gains a personal divine patron.\n\nCost: 4\n\nPrerequisites: None\n\nThe character is under the personal patronage of a powerful Divine Being, or one of their emissaries or heralds. The character has some sort of relationship with their Patron, whether it be servile, romantic, or purely business. The character can never refuse a request by that patron without losing this Perk. The character has a relationship with this Patron and can make requests or prayers to it, although there is no necessity that they be answered or honored. Most other Perks can be purchased more cheaply if they are granted (and thus revocable) by the Patron. Any Perk that doesn’t have the Patron prerequisite that is going to be considered a gift from the Patron costs 1 BP less (to a minimum of 1). The Patron perk may provide a maximum of 10 BP in discounts. The Strong Bloodline and Inheritance Perks cannot be discounted this way."
   },
   {
     "name": "Gift of Hateful Retribution",
@@ -173,7 +173,7 @@
     "ranks": null,
     "prereq": "Patron",
     "category": "Patron",
-    "description": "Causes damage to those that attempt to Deathblow or kill an individual. Cost: Var Prerequisites: Patron The character’s patron, often a war or death Divine Being, or some other similar greater power, has given the character the ability to destroy those who would end the patron’s beloved pet. Once per Event, when the character is Deathblowed or killed with a melee attack, they can deliver Verbal damage to the one who attacked them. The cost of this Perk depends on the amount of damage the character does when killed. If this Perk is upgraded after character creation, only the difference between the old level and the new level needs to be paid. At higher power levels, this Perk can do damage “By My Voice” instead. Whether the individual or By My Voice damage is done is up to the character at the time it is used. The Accent on the damage is “by Spite. Note that in the case of a Deathblow, the Hateful Retribution will go off before the character actually dies. Cost Damage By My Voice Dmg 2 10 - 3 15 - 4 25 - 5 50 5"
+    "description": "Causes damage to those that attempt to Deathblow or kill an individual.\n\nCost: Var\n\nPrerequisites: Patron\n\nThe character’s patron, often a war or death Divine Being, or some other similar greater power, has given the character the ability to destroy those who would end the patron’s beloved pet. Once per Event, when the character is Deathblowed or killed with a melee attack, they can deliver Verbal damage to the one who attacked them. The cost of this Perk depends on the amount of damage the character does when killed. If this Perk is upgraded after character creation, only the difference between the old level and the new level needs to be paid. At higher power levels, this Perk can do damage “By My Voice” instead. Whether the individual or By My Voice damage is done is up to the character at the time it is used. The Accent on the damage is “by Spite. Note that in the case of a Deathblow, the Hateful Retribution will go off before the character actually dies.\n\nCost\n\nDamage\n\nBy My Voice Dmg\n\n2\n\n10\n\n-\n\n3\n\n15\n\n-\n\n4\n\n25\n\n-\n\n5\n\n50\n\n5"
   },
   {
     "name": "Gift of Healing",
@@ -181,7 +181,7 @@
     "ranks": null,
     "prereq": "Patron",
     "category": "Patron",
-    "description": "Can focus for Q100 to heal themselves or another to full Life Points. Cost: 2 Ranks: Unlimited Prerequisites: Patron The character can Focus for a Quick 100 to Heal themself or another character within Touch range to full Life Points. This can be done once per Event. The Call for this is “Heal to full Life Points."
+    "description": "Can focus for Q100 to heal themselves or another to full Life Points.\n\nCost: 2\n\nRanks: Unlimited\n\nPrerequisites: Patron\n\nThe character can Focus for a Quick 100 to Heal themself or another character within Touch range to full Life Points. This can be done once per Event. The Call for this is “Heal to full Life Points."
   },
   {
     "name": "Gift of Rebirth",
@@ -189,7 +189,7 @@
     "ranks": null,
     "prereq": "Patron",
     "category": "Patron",
-    "description": "Instead of dissipating, one self-only Revive ever. Cost: 3 Prerequisites: Patron Once, the character’s patron will save them from death. One time of the character’s choice, when the character would dissipate to Spirit Form after dying, they may instead be the target of Revive by Agony. In addition, whenever the character is brought back to life from being dead, they come back with two Life Points instead of the normal one."
+    "description": "Instead of dissipating, one self-only Revive ever.\n\nCost: 3\n\nPrerequisites: Patron\n\nOnce, the character’s patron will save them from death. One time of the character’s choice, when the character would dissipate to Spirit Form after dying, they may instead be the target of Revive by Agony. In addition, whenever the character is brought back to life from being dead, they come back with two Life Points instead of the normal one."
   },
   {
     "name": "Gift of Recognition",
@@ -197,7 +197,7 @@
     "ranks": null,
     "prereq": "Patron",
     "category": "Patron",
-    "description": "Can sense who else is sworn to the same Patron. Cost: 1 Prerequisites: Patron The character can sense others who also give homage to their same Patron. They can ask at-will “Discern by Mind: Is [Patron’s Name] your Patron?”"
+    "description": "Can sense who else is sworn to the same Patron.\n\nCost: 1\n\nPrerequisites: Patron\n\nThe character can sense others who also give homage to their same Patron. They can ask at-will “Discern by Mind: Is [Patron’s Name] your Patron?”"
   },
   {
     "name": "Gift of Unbreakable Flesh",
@@ -205,7 +205,7 @@
     "ranks": null,
     "prereq": "Patron",
     "category": "Patron",
-    "description": "Gains Natural Armor from Patron. Cost: Variable Prerequisites: Patron The character is beloved by a Divine Being or greater supernatural power of some kind, who grants a number of points of Natural Armor (armor that need not have a prop and can be both Mended and Healed). The cost of this Perk is dependent on the number of Armor Points the character has been granted. If this Perk is upgraded after character creation, only the difference between the old level and the new level needs to be paid. (i.e. 3 points to get 2 points of armor, if the character already paid 2 Build Points to get 1 point of armor). If the Character has a source of Natural Armor, then the value in the Armor Points column instead functions as an addition to their existing Natural Armor. Note: This armor works just like created armor in that choosing armor from another source will immediately exhaust these points. Cost Armor Points 2 1 5 2 10 3 15 4"
+    "description": "Gains Natural Armor from Patron.\n\nCost: Variable\n\nPrerequisites: Patron\n\nThe character is beloved by a Divine Being or greater supernatural power of some kind, who grants a number of points of Natural Armor (armor that need not have a prop and can be both Mended and Healed). The cost of this Perk is dependent on the number of Armor Points the character has been granted. If this Perk is upgraded after character creation, only the difference between the old level and the new level needs to be paid. (i.e. 3 points to get 2 points of armor, if the character already paid 2 Build Points to get 1 point of armor).\n\nIf the Character has a source of Natural Armor, then the value in the Armor Points column instead functions as an addition to their existing Natural Armor.\n\nNote: This armor works just like created armor in that choosing armor from another source will immediately exhaust these points.\n\nCost\n\nArmor Points\n\n2\n\n1\n\n5\n\n2\n\n10\n\n3\n\n15\n\n4"
   },
   {
     "name": "Ultimate Gift",
@@ -213,7 +213,7 @@
     "ranks": null,
     "prereq": "Patron",
     "category": "Patron",
-    "description": "Go to the River to Revive and Heal others. Cost: 1 Prerequisites: Patron Once, the character can call out a final prayer to their Patron to save those around them. They should call out “[Patron’s name], I give the Ultimate Gift!. They can now use three separate powers, at their discretion. They can call out “By My Voice Revive to [Names]” and give the names of any number of individuals, bringing them all back to life. They may call “By My Voice Heal 10 to [Names]” and heal all the named characters. They may also call out “By My Voice Short Grant Insubstantial to [Names]” When these things are complete, the character themself will die, immediately dissipate, taking Spirit form and heading for the Spirit River. It is unknown for sure what awaits mortal souls in the Spirit River, but if there is a creature out there watching over the tide of souls, you can be sure it would need a heavy price paid for this gift. The character need not give a list of names and may just affect everyone within range."
+    "description": "Go to the River to Revive and Heal others.\n\nCost: 1\n\nPrerequisites: Patron\n\nOnce, the character can call out a final prayer to their Patron to save those around them. They should call out “[Patron’s name], I give the Ultimate Gift!. They can now use three separate powers, at their discretion. They can call out “By My Voice Revive to [Names]” and give the names of any number of individuals, bringing them all back to life. They may call “By My Voice Heal 10 to [Names]” and heal all the named characters. They may also call out “By My Voice Short Grant Insubstantial to [Names]” When these things are complete, the character themself will die, immediately dissipate, taking Spirit form and heading for the Spirit River. It is unknown for sure what awaits mortal souls in the Spirit River, but if there is a creature out there watching over the tide of souls, you can be sure it would need a heavy price paid for this gift. The character need not give a list of names and may just affect everyone within range."
   },
   {
     "name": "Ancestral Relic",
@@ -221,7 +221,7 @@
     "ranks": null,
     "prereq": null,
     "category": "Social/Background",
-    "description": "Choose one item that is important to the character which won’t be dropped involuntarily. Cost: 2 Prerequisites: None The character designates one item as being linked with their character’s history, family, or fate. At the character’s option, this item can be chosen to be magical or not, but it will not have specific magical qualities. The character can treat the item as if they had the Cold Dead Hands Perk. This Perk costs only 1 if the benefactor is a Patron the character has already purchased."
+    "description": "Choose one item that is important to the character which won’t be dropped involuntarily.\n\nCost: 2\n\nPrerequisites: None\n\nThe character designates one item as being linked with their character’s history, family, or fate. At the character’s option, this item can be chosen to be magical or not, but it will not have specific magical qualities. The character can treat the item as if they had the Cold Dead Hands Perk. This Perk costs only 1 if the benefactor is a Patron the character has already purchased."
   },
   {
     "name": "Ancestral Weapon",
@@ -229,7 +229,7 @@
     "ranks": null,
     "prereq": "Ancestral Relic",
     "category": "Social/Background",
-    "description": "Chosen weapon cannot be taken from the character. Cost: 4 Prerequisites: Ancestral Relic The item that the character has chosen as their Ancestral Relic is a weapon that is bonded to the soul of the character. The arm or arms holding the item is resistant to the Disable Effect (“Resist” should be called) and the weapon cannot be physically taken from the character, even if the character is unconscious or dead. The character can treat the item as if they had the Cold Dead Hands Perk. A Shatter Effect will destroy the Ancestral Weapon as per normal, and immediately drop the character to 0 Life Points and Dying, but the weapon will reappear and reform in the character’s hand during the next Long Rest. Similarly, if lost, the weapon will return at the next Long Rest."
+    "description": "Chosen weapon cannot be taken from the character.\n\nCost: 4\n\nPrerequisites: Ancestral Relic\n\nThe item that the character has chosen as their Ancestral Relic is a weapon that is bonded to the soul of the character. The arm or arms holding the item is resistant to the Disable Effect (“Resist” should be called) and the weapon cannot be physically taken from the character, even if the character is unconscious or dead. The character can treat the item as if they had the Cold Dead Hands Perk.\n\nA Shatter Effect will destroy the Ancestral Weapon as per normal, and immediately drop the character to 0 Life Points and Dying, but the weapon will reappear and reform in the character’s hand during the next Long Rest. Similarly, if lost, the weapon will return at the next Long Rest."
   },
   {
     "name": "Bits and Pieces",
@@ -237,7 +237,7 @@
     "ranks": null,
     "prereq": null,
     "category": "Social/Background",
-    "description": "Once per Long Rest, acts as if they had a Rank of Lore. Cost: 1 Prerequisites: None The character can remember strange, random bits of lore and trivia. Once per Event, the character may act as if they had all Lore skills for a particular physical prop (eg. blue card) and may read all portions of that prop as though they had Lore skills they do not possess."
+    "description": "Once per Long Rest, acts as if they had a Rank of Lore.\n\nCost: 1\n\nPrerequisites: None\n\nThe character can remember strange, random bits of lore and trivia. Once per Event, the character may act as if they had all Lore skills for a particular physical prop (eg. blue card) and may read all portions of that prop as though they had Lore skills they do not possess."
   },
   {
     "name": "Boon Bonds",
@@ -245,7 +245,7 @@
     "ranks": null,
     "prereq": null,
     "category": "Social/Background",
-    "description": "Chooses a group of people that character can diagnose, heal and Cure Effects once per Long Rest. Cost: 2 Prerequisites: None Some bonds are not love, or even a bond-pair but are, instead, a group of people who share some common purpose or mystical link. When a character takes this Perk, they name up to three other characters. They get the benefits of this Perk only with those named members. Those members do not have to take this Perk. With those individuals, the character gain certain benefits: This Character can use “[Name or Description] Subtle Discern: How many Life Points are you down?” to any other member of the group at-will. This Character can do 1 point of Healing (“Heal 1 by Bond”) by touch to any other member. This may be used once per Long Rest per named member. This Character may Cure any one of the following Conditions: Berserk, Charmed, or Dominated, with the call “[Name or Description] Cure [Condition] by Bond.” This may be used once per Long Rest per named member."
+    "description": "Chooses a group of people that character can diagnose, heal and Cure Effects once per Long Rest.\n\nCost: 2\n\nPrerequisites: None\n\nSome bonds are not love, or even a bond-pair but are, instead, a group of people who share some common purpose or mystical link. When a character takes this Perk, they name up to three other characters. They get the benefits of this Perk only with those named members. Those members do not have to take this Perk. With those individuals, the character gain certain benefits:\n\n• This Character can use “[Name or Description] Subtle Discern: How many Life Points are you down?” to any other member of the group at-will.\n• This Character can do 1 point of Healing (“Heal 1 by Bond”) by touch to any other member. This may be used once per Long Rest per named member.\n• This Character may Cure any one of the following Conditions: Berserk, Charmed, or Dominated, with the call “[Name or Description] Cure [Condition] by Bond.” This may be used once per Long Rest per named member."
   },
   {
     "name": "Contact",
@@ -253,7 +253,7 @@
     "ranks": null,
     "prereq": null,
     "category": "Social/Background",
-    "description": "Character can get Lore from an off-stage contact during games for a cost. Cost: 2 Prerequisites: None You have a friend or ally who knows things. Choose two areas of Lore that your Contact has expertise in. Once per Event, you can write a note or letter to this contact and include a few Wealth and Staff will answer for your Contact with clues, information, or additional hints. The helpfulness of this information will depend on whether the questions match the Contact’s Lore skills as well as the bribe sent. The player should create a name and simple backstory for the Contact and why that Contact would answer questions."
+    "description": "Character can get Lore from an off-stage contact during games for a cost.\n\nCost: 2\n\nPrerequisites: None\n\nYou have a friend or ally who knows things. Choose two areas of Lore that your Contact has expertise in. Once per Event, you can write a note or letter to this contact and include a few Wealth and Staff will answer for your Contact with clues, information, or additional hints. The helpfulness of this information will depend on whether the questions match the Contact’s Lore skills as well as the bribe sent. The player should create a name and simple backstory for the Contact and why that Contact would answer questions."
   },
   {
     "name": "Connections",
@@ -261,7 +261,7 @@
     "ranks": null,
     "prereq": null,
     "category": "Social/Background",
-    "description": "Character has connections to powerful allies that they can call on. Cost: 2 Prerequisites: None It’s all about who you know. The character may be a distant scion of a powerful family, or may have a past that has left others wanting to help them out. Characters with this Perk have friends in high places. This friendship will generally not extend to actual physical aid, but they can help get letters of support or pardon, or any similar activity that does not cost those performing the favors too much. The actual details of these connections should be detailed in a note to Staff or in the character background."
+    "description": "Character has connections to powerful allies that they can call on.\n\nCost: 2\n\nPrerequisites: None\n\nIt’s all about who you know. The character may be a distant scion of a powerful family, or may have a past that has left others wanting to help them out. Characters with this Perk have friends in high places. This friendship will generally not extend to actual physical aid, but they can help get letters of support or pardon, or any similar activity that does not cost those performing the favors too much. The actual details of these connections should be detailed in a note to Staff or in the character background."
   },
   {
     "name": "Draconic Heritage",
@@ -269,7 +269,7 @@
     "ranks": null,
     "prereq": null,
     "category": "Social/Background",
-    "description": "Has dragon ancestors that give advantages based on level. Cost: 2 Prerequisites: Must be taken at Character Creation. How exactly a mortal ends up with a draconic heritage is a matter of fierce debate (and more than a few romance novels). While the truth of how this occurs remains tightly veiled, it cannot be denied that some family trees have common expressions of dragon-like traits. While those people can’t travel through the void of space like their distant ancestors, other draconic traits do appear. When this Perk is taken, the player chooses one draconic Accent: Acid, Flame, Ice, or Lightning. For each perk tier below, after the first, the character pays additional BP. Each level of the Perk requires that all previous levels have been purchased. Characters may only purchase each tier once, but may purchase later tiers once they have attained the appropriate character levels. Cost Character Level Ability 2 2 The character can counter one attack from their chosen draconic Accent by calling “Counter, Draconic Heritage. They can do this once per Short Rest. The character is affected by Powers that affect Dragons, ie: Calls that have the “to Dragon” Qualifier. 3 5 The character can use a breath weapon once per Long Rest. As a Verbal, this will do three damage, plus the number of Draconic Heritage perks taken (including this one), to one target that the character could strike with a melee weapon. The damage will have the appropriate Accent. The Call is “[Name or Description] [X] by [Accent]. 4 10 The dragon’s natural magical resistance expresses itself. After completing a Short Rest, the character automatically gains a Protect vs Packets. This Protect lasts until it is used or until the character completes a Short Rest. 5 15 The character may choose to Resist effects from their chosen Element. They may do this at will.",
+    "description": "Has dragon ancestors that give advantages based on level.\n\nCost: 2\n\nPrerequisites: Must be taken at Character Creation.\n\nHow exactly a mortal ends up with a draconic heritage is a matter of fierce debate (and more than a few romance novels). While the truth of how this occurs remains tightly veiled, it cannot be denied that some family trees have common expressions of dragon-like traits. While those people can’t travel through the void of space like their distant ancestors, other draconic traits do appear.\n\nWhen this Perk is taken, the player chooses one draconic Accent: Acid, Flame, Ice, or Lightning. For each perk tier below, after the first, the character pays additional BP. Each level of the Perk requires that all previous levels have been purchased. Characters may only purchase each tier once, but may purchase later tiers once they have attained the appropriate character levels.\n\nCost\n\nCharacter Level\n\nAbility\n\n2\n\n2\n\nThe character can counter one attack from their chosen draconic Accent by calling “Counter, Draconic Heritage. They can do this once per Short Rest. The character is affected by Powers that affect Dragons, ie: Calls that have the “to Dragon” Qualifier.\n\n3\n\n5\n\nThe character can use a breath weapon once per Long Rest. As a Verbal, this will do three damage, plus the number of Draconic Heritage perks taken (including this one), to one target that the character could strike with a melee weapon. The damage will have the appropriate Accent. The Call is “[Name or Description] [X] by [Accent].\n\n4\n\n10\n\nThe dragon’s natural magical resistance expresses itself. After completing a Short Rest, the character automatically gains a Protect vs Packets. This Protect lasts until it is used or until the character completes a Short Rest.\n\n5\n\n15\n\nThe character may choose to Resist effects from their chosen Element. They may do this at will.",
     "tiers": [
       {
         "cost": 2,
@@ -299,7 +299,7 @@
     "ranks": null,
     "prereq": "Minor Fame",
     "category": "Social/Background",
-    "description": "The character is known for famous deeds across the land. Cost: 3 Prerequisites: Minor Fame In their life, the character has become famous for some reason. This might be one very significant event, a series of small but related events, or even just due to their position in life. This reason should be a part of the character’s backstory, and should be Staff-approved. The character may, at-will, use “It has been told” (one of the Power Phrases detailed in the Core Rules) to inform others (including PCs) that they have heard of their reason for fame. Note that “It has been told” does not require others to have heard the tale, but does suggest that it is likely. The reactions to the knowledge of the character’s fame are up to the portrayer."
+    "description": "The character is known for famous deeds across the land.\n\nCost: 3\n\nPrerequisites: Minor Fame\n\nIn their life, the character has become famous for some reason. This might be one very significant event, a series of small but related events, or even just due to their position in life. This reason should be a part of the character’s backstory, and should be Staff-approved. The character may, at-will, use “It has been told” (one of the Power Phrases detailed in the Core Rules) to inform others (including PCs) that they have heard of their reason for fame. Note that “It has been told” does not require others to have heard the tale, but does suggest that it is likely. The reactions to the knowledge of the character’s fame are up to the portrayer."
   },
   {
     "name": "Heartbond",
@@ -307,7 +307,7 @@
     "ranks": null,
     "prereq": null,
     "category": "Social/Background",
-    "description": "Gains Perks to a single creature bound by love. Cost: 3 Prerequisites: None Whether it is romantic love, familial love, an oath, or even a curse, there are some who are simply bound to help and protect each other. Please remember that these kinds of relationships must abide by the rules for romantic roleplay consent, and the player of the target character must consent to this Perk being purchased (even if the relationship is not romantic). When the Perk is purchased, the player should choose one other character with whom their character has the Heartbond. Note that this Perk does NOT require another character to take the same Perk. With chosen character, the character gets certain benefits: The character has the benefits of the Perk Generous Soul, but only for the Heartbonded character. While using Healing of any kind on the other Hearthbonded, the character may sacrifice any number of Life Points (but not more than their current total) and add those points to the Healing. If the character is Berserk or Charmed and finds themself in the position of having to harm the Heartbonded individual, the duration of the Berserk or Charmed Condition ends immediately. If the Berserk or Charmed Condition does not require that the Heartbonded character be attacked, they can simply be skipped. (i.e. if Berserk, if there are other individuals that could be attacked, the next closest character will be attacked.) The characters can feel each other's love as an almost physical sensation. At-will they may ask of the Heartbonded other: “Subtle Discern by Mind: Do you love me?”"
+    "description": "Gains Perks to a single creature bound by love.\n\nCost: 3\n\nPrerequisites: None\n\nWhether it is romantic love, familial love, an oath, or even a curse, there are some who are simply bound to help and protect each other. Please remember that these kinds of relationships must abide by the rules for romantic roleplay consent, and the player of the target character must consent to this Perk being purchased (even if the relationship is not romantic). When the Perk is purchased, the player should choose one other character with whom their character has the Heartbond. Note that this Perk does NOT require another character to take the same Perk. With chosen character, the character gets certain benefits:\n\n• The character has the benefits of the Perk Generous Soul, but only for the Heartbonded character.\n• While using Healing of any kind on the other Hearthbonded, the character may sacrifice any number of Life Points (but not more than their current total) and add those points to the Healing.\n• If the character is Berserk or Charmed and finds themself in the position of having to harm the Heartbonded individual, the duration of the Berserk or Charmed Condition ends immediately. If the Berserk or Charmed Condition does not require that the Heartbonded character be attacked, they can simply be skipped. (i.e. if Berserk, if there are other individuals that could be attacked, the next closest character will be attacked.)\n• The characters can feel each other's love as an almost physical sensation. At-will they may ask of the Heartbonded other: “Subtle Discern by Mind: Do you love me?”"
   },
   {
     "name": "Income",
@@ -315,7 +315,7 @@
     "ranks": null,
     "prereq": null,
     "category": "Social/Background",
-    "description": "Gains 10 Wealth at the beginning of every game. Cost: 3 Prerequisites: None Perhaps the character is a minor noble (see Title Perk) or perhaps their family owns a small business. Whatever the reason, the character gets a small stipend from it. The character gets 10 Wealth at the beginning of every game."
+    "description": "Gains 10 Wealth at the beginning of every game.\n\nCost: 3\n\nPrerequisites: None\n\nPerhaps the character is a minor noble (see Title Perk) or perhaps their family owns a small business. Whatever the reason, the character gets a small stipend from it. The character gets 10 Wealth at the beginning of every game."
   },
   {
     "name": "Inheritance",
@@ -323,7 +323,7 @@
     "ranks": null,
     "prereq": null,
     "category": "Social/Background",
-    "description": "Gains a one-time sum of money: 100 Wealth. Cost: 4 Prerequisites: None The character has a valuable item or sum of money left to them by their family or other benefactor. The character gets a significant bonus to their starting wealth and adds 100 Wealth at the beginning of their first Event. This Perk costs only 3 if the benefactor is a Patron the character has already purchased, however it does not count as a granted discount (as it is not revocable)."
+    "description": "Gains a one-time sum of money: 100 Wealth.\n\nCost: 4\n\nPrerequisites: None\n\nThe character has a valuable item or sum of money left to them by their family or other benefactor. The character gets a significant bonus to their starting wealth and adds 100 Wealth at the beginning of their first Event. This Perk costs only 3 if the benefactor is a Patron the character has already purchased, however it does not count as a granted discount (as it is not revocable)."
   },
   {
     "name": "Manse",
@@ -331,7 +331,7 @@
     "ranks": null,
     "prereq": null,
     "category": "Social/Background",
-    "description": "Owns a house where a character may draw funds from goods produced once per Event. Cost: 3 Prerequisites: None The character has a large house, villa, or manse complete with tenants. They should choose the name of their estate and should work with Staff to choose a location and the produce of the estate. Although most people with such lands are noble, some are merchants, crime bosses, or otherwise well-connected individuals with easy access to wealth. The character can draw funds from the goods produced by their tenants at the beginning of each game. This can be 6 Basic Resources [Bloom, Hide, Ingot] and 3 Uncommon Resources [Night Prize, Harvest, Rare Mineral]. Alternatively, 8 Wealth. Choices should be noted in the character’s registration."
+    "description": "Owns a house where a character may draw funds from goods produced once per Event.\n\nCost: 3\n\nPrerequisites: None\n\nThe character has a large house, villa, or manse complete with tenants. They should choose the name of their estate and should work with Staff to choose a location and the produce of the estate. Although most people with such lands are noble, some are merchants, crime bosses, or otherwise well-connected individuals with easy access to wealth. The character can draw funds from the goods produced by their tenants at the beginning of each game. This can be 6 Basic Resources [Bloom, Hide, Ingot] and 3 Uncommon Resources [Night Prize, Harvest, Rare Mineral]. Alternatively, 8 Wealth. Choices should be noted in the character’s registration."
   },
   {
     "name": "Minor Fame",
@@ -339,7 +339,7 @@
     "ranks": null,
     "prereq": null,
     "category": "Social/Background",
-    "description": "The Character is known for one famous deed in their past. Cost: 1 Prerequisites: None The character is noted for some small deed or act of heroism (or infamy) in their past. While speaking to another character or NPC, the character may say “It has been told” and give the reason that they might be well-known to the other. The character must choose one story in their approved background history to use with this Perk; it cannot be used to implant false knowledge or an adjusted tale (although, with Staff approval, the original story itself need not be true). For Example: Adrian the Bard is speaking to Lord Auclair, and Adrian says “So it has been told that I am the one who sang during the siege of Paradise Flame” and Lord Cassowary would remember the tale."
+    "description": "The Character is known for one famous deed in their past.\n\nCost: 1\n\nPrerequisites: None\n\nThe character is noted for some small deed or act of heroism (or infamy) in their past. While speaking to another character or NPC, the character may say “It has been told” and give the reason that they might be well-known to the other.\n\nThe character must choose one story in their approved background history to use with this Perk; it cannot be used to implant false knowledge or an adjusted tale (although, with Staff approval, the original story itself need not be true).\n\nFor Example: Adrian the Bard is speaking to Lord Auclair, and Adrian says “So it has been told that I am the one who sang during the siege of Paradise Flame” and Lord Cassowary would remember the tale."
   },
   {
     "name": "Title",
@@ -347,7 +347,7 @@
     "ranks": null,
     "prereq": null,
     "category": "Social/Background",
-    "description": "The Character gains a title and benefits that come from that title. Cost: 4 Prerequisites: None The character has a minor title such as Lord/Lady/Liege or Sir/Dame/Soren. This title has certain benefits and rights that come with it, but most only apply while the character is in their own demesne. How each title expresses itself society to society is different, but the character does have the right to be called by their title and crimes against the character will, in general, be taken more seriously. Additionally, they will often be believed by local authorities or soldiers. This reduces the cost of the Income, Manse, Connections, and Famous Perks by 1."
+    "description": "The Character gains a title and benefits that come from that title.\n\nCost: 4\n\nPrerequisites: None\n\nThe character has a minor title such as Lord/Lady/Liege or Sir/Dame/Soren. This title has certain benefits and rights that come with it, but most only apply while the character is in their own demesne. How each title expresses itself society to society is different, but the character does have the right to be called by their title and crimes against the character will, in general, be taken more seriously. Additionally, they will often be believed by local authorities or soldiers. This reduces the cost of the Income, Manse, Connections, and Famous Perks by 1."
   },
   {
     "name": "Sharp Mind",
@@ -355,7 +355,7 @@
     "ranks": null,
     "prereq": null,
     "category": "Social/Background",
-    "description": "Library Use Skill is free and Lore ranks cost 1 point less. Cost: 3 Prerequisites: None Gain the Library Use Skill at no cost, and Lore ranks cost 1 point less than normal to a minimum of 1."
+    "description": "Library Use Skill is free and Lore ranks cost 1 point less.\n\nCost: 3\n\nPrerequisites: None\n\nGain the Library Use Skill at no cost, and Lore ranks cost 1 point less than normal to a minimum of 1."
   },
   {
     "name": "Strong Bloodline",
@@ -363,7 +363,7 @@
     "ranks": null,
     "prereq": null,
     "category": "Social/Background",
-    "description": "Gain 3 Additional LBP for Lineage Advantages. Cost: 3 Prerequisites: None You gain 3 additional Lineage Build Points to spend on Lineage Advantages. This also increases the maximum to 13. This perk cannot be discounted by Patron."
+    "description": "Gain 3 Additional LBP for Lineage Advantages.\n\nCost: 3\n\nPrerequisites: None\n\nYou gain 3 additional Lineage Build Points to spend on Lineage Advantages. This also increases the maximum to 13. This perk cannot be discounted by Patron."
   },
   {
     "name": "Fortunate Finder",
@@ -371,7 +371,7 @@
     "ranks": 2,
     "prereq": null,
     "category": "Supernatural",
-    "description": "Once per Long Rest per Purchase, ignore a negative effect from Forage, Scavenge or Prospect. Cost: 3 Ranks: 2 Prerequisites: None The character can avoid the negative consequences of Gathering (Scavenging, Prospecting, or Foraging). The character can put back a Hazard card and re-draw when Prospecting, or can ignore the negative effects of Scavenging a monster or beast. This can be done once per Long Rest for each time this Perk is purchased."
+    "description": "Once per Long Rest per Purchase, ignore a negative effect from Forage, Scavenge or Prospect.\n\nCost: 3\n\nRanks: 2\n\nPrerequisites: None\n\nThe character can avoid the negative consequences of Gathering (Scavenging, Prospecting, or Foraging). The character can put back a Hazard card and re-draw when Prospecting, or can ignore the negative effects of Scavenging a monster or beast. This can be done once per Long Rest for each time this Perk is purchased."
   },
   {
     "name": "Insight",
@@ -379,7 +379,7 @@
     "ranks": 2,
     "prereq": null,
     "category": "Supernatural",
-    "description": "Once per Long Rest per Purchase the character can ask for help on a riddle or puzzle. Cost: 3 Ranks: 2 Prerequisites: None The character gets flashes of help from the beyond that can help in times of need. The character can call out to some great power, such as a Devotion, or any other greater or divine creature, and ask for a flash of insight to help with a mental puzzle or riddle. If there is an NPC nearby who can be briefly possessed by the power called for, they will blurt out a short hint or helpful piece of advice, but be totally unaware that they have done so. (An OOG Marshal, if available, can also provide hints.) The insight cannot talk about the future, nor speculate about actions. The incantation for this should be along the lines of “I call upon the domain of light to grant the gift of insight!” This can be done once per Long Rest for each time this Perk is purchased. Regardless of how many times Insight has been purchased, it cannot be used more than once per Short Rest. All uses return after a Long Rest."
+    "description": "Once per Long Rest per Purchase the character can ask for help on a riddle or puzzle.\n\nCost: 3\n\nRanks: 2\n\nPrerequisites: None\n\nThe character gets flashes of help from the beyond that can help in times of need. The character can call out to some great power, such as a Devotion, or any other greater or divine creature, and ask for a flash of insight to help with a mental puzzle or riddle. If there is an NPC nearby who can be briefly possessed by the power called for, they will blurt out a short hint or helpful piece of advice, but be totally unaware that they have done so. (An OOG Marshal, if available, can also provide hints.)\n\nThe insight cannot talk about the future, nor speculate about actions. The incantation for this should be along the lines of “I call upon the domain of light to grant the gift of insight!” This can be done once per Long Rest for each time this Perk is purchased. Regardless of how many times Insight has been purchased, it cannot be used more than once per Short Rest. All uses return after a Long Rest."
   },
   {
     "name": "Medium",
@@ -387,7 +387,7 @@
     "ranks": null,
     "prereq": null,
     "category": "Supernatural",
-    "description": "The character has some ability to summon and speak with Spirits. Cost: 5 Prerequisites: None The character has some ability to contact the spirits of the departed. Not only can the Medium talk to Spirits in a few, limited ways, but with preparation (and a forewarning to Staff) can hold a rite that will summon a Spirit or two from individuals who are gone (who have permanently died). At-will, the Medium can ask any of the following questions of any Spirits. “[Name or Description] Discern by Mind to Spirit: What was your name?”, “[Name or Description] Discern by Mind to Spirit: How did you die?”, or “[Name or Description] Discern by Mind to Spirit: What do you need?” For the rite, they should have a table with accouterments on it that are meaningful to them for speaking to the dead. For each Spirit that shows up (which is at Staff discretion) the Medium must sacrifice 6 Life Points. If others are involved in the rite, and within Touch range, this sacrifice may be shared (equally, round down to a minimum of 1). This is the power the Spirit needs to take form and answer questions. The Medium should specify (also forewarning the Staff) the names of particular Spirits they are calling, or what kind of Spirits they are calling to. They can then ask each Spirit up to one question per character level. These will all have a call of “Subtle Discern by Mind to Spirit:” unless it has been agreed with Staff that the Call is understood. These questions may be anything, but the answers may be vague, incomplete, in the form of riddles or puzzles, or even incorrect. The answers will never be lies, however, and will be true to the best knowledge of the summoned Spirit. The Medium can summon as many Spirits as they like (sequentially) in a session, but too many may cause the Spirits to get angry, with unpredictable results. The Medium can only perform such a rite once per Event."
+    "description": "The character has some ability to summon and speak with Spirits.\n\nCost: 5\n\nPrerequisites: None\n\nThe character has some ability to contact the spirits of the departed. Not only can the Medium talk to Spirits in a few, limited ways, but with preparation (and a forewarning to Staff) can hold a rite that will summon a Spirit or two from individuals who are gone (who have permanently died).\n\nAt-will, the Medium can ask any of the following questions of any Spirits. “[Name or Description] Discern by Mind to Spirit: What was your name?”, “[Name or Description] Discern by Mind to Spirit: How did you die?”, or “[Name or Description] Discern by Mind to Spirit: What do you need?” For the rite, they should have a table with accouterments on it that are meaningful to them for speaking to the dead. For each Spirit that shows up (which is at Staff discretion) the Medium must sacrifice 6 Life Points. If others are involved in the rite, and within Touch range, this sacrifice may be shared (equally, round down to a minimum of 1). This is the power the Spirit needs to take form and answer questions.\n\nThe Medium should specify (also forewarning the Staff) the names of particular Spirits they are calling, or what kind of Spirits they are calling to. They can then ask each Spirit up to one question per character level. These will all have a call of “Subtle Discern by Mind to Spirit:” unless it has been agreed with Staff that the Call is understood. These questions may be anything, but the answers may be vague, incomplete, in the form of riddles or puzzles, or even incorrect. The answers will never be lies, however, and will be true to the best knowledge of the summoned Spirit.\n\nThe Medium can summon as many Spirits as they like (sequentially) in a session, but too many may cause the Spirits to get angry, with unpredictable results. The Medium can only perform such a rite once per Event."
   },
   {
     "name": "Othersleep",
@@ -395,7 +395,7 @@
     "ranks": null,
     "prereq": null,
     "category": "Supernatural",
-    "description": "The character disappears when asleep and cannot be attacked during this time. Cost: 1 Prerequisites: None The character does not sleep on the prime plane. When they slumber (true deep sleep, not normally napping) the character fades out of the world, disappearing from this plane. Their equipment and clothing all stays, but they are gone until the morning comes. OOG: the player should have a white halo with a start time and end time written on it and this should be posted in clear sight near their sleeping space; this time cannot be longer than 10 hours, nor less than 2 and is meant to protect sleep; if it appears it is being used defensively, or to protect from normal attacks, Staff may remove the Perk. During the time on the sheet, the character is not present and cannot be affected, harmed, killed, etc., although their equipment is not protected. NPCs will not bother the PC, and although combat may occur around them, effort will be taken not to specifically disturb the protected character and player. When the time written on the sheet arrives, the character will reappear in the same location. There is no way for them to come out early, even if others need help. They should remain out-of-game and non-interactive while they are in Othersleep. This will recharge each sunrise."
+    "description": "The character disappears when asleep and cannot be attacked during this time.\n\nCost: 1\n\nPrerequisites: None\n\nThe character does not sleep on the prime plane. When they slumber (true deep sleep, not normally napping) the character fades out of the world, disappearing from this plane. Their equipment and clothing all stays, but they are gone until the morning comes.\n\nOOG: the player should have a white halo with a start time and end time written on it and this should be posted in clear sight near their sleeping space; this time cannot be longer than 10 hours, nor less than 2 and is meant to protect sleep; if it appears it is being used defensively, or to protect from normal attacks, Staff may remove the Perk.\n\nDuring the time on the sheet, the character is not present and cannot be affected, harmed, killed, etc., although their equipment is not protected. NPCs will not bother the PC, and although combat may occur around them, effort will be taken not to specifically disturb the protected character and player. When the time written on the sheet arrives, the character will reappear in the same location. There is no way for them to come out early, even if others need help. They should remain out-of-game and non-interactive while they are in Othersleep. This will recharge each sunrise."
   },
   {
     "name": "Sight",
@@ -403,7 +403,7 @@
     "ranks": null,
     "prereq": null,
     "category": "Supernatural",
-    "description": "The character gains the ability to see objects that are normally invisible. Cost: 3 Prerequisites: None The character can see the unseen, and can see objects that are marked with the White Halo on a red field. Most cannot."
+    "description": "The character gains the ability to see objects that are normally invisible.\n\nCost: 3\n\nPrerequisites: None\n\nThe character can see the unseen, and can see objects that are marked with the White Halo on a red field. Most cannot."
   },
   {
     "name": "Sight Beyond Sight",
@@ -411,7 +411,7 @@
     "ranks": null,
     "prereq": "Sight",
     "category": "Supernatural",
-    "description": "The character gains the ability to gain insight on objects normally invisible. Cost: 3 Prerequisites: Sight The character’s powers are impressive, and the character can read the information card found on the back of red flags marked with a White Halo."
+    "description": "The character gains the ability to gain insight on objects normally invisible.\n\nCost: 3\n\nPrerequisites: Sight\n\nThe character’s powers are impressive, and the character can read the information card found on the back of red flags marked with a White Halo."
   },
   {
     "name": "Sensitive",
@@ -419,7 +419,7 @@
     "ranks": null,
     "prereq": "Sight Beyond Sight",
     "category": "Supernatural",
-    "description": "The character has the ability to gain insight that normally is not possible. Cost: 3 Prerequisites: Sight Beyond Sight The character is vaguely aware of things beyond the ability of others to sense. The character is aware of information that would normally only be available to the player. They might understand the contents of a Subtle Call, or be able to know that danger is coming up on the other side of an unrepresented “door.”"
+    "description": "The character has the ability to gain insight that normally is not possible.\n\nCost: 3\n\nPrerequisites: Sight Beyond Sight\n\nThe character is vaguely aware of things beyond the ability of others to sense. The character is aware of information that would normally only be available to the player. They might understand the contents of a Subtle Call, or be able to know that danger is coming up on the other side of an unrepresented “door.”"
   },
   {
     "name": "Soothsayer",
@@ -427,7 +427,7 @@
     "ranks": null,
     "prereq": null,
     "category": "Supernatural",
-    "description": "By performing a ceremony, the player may ask a question to plot. Cost: 3 Prerequisites: None A soothsayer can see into the future, or see through the thin veil between reality and the possible. By performing a small ceremony (which may be drawing cards, viewing entrails, or even preparing for a sleep filled with prophetic dreams), the character should provide a question or topic to Staff in written form and, sometime after the ceremony is performed, the answer will come to them in a vision or by some other sign. The character can request one vision per event."
+    "description": "By performing a ceremony, the player may ask a question to plot.\n\nCost: 3\n\nPrerequisites: None\n\nA soothsayer can see into the future, or see through the thin veil between reality and the possible. By performing a small ceremony (which may be drawing cards, viewing entrails, or even preparing for a sleep filled with prophetic dreams), the character should provide a question or topic to Staff in written form and, sometime after the ceremony is performed, the answer will come to them in a vision or by some other sign. The character can request one vision per event."
   },
   {
     "name": "Strong Spirit",
@@ -435,7 +435,7 @@
     "ranks": null,
     "prereq": null,
     "category": "Supernatural",
-    "description": "While a Spirit, the character has options to interact with the mortal world. Cost: 3 Prerequisites: None Normally, when a character gains the Spirit Type, they are incapable of looking at others or communicating. A character with a strong spirit can make eye contact and even make gestures (although charades-type communication is simply too difficult). In addition, they need not head directly to the Spirit River, but can go to one familiar location or person first and can remain in that spot for up to ten minutes (Slow 600) before heading to the River."
+    "description": "While a Spirit, the character has options to interact with the mortal world.\n\nCost: 3\n\nPrerequisites: None\n\nNormally, when a character gains the Spirit Type, they are incapable of looking at others or communicating. A character with a strong spirit can make eye contact and even make gestures (although charades-type communication is simply too difficult). In addition, they need not head directly to the Spirit River, but can go to one familiar location or person first and can remain in that spot for up to ten minutes (Slow 600) before heading to the River."
   },
   {
     "name": "Hearth",
@@ -443,7 +443,7 @@
     "ranks": null,
     "prereq": null,
     "category": "Hearth",
-    "description": "Creates a special room that allows for Hearth Perks. Cost: 1 Prerequisites: None The character can perform an easy rite, taking only a few seconds, which will sanctify a particular room. The character should pick a special item like a horseshoe, banner, or other significant, meaningful item, and place it inside the room to designate it as a Hearth. If the item is removed from the room for any reason, the Hearth Perks are lost until it is returned. If needed, once per Event, a new rite can be performed after the next Long Rest, using a new special item. The room becomes the character’s Hearth and they can develop certain powers that are only effective when in their Hearth by taking additional Hearth Perks. In order for a room to become a Hearth, it must be the room where the character intends to sleep next. In addition, the room cannot be a public or multi-use room such as a Tavern. If the room is normally public but is closed off for sleeping, that is acceptable (such as a small shop that is closed and used as living quarters). While performing the rite, the character can name five additional people who also intend to sleep in that room and the area will count as a Hearth for them as well. Those others count this as their Hearth and can purchase and use other Hearth Perks even if they have no ability to make the Hearth in the first place. Note: If a player needs to sleep in a medical or ADA cabin for OOG reasons, they may designate a room other than their chosen sleeping area to count as their Hearth. The room must still meet the other listed requirements above."
+    "description": "Creates a special room that allows for Hearth Perks.\n\nCost: 1\n\nPrerequisites: None\n\nThe character can perform an easy rite, taking only a few seconds, which will sanctify a particular room. The character should pick a special item like a horseshoe, banner, or other significant, meaningful item, and place it inside the room to designate it as a Hearth. If the item is removed from the room for any reason, the Hearth Perks are lost until it is returned. If needed, once per Event, a new rite can be performed after the next Long Rest, using a new special item.\n\nThe room becomes the character’s Hearth and they can develop certain powers that are only effective when in their Hearth by taking additional Hearth Perks. In order for a room to become a Hearth, it must be the room where the character intends to sleep next. In addition, the room cannot be a public or multi-use room such as a Tavern. If the room is normally public but is closed off for sleeping, that is acceptable (such as a small shop that is closed and used as living quarters). While performing the rite, the character can name five additional people who also intend to sleep in that room and the area will count as a Hearth for them as well. Those others count this as their Hearth and can purchase and use other Hearth Perks even if they have no ability to make the Hearth in the first place.\n\nNote: If a player needs to sleep in a medical or ADA cabin for OOG reasons, they may designate a room other than their chosen sleeping area to count as their Hearth. The room must still meet the other listed requirements above."
   },
   {
     "name": "Arcane Hearth",
@@ -451,7 +451,7 @@
     "ranks": null,
     "prereq": "Hearth",
     "category": "Hearth",
-    "description": "Allows a Hearth to function as an Arcane Locus. Cost: 5 Prerequisites: Hearth When the character creates a Hearth, they may spend an additional minute or so on the rite, drawing in the magical weave to create a nexus of arcane energy. The Hearth will act as an Arcane Locus for the purposes of magical study until the end of the Event. The Hearth cannot also be designated as a Consecrated Hearth."
+    "description": "Allows a Hearth to function as an Arcane Locus.\n\nCost: 5\n\nPrerequisites: Hearth\n\nWhen the character creates a Hearth, they may spend an additional minute or so on the rite, drawing in the magical weave to create a nexus of arcane energy. The Hearth will act as an Arcane Locus for the purposes of magical study until the end of the Event. The Hearth cannot also be designated as a Consecrated Hearth."
   },
   {
     "name": "Bolt Hole",
@@ -459,7 +459,7 @@
     "ranks": null,
     "prereq": null,
     "category": "Hearth",
-    "description": "Once per Long Rest, allows a character to go Insubstantial from the Hearth. Cost: 3 Prerequisites: None The character can escape from a room designated as their Hearth. Once per Long Rest, they can go Insubstantial by calling “Insubstantial” and must then immediately walk slowly out of the room. Once outside the room, they no longer need to walk, and can remain Insubstantial for a Slow 180 before calling “Dispel Insubstantial.”"
+    "description": "Once per Long Rest, allows a character to go Insubstantial from the Hearth.\n\nCost: 3\n\nPrerequisites: None\n\nThe character can escape from a room designated as their Hearth. Once per Long Rest, they can go Insubstantial by calling “Insubstantial” and must then immediately walk slowly out of the room. Once outside the room, they no longer need to walk, and can remain Insubstantial for a Slow 180 before calling “Dispel Insubstantial.”"
   },
   {
     "name": "Consecrated Hearth",
@@ -467,7 +467,7 @@
     "ranks": null,
     "prereq": "Hearth",
     "category": "Hearth",
-    "description": "The Hearth becomes Consecrated Ground until the end of the Event. Cost: 5 Prerequisites: Hearth When the character creates a Hearth, they may spend an additional minute or so on the rite, deep in prayer and meditation. They can cause the area of their Hearth to be Consecrated Ground until the end of the Event. The Hearth cannot also be designated as an Arcane Locus."
+    "description": "The Hearth becomes Consecrated Ground until the end of the Event.\n\nCost: 5\n\nPrerequisites: Hearth\n\nWhen the character creates a Hearth, they may spend an additional minute or so on the rite, deep in prayer and meditation. They can cause the area of their Hearth to be Consecrated Ground until the end of the Event. The Hearth cannot also be designated as an Arcane Locus."
   },
   {
     "name": "Expanded Hearth",
@@ -475,7 +475,7 @@
     "ranks": null,
     "prereq": "Hearth",
     "category": "Hearth",
-    "description": "Hearth can be used by five additional people. Cost: 1 Prerequisites: Hearth When the character creates a Hearth, they may designate an additional five people (thus a maximum of 10 people, besides the caster) who also intend to sleep in that room and the area will count as a Hearth for them as well."
+    "description": "Hearth can be used by five additional people.\n\nCost: 1\n\nPrerequisites: Hearth\n\nWhen the character creates a Hearth, they may designate an additional five people (thus a maximum of 10 people, besides the caster) who also intend to sleep in that room and the area will count as a Hearth for them as well."
   },
   {
     "name": "Arcane/Divine Orchestra",
@@ -483,7 +483,7 @@
     "ranks": null,
     "prereq": null,
     "category": "Hearth",
-    "description": "Allows the character to play soft music within their Hearth. Cost: 1 Prerequisites: None The character possesses the ability to create a device that summons soft music to add ambiance or for entertainment. The Orchestra will not play if the character does not have a designated Hearth. This allows the player to use a musical device to play appropriate, in-period music. The music must be soft enough so it cannot easily be heard outside the character’s Hearth. The music must use real instruments, and cannot have lyrics that will break game immersion. The Arcane/Divine Orchestra cannot be removed from the Hearth without express staff approval."
+    "description": "Allows the character to play soft music within their Hearth.\n\nCost: 1\n\nPrerequisites: None\n\nThe character possesses the ability to create a device that summons soft music to add ambiance or for entertainment. The Orchestra will not play if the character does not have a designated Hearth.\n\nThis allows the player to use a musical device to play appropriate, in-period music. The music must be soft enough so it cannot easily be heard outside the character’s Hearth. The music must use real instruments, and cannot have lyrics that will break game immersion. The Arcane/Divine Orchestra cannot be removed from the Hearth without express staff approval."
   },
   {
     "name": "Peaceful Hearth",
@@ -491,7 +491,7 @@
     "ranks": null,
     "prereq": null,
     "category": "Hearth",
-    "description": "While taking a Short Rest in your Hearth, gain a Protect against Fear.. Cost: 3 Prerequisites: None The character’s Hearth brings them peace and a centered state of mind. Whenever they complete a Short Rest in a room designated as their Hearth, they gain one Protect against Fear or can grant one to one other person also taking a Short Rest in the same Hearth. If used on another, it is Delivered as a Verbal with the Call, “[Name or Description] Grant Protect vs Fear."
+    "description": "While taking a Short Rest in your Hearth, gain a Protect against Fear..\n\nCost: 3\n\nPrerequisites: None\n\nThe character’s Hearth brings them peace and a centered state of mind. Whenever they complete a Short Rest in a room designated as their Hearth, they gain one Protect against Fear or can grant one to one other person also taking a Short Rest in the same Hearth. If used on another, it is Delivered as a Verbal with the Call, “[Name or Description] Grant Protect vs Fear."
   },
   {
     "name": "Protected Hearth",
@@ -499,7 +499,7 @@
     "ranks": null,
     "prereq": null,
     "category": "Hearth",
-    "description": "While inside their Hearth, a character may recharge a spike with a Q100 at-will. Cost: 2 Prerequisites: None While inside a room designated as their Hearth, the character can Refresh a Spike by Focusing for a Quick 100. This can be done at-will as long as the character is in the room."
+    "description": "While inside their Hearth, a character may recharge a spike with a Q100 at-will.\n\nCost: 2\n\nPrerequisites: None\n\nWhile inside a room designated as their Hearth, the character can Refresh a Spike by Focusing for a Quick 100. This can be done at-will as long as the character is in the room."
   },
   {
     "name": "Restful Home",
@@ -507,7 +507,7 @@
     "ranks": null,
     "prereq": null,
     "category": "Hearth",
-    "description": "While taking a long rest within their Hearth, a character will heal to full. Will not die when resting and Tainted in their hearth. Cost: 3 Prerequisites: None The character can create a warm and nurturing environment. Whenever the character takes a Long Rest in a room designated as their Hearth, they can heal to full. If the character has the Tainted Condition and completes a Short Rest in their Hearth, they will not die."
+    "description": "While taking a long rest within their Hearth, a character will heal to full. Will not die when resting and Tainted in their hearth.\n\nCost: 3\n\nPrerequisites: None\n\nThe character can create a warm and nurturing environment. Whenever the character takes a Long Rest in a room designated as their Hearth, they can heal to full. If the character has the Tainted Condition and completes a Short Rest in their Hearth, they will not die."
   },
   {
     "name": "Lucent Hearth",
@@ -515,7 +515,7 @@
     "ranks": null,
     "prereq": "Consecrated Hearth",
     "category": "Hearth",
-    "description": "Rituals in the Hearth have reduced Dark Territory Cost: 3 Prerequisites: Consecrated Hearth When the character creates a Consecrated Hearth, they may spend an additional minute or so on the rite, constructing or assembling a simple prayer shrine to a Devotion. If a named member of the Hearth conducts a Ritual within the confines of the Hearth, the amount of Dark Territory is reduced by one."
+    "description": "Rituals in the Hearth have reduced Dark Territory\n\nCost: 3\n\nPrerequisites: Consecrated Hearth\n\nWhen the character creates a Consecrated Hearth, they may spend an additional minute or so on the rite, constructing or assembling a simple prayer shrine to a Devotion. If a named member of the Hearth conducts a Ritual within the confines of the Hearth, the amount of Dark Territory is reduced by one."
   },
   {
     "name": "Experimental Hearth",
@@ -523,6 +523,6 @@
     "ranks": null,
     "prereq": "Arcane Hearth",
     "category": "Hearth",
-    "description": "Rituals in the Hearth have reduced Dark Territory Cost: 3 Prerequisites: Arcane Hearth When the character creates an Arcane Hearth, they may spend an additional minute or so on the rite, constructing or assembling a simple crystal focus that must produce light. If a named member of the Hearth conducts a Ritual within the confines of the Hearth, the amount of Dark Territory is reduced by one."
+    "description": "Rituals in the Hearth have reduced Dark Territory\n\nCost: 3\n\nPrerequisites: Arcane Hearth\n\nWhen the character creates an Arcane Hearth, they may spend an additional minute or so on the rite, constructing or assembling a simple crystal focus that must produce light. If a named member of the Hearth conducts a Ritual within the confines of the Hearth, the amount of Dark Territory is reduced by one."
   }
 ]
