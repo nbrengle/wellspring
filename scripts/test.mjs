@@ -12,7 +12,8 @@
 import {
   validate, getClasses, characterLevel, budgetFor, computeSlots, spellSlots,
   devotionState, prereqStatus, LEVEL_CAP, LEGAL_MIN_LEVEL,
-  grantedAbilities, computeSpend, discountSources, getMaxRanks, bareSkill, cleanItemName
+  grantedAbilities, computeSpend, discountSources, getMaxRanks, bareSkill, cleanItemName,
+  bookcasterSpellOptions
 } from '../src/data/validate.js';
 import { formatCharacterSheet, parseCharacterSheet } from '../src/data/sheet.js';
 import { solveCrafting } from '../src/data/recipe-solver.js';
@@ -107,6 +108,26 @@ test('import tolerates spreadsheet (tab-separated) paste', () => {
 test('budget: 9 at level 4, +2 per level (extrapolated below 4)', () => {
   eq(budgetFor(4), 9, 'L4'); eq(budgetFor(5), 11, 'L5');
   eq(budgetFor(3), 7, 'L3'); eq(budgetFor(1), 3, 'L1');
+});
+test('Bookcaster spell options: known vs other accessible spells', () => {
+  const mk = (cls, level, extra = {}) => ({ archetypeName: 'x', classes: [{ name: cls, level }], ...extra });
+  // Mage L4 (Novice slots only), nothing known yet: all options land in `other`.
+  const l4 = bookcasterSpellOptions(mk('Mage', 4));
+  eq(l4.known.length, 0, 'no known spells when none picked');
+  ok(l4.other.length > 0, 'Mage L4 has accessible (other) options');
+  ok(l4.other.includes('Mage Armor'), 'includes a novice Mage spell');
+  // A known spell moves to the `known` group and out of `other`.
+  const withKnown = bookcasterSpellOptions(mk('Mage', 4, { noviceSpells: ['Mage Armor'] }));
+  ok(withKnown.known.includes('Mage Armor'), 'picked spell is in Known group');
+  ok(!withKnown.other.includes('Mage Armor'), 'and not duplicated in Other');
+  // Higher level unlocks more accessible spells (adept tier opens at L6: 6/2/0).
+  const l6 = bookcasterSpellOptions(mk('Mage', 6));
+  ok(l6.other.length > l4.other.length, 'L6 (adept unlocked) offers more spells than L4');
+  // Non-casters get nothing.
+  const fighter = bookcasterSpellOptions(mk('Fighter', 4));
+  eq(fighter.known.length + fighter.other.length, 0, 'non-caster has no options');
+  // Each group sorted.
+  eq(JSON.stringify(l4.other), JSON.stringify([...l4.other].sort((a, b) => a.localeCompare(b))), 'other sorted');
 });
 test('innate bonus cantrip (Cancel) is granted+locked, not a choosable slot', () => {
   const cant = (cls, lvl) => computeSlots({ archetypeName: 'x', classes: [{ name: cls, level: lvl }] })
