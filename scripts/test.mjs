@@ -873,6 +873,29 @@ test('rebuild preserves starting skills unrelated to the choices', () => {
   ok(rebuilt.startingSkills.includes('Lockpicking Improv'), 'unrelated manual skill preserved');
 });
 
+test('parameterized skills satisfy prerequisites and undergo prerequisite checking', () => {
+  // 1. Lore (Historical) satisfies Research prerequisite (Lore)
+  let c = {
+    classes: [{ name: 'Mage', level: 4 }],
+    purchasedSkills: ['Lore (Historical)', 'Research']
+  };
+  eq(validate(c).prereqs.issues.length, 0, 'Lore (Historical) satisfies Research');
+
+  // 2. Profession - Journeyman (Smith) requires Profession - Apprentice
+  c = {
+    classes: [{ name: 'Mage', level: 4 }],
+    purchasedSkills: ['Profession - Journeyman (Smith)']
+  };
+  const issues = validate(c).prereqs.issues;
+  eq(issues.length, 1, 'fails missing apprentice prerequisite');
+  eq(issues[0].id, 'skills:Profession - Journeyman (Smith)', 'identifies correct failing skill');
+  eq(issues[0].missing[0].id, 'skills:Profession - Apprentice', 'identifies missing base prerequisite');
+
+  // 3. Adding Apprentice (Smith) satisfies the prerequisite
+  c.purchasedSkills.push('Profession - Apprentice (Smith)');
+  eq(validate(c).prereqs.issues.length, 0, 'Apprentice satisfies Journeyman');
+});
+
 // ─── report ───────────────────────────────────────────────────────────────────
 console.log(`\n${passed} passed, ${failures.length} failed`);
 if (failures.length) {
