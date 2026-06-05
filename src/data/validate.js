@@ -1295,6 +1295,47 @@ export function spellSlots(character) {
   return total;
 }
 
+// Spells a Bookcaster can select, split into two groups for the picker:
+//   known — spells the character already KNOWS (their spells-known picks). The
+//           easy/default path: bookcasting a spell you know needs no friction.
+//   other — every OTHER spell the rules let a Bookcaster pick: any spell on the
+//           caster classes' lists, of a Tier the character can access (has a
+//           slot for). Per the rules "one spell from any spell list they have
+//           access to … of a Tier they would normally be able to access" — this
+//           is the higher-friction path (a spell you don't yet know).
+// Both groups are de-duped and sorted; `other` excludes anything in `known`.
+// Returns { known, other }; both empty for non-casters.
+const BOOKCASTER_TIER_FIELD = { novice: 'noviceSpells', adept: 'adeptSpells', greater: 'greaterSpells' };
+const KNOWN_SPELL_FIELDS = ['noviceSpells', 'adeptSpells', 'greaterSpells'];
+export function bookcasterSpellOptions(character) {
+  const casters = getClasses(character).filter((c) => SPELLCASTERS.has(c.name));
+  if (!casters.length) return { known: [], other: [] };
+  const slots = spellSlots(character) || { novice: 0, adept: 0, greater: 0 };
+  const accessibleTiers = Object.keys(BOOKCASTER_TIER_FIELD).filter((t) => (slots[t] || 0) > 0);
+
+  // Every accessible spell from the caster classes' lists.
+  const accessible = new Set();
+  for (const { name: cls } of casters) {
+    const byTier = CLASS_POWERS[cls];
+    if (!byTier) continue;
+    for (const tier of accessibleTiers) {
+      for (const sp of (byTier[BOOKCASTER_TIER_FIELD[tier]] || [])) {
+        // Skip placeholder rows the parser emits for undocumented tiers.
+        if (sp?.name && !/^(Adept|Greater)\s+\w+\s+Power$/i.test(sp.name)) accessible.add(sp.name);
+      }
+    }
+  }
+  // Spells the character actually knows (their spells-known picks). A known spell
+  // is offered even if its tier later falls out of `accessible` — you still know it.
+  const knownSet = new Set();
+  for (const f of KNOWN_SPELL_FIELDS) for (const name of (character[f] || [])) knownSet.add(cleanItemName(name));
+
+  const sort = (arr) => [...arr].sort((a, b) => a.localeCompare(b));
+  const known = sort(knownSet);
+  const other = sort([...accessible].filter((n) => !knownSet.has(n)));
+  return { known, other };
+}
+
 // Default starting Wealth (MegaDoc: "all characters start with 8 Wealth").
 export const DEFAULT_WEALTH = 8;
 
@@ -1649,6 +1690,7 @@ export function validate(character) {
   const spend = computeSpend(character);
   const slots = computeSlots(character);
   const spellSlotCounts = spellSlots(character);
+  const bookcasterOptions = bookcasterSpellOptions(character);
   const stats = levelStats(character);
   const wealth = wealthState(character);
   const devotion = devotionState(character);
@@ -1693,6 +1735,7 @@ export function validate(character) {
     slots,
     slotsOver,
     spellSlots: spellSlotCounts,
+    bookcasterOptions,
     stats,
     wealth,
     devotion,
