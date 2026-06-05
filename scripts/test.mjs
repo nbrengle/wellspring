@@ -540,8 +540,8 @@ test('base Life Points / Spikes come from the level table (classless baseline)',
   // Fighter's L2 "+1 Base Maximum Life Points" applies → total 4 at L4.
   eq(s4.lifePoints, 4, 'L4 Fighter total = 3 base + 1 (Fighter L2 bonus)');
   const s10 = validate({ classLevels: 'Fighter 10' }).stats;
-  eq(s10.baseLifePoints, 4, 'L10 base = 4 LP'); eq(s10.spikes, 3, 'L10 = 3 spikes');
-  eq(s10.lifePoints, 5, 'L10 Fighter total = 4 base + 1');
+  eq(s10.baseLifePoints, 4, 'L10 base = 4 LP'); eq(s10.spikes, 4, 'L10 = 4 spikes (3 base + 1 Fighter L9 bonus)');
+  eq(s10.lifePoints, 6, 'L10 Fighter total = 4 base + 1 (L2) + 1 (Warrior Spirit)');
 });
 test('class progression LP bonus applies and is level-gated', () => {
   // Fighter L2 grants +1 Base Maximum LP; below L2 it should NOT apply.
@@ -1024,6 +1024,86 @@ test('parameterized skills satisfy prerequisites and undergo prerequisite checki
   // 3. Adding Apprentice (Smith) satisfies the prerequisite
   c.purchasedSkills.push('Profession - Apprentice (Smith)');
   eq(validate(c).prereqs.issues.length, 0, 'Apprentice satisfies Journeyman');
+});
+
+// ─── Effect Coverage G1-G4 Tests ─────────────────────────────────────────────
+test('effect coverage G1: spikes progression bonuses', () => {
+  // Fighter Level 9 gets +1 Base Maximum Spikes (baseline Fighter starts with 3 spikes)
+  const f8 = { classes: [{ name: 'Fighter', level: 8 }] };
+  const f9 = { classes: [{ name: 'Fighter', level: 9 }] };
+  eq(validate(f8).stats.spikes, 3, 'Fighter L8 has 3 spikes');
+  eq(validate(f9).stats.spikes, 4, 'Fighter L9 has 4 spikes (from progression)');
+
+  // Rogue Level 3 gets +1 Spikes, Level 9 gets another +1
+  const r2 = { classes: [{ name: 'Rogue', level: 2 }] };
+  const r3 = { classes: [{ name: 'Rogue', level: 3 }] };
+  const r9 = { classes: [{ name: 'Rogue', level: 9 }] };
+  eq(validate(r2).stats.spikes, 2, 'Rogue L2 has 2 spikes');
+  eq(validate(r3).stats.spikes, 3, 'Rogue L3 has 3 spikes');
+  eq(validate(r9).stats.spikes, 5, 'Rogue L9 has 5 spikes');
+});
+
+test('effect coverage G2: Warrior Spirit innate at level 10', () => {
+  // Fighter L9 with Warrior Spirit innate: not active since level < 10
+  const f9 = { classes: [{ name: 'Fighter', level: 9 }] };
+  const r9 = validate(f9);
+  eq(r9.stats.lifePoints, 5, 'Fighter L9 has 5 LP (4 base + 1 Fighter L2 bonus)');
+  eq(r9.stats.armor, 1, 'Fighter L9 has 1 armor (Fighter L4 bonus)');
+  eq(r9.stats.naturalArmor, 0, 'Fighter L9 has 0 natural armor');
+
+  // Fighter L10 with Warrior Spirit innate active: LP +1, armor +1, naturalArmor +1 (plus Fighter L10 gets +1 Armor)
+  const f10 = { classes: [{ name: 'Fighter', level: 10 }] };
+  const r10 = validate(f10);
+  eq(r10.stats.lifePoints, 6, 'Fighter L10 has 6 LP (4 base + 1 Fighter L2 bonus + 1 Warrior Spirit)');
+  eq(r10.stats.armor, 3, 'Fighter L10 has 3 armor (1 L4 bonus + 1 L10 bonus + 1 Warrior Spirit)');
+  eq(r10.stats.naturalArmor, 1, 'Fighter L10 has 1 natural armor (Warrior Spirit)');
+});
+
+test('effect coverage G3: Extensive Combat Training slot grants', () => {
+  // Fighter level 4 has 2 basic, 0 advanced, 0 veteran power slots
+  const baseF = { classes: [{ name: 'Fighter', level: 4 }] };
+  const rBase = validate(baseF);
+  const getSlot = (r, cat) => r.slots.find(s => s.category === cat)?.allowed || 0;
+  eq(getSlot(rBase, 'basic'), 2, 'Fighter L4 base has 2 basic slots');
+  eq(getSlot(rBase, 'advanced'), 0, 'Fighter L4 base has 0 advanced slots');
+
+  // Fighter L4 with Extensive Combat Training - Basic x1 -> basic +1
+  const basicECT = {
+    classes: [{ name: 'Fighter', level: 4 }],
+    purchasedSkills: ['Extensive Combat Training - Basic']
+  };
+  eq(getSlot(validate(basicECT), 'basic'), 3, 'ECT Basic grants +1 basic slot');
+
+  // Fighter L4 with Extensive Combat Training - Advanced x1 -> advanced +1 (since Adept tier maps to advanced)
+  const advECT = {
+    classes: [{ name: 'Fighter', level: 4 }],
+    purchasedSkills: ['Extensive Combat Training - Advanced']
+  };
+  eq(getSlot(validate(advECT), 'advanced'), 1, 'ECT Advanced grants +1 advanced slot');
+});
+
+test('effect coverage G4: Aewen Deep Reserves spell slot grant', () => {
+  // Caster class (Mage L1 has 1 Novice, 0 Adept, 0 Greater spell slots)
+  const mageBase = { classes: [{ name: 'Mage', level: 1 }] };
+  const rMage = validate(mageBase);
+  eq(rMage.spellSlots.novice, 1, 'Mage L1 has 1 novice spell slot');
+
+  // Caster Aewen + Deep Reserves -> +1 at highest tier (Novice in this case)
+  const aewenCaster = {
+    classes: [{ name: 'Mage', level: 1 }],
+    lineage: 'Aewen',
+    lineageAdvantages: ['Deep Reserves']
+  };
+  const rAewenCaster = validate(aewenCaster);
+  eq(rAewenCaster.spellSlots.novice, 2, 'Deep Reserves increases novice slots to 2');
+
+  // Non-caster Aewen -> spellSlots is null, unaffected
+  const aewenNonCaster = {
+    classes: [{ name: 'Fighter', level: 1 }],
+    lineage: 'Aewen',
+    lineageAdvantages: ['Deep Reserves']
+  };
+  eq(validate(aewenNonCaster).spellSlots, null, 'Non-caster Aewen has null spellSlots');
 });
 
 // ─── report ───────────────────────────────────────────────────────────────────
