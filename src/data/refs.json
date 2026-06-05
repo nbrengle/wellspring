@@ -20929,6 +20929,424 @@
       "anyOf": [],
       "levels": [],
       "other": []
+    },
+    "perks:Generous Soul": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "perks:Greedy Soul": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "perks:Magical Resilience": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "perks:Mystic Armorer": {
+      "skills": [
+        "skills:Basic Arcane",
+        "skills:Basic Faith",
+        "skills:Apprentice Enchanting"
+      ],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "perks:Mystic Smith": {
+      "skills": [
+        "perks:Mystic Armorer"
+      ],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "perks:Master Mystic Smith": {
+      "skills": [
+        "perks:Mystic Smith"
+      ],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "perks:Soothing Touch": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "perks:Agility": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "perks:Bloody Minded": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "perks:Carnal Creature": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "perks:Cold Dead Hands": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "perks:Deathgrip": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "perks:Elemental Affinity": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "perks:Hard to Kill": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "perks:Holding On": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "perks:Iron Stomach": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "perks:Quick Healing": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "perks:Toughness": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "perks:Unkillable": {
+      "skills": [
+        "perks:Holding On"
+      ],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "perks:Will to Live": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "perks:Patron": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "perks:Gift of Hateful Retribution": {
+      "skills": [
+        "perks:Patron"
+      ],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "perks:Gift of Healing": {
+      "skills": [
+        "perks:Patron"
+      ],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "perks:Gift of Rebirth": {
+      "skills": [
+        "perks:Patron"
+      ],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "perks:Gift of Recognition": {
+      "skills": [
+        "perks:Patron"
+      ],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "perks:Gift of Unbreakable Flesh": {
+      "skills": [
+        "perks:Patron"
+      ],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "perks:Ultimate Gift": {
+      "skills": [
+        "perks:Patron"
+      ],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "perks:Ancestral Relic": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "perks:Ancestral Weapon": {
+      "skills": [
+        "perks:Ancestral Relic"
+      ],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "perks:Bits and Pieces": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "perks:Boon Bonds": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "perks:Contact": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "perks:Connections": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "perks:Draconic Heritage": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "perks:Famous": {
+      "skills": [
+        "perks:Minor Fame"
+      ],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "perks:Heartbond": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "perks:Income": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "perks:Inheritance": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "perks:Manse": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "perks:Minor Fame": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "perks:Title": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "perks:Sharp Mind": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "perks:Strong Bloodline": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "perks:Fortunate Finder": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "perks:Insight": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "perks:Medium": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "perks:Othersleep": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "perks:Sight": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "perks:Sight Beyond Sight": {
+      "skills": [
+        "perks:Sight"
+      ],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "perks:Sensitive": {
+      "skills": [
+        "perks:Sight Beyond Sight"
+      ],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "perks:Soothsayer": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "perks:Strong Spirit": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "perks:Hearth": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "perks:Arcane Hearth": {
+      "skills": [
+        "perks:Hearth"
+      ],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "perks:Bolt Hole": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "perks:Consecrated Hearth": {
+      "skills": [
+        "perks:Hearth"
+      ],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "perks:Expanded Hearth": {
+      "skills": [
+        "perks:Hearth"
+      ],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "perks:Arcane/Divine Orchestra": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "perks:Peaceful Hearth": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "perks:Protected Hearth": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "perks:Restful Home": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "perks:Lucent Hearth": {
+      "skills": [
+        "perks:Consecrated Hearth"
+      ],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "perks:Experimental Hearth": {
+      "skills": [
+        "perks:Arcane Hearth"
+      ],
+      "anyOf": [],
+      "levels": [],
+      "other": []
     }
   },
   "unlocks": {
@@ -21030,7 +21448,8 @@
       "skills:Advanced Recharge",
       "skills:Spell-Scholar",
       "skills:Bookcaster",
-      "skills:Spell Storing"
+      "skills:Spell Storing",
+      "perks:Mystic Armorer"
     ],
     "skills:Worship": [
       "skills:Divine Favor",
@@ -21042,7 +21461,8 @@
       "skills:Advanced Recharge",
       "skills:Spell-Scholar",
       "skills:Bookcaster",
-      "skills:Spell Storing"
+      "skills:Spell Storing",
+      "perks:Mystic Armorer"
     ],
     "skills:Bookcaster": [
       "skills:Bookcasting Expertise"
@@ -21107,13 +21527,54 @@
       "skills:Greater Tinkering"
     ],
     "skills:Apprentice Enchanting": [
-      "skills:Journeyman Enchanting"
+      "skills:Journeyman Enchanting",
+      "perks:Mystic Armorer"
     ],
     "skills:Journeyman Enchanting": [
       "skills:Greater Enchanting"
     ],
     "skills:Apprentice Ritual Magic": [
       "skills:Journeyman Ritual Magic"
+    ],
+    "perks:Mystic Armorer": [
+      "perks:Mystic Smith"
+    ],
+    "perks:Mystic Smith": [
+      "perks:Master Mystic Smith"
+    ],
+    "perks:Holding On": [
+      "perks:Unkillable"
+    ],
+    "perks:Patron": [
+      "perks:Gift of Hateful Retribution",
+      "perks:Gift of Healing",
+      "perks:Gift of Rebirth",
+      "perks:Gift of Recognition",
+      "perks:Gift of Unbreakable Flesh",
+      "perks:Ultimate Gift"
+    ],
+    "perks:Ancestral Relic": [
+      "perks:Ancestral Weapon"
+    ],
+    "perks:Minor Fame": [
+      "perks:Famous"
+    ],
+    "perks:Sight": [
+      "perks:Sight Beyond Sight"
+    ],
+    "perks:Sight Beyond Sight": [
+      "perks:Sensitive"
+    ],
+    "perks:Hearth": [
+      "perks:Arcane Hearth",
+      "perks:Consecrated Hearth",
+      "perks:Expanded Hearth"
+    ],
+    "perks:Consecrated Hearth": [
+      "perks:Lucent Hearth"
+    ],
+    "perks:Arcane Hearth": [
+      "perks:Experimental Hearth"
     ]
   },
   "grants": {

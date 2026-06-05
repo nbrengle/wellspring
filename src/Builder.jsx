@@ -23,6 +23,7 @@ import {
 } from "./data/starting-choices.js";
 import { formatCharacterSheet, parseCharacterSheet } from "./data/sheet.js";
 import RulesExplorer from "./RulesExplorer.jsx";
+import RecipeChecker from "./RecipeChecker.jsx";
 import "./Builder.css";
 
 // ─── CHARACTER STATE ────────────────────────────────────────────────────────
@@ -251,6 +252,9 @@ function validityReasons(report) {
     if (lbp.mixedSublineage) out.push("Lineage: items from more than one sublineage");
     if (lbp.needsSublineage) out.push(`Lineage: select the ${lbp.requiredSublineages.join("/")} sublineage to take its items`);
     if (lbp.missingRequired?.length) out.push(`Lineage: missing required ${lbp.missingRequired.map((c) => c.baseName).join(", ")}`);
+  }
+  for (const n of report.prereqs?.notes || []) {
+    out.push(`Note (${n.item}): ${n.text}`);
   }
   return out;
 }
@@ -2246,7 +2250,7 @@ function ExportImportPanel({ character, report, onImport, onClose }) {
 // ─── ROOT COMPONENT ─────────────────────────────────────────────────────────
 
 export default function Builder() {
-  const [mode, setMode] = useState("builder"); // "builder" | "explorer"
+  const [mode, setMode] = useState("builder"); // "builder" | "explorer" | "recipes"
   const [character, setCharacter] = useState(() => readFromHash() || EMPTY_CHARACTER);
   // view: null | {mode:'inspect', item, field, resolveType, archetypeName, category?, index?, choosable?}
   // The rail detail pane is inspect-only now; picking happens in a full-screen
@@ -2794,6 +2798,8 @@ export default function Builder() {
                onExport={() => setExportOpen(true)} />
       {mode === "explorer" ? (
         <RulesExplorer onClose={() => setMode("builder")} />
+      ) : mode === "recipes" ? (
+        <RecipeChecker onClose={() => setMode("builder")} />
       ) : (
         <div className="b-cols">
           <IdentityRail character={character} report={report}
@@ -2876,7 +2882,9 @@ function BTopBar({ mode, setMode, character, report, onLevelChange, onExport }) 
     <header className="b-topbar">
       <div className="b-topbar-brand">
         <span className="b-topbar-title">Wellspring</span>
-        <span className="b-topbar-sub">{mode === "explorer" ? "Rules Explorer" : "Character Builder"}</span>
+        <span className="b-topbar-sub">
+          {mode === "explorer" ? "Rules Explorer" : mode === "recipes" ? "Recipe Explorer" : "Character Builder"}
+        </span>
       </div>
       <div className="b-topbar-tabs">
         <button className={`b-topbar-tab ${mode === "builder" ? "is-active" : ""}`} onClick={() => setMode("builder")}>
@@ -2884,6 +2892,9 @@ function BTopBar({ mode, setMode, character, report, onLevelChange, onExport }) 
         </button>
         <button className={`b-topbar-tab ${mode === "explorer" ? "is-active" : ""}`} onClick={() => setMode("explorer")}>
           Rules Explorer
+        </button>
+        <button className={`b-topbar-tab ${mode === "recipes" ? "is-active" : ""}`} onClick={() => setMode("recipes")}>
+          Recipe Checker
         </button>
       </div>
       <div className="b-topbar-stats">
