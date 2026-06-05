@@ -587,6 +587,13 @@
 .b-slot-pick:hover { color: var(--b-amber); }
 .b-slot-row.is-focused { border-color: var(--b-amber); background: rgba(184,130,31,0.12); }
 .b-slot-row.is-filled.is-over { border-color: var(--b-red); }
+.b-slot-row.is-granted { background: rgba(176,143,208,0.08); border-style: dotted; }
+.b-slot-row.is-granted .b-slot-num { color: var(--b-purple); }
+.b-slot-granted-tag {
+  flex: none; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.04em;
+  color: var(--b-purple); padding: 0.1rem 0.35rem; border: 1px solid var(--b-purple);
+  border-radius: 0.25rem; opacity: 0.8;
+}
 .b-slot-action {
   flex: none; background: transparent; border: none; cursor: pointer;
   color: var(--b-dim); font-size: 0.85rem; padding: 0.25rem 0.3rem; line-height: 1;

@@ -128,6 +128,33 @@ test('Bookcaster spell options: known vs other accessible spells', () => {
   // Each group sorted.
   eq(JSON.stringify(l4.other), JSON.stringify([...l4.other].sort((a, b) => a.localeCompare(b))), 'other sorted');
 });
+test('innate bonus cantrip (Cancel) is granted+locked, not a choosable slot', () => {
+  const cant = (cls, lvl) => computeSlots({ archetypeName: 'x', classes: [{ name: cls, level: lvl }] })
+    .find((s) => s.category === 'cantrips');
+  // Mage L1: table Cantrips=0, bonus prose grants Cancel innate. 0 choosable, Cancel granted.
+  const mage1 = cant('Mage', 1);
+  eq(mage1.allowed, 0, 'Mage L1 has 0 CHOOSABLE cantrips');
+  eq(mage1.used, 0, 'Mage L1 uses 0 cantrips');
+  ok(mage1.granted?.includes('Cancel'), 'Mage L1 is granted Cancel');
+  // Cleric L1: gets Cancel at L2, so none granted yet.
+  ok(!(cant('Cleric', 1).granted || []).includes('Cancel'), 'Cleric L1 has no innate cantrip yet');
+  // Cleric/Druid/Sourcerer L2: table Cantrips=1 (choosable) + Cancel granted.
+  for (const cls of ['Cleric', 'Druid', 'Sourcerer']) {
+    const r = cant(cls, 2);
+    eq(r.allowed, 1, `${cls} L2 has 1 choosable cantrip`);
+    ok(r.granted?.includes('Cancel'), `${cls} L2 is granted Cancel`);
+  }
+});
+test('a granted cantrip in the pick list does not double-count', () => {
+  // Older archetypes ship "Cancel" as a cantrip pick; it must not consume a slot.
+  const r = computeSlots({
+    archetypeName: 'x', classes: [{ name: 'Mage', level: 2 }],
+    cantrips: ['Cancel', 'Force Shield'],
+  }).find((s) => s.category === 'cantrips');
+  eq(r.used, 1, 'only the non-granted pick counts');
+  ok(!r.over, 'not over the cap');
+  ok(r.granted?.includes('Cancel'), 'Cancel still surfaced as granted');
+});
 test('approved backstory adds +2 BP to the budget', () => {
   const base = validate({ archetypeName: 'x', classes: [{ name: 'Fighter', level: 4 }] });
   const boon = validate({ archetypeName: 'x', classes: [{ name: 'Fighter', level: 4 }], backstoryApproved: true });
@@ -865,6 +892,29 @@ test('rebuild preserves starting skills unrelated to the choices', () => {
   };
   const rebuilt = rebuildStartingSkills(c, 'Druid', c.startingChoices);
   ok(rebuilt.startingSkills.includes('Lockpicking Improv'), 'unrelated manual skill preserved');
+});
+
+test('parameterized skills satisfy prerequisites and undergo prerequisite checking', () => {
+  // 1. Lore (Historical) satisfies Research prerequisite (Lore)
+  let c = {
+    classes: [{ name: 'Mage', level: 4 }],
+    purchasedSkills: ['Lore (Historical)', 'Research']
+  };
+  eq(validate(c).prereqs.issues.length, 0, 'Lore (Historical) satisfies Research');
+
+  // 2. Profession - Journeyman (Smith) requires Profession - Apprentice
+  c = {
+    classes: [{ name: 'Mage', level: 4 }],
+    purchasedSkills: ['Profession - Journeyman (Smith)']
+  };
+  const issues = validate(c).prereqs.issues;
+  eq(issues.length, 1, 'fails missing apprentice prerequisite');
+  eq(issues[0].id, 'skills:Profession - Journeyman (Smith)', 'identifies correct failing skill');
+  eq(issues[0].missing[0].id, 'skills:Profession - Apprentice', 'identifies missing base prerequisite');
+
+  // 3. Adding Apprentice (Smith) satisfies the prerequisite
+  c.purchasedSkills.push('Profession - Apprentice (Smith)');
+  eq(validate(c).prereqs.issues.length, 0, 'Apprentice satisfies Journeyman');
 });
 
 // ─── report ───────────────────────────────────────────────────────────────────
