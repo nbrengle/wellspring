@@ -930,45 +930,74 @@ function enrichWithDetailSections(results) {
 // structured `tiers: [{ cost, level, ability }]` so the validator can price
 // cumulatively and gate per tier, instead of the flat rank×cost model.
 function extractTiers(results) {
-  // Table tail begins after the "Cost Character Level Ability" header; rows are
-  // "<cost> <level> <ability…>" until the next "<num> <num>" row or end.
-  const HEADER = /Cost\s+Character\s+Level\s+Ability\s+/i;
-  const ROW = /(\d+)\s+(\d+)\s+(.+?)(?=\s+\d+\s+\d+\s|$)/gs;
   for (const r of results) {
-    if (r.name === 'Gift of Hateful Retribution') {
-      r.tiers = [
-        { cost: 2, damage: 10 },
-        { cost: 1, damage: 15 },
-        { cost: 1, damage: 25 },
-        { cost: 1, damage: 50, byMyVoiceDmg: 5 }
-      ];
-      r.cost = 2;
-      continue;
-    }
-    if (r.name === 'Gift of Unbreakable Flesh') {
-      r.tiers = [
-        { cost: 2, armorPoints: 1 },
-        { cost: 3, armorPoints: 2 },
-        { cost: 5, armorPoints: 3 },
-        { cost: 5, armorPoints: 4 }
-      ];
-      r.cost = 2;
+    if (!r.description) continue;
+
+    // 1. Check for standard tiered table (Cost / Character Level / Ability)
+    const mStandard = r.description.match(/Cost\s+Character\s+Level\s+Ability/i);
+    if (mStandard) {
+      const tail = r.description.slice(mStandard.index + mStandard[0].length);
+      const ROW = /(\d+)\s+(\d+)\s+(.+?)(?=\s+\d+\s+\d+\s|$)/gs;
+      const tiers = [];
+      let row;
+      ROW.lastIndex = 0;
+      while ((row = ROW.exec(tail))) {
+        tiers.push({ cost: +row[1], level: +row[2], ability: row[3].trim() });
+      }
+      if (tiers.length > 1) {
+        r.tiers = tiers;
+        r.cost = tiers[0].cost;
+      }
       continue;
     }
 
-    const m = r.description && r.description.match(HEADER);
-    if (!m) continue;
-    const tail = r.description.slice(m.index + m[0].length);
-    const tiers = [];
-    let row;
-    ROW.lastIndex = 0;
-    while ((row = ROW.exec(tail))) {
-      tiers.push({ cost: +row[1], level: +row[2], ability: row[3].trim() });
+    // 2. Check for Cost / Damage / By My Voice Dmg table (e.g. Gift of Hateful Retribution)
+    const mHateful = r.description.match(/Cost\s+Damage\s+By\s+My\s+Voice\s+Dmg/i);
+    if (mHateful) {
+      const tail = r.description.slice(mHateful.index + mHateful[0].length).trim();
+      const tokens = tail.split(/\s+/).filter(Boolean);
+      const tiers = [];
+      let prevCost = 0;
+      for (let i = 0; i < tokens.length; i += 3) {
+        const cumulativeCost = +tokens[i];
+        const damage = +tokens[i+1];
+        const byMyVoiceVal = tokens[i+2];
+        const incrementalCost = cumulativeCost - prevCost;
+        prevCost = cumulativeCost;
+
+        const tier = { cost: incrementalCost, damage };
+        if (byMyVoiceVal && byMyVoiceVal !== '-') {
+          tier.byMyVoiceDmg = +byMyVoiceVal;
+        }
+        tiers.push(tier);
+      }
+      if (tiers.length > 1) {
+        r.tiers = tiers;
+        r.cost = tiers[0].cost;
+      }
+      continue;
     }
-    if (tiers.length > 1) {
-      r.tiers = tiers;
-      // The base `cost` is tier 1's cost (the flat field still reflects entry price).
-      r.cost = tiers[0].cost;
+
+    // 3. Check for Cost / Armor Points table (e.g. Gift of Unbreakable Flesh)
+    const mUnbreakable = r.description.match(/Cost\s+Armor\s+Points/i);
+    if (mUnbreakable) {
+      const tail = r.description.slice(mUnbreakable.index + mUnbreakable[0].length).trim();
+      const tokens = tail.split(/\s+/).filter(Boolean);
+      const tiers = [];
+      let prevCost = 0;
+      for (let i = 0; i < tokens.length; i += 2) {
+        const cumulativeCost = +tokens[i];
+        const armorPoints = +tokens[i+1];
+        const incrementalCost = cumulativeCost - prevCost;
+        prevCost = cumulativeCost;
+
+        tiers.push({ cost: incrementalCost, armorPoints });
+      }
+      if (tiers.length > 1) {
+        r.tiers = tiers;
+        r.cost = tiers[0].cost;
+      }
+      continue;
     }
   }
   return results;

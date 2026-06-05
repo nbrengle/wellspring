@@ -13,6 +13,9 @@ import { LEVEL_TABLE, lookupEntity, REFS, CLASS_POWER_SLOTS, CLASS_POWERS, CLASS
 import { startingSkillGrants } from './starting-choices.js';
 import { cleanItemName, bareSkill, resolveId, idName, entityType } from './resolver.js';
 
+// Base Classes derived dynamically from CLASSES database
+export const BASE_CLASSES = new Set(Object.keys(CLASSES));
+
 // Max Lineage Build Points a character can be awarded from challenges (MegaDoc:
 // "up to 10 awarded LBP").
 export const MAX_LBP = 10;
@@ -1626,7 +1629,6 @@ export function prereqStatus(character, entityId) {
 export function checkLevelConstraint(character, constraintStr, owned) {
   const charLevel = characterLevel(character);
   const charClasses = getClasses(character);
-  const BASE_CLASSES = new Set(['Artisan', 'Cleric', 'Druid', 'Fighter', 'Mage', 'Rogue', 'Socialite', 'Sourcerer']);
 
   // 1. "N levels in Martial Classes" or "N levels in a Martial Classes" or "N class-levels in martial classes"
   let m = constraintStr.match(/^(\d+)\s+(?:levels?|class-levels)\s+in\s+(?:a\s+)?Martial\s+Classes/i);
@@ -1675,8 +1677,7 @@ export function checkLevelConstraint(character, constraintStr, owned) {
 
   // 7. "At least one Armor Proficiency"
   if (/At\s+least\s+one\s+Armor\s+Proficiency/i.test(constraintStr)) {
-    const armorSkills = ['Basic Armor', 'Light Armor', 'Medium Armor', 'Heavy Armor', 'Ironclad Armor'];
-    return armorSkills.some(name => owned.has(`skills:${name}`));
+    return [...owned].some(id => id.startsWith('skills:') && id.includes('Armor') && id !== 'skills:Armor Expertise');
   }
 
   // 8. "One Novice-level spell-slot", "One Adept spell-slot", "One Greater spell-slot", etc.
@@ -1808,7 +1809,6 @@ export function checkPrereqs(character) {
   }
 
   // ─── Advanced Classes limit ───
-  const BASE_CLASSES = new Set(['Artisan', 'Cleric', 'Druid', 'Fighter', 'Mage', 'Rogue', 'Socialite', 'Sourcerer']);
   const charClasses = getClasses(character);
   const advancedClasses = charClasses.filter(c => !BASE_CLASSES.has(c.name));
   const baseLevel = charClasses
