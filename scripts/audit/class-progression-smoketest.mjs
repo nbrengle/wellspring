@@ -1,12 +1,17 @@
-// Per-class level 1->10 validation sweep.
+// Per-class level 1->10 progression SMOKE TEST.
+//
+// NOTE: this is a self-consistency check, NOT the rules audit. It builds a
+// default character for each base class and levels it 1->10, filling slots and
+// running validate() at each step, to catch the builder CONTRADICTING ITSELF
+// (a slot that can't be filled, a default build that goes over budget, a prereq
+// deadlock). It does NOT tell you whether the builder matches the MegaDoc — for
+// that, see RULES_AUDIT.md, which reads the rules text directly. Keep this as a
+// regression guard; don't mistake a clean run here for "rules-correct".
 //
 // For each base class: build a blank level-1 character (as "Start blank" does),
 // apply starting abilities, fill each starting-choice block with its FIRST
 // option (the UI default), then for levels 1..10 fill open power/spell/cantrip
-// slots with the first eligible candidate (as a player clicking "+ choose"
-// would) and run validate(). Records, per level, the validator's verdict and
-// every rule signal: prereq issues, over-budget, slot overages, LBP validity.
-//
+// slots with the first eligible candidate and run validate().
 // `belowFloor` (level < 4) is reported SEPARATELY since it's the builder's
 // campaign-floor flag, not a per-rules legality failure for L1-3.
 
