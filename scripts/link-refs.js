@@ -571,12 +571,25 @@ for (const e of registry) {
   for (const r of refs) (mentionedBy[r] = mentionedBy[r] || []).push(e.id);
 }
 
-// Structured prereqs from skills, and their inverse (unlocks).
+// Structured prereqs from skills and perks, and their inverse (unlocks).
+const eligibleForms = matchers.filter((m) => m.type === "skills" || m.type === "perks");
+
 const skills = read("skills.json");
 for (const s of skills) {
   const id = `skills:${s.name}`;
-  prereqs[id] = parsePrereq(s.prereq, skillForms);
+  prereqs[id] = parsePrereq(s.prereq, eligibleForms);
   // Required skills and every disjunction alternative both unlock this skill.
+  const depIds = [...prereqs[id].skills, ...prereqs[id].anyOf.flat()];
+  for (const dep of depIds) {
+    (unlocks[dep] = unlocks[dep] || []).push(id);
+  }
+}
+
+const perks = read("perks.json");
+for (const p of perks) {
+  const id = `perks:${p.name}`;
+  prereqs[id] = parsePrereq(p.prereq, eligibleForms);
+  // Required skills/perks and every disjunction alternative both unlock this perk.
   const depIds = [...prereqs[id].skills, ...prereqs[id].anyOf.flat()];
   for (const dep of depIds) {
     (unlocks[dep] = unlocks[dep] || []).push(id);

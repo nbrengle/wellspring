@@ -16,6 +16,7 @@ import {
   bookcasterSpellOptions
 } from '../src/data/validate.js';
 import { formatCharacterSheet, parseCharacterSheet } from '../src/data/sheet.js';
+import { solveCrafting } from '../src/data/recipe-solver.js';
 import { readFileSync } from 'node:fs';
 import { lookupEntity, eligiblePowers, DEVOTIONS, DOMAINS, REFS, CLASSES, LINEAGES } from '../src/data/index.js';
 import {
@@ -892,6 +893,67 @@ test('rebuild preserves starting skills unrelated to the choices', () => {
   };
   const rebuilt = rebuildStartingSkills(c, 'Druid', c.startingChoices);
   ok(rebuilt.startingSkills.includes('Lockpicking Improv'), 'unrelated manual skill preserved');
+});
+
+test('recipe solver resolves recursive and alternative recipes', () => {
+  const inventory = {
+    'Bloom': 5,
+    'Ingot': 1
+  };
+
+  // 1. Direct crafting of Alcohol (needs 1 Bloom)
+  let res = solveCrafting('Alcohol', 1, inventory);
+  ok(res.success, 'can craft Alcohol');
+  eq(res.inventory.Bloom, 4, 'deducts 1 Bloom');
+
+  // 2. Disjunctive crafting of Alchemical Suspension (needs 1 Bloom or 1 Night Prize or 1 Harvest)
+  res = solveCrafting('Alchemical Suspension', 1, inventory);
+  ok(res.success, 'can craft Alchemical Suspension from Bloom');
+  eq(res.inventory.Bloom, 4, 'deducts 1 Bloom for suspension');
+
+  // 3. Disjunctive crafting of Alchemical Salts (needs 1 Ingot or 1 Hide or 1 Rare Mineral)
+  res = solveCrafting('Alchemical Salts', 1, inventory);
+  ok(res.success, 'can craft Alchemical Salts from Ingot');
+  eq(res.inventory.Ingot, 0, 'deducts 1 Ingot for salts');
+
+  // 4. Crafting fails when ingredients are missing
+  res = solveCrafting('Adderstrike Venom', 1, inventory);
+  ok(!res.success, 'cannot craft Adderstrike Venom without Night Prizes');
+});
+
+test('validation: Weapon Specialization limit (only one type)', () => {
+  const clean = { archetypeName: 'x', classLevels: 'Fighter 4', purchasedSkills: ['Basic Martial Weapons', 'Weapon Specialization (Swords)'] };
+  const rClean = validate(clean);
+  eq(rClean.prereqs.issues.length, 0, 'One specialization is legal');
+
+  const multiple = { archetypeName: 'x', classLevels: 'Fighter 4', purchasedSkills: ['Basic Martial Weapons', 'Weapon Specialization (Swords)', 'Weapon Specialization (Daggers)'] };
+  const rMultiple = validate(multiple);
+  ok(rMultiple.prereqs.issues.some(i => i.item === 'Weapon Specialization' && i.text.includes('only have Weapon Specialization with one')), 'Multiple specializations are blocked');
+});
+
+test('validation: Advanced Classes limits and rules', () => {
+  const legalAdv = { archetypeName: 'x', classes: [{ name: 'Fighter', level: 10 }, { name: 'Shadowblade', level: 5 }] };
+  const rLegal = validate(legalAdv);
+  const shadowbladeIssues = rLegal.prereqs.issues.filter(i => i.item === 'Shadowblade' || i.item === 'Advanced Classes');
+  eq(shadowbladeIssues.length, 0, 'Level 10 base + Level 5 Advanced is legal under advanced class rules');
+
+  const lowBase = { archetypeName: 'x', classes: [{ name: 'Fighter', level: 4 }, { name: 'Shadowblade', level: 1 }] };
+  const rLowBase = validate(lowBase);
+  ok(rLowBase.prereqs.issues.some(i => i.item === 'Advanced Classes' && i.text.includes('until total level 10 has been reached')), 'Advanced class blocked if base classes level < 10');
+
+  const tooHighLevel = { archetypeName: 'x', classes: [{ name: 'Fighter', level: 10 }, { name: 'Shadowblade', level: 6 }] };
+  const rTooHighLevel = validate(tooHighLevel);
+  ok(rTooHighLevel.prereqs.issues.some(i => i.item === 'Shadowblade' && i.text.includes('maximum of 5 levels')), 'Advanced class capped at 5 levels');
+
+  const tooManyAdv = { archetypeName: 'x', classes: [{ name: 'Fighter', level: 10 }, { name: 'Shadowblade', level: 1 }, { name: 'Spellbinder', level: 1 }, { name: 'Archmage', level: 1 }] };
+  const rTooManyAdv = validate(tooManyAdv);
+  ok(rTooManyAdv.prereqs.issues.some(i => i.item === 'Advanced Classes' && i.text.includes('maximum of two')), 'Max of two Advanced Classes');
+});
+
+test('validation: Draconic Heritage character creation note', () => {
+  const c = { archetypeName: 'x', classLevels: 'Fighter 4', purchasedPerks: ['Draconic Heritage (Flame)'] };
+  const r = validate(c);
+  ok(r.prereqs.notes.some(n => n.item === 'Draconic Heritage' && n.text.includes('Must be taken at Character Creation')), 'Heritage note is registered');
 });
 
 test('parameterized skills satisfy prerequisites and undergo prerequisite checking', () => {
