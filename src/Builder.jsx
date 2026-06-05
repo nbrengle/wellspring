@@ -42,6 +42,19 @@ const PARAMETER_SUGGESTIONS = {
   "Chronic Hobbyist": ["Cooking", "Brewing", "Gardening", "Smith", "Carpenter", "Tailor", "Mason", "Hunter", "Scribe", "Herbalist", "Undertaker", "Merchant", "Charlatan", "Chirurgeon", "Teacher", "Soldier", "Sailor", "Wagoneer"],
   "Bookcaster": ["Magekey", "Mask Aura", "Identify", "Cancel", "Stop", "Mageskin"],
   "Favored Form": ["Hunting Panther", "Hulking Bear", "Striking Serpent"],
+  // Custom suggestion additions
+  "Weapon Specialization": ["Daggers", "Swords", "Maces", "Axes", "Projectile Weapons", "Thrown Weapons", "Staves", "Polearms"],
+  "Elemental Affinity": ["Flame", "Ice", "Lightning", "Acid"],
+  "Draconic Heritage": ["Acid", "Flame", "Ice", "Lightning"],
+  "Honor Debt": [],
+  "Contact": [],
+  "Ancestral Relic": [],
+  "Ancestral Weapon": [],
+  "Boon Bonds": [],
+  "Heartbond": [],
+  "Famous": [],
+  "Minor Fame": [],
+  "Manse": [],
   "Mild Allergy": ["Cloth", "Copper", "Gold", "Harvest", "Hide", "Ingot", "Iron", "Leather", "Materia", "Night Prize", "Other Common Allergen", "Other Uncommon Allergen", "Rare Minerals", "Scale", "Silver"],
   "Severe Allergy": ["Cloth", "Copper", "Gold", "Harvest", "Hide", "Ingot", "Iron", "Leather", "Materia", "Night Prize", "Other Common Allergen", "Other Uncommon Allergen", "Rare Minerals", "Scale", "Silver"]
 };
@@ -1579,12 +1592,18 @@ function DescriptionBlock({ text, terms = [], onInspect }) {
 // content (and link-following) is identical everywhere.
 function ParameterEditor({ baseName, entity, view, onUpdateParameter }) {
   const [isOpen, setIsOpen] = useState(false);
-  const [filter, setFilter] = useState(entity.parameter || "");
+  // `entity.parameter` is the USER's chosen value only when the resolved name
+  // carried one (the resolver sets `baseName` alongside it). For a bare base
+  // skill, `parameter` is the static descriptor from skills.json ("Area of
+  // Lore") — NOT a value — so treat the chosen value as empty in that case,
+  // otherwise the descriptor leaks into the input as a phantom value.
+  const chosenParam = entity.baseName ? (entity.parameter || "") : "";
+  const [filter, setFilter] = useState(chosenParam);
   const containerRef = useRef(null);
 
   useEffect(() => {
-    setFilter(entity.parameter || "");
-  }, [entity.parameter]);
+    setFilter(chosenParam);
+  }, [chosenParam]);
 
   useEffect(() => {
     const handleOutsideClick = (e) => {
@@ -1597,7 +1616,7 @@ function ParameterEditor({ baseName, entity, view, onUpdateParameter }) {
   }, []);
 
   const suggestions = PARAMETER_SUGGESTIONS[baseName] || [];
-  const isSearching = isOpen && filter !== entity.parameter;
+  const isSearching = isOpen && filter !== chosenParam;
   const filtered = isSearching
     ? suggestions.filter(opt => opt.toLowerCase().includes(filter.toLowerCase()))
     : suggestions;
