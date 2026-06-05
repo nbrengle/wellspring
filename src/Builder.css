@@ -1182,6 +1182,18 @@
   background: rgba(184, 130, 31, 0.16);
   color: var(--b-amber);
 }
+.b-combobox-group-label {
+  padding: 0.4rem 0.6rem 0.2rem;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--b-dim);
+  font-weight: 600;
+  border-top: 1px solid var(--b-border);
+}
+.b-combobox-group-label:first-child {
+  border-top: none;
+}
 
 .b-badge-refund {
   color: var(--b-green);

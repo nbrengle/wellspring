@@ -9,7 +9,7 @@
 // which doubles as the entity inspector so you can follow a power's links
 // (prereqs / unlocks / mentions) while deciding.
 
-import { useState, useEffect, useMemo, useCallback, useRef } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef, Fragment } from "react";
 import {
   ARCHETYPES, REFS, lookupEntity, LEVEL_TABLE,
   eligiblePowers, ALL_SKILLS, ALL_PERKS, ALL_FLAWS,
@@ -1566,7 +1566,7 @@ function DescriptionBlock({ text, terms = [], onInspect }) {
 // The shared reading body for an entity — description, facts, forward + back
 // links. Used by both the rail inspector and the picker's reading pane so the
 // content (and link-following) is identical everywhere.
-function ParameterEditor({ baseName, entity, view, suggestions: suggestionsProp, onUpdateParameter }) {
+function ParameterEditor({ baseName, entity, view, suggestions: suggestionsProp, groups, onUpdateParameter }) {
   const [isOpen, setIsOpen] = useState(false);
   // `entity.parameter` is the USER's chosen value only when the resolved name
   // carried one (the resolver sets `baseName` alongside it). For a bare base
@@ -1591,23 +1591,36 @@ function ParameterEditor({ baseName, entity, view, suggestions: suggestionsProp,
     return () => document.removeEventListener("mousedown", handleOutsideClick);
   }, []);
 
-  const suggestions = suggestionsProp || PARAMETER_SUGGESTIONS[baseName] || [];
-  const isSearching = isOpen && filter !== chosenParam;
-  const filtered = isSearching
-    ? suggestions.filter(opt => opt.toLowerCase().includes(filter.toLowerCase()))
-    : suggestions;
   const isSpellChoice = baseName === "Bookcaster";
+  // Normalize to grouped form: a single unnamed group for flat suggestions, or
+  // the provided labeled groups (Bookcaster's Known / Other Accessible spells).
+  const flat = suggestionsProp || PARAMETER_SUGGESTIONS[baseName] || [];
+  const allGroups = groups && groups.length ? groups : (flat.length ? [{ label: null, options: flat }] : []);
+  const isSearching = isOpen && filter !== chosenParam;
+  const match = (opt) => opt.toLowerCase().includes(filter.toLowerCase());
+  const visibleGroups = allGroups
+    .map((g) => ({ ...g, options: isSearching ? g.options.filter(match) : g.options }))
+    .filter((g) => g.options.length);
+  const hasOptions = allGroups.some((g) => g.options.length);
+
   const sectionLabel = baseName === "Lore" ? "Customize Area"
     : isSpellChoice ? "Choose a Spell" : "Customize Choice";
   const placeholder = baseName === "Lore" ? "Enter area..."
     : isSpellChoice ? "Choose or type a spell..." : "Enter choice...";
+
+  const choose = (opt) => {
+    setFilter(opt);
+    const newName = formatParameterizedName(baseName, opt, entity.name);
+    onUpdateParameter(view.field, entity.name, newName, view.index);
+    setIsOpen(false);
+  };
 
   return (
     <div className="b-detail-section b-parameter-editor" ref={containerRef}>
       <h3 className="b-detail-section-title">
         {sectionLabel}
       </h3>
-      {isSpellChoice && !suggestions.length && (
+      {isSpellChoice && !hasOptions && (
         <p className="b-detail-hint">No accessible spell lists yet — gain spell-slots (or a caster class) to bookcast.</p>
       )}
       <div className="b-combobox">
@@ -1634,23 +1647,23 @@ function ParameterEditor({ baseName, entity, view, suggestions: suggestionsProp,
             {isOpen ? "▲" : "▼"}
           </button>
         </div>
-        {isOpen && filtered.length > 0 && (
+        {isOpen && visibleGroups.length > 0 && (
           <ul className="b-combobox-list">
-            {filtered.map((opt) => (
-              <li key={opt}>
-                <button
-                  type="button"
-                  className="b-combobox-option"
-                  onClick={() => {
-                    setFilter(opt);
-                    const newName = formatParameterizedName(baseName, opt, entity.name);
-                    onUpdateParameter(view.field, entity.name, newName, view.index);
-                    setIsOpen(false);
-                  }}
-                >
-                  {opt}
-                </button>
-              </li>
+            {visibleGroups.map((g) => (
+              <Fragment key={g.label || "_"}>
+                {g.label && <li className="b-combobox-group-label" aria-hidden="true">{g.label}</li>}
+                {g.options.map((opt) => (
+                  <li key={`${g.label || ""}:${opt}`}>
+                    <button
+                      type="button"
+                      className="b-combobox-option"
+                      onClick={() => choose(opt)}
+                    >
+                      {opt}
+                    </button>
+                  </li>
+                ))}
+              </Fragment>
             ))}
           </ul>
         )}
@@ -1675,14 +1688,24 @@ export function EntityBody({ entity, view, report, choices, onSetChoice, onUpdat
   // Referenced concepts to linkify inside the description (#13).
   const terms = conceptTerms(entity);
   const baseName = entity.baseName || entity.name;
-  // Bookcaster is parameterized by a SPELL the character can access (rules: "one
-  // spell from any spell list they have access to … of a Tier they would normally
-  // be able to access"), so its suggestions are derived per-character from the
-  // validator rather than a static list. Other skills use the static map.
-  const paramSuggestions = baseName === "Bookcaster"
-    ? (report?.bookcasterOptions || [])
-    : (PARAMETER_SUGGESTIONS[baseName] || null);
-  const isParamEditable = !!(onUpdateParameter && view?.field && view.field !== "multiclassGrant" && paramSuggestions);
+  // Bookcaster is parameterized by a SPELL the character can access, derived
+  // per-character from the validator (report.bookcasterOptions = {known, other}).
+  // The picker groups them: "Known Spells" (easy path) above "Other Accessible
+  // Spells" (rules-legal but higher friction — a spell you don't yet know).
+  // Other skills use the static suggestion map (a flat list).
+  let paramSuggestions = null;       // flat list, or null
+  let paramGroups = null;            // [{ label, options }], or null
+  if (baseName === "Bookcaster") {
+    const bc = report?.bookcasterOptions || { known: [], other: [] };
+    paramGroups = [
+      { label: "Known Spells", options: bc.known || [] },
+      { label: "Other Accessible Spells", options: bc.other || [] },
+    ].filter((g) => g.options.length);
+  } else {
+    paramSuggestions = PARAMETER_SUGGESTIONS[baseName] || null;
+  }
+  const isParamEditable = !!(onUpdateParameter && view?.field && view.field !== "multiclassGrant"
+    && (paramSuggestions || paramGroups || baseName === "Bookcaster"));
   const grantedSubPowers = useMemo(() => {
     if (!entity?.id) return [];
     const targets = REFS.grants?.[entity.id] || [];
@@ -1704,6 +1727,7 @@ export function EntityBody({ entity, view, report, choices, onSetChoice, onUpdat
           entity={entity}
           view={view}
           suggestions={paramSuggestions}
+          groups={paramGroups}
           onUpdateParameter={onUpdateParameter}
         />
       )}
