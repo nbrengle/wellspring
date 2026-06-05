@@ -1373,7 +1373,36 @@ function ownedIds(character) {
   const owned = new Set();
   for (const field of ENTITY_FIELDS) {
     for (const item of character[field] || []) {
-      owned.add(resolveId(item, field, character));
+      const id = resolveId(item, field, character);
+      owned.add(id);
+
+      const clean = cleanItemName(item);
+      const bare = bareSkill(clean);
+      const candidates = [
+        id,
+        `${entityType(field)}:${bare}`,
+        `powers:${clean}`,
+        `perks:${clean}`,
+        `skills:${clean}`,
+        `powers:${bare}`,
+        `perks:${bare}`,
+        `skills:${bare}`
+      ];
+      for (const cand of candidates) {
+        const ent = lookupEntity(cand);
+        if (ent) {
+          owned.add(ent.id);
+          owned.add(`${ent.type}:${bareSkill(ent.name)}`);
+        }
+      }
+    }
+  }
+  // Also add granted abilities so they satisfy prerequisites
+  for (const g of grantedAbilities(character).list) {
+    owned.add(g.ability);
+    const ent = lookupEntity(g.ability);
+    if (ent) {
+      owned.add(`${ent.type}:${bareSkill(ent.name)}`);
     }
   }
   return owned;
@@ -1456,6 +1485,85 @@ export function checkPrereqs(character) {
       for (const o of pr.other || []) notes.push({ id, item, field, kind: 'other', text: o });
     }
   }
+
+  // ─── Weapon Specialization limit ───
+  const weaponSpecs = [];
+  for (const field of ['startingSkills', 'purchasedSkills']) {
+    (character[field] || []).forEach((item) => {
+      const clean = cleanItemName(item);
+      if (bareSkill(clean) === 'Weapon Specialization') {
+        weaponSpecs.push({ item, field });
+      }
+    });
+  }
+  for (const g of grantedAbilities(character).list) {
+    if (g.abilityType === 'skills' && bareSkill(cleanItemName(g.abilityName)) === 'Weapon Specialization') {
+      weaponSpecs.push({ item: g.abilityName, field: 'granted' });
+    }
+  }
+  // Filter out unparameterized 'Weapon Specialization' if a parameterized one is present
+  const hasParameterized = weaponSpecs.some(ws => ws.item.includes('('));
+  const filteredWeaponSpecs = hasParameterized
+    ? weaponSpecs.filter(ws => ws.item.includes('('))
+    : weaponSpecs;
+
+  if (filteredWeaponSpecs.length > 1) {
+    const types = filteredWeaponSpecs.map(ws => {
+      const m = ws.item.match(/\(([^)]+)\)/);
+      return m ? m[1].trim() : 'unspecified';
+    });
+    issues.push({
+      id: 'skills:Weapon Specialization',
+      item: 'Weapon Specialization',
+      text: `A character may only have Weapon Specialization with one weapon type (found: ${types.join(', ')}).`,
+    });
+  }
+
+  // ─── Advanced Classes limit ───
+  const BASE_CLASSES = new Set(['Artisan', 'Cleric', 'Druid', 'Fighter', 'Mage', 'Rogue', 'Socialite', 'Sourcerer']);
+  const charClasses = getClasses(character);
+  const advancedClasses = charClasses.filter(c => !BASE_CLASSES.has(c.name));
+  const baseLevel = charClasses
+    .filter(c => BASE_CLASSES.has(c.name))
+    .reduce((sum, c) => sum + c.level, 0);
+
+  if (advancedClasses.length > 2) {
+    issues.push({
+      id: 'classes:Advanced Classes',
+      item: 'Advanced Classes',
+      text: 'One character can have a maximum of two Advanced Classes.',
+    });
+  }
+  if (advancedClasses.length > 0 && baseLevel < 10) {
+    issues.push({
+      id: 'classes:Advanced Classes',
+      item: 'Advanced Classes',
+      text: `Cannot take levels in Advanced Classes until total level 10 has been reached in base classes (current base level: ${baseLevel}).`,
+    });
+  }
+  for (const c of advancedClasses) {
+    if (c.level > 5) {
+      issues.push({
+        id: `classes:${c.name}`,
+        item: c.name,
+        text: `${c.name} has a maximum of 5 levels.`,
+      });
+    }
+  }
+
+  // ─── Draconic Heritage character creation note ───
+  const hasDraconicHeritage = [...(character.purchasedPerks || [])]
+    .some(p => bareSkill(cleanItemName(p)) === 'Draconic Heritage');
+  if (hasDraconicHeritage) {
+    notes.push({
+      id: 'perks:Draconic Heritage',
+      item: 'Draconic Heritage',
+      field: 'purchasedPerks',
+      kind: 'other',
+      text: 'Must be taken at Character Creation.',
+    });
+  }
+
   return { issues, notes };
 }
 

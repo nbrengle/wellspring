@@ -236,6 +236,9 @@ function validityReasons(report) {
     if (lbp.needsSublineage) out.push(`Lineage: select the ${lbp.requiredSublineages.join("/")} sublineage to take its items`);
     if (lbp.missingRequired?.length) out.push(`Lineage: missing required ${lbp.missingRequired.map((c) => c.baseName).join(", ")}`);
   }
+  for (const n of report.prereqs?.notes || []) {
+    out.push(`Note (${n.item}): ${n.text}`);
+  }
   return out;
 }
 

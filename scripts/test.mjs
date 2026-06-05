@@ -859,6 +859,42 @@ test('recipe solver resolves recursive and alternative recipes', () => {
   ok(!res.success, 'cannot craft Adderstrike Venom without Night Prizes');
 });
 
+// ─── Weapon Specialization & Advanced Classes validation ───────────────────────
+test('validation: Weapon Specialization limit (only one type)', () => {
+  const clean = { archetypeName: 'x', classLevels: 'Fighter 4', purchasedSkills: ['Weapon Specialization (Swords)'] };
+  const rClean = validate(clean);
+  eq(rClean.prereqs.issues.length, 0, 'One specialization is legal');
+
+  const multiple = { archetypeName: 'x', classLevels: 'Fighter 4', purchasedSkills: ['Weapon Specialization (Swords)', 'Weapon Specialization (Daggers)'] };
+  const rMultiple = validate(multiple);
+  ok(rMultiple.prereqs.issues.some(i => i.item === 'Weapon Specialization' && i.text.includes('only have Weapon Specialization with one')), 'Multiple specializations are blocked');
+});
+
+test('validation: Advanced Classes limits and rules', () => {
+  const legalAdv = { archetypeName: 'x', classes: [{ name: 'Fighter', level: 10 }, { name: 'Shadowblade', level: 5 }] };
+  const rLegal = validate(legalAdv);
+  const shadowbladeIssues = rLegal.prereqs.issues.filter(i => i.item === 'Shadowblade' || i.item === 'Advanced Classes');
+  eq(shadowbladeIssues.length, 0, 'Level 10 base + Level 5 Advanced is legal under advanced class rules');
+
+  const lowBase = { archetypeName: 'x', classes: [{ name: 'Fighter', level: 4 }, { name: 'Shadowblade', level: 1 }] };
+  const rLowBase = validate(lowBase);
+  ok(rLowBase.prereqs.issues.some(i => i.item === 'Advanced Classes' && i.text.includes('until total level 10 has been reached')), 'Advanced class blocked if base classes level < 10');
+
+  const tooHighLevel = { archetypeName: 'x', classes: [{ name: 'Fighter', level: 10 }, { name: 'Shadowblade', level: 6 }] };
+  const rTooHighLevel = validate(tooHighLevel);
+  ok(rTooHighLevel.prereqs.issues.some(i => i.item === 'Shadowblade' && i.text.includes('maximum of 5 levels')), 'Advanced class capped at 5 levels');
+
+  const tooManyAdv = { archetypeName: 'x', classes: [{ name: 'Fighter', level: 10 }, { name: 'Shadowblade', level: 1 }, { name: 'Spellbinder', level: 1 }, { name: 'Archmage', level: 1 }] };
+  const rTooManyAdv = validate(tooManyAdv);
+  ok(rTooManyAdv.prereqs.issues.some(i => i.item === 'Advanced Classes' && i.text.includes('maximum of two')), 'Max of two Advanced Classes');
+});
+
+test('validation: Draconic Heritage character creation note', () => {
+  const c = { archetypeName: 'x', classLevels: 'Fighter 4', purchasedPerks: ['Draconic Heritage (Flame)'] };
+  const r = validate(c);
+  ok(r.prereqs.notes.some(n => n.item === 'Draconic Heritage' && n.text.includes('Must be taken at Character Creation')), 'Heritage note is registered');
+});
+
 // ─── report ───────────────────────────────────────────────────────────────────
 console.log(`\n${passed} passed, ${failures.length} failed`);
 if (failures.length) {
