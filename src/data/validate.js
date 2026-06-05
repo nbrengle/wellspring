@@ -1382,7 +1382,12 @@ function ownedIds(character) {
   const owned = new Set();
   for (const field of ENTITY_FIELDS) {
     for (const item of character[field] || []) {
-      owned.add(resolveId(item, field, character));
+      const id = resolveId(item, field, character);
+      owned.add(id);
+      const ent = lookupEntity(id);
+      if (ent?.id) {
+        owned.add(ent.id);
+      }
     }
   }
   return owned;
@@ -1394,7 +1399,9 @@ function ownedIds(character) {
 // satisfied. Free-text level/other prereqs can't be auto-verified, so they don't
 // block `met` but are surfaced as notes.
 export function prereqStatus(character, entityId) {
-  const pr = REFS.prereqs[entityId];
+  const ent = lookupEntity(entityId);
+  const prId = ent?.id || entityId;
+  const pr = REFS.prereqs[prId];
   if (!pr) return { met: true, missing: [], anyOf: [], notes: [] };
   const owned = ownedIds(character);
   const missing = (pr.skills || []).filter((dep) => !owned.has(dep));
@@ -1446,7 +1453,8 @@ export function checkPrereqs(character) {
           text: `${ent.name} is a sub-power and cannot be selected directly.`,
         });
       }
-      const pr = REFS.prereqs[id];
+      const prId = ent?.id || id;
+      const pr = REFS.prereqs[prId];
       if (!pr) continue;
 
       const missing = (pr.skills || []).filter((dep) => !owned.has(dep));
