@@ -83,8 +83,15 @@ export function lbpState(character) {
   const requiredSublineages = needsSublineage ? [...optionalSubs] : [];
 
   // Required challenges the character hasn't taken (some lineages mandate them).
+  // A required challenge belonging to a specific sublineage is only required if
+  // that sublineage is selected.
   const missingRequired = lin.challenges
-    .filter((c) => c.required && !challenges.some((x) => x.baseName === c.baseName));
+    .filter((c) => {
+      if (!c.required) return false;
+      const cSub = subKey(c.sublineage);
+      if (cSub && cSub !== 'general' && cSub !== pickedSub) return false;
+      return !challenges.some((x) => x.baseName === c.baseName);
+    });
 
   return {
     lineage: character.lineage,
@@ -1433,12 +1440,12 @@ const NUM = (w) => /^\d+$/.test(w) ? parseInt(w, 10) : (w.toLowerCase() === 'one
 const STAT_PATTERNS = [
   // "+1 Life Point to max" / "adds 1 Life Point to their maximum" / "1 maximum Life Point"
   { stat: 'lifePoints', re: /(?:\+?(\d+)|\bone)\s+(?:maximum\s+)?Life\s+Points?\s+to\s+(?:their\s+)?max(?:imum)?/gi },
-  { stat: 'lifePoints', re: /(?:additional\s+)?(?:\+?(\d+)|\bone)\s+maximum\s+Life\s+Points?/gi },
+  { stat: 'lifePoints', re: /(?:additional\s+)?(?:\+?(\d+)|\bone)\s+(?:Base\s+)?maximum\s+Life\s+Points?/gi },
   { stat: 'lifePoints', re: /(?:adds?|gains?)\s+(?:\+?(\d+)|\bone)\s+Life\s+Points?\s+to\s+(?:their\s+)?max(?:imum)?/gi },
   // "+1 Base Maximum Life Points" — class progression-bonus phrasing.
   { stat: 'lifePoints', re: /\+\s*(\d+)\s+(?:Base\s+)?Maximum\s+Life\s+Points?/gi },
   // "Base Maximum Life Points is increased by one/N" (Healthy and similar skills).
-  { stat: 'lifePoints', re: /(?:Base\s+)?Maximum\s+Life\s+Points?\s+(?:is|are)\s+increased\s+by\s+(?:\+?(\d+)|\bone)/gi },
+  { stat: 'lifePoints', re: /(?:Base\s+)?Maximum\s+Life\s+Points?\s+(?:is|are)\s+increased\s+by\s+(?:\+?(\d+)|\bone|two|three)\b/gi },
   // LP alias: "+1 Maximum Health" (Warrior Spirit)
   { stat: 'lifePoints', re: /(?:\+?(\d+)|\bone)\s+Maximum\s+Health\b/gi },
   // "gain N Natural Armor" / "N points of Natural Armor" / "increases to N" (Natural Armor)
@@ -1575,6 +1582,7 @@ function ownedIds(character) {
     for (const item of character[field] || []) {
       const id = resolveId(item, field, character);
       owned.add(id);
+
       const clean = cleanItemName(item);
       const bare = bareSkill(clean);
       const candidates = [
@@ -1613,9 +1621,8 @@ function ownedIds(character) {
 // satisfied. Free-text level/other prereqs can't be auto-verified, so they don't
 // block `met` but are surfaced as notes.
 export function prereqStatus(character, entityId) {
-  const ent = lookupEntity(entityId);
-  const prId = ent?.id || entityId;
-  const pr = REFS.prereqs[prId];
+  const ent = lookupEntity(entityId) || lookupEntity(entityId.split(':')[0] + ':' + bareSkill(idName(entityId)));
+  const pr = REFS.prereqs[ent?.id || entityId];
   if (!pr) return { met: true, missing: [], anyOf: [], notes: [] };
   const owned = ownedIds(character);
   const missing = (pr.skills || []).filter((dep) => !owned.has(dep));
@@ -1667,8 +1674,7 @@ export function checkPrereqs(character) {
           text: `${ent.name} is a sub-power and cannot be selected directly.`,
         });
       }
-      const prId = ent?.id || id;
-      const pr = REFS.prereqs[prId];
+      const pr = REFS.prereqs[ent?.id || id];
       if (!pr) continue;
 
       const missing = (pr.skills || []).filter((dep) => !owned.has(dep));

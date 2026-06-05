@@ -386,7 +386,7 @@ function parseGrants(text, grantLookups) {
 //
 // Returns { amount, scope, cap, min, refundIfFree, exclusions } or null. Scope is
 // the structured target: { kind: 'giftEligible'|'prereq'|'category'|'firstN', value, n? }.
-function parseDiscounts(text, exclusionLookup, grantLookups) {
+function parseDiscounts(text, exclusionLookup, grantLookups, selfName) {
   if (!text) return null;
   // Must actually be a discount source (not just mention the word in flavor). The
   // doc phrases BP discounts as "BP less", "less BP", or — for skills — "point(s)
@@ -449,6 +449,7 @@ function parseDiscounts(text, exclusionLookup, grantLookups) {
   if (!scope && grantLookups) {
     const skills = registry.filter((e) => e.type === "skills");
     for (const sk of skills) {
+      if (sk.name === selfName) continue;
       const escaped = sk.name.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
       const re = new RegExp(`\\b${escaped}\\b`, 'i');
       if (re.test(text)) {
@@ -633,7 +634,7 @@ for (const e of registry) {
     grants[e.id] = g;
     for (const t of g) (grantedBy[t] = grantedBy[t] || []).push(e.id);
   }
-  const d = parseDiscounts(e.body, exclusionLookup, grantTargetLookups);
+  const d = parseDiscounts(e.body, exclusionLookup, grantTargetLookups, e.name);
   if (d) discounts[e.id] = d;
   const lb = parseLbpBonus(e.body);
   if (lb) lbpBonuses[e.id] = lb;
