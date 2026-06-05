@@ -1367,7 +1367,13 @@
         "repped": false,
         "tags": [],
         "sublineage": "Astari (Civilization: The Astari)",
-        "description": "Blessed with the burning vibrancy of the stars, the Astari gains an additional 1 maximum Life Point."
+        "description": "Blessed with the burning vibrancy of the stars, the Astari gains an additional 1 maximum Life Point.",
+        "statMods": [
+          {
+            "stat": "lifePoints",
+            "n": 1
+          }
+        ]
       },
       {
         "name": "Oak Father’s Aegis",
@@ -1405,7 +1411,13 @@
           "Requires Oakskin"
         ],
         "sublineage": "Dryad",
-        "description": "The Dryad’s wooden skin growths aid them in deflecting the claws and blades of foes. They gain 2 Natural Armor."
+        "description": "The Dryad’s wooden skin growths aid them in deflecting the claws and blades of foes. They gain 2 Natural Armor.",
+        "statMods": [
+          {
+            "stat": "naturalArmor",
+            "n": 2
+          }
+        ]
       },
       {
         "name": "Enhanced Hardened Flesh",

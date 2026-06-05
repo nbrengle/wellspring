@@ -561,10 +561,15 @@ function parseProgressionTable(clsStart, clsEnd) {
     const bonusParts = data.slice(j, stopAt).filter(v => v && v !== '-');
     const bonus = bonusParts.length ? bonusParts.join(' ').replace(/,\s*$/, '').trim() : null;
 
+    // The "Class Bonuses" column states permanent stat boosts as prose ("+1 Base
+    // Maximum Life Points" at Fighter L2). Extract them structurally here so the
+    // validator reads progression[lvl].statMods instead of re-regexing the prose.
+    const { mods: bonusStatMods } = statModsFromText(bonus);
+    const row = bonusStatMods.length ? { statMods: bonusStatMods } : {};
     if (isCaster) {
-      progression[level] = { cantrips: num(cols[0]), spellsKnown: num(cols[1]), slots: orNull(cols[2]), bonus };
+      progression[level] = { cantrips: num(cols[0]), spellsKnown: num(cols[1]), slots: orNull(cols[2]), bonus, ...row };
     } else {
-      progression[level] = { utility: num(cols[0]), basic: num(cols[1]), advanced: num(cols[2]), veteran: num(cols[3]), bonus };
+      progression[level] = { utility: num(cols[0]), basic: num(cols[1]), advanced: num(cols[2]), veteran: num(cols[3]), bonus, ...row };
     }
     i = nextLevelIdx;
     level++;
@@ -592,6 +597,75 @@ function extractPowerBenefits(power) {
     power.levelBenefits = benefits;
     power.levelBenefitClass = gate ? gate[1] : null;   // gate on this class's level
   }
+}
+
+// ─── STAT-MOD EXTRACTION (prose → structured) ──────────────────────────────────
+// Permanent build-stat boosts (max Life Points / Armor / Spikes / Health / Natural
+// Armor) are stated in entity descriptions. We extract them HERE, at parse time,
+// next to the prose — emitting entity.statMods = [{ stat, n }] — so the validator
+// reads a structured field instead of re-regexing descriptions at character-build
+// time. One extraction site, close to the doc, diffable against it.
+const STAT_MOD_PATTERNS = [
+  { stat: 'lifePoints', re: /(?:additional\s+)?(?:\+?(\d+)|\bone)\s+(?:Base\s+)?maximum\s+Life\s+Points?/i },
+  { stat: 'lifePoints', re: /(?:adds?|gains?)\s+(?:\+?(\d+)|\bone)\s+Life\s+Points?\s+to\s+(?:their\s+)?max(?:imum)?/i },
+  { stat: 'lifePoints', re: /\+\s*(\d+)\s+(?:Base\s+)?Maximum\s+Life\s+Points?/i },
+  { stat: 'lifePoints', re: /(?:Base\s+)?Maximum\s+Life\s+Points?\s+(?:is|are)\s+increased\s+by\s+(?:\+?(\d+)|\bone|two|three)\b/i },
+  { stat: 'lifePoints', re: /(?:\+?(\d+)|\bone)\s+Maximum\s+Health\b/i },
+  { stat: 'naturalArmor', re: /(?:gains?|grant(?:ing|s)?)\s+(?:\+?(\d+)|\bone|three|two)\s+(?:points?\s+of\s+)?Natural\s+Armor/i },
+  { stat: 'naturalArmor', re: /(\d+)\s+points?\s+of\s+Natural\s+Armor/i },
+  { stat: 'naturalArmor', re: /\+?(\d+)\s+Maximum\s+Health,?\s+physical\s+Armor\s+Points?,?\s+and\s+Natural\s+Armor\s+Points?/i },
+  // "+N physical Armor Point" AND "one additional point to ... (Base) Maximum
+  // Armor Points" (Armor Expertise / Studded Leather — the conditional-on-wearing
+  // phrasing the old runtime regex missed).
+  { stat: 'armor', re: /\+?(\d+)\s+(?:Maximum\s+Health,?\s+)?(?:physical\s+)?Armor\s+Points?/i },
+  { stat: 'armor', re: /(?:\+?(\d+)|\bone)\s+additional\s+points?\s+to\s+(?:her|their|his|the)\s+(?:physical\s+)?Base\s+Maximum\s+Armor\s+Points?/i },
+  { stat: 'spikes', re: /(?:\+?(\d+)|\bone)\s+(?:(?:Base|Bonus)\s+)?Maximum\s+Spikes?\b/i },
+  { stat: 'spikes', re: /(?:Base\s+)?Maximum\s+Spikes?\s+(?:is|are)\s+increased\s+by\s+(?:\+?(\d+)|\bone)/i },
+];
+const STAT_WORD_N = { one: 1, two: 2, three: 3 };
+const statNum = (w) => /^\d+$/.test(String(w)) ? parseInt(w, 10) : (STAT_WORD_N[String(w).toLowerCase()] || 0);
+
+// Core extractor: prose → [{ stat, n }]. One boost per stat (alternate phrasings
+// of the same boost don't double-count). Returns { mods, variableNaturalArmor }.
+function statModsFromText(text) {
+  const mods = [];
+  const seen = new Set();
+  if (!text) return { mods, variableNaturalArmor: false };
+  for (const { stat, re } of STAT_MOD_PATTERNS) {
+    if (seen.has(stat)) continue;
+    const m = text.match(re);
+    if (!m) continue;
+    // Reject IN-PLAY boosts, not permanent build stats: a "Grant"/"Mend" is a
+    // temporary game Call ("Short Grant +1 Maximum Life Points", "Mend 5 Armor
+    // Points"), not a Base change. The doc wraps those in the Call verb (often
+    // quoted) right before the stat phrase — skip a match preceded by it.
+    // Context immediately around the match — used to reject IN-PLAY (temporary)
+    // boosts, which the doc phrases distinctly from permanent "Base" changes.
+    const before = text.slice(Math.max(0, m.index - 40), m.index);
+    // A "Grant"/"Mend"/"call"/"heal" is a temporary game Call ("Short Grant +1
+    // Maximum Life Points", "Mend 5 Armor Points"), not a Base change.
+    if (/\b(?:Short |Long )?Grant\b[^."]*$|\bMend\b[^."]*$|\bcall\b[^."]*$|\bheals?\b[^."]*$/i.test(before)) continue;
+    // "Bonus Maximum" (vs "Base Maximum") and a nearby "for the duration" both mark
+    // a TEMPORARY buff — the doc reserves "Base" for permanent stat changes.
+    if (/\bBonus\s+Maximum\b/i.test(m[0]) || /\bfor the duration\b/i.test(before)) continue;
+    const w = m[1] || (m[0].match(/\b(one|two|three)\b/i) || [])[1] || '0';
+    const n = statNum(w);
+    if (n > 0) { mods.push({ stat, n }); seen.add(stat); }
+  }
+  // Variable/contextual Natural Armor with no fixed number (Gift of Unbreakable
+  // Flesh: "Gains Natural Armor from Patron").
+  const variableNaturalArmor = !seen.has('naturalArmor') && /\bgains?\b[^.]*\bNatural Armor\b/i.test(text);
+  return { mods, variableNaturalArmor };
+}
+
+// Attach statMods (and statModNotes for variable amounts) to any entity with a
+// description. `tags` lets Druid Form powers (temporary while-transformed boosts)
+// opt out — those are not permanent build stats.
+function extractStatMods(entity) {
+  if ((entity.tags || []).includes('Form')) return;
+  const { mods, variableNaturalArmor } = statModsFromText(entity.description || entity.desc || '');
+  if (mods.length) entity.statMods = mods;
+  if (variableNaturalArmor) (entity.statModNotes ||= []).push({ stat: 'naturalArmor', text: 'variable' });
 }
 
 // Powers offering "choose one of the following: • … • …". Two flavors:
@@ -625,7 +699,7 @@ function extractChooseOne(power) {
 const CLASSES_OUT = parseClasses();
 for (const c of CLASSES_OUT) {
   for (const arr of Object.values(c)) {
-    if (Array.isArray(arr)) for (const p of arr) if (p && p.description) { extractPowerBenefits(p); extractChooseOne(p); }
+    if (Array.isArray(arr)) for (const p of arr) if (p && p.description) { extractPowerBenefits(p); extractChooseOne(p); extractStatMods(p); }
   }
 }
 write('classes.json', CLASSES_OUT);
@@ -710,7 +784,10 @@ function parseSkills() {
   return skills;
 }
 
-write('skills.json', parseSkills());
+// Enrich a flat entity list (skills/perks/flaws) with parsed stat mods, in place.
+const withStatMods = (list) => { for (const e of list) extractStatMods(e); return list; };
+
+write('skills.json', withStatMods(parseSkills()));
 
 // ─── PERKS & FLAWS ────────────────────────────────────────────────────────────
 // Under "Character Options" H1. Perks/Flaws are H3 entries with Cost/Award, Ranks,
@@ -974,8 +1051,8 @@ function extractTiers(results) {
   return results;
 }
 
-write('perks.json', extractTiers(enrichWithDetailSections(parsePerkFlawList('Perks List', 'cost'))));
-write('flaws.json', enrichWithDetailSections(parsePerkFlawList('Flaws List', 'bp')));
+write('perks.json', withStatMods(extractTiers(enrichWithDetailSections(parsePerkFlawList('Perks List', 'cost')))));
+write('flaws.json', withStatMods(enrichWithDetailSections(parsePerkFlawList('Flaws List', 'bp'))));
 
 // ─── DEVOTIONS ────────────────────────────────────────────────────────────────
 // Each devotion is an H1. Content is text nodes with bullet lists for tenets.
@@ -1215,6 +1292,7 @@ function parseLineages() {
 
     const challenges = parseItems('Challenges');
     const advantages = parseItems('Advantages');
+    for (const a of advantages) extractStatMods(a); // structured stat boosts
 
     // Derive sub-lineages from distinct non-General groups
     const byName = new Map();

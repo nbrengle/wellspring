@@ -1413,111 +1413,65 @@ export function wealthState(character) {
 // { lifePoints, spikes } as display strings/numbers, falling back to the stored
 // values when no numeric base is available.
 const BASE_LEVEL = 4;
-export // Numeric character-creation stat modifiers from owned powers/perks/lineage
-// advantages. ONLY permanent max-stat boosts count — anchored on "max/maximum"
-// for Life Points and the "Natural Armor" noun — so in-play effects ("heal 1 LP",
-// "Refresh 3 Spikes", a 6-second count) are NOT mistaken for build stats. Returns
-// { lifePoints, spikes, naturalArmor, armor, sources: [{name, stat, n}] }.
-const NUM = (w) => /^\d+$/.test(w) ? parseInt(w, 10) : (w.toLowerCase() === 'one' ? 1 : 0);
-const STAT_PATTERNS = [
-  // "+1 Life Point to max" / "adds 1 Life Point to their maximum" / "1 maximum Life Point"
-  { stat: 'lifePoints', re: /(?:\+?(\d+)|\bone)\s+(?:maximum\s+)?Life\s+Points?\s+to\s+(?:their\s+)?max(?:imum)?/gi },
-  { stat: 'lifePoints', re: /(?:additional\s+)?(?:\+?(\d+)|\bone)\s+(?:Base\s+)?maximum\s+Life\s+Points?/gi },
-  { stat: 'lifePoints', re: /(?:adds?|gains?)\s+(?:\+?(\d+)|\bone)\s+Life\s+Points?\s+to\s+(?:their\s+)?max(?:imum)?/gi },
-  // "+1 Base Maximum Life Points" — class progression-bonus phrasing.
-  { stat: 'lifePoints', re: /\+\s*(\d+)\s+(?:Base\s+)?Maximum\s+Life\s+Points?/gi },
-  // "Base Maximum Life Points is increased by one/N" (Healthy and similar skills).
-  { stat: 'lifePoints', re: /(?:Base\s+)?Maximum\s+Life\s+Points?\s+(?:is|are)\s+increased\s+by\s+(?:\+?(\d+)|\bone|two|three)\b/gi },
-  // LP alias: "+1 Maximum Health" (Warrior Spirit)
-  { stat: 'lifePoints', re: /(?:\+?(\d+)|\bone)\s+Maximum\s+Health\b/gi },
-  // "gain N Natural Armor" / "N points of Natural Armor" / "increases to N" (Natural Armor)
-  { stat: 'naturalArmor', re: /(?:gains?|grant(?:ing|s)?)\s+(?:\+?(\d+)|\bone|three|two)\s+(?:points?\s+of\s+)?Natural\s+Armor/gi },
-  { stat: 'naturalArmor', re: /(\d+)\s+points?\s+of\s+Natural\s+Armor/gi },
-  // Warrior Spirit comma list / separate Natural Armor Points
-  { stat: 'naturalArmor', re: /\+?(\d+)\s+Maximum\s+Health,?\s+physical\s+Armor\s+Points?,?\s+and\s+Natural\s+Armor\s+Points?/gi },
-  // "+1 physical Armor Point" (Warrior Spirit) — explicit max armor boost.
-  { stat: 'armor', re: /\+?(\d+)\s+(?:Maximum\s+Health,?\s+)?(?:physical\s+)?Armor\s+Points?/gi },
-  // "+N Maximum Spike(s)" — permanent spike boost (not "Refresh N Spikes").
-  { stat: 'spikes', re: /(?:\+?(\d+)|\bone)\s+(?:(?:Base|Bonus)\s+)?Maximum\s+Spikes?\b/gi },
-  { stat: 'spikes', re: /(?:Base\s+)?Maximum\s+Spikes?\s+(?:is|are)\s+increased\s+by\s+(?:\+?(\d+)|\bone)/gi },
-];
-const WORD_N = { one: 1, two: 2, three: 3 };
-function statMods(character) {
+// Numeric character-creation stat modifiers from owned powers / perks / lineage
+// advantages / class-progression bonuses. The prose interpretation is done ONCE,
+// in the parser (extractStatMods), which emits entity.statMods = [{stat, n}] and
+// progression[lvl].statMods. This function only WALKS what the character owns and
+// SUMS those structured fields — no description parsing. Returns
+// { lifePoints, spikes, naturalArmor, armor, sources: [{name, stat, n}], notes }.
+export function statMods(character) {
   const mods = { lifePoints: 0, spikes: 0, naturalArmor: 0, armor: 0 };
   const sources = [];
   const notes = [];   // contextual/variable boosts with no fixed number (display only)
-  // Per entity, take the FIRST match per stat. The patterns are alternate
-  // phrasings of the same boost (Toughness says it two ways), so summing every
-  // pattern hit would multi-count one boost. One entity → at most one boost per
-  // stat (none in the source grant two of the same stat).
-  const scan = (name, text, tags) => {
-    if (!text) return;
-    // Druid Form spells (tagged "Form") grant LP/armor only WHILE transformed
-    // ("+1 Maximum Life Points while in the Lesser Form…") — a temporary state,
-    // not a permanent build-stat. Skip their stat boosts so they don't inflate
-    // the rail's Life Points / Armor.
-    if (tags && tags.includes('Form')) return;
-    const seen = new Set();
-    for (const { stat, re } of STAT_PATTERNS) {
-      if (seen.has(stat)) continue;
-      re.lastIndex = 0;
-      const m = re.exec(text);
-      if (!m) continue;
-      const w = m[1] || (m[0].match(/\b(one|two|three)\b/i) || [])[1] || '0';
-      const n = NUM(w) || WORD_N[String(w).toLowerCase()] || 0;
-      if (n > 0) { mods[stat] += n; sources.push({ name, stat, n }); seen.add(stat); }
+
+  // Apply an entity's parsed statMods (and variable-amount notes) to the rail.
+  const apply = (name, ent) => {
+    if (!ent) return;
+    for (const { stat, n } of (ent.statMods || [])) {
+      if (n > 0) { mods[stat] += n; sources.push({ name, stat, n }); }
     }
-    // Variable/contextual Natural Armor with NO fixed number (Gift of Unbreakable
-    // Flesh: "Gains Natural Armor from Patron"). Record as a display note so the
-    // rail can show it even though the amount is variable.
-    if (!seen.has('naturalArmor') && /\bgains?\b[^.]*\bNatural Armor\b/i.test(text)) {
-      notes.push({ name, stat: 'naturalArmor', text: 'variable' });
-    }
+    for (const note of (ent.statModNotes || [])) notes.push({ name, ...note });
   };
+
   // Owned perks.
   for (const item of (character.purchasedPerks || [])) {
-    const e = lookupEntity(`perks:${cleanItemName(item)}`); scan(e?.name || item, e?.description);
+    const e = lookupEntity(`perks:${cleanItemName(item)}`); apply(e?.name || item, e);
   }
-  // Chosen lineage advantages (their stored desc carries the boost text).
+  // Chosen lineage advantages (indexed as advantages:<Lineage> - <name>).
   if (character.lineage) {
     const lin = LINEAGES[character.lineage];
     for (const name of (character.lineageAdvantages || [])) {
       const a = (lin?.advantages || []).find((x) => x.name === name || x.baseName === name);
-      if (a) scan(a.baseName || a.name, a.desc || a.description);
+      apply(a?.baseName || a?.name || name, a);
     }
   }
-  // Owned/selected powers (innate-at-level + slotted).
+  // Innate class powers held at level, then selected/slotted powers.
   for (const { name: cls, level: clsLevel } of getClasses(character)) {
     for (const p of (CLASS_POWERS[cls]?.innate || [])) {
-      if (requiredLevel(p) <= clsLevel) scan(p.name, p.desc || p.description, p.tags);
+      if (requiredLevel(p) <= clsLevel) apply(p.name, p);
     }
   }
   for (const field of POWER_SOURCE_FIELDS) {
     for (const item of (character[field] || [])) {
-      const e = lookupEntity(`powers:${cleanItemName(item)}`); scan(e?.name || item, e?.description, e?.tags);
+      apply(cleanItemName(item), lookupEntity(`powers:${cleanItemName(item)}`));
     }
   }
-  // Per-class progression bonuses, level-gated. The "Class Bonuses" column carries
-  // stat boosts as prose ("+1 Base Maximum Life Points" at Fighter L2 / Cleric L7).
-  // These are automatic at the gating level, so apply each row up to the class's
-  // current level. (The base level-table LP is the CLASSLESS baseline — these
-  // class bonuses stack on top; see levelStats.)
+  // Per-class progression bonuses, level-gated: apply each row's parsed statMods up
+  // to the class's current level. (The level-table LP is the CLASSLESS baseline;
+  // these class bonuses stack on top — see levelStats.)
   for (const { name: cls, level: clsLevel } of getClasses(character)) {
     const prog = CLASS_PROGRESSION[cls] || {};
     for (let lvl = 1; lvl <= clsLevel; lvl++) {
-      const bonus = prog[lvl]?.bonus;
-      if (bonus) scan(`${cls} L${lvl}`, bonus);
+      apply(`${cls} L${lvl}`, prog[lvl]);
     }
   }
-  // Owned Class skills and other purchased skills (Healthy: "Base Maximum Life
-  // Points is increased by one"). These aren't in POWER_SOURCE_FIELDS, so scan
-  // them via their resolved skill/power entity description.
+  // Owned class skills + purchased/starting skills (Healthy, Daggercraft, …).
   for (const field of ['classSkills', 'purchasedSkills', 'startingSkills']) {
     for (const item of (character[field] || [])) {
       const e = lookupEntity(`skills:${cleanItemName(item)}`)
         || lookupEntity(`powers:${cleanItemName(item)}`)
         || lookupEntity(resolveId(item, field, character));
-      if (e) scan(e.name, e.description);
+      apply(e?.name || cleanItemName(item), e);
     }
   }
   return { ...mods, sources, notes };

@@ -125,7 +125,13 @@
     "prereq": "At least one Armor Proficiency",
     "ranks": null,
     "category": "Martial",
-    "description": "Whenever the character is wearing any amount of physical armor, even if the armor has a value of 0, she gains one additional point to her physical Base Maximum Armor Points."
+    "description": "Whenever the character is wearing any amount of physical armor, even if the armor has a value of 0, she gains one additional point to her physical Base Maximum Armor Points.",
+    "statMods": [
+      {
+        "stat": "armor",
+        "n": 1
+      }
+    ]
   },
   {
     "name": "Two Weapon Style",
@@ -213,7 +219,13 @@
     "prereq": "Weapon Specialization (Daggers), 2 levels in Martial Classes",
     "ranks": null,
     "category": "Martial",
-    "description": "When only using one or two bladed hand weapons (each under 22) you find it easier to deal critical damage. While using daggers only, you have +1 Base Maximum Spikes for attacks with daggers. This bonus to Maximum Spikes is a Base change, and does not interact with the stacking rules for Maximum Spikes."
+    "description": "When only using one or two bladed hand weapons (each under 22) you find it easier to deal critical damage. While using daggers only, you have +1 Base Maximum Spikes for attacks with daggers. This bonus to Maximum Spikes is a Base change, and does not interact with the stacking rules for Maximum Spikes.",
+    "statMods": [
+      {
+        "stat": "spikes",
+        "n": 1
+      }
+    ]
   },
   {
     "name": "Parrying Dagger",

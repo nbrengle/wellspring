@@ -141,7 +141,13 @@
     "ranks": null,
     "prereq": null,
     "category": "Physical",
-    "description": "Adds +1 Life Point to max.\n\nCost: 5\n\nPrerequisites: None\n\nThe character is harder to kill and adds 1 Life Point to their maximum."
+    "description": "Adds +1 Life Point to max.\n\nCost: 5\n\nPrerequisites: None\n\nThe character is harder to kill and adds 1 Life Point to their maximum.",
+    "statMods": [
+      {
+        "stat": "lifePoints",
+        "n": 1
+      }
+    ]
   },
   {
     "name": "Unkillable",
@@ -241,6 +247,12 @@
       {
         "cost": 5,
         "armorPoints": 4
+      }
+    ],
+    "statModNotes": [
+      {
+        "stat": "naturalArmor",
+        "text": "variable"
       }
     ]
   },
