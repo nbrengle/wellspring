@@ -42,6 +42,19 @@ const PARAMETER_SUGGESTIONS = {
   "Chronic Hobbyist": ["Cooking", "Brewing", "Gardening", "Smith", "Carpenter", "Tailor", "Mason", "Hunter", "Scribe", "Herbalist", "Undertaker", "Merchant", "Charlatan", "Chirurgeon", "Teacher", "Soldier", "Sailor", "Wagoneer"],
   "Bookcaster": ["Magekey", "Mask Aura", "Identify", "Cancel", "Stop", "Mageskin"],
   "Favored Form": ["Hunting Panther", "Hulking Bear", "Striking Serpent"],
+  // Custom suggestion additions
+  "Weapon Specialization": ["Daggers", "Swords", "Maces", "Axes", "Projectile Weapons", "Thrown Weapons", "Staves", "Polearms"],
+  "Elemental Affinity": ["Flame", "Ice", "Lightning", "Acid"],
+  "Draconic Heritage": ["Acid", "Flame", "Ice", "Lightning"],
+  "Honor Debt": [],
+  "Contact": [],
+  "Ancestral Relic": [],
+  "Ancestral Weapon": [],
+  "Boon Bonds": [],
+  "Heartbond": [],
+  "Famous": [],
+  "Minor Fame": [],
+  "Manse": [],
   "Mild Allergy": ["Cloth", "Copper", "Gold", "Harvest", "Hide", "Ingot", "Iron", "Leather", "Materia", "Night Prize", "Other Common Allergen", "Other Uncommon Allergen", "Rare Minerals", "Scale", "Silver"],
   "Severe Allergy": ["Cloth", "Copper", "Gold", "Harvest", "Hide", "Ingot", "Iron", "Leather", "Materia", "Night Prize", "Other Common Allergen", "Other Uncommon Allergen", "Rare Minerals", "Scale", "Silver"]
 };
