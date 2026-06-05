@@ -12,7 +12,8 @@
 import {
   validate, getClasses, characterLevel, budgetFor, computeSlots, spellSlots,
   devotionState, prereqStatus, LEVEL_CAP, LEGAL_MIN_LEVEL,
-  grantedAbilities, computeSpend, discountSources, getMaxRanks, bareSkill, cleanItemName
+  grantedAbilities, computeSpend, discountSources, getMaxRanks, bareSkill, cleanItemName,
+  bookcasterSpellOptions
 } from '../src/data/validate.js';
 import { formatCharacterSheet, parseCharacterSheet } from '../src/data/sheet.js';
 import { solveCrafting } from '../src/data/recipe-solver.js';
@@ -107,6 +108,53 @@ test('import tolerates spreadsheet (tab-separated) paste', () => {
 test('budget: 9 at level 4, +2 per level (extrapolated below 4)', () => {
   eq(budgetFor(4), 9, 'L4'); eq(budgetFor(5), 11, 'L5');
   eq(budgetFor(3), 7, 'L3'); eq(budgetFor(1), 3, 'L1');
+});
+test('Bookcaster spell options: known vs other accessible spells', () => {
+  const mk = (cls, level, extra = {}) => ({ archetypeName: 'x', classes: [{ name: cls, level }], ...extra });
+  // Mage L4 (Novice slots only), nothing known yet: all options land in `other`.
+  const l4 = bookcasterSpellOptions(mk('Mage', 4));
+  eq(l4.known.length, 0, 'no known spells when none picked');
+  ok(l4.other.length > 0, 'Mage L4 has accessible (other) options');
+  ok(l4.other.includes('Mage Armor'), 'includes a novice Mage spell');
+  // A known spell moves to the `known` group and out of `other`.
+  const withKnown = bookcasterSpellOptions(mk('Mage', 4, { noviceSpells: ['Mage Armor'] }));
+  ok(withKnown.known.includes('Mage Armor'), 'picked spell is in Known group');
+  ok(!withKnown.other.includes('Mage Armor'), 'and not duplicated in Other');
+  // Higher level unlocks more accessible spells (adept tier opens at L6: 6/2/0).
+  const l6 = bookcasterSpellOptions(mk('Mage', 6));
+  ok(l6.other.length > l4.other.length, 'L6 (adept unlocked) offers more spells than L4');
+  // Non-casters get nothing.
+  const fighter = bookcasterSpellOptions(mk('Fighter', 4));
+  eq(fighter.known.length + fighter.other.length, 0, 'non-caster has no options');
+  // Each group sorted.
+  eq(JSON.stringify(l4.other), JSON.stringify([...l4.other].sort((a, b) => a.localeCompare(b))), 'other sorted');
+});
+test('innate bonus cantrip (Cancel) is granted+locked, not a choosable slot', () => {
+  const cant = (cls, lvl) => computeSlots({ archetypeName: 'x', classes: [{ name: cls, level: lvl }] })
+    .find((s) => s.category === 'cantrips');
+  // Mage L1: table Cantrips=0, bonus prose grants Cancel innate. 0 choosable, Cancel granted.
+  const mage1 = cant('Mage', 1);
+  eq(mage1.allowed, 0, 'Mage L1 has 0 CHOOSABLE cantrips');
+  eq(mage1.used, 0, 'Mage L1 uses 0 cantrips');
+  ok(mage1.granted?.includes('Cancel'), 'Mage L1 is granted Cancel');
+  // Cleric L1: gets Cancel at L2, so none granted yet.
+  ok(!(cant('Cleric', 1).granted || []).includes('Cancel'), 'Cleric L1 has no innate cantrip yet');
+  // Cleric/Druid/Sourcerer L2: table Cantrips=1 (choosable) + Cancel granted.
+  for (const cls of ['Cleric', 'Druid', 'Sourcerer']) {
+    const r = cant(cls, 2);
+    eq(r.allowed, 1, `${cls} L2 has 1 choosable cantrip`);
+    ok(r.granted?.includes('Cancel'), `${cls} L2 is granted Cancel`);
+  }
+});
+test('a granted cantrip in the pick list does not double-count', () => {
+  // Older archetypes ship "Cancel" as a cantrip pick; it must not consume a slot.
+  const r = computeSlots({
+    archetypeName: 'x', classes: [{ name: 'Mage', level: 2 }],
+    cantrips: ['Cancel', 'Force Shield'],
+  }).find((s) => s.category === 'cantrips');
+  eq(r.used, 1, 'only the non-granted pick counts');
+  ok(!r.over, 'not over the cap');
+  ok(r.granted?.includes('Cancel'), 'Cancel still surfaced as granted');
 });
 test('approved backstory adds +2 BP to the budget', () => {
   const base = validate({ archetypeName: 'x', classes: [{ name: 'Fighter', level: 4 }] });
@@ -459,6 +507,20 @@ test('flaw BP award is capped at 5 (extra flaws give no more BP)', () => {
   ok(s.flawCapped, 'flawCapped flagged');
 });
 
+test('allergy flaws calculate awards dynamically based on parameter', () => {
+  const s1 = computeSpend({ classLevels: 'Fighter 10', flaws: ['Mild Allergy (Iron)'] });
+  eq(s1.rawAwarded, 2, 'common mild allergy awards 2 BP');
+
+  const s2 = computeSpend({ classLevels: 'Fighter 10', flaws: ['Mild Allergy (Gold)'] });
+  eq(s2.rawAwarded, 1, 'uncommon mild allergy awards 1 BP');
+
+  const s3 = computeSpend({ classLevels: 'Fighter 10', flaws: ['Severe Allergy (Iron)'] });
+  eq(s3.rawAwarded, 3, 'common severe allergy awards 3 BP');
+
+  const s4 = computeSpend({ classLevels: 'Fighter 10', flaws: ['Severe Allergy (Gold)'] });
+  eq(s4.rawAwarded, 2, 'uncommon severe allergy awards 2 BP');
+});
+
 // ─── sub-power extraction + grant (Strange Token → Curious Balm) ──────────────
 test('inline sub-powers are extracted as entities', () => {
   ok(lookupEntity('powers:Curious Balm'), 'Curious Balm exists');
@@ -471,14 +533,38 @@ test('a power that grants a sub-power surfaces it as a free granted ability', ()
 });
 
 // ─── base stats from the level table + numeric power/perk/lineage mods ────────
-test('base Life Points / Spikes come from the level table', () => {
-  const s4 = validate({ classLevels: 'Mage 4' }).stats;
-  eq(s4.lifePoints, 3, 'L4 = 3 LP'); eq(s4.spikes, 2, 'L4 = 2 spikes');
-  const s10 = validate({ classLevels: 'Mage 10' }).stats;
-  eq(s10.lifePoints, 4, 'L10 = 4 LP'); eq(s10.spikes, 3, 'L10 = 3 spikes');
+test('base Life Points / Spikes come from the level table (classless baseline)', () => {
+  // Base LP is the classless table value; class progression bonuses layer on top.
+  const s4 = validate({ classLevels: 'Fighter 4' }).stats;
+  eq(s4.baseLifePoints, 3, 'L4 base = 3 LP'); eq(s4.spikes, 2, 'L4 = 2 spikes');
+  // Fighter's L2 "+1 Base Maximum Life Points" applies → total 4 at L4.
+  eq(s4.lifePoints, 4, 'L4 Fighter total = 3 base + 1 (Fighter L2 bonus)');
+  const s10 = validate({ classLevels: 'Fighter 10' }).stats;
+  eq(s10.baseLifePoints, 4, 'L10 base = 4 LP'); eq(s10.spikes, 3, 'L10 = 3 spikes');
+  eq(s10.lifePoints, 5, 'L10 Fighter total = 4 base + 1');
+});
+test('class progression LP bonus applies and is level-gated', () => {
+  // Fighter L2 grants +1 Base Maximum LP; below L2 it should NOT apply.
+  eq(validate({ classes: [{ name: 'Fighter', level: 1 }] }).stats.lifePoints, 3, 'L1 = 3 (no bonus yet)');
+  eq(validate({ classes: [{ name: 'Fighter', level: 2 }] }).stats.lifePoints, 4, 'L2 = 4 (bonus applies)');
+  // Cleric gets its +1 at L7, not before.
+  eq(validate({ classes: [{ name: 'Cleric', level: 6 }] }).stats.lifePoints, 4, 'Cleric L6 = 4 (table, no bonus)');
+  eq(validate({ classes: [{ name: 'Cleric', level: 7 }] }).stats.lifePoints, 5, 'Cleric L7 = 4 + 1 bonus');
+});
+test('Healthy class skill adds +1 max Life Point', () => {
+  const without = validate({ classes: [{ name: 'Fighter', level: 6 }] }).stats.lifePoints;
+  const withH = validate({ classes: [{ name: 'Fighter', level: 6 }], classSkills: ['Healthy'] }).stats;
+  eq(withH.lifePoints, without + 1, 'Healthy adds +1 LP');
+  ok(withH.mods.sources.some((s) => s.name === 'Healthy' && s.stat === 'lifePoints'), 'Healthy is a recorded LP source');
+});
+test('Druid Form spells do not inflate permanent Life Points', () => {
+  // "Lesser Form of the Hulking Bear" grants +1 LP only WHILE transformed (tag: Form).
+  const s = validate({ classes: [{ name: 'Druid', level: 4 }], noviceSpells: ['Lesser Form of the Hulking Bear'] }).stats;
+  eq(s.lifePoints, 3, 'Druid L4 stays 3 — form LP is conditional, not a build stat');
 });
 test('Toughness adds +1 max Life Point (counted once, not per phrasing)', () => {
-  const s = validate({ classLevels: 'Mage 4', purchasedPerks: ['Toughness'] }).stats;
+  // Druid L4 has no class LP bonus, so this isolates the perk's single +1.
+  const s = validate({ classLevels: 'Druid 4', purchasedPerks: ['Toughness'] }).stats;
   eq(s.baseLifePoints, 3, 'base 3'); eq(s.lifePoints, 4, '3 + 1');
   eq(s.mods.sources.filter((x) => x.name === 'Toughness').length, 1, 'one source, no double-count');
 });
@@ -909,6 +995,35 @@ test('validation: Fighter Level 2 and Healthy power increase Life Points', () =>
   // Healthy power gives +1 LP.
   // Total: 4 + 1 + 1 = 6 LP.
   eq(rHealthy.stats.lifePoints, 6, 'Fighter 6 with Healthy grants +2 LP total (+1 from lvl 2, +1 from Healthy)');
+});
+
+test('validation: Draconic Heritage character creation note', () => {
+  const c = { archetypeName: 'x', classLevels: 'Fighter 4', purchasedPerks: ['Draconic Heritage (Flame)'] };
+  const r = validate(c);
+  ok(r.prereqs.notes.some(n => n.item === 'Draconic Heritage' && n.text.includes('Must be taken at Character Creation')), 'Heritage note is registered');
+});
+
+test('parameterized skills satisfy prerequisites and undergo prerequisite checking', () => {
+  // 1. Lore (Historical) satisfies Research prerequisite (Lore)
+  let c = {
+    classes: [{ name: 'Mage', level: 4 }],
+    purchasedSkills: ['Lore (Historical)', 'Research']
+  };
+  eq(validate(c).prereqs.issues.length, 0, 'Lore (Historical) satisfies Research');
+
+  // 2. Profession - Journeyman (Smith) requires Profession - Apprentice
+  c = {
+    classes: [{ name: 'Mage', level: 4 }],
+    purchasedSkills: ['Profession - Journeyman (Smith)']
+  };
+  const issues = validate(c).prereqs.issues;
+  eq(issues.length, 1, 'fails missing apprentice prerequisite');
+  eq(issues[0].id, 'skills:Profession - Journeyman (Smith)', 'identifies correct failing skill');
+  eq(issues[0].missing[0].id, 'skills:Profession - Apprentice', 'identifies missing base prerequisite');
+
+  // 3. Adding Apprentice (Smith) satisfies the prerequisite
+  c.purchasedSkills.push('Profession - Apprentice (Smith)');
+  eq(validate(c).prereqs.issues.length, 0, 'Apprentice satisfies Journeyman');
 });
 
 // ─── report ───────────────────────────────────────────────────────────────────

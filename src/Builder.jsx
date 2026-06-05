@@ -9,7 +9,7 @@
 // which doubles as the entity inspector so you can follow a power's links
 // (prereqs / unlocks / mentions) while deciding.
 
-import { useState, useEffect, useMemo, useCallback, useRef } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef, Fragment } from "react";
 import {
   ARCHETYPES, REFS, lookupEntity, LEVEL_TABLE,
   eligiblePowers, ALL_SKILLS, ALL_PERKS, ALL_FLAWS,
@@ -41,8 +41,25 @@ const PARAMETER_SUGGESTIONS = {
   "Profession - Journeyman": ["Smith", "Carpenter", "Tailor", "Mason", "Hunter", "Scribe", "Herbalist", "Undertaker", "Merchant", "Charlatan", "Chirurgeon", "Teacher", "Soldier", "Sailor", "Wagoneer"],
   "Profession - Master": ["Smith", "Carpenter", "Tailor", "Mason", "Hunter", "Scribe", "Herbalist", "Undertaker", "Merchant", "Charlatan", "Chirurgeon", "Teacher", "Soldier", "Sailor", "Wagoneer"],
   "Chronic Hobbyist": ["Cooking", "Brewing", "Gardening", "Smith", "Carpenter", "Tailor", "Mason", "Hunter", "Scribe", "Herbalist", "Undertaker", "Merchant", "Charlatan", "Chirurgeon", "Teacher", "Soldier", "Sailor", "Wagoneer"],
-  "Bookcaster": ["Magekey", "Mask Aura", "Identify", "Cancel", "Stop", "Mageskin"],
-  "Favored Form": ["Hunting Panther", "Hulking Bear", "Striking Serpent"]
+  // Bookcaster is parameterized by a SPELL the character can access; its options
+  // are derived per-character from the validator (report.bookcasterOptions), not
+  // a static list — see EntityBody.
+  "Favored Form": ["Hunting Panther", "Hulking Bear", "Striking Serpent"],
+  // Custom suggestion additions
+  "Weapon Specialization": ["Daggers", "Swords", "Maces", "Axes", "Projectile Weapons", "Thrown Weapons", "Staves", "Polearms"],
+  "Elemental Affinity": ["Flame", "Ice", "Lightning", "Acid"],
+  "Draconic Heritage": ["Acid", "Flame", "Ice", "Lightning"],
+  "Honor Debt": [],
+  "Contact": [],
+  "Ancestral Relic": [],
+  "Ancestral Weapon": [],
+  "Boon Bonds": [],
+  "Heartbond": [],
+  "Famous": [],
+  "Minor Fame": [],
+  "Manse": [],
+  "Mild Allergy": ["Cloth", "Copper", "Gold", "Harvest", "Hide", "Ingot", "Iron", "Leather", "Materia", "Night Prize", "Other Common Allergen", "Other Uncommon Allergen", "Rare Minerals", "Scale", "Silver"],
+  "Severe Allergy": ["Cloth", "Copper", "Gold", "Harvest", "Hide", "Ingot", "Iron", "Leather", "Materia", "Night Prize", "Other Common Allergen", "Other Uncommon Allergen", "Rare Minerals", "Scale", "Silver"]
 };
 
 function formatParameterizedName(baseName, parameter, originalName) {
@@ -914,12 +931,18 @@ function SlotBlock({ slot, character, onInspect, onOpenSlot, isFocused, pickClas
   const fields = slot.category === "spellsKnown"
     ? ["noviceSpells", "adeptSpells", "greaterSpells"]
     : [SLOT_FIELD[slot.category]];
+  // Cantrips granted free + locked by class progression ("Innate Bonus Cantrip:
+  // Cancel"). Shown as fixed rows, never counted against the choosable cap.
+  const granted = slot.granted || [];
+  const grantedSet = new Set(granted);
   // Picks belonging to THIS class's slots, across the relevant field(s), each
-  // carrying its field + flat index so clear/swap target the right element.
+  // carrying its field + flat index so clear/swap target the right element. A
+  // granted cantrip is excluded here even if it sits in the pick list — it's
+  // rendered as a locked row instead, matching how the validator counts it.
   const myPicks = fields.flatMap((field) =>
     (character[field] || [])
       .map((name, flatIndex) => ({ name, flatIndex, field }))
-      .filter((p) => pickClassOf(field, p.flatIndex, p.name) === slot.cls));
+      .filter((p) => pickClassOf(field, p.flatIndex, p.name) === slot.cls && !grantedSet.has(p.name)));
 
   const rowCount = Math.max(slot.allowed, myPicks.length);
   const rows = Array.from({ length: rowCount }, (_, i) => myPicks[i] ?? null);
@@ -932,6 +955,13 @@ function SlotBlock({ slot, character, onInspect, onOpenSlot, isFocused, pickClas
         <span className="b-slot-count">{slot.used} / {slot.allowed}</span>
       </div>
       <ol className="b-slot-rows">
+        {granted.map((name) => (
+          <li key={`granted-${name}`} className="b-slot-row is-filled is-granted">
+            <span className="b-slot-num" title="Granted by class">★</span>
+            <button className="b-slot-pick" onClick={() => onInspect(name, fields[0], "powers")}>{name}</button>
+            <span className="b-slot-tier b-slot-granted-tag">innate</span>
+          </li>
+        ))}
         {rows.map((pick, i) => {
           const over = i >= slot.allowed;
           if (pick) {
@@ -1137,7 +1167,6 @@ function ArchetypePicker({ onPick, onStartBlank }) {
                 <span className="b-archetype-tagline">{a.tagline}</span>
                 <span className="b-archetype-meta">
                   {a.specialization && <Tag label={a.specialization} tone="amber" />}
-                  <span className="b-archetype-stats">LP {a.lifePoints} · Sp {a.spikes}</span>
                 </span>
               </button>
             ))}
@@ -1566,14 +1595,20 @@ function DescriptionBlock({ text, terms = [], onInspect }) {
 // The shared reading body for an entity — description, facts, forward + back
 // links. Used by both the rail inspector and the picker's reading pane so the
 // content (and link-following) is identical everywhere.
-function ParameterEditor({ baseName, entity, view, onUpdateParameter }) {
+function ParameterEditor({ baseName, entity, view, suggestions: suggestionsProp, groups, onUpdateParameter }) {
   const [isOpen, setIsOpen] = useState(false);
-  const [filter, setFilter] = useState(entity.parameter || "");
+  // `entity.parameter` is the USER's chosen value only when the resolved name
+  // carried one (the resolver sets `baseName` alongside it). For a bare base
+  // skill, `parameter` is the static descriptor from skills.json ("Area of
+  // Lore") — NOT a value — so treat the chosen value as empty in that case,
+  // otherwise the descriptor leaks into the input as a phantom value.
+  const chosenParam = entity.baseName ? (entity.parameter || "") : "";
+  const [filter, setFilter] = useState(chosenParam);
   const containerRef = useRef(null);
 
   useEffect(() => {
-    setFilter(entity.parameter || "");
-  }, [entity.parameter]);
+    setFilter(chosenParam);
+  }, [chosenParam]);
 
   useEffect(() => {
     const handleOutsideClick = (e) => {
@@ -1585,23 +1620,44 @@ function ParameterEditor({ baseName, entity, view, onUpdateParameter }) {
     return () => document.removeEventListener("mousedown", handleOutsideClick);
   }, []);
 
-  const suggestions = PARAMETER_SUGGESTIONS[baseName] || [];
-  const isSearching = isOpen && filter !== entity.parameter;
-  const filtered = isSearching
-    ? suggestions.filter(opt => opt.toLowerCase().includes(filter.toLowerCase()))
-    : suggestions;
+  const isSpellChoice = baseName === "Bookcaster";
+  // Normalize to grouped form: a single unnamed group for flat suggestions, or
+  // the provided labeled groups (Bookcaster's Known / Other Accessible spells).
+  const flat = suggestionsProp || PARAMETER_SUGGESTIONS[baseName] || [];
+  const allGroups = groups && groups.length ? groups : (flat.length ? [{ label: null, options: flat }] : []);
+  const isSearching = isOpen && filter !== chosenParam;
+  const match = (opt) => opt.toLowerCase().includes(filter.toLowerCase());
+  const visibleGroups = allGroups
+    .map((g) => ({ ...g, options: isSearching ? g.options.filter(match) : g.options }))
+    .filter((g) => g.options.length);
+  const hasOptions = allGroups.some((g) => g.options.length);
+
+  const sectionLabel = baseName === "Lore" ? "Customize Area"
+    : isSpellChoice ? "Choose a Spell" : "Customize Choice";
+  const placeholder = baseName === "Lore" ? "Enter area..."
+    : isSpellChoice ? "Choose or type a spell..." : "Enter choice...";
+
+  const choose = (opt) => {
+    setFilter(opt);
+    const newName = formatParameterizedName(baseName, opt, entity.name);
+    onUpdateParameter(view.field, entity.name, newName, view.index);
+    setIsOpen(false);
+  };
 
   return (
     <div className="b-detail-section b-parameter-editor" ref={containerRef}>
       <h3 className="b-detail-section-title">
-        {baseName === "Lore" ? "Customize Area" : "Customize Choice"}
+        {sectionLabel}
       </h3>
+      {isSpellChoice && !hasOptions && (
+        <p className="b-detail-hint">No accessible spell lists yet — gain spell-slots (or a caster class) to bookcast.</p>
+      )}
       <div className="b-combobox">
         <div className="b-combobox-input-wrapper">
           <input
             type="text"
             className="b-parameter-input"
-            placeholder={baseName === "Lore" ? "Enter area..." : "Enter choice..."}
+            placeholder={placeholder}
             value={filter}
             onFocus={() => setIsOpen(true)}
             onChange={(e) => {
@@ -1620,23 +1676,23 @@ function ParameterEditor({ baseName, entity, view, onUpdateParameter }) {
             {isOpen ? "▲" : "▼"}
           </button>
         </div>
-        {isOpen && filtered.length > 0 && (
+        {isOpen && visibleGroups.length > 0 && (
           <ul className="b-combobox-list">
-            {filtered.map((opt) => (
-              <li key={opt}>
-                <button
-                  type="button"
-                  className="b-combobox-option"
-                  onClick={() => {
-                    setFilter(opt);
-                    const newName = formatParameterizedName(baseName, opt, entity.name);
-                    onUpdateParameter(view.field, entity.name, newName, view.index);
-                    setIsOpen(false);
-                  }}
-                >
-                  {opt}
-                </button>
-              </li>
+            {visibleGroups.map((g) => (
+              <Fragment key={g.label || "_"}>
+                {g.label && <li className="b-combobox-group-label" aria-hidden="true">{g.label}</li>}
+                {g.options.map((opt) => (
+                  <li key={`${g.label || ""}:${opt}`}>
+                    <button
+                      type="button"
+                      className="b-combobox-option"
+                      onClick={() => choose(opt)}
+                    >
+                      {opt}
+                    </button>
+                  </li>
+                ))}
+              </Fragment>
             ))}
           </ul>
         )}
@@ -1661,7 +1717,24 @@ export function EntityBody({ entity, view, report, choices, onSetChoice, onUpdat
   // Referenced concepts to linkify inside the description (#13).
   const terms = conceptTerms(entity);
   const baseName = entity.baseName || entity.name;
-  const isParamEditable = !!(onUpdateParameter && view?.field && view.field !== "multiclassGrant" && PARAMETER_SUGGESTIONS[baseName]);
+  // Bookcaster is parameterized by a SPELL the character can access, derived
+  // per-character from the validator (report.bookcasterOptions = {known, other}).
+  // The picker groups them: "Known Spells" (easy path) above "Other Accessible
+  // Spells" (rules-legal but higher friction — a spell you don't yet know).
+  // Other skills use the static suggestion map (a flat list).
+  let paramSuggestions = null;       // flat list, or null
+  let paramGroups = null;            // [{ label, options }], or null
+  if (baseName === "Bookcaster") {
+    const bc = report?.bookcasterOptions || { known: [], other: [] };
+    paramGroups = [
+      { label: "Known Spells", options: bc.known || [] },
+      { label: "Other Accessible Spells", options: bc.other || [] },
+    ].filter((g) => g.options.length);
+  } else {
+    paramSuggestions = PARAMETER_SUGGESTIONS[baseName] || null;
+  }
+  const isParamEditable = !!(onUpdateParameter && view?.field && view.field !== "multiclassGrant"
+    && (paramSuggestions || paramGroups || baseName === "Bookcaster"));
   const grantedSubPowers = useMemo(() => {
     if (!entity?.id) return [];
     const targets = REFS.grants?.[entity.id] || [];
@@ -1682,6 +1755,8 @@ export function EntityBody({ entity, view, report, choices, onSetChoice, onUpdat
           baseName={baseName}
           entity={entity}
           view={view}
+          suggestions={paramSuggestions}
+          groups={paramGroups}
           onUpdateParameter={onUpdateParameter}
         />
       )}
@@ -1763,6 +1838,15 @@ function DetailFacts({ entity, isEditable }) {
   if (entity.parameter && !isEditable) facts.push([entity.baseName === "Lore" ? "Area" : "Choice", entity.parameter]);
   if (typeof entity.cost === "number") facts.push(["Cost", `${entity.cost} BP`]);
   else if (entity.cost && /^var/i.test(String(entity.cost))) facts.push(["Cost", "Variable"]);
+  if (typeof entity.bp === "number" || typeof entity.bp === "string") {
+    let val = entity.bp;
+    if (entity.parameter && (entity.baseName === "Mild Allergy" || entity.baseName === "Severe Allergy")) {
+      const common = ["cloth", "iron", "leather", "materia", "other common allergen"];
+      const isCommon = common.includes(String(entity.parameter).toLowerCase().trim());
+      val = entity.baseName === "Mild Allergy" ? (isCommon ? 2 : 1) : (isCommon ? 3 : 2);
+    }
+    facts.push(["Award", `${val} BP`]);
+  }
   if (entity.prereq && entity.prereq !== "None") facts.push(["Prereq", entity.prereq]);
   if (entity.prerequisites && entity.prerequisites !== "None") facts.push(["Prereq", entity.prerequisites]);
   if (entity.tier) facts.push(["Tier", entity.tier]);

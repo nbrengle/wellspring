@@ -972,7 +972,16 @@ export function computeSpend(character) {
   let rawAwarded = 0;
   for (const item of character.flaws || []) {
     const ent = lookupEntity(`flaws:${item}`);
-    const bp = typeof ent?.bp === 'number' ? ent.bp : parseInt(String(ent?.bp), 10) || 0;
+    let bp = 0;
+    if (ent) {
+      if (ent.baseName === "Mild Allergy" || ent.baseName === "Severe Allergy") {
+        const common = ["cloth", "iron", "leather", "materia", "other common allergen"];
+        const isCommon = common.includes(String(ent.parameter || "").toLowerCase().trim());
+        bp = ent.baseName === "Mild Allergy" ? (isCommon ? 2 : 1) : (isCommon ? 3 : 2);
+      } else {
+        bp = typeof ent.bp === 'number' ? ent.bp : parseInt(String(ent.bp), 10) || 0;
+      }
+    }
     byItem[`flaws:${item}`] = { cost: -bp, base: -bp, grant: null };
     rawAwarded += bp;
   }
@@ -1063,19 +1072,48 @@ function slotGrants(character) {
 
   // 2 + 3. Per-class automatic grants, gated by that class's own level:
   //   - INNATE powers granting slots (Artisan "Brilliant Thinker" → +1 Basic).
-  //   - Per-level progression `bonus` prose ("Innate Bonus Cantrip" → +1 cantrip).
+  // NOTE: the progression "Innate Bonus Cantrip: Cancel" prose is intentionally
+  // NOT handled here. It grants the SPECIFIC Cancel cantrip as a free, locked
+  // innate — not a choosable cantrip slot — so it must not bump the cantrip cap
+  // (which is the table's Cantrips column). See innateBonusCantrips().
   for (const { name: cls, level: clsLevel } of classes) {
     for (const p of (CLASS_POWERS[cls]?.innate || [])) {
       if (requiredLevel(p) <= clsLevel) scanSlotGrant(p.desc || p.description, (cat, n) => addTo(cls, cat, n));
     }
-    const progression = CLASS_PROGRESSION[cls] || {};
-    for (let lvl = 1; lvl <= clsLevel; lvl++) {
-      const bonus = progression[lvl]?.bonus;
-      if (bonus && /bonus\s+cantrip/i.test(bonus)) addTo(cls, 'cantrips', 1);
-    }
   }
 
   return grants;
+}
+
+// Cantrips a caster is GRANTED for free (locked, not choosable) by the
+// progression "Innate Bonus Cantrip: <name>" prose. The MegaDoc tables list the
+// choosable Cantrips count in its own column; the Class-Bonuses column's "Innate
+// Bonus Cantrip: Cancel" is a separate fixed grant on top. The prose reads e.g.
+// "Innate Bonus Cantrip: Cancel, Healing Touch" — only the items that are
+// actually cantrips of the class count (Cancel); the rest are unrelated bonuses
+// (Healing Touch is a pool). Returns [{ cls, name }], deduped per class+name.
+export function innateBonusCantrips(character) {
+  const out = [];
+  const seen = new Set();
+  for (const { name: cls, level: clsLevel } of getClasses(character)) {
+    const classCantrips = new Set((CLASS_POWERS[cls]?.cantrips || []).map((c) => c.name));
+    const progression = CLASS_PROGRESSION[cls] || {};
+    for (let lvl = 1; lvl <= clsLevel; lvl++) {
+      const bonus = progression[lvl]?.bonus;
+      const m = bonus && bonus.match(/innate\s+bonus\s+cantrip:\s*([^]*)/i);
+      if (!m) continue;
+      // Split the trailing list on commas/newlines; keep only real cantrips.
+      for (const raw of m[1].split(/[,\n]/)) {
+        const nm = raw.trim();
+        if (!classCantrips.has(nm)) continue;
+        const key = `${cls}:${nm}`;
+        if (seen.has(key)) continue;
+        seen.add(key);
+        out.push({ cls, name: nm });
+      }
+    }
+  }
+  return out;
 }
 
 // Which class a power pick belongs to. Slots are per-class, so each pick is
@@ -1124,6 +1162,10 @@ export function computeSlots(character) {
   if (!classes.length) return [];
   const multi = classes.length > 1;
   const bonus = slotGrants(character);
+  // Free, locked cantrips granted by progression ("Innate Bonus Cantrip: Cancel").
+  // Surfaced on the cantrip row as `granted` so the UI shows them as fixed rows
+  // (not choosable), without counting against the choosable cantrip cap.
+  const grantedCantrips = innateBonusCantrips(character);
 
   const rows = [];
   for (const { name: cls, level } of classes) {
@@ -1138,7 +1180,15 @@ export function computeSlots(character) {
       };
     };
     if (isCaster) {
-      rows.push(mkRow('cantrips', 'Cantrips', countPicksForClass(character, 'cantrips', cls), prog.cantrips ?? 0));
+      const granted = grantedCantrips.filter((g) => g.cls === cls).map((g) => g.name);
+      // A granted (innate) cantrip never consumes a choosable slot, even if it
+      // appears in the character's cantrip pick list (older archetypes ship
+      // "Cancel" as a pick — it's really the free innate). Exclude it from `used`.
+      const used = (character.cantrips || []).reduce((n, name, i) =>
+        n + (pickClass(character, 'cantrips', i, name) === cls && !granted.includes(name) ? 1 : 0), 0);
+      const cantripRow = mkRow('cantrips', 'Cantrips', used, prog.cantrips ?? 0);
+      cantripRow.granted = granted;
+      rows.push(cantripRow);
       const known = CASTER_SLOT_FIELDS.spellsKnown
         .reduce((n, f) => n + countPicksForClass(character, f, cls), 0);
       rows.push(mkRow('spellsKnown', 'Spells Known', known, prog.spellsKnown ?? 0));
@@ -1186,6 +1236,47 @@ export function spellSlots(character) {
   }
 
   return total;
+}
+
+// Spells a Bookcaster can select, split into two groups for the picker:
+//   known — spells the character already KNOWS (their spells-known picks). The
+//           easy/default path: bookcasting a spell you know needs no friction.
+//   other — every OTHER spell the rules let a Bookcaster pick: any spell on the
+//           caster classes' lists, of a Tier the character can access (has a
+//           slot for). Per the rules "one spell from any spell list they have
+//           access to … of a Tier they would normally be able to access" — this
+//           is the higher-friction path (a spell you don't yet know).
+// Both groups are de-duped and sorted; `other` excludes anything in `known`.
+// Returns { known, other }; both empty for non-casters.
+const BOOKCASTER_TIER_FIELD = { novice: 'noviceSpells', adept: 'adeptSpells', greater: 'greaterSpells' };
+const KNOWN_SPELL_FIELDS = ['noviceSpells', 'adeptSpells', 'greaterSpells'];
+export function bookcasterSpellOptions(character) {
+  const casters = getClasses(character).filter((c) => SPELLCASTERS.has(c.name));
+  if (!casters.length) return { known: [], other: [] };
+  const slots = spellSlots(character) || { novice: 0, adept: 0, greater: 0 };
+  const accessibleTiers = Object.keys(BOOKCASTER_TIER_FIELD).filter((t) => (slots[t] || 0) > 0);
+
+  // Every accessible spell from the caster classes' lists.
+  const accessible = new Set();
+  for (const { name: cls } of casters) {
+    const byTier = CLASS_POWERS[cls];
+    if (!byTier) continue;
+    for (const tier of accessibleTiers) {
+      for (const sp of (byTier[BOOKCASTER_TIER_FIELD[tier]] || [])) {
+        // Skip placeholder rows the parser emits for undocumented tiers.
+        if (sp?.name && !/^(Adept|Greater)\s+\w+\s+Power$/i.test(sp.name)) accessible.add(sp.name);
+      }
+    }
+  }
+  // Spells the character actually knows (their spells-known picks). A known spell
+  // is offered even if its tier later falls out of `accessible` — you still know it.
+  const knownSet = new Set();
+  for (const f of KNOWN_SPELL_FIELDS) for (const name of (character[f] || [])) knownSet.add(cleanItemName(name));
+
+  const sort = (arr) => [...arr].sort((a, b) => a.localeCompare(b));
+  const known = sort(knownSet);
+  const other = sort([...accessible].filter((n) => !knownSet.has(n)));
+  return { known, other };
 }
 
 // Default starting Wealth (MegaDoc: "all characters start with 8 Wealth").
@@ -1287,7 +1378,10 @@ const STAT_PATTERNS = [
   { stat: 'lifePoints', re: /(?:\+?(\d+)|\bone)\s+(?:maximum\s+)?Life\s+Points?\s+to\s+(?:their\s+)?max(?:imum)?/gi },
   { stat: 'lifePoints', re: /(?:additional\s+)?(?:\+?(\d+)|\bone)\s+(?:Base\s+)?maximum\s+Life\s+Points?/gi },
   { stat: 'lifePoints', re: /(?:adds?|gains?)\s+(?:\+?(\d+)|\bone)\s+Life\s+Points?\s+to\s+(?:their\s+)?max(?:imum)?/gi },
-  { stat: 'lifePoints', re: /(?:Base\s+)?Maximum\s+Life\s+Points?\s+is\s+increased\s+by\s+(?:\+?(\d+)|\bone|two|three)\b/gi },
+  // "+1 Base Maximum Life Points" — class progression-bonus phrasing.
+  { stat: 'lifePoints', re: /\+\s*(\d+)\s+(?:Base\s+)?Maximum\s+Life\s+Points?/gi },
+  // "Base Maximum Life Points is increased by one/N" (Healthy and similar skills).
+  { stat: 'lifePoints', re: /(?:Base\s+)?Maximum\s+Life\s+Points?\s+(?:is|are)\s+increased\s+by\s+(?:\+?(\d+)|\bone|two|three)\b/gi },
   // "gain N Natural Armor" / "N points of Natural Armor" / "increases to N" (Natural Armor)
   { stat: 'naturalArmor', re: /(?:gains?|grant(?:ing|s)?)\s+(?:\+?(\d+)|\bone|three|two)\s+(?:points?\s+of\s+)?Natural\s+Armor/gi },
   { stat: 'naturalArmor', re: /(\d+)\s+points?\s+of\s+Natural\s+Armor/gi },
@@ -1305,8 +1399,13 @@ function statMods(character) {
   // phrasings of the same boost (Toughness says it two ways), so summing every
   // pattern hit would multi-count one boost. One entity → at most one boost per
   // stat (none in the source grant two of the same stat).
-  const scan = (name, text) => {
+  const scan = (name, text, tags) => {
     if (!text) return;
+    // Druid Form spells (tagged "Form") grant LP/armor only WHILE transformed
+    // ("+1 Maximum Life Points while in the Lesser Form…") — a temporary state,
+    // not a permanent build-stat. Skip their stat boosts so they don't inflate
+    // the rail's Life Points / Armor.
+    if (tags && tags.includes('Form')) return;
     const seen = new Set();
     for (const { stat, re } of STAT_PATTERNS) {
       if (seen.has(stat)) continue;
@@ -1339,38 +1438,62 @@ function statMods(character) {
   // Owned/selected powers (innate-at-level + slotted).
   for (const { name: cls, level: clsLevel } of getClasses(character)) {
     for (const p of (CLASS_POWERS[cls]?.innate || [])) {
-      if (requiredLevel(p) <= clsLevel) scan(p.name, p.description);
-    }
-    const progression = CLASS_PROGRESSION[cls] || {};
-    for (let lvl = 1; lvl <= clsLevel; lvl++) {
-      const bonus = progression[lvl]?.bonus;
-      if (bonus) scan(`${cls} Level ${lvl} Bonus`, bonus);
+      if (requiredLevel(p) <= clsLevel) scan(p.name, p.description, p.tags);
     }
   }
   for (const field of POWER_SOURCE_FIELDS) {
     for (const item of (character[field] || [])) {
-      const e = lookupEntity(`powers:${cleanItemName(item)}`); scan(e?.name || item, e?.description);
+      const e = lookupEntity(`powers:${cleanItemName(item)}`); scan(e?.name || item, e?.description, e?.tags);
+    }
+  }
+  // Per-class progression bonuses, level-gated. The "Class Bonuses" column carries
+  // stat boosts as prose ("+1 Base Maximum Life Points" at Fighter L2 / Cleric L7).
+  // These are automatic at the gating level, so apply each row up to the class's
+  // current level. (The base level-table LP is the CLASSLESS baseline — these
+  // class bonuses stack on top; see levelStats.)
+  for (const { name: cls, level: clsLevel } of getClasses(character)) {
+    const prog = CLASS_PROGRESSION[cls] || {};
+    for (let lvl = 1; lvl <= clsLevel; lvl++) {
+      const bonus = prog[lvl]?.bonus;
+      if (bonus) scan(`${cls} L${lvl}`, bonus);
+    }
+  }
+  // Owned Class skills and other purchased skills (Healthy: "Base Maximum Life
+  // Points is increased by one"). These aren't in POWER_SOURCE_FIELDS, so scan
+  // them via their resolved skill/power entity description.
+  for (const field of ['classSkills', 'purchasedSkills', 'startingSkills']) {
+    for (const item of (character[field] || [])) {
+      const e = lookupEntity(`skills:${cleanItemName(item)}`)
+        || lookupEntity(`powers:${cleanItemName(item)}`)
+        || lookupEntity(resolveId(item, field, character));
+      if (e) scan(e.name, e.description);
     }
   }
   return { ...mods, sources, notes };
 }
 
-// Base character stats. Life Points and Spikes come straight from the level table
-// for the character's level (the rules' baseline). An authored sheet may store an
-// explicit value that already bakes in bonuses — when present, honor it as the
-// base. Numeric power/perk/lineage modifiers are layered on top (statMods).
+// Base character stats. Life Points and Spikes come from the level table for the
+// character's total level — the CLASSLESS rules baseline ("starting level 4
+// characters will have 3 LP"). Per-class progression bonuses (Fighter L2 / Cleric
+// L7 "+1 Base Maximum Life Points") and skill/perk/lineage boosts are layered on
+// top via statMods, NOT baked into the base — so the displayed total updates as
+// the character levels and buys those abilities. (Authored archetype sheets store
+// a final LP that already equals base+bonuses; we recompute from the rules rather
+// than trust the stored number, which keeps blank builds and archetypes
+// consistent. The 14 shipped archetypes all reproduce their authored LP this way.)
 // Returns { lifePoints, spikes, baseLifePoints, baseSpikes, mods } so the UI can
 // show the total and explain it.
 function levelStats(character) {
   const level = characterLevel(character);
+  const minRow = LEVEL_TABLE[0];
+  const maxRow = LEVEL_TABLE[LEVEL_TABLE.length - 1];
+  // Clamp to the documented range: below L4 use the L4 baseline (LP barely scales
+  // and the table starts at 4); above the table, hold the top row.
   const row = LEVEL_TABLE.find((r) => r.level === level)
-    || LEVEL_TABLE.find((r) => r.level === Math.min(level, LEVEL_TABLE[LEVEL_TABLE.length - 1].level))
-    || {};
-  // Base from the table; an explicit stored value (authored sheet) overrides it.
-  const storedLp = parseInt(String(character.lifePoints), 10);
-  const storedSp = parseInt(String(character.spikes), 10);
-  const baseLp = Number.isNaN(storedLp) ? (row.lp ?? 0) : storedLp;
-  const baseSp = Number.isNaN(storedSp) ? (row.spikes ?? 0) : storedSp;
+    || (level < minRow.level ? minRow : maxRow);
+
+  const baseLp = row.lp ?? 0;
+  const baseSp = row.spikes ?? 0;
 
   const mods = statMods(character);
   return {
@@ -1606,6 +1729,7 @@ export function validate(character) {
   const spend = computeSpend(character);
   const slots = computeSlots(character);
   const spellSlotCounts = spellSlots(character);
+  const bookcasterOptions = bookcasterSpellOptions(character);
   const stats = levelStats(character);
   const wealth = wealthState(character);
   const devotion = devotionState(character);
@@ -1650,6 +1774,7 @@ export function validate(character) {
     slots,
     slotsOver,
     spellSlots: spellSlotCounts,
+    bookcasterOptions,
     stats,
     wealth,
     devotion,
