@@ -1013,11 +1013,17 @@ const TIER_TO_CATEGORY = {
 // Scan one entity's text for a slot-granting phrase, adding to `grants`.
 //   "additional Cantrip"                 → +1 cantrips
 //   "additional <Tier> [spell-]slot/power" → +1 to that tier's category
-function scanSlotGrant(text, add) {
+function scanSlotGrant(text, add, name) {
   if (!text) return;
+  if (name && name.includes('Extensive Combat Training')) {
+    if (name.includes('Basic')) add('basic', 1);
+    else if (name.includes('Advanced')) add('advanced', 1);
+    else if (name.includes('Veteran')) add('veteran', 1);
+    return;
+  }
   if (/\badditional\s+cantrip\b/i.test(text)) add('cantrips', 1);
   // "additional <Tier> spell-slot/slot/power" → +1 to that tier's category.
-  const m = text.match(/\badditional\s+(Novice|Adept|Greater|Utility|Basic|Advanced|Veteran)\s+(?:spell-?\s*slot|slot|power)/i);
+  const m = text.match(/\badditional\s+(Novice|Adept|Greater|Utility|Basic|Advanced|Veteran)\s+(?:Tier\s+)?(?:spell-?\s*slot|slot|power)/i);
   if (m) {
     const cat = TIER_TO_CATEGORY[m[1].toLowerCase()];
     if (cat) add(cat, 1);
@@ -1059,7 +1065,7 @@ function slotGrants(character) {
       const ent = lookupEntity(resolveId(item, field, character))
         || lookupEntity(`skills:${cleanItemName(item)}`);
       const rank = rankOf(character, field, idx);
-      scanSlotGrant(ent?.description, (cat, n) => addTo(classFor(cat), cat, n * rank));
+      scanSlotGrant(ent?.description, (cat, n) => addTo(classFor(cat), cat, n * rank), ent?.name || item);
     });
   }
 
@@ -1071,7 +1077,7 @@ function slotGrants(character) {
   // (which is the table's Cantrips column). See innateBonusCantrips().
   for (const { name: cls, level: clsLevel } of classes) {
     for (const p of (CLASS_POWERS[cls]?.innate || [])) {
-      if (requiredLevel(p) <= clsLevel) scanSlotGrant(p.desc || p.description, (cat, n) => addTo(cls, cat, n));
+      if (requiredLevel(p) <= clsLevel) scanSlotGrant(p.desc || p.description, (cat, n) => addTo(cls, cat, n), p.name);
     }
   }
 
@@ -1213,8 +1219,8 @@ export function spellSlots(character) {
     }
   }
 
-  // Scan starting and purchased skills for permanent spell slot grants.
-  for (const field of ['startingSkills', 'purchasedSkills']) {
+  // 1. Scan starting, purchased, and class skills.
+  for (const field of ['startingSkills', 'purchasedSkills', 'classSkills']) {
     (character[field] || []).forEach((item, idx) => {
       const ent = lookupEntity(resolveId(item, field, character))
         || lookupEntity(`skills:${cleanItemName(item)}`);
@@ -1226,6 +1232,64 @@ export function spellSlots(character) {
         }
       }
     });
+  }
+
+  // 2. Scan purchased perks.
+  for (const item of (character.purchasedPerks || [])) {
+    const ent = lookupEntity(`perks:${cleanItemName(item)}`);
+    if (ent?.description) {
+      const m = ent.description.match(/\badditional\s+(Novice|Adept|Greater)\s+spell-?slot/i);
+      if (m) {
+        total[m[1].toLowerCase()] += 1;
+      }
+    }
+  }
+
+  // 3. Scan lineage advantages.
+  if (character.lineage) {
+    const lin = LINEAGES[character.lineage];
+    for (const name of (character.lineageAdvantages || [])) {
+      const a = (lin?.advantages || []).find((x) => x.name === name || x.baseName === name);
+      if (a?.desc || a?.description) {
+        const desc = a.desc || a.description;
+        const m = desc.match(/\badditional\s+(Novice|Adept|Greater)\s+spell-?slot/i);
+        if (m) {
+          total[m[1].toLowerCase()] += 1;
+        }
+      }
+    }
+  }
+
+  // 4. Handle "highest-level spell-slot" modifiers.
+  const allTexts = [];
+  for (const field of ['startingSkills', 'purchasedSkills', 'classSkills']) {
+    for (const item of (character[field] || [])) {
+      const ent = lookupEntity(resolveId(item, field, character))
+        || lookupEntity(`skills:${cleanItemName(item)}`);
+      if (ent?.description) allTexts.push(ent.description);
+    }
+  }
+  for (const item of (character.purchasedPerks || [])) {
+    const ent = lookupEntity(`perks:${cleanItemName(item)}`);
+    if (ent?.description) allTexts.push(ent.description);
+  }
+  if (character.lineage) {
+    const lin = LINEAGES[character.lineage];
+    for (const name of (character.lineageAdvantages || [])) {
+      const a = (lin?.advantages || []).find((x) => x.name === name || x.baseName === name);
+      if (a?.desc || a?.description) allTexts.push(a.desc || a.description);
+    }
+  }
+  for (const text of allTexts) {
+    if (/additional\s+spell-?slot\s+of\s+their\s+highest[- ]level/i.test(text)) {
+      if (total.greater > 0) {
+        total.greater += 1;
+      } else if (total.adept > 0) {
+        total.adept += 1;
+      } else if (total.novice > 0) {
+        total.novice += 1;
+      }
+    }
   }
 
   return total;
@@ -1334,13 +1398,18 @@ const STAT_PATTERNS = [
   { stat: 'lifePoints', re: /\+\s*(\d+)\s+(?:Base\s+)?Maximum\s+Life\s+Points?/gi },
   // "Base Maximum Life Points is increased by one/N" (Healthy and similar skills).
   { stat: 'lifePoints', re: /(?:Base\s+)?Maximum\s+Life\s+Points?\s+(?:is|are)\s+increased\s+by\s+(?:\+?(\d+)|\bone)/gi },
+  // LP alias: "+1 Maximum Health" (Warrior Spirit)
+  { stat: 'lifePoints', re: /(?:\+?(\d+)|\bone)\s+Maximum\s+Health\b/gi },
   // "gain N Natural Armor" / "N points of Natural Armor" / "increases to N" (Natural Armor)
   { stat: 'naturalArmor', re: /(?:gains?|grant(?:ing|s)?)\s+(?:\+?(\d+)|\bone|three|two)\s+(?:points?\s+of\s+)?Natural\s+Armor/gi },
   { stat: 'naturalArmor', re: /(\d+)\s+points?\s+of\s+Natural\s+Armor/gi },
+  // Warrior Spirit comma list / separate Natural Armor Points
+  { stat: 'naturalArmor', re: /\+?(\d+)\s+Maximum\s+Health,?\s+physical\s+Armor\s+Points?,?\s+and\s+Natural\s+Armor\s+Points?/gi },
   // "+1 physical Armor Point" (Warrior Spirit) — explicit max armor boost.
-  { stat: 'armor', re: /\+?(\d+)\s+(?:physical\s+)?Armor\s+Points?\b/gi },
+  { stat: 'armor', re: /\+?(\d+)\s+(?:Maximum\s+Health,?\s+)?(?:physical\s+)?Armor\s+Points?/gi },
   // "+N Maximum Spike(s)" — permanent spike boost (not "Refresh N Spikes").
-  { stat: 'spikes', re: /(?:\+?(\d+)|\bone)\s+(?:Bonus\s+)?Maximum\s+Spikes?\b/gi },
+  { stat: 'spikes', re: /(?:\+?(\d+)|\bone)\s+(?:(?:Base|Bonus)\s+)?Maximum\s+Spikes?\b/gi },
+  { stat: 'spikes', re: /(?:Base\s+)?Maximum\s+Spikes?\s+(?:is|are)\s+increased\s+by\s+(?:\+?(\d+)|\bone)/gi },
 ];
 const WORD_N = { one: 1, two: 2, three: 3 };
 function statMods(character) {
@@ -1388,8 +1457,10 @@ function statMods(character) {
     }
   }
   // Owned/selected powers (innate-at-level + slotted).
-  for (const { name: cls } of getClasses(character)) {
-    for (const p of (CLASS_POWERS[cls]?.innate || [])) scan(p.name, p.description, p.tags);
+  for (const { name: cls, level: clsLevel } of getClasses(character)) {
+    for (const p of (CLASS_POWERS[cls]?.innate || [])) {
+      if (requiredLevel(p) <= clsLevel) scan(p.name, p.desc || p.description, p.tags);
+    }
   }
   for (const field of POWER_SOURCE_FIELDS) {
     for (const item of (character[field] || [])) {
