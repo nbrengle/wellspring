@@ -42,7 +42,22 @@ const PARAMETER_SUGGESTIONS = {
   "Profession - Master": ["Smith", "Carpenter", "Tailor", "Mason", "Hunter", "Scribe", "Herbalist", "Undertaker", "Merchant", "Charlatan", "Chirurgeon", "Teacher", "Soldier", "Sailor", "Wagoneer"],
   "Chronic Hobbyist": ["Cooking", "Brewing", "Gardening", "Smith", "Carpenter", "Tailor", "Mason", "Hunter", "Scribe", "Herbalist", "Undertaker", "Merchant", "Charlatan", "Chirurgeon", "Teacher", "Soldier", "Sailor", "Wagoneer"],
   "Bookcaster": ["Magekey", "Mask Aura", "Identify", "Cancel", "Stop", "Mageskin"],
-  "Favored Form": ["Hunting Panther", "Hulking Bear", "Striking Serpent"]
+  "Favored Form": ["Hunting Panther", "Hulking Bear", "Striking Serpent"],
+  // Custom suggestion additions
+  "Weapon Specialization": ["Daggers", "Swords", "Maces", "Axes", "Projectile Weapons", "Thrown Weapons", "Staves", "Polearms"],
+  "Elemental Affinity": ["Flame", "Ice", "Lightning", "Acid"],
+  "Draconic Heritage": ["Acid", "Flame", "Ice", "Lightning"],
+  "Honor Debt": [],
+  "Contact": [],
+  "Ancestral Relic": [],
+  "Ancestral Weapon": [],
+  "Boon Bonds": [],
+  "Heartbond": [],
+  "Famous": [],
+  "Minor Fame": [],
+  "Manse": [],
+  "Mild Allergy": ["Cloth", "Copper", "Gold", "Harvest", "Hide", "Ingot", "Iron", "Leather", "Materia", "Night Prize", "Other Common Allergen", "Other Uncommon Allergen", "Rare Minerals", "Scale", "Silver"],
+  "Severe Allergy": ["Cloth", "Copper", "Gold", "Harvest", "Hide", "Ingot", "Iron", "Leather", "Materia", "Night Prize", "Other Common Allergen", "Other Uncommon Allergen", "Rare Minerals", "Scale", "Silver"]
 };
 
 function formatParameterizedName(baseName, parameter, originalName) {
@@ -914,12 +929,18 @@ function SlotBlock({ slot, character, onInspect, onOpenSlot, isFocused, pickClas
   const fields = slot.category === "spellsKnown"
     ? ["noviceSpells", "adeptSpells", "greaterSpells"]
     : [SLOT_FIELD[slot.category]];
+  // Cantrips granted free + locked by class progression ("Innate Bonus Cantrip:
+  // Cancel"). Shown as fixed rows, never counted against the choosable cap.
+  const granted = slot.granted || [];
+  const grantedSet = new Set(granted);
   // Picks belonging to THIS class's slots, across the relevant field(s), each
-  // carrying its field + flat index so clear/swap target the right element.
+  // carrying its field + flat index so clear/swap target the right element. A
+  // granted cantrip is excluded here even if it sits in the pick list — it's
+  // rendered as a locked row instead, matching how the validator counts it.
   const myPicks = fields.flatMap((field) =>
     (character[field] || [])
       .map((name, flatIndex) => ({ name, flatIndex, field }))
-      .filter((p) => pickClassOf(field, p.flatIndex, p.name) === slot.cls));
+      .filter((p) => pickClassOf(field, p.flatIndex, p.name) === slot.cls && !grantedSet.has(p.name)));
 
   const rowCount = Math.max(slot.allowed, myPicks.length);
   const rows = Array.from({ length: rowCount }, (_, i) => myPicks[i] ?? null);
@@ -932,6 +953,13 @@ function SlotBlock({ slot, character, onInspect, onOpenSlot, isFocused, pickClas
         <span className="b-slot-count">{slot.used} / {slot.allowed}</span>
       </div>
       <ol className="b-slot-rows">
+        {granted.map((name) => (
+          <li key={`granted-${name}`} className="b-slot-row is-filled is-granted">
+            <span className="b-slot-num" title="Granted by class">★</span>
+            <button className="b-slot-pick" onClick={() => onInspect(name, fields[0], "powers")}>{name}</button>
+            <span className="b-slot-tier b-slot-granted-tag">innate</span>
+          </li>
+        ))}
         {rows.map((pick, i) => {
           const over = i >= slot.allowed;
           if (pick) {
@@ -1568,12 +1596,18 @@ function DescriptionBlock({ text, terms = [], onInspect }) {
 // content (and link-following) is identical everywhere.
 function ParameterEditor({ baseName, entity, view, onUpdateParameter }) {
   const [isOpen, setIsOpen] = useState(false);
-  const [filter, setFilter] = useState(entity.parameter || "");
+  // `entity.parameter` is the USER's chosen value only when the resolved name
+  // carried one (the resolver sets `baseName` alongside it). For a bare base
+  // skill, `parameter` is the static descriptor from skills.json ("Area of
+  // Lore") — NOT a value — so treat the chosen value as empty in that case,
+  // otherwise the descriptor leaks into the input as a phantom value.
+  const chosenParam = entity.baseName ? (entity.parameter || "") : "";
+  const [filter, setFilter] = useState(chosenParam);
   const containerRef = useRef(null);
 
   useEffect(() => {
-    setFilter(entity.parameter || "");
-  }, [entity.parameter]);
+    setFilter(chosenParam);
+  }, [chosenParam]);
 
   useEffect(() => {
     const handleOutsideClick = (e) => {
@@ -1586,7 +1620,7 @@ function ParameterEditor({ baseName, entity, view, onUpdateParameter }) {
   }, []);
 
   const suggestions = PARAMETER_SUGGESTIONS[baseName] || [];
-  const isSearching = isOpen && filter !== entity.parameter;
+  const isSearching = isOpen && filter !== chosenParam;
   const filtered = isSearching
     ? suggestions.filter(opt => opt.toLowerCase().includes(filter.toLowerCase()))
     : suggestions;
@@ -1763,6 +1797,15 @@ function DetailFacts({ entity, isEditable }) {
   if (entity.parameter && !isEditable) facts.push([entity.baseName === "Lore" ? "Area" : "Choice", entity.parameter]);
   if (typeof entity.cost === "number") facts.push(["Cost", `${entity.cost} BP`]);
   else if (entity.cost && /^var/i.test(String(entity.cost))) facts.push(["Cost", "Variable"]);
+  if (typeof entity.bp === "number" || typeof entity.bp === "string") {
+    let val = entity.bp;
+    if (entity.parameter && (entity.baseName === "Mild Allergy" || entity.baseName === "Severe Allergy")) {
+      const common = ["cloth", "iron", "leather", "materia", "other common allergen"];
+      const isCommon = common.includes(String(entity.parameter).toLowerCase().trim());
+      val = entity.baseName === "Mild Allergy" ? (isCommon ? 2 : 1) : (isCommon ? 3 : 2);
+    }
+    facts.push(["Award", `${val} BP`]);
+  }
   if (entity.prereq && entity.prereq !== "None") facts.push(["Prereq", entity.prereq]);
   if (entity.prerequisites && entity.prerequisites !== "None") facts.push(["Prereq", entity.prerequisites]);
   if (entity.tier) facts.push(["Tier", entity.tier]);
