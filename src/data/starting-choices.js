@@ -11,189 +11,294 @@
 // from-scratch build gets.
 
 import classesJson from './classes.json';
-import { lookupEntity } from './index.js';
+import { lookupEntity, ALL_SKILLS } from './index.js';
 import { getClasses } from './validate.js';
 import { bareSkill, cleanItemName } from './resolver.js';
 
-// The class's fixed starting skills (granted regardless of the choice blocks). The
-// choice-block grants are appended on top via STARTING_CHOICES_CONFIG.
-export const BASE_STARTING_SKILLS = {
-  Artisan: ["Basic Martial Weapons", "Short Weapons", "Basic Armor"],
-  Cleric: ["Basic Faith", "Worship", "Basic Martial Weapons", "Basic Armor"],
-  Druid: ["Basic Martial Weapons", "Profession - Apprentice (your choice)", "Basic Faith"],
-  Fighter: ["Basic Martial Weapons", "Basic Shields", "Basic Armor", "Light Armor"],
-  Mage: ["Basic Arcane", "Library Use", "Bookcaster", "Bookcaster"],
-  Rogue: ["Basic Martial Weapons", "Thrown Weapons", "Basic Armor", "Light Armor"],
-  Socialite: ["Basic Martial Weapons", "Library Use", "Poisoner", "Basic Armor", "Profession - Apprentice", "Profession - Journeyman"],
-  Sourcerer: ["Basic Arcane", "Warcaster"]
-};
+// ─── STARTING SKILLS, DERIVED FROM THE PARSED MEGADOC ──────────────────────────
+// The MegaDoc is the single source of truth. The parser already captures each
+// class's "Starting Skills" block as raw lines in classes.json[cls].startingSkills,
+// e.g.:
+//   "The Most Basic Training: Basic Martial Weapons (1), Basic Shields (4)"  (fixed)
+//   "The Path of Combat - Choose one of the following:"                      (header)
+//   "Projectile Weapons (3), Lore: Historical (2)"                           (option)
+// We structure those lines here into the two shapes the builder consumes — rather
+// than hand-maintaining a second copy that drifts (it did, for all 8 classes). No
+// option list is stashed: category choices ("Choose a Gathering Skill", "Apprentice
+// Crafting") expand from the skill list, and "Choose a Lore Skill" maps to the one
+// parameterized Lore skill (its picker enumerates areas from the skill's own text).
 
-// Per-class "choose one" blocks. Each block: { id, label (the sheet name), options }
-// where each option is { label, skills: [name | { name, rank }] }. `label` is shown
-// in the dropdown; `id` keys the recorded choice; the block's `label` is the
-// provenance shown on granted items ("<Class> · <label>").
-export const STARTING_CHOICES_CONFIG = {
-  Mage: [
-    {
-      id: "startingLore",
-      label: "Starting Lore Skill",
-      options: [
-        { label: "Historical", skills: ["Lore (Historical)"] },
-        { label: "Arcane", skills: ["Lore (Arcane)"] },
-        { label: "Nature", skills: ["Lore (Nature)"] },
-        { label: "Noble", skills: ["Lore (Noble)"] },
-        { label: "Religious", skills: ["Lore (Religious)"] },
-        { label: "Shadow", skills: ["Lore (Shadow)"] },
-        { label: "Ritual", skills: ["Lore (Ritual)"] }
-      ]
-    },
-    {
-      id: "magicalSpecialty",
-      label: "Magical Specialty",
-      options: [
-        { label: "Extended Capacity - Novice x2", skills: [{ name: "Extended Capacity - Novice", rank: 2 }] },
-        { label: "Advanced Recharge, Lore (Arcane), Bookcaster x2", skills: ["Advanced Recharge", "Lore (Arcane)", "Bookcaster", "Bookcaster"] },
-        { label: "Bookcaster x6", skills: ["Bookcaster", "Bookcaster", "Bookcaster", "Bookcaster", "Bookcaster", "Bookcaster"] },
-        { label: "Additional Cantrip", skills: ["Additional Cantrip"] }
-      ]
+// Deterministic, label-derived block id — no hand-typed ids (there are no saved
+// characters, so id stability across edits doesn't matter).
+const slugId = (label) => 'choice-' + String(label).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+
+// A CHOICE HEADER asks the player to choose and ends with ":" (options follow on
+// later lines). A mid-line "Choose a Lore Skill (2)" is an INLINE choice instead.
+const isChoiceHeader = (line) => /\bchoose\b/i.test(line) && /:\s*$/.test(line.trim());
+const hasInlineChoose = (line) => /\bchoose\b/i.test(line) && !/:\s*$/.test(line.trim());
+
+// Human label from a header/inline line: text before " - Choose", "Title: Choose",
+// or the leading "Title:" — whichever yields a title.
+function choiceLabel(line) {
+  let m = line.match(/^(.*?)\s*[-–]\s*choose\b/i);
+  if (m) return m[1].trim();
+  m = line.match(/^(.*?):\s*choose\b/i);
+  if (m) return m[1].trim();
+  m = line.match(/^([^:]+):/);
+  if (m && !/\bchoose\b/i.test(m[1])) return m[1].trim();
+  return 'Choose';
+}
+
+// Parse SKILL TOKENS out of line text into [{ name, rank }]: drops "(cost)", reads
+// "xN" rank multipliers, splits on commas / "&" / "and" / "or" / "either", strips
+// bracketed params, and keeps only tokens that resolve to a real skill (via the
+// alias layer) — prose noise ("A Good Defense") is dropped.
+function parseSkillTokens(text) {
+  const out = [];
+  // Strip a leading "Block Title - " / "Block Title: " provenance prefix, but only
+  // when doing so leaves a resolvable first skill (skill names also contain " - ",
+  // e.g. "Extended Capacity - Novice", so a blind strip would corrupt them).
+  // Distribute a shared skill base over "&"-joined tiers FIRST (before any prefix
+  // strip), both orderings:
+  //   "Apprentice & Journeyman Profession"   (base last)
+  //   "Profession: Apprentice & Journeyman"  (base first, Socialite)
+  // → "Apprentice Profession, Journeyman Profession" (each aliases to "Profession
+  // - <Tier>").
+  let body = text
+    .replace(/\b(Apprentice|Journeyman|Greater|Master)\s*&\s*(Apprentice|Journeyman|Greater|Master)\s+(\w+)/gi,
+      (_, a, b, base) => `${a} ${base}, ${b} ${base}`)
+    .replace(/\b(\w+):\s*(Apprentice|Journeyman|Greater|Master)\s*&\s*(Apprentice|Journeyman|Greater|Master)\b/gi,
+      (_, base, a, b) => `${a} ${base}, ${b} ${base}`);
+  // Strip a leading "Block Title - " / "Block Title: " provenance prefix, but only
+  // when doing so leaves a resolvable first skill (skill names also contain " - ").
+  const pm = body.match(/^(.+?)\s*[-–:]\s+(.+)$/);
+  if (pm) {
+    const firstRaw = (s) => s.split(/\s*,\s*|\s*&\s*/)[0].replace(/x\s*\d+/ig, '').replace(/\(\d+\)/g, '').replace(/\[[^\]]*\]/g, '').trim();
+    if (resolveSkill(firstRaw(pm[2])) && !resolveSkill(firstRaw(body))) body = pm[2];
+  }
+  const parts = body
+    .replace(/\band either\b/gi, ',').replace(/\beither\b/gi, ' ')
+    .replace(/\bone of\b/gi, ',')
+    .split(/\s*,\s*|\s*&\s*|\s+\band\b\s+|\s+\bor\b\s+/i);
+  for (const raw of parts) {
+    const tok = canonicalSkill(raw);
+    if (tok) out.push(tok);
+  }
+  return out;
+}
+
+// Resolve one raw skill token ("Lore: Nature (2)", "Two-Weapon Style (2)",
+// "Bookcaster (1) x 2") to { name (canonical), rank } or null. Re-attaches a
+// parameter captured from "Base: Param" / "Base (Param)" / "Base [Param]" so a
+// parameterized skill (Lore) keeps its subject; normalizes dash spacing as a
+// fallback. The one place a token becomes a canonical {name,rank}, shared by the
+// token scanner and the option-line expander.
+function canonicalSkill(raw) {
+  if (!raw || !raw.trim()) return null;
+  const xm = raw.match(/x\s*(\d+)/i);
+  const rank = xm ? parseInt(xm[1], 10) : 1;
+  const paramM = raw.match(/(?::\s*|\(|\[)\s*([A-Za-z][A-Za-z ]+?)\s*[)\]]?\s*(?:\(\d+\)|x\s*\d+|$)/);
+  let name = raw.replace(/x\s*\d+/ig, '').replace(/\(\d+\)/g, '').replace(/\[[^\]]*\]/g, '')
+    .replace(/\bAND\b/g, ' ').replace(/[()]/g, ' ')
+    .replace(/[:;]+\s*$/, '')      // trailing "Journeyman Profession:" colon
+    .replace(/\s+/g, ' ').trim();
+  let ent = resolveSkill(name);
+  if (!ent) {
+    const normalized = name.replace(/\s*-\s*/g, ' - ');
+    if ((ent = resolveSkill(normalized))) name = normalized;
+  }
+  if (!ent) return null;
+  const base = ent.baseName || ent.name;
+  if (ent.parameter && paramM && paramM[1] && base.toLowerCase() !== paramM[1].trim().toLowerCase()) {
+    // Parameter captured from the raw token ("Lore: Nature" → "Lore (Nature)").
+    name = `${base} (${paramM[1].trim()})`;
+  } else if (ent.parameter && /\(/.test(ent.name)) {
+    // The alias already resolved to a fully-parameterized name ("Ritual Lore" →
+    // "Lore (Ritual)") — use it verbatim.
+    name = ent.name;
+  } else if (!ent.parameter) {
+    name = base;
+  }
+  return { name, rank };
+}
+
+// The suggested Lore areas, DERIVED from the Lore skill's own description prose
+// ("Arcane Lore: …  Historical Lore: …"). Lore is a single parameterized skill;
+// enumerating its areas here gives "Choose a Lore Skill" a real multi-option UI
+// dropdown without stashing a hand-typed copy — the areas come from the doc.
+let _loreOptions = null;
+function loreAreaOptions() {
+  if (_loreOptions) return _loreOptions;
+  const lore = ALL_SKILLS.find((s) => s.name === 'Lore');
+  const areas = lore ? [...String(lore.desc || '').matchAll(/([A-Z][a-z]+)\s+Lore:/g)].map((m) => m[1]) : [];
+  _loreOptions = [...new Set(areas)].map((a) => ({ label: a, skills: [{ name: `Lore (${a})`, rank: 1 }] }));
+  return _loreOptions;
+}
+
+// Expand an INLINE "Choose a <category> Skill" into concrete options from the skill
+// list. Returns { options, fixed } — fixed = non-choice skills sharing the line.
+function expandInlineChoice(line) {
+  const fixed = [];
+  let options = [];
+  if (/choose\s+a\s+lore\s+skill/i.test(line)) {
+    // Lore areas enumerated from the Lore skill's description (see loreAreaOptions).
+    options = loreAreaOptions();
+  } else if (/choose\s+a\s+gathering\s+skill/i.test(line)) {
+    options = ALL_SKILLS.filter((s) => s.cat === 'Gathering' && /\bI\b/.test(s.name))
+      .map((s) => ({ label: s.name, skills: [{ name: s.name, rank: 1 }] }));
+  } else if (/apprentice\s+crafting/i.test(line)) {
+    options = ALL_SKILLS.filter((s) => /^Apprentice /.test(s.name) && s.cat === 'Crafting')
+      .map((s) => ({ label: s.name, skills: [{ name: s.name, rank: 1 }] }));
+  }
+  // Fixed skills riding along after the choice clause (Mage: "…Choose a Lore Skill
+  // (2), Library Use (1), Bookcaster x2"). Drop the bracketed option list first.
+  const tail = line.replace(/\[[^\]]*\]/g, '').replace(/.*choose\b[^,]*?(?:skill|crafting)?\s*(?::|,|$)/i, '');
+  for (const tok of parseSkillTokens(tail)) {
+    if (!options.some((o) => o.skills.some((s) => s.name === tok.name))) fixed.push(tok);
+  }
+  return { options, fixed };
+}
+
+// Pull an EMBEDDED choice out of an otherwise-fixed line. The doc states small
+// either/or choices inline rather than as a header:
+//   "…and either Forage I (3) or Scavenge I (3)"        (Druid)
+//   "Basic Medicine (2) and one of [Bits & Pieces, …]"  (Artisan)
+// Returns { fixedText, options } — fixedText is the line with the choice clause
+// removed; options is the extracted alternatives (empty if none).
+function extractEmbeddedChoice(line) {
+  let m = line.match(/\b(?:and\s+)?one of\s*\[([^\]]*)\]/i);
+  if (m) {
+    const options = m[1].split(/\s*,\s*|\bor\b/i)
+      .map((s) => canonicalSkill(s)).filter(Boolean)
+      .map((t) => ({ label: t.name, skills: [t] }));
+    if (options.length) return { fixedText: line.replace(m[0], ''), options };
+  }
+  m = line.match(/\b(?:and\s+)?either\s+(.+?)\s+or\s+(.+?)(?:$|,)/i);
+  if (m) {
+    const options = [m[1], m[2]]
+      .map((s) => canonicalSkill(s)).filter(Boolean)
+      .map((t) => ({ label: t.name, skills: [t] }));
+    if (options.length >= 2) return { fixedText: line.replace(m[0], ''), options };
+  }
+  return { fixedText: line, options: [] };
+}
+
+// Expand one OPTION line (under a "Choose…" header) into one or more flattened
+// options. Most lines are a single option (their parsed tokens). But a line with a
+// nested sub-choice — a tier-distributed bracket ("Apprentice Crafting: [Alchemy,
+// Enchanting, …]") or "<fixed> and one of [a, b, c]" — becomes several options, one
+// per alternative, each combining the line's fixed tokens with that alternative.
+// `baseToks` are the already-parsed non-bracket tokens of the line.
+function expandOptionLine(line, baseToks) {
+  // Tier-distributed bracket: "Apprentice Crafting: [Alchemy, (Ritual Magic AND
+  // Ritual Lore), Enchanting, or Tinkering]" → one option per crafting discipline.
+  const br = line.match(/\b(Apprentice|Journeyman|Greater|Master)\b[^[]*\[([^\]]*)\]/i);
+  if (br) {
+    const tier = br[1];
+    const opts = [];
+    for (const raw of br[2].split(/\s*,\s*|\bor\b/i)) {
+      const inner = raw.replace(/[()]/g, ' ').replace(/\bAND\b/gi, ',');
+      // An alternative may itself be a combo ("Ritual Magic AND Ritual Lore").
+      const skills = [];
+      for (const piece of inner.split(/\s*,\s*/)) {
+        // Try the tier-prefixed form ("Apprentice Alchemy") first, then the bare
+        // piece ("Ritual Lore" → Lore (Ritual)) — both via the canonical resolver.
+        const tok = canonicalSkill(`${tier} ${piece.trim()}`) || canonicalSkill(piece.trim());
+        if (tok) skills.push(tok);
+      }
+      if (skills.length) opts.push({ label: skills.map((s) => s.name).join(', '), skills });
     }
-  ],
-  Cleric: [
-    {
-      id: "clericService",
-      label: "The Means of Service",
-      options: [
-        { label: "Short Weapons", skills: ["Short Weapons"] },
-        { label: "Extended Capacity - Novice", skills: ["Extended Capacity - Novice"] },
-        { label: "Basic Medicine, Diagnose", skills: ["Basic Medicine", "Diagnose"] }
-      ]
-    },
-    {
-      id: "clericStudy",
-      label: "Divine Study",
-      options: [
-        { label: "Extended Capacity- Novice x2", skills: [{ name: "Extended Capacity - Novice", rank: 2 }] },
-        { label: "Additional Cantrip", skills: ["Additional Cantrip"] },
-        { label: "Bookcaster x3, Peacecaster", skills: ["Bookcaster", "Bookcaster", "Bookcaster", "Peacecaster"] },
-        { label: "Basic Shields, Advanced Shields", skills: ["Basic Shields", "Advanced Shields"] }
-      ]
+    if (opts.length) return opts;
+  }
+  // "<fixed> and one of [a, b, c]" → one option per bracket item, each plus fixed.
+  const oneOf = line.match(/\bone of\s*\[([^\]]*)\]/i);
+  if (oneOf) {
+    const opts = [];
+    for (const raw of oneOf[1].split(/\s*,\s*|\bor\b/i)) {
+      const tok = canonicalSkill(raw);
+      if (tok) opts.push({ label: [...baseToks.map((t) => t.name), tok.name].join(', '),
+        skills: [...baseToks, tok] });
     }
-  ],
-  Druid: [
-    {
-      id: "druidSurvival",
-      label: "Gathering Choice",
-      options: [
-        { label: "Forage I", skills: ["Forage I"] },
-        { label: "Scavenge I", skills: ["Scavenge I"] }
-      ]
-    },
-    {
-      id: "druidBuddingWisdom",
-      label: "Budding Wisdom",
-      options: [
-        { label: "Extended Capacity - Novice, Lore (Nature)", skills: ["Extended Capacity - Novice", "Lore (Nature)"] },
-        { label: "Short Weapons, Two Weapon Style", skills: ["Short Weapons", "Two Weapon Style"] },
-        { label: "Peacecaster, Basic Medicine", skills: ["Peacecaster", "Basic Medicine"] }
-      ]
+    if (opts.length) return opts;
+  }
+  // Inline "A or B, C" within an option line → "(A | B) + C": the doc's Rogue line
+  // "Basic Lock Skill or Basic Trap Skill, Poisoner" is two options (Locks+Poisoner,
+  // Traps+Poisoner), NOT one all-of. Split the alternatives from the shared rest.
+  const orM = line.match(/^(.*?\S)\s+or\s+(\S.*)$/i);
+  if (orM && !/\[/.test(line)) {
+    // Left side's last skill + right side's first skill are the alternatives; any
+    // remaining comma-separated skills are shared by both options.
+    const leftToks = parseSkillTokens(orM[1]);
+    const rightParts = orM[2].split(/\s*,\s*/);
+    const altTok = canonicalSkill(rightParts[0]);
+    const sharedToks = rightParts.slice(1).flatMap((p) => parseSkillTokens(p));
+    if (leftToks.length && altTok) {
+      const lastLeft = leftToks[leftToks.length - 1];
+      const common = [...leftToks.slice(0, -1), ...sharedToks];
+      const mk = (alt) => ({ label: [...common, alt].map((t) => t.name).join(', '), skills: [...common, alt] });
+      return [mk(lastLeft), mk(altTok)];
     }
-  ],
-  Fighter: [
-    {
-      id: "fighterCombatPath",
-      label: "The Path of Combat",
-      options: [
-        { label: "Projectile Weapons, Lore (Historical)", skills: ["Projectile Weapons", "Lore (Historical)"] },
-        { label: "Short Weapons, Advanced Shields", skills: ["Short Weapons", "Advanced Shields"] },
-        { label: "Short Weapons, Two Weapon Style", skills: ["Short Weapons", "Two Weapon Style"] },
-        { label: "Great Weapons", skills: ["Great Weapons"] }
-      ]
+  }
+  // Plain option: its parsed tokens are the one option.
+  return [{ label: baseToks.map((t) => t.name).join(', '), skills: baseToks }];
+}
+
+// Structure one class's raw startingSkills lines into { fixed, choices }.
+function deriveStartingSkills(className) {
+  const cls = classesJson.find((c) => c.name === className);
+  const fixed = [];
+  const choices = [];
+  if (!cls?.startingSkills) return { fixed, choices };
+  let current = null; // an open choice block awaiting option lines
+  for (const line of cls.startingSkills) {
+    if (/^Note:/i.test(line.trim())) continue;
+    if (isChoiceHeader(line)) {
+      current = { id: slugId(choiceLabel(line)), label: choiceLabel(line), options: [] };
+      choices.push(current);
+      continue;
     }
-  ],
-  Rogue: [
-    {
-      id: "rogueSpecialty",
-      label: "Up to No Good",
-      options: [
-        { label: "Short Weapons, Scavenge I", skills: ["Short Weapons", "Scavenge I"] },
-        { label: "Fence, Lore (Shadow), Profession - Apprentice", skills: ["Fence", "Lore (Shadow)", "Profession - Apprentice"] },
-        { label: "Basic Locks, Poisoner", skills: ["Basic Locks", "Poisoner"] },
-        { label: "Basic Traps, Poisoner", skills: ["Basic Traps", "Poisoner"] },
-        { label: "Connections, Lore (Shadow), Contact", skills: ["Connections", "Lore (Shadow)", "Contact"] }
-      ]
+    if (hasInlineChoose(line)) {
+      const { options, fixed: tail } = expandInlineChoice(line);
+      if (options.length) choices.push({ id: slugId(choiceLabel(line)), label: choiceLabel(line), options });
+      fixed.push(...tail);
+      current = null;
+      continue;
     }
-  ],
-  Socialite: [
-    {
-      id: "socialiteLore",
-      label: "Old Secrets",
-      options: [
-        { label: "Historical", skills: ["Lore (Historical)"] },
-        { label: "Arcane", skills: ["Lore (Arcane)"] },
-        { label: "Nature", skills: ["Lore (Nature)"] },
-        { label: "Noble", skills: ["Lore (Noble)"] },
-        { label: "Religious", skills: ["Lore (Religious)"] },
-        { label: "Shadow", skills: ["Lore (Shadow)"] },
-        { label: "Ritual", skills: ["Lore (Ritual)"] }
-      ]
-    },
-    {
-      id: "socialiteOpportunities",
-      label: "Opportunities Abound",
-      options: [
-        { label: "Fence & Contact", skills: ["Fence", "Contact"] },
-        { label: "Title & Minor Fame", skills: ["Title", "Minor Fame"] },
-        { label: "Short Weapons & Connections", skills: ["Short Weapons", "Connections"] }
-      ]
+    const { fixedText, options: embedded } = extractEmbeddedChoice(line);
+    const toks = parseSkillTokens(fixedText);
+    if (current) {
+      // An option line may itself carry a nested sub-choice — a bracketed list
+      // ("Apprentice Crafting: [Alchemy, …]") or "one of [perks]". Flatten each
+      // alternative into its own top-level option (matching how the UI presents
+      // the block), so e.g. Artisan's "A Path Unfolds" offers each crafting and
+      // each medicine-perk pairing directly.
+      for (const opt of expandOptionLine(line, toks)) current.options.push(opt);
+    } else {
+      fixed.push(...toks);
+      if (embedded.length) {
+        const label = choiceLabel(line) === 'Choose' ? 'Gathering Choice' : choiceLabel(line);
+        choices.push({ id: slugId(label), label, options: embedded });
+      }
     }
-  ],
-  Sourcerer: [
-    {
-      id: "sourcererContract",
-      label: "The Contract With the Other",
-      options: [
-        { label: "Extended Capacity - Novice x2", skills: [{ name: "Extended Capacity - Novice", rank: 2 }] },
-        { label: "Additional Cantrip", skills: ["Additional Cantrip"] },
-        { label: "Patron, Gift of Hateful Retribution", skills: ["Patron", "Gift of Hateful Retribution"] }
-      ]
-    }
-  ],
-  Artisan: [
-    {
-      id: "artisanProductive",
-      label: "Productive Equipment",
-      options: [
-        { label: "Apprentice Alchemy", skills: ["Apprentice Alchemy"] },
-        { label: "Apprentice Enchanting", skills: ["Apprentice Enchanting"] },
-        { label: "Apprentice Tinkering", skills: ["Apprentice Tinkering"] },
-        { label: "Apprentice Ritual Magic & Lore (Ritual)", skills: ["Apprentice Ritual Magic", "Lore (Ritual)"] }
-      ]
-    },
-    {
-      id: "artisanGathering",
-      label: "The Land Provides",
-      options: [
-        { label: "Forage I", skills: ["Forage I"] },
-        { label: "Prospect I", skills: ["Prospect I"] },
-        { label: "Scavenge I", skills: ["Scavenge I"] }
-      ]
-    },
-    {
-      id: "artisanPath",
-      label: "A Path Unfolds",
-      options: [
-        { label: "Apprentice & Journeyman Profession", skills: ["Profession - Apprentice", "Profession - Journeyman"] },
-        { label: "Apprentice Crafting (Alchemy)", skills: ["Apprentice Alchemy"] },
-        { label: "Apprentice Crafting (Enchanting)", skills: ["Apprentice Enchanting"] },
-        { label: "Apprentice Crafting (Tinkering)", skills: ["Apprentice Tinkering"] },
-        { label: "Apprentice Crafting (Ritual)", skills: ["Apprentice Ritual Magic", "Lore (Ritual)"] },
-        { label: "Basic Medicine & Hearth", skills: ["Basic Medicine", "Hearth"] },
-        { label: "Basic Medicine & Bits and Pieces", skills: ["Basic Medicine", "Bits and Pieces"] },
-        { label: "Basic Medicine & Soothing Touch", skills: ["Basic Medicine", "Soothing Touch"] }
-      ]
-    }
-  ]
-};
+  }
+  return { fixed, choices };
+}
+
+const DERIVED = Object.fromEntries(
+  classesJson.filter((c) => c.startingSkills).map((c) => [c.name, deriveStartingSkills(c.name)])
+);
+
+// The class's fixed starting skills (granted regardless of choice blocks), derived
+// from the parsed MegaDoc. Shape: [{ name, rank }].
+export const BASE_STARTING_SKILLS = Object.fromEntries(
+  Object.entries(DERIVED).map(([cls, d]) => [cls, d.fixed])
+);
+
+// Per-class "choose one" blocks, derived from the parsed MegaDoc. Each block:
+// { id, label, options:[{ label, skills:[{name,rank}] }] }.
+export const STARTING_CHOICES_CONFIG = Object.fromEntries(
+  Object.entries(DERIVED).map(([cls, d]) => [cls, d.choices])
+);
 
 // Does this class have any starting-choice blocks?
 export function hasStartingChoices(className) {

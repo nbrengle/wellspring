@@ -694,6 +694,23 @@ test('every starting-choice config skill resolves to an entity', () => {
   }
 });
 
+// ── Helpers: resolve a block's id / an option's label from the live (derived)
+// config by CONTENT, so these tests assert on behavior (the right option is
+// chosen, swaps work) without hardcoding derived ids/labels that change when the
+// derivation does. `blockBy` finds a block whose any option grants `skillName`;
+// `optLabel` finds the label of the option in that block granting `skillName`.
+const _blockBy = (cls, skillName) =>
+  (STARTING_CHOICES_CONFIG[cls] || []).find((b) =>
+    b.options.some((o) => o.skills.some((s) => (typeof s === 'string' ? s : s.name).includes(skillName))));
+const blockId = (cls, skillName) => _blockBy(cls, skillName)?.id;
+const optLabel = (cls, skillName) => {
+  const b = _blockBy(cls, skillName);
+  return b?.options.find((o) => o.skills.some((s) => (typeof s === 'string' ? s : s.name).includes(skillName)))?.label;
+};
+// Build a startingChoices object selecting, per (skillName), the option granting it.
+const choicesFor = (cls, ...skillNames) =>
+  Object.fromEntries(skillNames.map((n) => [blockId(cls, n), optLabel(cls, n)]).filter(([id]) => id));
+
 // Structural integrity: every configured class is real, block ids are unique, and
 // option labels within a block are unique (labels key the recorded choice + drive
 // the dropdown, so collisions would make a choice ambiguous).
@@ -774,41 +791,50 @@ function validityFlags(r) {
 // subject. But a player-chosen value on a PLACEHOLDER grant ("(your choice)")
 // must survive a rebuild triggered by an unrelated choice.
 test('switching a parameterized choice updates the subject; player picks survive', () => {
+  const loreBlock = blockId('Mage', 'Lore');
   const mage = (lore) => rebuildStartingSkills({ classes: [{ name: 'Mage', level: 4 }] }, 'Mage',
-    { startingLore: lore, magicalSpecialty: 'Additional Cantrip' });
+    { [loreBlock]: lore, ...choicesFor('Mage', 'Additional Cantrip') });
   let c = mage('Historical');
   ok(c.startingSkills.includes('Lore (Historical)'), 'starts Historical');
-  c = rebuildStartingSkills(c, 'Mage', { ...c.startingChoices, startingLore: 'Arcane' });
+  c = rebuildStartingSkills(c, 'Mage', { ...c.startingChoices, [loreBlock]: 'Arcane' });
   ok(c.startingSkills.includes('Lore (Arcane)'), 'updates to Arcane');
   ok(!c.startingSkills.includes('Lore (Historical)'), 'old subject dropped');
 
   // Druid's base "Profession - Apprentice (your choice)" is a placeholder; a
   // player setting it to (Smith) must survive an unrelated survival-choice swap.
+  const survBlock = blockId('Druid', 'Forage I');
   let d = rebuildStartingSkills({ classes: [{ name: 'Druid', level: 4 }] }, 'Druid',
-    { druidSurvival: 'Forage I', druidBuddingWisdom: 'Peacecaster, Basic Medicine' });
+    { [survBlock]: 'Forage I', ...choicesFor('Druid', 'Peacecaster') });
   const pi = d.startingSkills.findIndex((s) => /^Profession - Apprentice/.test(s));
   d.startingSkills[pi] = 'Profession - Apprentice (Smith)';
-  d = rebuildStartingSkills(d, 'Druid', { ...d.startingChoices, druidSurvival: 'Scavenge I' });
+  d = rebuildStartingSkills(d, 'Druid', { ...d.startingChoices, [survBlock]: 'Scavenge I' });
   ok(d.startingSkills.includes('Profession - Apprentice (Smith)'), 'player profession pick preserved');
 });
 
 // Reconcile resolves the implicit choice for every block of every archetype (no
 // block left at an arbitrary default when the skills actually determine it).
 test('reconcile picks a concrete option for each archetype choice block', () => {
+  // Each expectation: archetype → [skill that the chosen option must grant]. The
+  // block id and the expected option label are looked up from the live config, so
+  // we assert "reconcile selected the option granting this skill" without pinning
+  // derived ids/labels.
   const expectations = {
-    'Healer Druid': { druidSurvival: 'Forage I', druidBuddingWisdom: 'Peacecaster, Basic Medicine' },
-    'Form Fighter Druid': { druidSurvival: 'Scavenge I', druidBuddingWisdom: 'Extended Capacity - Novice, Lore (Nature)' },
-    'Utility Mage': { magicalSpecialty: 'Extended Capacity - Novice x2' },
+    'Healer Druid': ['Forage I', 'Peacecaster'],
+    'Form Fighter Druid': ['Scavenge I', 'Lore (Nature)'],
+    'Utility Mage': ['Extended Capacity - Novice'],
     // Artisan has THREE blocks; the shared-skill assignment must not collide
     // (Productive=Enchanting, Path=Ritual — not both claiming the same skill).
-    'Mystic Artisan': { artisanProductive: 'Apprentice Enchanting', artisanPath: 'Apprentice Crafting (Ritual)' },
-    'Artificer Artisan': { artisanProductive: 'Apprentice Tinkering', artisanPath: 'Apprentice & Journeyman Profession' },
+    'Mystic Artisan': ['Apprentice Enchanting', 'Lore (Ritual)'],
+    'Artificer Artisan': ['Apprentice Tinkering', 'Profession - Journeyman'],
   };
-  for (const [name, want] of Object.entries(expectations)) {
+  for (const [name, skills] of Object.entries(expectations)) {
     const a = ARCHETYPES.find((x) => x.name === name);
-    const choices = reconcileStartingChoices(fromArchetype(a), getClasses(a)[0].name);
-    for (const [id, label] of Object.entries(want)) {
-      eq(choices[id], label, `${name}.${id}`);
+    const cls = getClasses(a)[0].name;
+    const choices = reconcileStartingChoices(fromArchetype(a), cls);
+    for (const skill of skills) {
+      const id = blockId(cls, skill);
+      ok(id, `${name}: a block grants ${skill}`);
+      eq(choices[id], optLabel(cls, skill), `${name}: chose the option granting ${skill}`);
     }
   }
 });
@@ -817,13 +843,14 @@ test('reconcile picks a concrete option for each archetype choice block', () => 
 // the new option's arrive. (Uses a from-scratch Druid so no PURCHASED skill
 // depends on the swapped-away option — see the prereq-cascade note below.)
 test('changing a Druid choice swaps its granted skills', () => {
+  const wisdomBlock = blockId('Druid', 'Peacecaster');
   const blank = rebuildStartingSkills(
     { classes: [{ name: 'Druid', level: 4 }] }, 'Druid',
-    { druidSurvival: 'Forage I', druidBuddingWisdom: 'Peacecaster, Basic Medicine' });
+    { ...choicesFor('Druid', 'Forage I', 'Peacecaster') });
   ok(blank.startingSkills.some((s) => bareSkill(cleanItemName(s)) === 'Peacecaster'), 'starts with Peacecaster');
 
   const swapped = rebuildStartingSkills(blank, 'Druid',
-    { ...blank.startingChoices, druidBuddingWisdom: 'Short Weapons, Two Weapon Style' });
+    { ...blank.startingChoices, [wisdomBlock]: optLabel('Druid', 'Two Weapon Style') });
   const names = swapped.startingSkills.map((s) => bareSkill(cleanItemName(s)));
   ok(names.includes('Short Weapons') && names.includes('Two Weapon Style'), 'gains the new option');
   ok(!names.includes('Peacecaster') && !names.includes('Basic Medicine'), 'drops the old option');
@@ -836,8 +863,9 @@ test('changing a Druid choice swaps its granted skills', () => {
 test('swapping away a depended-on specialty skill surfaces the broken prereq', () => {
   const base = loadWithChoices(ARCHETYPES.find((x) => x.name === 'Healer Druid'));
   ok(validate(base).valid, 'archetype starts legal');
+  const wisdomBlock = blockId('Druid', 'Peacecaster');
   const swapped = rebuildStartingSkills(base, 'Druid',
-    { ...base.startingChoices, druidBuddingWisdom: 'Short Weapons, Two Weapon Style' });
+    { ...base.startingChoices, [wisdomBlock]: optLabel('Druid', 'Two Weapon Style') });
   const r = validate(swapped);
   ok(!r.valid, 'illegal after dropping Basic Medicine');
   ok(r.prereqs.issues.some((i) => i.item === 'Diagnose'), 'Diagnose prereq flagged');
@@ -849,8 +877,11 @@ test('rebuild tags granted skills with their choice-block provenance', () => {
   const a = ARCHETYPES.find((x) => x.name === 'Healer Druid');
   const c = loadWithChoices(a);
   const sources = Object.values(c.specialtySources || {});
-  ok(sources.includes('Budding Wisdom'), 'Budding Wisdom grant tagged');
-  ok(sources.includes('Gathering Choice'), 'Gathering Choice grant tagged');
+  // Labels are derived from the doc's block titles; look them up rather than pin.
+  const wisdomLabel = _blockBy('Druid', 'Peacecaster')?.label;
+  const survivalLabel = _blockBy('Druid', 'Forage I')?.label;
+  ok(sources.includes(wisdomLabel), `${wisdomLabel} grant tagged`);
+  ok(sources.includes(survivalLabel), `${survivalLabel} grant tagged`);
   // A FIXED base grant (Basic Faith) carries no specialty tag.
   const faithIdx = c.startingSkills.findIndex((s) => bareSkill(cleanItemName(s)) === 'Basic Faith');
   ok(faithIdx >= 0 && !c.specialtySources[faithIdx], 'fixed base grant is untagged');
@@ -861,7 +892,7 @@ test('rebuild tags granted skills with their choice-block provenance', () => {
 // though free class grants carry no per-item cost entry to read the rank from.
 test('granted "x2" specialty skill records rank 2 on a single row', () => {
   const c = rebuildStartingSkills({ classes: [{ name: 'Mage', level: 4 }] }, 'Mage',
-    { startingLore: 'Historical', magicalSpecialty: 'Extended Capacity - Novice x2' });
+    { [blockId('Mage', 'Lore')]: 'Historical', ...choicesFor('Mage', 'Extended Capacity - Novice') });
   const idxs = c.startingSkills
     .map((s, i) => ({ i, base: bareSkill(cleanItemName(s)) }))
     .filter((x) => x.base === 'Extended Capacity - Novice');
@@ -884,7 +915,7 @@ test('buying a granted skill above its free floor bills only the excess', () => 
     return { ...c, ranks: { ...ranks, [field]: list } };
   };
   let c = rebuildStartingSkills({ classes: [{ name: 'Mage', level: 4 }] }, 'Mage',
-    { startingLore: 'Historical', magicalSpecialty: 'Extended Capacity - Novice x2' });
+    { [blockId('Mage', 'Lore')]: 'Historical', ...choicesFor('Mage', 'Extended Capacity - Novice') });
   const i = c.startingSkills.findIndex((s) => /Extended Capacity/.test(s));
   eq(c.grantedRanks[i], 2, 'free floor is 2');
 
