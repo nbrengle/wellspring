@@ -1161,7 +1161,6 @@ function ArchetypePicker({ onPick, onStartBlank }) {
                 <span className="b-archetype-tagline">{a.tagline}</span>
                 <span className="b-archetype-meta">
                   {a.specialization && <Tag label={a.specialization} tone="amber" />}
-                  <span className="b-archetype-stats">LP {a.lifePoints} · Sp {a.spikes}</span>
                 </span>
               </button>
             ))}

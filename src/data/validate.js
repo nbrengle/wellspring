@@ -1330,6 +1330,10 @@ const STAT_PATTERNS = [
   { stat: 'lifePoints', re: /(?:\+?(\d+)|\bone)\s+(?:maximum\s+)?Life\s+Points?\s+to\s+(?:their\s+)?max(?:imum)?/gi },
   { stat: 'lifePoints', re: /(?:additional\s+)?(?:\+?(\d+)|\bone)\s+maximum\s+Life\s+Points?/gi },
   { stat: 'lifePoints', re: /(?:adds?|gains?)\s+(?:\+?(\d+)|\bone)\s+Life\s+Points?\s+to\s+(?:their\s+)?max(?:imum)?/gi },
+  // "+1 Base Maximum Life Points" — class progression-bonus phrasing.
+  { stat: 'lifePoints', re: /\+\s*(\d+)\s+(?:Base\s+)?Maximum\s+Life\s+Points?/gi },
+  // "Base Maximum Life Points is increased by one/N" (Healthy and similar skills).
+  { stat: 'lifePoints', re: /(?:Base\s+)?Maximum\s+Life\s+Points?\s+(?:is|are)\s+increased\s+by\s+(?:\+?(\d+)|\bone)/gi },
   // "gain N Natural Armor" / "N points of Natural Armor" / "increases to N" (Natural Armor)
   { stat: 'naturalArmor', re: /(?:gains?|grant(?:ing|s)?)\s+(?:\+?(\d+)|\bone|three|two)\s+(?:points?\s+of\s+)?Natural\s+Armor/gi },
   { stat: 'naturalArmor', re: /(\d+)\s+points?\s+of\s+Natural\s+Armor/gi },
@@ -1347,8 +1351,13 @@ function statMods(character) {
   // phrasings of the same boost (Toughness says it two ways), so summing every
   // pattern hit would multi-count one boost. One entity → at most one boost per
   // stat (none in the source grant two of the same stat).
-  const scan = (name, text) => {
+  const scan = (name, text, tags) => {
     if (!text) return;
+    // Druid Form spells (tagged "Form") grant LP/armor only WHILE transformed
+    // ("+1 Maximum Life Points while in the Lesser Form…") — a temporary state,
+    // not a permanent build-stat. Skip their stat boosts so they don't inflate
+    // the rail's Life Points / Armor.
+    if (tags && tags.includes('Form')) return;
     const seen = new Set();
     for (const { stat, re } of STAT_PATTERNS) {
       if (seen.has(stat)) continue;
@@ -1380,32 +1389,61 @@ function statMods(character) {
   }
   // Owned/selected powers (innate-at-level + slotted).
   for (const { name: cls } of getClasses(character)) {
-    for (const p of (CLASS_POWERS[cls]?.innate || [])) scan(p.name, p.description);
+    for (const p of (CLASS_POWERS[cls]?.innate || [])) scan(p.name, p.description, p.tags);
   }
   for (const field of POWER_SOURCE_FIELDS) {
     for (const item of (character[field] || [])) {
-      const e = lookupEntity(`powers:${cleanItemName(item)}`); scan(e?.name || item, e?.description);
+      const e = lookupEntity(`powers:${cleanItemName(item)}`); scan(e?.name || item, e?.description, e?.tags);
+    }
+  }
+  // Per-class progression bonuses, level-gated. The "Class Bonuses" column carries
+  // stat boosts as prose ("+1 Base Maximum Life Points" at Fighter L2 / Cleric L7).
+  // These are automatic at the gating level, so apply each row up to the class's
+  // current level. (The base level-table LP is the CLASSLESS baseline — these
+  // class bonuses stack on top; see levelStats.)
+  for (const { name: cls, level: clsLevel } of getClasses(character)) {
+    const prog = CLASS_PROGRESSION[cls] || {};
+    for (let lvl = 1; lvl <= clsLevel; lvl++) {
+      const bonus = prog[lvl]?.bonus;
+      if (bonus) scan(`${cls} L${lvl}`, bonus);
+    }
+  }
+  // Owned Class skills and other purchased skills (Healthy: "Base Maximum Life
+  // Points is increased by one"). These aren't in POWER_SOURCE_FIELDS, so scan
+  // them via their resolved skill/power entity description.
+  for (const field of ['classSkills', 'purchasedSkills', 'startingSkills']) {
+    for (const item of (character[field] || [])) {
+      const e = lookupEntity(`skills:${cleanItemName(item)}`)
+        || lookupEntity(`powers:${cleanItemName(item)}`)
+        || lookupEntity(resolveId(item, field, character));
+      if (e) scan(e.name, e.description);
     }
   }
   return { ...mods, sources, notes };
 }
 
-// Base character stats. Life Points and Spikes come straight from the level table
-// for the character's level (the rules' baseline). An authored sheet may store an
-// explicit value that already bakes in bonuses — when present, honor it as the
-// base. Numeric power/perk/lineage modifiers are layered on top (statMods).
+// Base character stats. Life Points and Spikes come from the level table for the
+// character's total level — the CLASSLESS rules baseline ("starting level 4
+// characters will have 3 LP"). Per-class progression bonuses (Fighter L2 / Cleric
+// L7 "+1 Base Maximum Life Points") and skill/perk/lineage boosts are layered on
+// top via statMods, NOT baked into the base — so the displayed total updates as
+// the character levels and buys those abilities. (Authored archetype sheets store
+// a final LP that already equals base+bonuses; we recompute from the rules rather
+// than trust the stored number, which keeps blank builds and archetypes
+// consistent. The 14 shipped archetypes all reproduce their authored LP this way.)
 // Returns { lifePoints, spikes, baseLifePoints, baseSpikes, mods } so the UI can
 // show the total and explain it.
 function levelStats(character) {
   const level = characterLevel(character);
+  const minRow = LEVEL_TABLE[0];
+  const maxRow = LEVEL_TABLE[LEVEL_TABLE.length - 1];
+  // Clamp to the documented range: below L4 use the L4 baseline (LP barely scales
+  // and the table starts at 4); above the table, hold the top row.
   const row = LEVEL_TABLE.find((r) => r.level === level)
-    || LEVEL_TABLE.find((r) => r.level === Math.min(level, LEVEL_TABLE[LEVEL_TABLE.length - 1].level))
-    || {};
-  // Base from the table; an explicit stored value (authored sheet) overrides it.
-  const storedLp = parseInt(String(character.lifePoints), 10);
-  const storedSp = parseInt(String(character.spikes), 10);
-  const baseLp = Number.isNaN(storedLp) ? (row.lp ?? 0) : storedLp;
-  const baseSp = Number.isNaN(storedSp) ? (row.spikes ?? 0) : storedSp;
+    || (level < minRow.level ? minRow : maxRow);
+
+  const baseLp = row.lp ?? 0;
+  const baseSp = row.spikes ?? 0;
 
   const mods = statMods(character);
   return {

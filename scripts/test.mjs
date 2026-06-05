@@ -511,14 +511,38 @@ test('a power that grants a sub-power surfaces it as a free granted ability', ()
 });
 
 // ─── base stats from the level table + numeric power/perk/lineage mods ────────
-test('base Life Points / Spikes come from the level table', () => {
+test('base Life Points / Spikes come from the level table (classless baseline)', () => {
+  // Base LP is the classless table value; class progression bonuses layer on top.
   const s4 = validate({ classLevels: 'Fighter 4' }).stats;
-  eq(s4.lifePoints, 3, 'L4 = 3 LP'); eq(s4.spikes, 2, 'L4 = 2 spikes');
+  eq(s4.baseLifePoints, 3, 'L4 base = 3 LP'); eq(s4.spikes, 2, 'L4 = 2 spikes');
+  // Fighter's L2 "+1 Base Maximum Life Points" applies → total 4 at L4.
+  eq(s4.lifePoints, 4, 'L4 Fighter total = 3 base + 1 (Fighter L2 bonus)');
   const s10 = validate({ classLevels: 'Fighter 10' }).stats;
-  eq(s10.lifePoints, 4, 'L10 = 4 LP'); eq(s10.spikes, 3, 'L10 = 3 spikes');
+  eq(s10.baseLifePoints, 4, 'L10 base = 4 LP'); eq(s10.spikes, 3, 'L10 = 3 spikes');
+  eq(s10.lifePoints, 5, 'L10 Fighter total = 4 base + 1');
+});
+test('class progression LP bonus applies and is level-gated', () => {
+  // Fighter L2 grants +1 Base Maximum LP; below L2 it should NOT apply.
+  eq(validate({ classes: [{ name: 'Fighter', level: 1 }] }).stats.lifePoints, 3, 'L1 = 3 (no bonus yet)');
+  eq(validate({ classes: [{ name: 'Fighter', level: 2 }] }).stats.lifePoints, 4, 'L2 = 4 (bonus applies)');
+  // Cleric gets its +1 at L7, not before.
+  eq(validate({ classes: [{ name: 'Cleric', level: 6 }] }).stats.lifePoints, 4, 'Cleric L6 = 4 (table, no bonus)');
+  eq(validate({ classes: [{ name: 'Cleric', level: 7 }] }).stats.lifePoints, 5, 'Cleric L7 = 4 + 1 bonus');
+});
+test('Healthy class skill adds +1 max Life Point', () => {
+  const without = validate({ classes: [{ name: 'Fighter', level: 6 }] }).stats.lifePoints;
+  const withH = validate({ classes: [{ name: 'Fighter', level: 6 }], classSkills: ['Healthy'] }).stats;
+  eq(withH.lifePoints, without + 1, 'Healthy adds +1 LP');
+  ok(withH.mods.sources.some((s) => s.name === 'Healthy' && s.stat === 'lifePoints'), 'Healthy is a recorded LP source');
+});
+test('Druid Form spells do not inflate permanent Life Points', () => {
+  // "Lesser Form of the Hulking Bear" grants +1 LP only WHILE transformed (tag: Form).
+  const s = validate({ classes: [{ name: 'Druid', level: 4 }], noviceSpells: ['Lesser Form of the Hulking Bear'] }).stats;
+  eq(s.lifePoints, 3, 'Druid L4 stays 3 — form LP is conditional, not a build stat');
 });
 test('Toughness adds +1 max Life Point (counted once, not per phrasing)', () => {
-  const s = validate({ classLevels: 'Fighter 4', purchasedPerks: ['Toughness'] }).stats;
+  // Druid L4 has no class LP bonus, so this isolates the perk's single +1.
+  const s = validate({ classLevels: 'Druid 4', purchasedPerks: ['Toughness'] }).stats;
   eq(s.baseLifePoints, 3, 'base 3'); eq(s.lifePoints, 4, '3 + 1');
   eq(s.mods.sources.filter((x) => x.name === 'Toughness').length, 1, 'one source, no double-count');
 });
