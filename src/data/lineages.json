@@ -131,7 +131,8 @@
         "repped": false,
         "tags": [],
         "sublineage": "General",
-        "description": "The potent reserves of the Aewen allow them to call on the Arcane more frequently than other lineages. The Aewen gains an additional spell-slot of their highest level spell-slot."
+        "description": "The potent reserves of the Aewen allow them to call on the Arcane more frequently than other lineages. The Aewen gains an additional spell-slot of their highest level spell-slot.",
+        "highestSlot": true
       },
       {
         "name": "Arcane Aptitude",
