@@ -1190,6 +1190,32 @@ export function spellSlots(character) {
   return total;
 }
 
+// Spells a Bookcaster can select. Per the rules, Bookcaster "selects one spell
+// from any spell list they have access to through their classes, of a Tier they
+// would normally be able to access." So: every spell on the character's caster
+// classes' Novice/Adept/Greater lists, restricted to the tiers the character
+// actually has a spell-slot for. Returns a flat, de-duped, sorted name list
+// (used to drive the Bookcaster parameter picker). Empty for non-casters.
+const BOOKCASTER_TIER_FIELD = { novice: 'noviceSpells', adept: 'adeptSpells', greater: 'greaterSpells' };
+export function bookcasterSpellOptions(character) {
+  const casters = getClasses(character).filter((c) => SPELLCASTERS.has(c.name));
+  if (!casters.length) return [];
+  const slots = spellSlots(character) || { novice: 0, adept: 0, greater: 0 };
+  const accessibleTiers = Object.keys(BOOKCASTER_TIER_FIELD).filter((t) => (slots[t] || 0) > 0);
+  const names = new Set();
+  for (const { name: cls } of casters) {
+    const byTier = CLASS_POWERS[cls];
+    if (!byTier) continue;
+    for (const tier of accessibleTiers) {
+      for (const sp of (byTier[BOOKCASTER_TIER_FIELD[tier]] || [])) {
+        // Skip placeholder rows the parser emits for undocumented tiers.
+        if (sp?.name && !/^(Adept|Greater)\s+\w+\s+Power$/i.test(sp.name)) names.add(sp.name);
+      }
+    }
+  }
+  return [...names].sort((a, b) => a.localeCompare(b));
+}
+
 // Default starting Wealth (MegaDoc: "all characters start with 8 Wealth").
 export const DEFAULT_WEALTH = 8;
 
@@ -1491,6 +1517,7 @@ export function validate(character) {
   const spend = computeSpend(character);
   const slots = computeSlots(character);
   const spellSlotCounts = spellSlots(character);
+  const bookcasterOptions = bookcasterSpellOptions(character);
   const stats = levelStats(character);
   const wealth = wealthState(character);
   const devotion = devotionState(character);
@@ -1535,6 +1562,7 @@ export function validate(character) {
     slots,
     slotsOver,
     spellSlots: spellSlotCounts,
+    bookcasterOptions,
     stats,
     wealth,
     devotion,

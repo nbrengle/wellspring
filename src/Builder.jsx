@@ -40,7 +40,9 @@ const PARAMETER_SUGGESTIONS = {
   "Profession - Journeyman": ["Smith", "Carpenter", "Tailor", "Mason", "Hunter", "Scribe", "Herbalist", "Undertaker", "Merchant", "Charlatan", "Chirurgeon", "Teacher", "Soldier", "Sailor", "Wagoneer"],
   "Profession - Master": ["Smith", "Carpenter", "Tailor", "Mason", "Hunter", "Scribe", "Herbalist", "Undertaker", "Merchant", "Charlatan", "Chirurgeon", "Teacher", "Soldier", "Sailor", "Wagoneer"],
   "Chronic Hobbyist": ["Cooking", "Brewing", "Gardening", "Smith", "Carpenter", "Tailor", "Mason", "Hunter", "Scribe", "Herbalist", "Undertaker", "Merchant", "Charlatan", "Chirurgeon", "Teacher", "Soldier", "Sailor", "Wagoneer"],
-  "Bookcaster": ["Magekey", "Mask Aura", "Identify", "Cancel", "Stop", "Mageskin"],
+  // Bookcaster is parameterized by a SPELL the character can access; its options
+  // are derived per-character from the validator (report.bookcasterOptions), not
+  // a static list — see EntityBody.
   "Favored Form": ["Hunting Panther", "Hulking Bear", "Striking Serpent"],
   "Mild Allergy": ["Cloth", "Copper", "Gold", "Harvest", "Hide", "Ingot", "Iron", "Leather", "Materia", "Night Prize", "Other Common Allergen", "Other Uncommon Allergen", "Rare Minerals", "Scale", "Silver"],
   "Severe Allergy": ["Cloth", "Copper", "Gold", "Harvest", "Hide", "Ingot", "Iron", "Leather", "Materia", "Night Prize", "Other Common Allergen", "Other Uncommon Allergen", "Rare Minerals", "Scale", "Silver"]
@@ -1564,14 +1566,20 @@ function DescriptionBlock({ text, terms = [], onInspect }) {
 // The shared reading body for an entity — description, facts, forward + back
 // links. Used by both the rail inspector and the picker's reading pane so the
 // content (and link-following) is identical everywhere.
-function ParameterEditor({ baseName, entity, view, onUpdateParameter }) {
+function ParameterEditor({ baseName, entity, view, suggestions: suggestionsProp, onUpdateParameter }) {
   const [isOpen, setIsOpen] = useState(false);
-  const [filter, setFilter] = useState(entity.parameter || "");
+  // `entity.parameter` is the USER's chosen value only when the resolved name
+  // carried one (the resolver sets `baseName` alongside it). For a bare base
+  // skill, `parameter` is the static descriptor from skills.json ("Area of
+  // Lore") — NOT a value — so treat the chosen value as empty in that case,
+  // otherwise the descriptor leaks into the input as a phantom value.
+  const chosenParam = entity.baseName ? (entity.parameter || "") : "";
+  const [filter, setFilter] = useState(chosenParam);
   const containerRef = useRef(null);
 
   useEffect(() => {
-    setFilter(entity.parameter || "");
-  }, [entity.parameter]);
+    setFilter(chosenParam);
+  }, [chosenParam]);
 
   useEffect(() => {
     const handleOutsideClick = (e) => {
@@ -1583,23 +1591,31 @@ function ParameterEditor({ baseName, entity, view, onUpdateParameter }) {
     return () => document.removeEventListener("mousedown", handleOutsideClick);
   }, []);
 
-  const suggestions = PARAMETER_SUGGESTIONS[baseName] || [];
-  const isSearching = isOpen && filter !== entity.parameter;
+  const suggestions = suggestionsProp || PARAMETER_SUGGESTIONS[baseName] || [];
+  const isSearching = isOpen && filter !== chosenParam;
   const filtered = isSearching
     ? suggestions.filter(opt => opt.toLowerCase().includes(filter.toLowerCase()))
     : suggestions;
+  const isSpellChoice = baseName === "Bookcaster";
+  const sectionLabel = baseName === "Lore" ? "Customize Area"
+    : isSpellChoice ? "Choose a Spell" : "Customize Choice";
+  const placeholder = baseName === "Lore" ? "Enter area..."
+    : isSpellChoice ? "Choose or type a spell..." : "Enter choice...";
 
   return (
     <div className="b-detail-section b-parameter-editor" ref={containerRef}>
       <h3 className="b-detail-section-title">
-        {baseName === "Lore" ? "Customize Area" : "Customize Choice"}
+        {sectionLabel}
       </h3>
+      {isSpellChoice && !suggestions.length && (
+        <p className="b-detail-hint">No accessible spell lists yet — gain spell-slots (or a caster class) to bookcast.</p>
+      )}
       <div className="b-combobox">
         <div className="b-combobox-input-wrapper">
           <input
             type="text"
             className="b-parameter-input"
-            placeholder={baseName === "Lore" ? "Enter area..." : "Enter choice..."}
+            placeholder={placeholder}
             value={filter}
             onFocus={() => setIsOpen(true)}
             onChange={(e) => {
@@ -1659,7 +1675,14 @@ export function EntityBody({ entity, view, report, choices, onSetChoice, onUpdat
   // Referenced concepts to linkify inside the description (#13).
   const terms = conceptTerms(entity);
   const baseName = entity.baseName || entity.name;
-  const isParamEditable = !!(onUpdateParameter && view?.field && view.field !== "multiclassGrant" && PARAMETER_SUGGESTIONS[baseName]);
+  // Bookcaster is parameterized by a SPELL the character can access (rules: "one
+  // spell from any spell list they have access to … of a Tier they would normally
+  // be able to access"), so its suggestions are derived per-character from the
+  // validator rather than a static list. Other skills use the static map.
+  const paramSuggestions = baseName === "Bookcaster"
+    ? (report?.bookcasterOptions || [])
+    : (PARAMETER_SUGGESTIONS[baseName] || null);
+  const isParamEditable = !!(onUpdateParameter && view?.field && view.field !== "multiclassGrant" && paramSuggestions);
   const grantedSubPowers = useMemo(() => {
     if (!entity?.id) return [];
     const targets = REFS.grants?.[entity.id] || [];
@@ -1680,6 +1703,7 @@ export function EntityBody({ entity, view, report, choices, onSetChoice, onUpdat
           baseName={baseName}
           entity={entity}
           view={view}
+          suggestions={paramSuggestions}
           onUpdateParameter={onUpdateParameter}
         />
       )}

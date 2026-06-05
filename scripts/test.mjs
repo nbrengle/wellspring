@@ -12,7 +12,8 @@
 import {
   validate, getClasses, characterLevel, budgetFor, computeSlots, spellSlots,
   devotionState, prereqStatus, LEVEL_CAP, LEGAL_MIN_LEVEL,
-  grantedAbilities, computeSpend, discountSources, getMaxRanks, bareSkill, cleanItemName
+  grantedAbilities, computeSpend, discountSources, getMaxRanks, bareSkill, cleanItemName,
+  bookcasterSpellOptions
 } from '../src/data/validate.js';
 import { formatCharacterSheet, parseCharacterSheet } from '../src/data/sheet.js';
 import { readFileSync } from 'node:fs';
@@ -106,6 +107,21 @@ test('import tolerates spreadsheet (tab-separated) paste', () => {
 test('budget: 9 at level 4, +2 per level (extrapolated below 4)', () => {
   eq(budgetFor(4), 9, 'L4'); eq(budgetFor(5), 11, 'L5');
   eq(budgetFor(3), 7, 'L3'); eq(budgetFor(1), 3, 'L1');
+});
+test('Bookcaster spell options come from accessible caster spell tiers', () => {
+  const mk = (cls, level) => ({ archetypeName: 'x', classes: [{ name: cls, level }] });
+  // Mage L4 has only Novice slots -> novice-tier spells, no adept/greater.
+  const l4 = bookcasterSpellOptions(mk('Mage', 4));
+  ok(l4.length > 0, 'Mage L4 has bookcaster options');
+  ok(l4.includes('Mage Armor'), 'includes a known novice Mage spell');
+  // Higher level unlocks more (adept tier opens at L6: slots 6/2/0).
+  const l6 = bookcasterSpellOptions(mk('Mage', 6));
+  ok(l6.length > l4.length, 'L6 (adept unlocked) offers more spells than L4');
+  // Non-casters get nothing.
+  eq(bookcasterSpellOptions(mk('Fighter', 4)).length, 0, 'non-caster has no options');
+  // Sorted + de-duped.
+  const sorted = [...l4].sort((a, b) => a.localeCompare(b));
+  eq(JSON.stringify(l4), JSON.stringify(sorted), 'options are sorted');
 });
 test('approved backstory adds +2 BP to the budget', () => {
   const base = validate({ archetypeName: 'x', classes: [{ name: 'Fighter', level: 4 }] });
