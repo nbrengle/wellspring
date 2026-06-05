@@ -300,8 +300,11 @@ function parsePrereq(prereqText, skillForms) {
   // Split on commas, but keep "(...)" groups intact.
   const parts = prereqText.split(/,(?![^(]*\))/).map((p) => p.trim()).filter(Boolean);
   for (const part of parts) {
-    // Level requirement: "N levels in X", "Nth character-level", "Character Level N".
-    const lvl = part.match(/(\d+)\s*(?:levels?|character-level|character level)/i) || part.match(/(?:level|character[- ]level)\s*(\d+)/i);
+    // Level requirement: "N levels in X", "Nth character-level", "Character Level N", or non-casting/class levels.
+    const lvl = part.match(/(?:\d+|one|two|three|four|five|six|seven|eight|nine|ten)(?:st|nd|rd|th)?\s*(?:levels?|character-level|character level)/i)
+      || part.match(/(?:level|character[- ]level)\s*(\d+)/i)
+      || part.match(/class-levels/i)
+      || part.match(/level\s+in\s+a\s+non-casting\s+class/i);
 
     // Disjunction: "Basic Arcane or Basic Faith" — record every alternative as
     // an anyOf group rather than collapsing to one required skill. Only treat it

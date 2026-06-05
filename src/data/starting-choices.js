@@ -12,7 +12,8 @@
 
 import classesJson from './classes.json';
 import { lookupEntity } from './index.js';
-import { bareSkill, cleanItemName, getClasses } from './validate.js';
+import { getClasses } from './validate.js';
+import { bareSkill, cleanItemName } from './resolver.js';
 
 // The class's fixed starting skills (granted regardless of the choice blocks). The
 // choice-block grants are appended on top via STARTING_CHOICES_CONFIG.

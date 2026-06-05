@@ -169,11 +169,30 @@
   },
   {
     "name": "Gift of Hateful Retribution",
-    "cost": "Var",
+    "cost": 2,
     "ranks": null,
     "prereq": "Patron",
     "category": "Patron",
-    "description": "Causes damage to those that attempt to Deathblow or kill an individual.\n\nCost: Var\n\nPrerequisites: Patron\n\nThe character’s patron, often a war or death Divine Being, or some other similar greater power, has given the character the ability to destroy those who would end the patron’s beloved pet. Once per Event, when the character is Deathblowed or killed with a melee attack, they can deliver Verbal damage to the one who attacked them. The cost of this Perk depends on the amount of damage the character does when killed. If this Perk is upgraded after character creation, only the difference between the old level and the new level needs to be paid. At higher power levels, this Perk can do damage “By My Voice” instead. Whether the individual or By My Voice damage is done is up to the character at the time it is used. The Accent on the damage is “by Spite. Note that in the case of a Deathblow, the Hateful Retribution will go off before the character actually dies.\n\nCost\n\nDamage\n\nBy My Voice Dmg\n\n2\n\n10\n\n-\n\n3\n\n15\n\n-\n\n4\n\n25\n\n-\n\n5\n\n50\n\n5"
+    "description": "Causes damage to those that attempt to Deathblow or kill an individual.\n\nCost: Var\n\nPrerequisites: Patron\n\nThe character’s patron, often a war or death Divine Being, or some other similar greater power, has given the character the ability to destroy those who would end the patron’s beloved pet. Once per Event, when the character is Deathblowed or killed with a melee attack, they can deliver Verbal damage to the one who attacked them. The cost of this Perk depends on the amount of damage the character does when killed. If this Perk is upgraded after character creation, only the difference between the old level and the new level needs to be paid. At higher power levels, this Perk can do damage “By My Voice” instead. Whether the individual or By My Voice damage is done is up to the character at the time it is used. The Accent on the damage is “by Spite. Note that in the case of a Deathblow, the Hateful Retribution will go off before the character actually dies.\n\nCost\n\nDamage\n\nBy My Voice Dmg\n\n2\n\n10\n\n-\n\n3\n\n15\n\n-\n\n4\n\n25\n\n-\n\n5\n\n50\n\n5",
+    "tiers": [
+      {
+        "cost": 2,
+        "damage": 10
+      },
+      {
+        "cost": 1,
+        "damage": 15
+      },
+      {
+        "cost": 1,
+        "damage": 25
+      },
+      {
+        "cost": 1,
+        "damage": 50,
+        "byMyVoiceDmg": 5
+      }
+    ]
   },
   {
     "name": "Gift of Healing",
@@ -201,11 +220,29 @@
   },
   {
     "name": "Gift of Unbreakable Flesh",
-    "cost": "Var",
+    "cost": 2,
     "ranks": null,
     "prereq": "Patron",
     "category": "Patron",
-    "description": "Gains Natural Armor from Patron.\n\nCost: Variable\n\nPrerequisites: Patron\n\nThe character is beloved by a Divine Being or greater supernatural power of some kind, who grants a number of points of Natural Armor (armor that need not have a prop and can be both Mended and Healed). The cost of this Perk is dependent on the number of Armor Points the character has been granted. If this Perk is upgraded after character creation, only the difference between the old level and the new level needs to be paid. (i.e. 3 points to get 2 points of armor, if the character already paid 2 Build Points to get 1 point of armor).\n\nIf the Character has a source of Natural Armor, then the value in the Armor Points column instead functions as an addition to their existing Natural Armor.\n\nNote: This armor works just like created armor in that choosing armor from another source will immediately exhaust these points.\n\nCost\n\nArmor Points\n\n2\n\n1\n\n5\n\n2\n\n10\n\n3\n\n15\n\n4"
+    "description": "Gains Natural Armor from Patron.\n\nCost: Variable\n\nPrerequisites: Patron\n\nThe character is beloved by a Divine Being or greater supernatural power of some kind, who grants a number of points of Natural Armor (armor that need not have a prop and can be both Mended and Healed). The cost of this Perk is dependent on the number of Armor Points the character has been granted. If this Perk is upgraded after character creation, only the difference between the old level and the new level needs to be paid. (i.e. 3 points to get 2 points of armor, if the character already paid 2 Build Points to get 1 point of armor).\n\nIf the Character has a source of Natural Armor, then the value in the Armor Points column instead functions as an addition to their existing Natural Armor.\n\nNote: This armor works just like created armor in that choosing armor from another source will immediately exhaust these points.\n\nCost\n\nArmor Points\n\n2\n\n1\n\n5\n\n2\n\n10\n\n3\n\n15\n\n4",
+    "tiers": [
+      {
+        "cost": 2,
+        "armorPoints": 1
+      },
+      {
+        "cost": 3,
+        "armorPoints": 2
+      },
+      {
+        "cost": 5,
+        "armorPoints": 3
+      },
+      {
+        "cost": 5,
+        "armorPoints": 4
+      }
+    ]
   },
   {
     "name": "Ultimate Gift",

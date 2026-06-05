@@ -583,7 +583,14 @@
       "terms:Packet"
     ],
     "perks:Mystic Armorer": [
+      "rules-concepts:“Quick X” Count",
+      "skills:Apprentice Enchanting",
+      "skills:Basic Arcane",
+      "rules-concepts:Armor Points",
+      "skills:Basic Faith",
+      "terms:Long Rest",
       "terms:Armor",
+      "terms:Focus",
       "effects:Mend"
     ],
     "perks:Mystic Smith": [
@@ -639,9 +646,24 @@
       "terms:Dying"
     ],
     "perks:Elemental Affinity": [
+      "rules-concepts:“Quick X” Count",
+      "terms:Life Points",
+      "terms:Short Rest",
       "conditions:Resistance",
+      "conditions:Vulnerable",
+      "crafting-concepts:Attunement",
+      "terms:Long Rest",
+      "accents:Lightning",
       "rituals:Attune",
-      "modifiers:Final"
+      "terms:Accent",
+      "defenses:Resist",
+      "domains:Energy",
+      "powers:Infuse",
+      "accents:Flame",
+      "modifiers:Final",
+      "terms:Perk",
+      "accents:Acid",
+      "accents:Ice"
     ],
     "perks:Hard to Kill": [
       "rules-concepts:“Slow X” Count",
@@ -1002,18 +1024,33 @@
     ],
     "flaws:Honor Debt": [],
     "flaws:Indoor Discomfort": [
+      "terms:Spike Damage",
       "terms:Power",
       "rules-concepts:Spikes"
     ],
-    "flaws:Nightmares": [],
+    "flaws:Nightmares": [
+      "terms:Spike Damage",
+      "terms:Spell-slots",
+      "terms:Long Rest",
+      "powers:Judgment",
+      "terms:Accent",
+      "terms:Power",
+      "rules-concepts:Spikes",
+      "accents:Fear"
+    ],
     "flaws:Pliant": [
-      "effects:Charm"
+      "powers:Treat",
+      "effects:Charm",
+      "modifiers:Final",
+      "terms:Flaw"
     ],
     "flaws:Outdoor Discomfort": [
+      "terms:Spike Damage",
       "terms:Power",
       "rules-concepts:Spikes"
     ],
     "flaws:Fragile Bones": [
+      "conditions:Vulnerable",
       "terms:Accent",
       "powers:Treat",
       "accents:Force",
@@ -1023,18 +1060,39 @@
       "terms:Dying"
     ],
     "flaws:Divine Vulnerability": [
+      "conditions:Vulnerable",
       "terms:Accent",
       "accents:Divine",
       "powers:Treat",
       "modifiers:Final"
     ],
     "flaws:Mild Allergy": [
+      "resources:Rare Minerals",
+      "resources:Night Prizes",
+      "terms:Long Rest",
       "perks:Contact",
+      "effects:Heal",
+      "resources:Harvest",
+      "powers:Sources",
+      "resources:Ingots",
+      "resources:Hide",
       "powers:Rest"
     ],
     "flaws:Severe Allergy": [
+      "resources:Rare Minerals",
+      "terms:Life Points",
+      "resources:Night Prizes",
+      "terms:Conditions",
+      "terms:Long Rest",
+      "effects:Piercing",
       "perks:Contact",
-      "effects:Drain"
+      "effects:Drain",
+      "effects:Heal",
+      "resources:Harvest",
+      "powers:Burn",
+      "resources:Ingots",
+      "accents:Agony",
+      "resources:Hide"
     ],
     "flaws:Shunned Soul": [
       "terms:Short Rest"
@@ -1048,18 +1106,46 @@
     ],
     "flaws:Torn Soul": [
       "effects:Heal",
+      "domains:Energy",
       "powers:Sources"
     ],
     "flaws:Truthbound": [
-      "modifiers:Final"
+      "terms:Life Points",
+      "terms:Dying",
+      "modifiers:Final",
+      "terms:Flaw"
     ],
-    "flaws:Binding Oath of Charity": [],
-    "flaws:Binding Oath of Chastity": [],
+    "flaws:Binding Oath of Charity": [
+      "terms:Life Points",
+      "domains:Protection",
+      "terms:Power",
+      "rules-concepts:Wealth",
+      "effects:Obey"
+    ],
+    "flaws:Binding Oath of Chastity": [
+      "terms:Life Points",
+      "terms:Power",
+      "effects:Obey"
+    ],
     "flaws:Binding Oath of Civility": [
-      "powers:Treat"
+      "terms:Life Points",
+      "terms:Power",
+      "creature-types:Living",
+      "powers:Treat",
+      "effects:Obey"
     ],
-    "flaws:Binding Oath of Honor": [],
-    "flaws:Binding Oath of Peace": [],
+    "flaws:Binding Oath of Honor": [
+      "terms:Life Points",
+      "terms:Advantage",
+      "terms:Power",
+      "effects:Obey"
+    ],
+    "flaws:Binding Oath of Peace": [
+      "terms:Life Points",
+      "terms:Power",
+      "domains:Peace",
+      "effects:Obey"
+    ],
     "terms:Accent": [
       "accents:Shadow",
       "powers:Sources",
@@ -10552,6 +10638,7 @@
       "skills:Additional Cantrip",
       "skills:Advanced Recharge",
       "skills:Lore",
+      "perks:Mystic Armorer",
       "perks:Arcane Hearth",
       "perks:Consecrated Hearth",
       "terms:Sphere",
@@ -10624,6 +10711,7 @@
       "rules-concepts:Spheres of Magic"
     ],
     "skills:Basic Faith": [
+      "perks:Mystic Armorer",
       "classes:Cleric",
       "classes:Druid",
       "archetypes:Balanced Cleric",
@@ -10966,6 +11054,7 @@
       "powers:Expert Craft"
     ],
     "skills:Apprentice Enchanting": [
+      "perks:Mystic Armorer",
       "powers:Custom Creation",
       "archetypes:Mystic Artisan"
     ],
@@ -11329,9 +11418,11 @@
       "skills:Profession - Journeyman",
       "skills:Profession - Master",
       "perks:Soothing Touch",
+      "perks:Elemental Affinity",
       "perks:Will to Live",
       "perks:Gift of Hateful Retribution",
       "perks:Draconic Heritage",
+      "flaws:Nightmares",
       "flaws:Fragile Bones",
       "flaws:Divine Vulnerability",
       "terms:Power",
@@ -11445,6 +11536,7 @@
       "perks:Agility",
       "perks:Draconic Heritage",
       "perks:Strong Bloodline",
+      "flaws:Binding Oath of Honor",
       "terms:Build Points",
       "terms:Challenge",
       "terms:Lineage",
@@ -11651,6 +11743,7 @@
       "perks:Boon Bonds",
       "perks:Heartbond",
       "perks:Restful Home",
+      "flaws:Severe Allergy",
       "flaws:Disquieting Aura",
       "terms:Effects",
       "effects:Berserk",
@@ -11803,6 +11896,7 @@
       "perks:Gift of Rebirth",
       "perks:Ancestral Weapon",
       "flaws:Dies Alone",
+      "flaws:Truthbound",
       "terms:Life Points",
       "effects:Stabilize",
       "devotions:Senri, Voice of Mercy",
@@ -11829,6 +11923,8 @@
     ],
     "terms:Effects": [],
     "terms:Flaw": [
+      "flaws:Pliant",
+      "flaws:Truthbound",
       "terms:Challenge",
       "terms:Character Options",
       "terms:Lineage",
@@ -11869,6 +11965,7 @@
     "terms:Focus": [
       "skills:Projectile Weapons",
       "skills:Spell Storing",
+      "perks:Mystic Armorer",
       "perks:Mystic Smith",
       "perks:Gift of Healing",
       "perks:Protected Hearth",
@@ -12023,6 +12120,7 @@
       "skills:Basic Medicine",
       "skills:Diagnose",
       "perks:Generous Soul",
+      "perks:Elemental Affinity",
       "perks:Hard to Kill",
       "perks:Quick Healing",
       "perks:Toughness",
@@ -12034,6 +12132,13 @@
       "perks:Boon Bonds",
       "perks:Heartbond",
       "perks:Medium",
+      "flaws:Severe Allergy",
+      "flaws:Truthbound",
+      "flaws:Binding Oath of Charity",
+      "flaws:Binding Oath of Chastity",
+      "flaws:Binding Oath of Civility",
+      "flaws:Binding Oath of Honor",
+      "flaws:Binding Oath of Peace",
       "terms:Armor",
       "terms:Death-count",
       "terms:Dying",
@@ -12156,7 +12261,9 @@
       "skills:Advanced Traps",
       "skills:Prospect I",
       "perks:Generous Soul",
+      "perks:Mystic Armorer",
       "perks:Bloody Minded",
+      "perks:Elemental Affinity",
       "perks:Iron Stomach",
       "perks:Unkillable",
       "perks:Ancestral Weapon",
@@ -12168,6 +12275,9 @@
       "perks:Hearth",
       "perks:Bolt Hole",
       "perks:Restful Home",
+      "flaws:Nightmares",
+      "flaws:Mild Allergy",
+      "flaws:Severe Allergy",
       "terms:Dawn",
       "terms:Dusk",
       "terms:Short Rest",
@@ -12421,6 +12531,7 @@
       "rules-concepts:Incanting"
     ],
     "terms:Perk": [
+      "perks:Elemental Affinity",
       "perks:Will to Live",
       "perks:Patron",
       "perks:Gift of Hateful Retribution",
@@ -12506,7 +12617,13 @@
       "perks:Master Mystic Smith",
       "perks:Draconic Heritage",
       "flaws:Indoor Discomfort",
+      "flaws:Nightmares",
       "flaws:Outdoor Discomfort",
+      "flaws:Binding Oath of Charity",
+      "flaws:Binding Oath of Chastity",
+      "flaws:Binding Oath of Civility",
+      "flaws:Binding Oath of Honor",
+      "flaws:Binding Oath of Peace",
       "terms:Armor",
       "terms:Base Class",
       "terms:Cantrip",
@@ -12879,6 +12996,7 @@
       "skills:Divine Favor",
       "skills:Advanced Medicine",
       "perks:Magical Resilience",
+      "perks:Elemental Affinity",
       "perks:Quick Healing",
       "perks:Draconic Heritage",
       "perks:Insight",
@@ -13154,6 +13272,7 @@
       "skills:Bookcaster",
       "skills:Bookcasting Expertise",
       "skills:Spell Storing",
+      "flaws:Nightmares",
       "terms:Cantrip",
       "terms:Refresh",
       "terms:Spells",
@@ -13223,6 +13342,9 @@
       "skills:Projectile Weapons",
       "skills:Quick Shot",
       "skills:Weapon Mastery",
+      "flaws:Indoor Discomfort",
+      "flaws:Nightmares",
+      "flaws:Outdoor Discomfort",
       "terms:Base Class",
       "advantages:Chimera - Bestial Strength",
       "advantages:Underkin - Strike like a Boulder",
@@ -13754,6 +13876,8 @@
       "perks:Ultimate Gift",
       "perks:Boon Bonds",
       "perks:Heartbond",
+      "flaws:Mild Allergy",
+      "flaws:Severe Allergy",
       "flaws:Torn Soul",
       "terms:Armor",
       "crafting-concepts:Corrupted Alchemy",
@@ -13899,6 +14023,11 @@
       "rules-concepts:Barrier"
     ],
     "effects:Obey": [
+      "flaws:Binding Oath of Charity",
+      "flaws:Binding Oath of Chastity",
+      "flaws:Binding Oath of Civility",
+      "flaws:Binding Oath of Honor",
+      "flaws:Binding Oath of Peace",
       "conditions:Berserk",
       "conditions:Obedient",
       "powers:Non-Aggression Pact",
@@ -13934,6 +14063,7 @@
     ],
     "effects:Piercing": [
       "skills:Flurry of Cuts",
+      "flaws:Severe Allergy",
       "conditions:Immunity",
       "advantages:Forged - Self Destruct",
       "advantages:Ogrim - Thorns",
@@ -14375,6 +14505,9 @@
     "conditions:Slowed": [],
     "conditions:Tainted": [],
     "conditions:Vulnerable": [
+      "perks:Elemental Affinity",
+      "flaws:Fragile Bones",
+      "flaws:Divine Vulnerability",
       "powers:Disruption",
       "challenges:Aewen - Like Attracts Like",
       "challenges:Chimera - Prey Animal",
@@ -14441,6 +14574,7 @@
       "skills:Diagnose",
       "perks:Quick Healing",
       "perks:Hearth",
+      "flaws:Binding Oath of Civility",
       "effects:Shatter",
       "creature-types:Animal",
       "creature-types:Plant",
@@ -14620,6 +14754,8 @@
       "skills:Bookcaster",
       "skills:Scavenge I",
       "perks:Manse",
+      "flaws:Mild Allergy",
+      "flaws:Severe Allergy",
       "terms:Armor",
       "effects:Expose",
       "powers:Pulse of Light",
@@ -14689,6 +14825,8 @@
     "resources:Ingots": [
       "skills:Prospect I",
       "perks:Manse",
+      "flaws:Mild Allergy",
+      "flaws:Severe Allergy",
       "powers:Waste Not",
       "challenges:Underkin - Mineral Nourishment",
       "powers:Adept Ritualist",
@@ -14762,6 +14900,8 @@
       "skills:Forage II",
       "skills:Forage III",
       "perks:Manse",
+      "flaws:Mild Allergy",
+      "flaws:Severe Allergy",
       "powers:Waste Not",
       "challenges:Human - Leaky Bucket",
       "advantages:Oaksworn - Natural Knowledge",
@@ -14811,6 +14951,8 @@
     "resources:Harvest": [
       "skills:Scavenge I",
       "perks:Manse",
+      "flaws:Mild Allergy",
+      "flaws:Severe Allergy",
       "powers:Forgesource Specialist",
       "powers:Exploding Arrows",
       "powers:Smuggler’s Powdercase",
@@ -14863,6 +15005,8 @@
       "skills:Prospect II",
       "skills:Prospect III",
       "perks:Manse",
+      "flaws:Mild Allergy",
+      "flaws:Severe Allergy",
       "powers:Waste Not",
       "challenges:Underkin - Mineral Nourishment",
       "powers:Forgesource Specialist",
@@ -14951,6 +15095,7 @@
     "accents:Agony": [
       "skills:Thrown Weaponcraft",
       "perks:Gift of Rebirth",
+      "flaws:Severe Allergy",
       "advantages:Ogrim - Used to It",
       "powers:Mechanical Augmentation",
       "powers:Lesser Form of the Hunting Panther",
@@ -14963,6 +15108,7 @@
       "recipes:Agony Elixir"
     ],
     "accents:Acid": [
+      "perks:Elemental Affinity",
       "perks:Draconic Heritage",
       "devotions:The Song in Iron",
       "advantages:Aewen - Arcane Aptitude",
@@ -15092,6 +15238,7 @@
     "accents:Fear": [
       "perks:Soothing Touch",
       "perks:Peaceful Hearth",
+      "flaws:Nightmares",
       "challenges:Chimera - Prey Animal",
       "powers:Mechanical Augmentation",
       "powers:Intimidating Spines",
@@ -15109,6 +15256,7 @@
       "recipes:Euphoria"
     ],
     "accents:Flame": [
+      "perks:Elemental Affinity",
       "perks:Draconic Heritage",
       "perks:Minor Fame",
       "terms:Accent",
@@ -15228,6 +15376,7 @@
       "powers:Restful Prison"
     ],
     "accents:Ice": [
+      "perks:Elemental Affinity",
       "perks:Draconic Heritage",
       "conditions:Immunity",
       "advantages:Aewen - Arcane Aptitude",
@@ -15280,6 +15429,7 @@
       "rules-concepts:Devotions & Divine Beings"
     ],
     "accents:Lightning": [
+      "perks:Elemental Affinity",
       "perks:Draconic Heritage",
       "powers:Disruption",
       "advantages:Aewen - Arcane Aptitude",
@@ -15582,6 +15732,7 @@
     ],
     "defenses:Resist": [
       "perks:Bloody Minded",
+      "perks:Elemental Affinity",
       "perks:Ancestral Weapon",
       "perks:Draconic Heritage",
       "terms:Prevented",
@@ -15629,6 +15780,7 @@
     "modifiers:Final": [
       "perks:Elemental Affinity",
       "perks:Will to Live",
+      "flaws:Pliant",
       "flaws:Fragile Bones",
       "flaws:Divine Vulnerability",
       "flaws:Truthbound",
@@ -16006,6 +16158,7 @@
       "recipes:Scribe Adept Scroll"
     ],
     "crafting-concepts:Attunement": [
+      "perks:Elemental Affinity",
       "terms:Attune",
       "terms:Signature Item",
       "advantages:Aewen - Naturally Attuned",
@@ -16238,7 +16391,9 @@
     "powers:Pyrrhic Strike": [],
     "domains:Energy": [
       "perks:Generous Soul",
+      "perks:Elemental Affinity",
       "perks:Arcane Hearth",
+      "flaws:Torn Soul",
       "creature-types:Exalted",
       "resources:Golden Blossom",
       "accents:Divine",
@@ -16493,6 +16648,7 @@
     "powers:Orderly Conduct": [],
     "domains:Peace": [
       "perks:Peaceful Hearth",
+      "flaws:Binding Oath of Peace",
       "powers:Non-Aggression Pact",
       "powers:Divine Substitution",
       "powers:Commission of Protection",
@@ -16500,6 +16656,7 @@
     ],
     "powers:Non-Aggression Pact": [],
     "domains:Protection": [
+      "flaws:Binding Oath of Charity",
       "powers:Reinforce Shield",
       "powers:Mantle of Faith",
       "powers:Blade Guard",
@@ -16995,6 +17152,7 @@
       "skills:Basic Medicine",
       "perks:Ancestral Relic",
       "perks:Ancestral Weapon",
+      "flaws:Pliant",
       "flaws:Fragile Bones",
       "flaws:Divine Vulnerability",
       "flaws:Binding Oath of Civility",
@@ -17022,6 +17180,7 @@
     "powers:Grounded": [],
     "powers:Hiatus": [],
     "powers:Infuse": [
+      "perks:Elemental Affinity",
       "advantages:Aewen - Affinity Healing",
       "powers:Mechanical Augmentation",
       "powers:Detonate",
@@ -17169,6 +17328,7 @@
     "powers:Benediction": [],
     "powers:Burn": [
       "skills:Scavenge I",
+      "flaws:Severe Allergy",
       "accents:Acid",
       "accents:Flame",
       "crafting-concepts:The Tinker's Workshop",
@@ -17241,6 +17401,7 @@
     "powers:Flame of Faith": [],
     "powers:Gift of Life": [],
     "powers:Judgment": [
+      "flaws:Nightmares",
       "terms:Paces"
     ],
     "powers:Minor Circle": [],
@@ -18072,6 +18233,7 @@
       "skills:Advanced Recharge",
       "skills:Peacecaster",
       "perks:Gift of Unbreakable Flesh",
+      "flaws:Mild Allergy",
       "flaws:Torn Soul",
       "terms:Accent",
       "terms:Selective Immunity",
@@ -18862,9 +19024,11 @@
       "skills:Scavenge I",
       "skills:Scavenge II",
       "skills:Scavenge III",
+      "perks:Mystic Armorer",
       "perks:Mystic Smith",
       "perks:Soothing Touch",
       "perks:Cold Dead Hands",
+      "perks:Elemental Affinity",
       "perks:Gift of Healing",
       "perks:Protected Hearth",
       "terms:Count",
@@ -19194,6 +19358,7 @@
       "skills:Heavy Armor",
       "skills:Ironclad Armor",
       "skills:Armor Expertise",
+      "perks:Mystic Armorer",
       "perks:Gift of Unbreakable Flesh",
       "terms:Repped Armor",
       "effects:Mend",
@@ -19321,6 +19486,7 @@
       "perks:Mystic Smith",
       "perks:Protected Hearth",
       "flaws:Indoor Discomfort",
+      "flaws:Nightmares",
       "flaws:Outdoor Discomfort",
       "terms:Spike Damage",
       "powers:Disruption",
@@ -19942,6 +20108,7 @@
       "perks:Income",
       "perks:Inheritance",
       "perks:Manse",
+      "flaws:Binding Oath of Charity",
       "advantages:Underkin - Blood Money",
       "powers:Adept Ritualist",
       "powers:Back Alley Deals",
@@ -20385,10 +20552,10 @@
         "skills:Weapon Specialization"
       ],
       "anyOf": [],
-      "levels": [],
-      "other": [
+      "levels": [
         "10 class-levels in martial classes"
-      ]
+      ],
+      "other": []
     },
     "skills:Bladechannel": {
       "skills": [
@@ -20403,43 +20570,43 @@
     "skills:Extensive Combat Training - Basic": {
       "skills": [],
       "anyOf": [],
-      "levels": [],
-      "other": [
+      "levels": [
         "One level in a non-casting class"
-      ]
+      ],
+      "other": []
     },
     "skills:Extensive Combat Training - Advanced": {
       "skills": [],
       "anyOf": [],
-      "levels": [],
-      "other": [
+      "levels": [
         "One level in a non-casting class"
-      ]
+      ],
+      "other": []
     },
     "skills:Extensive Combat Training - Veteran": {
       "skills": [],
       "anyOf": [],
-      "levels": [],
-      "other": [
+      "levels": [
         "One level in a non-casting class"
-      ]
+      ],
+      "other": []
     },
     "skills:Extensive Training": {
       "skills": [],
       "anyOf": [],
-      "levels": [],
-      "other": [
+      "levels": [
         "One level in a non-casting class"
-      ]
+      ],
+      "other": []
     },
     "skills:Agile Learner": {
       "skills": [],
       "anyOf": [],
-      "levels": [],
-      "other": [
+      "levels": [
         "6th character-level",
         "class-levels in at least two Base Classes"
-      ]
+      ],
+      "other": []
     },
     "skills:Basic Arcane": {
       "skills": [],
@@ -20829,20 +20996,20 @@
         "skills:Apprentice Alchemy"
       ],
       "anyOf": [],
-      "levels": [],
-      "other": [
+      "levels": [
         "4th level character"
-      ]
+      ],
+      "other": []
     },
     "skills:Greater Alchemy": {
       "skills": [
         "skills:Journeyman Alchemy"
       ],
       "anyOf": [],
-      "levels": [],
-      "other": [
+      "levels": [
         "10th level character"
-      ]
+      ],
+      "other": []
     },
     "skills:Apprentice Tinkering": {
       "skills": [],
@@ -20855,20 +21022,20 @@
         "skills:Apprentice Tinkering"
       ],
       "anyOf": [],
-      "levels": [],
-      "other": [
+      "levels": [
         "4th level character"
-      ]
+      ],
+      "other": []
     },
     "skills:Greater Tinkering": {
       "skills": [
         "skills:Journeyman Tinkering"
       ],
       "anyOf": [],
-      "levels": [],
-      "other": [
+      "levels": [
         "10th level character"
-      ]
+      ],
+      "other": []
     },
     "skills:Apprentice Enchanting": {
       "skills": [],
@@ -20881,20 +21048,20 @@
         "skills:Apprentice Enchanting"
       ],
       "anyOf": [],
-      "levels": [],
-      "other": [
+      "levels": [
         "4th level character"
-      ]
+      ],
+      "other": []
     },
     "skills:Greater Enchanting": {
       "skills": [
         "skills:Journeyman Enchanting"
       ],
       "anyOf": [],
-      "levels": [],
-      "other": [
+      "levels": [
         "10th level character"
-      ]
+      ],
+      "other": []
     },
     "skills:Apprentice Ritual Magic": {
       "skills": [],
@@ -20907,20 +21074,20 @@
         "skills:Apprentice Ritual Magic"
       ],
       "anyOf": [],
-      "levels": [],
-      "other": [
+      "levels": [
         "4th level character"
-      ]
+      ],
+      "other": []
     },
     "skills:Greater Ritual Magic": {
       "skills": [
         "skills:Journeyman Ritual Magic"
       ],
       "anyOf": [],
-      "levels": [],
-      "other": [
+      "levels": [
         "10th level character"
-      ]
+      ],
+      "other": []
     },
     "skills:Mastercrafter": {
       "skills": [

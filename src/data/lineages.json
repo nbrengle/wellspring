@@ -1452,7 +1452,7 @@
         "note": ""
       },
       {
-        "name": "General",
+        "name": "General.",
         "note": ""
       }
     ],
@@ -1573,7 +1573,7 @@
         "required": false,
         "repped": false,
         "tags": [],
-        "sublineage": "General",
+        "sublineage": "General.",
         "description": "Ogrim heal from any wound. The character gains the Regenerate Power:"
       },
       {
@@ -1582,7 +1582,7 @@
         "required": false,
         "repped": false,
         "tags": [],
-        "sublineage": "General",
+        "sublineage": "General.",
         "description": "Ogrim can survive even the most hideous of blows. At the end of each short rest, the character gains a Protect vs any attack that would bring them to 0 Life Points or kill them."
       },
       {
@@ -1591,7 +1591,7 @@
         "required": false,
         "repped": false,
         "tags": [],
-        "sublineage": "General",
+        "sublineage": "General.",
         "description": "The Ogrim are used to their weapons giving out before them and having to make do on the battlefield. They are considered to have one higher Rank in the Scavenge skill than they have purchased. If the character has purchased Scavenge III, they can Scavenge with no RP timer."
       },
       {
@@ -1600,7 +1600,7 @@
         "required": false,
         "repped": false,
         "tags": [],
-        "sublineage": "General",
+        "sublineage": "General.",
         "description": "Healing quickly helps build strength. The Ogrim gains an additional maximum Spike."
       },
       {

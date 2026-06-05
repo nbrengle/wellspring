@@ -5,7 +5,8 @@
 // and reusable for copy / download / print. The output round-trips visually with
 // the source archetype format.
 
-import { getClasses, bareSkill, cleanItemName } from './validate.js';
+import { getClasses } from './validate.js';
+import { bareSkill, cleanItemName } from './resolver.js';
 import { ARCHETYPES, UNLIMITED_SKILLS } from './index.js';
 import {
   LABEL_FIELD, SCALAR_FIELDS, ITEM_FIELDS, fieldForLabel, cleanItem, splitItems,

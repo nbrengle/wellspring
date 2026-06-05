@@ -11,6 +11,7 @@
 
 import { LEVEL_TABLE, lookupEntity, REFS, CLASS_POWER_SLOTS, CLASS_POWERS, CLASS_PROGRESSION, SPELLCASTERS, DEVOTIONS, DOMAINS, CLASSES, LINEAGES, CRAFTING, RITUALS, EVENTS_TABLE, UNLIMITED_SKILLS } from './index.js';
 import { startingSkillGrants } from './starting-choices.js';
+import { cleanItemName, bareSkill, resolveId, idName, entityType } from './resolver.js';
 
 // Max Lineage Build Points a character can be awarded from challenges (MegaDoc:
 // "up to 10 awarded LBP").
@@ -312,25 +313,7 @@ const ENTITY_FIELDS = [
   'domainPowers', 'formPowers',
 ];
 
-function entityType(field) {
-  if (field.endsWith('Perks')) return 'perks';
-  if (field === 'flaws') return 'flaws';
-  if (field.endsWith('Skills')) return 'skills';
-  return 'powers';
-}
-
-// Character sheet item names carry a display suffix like " - 5 BP" that isn't part of
-// the canonical entity name. Strip it so name-based lookups resolve.
-export function cleanItemName(item) {
-  return item.replace(/\s*-\s*\d+\s*BP$/i, '').trim();
-}
-
-// Resolve a character item to its canonical entity id (type:cleanName).
-function resolveId(item, field, character) {
-  return `${entityType(field)}:${cleanItemName(item)}`;
-}
-
-export const idName = (id) => id.slice(id.indexOf(':') + 1);
+// Normalization functions cleanItemName, resolveId, idName, and entityType are now imported from ./resolver.js
 
 // Normalize a character's class/level info into [{ name, level }], the canonical
 // multi-class form. Accepts either the new `classes` array or the legacy
@@ -358,8 +341,7 @@ export function primaryClass(character) {
   return getClasses(character)[0]?.name || null;
 }
 
-// Strip a trailing "(parameter)" from a skill name for ownership comparison.
-export const bareSkill = (s) => String(s).replace(/\s*\([^)]*\)\s*$/, '').trim();
+// bareSkill helper is now imported from ./resolver.js
 
 // DERIVED multi-class grants — a pure function of the character's classes, so the
 // same rule drives both the forward path (materialize grants when a class is
@@ -1636,9 +1618,87 @@ export function prereqStatus(character, entityId) {
   };
 }
 
+// Parse and check free-text level/class/armor/spell-slot/profession constraints.
+// Returns:
+//   true  if the constraint is parsed and met.
+//   false if the constraint is parsed and failed.
+//   null  if the constraint format is unrecognized.
+export function checkLevelConstraint(character, constraintStr, owned) {
+  const charLevel = characterLevel(character);
+  const charClasses = getClasses(character);
+  const BASE_CLASSES = new Set(['Artisan', 'Cleric', 'Druid', 'Fighter', 'Mage', 'Rogue', 'Socialite', 'Sourcerer']);
+
+  // 1. "N levels in Martial Classes" or "N levels in a Martial Classes" or "N class-levels in martial classes"
+  let m = constraintStr.match(/^(\d+)\s+(?:levels?|class-levels)\s+in\s+(?:a\s+)?Martial\s+Classes/i);
+  if (m) {
+    const required = parseInt(m[1], 10);
+    const martialLevels = charClasses
+      .filter(c => !SPELLCASTERS.has(c.name))
+      .reduce((sum, c) => sum + c.level, 0);
+    return martialLevels >= required;
+  }
+
+  // 2. "One level in a non-casting class"
+  m = constraintStr.match(/^(one|1)\s+level\s+in\s+a\s+non-casting\s+class/i);
+  if (m) {
+    return charClasses.some(c => !SPELLCASTERS.has(c.name) && c.level >= 1);
+  }
+
+  // 3. "class-levels in at least two Base Classes"
+  m = constraintStr.match(/class-levels\s+in\s+at\s+least\s+(two|2)\s+Base\s+Classes/i);
+  if (m) {
+    const activeBaseClasses = charClasses.filter(c => BASE_CLASSES.has(c.name) && c.level > 0);
+    return activeBaseClasses.length >= 2;
+  }
+
+  // 4. "N levels in any one spell-casting class."
+  m = constraintStr.match(/^(\d+)\s+levels?\s+in\s+any\s+one\s+spell-casting\s+class/i);
+  if (m) {
+    const required = parseInt(m[1], 10);
+    return charClasses.some(c => SPELLCASTERS.has(c.name) && c.level >= required);
+  }
+
+  // 5. "N levels in a single casting class."
+  m = constraintStr.match(/^(\d+)\s+levels?\s+in\s+a\s+single\s+casting\s+class/i);
+  if (m) {
+    const required = parseInt(m[1], 10);
+    return charClasses.some(c => SPELLCASTERS.has(c.name) && c.level >= required);
+  }
+
+  // 6. "Character Level N", "Requires Level N", "character-level N", "Nth character-level", "Nth level character"
+  m = constraintStr.match(/(?:\b(\d+)(?:st|nd|rd|th)?\s+(?:character-level|level\s+character)|(?:Character[- ]Level|Requires[- ]Level|character[- ]level)\s*(\d+))/i);
+  if (m) {
+    const num = m[1] || m[2];
+    const required = parseInt(num, 10);
+    return charLevel >= required;
+  }
+
+  // 7. "At least one Armor Proficiency"
+  if (/At\s+least\s+one\s+Armor\s+Proficiency/i.test(constraintStr)) {
+    const armorSkills = ['Basic Armor', 'Light Armor', 'Medium Armor', 'Heavy Armor', 'Ironclad Armor'];
+    return armorSkills.some(name => owned.has(`skills:${name}`));
+  }
+
+  // 8. "One Novice-level spell-slot", "One Adept spell-slot", "One Greater spell-slot", etc.
+  m = constraintStr.match(/(?:one|1)\s+(Novice|Adept|Greater)(?:-level)?\s+spell-?slot/i);
+  if (m) {
+    const tier = m[1].toLowerCase();
+    const slotsObj = spellSlots(character) || { novice: 0, adept: 0, greater: 0 };
+    return (slotsObj[tier] || 0) >= 1;
+  }
+
+  // 9. "Profession - [Any]"
+  if (/Profession\s+-\s+\[?Any\]?/i.test(constraintStr)) {
+    return [...owned].some(id => id.startsWith('skills:Profession'));
+  }
+
+  return null;
+}
+
 // Prereq check across every owned item. Skill-prereqs (entity ids) are verified
 // against ownership and become hard `issues` when unmet. Level/other prereqs are
-// free-text and surface as `notes` (manual verification) rather than failures.
+// free-text. Level constraints are parsed and hard-enforced as issues, while
+// unrecognized/other constraints surface as `notes` (manual verification).
 export function checkPrereqs(character) {
   const owned = ownedIds(character);
   const issues = [];
@@ -1689,8 +1749,28 @@ export function checkPrereqs(character) {
           anyOf: unmetGroups.map((group) => group.map((m) => ({ id: m, name: idName(m) }))),
         });
       }
-      for (const lvl of pr.levels || []) notes.push({ id, item, field, kind: 'level', text: lvl });
-      for (const o of pr.other || []) notes.push({ id, item, field, kind: 'other', text: o });
+      for (const lvl of pr.levels || []) {
+        const met = checkLevelConstraint(character, lvl, owned);
+        if (met === false) {
+          issues.push({
+            id, item, field,
+            text: `Requires ${lvl}`
+          });
+        } else if (met === null) {
+          notes.push({ id, item, field, kind: 'level', text: lvl });
+        }
+      }
+      for (const o of pr.other || []) {
+        const met = checkLevelConstraint(character, o, owned);
+        if (met === false) {
+          issues.push({
+            id, item, field,
+            text: `Requires ${o}`
+          });
+        } else if (met === null) {
+          notes.push({ id, item, field, kind: 'other', text: o });
+        }
+      }
     }
   }
 

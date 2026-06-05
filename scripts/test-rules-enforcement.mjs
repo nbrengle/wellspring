@@ -75,9 +75,10 @@ for (const s of skills) {
   const pr = REFS.prereqs[id];
   if (pr && (pr.levels.length > 0 || pr.other.length > 0)) {
     const item = s.parameter ? `${s.name} (Test Parameter)` : s.name;
+    const isCasterRequirement = [...pr.levels, ...pr.other].some(r => r.includes('non-casting') || r.includes('Armor'));
     const char = {
       lineage: 'Human',
-      classLevels: 'Fighter 4', // below lvl 10, below base classes requirement etc.
+      classLevels: isCasterRequirement ? 'Mage 4' : 'Fighter 4', // below lvl 10, below base classes requirement etc.
       purchasedSkills: [item]
     };
     const res = validate(char);
@@ -91,9 +92,10 @@ for (const p of perks) {
   const id = `perks:${p.name}`;
   const pr = REFS.prereqs[id];
   if (pr && (pr.levels.length > 0 || pr.other.length > 0)) {
+    const isCasterRequirement = [...pr.levels, ...pr.other].some(r => r.includes('non-casting') || r.includes('Armor'));
     const char = {
       lineage: 'Human',
-      classLevels: 'Fighter 4',
+      classLevels: isCasterRequirement ? 'Mage 4' : 'Fighter 4',
       purchasedPerks: [p.name]
     };
     const res = validate(char);
