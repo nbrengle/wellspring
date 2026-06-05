@@ -43,6 +43,25 @@ only matches "additional <Tier> spell-slot/slot/power" — here the noun order i
 skills doesn't raise the martial slot cap.
 Fix: extend `scanSlotGrant` to handle "additional <Tier> Tier Power".
 
+### G4. Aewen "Deep Reserves" — caster spell-slot DROPPED ❌ (the caster analog)
+*"The Aewen gains an additional spell-slot of their highest level spell-slot."*
+This is the per-day **spell-slot** path, handled by `spellSlots()` — which has the
+SAME blind spot the LP bug had: it only scans `startingSkills`/`purchasedSkills`,
+NOT lineage advantages (nor perks/innate). So a caster Aewen is silently missing a
+spell-slot. Two problems compound: the source field isn't scanned, AND the phrasing
+("highest level spell-slot") wouldn't match the regex even if it were.
+Fix: have `spellSlots()` scan the same source set as the other passes (the
+consolidation below), and add a "highest-level spell-slot" handler. This is the
+direct caster sibling of G1/G2 — and the reason the FIRST effect audit missed it
+is that it mirrored `scanSlotGrant` (power-slot cap) but not `spellSlots`
+(per-day spell-slots). Now both are mirrored.
+
+### Caster completeness check
+Beyond G4, the caster side is clean: a dedicated sweep for spells-known / extra-
+cantrip / spell-slot grants across skills, perks, powers, and lineage advantages
+found no other dropped grants. The "Innate Bonus Cantrip: Cancel" structural grant
+is materialized (PR #12). So the only caster-specific gap is G4.
+
 ## Borderline / conditional (decide intent)
 
 - **Daggercraft** — "+1 Base Maximum Spikes **for attacks with daggers**." A
@@ -87,8 +106,10 @@ set of owned fields with its own regexes:
 | granted abilities | `grantedAbilities` | reference graph (REFS.grants) |
 
 Each pass decides for itself which fields count — which is exactly how "Healthy"
-(a Class skill) got LP but not the others, and how progression bonuses reached
-slots before stats. Recommendation:
+(a Class skill) got LP but not the others, how progression bonuses reached slots
+before stats, and how G4 (Aewen Deep Reserves, a lineage advantage) is invisible
+to `spellSlots` because that pass only walks two skill fields. Every gap in this
+audit is a "which fields does THIS pass scan" mismatch. Recommendation:
 
 > Define ONE `ownedEffectSources(character)` that yields every effect-bearing
 > ability the character owns — `{ name, description, tags, sourceField,

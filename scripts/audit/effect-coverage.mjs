@@ -16,7 +16,7 @@
 // signal set). Output is a triage list, not a pass/fail gate.
 
 import {
-  ALL_SKILLS, ALL_PERKS, ALL_FLAWS, CLASS_POWERS, CLASS_PROGRESSION, lookupEntity,
+  ALL_SKILLS, ALL_PERKS, ALL_FLAWS, CLASS_POWERS, CLASS_PROGRESSION, LINEAGES, lookupEntity,
 } from '../../src/data/index.js';
 
 // Full description for an ability — the ALL_* collections carry `desc`, class
@@ -35,7 +35,12 @@ const SIGNALS = [
   // Maximum Spikes only — NOT "Spike Damage" (a damage bonus, different stat).
   { cat: 'maxSpikes',     re: /(?:Maximum|Base Maximum)\s+Spikes?\b(?!\s+Damage)|\+\s*\d+\s+(?:Bonus\s+)?Maximum\s+Spikes?\b/i },
   { cat: 'armor',         re: /\bNatural Armor\b|\+\s*\d+\s*(?:physical\s+)?Armor Points?\b|\bArmor Points?\b[^.]*\bmax/i },
-  { cat: 'slots',         re: /\badditional\s+(?:Cantrip|Novice|Adept|Greater|Utility|Basic|Advanced|Veteran)\b|\badds?\s+\d+\s+to\s+the\s+number\s+of\s+Known Spells|additional\s+(?:spell-?slot|Known Spell)/i },
+  { cat: 'slots',         re: /\badditional\s+(?:Cantrip|Utility|Basic|Advanced|Veteran)\s+(?:Tier\s+)?Power|\badds?\s+\d+\s+to\s+the\s+number\s+of\s+Known Spells|additional\s+Known Spell/i },
+  // Per-day SPELL-slots (Novice/Adept/Greater) — scanned by spellSlots(), which
+  // ONLY walks startingSkills/purchasedSkills. A grant from a perk, lineage
+  // advantage, or innate is dropped. `spellSlotField` flags whether the source
+  // field is one spellSlots() actually reads.
+  { cat: 'spellSlot',     re: /\badditional\s+(?:Novice|Adept|Greater|highest[- ]level)\s+spell-?slot|gains?\s+an?\s+additional\s+spell-?slot/i },
   { cat: 'wealth',        re: /\bWealth\b[^.]*\b(?:beginning of (?:each|every) (?:game|event)|per Event)|Alternatively,?\s*\d+\s*Wealth|\d+\s*Wealth\s+at the beginning of (?:their\s+)?first/i },
   { cat: 'grant',         re: /\bgains?\s+(?:the\s+)?[A-Z][\w' -]+\s+(?:Perk|Power|Skill|Cantrip|Spell)\b|\bgrants?\s+(?:them|themselves|the character)\b/i },
   // STRUCTURAL grants stated in progression / innate text: "Innate Bonus Cantrip:
@@ -86,7 +91,11 @@ const anyMatch = (res, text) => res.some((re) => re.test(text));
 // `grant` is handled by the reference graph (REFS.grants) at build time, not by a
 // text scan, so we can't cheaply replicate it — mark those as 'graph' (needs
 // manual check that the grant edge exists) rather than miss.
-function builderCatches(cat, text) {
+// Per-day spell-slot grant regex (spellSlots()), and the ONLY fields it walks.
+const SPELLSLOT_RE = /\badditional\s+(Novice|Adept|Greater)\s+spell-?slot/i;
+const SPELLSLOT_FIELDS_SCANNED = ['skill']; // = startingSkills/purchasedSkills
+
+function builderCatches(cat, text, kind) {
   switch (cat) {
     case 'maxLifePoints': return anyMatch(STAT_RE.lifePoints, text);
     case 'maxSpikes':     return anyMatch(STAT_RE.spikes, text);
@@ -96,6 +105,14 @@ function builderCatches(cat, text) {
     case 'grant':         return 'graph';
     // innateBonusCantrips (PR #12) extracts the named cantrip from this prose.
     case 'innateCantrip': return /\binnate\s+bonus\s+cantrip:\s*([^]*)/i.test(text);
+    case 'spellSlot': {
+      // Caught only if the phrasing matches AND the source is a field spellSlots
+      // actually reads (startingSkills/purchasedSkills → kind "skill").
+      const sourceKind = kind.split(':')[0].split('/')[0];
+      const fieldScanned = SPELLSLOT_FIELDS_SCANNED.includes(sourceKind);
+      if (!SPELLSLOT_RE.test(text)) return false;     // phrasing missed (e.g. "highest level")
+      return fieldScanned ? true : 'wrong-field';     // right phrasing, unscanned source
+    }
     default:              return false;
   }
 }
@@ -116,6 +133,11 @@ function* abilities() {
       if (row?.bonus) yield { kind: `progression:${cls}`, name: `${cls} L${lvl} bonus`, text: row.bonus, progression: { cls, lvl: +lvl } };
     }
   }
+  for (const [ln, d] of Object.entries(LINEAGES || {})) {
+    for (const a of (d.advantages || [])) {
+      yield { kind: `lineage:${ln}`, name: a.baseName || a.name, text: a.desc || a.description };
+    }
+  }
 }
 
 // ── 4. Run ───────────────────────────────────────────────────────────────────
@@ -129,13 +151,15 @@ for (const a of abilities()) {
   for (const { cat, re } of SIGNALS) {
     if (!re.test(a.text)) continue;
     signalHits++;
-    const caught = builderCatches(cat, a.text);
+    const caught = builderCatches(cat, a.text, a.kind);
     // Form-tagged powers grant LP/armor only while transformed — intentionally
     // excluded from permanent stats, so not a gap.
     const formExcluded = (cat === 'maxLifePoints' || cat === 'armor' || cat === 'maxSpikes')
       && Array.isArray(a.tags) && a.tags.includes('Form');
     if (caught === 'graph') {
       graphChecks.push({ ...a, cat });
+    } else if (caught === 'wrong-field') {
+      gaps.push({ kind: a.kind, name: a.name, cat: `${cat} (unscanned source field)`, sentence: firstEffectSentence(a.text, cat) });
     } else if (!caught && !formExcluded) {
       gaps.push({ kind: a.kind, name: a.name, cat, sentence: firstEffectSentence(a.text, cat) });
     }
