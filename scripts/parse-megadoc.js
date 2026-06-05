@@ -935,6 +935,27 @@ function extractTiers(results) {
   const HEADER = /Cost\s+Character\s+Level\s+Ability\s+/i;
   const ROW = /(\d+)\s+(\d+)\s+(.+?)(?=\s+\d+\s+\d+\s|$)/gs;
   for (const r of results) {
+    if (r.name === 'Gift of Hateful Retribution') {
+      r.tiers = [
+        { cost: 2, damage: 10 },
+        { cost: 1, damage: 15 },
+        { cost: 1, damage: 25 },
+        { cost: 1, damage: 50, byMyVoiceDmg: 5 }
+      ];
+      r.cost = 2;
+      continue;
+    }
+    if (r.name === 'Gift of Unbreakable Flesh') {
+      r.tiers = [
+        { cost: 2, armorPoints: 1 },
+        { cost: 3, armorPoints: 2 },
+        { cost: 5, armorPoints: 3 },
+        { cost: 5, armorPoints: 4 }
+      ];
+      r.cost = 2;
+      continue;
+    }
+
     const m = r.description && r.description.match(HEADER);
     if (!m) continue;
     const tail = r.description.slice(m.index + m[0].length);

@@ -16,7 +16,8 @@ import {
   CLASS_POWER_SLOTS, CLASSES, DEVOTIONS, DOMAINS, LINEAGES, META,
   CLASS_POWERS, UNLIMITED_SKILLS,
 } from "./data/index.js";
-import { validate, characterLevel, prereqStatus, pickClass, getClasses, MAX_DOMAINS, subKey, EVENTS_TABLE, getMaxRanks, bareSkill, cleanItemName } from "./data/validate.js";
+import { validate, characterLevel, prereqStatus, pickClass, getClasses, MAX_DOMAINS, subKey, EVENTS_TABLE, getMaxRanks } from "./data/validate.js";
+import { bareSkill, cleanItemName } from "./data/resolver.js";
 import {
   STARTING_CHOICES_CONFIG, hasStartingChoices,
   reconcileStartingChoices, rebuildStartingSkills,

@@ -12,9 +12,10 @@
 import {
   validate, getClasses, characterLevel, budgetFor, computeSlots, spellSlots,
   devotionState, prereqStatus, LEVEL_CAP, LEGAL_MIN_LEVEL,
-  grantedAbilities, computeSpend, discountSources, getMaxRanks, bareSkill, cleanItemName,
+  grantedAbilities, computeSpend, discountSources, getMaxRanks,
   bookcasterSpellOptions
 } from '../src/data/validate.js';
+import { bareSkill, cleanItemName } from '../src/data/resolver.js';
 import { formatCharacterSheet, parseCharacterSheet } from '../src/data/sheet.js';
 import { solveCrafting } from '../src/data/recipe-solver.js';
 import { readFileSync } from 'node:fs';

@@ -79,6 +79,9 @@ export function buildLookup(entities) {
   };
 }
 
+// Additional imports for consolidated resolution
+import { cleanItemName, bareSkill } from "../src/data/resolver.js";
+
 // Strip the decorations archetype/character data carries around an entity
 // reference: BP cost suffixes, parenthesized parameters, "xN" rank
 // multipliers, trailing roman-numeral instance counters. Idempotent — runs
@@ -87,9 +90,7 @@ export function stripDecorations(item) {
   let out = item, prev;
   do {
     prev = out;
-    out = out
-      .replace(/\s*-\s*-?\d+\s*BP\s*$/i, "")           // " - 2 BP" or " - -3 BP"
-      .replace(/\s*\([^()]+\)\s*$/, "")                // " (Religious)" / " (your choice)"
+    out = cleanItemName(bareSkill(out))
       .replace(/\s+x\d+\s*$/i, "")                     // " x2" rank multiplier
       .replace(/\s+(I+|IV|VI*|IX|XI*|XV*)\s*$/, "")    // trailing roman instance counter
       .trim();
