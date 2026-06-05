@@ -83,8 +83,15 @@ export function lbpState(character) {
   const requiredSublineages = needsSublineage ? [...optionalSubs] : [];
 
   // Required challenges the character hasn't taken (some lineages mandate them).
+  // A required challenge belonging to a specific sublineage is only required if
+  // that sublineage is selected.
   const missingRequired = lin.challenges
-    .filter((c) => c.required && !challenges.some((x) => x.baseName === c.baseName));
+    .filter((c) => {
+      if (!c.required) return false;
+      const cSub = subKey(c.sublineage);
+      if (cSub && cSub !== 'general' && cSub !== pickedSub) return false;
+      return !challenges.some((x) => x.baseName === c.baseName);
+    });
 
   return {
     lineage: character.lineage,
@@ -1278,8 +1285,9 @@ const NUM = (w) => /^\d+$/.test(w) ? parseInt(w, 10) : (w.toLowerCase() === 'one
 const STAT_PATTERNS = [
   // "+1 Life Point to max" / "adds 1 Life Point to their maximum" / "1 maximum Life Point"
   { stat: 'lifePoints', re: /(?:\+?(\d+)|\bone)\s+(?:maximum\s+)?Life\s+Points?\s+to\s+(?:their\s+)?max(?:imum)?/gi },
-  { stat: 'lifePoints', re: /(?:additional\s+)?(?:\+?(\d+)|\bone)\s+maximum\s+Life\s+Points?/gi },
+  { stat: 'lifePoints', re: /(?:additional\s+)?(?:\+?(\d+)|\bone)\s+(?:Base\s+)?maximum\s+Life\s+Points?/gi },
   { stat: 'lifePoints', re: /(?:adds?|gains?)\s+(?:\+?(\d+)|\bone)\s+Life\s+Points?\s+to\s+(?:their\s+)?max(?:imum)?/gi },
+  { stat: 'lifePoints', re: /(?:Base\s+)?Maximum\s+Life\s+Points?\s+is\s+increased\s+by\s+(?:\+?(\d+)|\bone|two|three)\b/gi },
   // "gain N Natural Armor" / "N points of Natural Armor" / "increases to N" (Natural Armor)
   { stat: 'naturalArmor', re: /(?:gains?|grant(?:ing|s)?)\s+(?:\+?(\d+)|\bone|three|two)\s+(?:points?\s+of\s+)?Natural\s+Armor/gi },
   { stat: 'naturalArmor', re: /(\d+)\s+points?\s+of\s+Natural\s+Armor/gi },
@@ -1329,8 +1337,15 @@ function statMods(character) {
     }
   }
   // Owned/selected powers (innate-at-level + slotted).
-  for (const { name: cls } of getClasses(character)) {
-    for (const p of (CLASS_POWERS[cls]?.innate || [])) scan(p.name, p.description);
+  for (const { name: cls, level: clsLevel } of getClasses(character)) {
+    for (const p of (CLASS_POWERS[cls]?.innate || [])) {
+      if (requiredLevel(p) <= clsLevel) scan(p.name, p.description);
+    }
+    const progression = CLASS_PROGRESSION[cls] || {};
+    for (let lvl = 1; lvl <= clsLevel; lvl++) {
+      const bonus = progression[lvl]?.bonus;
+      if (bonus) scan(`${cls} Level ${lvl} Bonus`, bonus);
+    }
   }
   for (const field of POWER_SOURCE_FIELDS) {
     for (const item of (character[field] || [])) {
@@ -1373,7 +1388,36 @@ function ownedIds(character) {
   const owned = new Set();
   for (const field of ENTITY_FIELDS) {
     for (const item of character[field] || []) {
-      owned.add(resolveId(item, field, character));
+      const id = resolveId(item, field, character);
+      owned.add(id);
+
+      const clean = cleanItemName(item);
+      const bare = bareSkill(clean);
+      const candidates = [
+        id,
+        `${entityType(field)}:${bare}`,
+        `powers:${clean}`,
+        `perks:${clean}`,
+        `skills:${clean}`,
+        `powers:${bare}`,
+        `perks:${bare}`,
+        `skills:${bare}`
+      ];
+      for (const cand of candidates) {
+        const ent = lookupEntity(cand);
+        if (ent) {
+          owned.add(ent.id);
+          owned.add(`${ent.type}:${bareSkill(ent.name)}`);
+        }
+      }
+    }
+  }
+  // Also add granted abilities so they satisfy prerequisites
+  for (const g of grantedAbilities(character).list) {
+    owned.add(g.ability);
+    const ent = lookupEntity(g.ability);
+    if (ent) {
+      owned.add(`${ent.type}:${bareSkill(ent.name)}`);
     }
   }
   return owned;
@@ -1385,7 +1429,8 @@ function ownedIds(character) {
 // satisfied. Free-text level/other prereqs can't be auto-verified, so they don't
 // block `met` but are surfaced as notes.
 export function prereqStatus(character, entityId) {
-  const pr = REFS.prereqs[entityId];
+  const ent = lookupEntity(entityId) || lookupEntity(entityId.split(':')[0] + ':' + bareSkill(idName(entityId)));
+  const pr = REFS.prereqs[ent?.id || entityId];
   if (!pr) return { met: true, missing: [], anyOf: [], notes: [] };
   const owned = ownedIds(character);
   const missing = (pr.skills || []).filter((dep) => !owned.has(dep));
@@ -1437,7 +1482,7 @@ export function checkPrereqs(character) {
           text: `${ent.name} is a sub-power and cannot be selected directly.`,
         });
       }
-      const pr = REFS.prereqs[id];
+      const pr = REFS.prereqs[ent?.id || id];
       if (!pr) continue;
 
       const missing = (pr.skills || []).filter((dep) => !owned.has(dep));
@@ -1456,6 +1501,85 @@ export function checkPrereqs(character) {
       for (const o of pr.other || []) notes.push({ id, item, field, kind: 'other', text: o });
     }
   }
+
+  // ─── Weapon Specialization limit ───
+  const weaponSpecs = [];
+  for (const field of ['startingSkills', 'purchasedSkills']) {
+    (character[field] || []).forEach((item) => {
+      const clean = cleanItemName(item);
+      if (bareSkill(clean) === 'Weapon Specialization') {
+        weaponSpecs.push({ item, field });
+      }
+    });
+  }
+  for (const g of grantedAbilities(character).list) {
+    if (g.abilityType === 'skills' && bareSkill(cleanItemName(g.abilityName)) === 'Weapon Specialization') {
+      weaponSpecs.push({ item: g.abilityName, field: 'granted' });
+    }
+  }
+  // Filter out unparameterized 'Weapon Specialization' if a parameterized one is present
+  const hasParameterized = weaponSpecs.some(ws => ws.item.includes('('));
+  const filteredWeaponSpecs = hasParameterized
+    ? weaponSpecs.filter(ws => ws.item.includes('('))
+    : weaponSpecs;
+
+  if (filteredWeaponSpecs.length > 1) {
+    const types = filteredWeaponSpecs.map(ws => {
+      const m = ws.item.match(/\(([^)]+)\)/);
+      return m ? m[1].trim() : 'unspecified';
+    });
+    issues.push({
+      id: 'skills:Weapon Specialization',
+      item: 'Weapon Specialization',
+      text: `A character may only have Weapon Specialization with one weapon type (found: ${types.join(', ')}).`,
+    });
+  }
+
+  // ─── Advanced Classes limit ───
+  const BASE_CLASSES = new Set(['Artisan', 'Cleric', 'Druid', 'Fighter', 'Mage', 'Rogue', 'Socialite', 'Sourcerer']);
+  const charClasses = getClasses(character);
+  const advancedClasses = charClasses.filter(c => !BASE_CLASSES.has(c.name));
+  const baseLevel = charClasses
+    .filter(c => BASE_CLASSES.has(c.name))
+    .reduce((sum, c) => sum + c.level, 0);
+
+  if (advancedClasses.length > 2) {
+    issues.push({
+      id: 'classes:Advanced Classes',
+      item: 'Advanced Classes',
+      text: 'One character can have a maximum of two Advanced Classes.',
+    });
+  }
+  if (advancedClasses.length > 0 && baseLevel < 10) {
+    issues.push({
+      id: 'classes:Advanced Classes',
+      item: 'Advanced Classes',
+      text: `Cannot take levels in Advanced Classes until total level 10 has been reached in base classes (current base level: ${baseLevel}).`,
+    });
+  }
+  for (const c of advancedClasses) {
+    if (c.level > 5) {
+      issues.push({
+        id: `classes:${c.name}`,
+        item: c.name,
+        text: `${c.name} has a maximum of 5 levels.`,
+      });
+    }
+  }
+
+  // ─── Draconic Heritage character creation note ───
+  const hasDraconicHeritage = [...(character.purchasedPerks || [])]
+    .some(p => bareSkill(cleanItemName(p)) === 'Draconic Heritage');
+  if (hasDraconicHeritage) {
+    notes.push({
+      id: 'perks:Draconic Heritage',
+      item: 'Draconic Heritage',
+      field: 'purchasedPerks',
+      kind: 'other',
+      text: 'Must be taken at Character Creation.',
+    });
+  }
+
   return { issues, notes };
 }
 

@@ -247,7 +247,7 @@ test('LBP: overspend is invalid', () => {
   ok(s.overspent, 'overspent (1 awarded, 4 spent)');
 });
 test('LBP: missing required challenge is invalid', () => {
-  const s = validate({ lineage: 'Aewen', lineageChallenges: ['Mana Lines [Repped]'], lineageAdvantages: [] }).lbp;
+  const s = validate({ lineage: 'Lost', lineageChallenges: ['Lost Life'], lineageAdvantages: [] }).lbp;
   ok(s.missingRequired.length > 0, 'required challenge flagged');
 });
 test('sublineage: same sublineage (inconsistent strings) is NOT mixed', () => {
@@ -472,13 +472,13 @@ test('a power that grants a sub-power surfaces it as a free granted ability', ()
 
 // ─── base stats from the level table + numeric power/perk/lineage mods ────────
 test('base Life Points / Spikes come from the level table', () => {
-  const s4 = validate({ classLevels: 'Fighter 4' }).stats;
+  const s4 = validate({ classLevels: 'Mage 4' }).stats;
   eq(s4.lifePoints, 3, 'L4 = 3 LP'); eq(s4.spikes, 2, 'L4 = 2 spikes');
-  const s10 = validate({ classLevels: 'Fighter 10' }).stats;
+  const s10 = validate({ classLevels: 'Mage 10' }).stats;
   eq(s10.lifePoints, 4, 'L10 = 4 LP'); eq(s10.spikes, 3, 'L10 = 3 spikes');
 });
 test('Toughness adds +1 max Life Point (counted once, not per phrasing)', () => {
-  const s = validate({ classLevels: 'Fighter 4', purchasedPerks: ['Toughness'] }).stats;
+  const s = validate({ classLevels: 'Mage 4', purchasedPerks: ['Toughness'] }).stats;
   eq(s.baseLifePoints, 3, 'base 3'); eq(s.lifePoints, 4, '3 + 1');
   eq(s.mods.sources.filter((x) => x.name === 'Toughness').length, 1, 'one source, no double-count');
 });
@@ -857,6 +857,58 @@ test('recipe solver resolves recursive and alternative recipes', () => {
   // 4. Crafting fails when ingredients are missing
   res = solveCrafting('Adderstrike Venom', 1, inventory);
   ok(!res.success, 'cannot craft Adderstrike Venom without Night Prizes');
+});
+
+// ─── Weapon Specialization & Advanced Classes validation ───────────────────────
+test('validation: Weapon Specialization limit (only one type)', () => {
+  const clean = { archetypeName: 'x', classLevels: 'Fighter 4', startingSkills: ['Basic Martial Weapons'], purchasedSkills: ['Weapon Specialization (Swords)'] };
+  const rClean = validate(clean);
+  eq(rClean.prereqs.issues.length, 0, 'One specialization is legal');
+
+  const multiple = { archetypeName: 'x', classLevels: 'Fighter 4', startingSkills: ['Basic Martial Weapons'], purchasedSkills: ['Weapon Specialization (Swords)', 'Weapon Specialization (Daggers)'] };
+  const rMultiple = validate(multiple);
+  ok(rMultiple.prereqs.issues.some(i => i.item === 'Weapon Specialization' && i.text.includes('only have Weapon Specialization with one')), 'Multiple specializations are blocked');
+});
+
+test('validation: Advanced Classes limits and rules', () => {
+  const legalAdv = { archetypeName: 'x', classes: [{ name: 'Fighter', level: 10 }, { name: 'Shadowblade', level: 5 }] };
+  const rLegal = validate(legalAdv);
+  const shadowbladeIssues = rLegal.prereqs.issues.filter(i => i.item === 'Shadowblade' || i.item === 'Advanced Classes');
+  eq(shadowbladeIssues.length, 0, 'Level 10 base + Level 5 Advanced is legal under advanced class rules');
+
+  const lowBase = { archetypeName: 'x', classes: [{ name: 'Fighter', level: 4 }, { name: 'Shadowblade', level: 1 }] };
+  const rLowBase = validate(lowBase);
+  ok(rLowBase.prereqs.issues.some(i => i.item === 'Advanced Classes' && i.text.includes('until total level 10 has been reached')), 'Advanced class blocked if base classes level < 10');
+
+  const tooHighLevel = { archetypeName: 'x', classes: [{ name: 'Fighter', level: 10 }, { name: 'Shadowblade', level: 6 }] };
+  const rTooHighLevel = validate(tooHighLevel);
+  ok(rTooHighLevel.prereqs.issues.some(i => i.item === 'Shadowblade' && i.text.includes('maximum of 5 levels')), 'Advanced class capped at 5 levels');
+
+  const tooManyAdv = { archetypeName: 'x', classes: [{ name: 'Fighter', level: 10 }, { name: 'Shadowblade', level: 1 }, { name: 'Spellbinder', level: 1 }, { name: 'Archmage', level: 1 }] };
+  const rTooManyAdv = validate(tooManyAdv);
+  ok(rTooManyAdv.prereqs.issues.some(i => i.item === 'Advanced Classes' && i.text.includes('maximum of two')), 'Max of two Advanced Classes');
+});
+
+test('validation: Fighter Level 2 and Healthy power increase Life Points', () => {
+  // A Fighter 2 / Mage 2 character has total level 4 (base 3 LP from level table).
+  // Fighter 2 progression adds "+1 Base Maximum Life Points".
+  const fighter2 = { archetypeName: 'x', classes: [{ name: 'Fighter', level: 2 }, { name: 'Mage', level: 2 }], lifePoints: NaN };
+  const rF2 = validate(fighter2);
+  eq(rF2.stats.lifePoints, 3 + 1, 'Fighter 2 grants +1 LP');
+
+  // Fighter 6 character taking Healthy power gets +1 LP.
+  const fighter6Healthy = {
+    archetypeName: 'x',
+    classes: [{ name: 'Fighter', level: 6 }],
+    classPowers: ['Healthy'],
+    lifePoints: NaN
+  };
+  const rHealthy = validate(fighter6Healthy);
+  // Fighter level 6 base from level table is 4 LP.
+  // Fighter level 2 bonus gives +1 LP.
+  // Healthy power gives +1 LP.
+  // Total: 4 + 1 + 1 = 6 LP.
+  eq(rHealthy.stats.lifePoints, 6, 'Fighter 6 with Healthy grants +2 LP total (+1 from lvl 2, +1 from Healthy)');
 });
 
 // ─── report ───────────────────────────────────────────────────────────────────
