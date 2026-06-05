@@ -42,6 +42,19 @@ const PARAMETER_SUGGESTIONS = {
   "Chronic Hobbyist": ["Cooking", "Brewing", "Gardening", "Smith", "Carpenter", "Tailor", "Mason", "Hunter", "Scribe", "Herbalist", "Undertaker", "Merchant", "Charlatan", "Chirurgeon", "Teacher", "Soldier", "Sailor", "Wagoneer"],
   "Bookcaster": ["Magekey", "Mask Aura", "Identify", "Cancel", "Stop", "Mageskin"],
   "Favored Form": ["Hunting Panther", "Hulking Bear", "Striking Serpent"],
+  // Custom suggestion additions
+  "Weapon Specialization": ["Daggers", "Swords", "Maces", "Axes", "Projectile Weapons", "Thrown Weapons", "Staves", "Polearms"],
+  "Elemental Affinity": ["Flame", "Ice", "Lightning", "Acid"],
+  "Draconic Heritage": ["Acid", "Flame", "Ice", "Lightning"],
+  "Honor Debt": [],
+  "Contact": [],
+  "Ancestral Relic": [],
+  "Ancestral Weapon": [],
+  "Boon Bonds": [],
+  "Heartbond": [],
+  "Famous": [],
+  "Minor Fame": [],
+  "Manse": [],
   "Mild Allergy": ["Cloth", "Copper", "Gold", "Harvest", "Hide", "Ingot", "Iron", "Leather", "Materia", "Night Prize", "Other Common Allergen", "Other Uncommon Allergen", "Rare Minerals", "Scale", "Silver"],
   "Severe Allergy": ["Cloth", "Copper", "Gold", "Harvest", "Hide", "Ingot", "Iron", "Leather", "Materia", "Night Prize", "Other Common Allergen", "Other Uncommon Allergen", "Rare Minerals", "Scale", "Silver"]
 };
@@ -912,12 +925,18 @@ function SlotBlock({ slot, character, onInspect, onOpenSlot, isFocused, pickClas
   const fields = slot.category === "spellsKnown"
     ? ["noviceSpells", "adeptSpells", "greaterSpells"]
     : [SLOT_FIELD[slot.category]];
+  // Cantrips granted free + locked by class progression ("Innate Bonus Cantrip:
+  // Cancel"). Shown as fixed rows, never counted against the choosable cap.
+  const granted = slot.granted || [];
+  const grantedSet = new Set(granted);
   // Picks belonging to THIS class's slots, across the relevant field(s), each
-  // carrying its field + flat index so clear/swap target the right element.
+  // carrying its field + flat index so clear/swap target the right element. A
+  // granted cantrip is excluded here even if it sits in the pick list — it's
+  // rendered as a locked row instead, matching how the validator counts it.
   const myPicks = fields.flatMap((field) =>
     (character[field] || [])
       .map((name, flatIndex) => ({ name, flatIndex, field }))
-      .filter((p) => pickClassOf(field, p.flatIndex, p.name) === slot.cls));
+      .filter((p) => pickClassOf(field, p.flatIndex, p.name) === slot.cls && !grantedSet.has(p.name)));
 
   const rowCount = Math.max(slot.allowed, myPicks.length);
   const rows = Array.from({ length: rowCount }, (_, i) => myPicks[i] ?? null);
@@ -930,6 +949,13 @@ function SlotBlock({ slot, character, onInspect, onOpenSlot, isFocused, pickClas
         <span className="b-slot-count">{slot.used} / {slot.allowed}</span>
       </div>
       <ol className="b-slot-rows">
+        {granted.map((name) => (
+          <li key={`granted-${name}`} className="b-slot-row is-filled is-granted">
+            <span className="b-slot-num" title="Granted by class">★</span>
+            <button className="b-slot-pick" onClick={() => onInspect(name, fields[0], "powers")}>{name}</button>
+            <span className="b-slot-tier b-slot-granted-tag">innate</span>
+          </li>
+        ))}
         {rows.map((pick, i) => {
           const over = i >= slot.allowed;
           if (pick) {

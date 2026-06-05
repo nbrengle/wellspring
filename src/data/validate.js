@@ -1065,19 +1065,48 @@ function slotGrants(character) {
 
   // 2 + 3. Per-class automatic grants, gated by that class's own level:
   //   - INNATE powers granting slots (Artisan "Brilliant Thinker" → +1 Basic).
-  //   - Per-level progression `bonus` prose ("Innate Bonus Cantrip" → +1 cantrip).
+  // NOTE: the progression "Innate Bonus Cantrip: Cancel" prose is intentionally
+  // NOT handled here. It grants the SPECIFIC Cancel cantrip as a free, locked
+  // innate — not a choosable cantrip slot — so it must not bump the cantrip cap
+  // (which is the table's Cantrips column). See innateBonusCantrips().
   for (const { name: cls, level: clsLevel } of classes) {
     for (const p of (CLASS_POWERS[cls]?.innate || [])) {
       if (requiredLevel(p) <= clsLevel) scanSlotGrant(p.desc || p.description, (cat, n) => addTo(cls, cat, n));
     }
-    const progression = CLASS_PROGRESSION[cls] || {};
-    for (let lvl = 1; lvl <= clsLevel; lvl++) {
-      const bonus = progression[lvl]?.bonus;
-      if (bonus && /bonus\s+cantrip/i.test(bonus)) addTo(cls, 'cantrips', 1);
-    }
   }
 
   return grants;
+}
+
+// Cantrips a caster is GRANTED for free (locked, not choosable) by the
+// progression "Innate Bonus Cantrip: <name>" prose. The MegaDoc tables list the
+// choosable Cantrips count in its own column; the Class-Bonuses column's "Innate
+// Bonus Cantrip: Cancel" is a separate fixed grant on top. The prose reads e.g.
+// "Innate Bonus Cantrip: Cancel, Healing Touch" — only the items that are
+// actually cantrips of the class count (Cancel); the rest are unrelated bonuses
+// (Healing Touch is a pool). Returns [{ cls, name }], deduped per class+name.
+export function innateBonusCantrips(character) {
+  const out = [];
+  const seen = new Set();
+  for (const { name: cls, level: clsLevel } of getClasses(character)) {
+    const classCantrips = new Set((CLASS_POWERS[cls]?.cantrips || []).map((c) => c.name));
+    const progression = CLASS_PROGRESSION[cls] || {};
+    for (let lvl = 1; lvl <= clsLevel; lvl++) {
+      const bonus = progression[lvl]?.bonus;
+      const m = bonus && bonus.match(/innate\s+bonus\s+cantrip:\s*([^]*)/i);
+      if (!m) continue;
+      // Split the trailing list on commas/newlines; keep only real cantrips.
+      for (const raw of m[1].split(/[,\n]/)) {
+        const nm = raw.trim();
+        if (!classCantrips.has(nm)) continue;
+        const key = `${cls}:${nm}`;
+        if (seen.has(key)) continue;
+        seen.add(key);
+        out.push({ cls, name: nm });
+      }
+    }
+  }
+  return out;
 }
 
 // Which class a power pick belongs to. Slots are per-class, so each pick is
@@ -1126,6 +1155,10 @@ export function computeSlots(character) {
   if (!classes.length) return [];
   const multi = classes.length > 1;
   const bonus = slotGrants(character);
+  // Free, locked cantrips granted by progression ("Innate Bonus Cantrip: Cancel").
+  // Surfaced on the cantrip row as `granted` so the UI shows them as fixed rows
+  // (not choosable), without counting against the choosable cantrip cap.
+  const grantedCantrips = innateBonusCantrips(character);
 
   const rows = [];
   for (const { name: cls, level } of classes) {
@@ -1140,7 +1173,15 @@ export function computeSlots(character) {
       };
     };
     if (isCaster) {
-      rows.push(mkRow('cantrips', 'Cantrips', countPicksForClass(character, 'cantrips', cls), prog.cantrips ?? 0));
+      const granted = grantedCantrips.filter((g) => g.cls === cls).map((g) => g.name);
+      // A granted (innate) cantrip never consumes a choosable slot, even if it
+      // appears in the character's cantrip pick list (older archetypes ship
+      // "Cancel" as a pick — it's really the free innate). Exclude it from `used`.
+      const used = (character.cantrips || []).reduce((n, name, i) =>
+        n + (pickClass(character, 'cantrips', i, name) === cls && !granted.includes(name) ? 1 : 0), 0);
+      const cantripRow = mkRow('cantrips', 'Cantrips', used, prog.cantrips ?? 0);
+      cantripRow.granted = granted;
+      rows.push(cantripRow);
       const known = CASTER_SLOT_FIELDS.spellsKnown
         .reduce((n, f) => n + countPicksForClass(character, f, cls), 0);
       rows.push(mkRow('spellsKnown', 'Spells Known', known, prog.spellsKnown ?? 0));
@@ -1382,7 +1423,12 @@ function ownedIds(character) {
   const owned = new Set();
   for (const field of ENTITY_FIELDS) {
     for (const item of character[field] || []) {
-      owned.add(resolveId(item, field, character));
+      const id = resolveId(item, field, character);
+      owned.add(id);
+      const ent = lookupEntity(id);
+      if (ent?.id) {
+        owned.add(ent.id);
+      }
     }
   }
   return owned;
@@ -1394,7 +1440,9 @@ function ownedIds(character) {
 // satisfied. Free-text level/other prereqs can't be auto-verified, so they don't
 // block `met` but are surfaced as notes.
 export function prereqStatus(character, entityId) {
-  const pr = REFS.prereqs[entityId];
+  const ent = lookupEntity(entityId);
+  const prId = ent?.id || entityId;
+  const pr = REFS.prereqs[prId];
   if (!pr) return { met: true, missing: [], anyOf: [], notes: [] };
   const owned = ownedIds(character);
   const missing = (pr.skills || []).filter((dep) => !owned.has(dep));
@@ -1446,7 +1494,8 @@ export function checkPrereqs(character) {
           text: `${ent.name} is a sub-power and cannot be selected directly.`,
         });
       }
-      const pr = REFS.prereqs[id];
+      const prId = ent?.id || id;
+      const pr = REFS.prereqs[prId];
       if (!pr) continue;
 
       const missing = (pr.skills || []).filter((dep) => !owned.has(dep));
