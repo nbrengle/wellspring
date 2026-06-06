@@ -166,6 +166,8 @@ function powerEntry(p) {
     effect: p.effect ?? null,
     incantation: p.incantation ?? null,
     maxRanks: p.maxRanks ?? 1,
+    statMods: p.statMods ?? [],
+    statModNotes: p.statModNotes ?? [],
   };
 }
 
@@ -267,6 +269,8 @@ const lineageItem = it => ({
   repped: it.repped,
   sublineage: it.sublineage,
   desc: it.description,
+  statMods: it.statMods ?? [],
+  statModNotes: it.statModNotes ?? [],
 });
 
 export const LINEAGES = Object.fromEntries(
