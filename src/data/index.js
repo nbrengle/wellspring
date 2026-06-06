@@ -349,6 +349,14 @@ for (const c of classesJson) {
 for (const d of domainsJson) for (const p of (d.powers || [])) {
   ENTITY_INDEX.set(`powers:${p.name}`, { ...p, id: `powers:${p.name}`, type: 'powers', domain: d.name });
 }
+// Lineage advantages. Keyed "advantages:<Lineage> - <name>" to match how the rules
+// relations reference them (REFS.grants/discounts) and how ownedGrantSources builds
+// the id — without this, grant/discount edges from advantages, plus their
+// descriptions and the inspector, resolve to nothing.
+for (const lin of lineagesJson) for (const a of (lin.advantages || [])) {
+  const id = `advantages:${lin.name} - ${a.name}`;
+  ENTITY_INDEX.set(id, { ...a, id, type: 'advantages', name: a.name, lineage: lin.name });
+}
 
 // ─── CONCEPT / GLOSSARY INDEX ──────────────────────────────────────────────────
 // Index the rules-reference content so the linker's reference links (terms:,
