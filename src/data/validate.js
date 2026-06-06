@@ -994,11 +994,12 @@ export function computeSpend(character) {
 // description rather than a hardcoded list: a phrase like "one additional
 // Cantrip" or "additional Novice spell-slot" adds to the matching category cap.
 
-// Minimum class level a power requires, parsed from "<Class> Level N" / "Level N"
-// in its requirement text. 0 when none stated.
+// Minimum class level a power requires. Parser-extracted to power.requiredLevel
+// (from the "<Class> Level N" requirement text); 0 when none stated. Named-entity
+// requirements (power.requiresEntity, e.g. "Parry Blow") are NOT enforced yet —
+// that's a separate follow-up.
 function requiredLevel(power) {
-  const m = String(power?.requirement || '').match(/level\s+(\d+)/i);
-  return m ? parseInt(m[1], 10) : 0;
+  return power?.requiredLevel ?? 0;
 }
 
 // Bonus slots, keyed PER CLASS as "class:category" → count. Class features
