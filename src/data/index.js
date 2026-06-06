@@ -175,6 +175,9 @@ function powerEntry(p) {
     highestSlot: p.highestSlot ?? false,
     levelDiscounts: p.levelDiscounts ?? [],
     sharedWith: p.sharedWith ?? [],
+    requiredLevel: p.requiredLevel ?? 0,
+    requiredClass: p.requiredClass ?? null,
+    requiresEntity: p.requiresEntity ?? [],
   };
 }
 
