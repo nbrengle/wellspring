@@ -1138,6 +1138,41 @@ test('effect coverage G4: Aewen Deep Reserves spell slot grant', () => {
   eq(validate(aewenNonCaster).spellSlots, null, 'Non-caster Aewen has null spellSlots');
 });
 
+// ─── referential integrity of the rules network ────────────────────────────────
+// The data files form a NAME-KEYED cross-reference network: refs.json relations
+// (prereqs / grants / discounts / unlocks) connect entities by `type:name` string,
+// resolved at runtime via lookupEntity across skills / perks / powers / classes /
+// advantages. If an entity is referenced by a rule but never registered in the
+// entity index, the reference silently dangles — a dropped prereq, an inert grant,
+// an empty inspector. (This is exactly how lineage advantages were once invisible:
+// referenced by grants but never indexed.) Assert every id a rule points at resolves.
+test('every entity referenced by a rules relation resolves (no dangling refs)', () => {
+  const referenced = new Set();
+  const add = (id) => { if (typeof id === 'string' && id.includes(':')) referenced.add(id); };
+
+  for (const [id, pr] of Object.entries(REFS.prereqs || {})) {
+    add(id);
+    for (const dep of pr.skills || []) add(dep);
+    for (const group of pr.anyOf || []) for (const dep of group) add(dep);
+  }
+  for (const [id, targets] of Object.entries(REFS.grants || {})) {
+    add(id);
+    for (const t of targets || []) add(t);
+  }
+  for (const [id, d] of Object.entries(REFS.discounts || {})) {
+    add(id);
+    for (const ex of d.exclusions || []) add(ex);
+  }
+  for (const [id, targets] of Object.entries(REFS.unlocks || {})) {
+    add(id);
+    for (const t of targets || []) add(t);
+  }
+
+  const dangling = [...referenced].filter((id) => !lookupEntity(id));
+  ok(dangling.length === 0,
+    `${dangling.length} dangling rule reference(s) — referenced by a rule but not in the entity index:\n        ${dangling.join('\n        ')}`);
+});
+
 // ─── report ───────────────────────────────────────────────────────────────────
 console.log(`\n${passed} passed, ${failures.length} failed`);
 if (failures.length) {
