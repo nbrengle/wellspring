@@ -476,6 +476,30 @@ test('tier level gate is hard-enforced (rank 2 below char level 5 is an issue)',
   ok(!at.prereqs.issues.some((i) => i.tier), 'clears at the required level');
 });
 
+// ─── power requirements (parser-extracted requiredLevel + requiresEntity) ─────
+// A selected power's requirement is enforced: a minimum class level and/or another
+// owned entity. Requirements resolve in the OWNING class's context (power names are
+// shared across classes with different requirements).
+test('power level requirement is enforced', () => {
+  // Warrior Spirit requires Fighter Level 10.
+  const below = validate({ classLevels: 'Fighter 4', innatePowers: ['Warrior Spirit'] });
+  ok(below.prereqs.issues.some((i) => i.item === 'Warrior Spirit' && /Fighter Level 10/.test(i.text)), 'flagged below level');
+  const at = validate({ classLevels: 'Fighter 10', innatePowers: ['Warrior Spirit'] });
+  ok(!at.prereqs.issues.some((i) => i.item === 'Warrior Spirit'), 'clears at level');
+});
+test('power entity requirement is enforced (Expert Parry needs Parry Blow)', () => {
+  const missing = validate({ classLevels: 'Fighter 6', advancedPowers: ['Expert Parry'] });
+  ok(missing.prereqs.issues.some((i) => i.item === 'Expert Parry' && i.requiresEntity === 'Parry Blow'), 'flagged without prerequisite');
+  const ok2 = validate({ classLevels: 'Fighter 6', innatePowers: ['Parry Blow'], advancedPowers: ['Expert Parry'] });
+  ok(!ok2.prereqs.issues.some((i) => i.item === 'Expert Parry'), 'clears with prerequisite');
+});
+test('shared power name resolves requirement per owning class (no false positive)', () => {
+  // "Ritual Affinity" exists for both Cleric (Cleric L3) and Mage (Mage L3). A
+  // Cleric who owns it at Cleric L3 must NOT be flagged with the Mage requirement.
+  const cleric = validate({ classLevels: 'Cleric 4', innatePowers: ['Ritual Affinity'] });
+  ok(!cleric.prereqs.issues.some((i) => i.item === 'Ritual Affinity'), 'cleric version satisfied, not the mage one');
+});
+
 // ─── per-level power benefits (Adept Ritualist) ──────────────────────────────
 test('Adept Ritualist level-benefits activate by Artisan class level', () => {
   const at1 = validate({ classLevels: 'Artisan 1', utilityPowers: ['Adept Ritualist'] });
