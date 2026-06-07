@@ -2,6 +2,7 @@
   {
     "name": "Artisan",
     "type": "Martial",
+    "magicType": null,
     "description": "Crafting & Support Martial Class",
     "startingSkills": [
       "A Good Defense - Basic Martial Weapons (1), Short Weapons (3)",
@@ -1812,6 +1813,7 @@
   {
     "name": "Cleric",
     "type": "Spellcaster",
+    "magicType": "Divine",
     "description": "Divine Spell-Casting Class",
     "startingSkills": [
       "The Path of the Initiate: Basic Faith (4), Worship (1), Basic Martial Weapons (1)",
@@ -3002,6 +3004,7 @@
   {
     "name": "Druid",
     "type": "Spellcaster",
+    "magicType": "Divine",
     "description": "Divine Spell-Casting Class",
     "startingSkills": [
       "Natural Survival: Basic Martial Weapons (1), Profession - Apprentice (1), and either Forage I (3) or Scavenge I (3)",
@@ -4290,6 +4293,7 @@
   {
     "name": "Fighter",
     "type": "Martial",
+    "magicType": null,
     "description": "Martial Class",
     "startingSkills": [
       "The Most Basic Training: Basic Martial Weapons (1), Basic Shields (4)",
@@ -5626,6 +5630,7 @@
   {
     "name": "Mage",
     "type": "Spellcaster",
+    "magicType": "Arcane",
     "description": "Utility & Arcane Spell-Casting Class",
     "startingSkills": [
       "The Arcane Unveiled: Basic Arcane (4)",
@@ -6846,6 +6851,7 @@
   {
     "name": "Rogue",
     "type": "Martial",
+    "magicType": null,
     "description": "Martial Class",
     "startingSkills": [
       "To the Point: Basic Martial Weapons (1), Thrown Weapons (3)",
@@ -8088,6 +8094,7 @@
   {
     "name": "Socialite",
     "type": "Martial",
+    "magicType": null,
     "description": "Information & Leadership Martial Class",
     "startingSkills": [
       "Forewarned is Forearmed: Basic Martial Weapons (1), Library Use (1), Poisoner (1)",
@@ -9689,6 +9696,7 @@
   {
     "name": "Sourcerer",
     "type": "Spellcaster",
+    "magicType": "Arcane",
     "description": "Alpha Striker & Arcane Spell-Casting Class",
     "startingSkills": [
       "The Ritual of Beginnings: Basic Arcane (4), Warcaster (5)",

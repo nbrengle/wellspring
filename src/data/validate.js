@@ -9,7 +9,7 @@
 // Pure functions, no React, so the UI calls them in a useMemo and they stay
 // unit-testable. The character shape is the flat object from Builder.jsx.
 
-import { LEVEL_TABLE, lookupEntity, REFS, CLASS_POWER_SLOTS, CLASS_POWERS, CLASS_PROGRESSION, SPELLCASTERS, DEVOTIONS, DOMAINS, CLASSES, LINEAGES, CRAFTING, RITUALS, EVENTS_TABLE, UNLIMITED_SKILLS } from './index.js';
+import { LEVEL_TABLE, lookupEntity, REFS, CLASS_POWER_SLOTS, CLASS_POWERS, CLASS_PROGRESSION, SPELLCASTERS, DEVOTIONS, DOMAINS, CLASSES, LINEAGES, CRAFTING, RITUALS, EVENTS_TABLE, UNLIMITED_SKILLS, BASE_CLASSES } from './index.js';
 import { startingSkillGrants } from './starting-choices.js';
 import { cleanItemName, bareSkill, resolveId, idName, entityType } from './resolver.js';
 
@@ -1532,7 +1532,6 @@ export function prereqStatus(character, entityId) {
 export function checkLevelConstraint(character, constraintStr, owned) {
   const charLevel = characterLevel(character);
   const charClasses = getClasses(character);
-  const BASE_CLASSES = new Set(['Artisan', 'Cleric', 'Druid', 'Fighter', 'Mage', 'Rogue', 'Socialite', 'Sourcerer']);
 
   // 1. "N levels in Martial Classes" or "N levels in a Martial Classes" or "N class-levels in martial classes"
   let m = constraintStr.match(/^(\d+)\s+(?:levels?|class-levels)\s+in\s+(?:a\s+)?Martial\s+Classes/i);
@@ -1714,7 +1713,6 @@ export function checkPrereqs(character) {
   }
 
   // ─── Advanced Classes limit ───
-  const BASE_CLASSES = new Set(['Artisan', 'Cleric', 'Druid', 'Fighter', 'Mage', 'Rogue', 'Socialite', 'Sourcerer']);
   const charClasses = getClasses(character);
   const advancedClasses = charClasses.filter(c => !BASE_CLASSES.has(c.name));
   const baseLevel = charClasses

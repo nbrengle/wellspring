@@ -472,10 +472,17 @@ function parseClasses() {
     };
 
     const isCaster = ['Cleric', 'Druid', 'Mage', 'Sourcerer'].includes(clsName);
+    // Divine vs Arcane is derived from the class's own text: Divine casters draw on
+    // Faith/Worship, Arcane casters on Arcane. Emitted as a structured field so the
+    // data layer reads class.magicType instead of hand-maintaining a class→type map.
+    const magicType = !isCaster ? null
+      : /\barcane\b/i.test([description, ...(skillList('Starting Skills') || [])].join(' ')) ? 'Arcane'
+      : 'Divine';
 
     classes.push({
       name: clsName,
       type: isCaster ? 'Spellcaster' : 'Martial',
+      magicType,
       description,
       startingSkills:   skillList('Starting Skills'),
       multiclassSkills: skillList('Multiclass Skills'),

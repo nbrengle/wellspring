@@ -34,14 +34,31 @@ import "./Builder.css";
 // Default starting Wealth (MegaDoc: "all characters start with 8 Wealth").
 const DEFAULT_WEALTH = 8;
 
+// Devotion names + Lore areas + Profession suggestions are derived from parsed data
+// (devotions.json, the Lore / Profession skill descriptions) so they can't drift
+// from the MegaDoc — adding a devotion or profession in the doc flows through here
+// without editing this list.
+const DEVOTION_NAMES = DEVOTIONS.map((d) => d.name);
+// Lore areas + suggested professions are enumerated in those skills' own
+// description prose ("Arcane Lore: …", "Suggested Professions: Soldier, Hunter, …").
+const skillDesc = (name) => (ALL_SKILLS.find((s) => s.name === name)?.desc) || "";
+const LORE_AREAS = [...new Set([...skillDesc("Lore").matchAll(/([A-Z][a-z]+)\s+Lore:/g)].map((m) => m[1]))];
+const PROFESSIONS = (() => {
+  // The "Suggested Professions:" list lives in whichever Profession tier's
+  // description carries it (currently Profession - Master).
+  const desc = ["Profession - Master", "Profession - Journeyman", "Profession - Apprentice"].map(skillDesc).join(" ");
+  const m = desc.match(/Suggested Professions?:\s*([^.]+)/i);
+  return m ? m[1].split(/,|\band\b/).map((s) => s.replace(/\s+with Staff approval.*/i, "").trim()).filter(Boolean) : [];
+})();
+
 const PARAMETER_SUGGESTIONS = {
-  "Lore": ["Historical", "Nature", "Noble", "Religious", "Ritual", "Shadow", "Arcane"],
-  "Worship": ["The Mother", "The Steed", "Senri, Voice of Mercy", "Dorne, Bringer of Law", "Filian, Keeper of the Hearth", "Mille, Muse of Creation", "The Song in Iron", "Dave", "The Great Mind", "Druidism", "The Howl at the End", "The Divine Bloom", "The Witch of Webs", "The Pale Star", "Devourer", "The Librarian", "Wildfire", "The Dancer"],
-  "Patron": ["The Mother", "The Steed", "Senri, Voice of Mercy", "Dorne, Bringer of Law", "Filian, Keeper of the Hearth", "Mille, Muse of Creation", "The Song in Iron", "Dave", "The Great Mind", "Druidism", "The Howl at the End", "The Divine Bloom", "The Witch of Webs", "The Pale Star", "Devourer", "The Librarian", "Wildfire", "The Dancer"],
-  "Profession - Apprentice": ["Smith", "Carpenter", "Tailor", "Mason", "Hunter", "Scribe", "Herbalist", "Undertaker", "Merchant", "Charlatan", "Chirurgeon", "Teacher", "Soldier", "Sailor", "Wagoneer"],
-  "Profession - Journeyman": ["Smith", "Carpenter", "Tailor", "Mason", "Hunter", "Scribe", "Herbalist", "Undertaker", "Merchant", "Charlatan", "Chirurgeon", "Teacher", "Soldier", "Sailor", "Wagoneer"],
-  "Profession - Master": ["Smith", "Carpenter", "Tailor", "Mason", "Hunter", "Scribe", "Herbalist", "Undertaker", "Merchant", "Charlatan", "Chirurgeon", "Teacher", "Soldier", "Sailor", "Wagoneer"],
-  "Chronic Hobbyist": ["Cooking", "Brewing", "Gardening", "Smith", "Carpenter", "Tailor", "Mason", "Hunter", "Scribe", "Herbalist", "Undertaker", "Merchant", "Charlatan", "Chirurgeon", "Teacher", "Soldier", "Sailor", "Wagoneer"],
+  "Lore": LORE_AREAS,
+  "Worship": DEVOTION_NAMES,
+  "Patron": DEVOTION_NAMES,
+  "Profession - Apprentice": PROFESSIONS,
+  "Profession - Journeyman": PROFESSIONS,
+  "Profession - Master": PROFESSIONS,
+  "Chronic Hobbyist": ["Cooking", "Brewing", "Gardening", ...PROFESSIONS],
   // Bookcaster is parameterized by a SPELL the character can access; its options
   // are derived per-character from the validator (report.bookcasterOptions), not
   // a static list — see EntityBody.
@@ -101,9 +118,9 @@ function applyClassStartingAbilities(character, className, level = 1) {
   for (const c of nextCharacter.classes || []) {
     const innate = CLASS_POWERS[c.name]?.innate || [];
     for (const p of innate) {
-      const reqMatch = String(p.requirement || p.tier || '').match(/\b(?:L|level)\s*(\d+)\b/i)
-        || String(p.prereq || p.prerequisites || '').match(/\b(?:L|level)\s*(\d+)\b/i);
-      const reqLvl = reqMatch ? parseInt(reqMatch[1], 10) : 1;
+      // Level gate comes from the parser-extracted field (p.requiredLevel), not a
+      // runtime regex over the requirement prose. 0 = ungated (available at L1).
+      const reqLvl = p.requiredLevel || 0;
       const effectiveLvl = c.name === className ? level : c.level;
       if (effectiveLvl >= reqLvl) {
         activeInnateNames.add(p.name);

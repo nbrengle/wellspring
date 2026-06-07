@@ -77,6 +77,12 @@ export function fieldForLabel(label) {
 
 // Item-annotation patterns. An item name may carry "- N BP", a grant note
 // "(from X)" / "(X)", a refund "(N BP refunded from X)" / "(X +NBP)", or a flaw award "(+N BP)".
+// NOTE: the base-class alternation below is hardcoded ON PURPOSE — this module is
+// intentionally dependency-free (imported by both a Node build script and the
+// browser bundle), so it does not pull in index.js/classesJson to derive the list.
+// It parses our OWN serialized sheet format, not MegaDoc content; if the class
+// roster changes, update this alternation (the one deliberate exception to deriving
+// class lists from the parsed data).
 const ITEM_BP = /\s*-\s*(-?\d+)\s*BP\b.*$/i;
 const ITEM_GRANT = /\(\s*(?:(?:from\s+([^)]+))|(Artisan|Cleric|Druid|Fighter|Mage|Rogue|Socialite|Sourcerer))\s*\)/i;
 const ITEM_REFUND = /\(\s*(?:(?:(\d+)\s*BP\s+refunded\s+from\s+([^)]+))|(?:(Artisan|Cleric|Druid|Fighter|Mage|Rogue|Socialite|Sourcerer)\s*\+(\d+)\s*BP))\)/i;

@@ -7,7 +7,7 @@
 
 import { getClasses } from './validate.js';
 import { bareSkill, cleanItemName } from './resolver.js';
-import { ARCHETYPES, UNLIMITED_SKILLS } from './index.js';
+import { ARCHETYPES, UNLIMITED_SKILLS, BASE_CLASSES } from './index.js';
 import {
   LABEL_FIELD, SCALAR_FIELDS, ITEM_FIELDS, fieldForLabel, cleanItem, splitItems,
   expandInstances, CHOICE_DEFAULTS,
@@ -31,16 +31,15 @@ function bpSuffix(name, field, report, idx) {
     e = report?.spend.byItem[`${field}:${name}`];
   }
   if (!e) return '';
-  const CLASSES_SET = new Set(['Artisan', 'Cleric', 'Druid', 'Fighter', 'Mage', 'Rogue', 'Socialite', 'Sourcerer']);
   // Flaws award BP; a starting-skill refund is also a negative cost on a free item.
   if (e.cost < 0) {
-    if (e.grant?.source && CLASSES_SET.has(e.grant.source)) {
+    if (e.grant?.source && BASE_CLASSES.has(e.grant.source)) {
       return ` (${e.grant.source.toUpperCase()} +${-e.cost}BP)`;
     }
     return e.grant?.source ? ` (${-e.cost} BP refunded from ${e.grant.source})` : ` (+${-e.cost}BP)`;
   }
   if (e.cost === 0 && e.grant?.source) {
-    if (CLASSES_SET.has(e.grant.source)) {
+    if (BASE_CLASSES.has(e.grant.source)) {
       return ` (${e.grant.source.toUpperCase()})`;
     }
     return ` - 0 BP (from ${e.grant.source})`;

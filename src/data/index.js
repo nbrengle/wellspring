@@ -128,8 +128,20 @@ export const ALL_FLAWS = flawsJson.map(f => ({
 // description, startingSkills, multiclassSkills }. Role/keyFeatures prose is not
 // in the data (intentionally — to be parsed later), so it's simply omitted.
 
-export const SPELLCASTERS = new Set(['Cleric', 'Druid', 'Mage', 'Sourcerer']);
-const MAGIC_TYPE = { Cleric: 'Divine', Druid: 'Divine', Mage: 'Arcane', Sourcerer: 'Arcane' };
+// Derived from the parsed class data, not hand-maintained — a class is a caster
+// when its parsed type is 'Spellcaster', and its Divine/Arcane magicType is a
+// parser-extracted field. A MegaDoc change to the class roster flows through here
+// without edits. BASE_CLASSES is the canonical base-class set, shared by the
+// validator and sheet logic so the list lives in exactly one place.
+export const SPELLCASTERS = new Set(classesJson.filter(c => c.type === 'Spellcaster').map(c => c.name));
+const MAGIC_TYPE = Object.fromEntries(classesJson.filter(c => c.magicType).map(c => [c.name, c.magicType]));
+// Base (non-advanced) classes. Today every parsed class is a base class — Advanced
+// Classes aren't in the MegaDoc yet ("published when the campaign draws closer").
+// When they arrive the parser should mark them (e.g. type:'Advanced' or
+// isAdvanced); exclude any such marker here so the base/advanced split stays correct.
+export const BASE_CLASSES = new Set(
+  classesJson.filter(c => c.type !== 'Advanced' && !c.isAdvanced).map(c => c.name)
+);
 
 export const CLASSES = Object.fromEntries(
   classesJson.map(c => [
@@ -137,7 +149,7 @@ export const CLASSES = Object.fromEntries(
     {
       type: c.type,
       spellcaster: SPELLCASTERS.has(c.name),
-      magicType: MAGIC_TYPE[c.name] || null,
+      magicType: c.magicType || MAGIC_TYPE[c.name] || null,
       description: c.description,
       startingSkills: c.startingSkills,
       multiclassSkills: c.multiclassSkills,
