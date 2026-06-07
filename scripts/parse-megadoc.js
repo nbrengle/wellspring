@@ -565,7 +565,15 @@ function parseProgressionTable(clsStart, clsEnd) {
     // Maximum Life Points" at Fighter L2). Extract them structurally here so the
     // validator reads progression[lvl].statMods instead of re-regexing the prose.
     const { mods: bonusStatMods } = statModsFromText(bonus);
-    const row = bonusStatMods.length ? { statMods: bonusStatMods } : {};
+    const row = {};
+    if (bonusStatMods.length) row.statMods = bonusStatMods;
+    // "Innate Bonus Cantrip: <name>[, <name>]" in the bonus column → structured
+    // list (the validator filters these against the class's real cantrips).
+    const icm = bonus && bonus.match(/innate\s+bonus\s+cantrip:\s*(.+)$/i);
+    if (icm) {
+      const names = icm[1].split(/[,\n]/).map((s) => s.trim()).filter(Boolean);
+      if (names.length) row.innateCantrips = names;
+    }
     if (isCaster) {
       progression[level] = { cantrips: num(cols[0]), spellsKnown: num(cols[1]), slots: orNull(cols[2]), bonus, ...row };
     } else {
@@ -668,6 +676,80 @@ function extractStatMods(entity) {
   if (variableNaturalArmor) (entity.statModNotes ||= []).push({ stat: 'naturalArmor', text: 'variable' });
 }
 
+// ─── WEALTH INCOME (prose → structured) ────────────────────────────────────────
+// Per-game income an entity grants ("N Wealth at the beginning of each game", a
+// Manse cash alternative, or a one-time first-event sum). Extracted here so the
+// validator reads entity.wealthIncome instead of regexing descriptions at runtime.
+// Returns { n, kind } | null. kind: 'recurring' | 'manse' | 'firstEvent'.
+function wealthIncomeFromText(name, text) {
+  if (!text) return null;
+  const recurring = text.match(/(\d+)\s*Wealth\s+(?:at the beginning of (?:each|every)\s+(?:game|event)|per\s+Event)/i);
+  if (recurring) return { n: parseInt(recurring[1], 10), kind: 'recurring' };
+  if (/\bManse\b/i.test(name || '')) {
+    const alt = text.match(/Alternatively,?\s*(\d+)\s*Wealth/i);
+    if (alt) return { n: parseInt(alt[1], 10), kind: 'manse' };
+  }
+  // One-time sums that land AT the first event count toward the point-in-time total.
+  const firstEvent = text.match(/(\d+)\s*Wealth\s+at the beginning of (?:their\s+)?first\s+Event/i)
+    || text.match(/one-time\s+sum[^.]*?(\d+)\s*Wealth/i);
+  if (firstEvent) return { n: parseInt(firstEvent[1], 10), kind: 'firstEvent' };
+  return null;
+}
+function extractWealthIncome(entity) {
+  const w = wealthIncomeFromText(entity.name, entity.description || entity.desc || '');
+  if (w) entity.wealthIncome = w;
+}
+
+// ─── SLOT GRANTS (prose → structured) ──────────────────────────────────────────
+// Power/spell-slot grants an entity confers: an extra cantrip, an extra tier slot,
+// added Known Spells, or a floating "highest-level" slot. Emitted as
+// entity.slotGrants = [{ cat, n }] (+ entity.highestSlot for the floating one) so
+// the validator reads structured grants instead of regexing descriptions. `cat` is
+// the slot category: cantrips | spellsKnown | utility|basic|advanced|veteran |
+// novice|adept|greater.
+const SLOT_TIER_TO_CAT = {
+  novice: 'novice', adept: 'adept', greater: 'greater',
+  utility: 'utility', basic: 'basic', advanced: 'advanced', veteran: 'veteran',
+};
+function slotGrantsFromText(name, text) {
+  const grants = [];
+  let highest = false;
+  if (!text) return { grants, highest };
+  // Extensive Combat Training - <Tier>: the NAME's tier word is authoritative (its
+  // prose says "Adept Tier Power" for the "- Advanced" variant — a doc mismatch, so
+  // trust the name). Keep this name-keyed rule in the parser, next to the data.
+  const ect = (name || '').match(/Extensive Combat Training\s*-\s*(Basic|Advanced|Veteran)/i);
+  if (ect) { grants.push({ cat: ect[1].toLowerCase(), n: 1 }); return { grants, highest }; }
+  if (/\badditional\s+cantrip\b/i.test(text)) grants.push({ cat: 'cantrips', n: 1 });
+  const tier = text.match(/\badditional\s+(Novice|Adept|Greater|Utility|Basic|Advanced|Veteran)\s+(?:Tier\s+)?(?:spell-?\s*slot|slot|power)/i);
+  if (tier) {
+    const cat = SLOT_TIER_TO_CAT[tier[1].toLowerCase()];
+    if (cat) {
+      grants.push({ cat, n: 1 });
+      // An "additional <spell-tier> spell-slot" (Extended Capacity) ALSO raises the
+      // spells-KNOWN budget — a larger slot lets you know one more spell. (Martial
+      // tiers utility/basic/advanced/veteran are plain power slots, no known-spell.)
+      if (['novice', 'adept', 'greater'].includes(cat)) grants.push({ cat: 'spellsKnown', n: 1 });
+    }
+  }
+  const known = text.match(/\badds?\s+(\d+)\s+to\s+the\s+number\s+of\s+Known\s+Spells/i);
+  if (known) grants.push({ cat: 'spellsKnown', n: parseInt(known[1], 10) });
+  if (/additional\s+spell-?slot\s+of\s+their\s+highest[- ]level/i.test(text)) highest = true;
+  return { grants, highest };
+}
+function extractSlotGrants(entity) {
+  const { grants, highest } = slotGrantsFromText(entity.name, entity.description || entity.desc || '');
+  if (grants.length) entity.slotGrants = grants;
+  if (highest) entity.highestSlot = true;
+}
+
+// Run every per-entity mechanical extractor over an entity with a description.
+function enrichMechanics(entity) {
+  extractStatMods(entity);
+  extractWealthIncome(entity);
+  extractSlotGrants(entity);
+}
+
 // Powers offering "choose one of the following: • … • …". Two flavors:
 //   - BUILD-TIME permanent: "gains one of the following FOR FREE" (Expert Craft) —
 //     a character-creation pick; each option names a skill granted free. Tagged
@@ -699,7 +781,7 @@ function extractChooseOne(power) {
 const CLASSES_OUT = parseClasses();
 for (const c of CLASSES_OUT) {
   for (const arr of Object.values(c)) {
-    if (Array.isArray(arr)) for (const p of arr) if (p && p.description) { extractPowerBenefits(p); extractChooseOne(p); extractStatMods(p); }
+    if (Array.isArray(arr)) for (const p of arr) if (p && p.description) { extractPowerBenefits(p); extractChooseOne(p); enrichMechanics(p); }
   }
 }
 write('classes.json', CLASSES_OUT);
@@ -785,9 +867,9 @@ function parseSkills() {
 }
 
 // Enrich a flat entity list (skills/perks/flaws) with parsed stat mods, in place.
-const withStatMods = (list) => { for (const e of list) extractStatMods(e); return list; };
+const withMechanics = (list) => { for (const e of list) enrichMechanics(e); return list; };
 
-write('skills.json', withStatMods(parseSkills()));
+write('skills.json', withMechanics(parseSkills()));
 
 // ─── PERKS & FLAWS ────────────────────────────────────────────────────────────
 // Under "Character Options" H1. Perks/Flaws are H3 entries with Cost/Award, Ranks,
@@ -1051,8 +1133,8 @@ function extractTiers(results) {
   return results;
 }
 
-write('perks.json', withStatMods(extractTiers(enrichWithDetailSections(parsePerkFlawList('Perks List', 'cost')))));
-write('flaws.json', withStatMods(enrichWithDetailSections(parsePerkFlawList('Flaws List', 'bp'))));
+write('perks.json', withMechanics(extractTiers(enrichWithDetailSections(parsePerkFlawList('Perks List', 'cost')))));
+write('flaws.json', withMechanics(enrichWithDetailSections(parsePerkFlawList('Flaws List', 'bp'))));
 
 // ─── DEVOTIONS ────────────────────────────────────────────────────────────────
 // Each devotion is an H1. Content is text nodes with bullet lists for tenets.
@@ -1292,7 +1374,7 @@ function parseLineages() {
 
     const challenges = parseItems('Challenges');
     const advantages = parseItems('Advantages');
-    for (const a of advantages) extractStatMods(a); // structured stat boosts
+    for (const a of advantages) enrichMechanics(a); // structured mechanics
 
     // Derive sub-lineages from distinct non-General groups
     const byName = new Map();

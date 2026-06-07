@@ -150,7 +150,13 @@
         "requirement": "Artisan Level 3",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Artisan learns an additional Basic Power from the Artisan Class Powers."
+        "description": "The Artisan learns an additional Basic Power from the Artisan Class Powers.",
+        "slotGrants": [
+          {
+            "cat": "basic",
+            "n": 1
+          }
+        ]
       },
       {
         "name": "The Learned One",
@@ -188,7 +194,13 @@
         "requirement": "Artisan Level 5",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Artisan learns an additional Utility Power from the Artisan Class Powers."
+        "description": "The Artisan learns an additional Utility Power from the Artisan Class Powers.",
+        "slotGrants": [
+          {
+            "cat": "utility",
+            "n": 1
+          }
+        ]
       },
       {
         "name": "Grand Ritualist",
@@ -226,7 +238,13 @@
         "requirement": "Artisan Level 8",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Artisan learns an additional Advanced Power from the Artisan Class Powers."
+        "description": "The Artisan learns an additional Advanced Power from the Artisan Class Powers.",
+        "slotGrants": [
+          {
+            "cat": "advanced",
+            "n": 1
+          }
+        ]
       },
       {
         "name": "Expert Craft",
@@ -1684,7 +1702,13 @@
         "requirement": "Artisan Level 6",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Artisan learns an additional Utility Power from the Artisan Class Powers."
+        "description": "The Artisan learns an additional Utility Power from the Artisan Class Powers.",
+        "slotGrants": [
+          {
+            "cat": "utility",
+            "n": 1
+          }
+        ]
       },
       {
         "name": "Batch Process",
@@ -1791,7 +1815,11 @@
         "cantrips": 1,
         "spellsKnown": 2,
         "slots": "2/0/0",
-        "bonus": "Innate Bonus Cantrip: Cancel, Healing Touch"
+        "bonus": "Innate Bonus Cantrip: Cancel, Healing Touch",
+        "innateCantrips": [
+          "Cancel",
+          "Healing Touch"
+        ]
       },
       "3": {
         "cantrips": 1,
@@ -2025,7 +2053,13 @@
         "requirement": "Cleric Level 6",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Cleric learns an additional Cantrip from the Cleric Class Powers or Cantrips."
+        "description": "The Cleric learns an additional Cantrip from the Cleric Class Powers or Cantrips.",
+        "slotGrants": [
+          {
+            "cat": "cantrips",
+            "n": 1
+          }
+        ]
       },
       {
         "name": "Expand Focus",
@@ -2905,7 +2939,11 @@
         "cantrips": 1,
         "spellsKnown": 2,
         "slots": "2/0/0",
-        "bonus": "Innate Bonus Cantrip: Cancel, Nature’s Understanding"
+        "bonus": "Innate Bonus Cantrip: Cancel, Nature’s Understanding",
+        "innateCantrips": [
+          "Cancel",
+          "Nature’s Understanding"
+        ]
       },
       "3": {
         "cantrips": 1,
@@ -3190,7 +3228,13 @@
         "requirement": "Druid Level 6",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Druid learns an additional Cantrip from the Druid Class Powers or Cantrips."
+        "description": "The Druid learns an additional Cantrip from the Druid Class Powers or Cantrips.",
+        "slotGrants": [
+          {
+            "cat": "cantrips",
+            "n": 1
+          }
+        ]
       },
       {
         "name": "Flexible Form",
@@ -5365,7 +5409,13 @@
         "requirement": "Fighter Level 6",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Fighter learns an additional Utility Power from the Fighter Class Powers."
+        "description": "The Fighter learns an additional Utility Power from the Fighter Class Powers.",
+        "slotGrants": [
+          {
+            "cat": "utility",
+            "n": 1
+          }
+        ]
       },
       {
         "name": "Flesh of the Titan",
@@ -5420,7 +5470,10 @@
         "cantrips": 0,
         "spellsKnown": 1,
         "slots": "1/0/0",
-        "bonus": "Arcane Study, Innate Bonus Cantrip: Cancel"
+        "bonus": "Arcane Study, Innate Bonus Cantrip: Cancel",
+        "innateCantrips": [
+          "Cancel"
+        ]
       },
       "2": {
         "cantrips": 1,
@@ -5673,7 +5726,13 @@
         "requirement": "Mage Level 6",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Mage learns an additional Cantrip from the Mage Class Powers or Cantrips."
+        "description": "The Mage learns an additional Cantrip from the Mage Class Powers or Cantrips.",
+        "slotGrants": [
+          {
+            "cat": "cantrips",
+            "n": 1
+          }
+        ]
       }
     ],
     "rightHandPowers": [],
@@ -7723,7 +7782,13 @@
         "requirement": "Rogue Level 6",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Rogue learns an additional Utility Power from the Rogue Class Powers."
+        "description": "The Rogue learns an additional Utility Power from the Rogue Class Powers.",
+        "slotGrants": [
+          {
+            "cat": "utility",
+            "n": 1
+          }
+        ]
       },
       {
         "name": "Retreat",
@@ -7873,7 +7938,13 @@
         "requirement": "Socialite Level 2",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Socialite learns an additional Basic Power from the Socialite Class Powers."
+        "description": "The Socialite learns an additional Basic Power from the Socialite Class Powers.",
+        "slotGrants": [
+          {
+            "cat": "basic",
+            "n": 1
+          }
+        ]
       },
       {
         "name": "Heart of the Group",
@@ -8122,7 +8193,11 @@
         "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Socialite gains 4 Wealth per Event at Logistics check-in. Additionally, the Socialite can serve as an intermediary between two combatants who wish to beat each other to a pulp. The Socialite declares the fight and ensures everyone knows the rules. Once the two duelists accept the duel, the Pit Master has a few Instructions to give. This need not be verbatim: “Instruction to [Names of Duelists]: You will be unable to use Powers or make attacks on anyone but each other until this duel ends. The duel ends when I declare a winner, when one of you takes damage or an Effect from someone not in this duel, or one of you admit defeat to the other. When the duel ends, you will have all the same Powers, Life Points, and Armor Points you have right now, regardless of what is used during the duel; only expended Resources will remain expended.” The duel is declared by the Socialite with the following example calls at thematically appropriate moments: • “I declare this duel honorable and just!” • “Duelists, are you ready?” • “Fight!” • “Winner!” If the Socialite knows that the duel has ended, they must inform the duelists."
+        "description": "The Socialite gains 4 Wealth per Event at Logistics check-in. Additionally, the Socialite can serve as an intermediary between two combatants who wish to beat each other to a pulp. The Socialite declares the fight and ensures everyone knows the rules. Once the two duelists accept the duel, the Pit Master has a few Instructions to give. This need not be verbatim: “Instruction to [Names of Duelists]: You will be unable to use Powers or make attacks on anyone but each other until this duel ends. The duel ends when I declare a winner, when one of you takes damage or an Effect from someone not in this duel, or one of you admit defeat to the other. When the duel ends, you will have all the same Powers, Life Points, and Armor Points you have right now, regardless of what is used during the duel; only expended Resources will remain expended.” The duel is declared by the Socialite with the following example calls at thematically appropriate moments: • “I declare this duel honorable and just!” • “Duelists, are you ready?” • “Fight!” • “Winner!” If the Socialite knows that the duel has ended, they must inform the duelists.",
+        "wealthIncome": {
+          "n": 4,
+          "kind": "recurring"
+        }
       },
       {
         "name": "Safebox",
@@ -8955,7 +9030,13 @@
         "requirement": "Socialite Level 6",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Socialite learns an additional Utility Power from the Socialite Class Powers."
+        "description": "The Socialite learns an additional Utility Power from the Socialite Class Powers.",
+        "slotGrants": [
+          {
+            "cat": "utility",
+            "n": 1
+          }
+        ]
       }
     ],
     "rightHandPowers": [
@@ -9286,7 +9367,11 @@
         "cantrips": 1,
         "spellsKnown": 2,
         "slots": "2/0/0",
-        "bonus": "Innate Bonus Cantrip: Cancel, Astride the Weave"
+        "bonus": "Innate Bonus Cantrip: Cancel, Astride the Weave",
+        "innateCantrips": [
+          "Cancel",
+          "Astride the Weave"
+        ]
       },
       "3": {
         "cantrips": 1,
@@ -9577,7 +9662,13 @@
         "requirement": "Sourcerer Level 6",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Sourcerer learns an additional Cantrip from the Sourcerer Class Powers or Cantrips."
+        "description": "The Sourcerer learns an additional Cantrip from the Sourcerer Class Powers or Cantrips.",
+        "slotGrants": [
+          {
+            "cat": "cantrips",
+            "n": 1
+          }
+        ]
       },
       {
         "name": "Faded Slumber",

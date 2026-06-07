@@ -337,7 +337,13 @@
     "prereq": "One level in a non-casting class",
     "ranks": 2,
     "category": "Martial",
-    "description": "The character may choose an additional Basic Tier Power from a non-casting class that they have levels in. The Power cannot be one the character already has. This is just like an additional Tier Power from the class. The Power must be of a Tier they could normally take without using Agile Learner."
+    "description": "The character may choose an additional Basic Tier Power from a non-casting class that they have levels in. The Power cannot be one the character already has. This is just like an additional Tier Power from the class. The Power must be of a Tier they could normally take without using Agile Learner.",
+    "slotGrants": [
+      {
+        "cat": "basic",
+        "n": 1
+      }
+    ]
   },
   {
     "name": "Extensive Combat Training - Advanced",
@@ -345,7 +351,13 @@
     "prereq": "One level in a non-casting class",
     "ranks": 2,
     "category": "Martial",
-    "description": "The character may choose an additional Adept Tier Power from a non-casting class that they have levels in. The Power cannot be one the character already has. This is just like an additional Tier Power from the class. The Power must be of a Tier they could normally take without using Agile Learner."
+    "description": "The character may choose an additional Adept Tier Power from a non-casting class that they have levels in. The Power cannot be one the character already has. This is just like an additional Tier Power from the class. The Power must be of a Tier they could normally take without using Agile Learner.",
+    "slotGrants": [
+      {
+        "cat": "advanced",
+        "n": 1
+      }
+    ]
   },
   {
     "name": "Extensive Combat Training - Veteran",
@@ -353,7 +365,13 @@
     "prereq": "One level in a non-casting class",
     "ranks": 1,
     "category": "Martial",
-    "description": "The character may choose an additional Veteran Tier Power from a non-casting class that they have levels in. The Power cannot be one the character already has. This is just like an additional Tier Power from the class. The Power must be of a Tier they could normally take without using Agile Learner."
+    "description": "The character may choose an additional Veteran Tier Power from a non-casting class that they have levels in. The Power cannot be one the character already has. This is just like an additional Tier Power from the class. The Power must be of a Tier they could normally take without using Agile Learner.",
+    "slotGrants": [
+      {
+        "cat": "veteran",
+        "n": 1
+      }
+    ]
   },
   {
     "name": "Extensive Training",
@@ -361,7 +379,13 @@
     "prereq": "One level in a non-casting class",
     "ranks": 2,
     "category": "Martial",
-    "description": "The character may choose an additional Utility Power from a non-casting class that they have levels in. This is just like an additional Utility Power from the class."
+    "description": "The character may choose an additional Utility Power from a non-casting class that they have levels in. This is just like an additional Utility Power from the class.",
+    "slotGrants": [
+      {
+        "cat": "utility",
+        "n": 1
+      }
+    ]
   },
   {
     "name": "Agile Learner",
@@ -425,7 +449,17 @@
     "prereq": "Basic Arcane or Basic Faith",
     "ranks": 4,
     "category": "Magic",
-    "description": "The character chooses one Sphere of magic and gains one additional Novice spell-slot in that Sphere and can use it to cast a Known spell."
+    "description": "The character chooses one Sphere of magic and gains one additional Novice spell-slot in that Sphere and can use it to cast a Known spell.",
+    "slotGrants": [
+      {
+        "cat": "novice",
+        "n": 1
+      },
+      {
+        "cat": "spellsKnown",
+        "n": 1
+      }
+    ]
   },
   {
     "name": "Extended Capacity - Adept",
@@ -433,7 +467,17 @@
     "prereq": "One Adept spell-slot",
     "ranks": 4,
     "category": "Magic",
-    "description": "The character chooses one Sphere of magic they have an Adept Spell slot for and gains one additional Adept Spell-Slot in that Sphere and can use it to cast a Known spell."
+    "description": "The character chooses one Sphere of magic they have an Adept Spell slot for and gains one additional Adept Spell-Slot in that Sphere and can use it to cast a Known spell.",
+    "slotGrants": [
+      {
+        "cat": "adept",
+        "n": 1
+      },
+      {
+        "cat": "spellsKnown",
+        "n": 1
+      }
+    ]
   },
   {
     "name": "Extended Capacity - Greater",
@@ -441,7 +485,17 @@
     "prereq": "One Greater spell-slot",
     "ranks": 3,
     "category": "Magic",
-    "description": "The character chooses one Sphere of magic they have a Greater Spell slot for and gains one additional Greater Spell-Slot in that Sphere and can use it to cast a Known spell."
+    "description": "The character chooses one Sphere of magic they have a Greater Spell slot for and gains one additional Greater Spell-Slot in that Sphere and can use it to cast a Known spell.",
+    "slotGrants": [
+      {
+        "cat": "greater",
+        "n": 1
+      },
+      {
+        "cat": "spellsKnown",
+        "n": 1
+      }
+    ]
   },
   {
     "name": "Additional Cantrip",
@@ -449,7 +503,13 @@
     "prereq": "Basic Arcane or Basic Faith",
     "ranks": 4,
     "category": "Magic",
-    "description": "The character can choose one additional Cantrip from their class’ Cantrip spell-list. If the character does not have a class spell-list, they may pick any Base Class Cantrip but the Cantrip must be from the same Sphere (Arcane or Divine) as the prerequisite that qualifies them for this skill."
+    "description": "The character can choose one additional Cantrip from their class’ Cantrip spell-list. If the character does not have a class spell-list, they may pick any Base Class Cantrip but the Cantrip must be from the same Sphere (Arcane or Divine) as the prerequisite that qualifies them for this skill.",
+    "slotGrants": [
+      {
+        "cat": "cantrips",
+        "n": 1
+      }
+    ]
   },
   {
     "name": "Advanced Recharge",
@@ -465,7 +525,13 @@
     "prereq": "Basic Arcane or Basic Faith",
     "ranks": 12,
     "category": "Magic",
-    "description": "The character chooses one spell-casting class in which they have at least 1 Known Spell, and adds 1 to the number of Known Spells that they have access to in that class."
+    "description": "The character chooses one spell-casting class in which they have at least 1 Known Spell, and adds 1 to the number of Known Spells that they have access to in that class.",
+    "slotGrants": [
+      {
+        "cat": "spellsKnown",
+        "n": 1
+      }
+    ]
   },
   {
     "name": "Bookcaster",
@@ -604,7 +670,11 @@
     "ranks": null,
     "category": "Trade",
     "description": "The character has some basic knowledge in a profession and can generally perform in that profession on basic tasks without journeyman or master supervision. More complex tasks may require guidance. The character can perform the basic functions of the chosen profession and will have corollary knowledge of lore and procedures related to it. The character earns some basic income from their profession, represented by earning 3 Wealth at the beginning of each game.",
-    "parameter": "Specific Profession"
+    "parameter": "Specific Profession",
+    "wealthIncome": {
+      "n": 3,
+      "kind": "recurring"
+    }
   },
   {
     "name": "Profession - Journeyman",
@@ -613,7 +683,11 @@
     "ranks": null,
     "category": "Trade",
     "description": "The character has functional knowledge in a profession. The character can perform all normal functions of the chosen profession and they will show solid knowledge related to it. Most tasks associated with that profession can be performed without aid or supervision. The character earns income as a member of the profession, represented by earning 5 Wealth at the beginning of each game, in addition to what they earn from their Apprentice skill. In addition, the character can choose one Profession-related Discern question and can ask it at-will (such as “Discern by Mind: Which civilization built this?” for a mason). This question should be approved by Staff (between games) and at Staff discretion, the question may be allowed to have the Subtle Modifier. The Accent is always “by Mind.”",
-    "parameter": "Specific Profession"
+    "parameter": "Specific Profession",
+    "wealthIncome": {
+      "n": 5,
+      "kind": "recurring"
+    }
   },
   {
     "name": "Profession - Master",
@@ -622,7 +696,11 @@
     "ranks": null,
     "category": "Trade",
     "description": "The character has mastered their chosen profession. They can perform the most complicated tasks and have a deep knowledge of lore associated with that mastery. The character’s mastery earns income represented by earning 8 Wealth at the beginning of each game, in addition to what they earn from their Apprentice and Journeyman skills. In addition, the character can choose one additional Profession-related Discern question and can ask it at-will (such as “Discern by Mind: Does this stone wall seem to be moveable?” for a mason). This question should be approved by Staff (between games) and at Staff discretion, the question may be allowed to have the Subtle Modifier. The Accent is always “by Mind.” Suggested Professions: Soldier, Hunter, Sailor, Wagoneer, Factor, Mercenary, Builder, Fisher, Scribe, Herbalist, Undertaker, Executioner, Merchant, Charlatan, Chirurgeon, Teacher, Magistrate, and other Professions with Staff approval.",
-    "parameter": "Specific Profession"
+    "parameter": "Specific Profession",
+    "wealthIncome": {
+      "n": 8,
+      "kind": "recurring"
+    }
   },
   {
     "name": "Tracking",

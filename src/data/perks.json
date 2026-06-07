@@ -364,7 +364,11 @@
     "ranks": null,
     "prereq": null,
     "category": "Social/Background",
-    "description": "Gains 10 Wealth at the beginning of every game.\n\nCost: 3\n\nPrerequisites: None\n\nPerhaps the character is a minor noble (see Title Perk) or perhaps their family owns a small business. Whatever the reason, the character gets a small stipend from it. The character gets 10 Wealth at the beginning of every game."
+    "description": "Gains 10 Wealth at the beginning of every game.\n\nCost: 3\n\nPrerequisites: None\n\nPerhaps the character is a minor noble (see Title Perk) or perhaps their family owns a small business. Whatever the reason, the character gets a small stipend from it. The character gets 10 Wealth at the beginning of every game.",
+    "wealthIncome": {
+      "n": 10,
+      "kind": "recurring"
+    }
   },
   {
     "name": "Inheritance",
@@ -372,7 +376,11 @@
     "ranks": null,
     "prereq": null,
     "category": "Social/Background",
-    "description": "Gains a one-time sum of money: 100 Wealth.\n\nCost: 4\n\nPrerequisites: None\n\nThe character has a valuable item or sum of money left to them by their family or other benefactor. The character gets a significant bonus to their starting wealth and adds 100 Wealth at the beginning of their first Event. This Perk costs only 3 if the benefactor is a Patron the character has already purchased, however it does not count as a granted discount (as it is not revocable)."
+    "description": "Gains a one-time sum of money: 100 Wealth.\n\nCost: 4\n\nPrerequisites: None\n\nThe character has a valuable item or sum of money left to them by their family or other benefactor. The character gets a significant bonus to their starting wealth and adds 100 Wealth at the beginning of their first Event. This Perk costs only 3 if the benefactor is a Patron the character has already purchased, however it does not count as a granted discount (as it is not revocable).",
+    "wealthIncome": {
+      "n": 100,
+      "kind": "firstEvent"
+    }
   },
   {
     "name": "Manse",
@@ -380,7 +388,11 @@
     "ranks": null,
     "prereq": null,
     "category": "Social/Background",
-    "description": "Owns a house where a character may draw funds from goods produced once per Event.\n\nCost: 3\n\nPrerequisites: None\n\nThe character has a large house, villa, or manse complete with tenants. They should choose the name of their estate and should work with Staff to choose a location and the produce of the estate. Although most people with such lands are noble, some are merchants, crime bosses, or otherwise well-connected individuals with easy access to wealth. The character can draw funds from the goods produced by their tenants at the beginning of each game. This can be 6 Basic Resources [Bloom, Hide, Ingot] and 3 Uncommon Resources [Night Prize, Harvest, Rare Mineral]. Alternatively, 8 Wealth. Choices should be noted in the character’s registration."
+    "description": "Owns a house where a character may draw funds from goods produced once per Event.\n\nCost: 3\n\nPrerequisites: None\n\nThe character has a large house, villa, or manse complete with tenants. They should choose the name of their estate and should work with Staff to choose a location and the produce of the estate. Although most people with such lands are noble, some are merchants, crime bosses, or otherwise well-connected individuals with easy access to wealth. The character can draw funds from the goods produced by their tenants at the beginning of each game. This can be 6 Basic Resources [Bloom, Hide, Ingot] and 3 Uncommon Resources [Night Prize, Harvest, Rare Mineral]. Alternatively, 8 Wealth. Choices should be noted in the character’s registration.",
+    "wealthIncome": {
+      "n": 8,
+      "kind": "manse"
+    }
   },
   {
     "name": "Minor Fame",

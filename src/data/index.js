@@ -166,8 +166,13 @@ function powerEntry(p) {
     effect: p.effect ?? null,
     incantation: p.incantation ?? null,
     maxRanks: p.maxRanks ?? 1,
+    // Parser-extracted structured mechanics (read by the validator instead of
+    // re-parsing the description). Keep this list in sync with enrichMechanics.
     statMods: p.statMods ?? [],
     statModNotes: p.statModNotes ?? [],
+    wealthIncome: p.wealthIncome ?? null,
+    slotGrants: p.slotGrants ?? [],
+    highestSlot: p.highestSlot ?? false,
   };
 }
 
@@ -271,6 +276,9 @@ const lineageItem = it => ({
   desc: it.description,
   statMods: it.statMods ?? [],
   statModNotes: it.statModNotes ?? [],
+  wealthIncome: it.wealthIncome ?? null,
+  slotGrants: it.slotGrants ?? [],
+  highestSlot: it.highestSlot ?? false,
 });
 
 export const LINEAGES = Object.fromEntries(

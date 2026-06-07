@@ -117,7 +117,8 @@ export function lbpState(character) {
 //   1. GRANT-OF-ENTITY — a source gives you a named Perk/Power/Skill for free
 //      ("gains the Magical Resilience Perk"). Edge: REFS.grants/grantedBy. ↓ here.
 //   2. GRANT-OF-SLOT    — a source gives you an extra slot/pool ("+1 Novice
-//      spell-slot"). Handled by scanSlotGrant/slotGrants, not here.
+//      spell-slot"). Parser-extracted to entity.slotGrants; applied by
+//      slotGrants/spellSlots, not here.
 //   3. DISCOUNT         — a source makes other purchases cheaper (Patron, etc.).
 //      Edge: REFS.discounts. Handled by discountSources/applyDiscounts.
 // (We use one word — "grant" — for #1; an earlier draft called it "bestowal".)
@@ -992,35 +993,6 @@ export function computeSpend(character) {
 // "Extended Capacity - Novice"). Derived data-driven from each owned skill's
 // description rather than a hardcoded list: a phrase like "one additional
 // Cantrip" or "additional Novice spell-slot" adds to the matching category cap.
-// Novice/Adept/Greater spell-slots all feed the single spellsKnown budget.
-// Returns { cantrips, spellsKnown, utility, basic, advanced, veteran } deltas.
-const TIER_TO_CATEGORY = {
-  novice: 'spellsKnown', adept: 'spellsKnown', greater: 'spellsKnown',
-  cantrip: 'cantrips',
-  utility: 'utility', basic: 'basic', advanced: 'advanced', veteran: 'veteran',
-};
-// Scan one entity's text for a slot-granting phrase, adding to `grants`.
-//   "additional Cantrip"                 → +1 cantrips
-//   "additional <Tier> [spell-]slot/power" → +1 to that tier's category
-function scanSlotGrant(text, add, name) {
-  if (!text) return;
-  if (name && name.includes('Extensive Combat Training')) {
-    if (name.includes('Basic')) add('basic', 1);
-    else if (name.includes('Advanced')) add('advanced', 1);
-    else if (name.includes('Veteran')) add('veteran', 1);
-    return;
-  }
-  if (/\badditional\s+cantrip\b/i.test(text)) add('cantrips', 1);
-  // "additional <Tier> spell-slot/slot/power" → +1 to that tier's category.
-  const m = text.match(/\badditional\s+(Novice|Adept|Greater|Utility|Basic|Advanced|Veteran)\s+(?:Tier\s+)?(?:spell-?\s*slot|slot|power)/i);
-  if (m) {
-    const cat = TIER_TO_CATEGORY[m[1].toLowerCase()];
-    if (cat) add(cat, 1);
-  }
-  // "adds N to the number of Known Spells" (e.g. Spell-Scholar) → +N spellsKnown.
-  const known = text.match(/\badds?\s+(\d+)\s+to\s+the\s+number\s+of\s+Known\s+Spells/i);
-  if (known) add('spellsKnown', parseInt(known[1], 10));
-}
 
 // Minimum class level a power requires, parsed from "<Class> Level N" / "Level N"
 // in its requirement text. 0 when none stated.
@@ -1035,8 +1007,11 @@ function requiredLevel(power) {
 // the bonus lands on the correct per-class slot row.
 function slotGrants(character) {
   const grants = {};
+  // computeSlots categories only. Raw spell-tier grants (novice/adept/greater) are
+  // the province of spellSlots(), not the slot-cap budget here — skip them.
+  const SLOT_CATS = new Set(['cantrips', 'spellsKnown', 'utility', 'basic', 'advanced', 'veteran']);
   const addTo = (cls, cat, n) => {
-    if (!cls) return;
+    if (!cls || !SLOT_CATS.has(cat)) return;
     const k = `${cls}:${cat}`;
     grants[k] = (grants[k] || 0) + n;
   };
@@ -1047,26 +1022,25 @@ function slotGrants(character) {
   const classFor = (cat) => (cat === 'cantrips' || cat === 'spellsKnown') ? casterClass : martialClass;
 
   // 1. Purchased / starting skills that grant slots (Additional Cantrip,
-  //    Extended Capacity, Spell-Scholar). Attribute to the relevant class, and
-  //    multiply by the item's rank ("Extended Capacity - Novice x2" → +2).
+  //    Extended Capacity, Spell-Scholar). The grants are parser-extracted
+  //    (ent.slotGrants); attribute each to the relevant class and multiply by the
+  //    item's rank ("Extended Capacity - Novice x2" → +2).
   for (const field of ['startingSkills', 'purchasedSkills']) {
     (character[field] || []).forEach((item, idx) => {
       const ent = lookupEntity(resolveId(item, field, character))
         || lookupEntity(`skills:${cleanItemName(item)}`);
       const rank = rankOf(character, field, idx);
-      scanSlotGrant(ent?.description, (cat, n) => addTo(classFor(cat), cat, n * rank), ent?.name || item);
+      for (const { cat, n } of (ent?.slotGrants || [])) addTo(classFor(cat), cat, n * rank);
     });
   }
 
-  // 2 + 3. Per-class automatic grants, gated by that class's own level:
-  //   - INNATE powers granting slots (Artisan "Brilliant Thinker" → +1 Basic).
-  // NOTE: the progression "Innate Bonus Cantrip: Cancel" prose is intentionally
-  // NOT handled here. It grants the SPECIFIC Cancel cantrip as a free, locked
-  // innate — not a choosable cantrip slot — so it must not bump the cantrip cap
-  // (which is the table's Cantrips column). See innateBonusCantrips().
+  // 2 + 3. Per-class automatic grants, gated by that class's own level: INNATE
+  // powers granting slots (Artisan "Brilliant Thinker" → +1 Basic). The
+  // progression "Innate Bonus Cantrip" is NOT a slot — it grants the specific
+  // locked cantrip, handled by innateBonusCantrips(), so it never bumps the cap.
   for (const { name: cls, level: clsLevel } of classes) {
     for (const p of (CLASS_POWERS[cls]?.innate || [])) {
-      if (requiredLevel(p) <= clsLevel) scanSlotGrant(p.desc || p.description, (cat, n) => addTo(cls, cat, n), p.name);
+      if (requiredLevel(p) <= clsLevel) for (const { cat, n } of (p.slotGrants || [])) addTo(cls, cat, n);
     }
   }
 
@@ -1087,12 +1061,9 @@ export function innateBonusCantrips(character) {
     const classCantrips = new Set((CLASS_POWERS[cls]?.cantrips || []).map((c) => c.name));
     const progression = CLASS_PROGRESSION[cls] || {};
     for (let lvl = 1; lvl <= clsLevel; lvl++) {
-      const bonus = progression[lvl]?.bonus;
-      const m = bonus && bonus.match(/innate\s+bonus\s+cantrip:\s*([^]*)/i);
-      if (!m) continue;
-      // Split the trailing list on commas/newlines; keep only real cantrips.
-      for (const raw of m[1].split(/[,\n]/)) {
-        const nm = raw.trim();
+      // Parser-extracted innate-cantrip names from the progression bonus column;
+      // keep only those that are real cantrips of this class.
+      for (const nm of (progression[lvl]?.innateCantrips || [])) {
         if (!classCantrips.has(nm)) continue;
         const key = `${cls}:${nm}`;
         if (seen.has(key)) continue;
@@ -1208,77 +1179,43 @@ export function spellSlots(character) {
     }
   }
 
-  // 1. Scan starting, purchased, and class skills.
+  // Additional spell-slot grants from owned skills/perks/advantages are
+  // parser-extracted (ent.slotGrants for novice/adept/greater; ent.highestSlot for
+  // a floating "highest-level" slot). Walk every owned source once, apply its
+  // tier-slot grants (×rank for ranked skills), and collect any highest-slot flag.
+  const SPELL_TIERS = new Set(['novice', 'adept', 'greater']);
+  let highestSlots = 0;
+  const applySpellGrants = (ent, rank = 1) => {
+    if (!ent) return;
+    for (const { cat, n } of (ent.slotGrants || [])) {
+      if (SPELL_TIERS.has(cat)) total[cat] += n * rank;
+    }
+    if (ent.highestSlot) highestSlots += 1;
+  };
+
   for (const field of ['startingSkills', 'purchasedSkills', 'classSkills']) {
     (character[field] || []).forEach((item, idx) => {
       const ent = lookupEntity(resolveId(item, field, character))
         || lookupEntity(`skills:${cleanItemName(item)}`);
-      const rank = rankOf(character, field, idx);
-      if (ent?.description) {
-        const m = ent.description.match(/\badditional\s+(Novice|Adept|Greater)\s+spell-?slot/i);
-        if (m) {
-          total[m[1].toLowerCase()] += rank;
-        }
-      }
+      applySpellGrants(ent, rankOf(character, field, idx));
     });
   }
-
-  // 2. Scan purchased perks.
   for (const item of (character.purchasedPerks || [])) {
-    const ent = lookupEntity(`perks:${cleanItemName(item)}`);
-    if (ent?.description) {
-      const m = ent.description.match(/\badditional\s+(Novice|Adept|Greater)\s+spell-?slot/i);
-      if (m) {
-        total[m[1].toLowerCase()] += 1;
-      }
-    }
-  }
-
-  // 3. Scan lineage advantages.
-  if (character.lineage) {
-    const lin = LINEAGES[character.lineage];
-    for (const name of (character.lineageAdvantages || [])) {
-      const a = (lin?.advantages || []).find((x) => x.name === name || x.baseName === name);
-      if (a?.desc || a?.description) {
-        const desc = a.desc || a.description;
-        const m = desc.match(/\badditional\s+(Novice|Adept|Greater)\s+spell-?slot/i);
-        if (m) {
-          total[m[1].toLowerCase()] += 1;
-        }
-      }
-    }
-  }
-
-  // 4. Handle "highest-level spell-slot" modifiers.
-  const allTexts = [];
-  for (const field of ['startingSkills', 'purchasedSkills', 'classSkills']) {
-    for (const item of (character[field] || [])) {
-      const ent = lookupEntity(resolveId(item, field, character))
-        || lookupEntity(`skills:${cleanItemName(item)}`);
-      if (ent?.description) allTexts.push(ent.description);
-    }
-  }
-  for (const item of (character.purchasedPerks || [])) {
-    const ent = lookupEntity(`perks:${cleanItemName(item)}`);
-    if (ent?.description) allTexts.push(ent.description);
+    applySpellGrants(lookupEntity(`perks:${cleanItemName(item)}`));
   }
   if (character.lineage) {
     const lin = LINEAGES[character.lineage];
     for (const name of (character.lineageAdvantages || [])) {
-      const a = (lin?.advantages || []).find((x) => x.name === name || x.baseName === name);
-      if (a?.desc || a?.description) allTexts.push(a.desc || a.description);
+      applySpellGrants((lin?.advantages || []).find((x) => x.name === name || x.baseName === name));
     }
   }
-  for (const text of allTexts) {
-    if (/additional\s+spell-?slot\s+of\s+their\s+highest[- ]level/i.test(text)) {
-      if (total.greater > 0) {
-        total.greater += 1;
-      } else if (total.adept > 0) {
-        total.adept += 1;
-      } else if (total.novice > 0) {
-        total.novice += 1;
-      }
-    }
+
+  // A "highest-level spell-slot" grant adds one slot at the character's highest
+  // accessible tier (greater, else adept, else novice).
+  for (let i = 0; i < highestSlots; i++) {
+    if (total.greater > 0) total.greater += 1;
+    else if (total.adept > 0) total.adept += 1;
+    else if (total.novice > 0) total.novice += 1;
   }
 
   return total;
@@ -1338,25 +1275,14 @@ export const DEFAULT_WEALTH = 8;
 //   Tax Evasion: "+3 Wealth per rank of Profession, +2 each for Manse & Income"
 // One-time / spend amounts (Inheritance's lump sum, bounty costs) are NOT income
 // and are skipped. Returns { base, income, total, sources:[{name,n,note}] }.
-function scanWealthIncome(name, text) {
-  if (!text) return null;
-  // "<N> Wealth at the beginning of each/every game" or "<N> Wealth per Event".
-  const recurring = text.match(/(\d+)\s*Wealth\s+(?:at the beginning of (?:each|every)\s+(?:game|event)|per\s+Event)/i);
-  if (recurring) return { n: parseInt(recurring[1], 10) };
-  // Manse: the cash alternative to resources ("Alternatively, N Wealth").
-  if (/\bManse\b/i.test(name)) {
-    const alt = text.match(/Alternatively,?\s*(\d+)\s*Wealth/i);
-    if (alt) return { n: parseInt(alt[1], 10), note: 'or resources' };
-  }
-  // One-time starting grants that land AT THE FIRST EVENT count toward the
-  // point-in-time total (Inheritance: "adds 100 Wealth at the beginning of their
-  // first Event" / "one-time sum of money: N Wealth"). Recurring patterns above
-  // win first, so this only catches genuine one-time first-event sums.
-  const firstEvent = text.match(/(\d+)\s*Wealth\s+at the beginning of (?:their\s+)?first\s+Event/i)
-    || text.match(/one-time\s+sum[^.]*?(\d+)\s*Wealth/i);
-  if (firstEvent) return { n: parseInt(firstEvent[1], 10), note: 'one-time, first event' };
-  return null;
-}
+// The display note for a parser-extracted wealthIncome { n, kind }. Income amounts
+// and their classification are extracted in the parser (entity.wealthIncome); this
+// just maps the kind to the UI label the wealth panel already shows.
+const WEALTH_NOTE = { manse: 'or resources', firstEvent: 'one-time, first event', recurring: undefined };
+const wealthFrom = (ent) => {
+  const w = ent?.wealthIncome;
+  return w ? { n: w.n, note: WEALTH_NOTE[w.kind] } : null;
+};
 
 export function wealthState(character) {
   const base = character.wealth != null && character.wealth !== ''
@@ -1373,7 +1299,7 @@ export function wealthState(character) {
     const ent = lookupEntity(`${entityType(r.field) === 'perks' ? 'perks' : 'skills'}:${bareSkill(cleanItemName(r.name))}`)
       || lookupEntity(`perks:${cleanItemName(r.name)}`) || lookupEntity(`skills:${cleanItemName(r.name)}`);
     if (ent?.type === 'perks') ownedPerkNames.add(ent.name);
-    const w = scanWealthIncome(ent?.name || r.name, ent?.description);
+    const w = wealthFrom(ent);
     if (w) add(ent?.name || r.name, w.n, w.note);
   }
   // Owned/selected powers (Pit Master, etc.) + innate at level.
@@ -1381,7 +1307,7 @@ export function wealthState(character) {
   for (const { name: cls } of getClasses(character)) {
     for (const p of (CLASS_POWERS[cls]?.innate || [])) {
       ownedPowerNames.add(p.name);
-      const w = scanWealthIncome(p.name, p.description); if (w) add(p.name, w.n, w.note);
+      const w = wealthFrom(p); if (w) add(p.name, w.n, w.note);
     }
   }
   for (const field of POWER_SOURCE_FIELDS) {
@@ -1389,7 +1315,7 @@ export function wealthState(character) {
       const ent = lookupEntity(`powers:${cleanItemName(item)}`);
       if (!ent) continue;
       ownedPowerNames.add(ent.name);
-      const w = scanWealthIncome(ent.name, ent.description); if (w) add(ent.name, w.n, w.note);
+      const w = wealthFrom(ent); if (w) add(ent.name, w.n, w.note);
     }
   }
 
