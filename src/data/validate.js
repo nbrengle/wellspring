@@ -1019,11 +1019,12 @@ export function computeSpend(character) {
 // description rather than a hardcoded list: a phrase like "one additional
 // Cantrip" or "additional Novice spell-slot" adds to the matching category cap.
 
-// Minimum class level a power requires, parsed from "<Class> Level N" / "Level N"
-// in its requirement text. 0 when none stated.
+// Minimum class level a power requires. Parser-extracted to power.requiredLevel
+// (from the "<Class> Level N" requirement text); 0 when none stated. Named-entity
+// requirements (power.requiresEntity, e.g. "Parry Blow") are NOT enforced yet —
+// that's a separate follow-up.
 function requiredLevel(power) {
-  const m = String(power?.requirement || '').match(/level\s+(\d+)/i);
-  return m ? parseInt(m[1], 10) : 0;
+  return power?.requiredLevel ?? 0;
 }
 
 // Bonus slots, keyed PER CLASS as "class:category" → count. Class features
@@ -1755,6 +1756,61 @@ export function checkPrereqs(character) {
       kind: 'other',
       text: 'Must be taken at Character Creation.',
     });
+  }
+
+  // ─── Power requirements (parser-extracted: requiredLevel + requiresEntity) ───
+  // A selected power may require a minimum class level and/or another owned entity
+  // (e.g. Expert Parry → Parry Blow). Resolve each owned power IN THE CONTEXT OF
+  // THE CHARACTER'S OWN CLASSES — power names are shared across classes with
+  // different requirements (a Cleric's "Ritual Affinity" requires Cleric L3, the
+  // Mage's requires Mage L3), so the flat lookup would pick the wrong one.
+  const charClassLevels = new Map(charClasses.map((c) => [c.name, c.level]));
+  // Find a power entity by name from one of the character's classes (the version
+  // whose requirements actually apply); fall back to the global entity.
+  const powerInContext = (name) => {
+    for (const { name: cls } of charClasses) {
+      const tiers = CLASS_POWERS[cls];
+      if (!tiers) continue;
+      for (const list of Object.values(tiers)) {
+        if (!Array.isArray(list)) continue;
+        const hit = list.find((p) => p.name === name);
+        if (hit) return hit;
+      }
+    }
+    return lookupEntity(`powers:${name}`);
+  };
+  const POWER_REQ_FIELDS = [
+    'innatePowers', 'utilityPowers', 'basicPowers', 'advancedPowers', 'veteranPowers',
+    'classPowers', 'rightHandPowers', 'cantrips', 'noviceSpells', 'adeptSpells',
+    'greaterSpells', 'bookSpells', 'domainPowers', 'formPowers',
+  ];
+  const reqSeen = new Set();
+  for (const field of POWER_REQ_FIELDS) {
+    for (const item of character[field] || []) {
+      const name = cleanItemName(item);
+      if (reqSeen.has(name)) continue;
+      reqSeen.add(name);
+      const ent = powerInContext(name);
+      if (!ent) continue;
+      // Level requirement: against the owning class's level (or character level
+      // when the requirement names no class).
+      if (ent.requiredLevel > 0) {
+        const have = ent.requiredClass ? (charClassLevels.get(ent.requiredClass) || 0) : charLevel;
+        if (have < ent.requiredLevel) {
+          issues.push({ id: `powers:${name}`, item: name, field,
+            text: `Requires ${ent.requiredClass ? `${ent.requiredClass} ` : ''}Level ${ent.requiredLevel}` });
+        }
+      }
+      // Entity requirement: each named prerequisite power/skill must be owned.
+      for (const reqName of (ent.requiresEntity || [])) {
+        const ok = owned.has(`powers:${reqName}`) || owned.has(`skills:${reqName}`)
+          || owned.has(`perks:${reqName}`) || owned.has(`powers:${bareSkill(reqName)}`);
+        if (!ok) {
+          issues.push({ id: `powers:${name}`, item: name, field,
+            requiresEntity: reqName, text: `Requires ${reqName}` });
+        }
+      }
+    }
   }
 
   return { issues, notes };

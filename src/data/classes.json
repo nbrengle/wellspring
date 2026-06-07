@@ -131,7 +131,9 @@
         "requirement": "Artisan Level 2",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Artisan gains a Living Iron pool equal to 3 x Artisan’s Class Level. This pool resets every Long Rest. The Artisan may subtract from their Living Iron pool when the power is used to Mend armor (Physical, Summoned, or Natural) up to the Artisan’s class-level. Example: A 4th level Artisan has 12 total points of Mending per Long Rests, and can Mend up to 4 points per use of the Power. Artificers gain additional points to their Living Iron pool based on the amounts below. Artisans that are Artificers gain bonuses based on how many tagged [Artificer] powers they have from all their classes. • 5+         [Artificer] Artisan Powers - Living Iron pool is 4 x Artisan’s Class levels • 7+         [Artificer] Artisan Powers - Living Iron pool is 5 x Artisan's Class levels • 10+         [Artificer] Artisan Powers - Living Iron pool is 6 x Artisan's Class levels • 15+         [Artificer] Artisan Powers - Living Iron pool is 7 x Artisan's Class levels"
+        "description": "The Artisan gains a Living Iron pool equal to 3 x Artisan’s Class Level. This pool resets every Long Rest. The Artisan may subtract from their Living Iron pool when the power is used to Mend armor (Physical, Summoned, or Natural) up to the Artisan’s class-level. Example: A 4th level Artisan has 12 total points of Mending per Long Rests, and can Mend up to 4 points per use of the Power. Artificers gain additional points to their Living Iron pool based on the amounts below. Artisans that are Artificers gain bonuses based on how many tagged [Artificer] powers they have from all their classes. • 5+         [Artificer] Artisan Powers - Living Iron pool is 4 x Artisan’s Class levels • 7+         [Artificer] Artisan Powers - Living Iron pool is 5 x Artisan's Class levels • 10+         [Artificer] Artisan Powers - Living Iron pool is 6 x Artisan's Class levels • 15+         [Artificer] Artisan Powers - Living Iron pool is 7 x Artisan's Class levels",
+        "requiredLevel": 2,
+        "requiredClass": "Artisan"
       },
       {
         "name": "Brilliant Thinker",
@@ -156,7 +158,9 @@
             "cat": "basic",
             "n": 1
           }
-        ]
+        ],
+        "requiredLevel": 3,
+        "requiredClass": "Artisan"
       },
       {
         "name": "The Learned One",
@@ -175,7 +179,9 @@
         "requirement": "Artisan Level 4Skills and Options: The Artisan gains one of the following skills for free based on their Specialization when they attain level 4 Artisan (this one time skill bonus does not change if their Specialization later changes). The Artisan must have the prerequisites for this skill and if they do not then they may instead take the Apprentice or Basic level of the skill.",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "• Artificer- Basic Shields (4), Basic Traps (5), Medium Armor (4) • Crafter- Journeyman Alchemy (4), Journeyman Enchanting (4), Journeyman Tinkering (4) • Mystic- Advanced Medicine (4), [Journeyman Ritual Magic (2) AND Ritual Lore (2)]"
+        "description": "• Artificer- Basic Shields (4), Basic Traps (5), Medium Armor (4) • Crafter- Journeyman Alchemy (4), Journeyman Enchanting (4), Journeyman Tinkering (4) • Mystic- Advanced Medicine (4), [Journeyman Ritual Magic (2) AND Ritual Lore (2)]",
+        "requiredLevel": 4,
+        "requiredClass": "Artisan"
       },
       {
         "name": "Pragmatist",
@@ -200,7 +206,9 @@
             "cat": "utility",
             "n": 1
           }
-        ]
+        ],
+        "requiredLevel": 5,
+        "requiredClass": "Artisan"
       },
       {
         "name": "Grand Ritualist",
@@ -219,7 +227,9 @@
         "requirement": "Artisan Level 7",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "Mystics gain the ability to modify the Dark Territory of any ritual they are a Participant or Ritualist of, increasing or decreasing it by up to 1 if they are a Participant or up to 2 if they are the Ritualist. Additionally, after completing a ritual successfully, the Mystic gains 5 points of Summoned Armor that last for a Short Rest. Artisans that are of the Specialization Mystic may Grant each Participant of a ritual where they are the Primary Ritualist a number of Counters to Damage that do not interrupt the ritual when used. The Call for this Counter is “Counter, Grand Ritualist.” The Artisan may do this once per Long Rest. These Counters last until the next Short Rest, the end of the Ritual or until used whichever is first. The ritualist must explain these counters expire after the ritual has been completed. • 5+         [Mystic] Artisan Powers: Short Grant 1 Counter to Damage • 8+         [Mystic] Artisan powers: Short Grant 2 Counter to Damage • 11+         [Mystic] Artisan powers: Short Grant 3 Counter to Damage • 15+         [Mystic] Artisan Powers: Short Grant 4 Counter to Damage"
+        "description": "Mystics gain the ability to modify the Dark Territory of any ritual they are a Participant or Ritualist of, increasing or decreasing it by up to 1 if they are a Participant or up to 2 if they are the Ritualist. Additionally, after completing a ritual successfully, the Mystic gains 5 points of Summoned Armor that last for a Short Rest. Artisans that are of the Specialization Mystic may Grant each Participant of a ritual where they are the Primary Ritualist a number of Counters to Damage that do not interrupt the ritual when used. The Call for this Counter is “Counter, Grand Ritualist.” The Artisan may do this once per Long Rest. These Counters last until the next Short Rest, the end of the Ritual or until used whichever is first. The ritualist must explain these counters expire after the ritual has been completed. • 5+         [Mystic] Artisan Powers: Short Grant 1 Counter to Damage • 8+         [Mystic] Artisan powers: Short Grant 2 Counter to Damage • 11+         [Mystic] Artisan powers: Short Grant 3 Counter to Damage • 15+         [Mystic] Artisan Powers: Short Grant 4 Counter to Damage",
+        "requiredLevel": 7,
+        "requiredClass": "Artisan"
       },
       {
         "name": "Technical Expertise",
@@ -244,7 +254,9 @@
             "cat": "advanced",
             "n": 1
           }
-        ]
+        ],
+        "requiredLevel": 8,
+        "requiredClass": "Artisan"
       },
       {
         "name": "Expert Craft",
@@ -280,7 +292,9 @@
               "grantsSkill": "Greater Tinkering"
             }
           ]
-        }
+        },
+        "requiredLevel": 9,
+        "requiredClass": "Artisan"
       },
       {
         "name": "Opus",
@@ -299,7 +313,9 @@
         "requirement": "Artisan Level 10",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Artisan gains one of: Aetheric Infusion if they are an Artificer, Artisan’s Reforge if they are a Crafter, or Eureka! If they are a Mystic. The Artisan may only have one Opus Power. If the Artisan’s Specialization changes, a different Opus Power will automatically replace their current one."
+        "description": "The Artisan gains one of: Aetheric Infusion if they are an Artificer, Artisan’s Reforge if they are a Crafter, or Eureka! If they are a Mystic. The Artisan may only have one Opus Power. If the Artisan’s Specialization changes, a different Opus Power will automatically replace their current one.",
+        "requiredLevel": 10,
+        "requiredClass": "Artisan"
       }
     ],
     "utility": [
@@ -1557,7 +1573,10 @@
         "requirement": "Mystic Specialization",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "Through prayers to a Divine Being, energy manipulation, or binding of minor spirits, the Mystic energizes up to six objects with power that may be gifted to others. When bestowed to another, the Mystic explains the token’s healing properties, and how they are used. The bound powers are non-transferrable, and cannot be regifted. Such power comes with a price, and the life given will take something in return, causing the recipient to be drained until they complete a Short Rest. The recipients are granted the Curious Balm Power below:"
+        "description": "Through prayers to a Divine Being, energy manipulation, or binding of minor spirits, the Mystic energizes up to six objects with power that may be gifted to others. When bestowed to another, the Mystic explains the token’s healing properties, and how they are used. The bound powers are non-transferrable, and cannot be regifted. Such power comes with a price, and the life given will take something in return, causing the recipient to be drained until they complete a Short Rest. The recipients are granted the Curious Balm Power below:",
+        "requiresEntity": [
+          "Mystic Specialization"
+        ]
       },
       {
         "name": "Curious Balm",
@@ -1683,7 +1702,9 @@
         "requirement": "Artisan Level 5",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Artisan has found shortcuts and efficiencies in Plans after many hours spent honing and perfecting their craft. Choose one Craft: Alchemy, Enchanting, or Tinkering. The Artisan may reduce all mentions of “turns of the hourglass” by half, and single turns of the hourglass are reduced to a Quick Count of 30. All other repeated actions are reduced by half (rounded up). This power may be purchased once for each Craft. Note: This Power stacks with other time reduction skills for crafting, however, the reductions from this Power are calculated first."
+        "description": "The Artisan has found shortcuts and efficiencies in Plans after many hours spent honing and perfecting their craft. Choose one Craft: Alchemy, Enchanting, or Tinkering. The Artisan may reduce all mentions of “turns of the hourglass” by half, and single turns of the hourglass are reduced to a Quick Count of 30. All other repeated actions are reduced by half (rounded up). This power may be purchased once for each Craft. Note: This Power stacks with other time reduction skills for crafting, however, the reductions from this Power are calculated first.",
+        "requiredLevel": 5,
+        "requiredClass": "Artisan"
       },
       {
         "name": "Utilitarian",
@@ -1709,6 +1730,8 @@
             "n": 1
           }
         ],
+        "requiredLevel": 6,
+        "requiredClass": "Artisan",
         "sharedWith": [
           "Artisan",
           "Fighter",
@@ -1733,7 +1756,9 @@
         "requirement": "Artisan Level 7",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "Masters of their trade, Artisans craft some Plans so often that the patterns have become rote muscle memory, making it trivial to build several copies in parallel. Choose one Craft: Alchemy, Ritual Magic, Enchanting, or Tinkering. The Artisan may call “Batch Process” at the beginning of their crafting attempt to double the number of outputs from the crafting plan. This requires that the Artisan expend double the appropriate resources for the plan they are crafting. The Forgesource plan cannot be affected with this skill. Note: Crafting processes requiring a Dark Territory card pull must be pulled twice from the same hand. Resolve the first card before the second is pulled."
+        "description": "Masters of their trade, Artisans craft some Plans so often that the patterns have become rote muscle memory, making it trivial to build several copies in parallel. Choose one Craft: Alchemy, Ritual Magic, Enchanting, or Tinkering. The Artisan may call “Batch Process” at the beginning of their crafting attempt to double the number of outputs from the crafting plan. This requires that the Artisan expend double the appropriate resources for the plan they are crafting. The Forgesource plan cannot be affected with this skill. Note: Crafting processes requiring a Dark Territory card pull must be pulled twice from the same hand. Resolve the first card before the second is pulled.",
+        "requiredLevel": 7,
+        "requiredClass": "Artisan"
       },
       {
         "name": "Quality Control",
@@ -1752,7 +1777,9 @@
         "requirement": "Artisan Level 8",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Artisan may oversee their own or an ally’s crafting recipe once per event. The crafting resources are refunded if the process fails so long as the failure condition does not specify otherwise."
+        "description": "The Artisan may oversee their own or an ally’s crafting recipe once per event. The crafting resources are refunded if the process fails so long as the failure condition does not specify otherwise.",
+        "requiredLevel": 8,
+        "requiredClass": "Artisan"
       },
       {
         "name": "It’s Alive!",
@@ -1771,7 +1798,9 @@
         "requirement": "Artisan Level 10",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "Once per Long Rest, an Artificer may sacrifice an Ingot to call “Revive by Lightning” to one individual."
+        "description": "Once per Long Rest, an Artificer may sacrifice an Ingot to call “Revive by Lightning” to one individual.",
+        "requiredLevel": 10,
+        "requiredClass": "Artisan"
       }
     ],
     "rightHandPowers": [],
@@ -1901,7 +1930,9 @@
         "requirement": "Cleric Level 1",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Cleric can pray to their Divine Being or Devotion to rebuild focus and refresh their Divine Spell-slots. The Cleric can spend a Short Rest studying their spellbook, meditating, or speaking to their higher powers. The Cleric can perform this special study and refresh all of their expended Divine spell-slots. If the Cleric has used any other Innate Power from another class to refresh their Divine spell slots this long rest they may not use Refreshing Prayer. Additional benefits come if this prayer is done in an area of sacred faith (such as consecrated ground), especially an area sacred to the Cleric’s Devotion. Doing so, the Cleric gains three additional Divine Novice-tier Spell-Slots. These Spell-Slots last until the Cleric completes a Long Rest. Additional benefits may be possible (see the Skills, Perks, and Flaws document for more details)."
+        "description": "The Cleric can pray to their Divine Being or Devotion to rebuild focus and refresh their Divine Spell-slots. The Cleric can spend a Short Rest studying their spellbook, meditating, or speaking to their higher powers. The Cleric can perform this special study and refresh all of their expended Divine spell-slots. If the Cleric has used any other Innate Power from another class to refresh their Divine spell slots this long rest they may not use Refreshing Prayer. Additional benefits come if this prayer is done in an area of sacred faith (such as consecrated ground), especially an area sacred to the Cleric’s Devotion. Doing so, the Cleric gains three additional Divine Novice-tier Spell-Slots. These Spell-Slots last until the Cleric completes a Long Rest. Additional benefits may be possible (see the Skills, Perks, and Flaws document for more details).",
+        "requiredLevel": 1,
+        "requiredClass": "Cleric"
       },
       {
         "name": "Healing Touch",
@@ -1920,7 +1951,9 @@
         "requirement": "Cleric Level 2",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The cleric gains a pool of healing that can be used between Long Rests called the Healing Touch Pool. This Healing Touch pool is equal to three times the Cleric’s class-level. Each time this power is used, the Cleric can heal another Individual up to the Cleric’s class-level, subtracting the healing from the Healing Touch Pool. Healing Touch will not work on the caster themself. For Example: a 4th level Cleric would have 12 total points of Healing to give out between Long Rests and could use this Power to Heal up to 4 points at a time. There is no limit to the number of points that can be in this pool; however, the pool resets to three times the Cleric’s class-level at the end of a Long Rest. Note: While this Power is an Innate Power, for purposes of Advanced Peacecaster, it counts as a Cantrip. Bonus healing provided by Advanced Peacecaster is not subtracted from the Cleric’s Healing Touch pool, however a minimum of 1 point must always be subtracted."
+        "description": "The cleric gains a pool of healing that can be used between Long Rests called the Healing Touch Pool. This Healing Touch pool is equal to three times the Cleric’s class-level. Each time this power is used, the Cleric can heal another Individual up to the Cleric’s class-level, subtracting the healing from the Healing Touch Pool. Healing Touch will not work on the caster themself. For Example: a 4th level Cleric would have 12 total points of Healing to give out between Long Rests and could use this Power to Heal up to 4 points at a time. There is no limit to the number of points that can be in this pool; however, the pool resets to three times the Cleric’s class-level at the end of a Long Rest. Note: While this Power is an Innate Power, for purposes of Advanced Peacecaster, it counts as a Cantrip. Bonus healing provided by Advanced Peacecaster is not subtracted from the Cleric’s Healing Touch pool, however a minimum of 1 point must always be subtracted.",
+        "requiredLevel": 2,
+        "requiredClass": "Cleric"
       },
       {
         "name": "Ritual Affinity",
@@ -1952,6 +1985,8 @@
             "atLevel": 12
           }
         ],
+        "requiredLevel": 3,
+        "requiredClass": "Cleric",
         "sharedWith": [
           "Cleric",
           "Mage"
@@ -1974,7 +2009,12 @@
         "requirement": "Cleric Level 5, Basic Shields",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Cleric's faith protects them from those that seek to do them harm, forming a magical aegis around a shield the Cleric wields in battle. Once per Short Rest, the Cleric may call “Counter, Shield of Faith” when their shield is hit by an attack with Weapon or Packet delivery, Preventing the attack. Attacks that do not strike the Cleric's shield may not be countered in this way."
+        "description": "The Cleric's faith protects them from those that seek to do them harm, forming a magical aegis around a shield the Cleric wields in battle. Once per Short Rest, the Cleric may call “Counter, Shield of Faith” when their shield is hit by an attack with Weapon or Packet delivery, Preventing the attack. Attacks that do not strike the Cleric's shield may not be countered in this way.",
+        "requiredLevel": 5,
+        "requiredClass": "Cleric",
+        "requiresEntity": [
+          "Basic Shields"
+        ]
       },
       {
         "name": "Holy Armor",
@@ -1993,7 +2033,9 @@
         "requirement": "Cleric Level 9",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Cleric's Divine Being lends their power to enhance their defenses, increasing the Maximum Summoned and Physical Armor of the Cleric by 1."
+        "description": "The Cleric's Divine Being lends their power to enhance their defenses, increasing the Maximum Summoned and Physical Armor of the Cleric by 1.",
+        "requiredLevel": 9,
+        "requiredClass": "Cleric"
       },
       {
         "name": "Shepherd the Faithful",
@@ -2012,7 +2054,9 @@
         "requirement": "Cleric Level 10",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "Once per Long Rest, after having an extended conversation with another member of their Devotion, the Cleric may Refresh one Power of the target with a Refresh of Short or Long Rest (Note: this cannot be used on Powers that themselves have the Refresh effect). Any individual may be the recipient of Shepherd the Faithful only once per Event. Additionally, once per Event, the Cleric may call upon the power of their Divine Being to refresh all of their Novice and Adept Divine spell slots. Alternatively, they may entreat a creature of the Exalted type for a boon. Simple prayer generally is not enough to ask for such a boon through this power, and the entity must be present with the Cleric: often the Beckon Ritual is used for this purpose. What is granted is up to the entity’s discretion and may vary greatly, as are the consequences of being found unworthy or the presumption of the request. Asking powerful entities for boons is not without risk, especially entities known to be fickle or exacting. (Note: asking a Player Character with the Exalted type for a boon may not have any particular mechanical benefit.)"
+        "description": "Once per Long Rest, after having an extended conversation with another member of their Devotion, the Cleric may Refresh one Power of the target with a Refresh of Short or Long Rest (Note: this cannot be used on Powers that themselves have the Refresh effect). Any individual may be the recipient of Shepherd the Faithful only once per Event. Additionally, once per Event, the Cleric may call upon the power of their Divine Being to refresh all of their Novice and Adept Divine spell slots. Alternatively, they may entreat a creature of the Exalted type for a boon. Simple prayer generally is not enough to ask for such a boon through this power, and the entity must be present with the Cleric: often the Beckon Ritual is used for this purpose. What is granted is up to the entity’s discretion and may vary greatly, as are the consequences of being found unworthy or the presumption of the request. Asking powerful entities for boons is not without risk, especially entities known to be fickle or exacting. (Note: asking a Player Character with the Exalted type for a boon may not have any particular mechanical benefit.)",
+        "requiredLevel": 10,
+        "requiredClass": "Cleric"
       }
     ],
     "utility": [],
@@ -2037,7 +2081,9 @@
         "requirement": "Cleric Level 2",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Cleric can expend 3 points from their Healing Touch Pool to immediately call “Heal 1 to Dying”.  Note, this effect has no incant whatsoever."
+        "description": "The Cleric can expend 3 points from their Healing Touch Pool to immediately call “Heal 1 to Dying”.  Note, this effect has no incant whatsoever.",
+        "requiredLevel": 2,
+        "requiredClass": "Cleric"
       },
       {
         "name": "Mantle of Faith",
@@ -2056,7 +2102,9 @@
         "requirement": "Cleric Level 4",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "When taking a Short Rest, the Cleric may spend a quick moment reciting prayers or a creed specific to their Devotion. In doing so, they may grant protection against those who would use the nature of their Divine Being’s power against them.When completing a Short Rest, they may “Grant Protect vs [Devotion Accent]” to an ally and themselves."
+        "description": "When taking a Short Rest, the Cleric may spend a quick moment reciting prayers or a creed specific to their Devotion. In doing so, they may grant protection against those who would use the nature of their Divine Being’s power against them.When completing a Short Rest, they may “Grant Protect vs [Devotion Accent]” to an ally and themselves.",
+        "requiredLevel": 4,
+        "requiredClass": "Cleric"
       },
       {
         "name": "Cantrip Scholar",
@@ -2082,6 +2130,8 @@
             "n": 1
           }
         ],
+        "requiredLevel": 6,
+        "requiredClass": "Cleric",
         "sharedWith": [
           "Cleric",
           "Druid",
@@ -2106,7 +2156,9 @@
         "requirement": "Cleric Level 6",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Cleric may expend a Spike to alter the “to Undead” Qualifier and Accent on a Spell they cast to “to Exalted by Divine.” The Spell must come from the Cleric Base Class Spell List."
+        "description": "The Cleric may expend a Spike to alter the “to Undead” Qualifier and Accent on a Spell they cast to “to Exalted by Divine.” The Spell must come from the Cleric Base Class Spell List.",
+        "requiredLevel": 6,
+        "requiredClass": "Cleric"
       },
       {
         "name": "Expansive Worship",
@@ -2125,7 +2177,9 @@
         "requirement": "Cleric Level 6",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Cleric may take abilities within a third divine domain associated with their Devotion."
+        "description": "The Cleric may take abilities within a third divine domain associated with their Devotion.",
+        "requiredLevel": 6,
+        "requiredClass": "Cleric"
       },
       {
         "name": "Greater Healing Touch",
@@ -2144,7 +2198,9 @@
         "requirement": "Cleric Level 9",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The depth of the Cleric’s devotion to their cause deepens, and with it, new boons are born from the mastery of novice skills. The Cleric now gains one additional point to their healing pool per cleric level for the Healing Touch Archetype Power."
+        "description": "The depth of the Cleric’s devotion to their cause deepens, and with it, new boons are born from the mastery of novice skills. The Cleric now gains one additional point to their healing pool per cleric level for the Healing Touch Archetype Power.",
+        "requiredLevel": 9,
+        "requiredClass": "Cleric"
       },
       {
         "name": "Divine Substitution",
@@ -2163,7 +2219,9 @@
         "requirement": "Cleric Level 10",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Cleric has gained enough mastery over the interpretation of their doctrine that they can begin offering less… common interpretations of their Divine Domain. They may choose a single domain not within their Devotion’s standard domains, and take it as if their Devotion had access to this domain. The Cleric may not take a divine domain that is in direct opposition to their Devotion’s standard domains. See the Divine Domains document for more information. Opposed Domains: Chaos Order Destruction Creation Manipulation Expression Death Life Light Shadow Peace War"
+        "description": "The Cleric has gained enough mastery over the interpretation of their doctrine that they can begin offering less… common interpretations of their Divine Domain. They may choose a single domain not within their Devotion’s standard domains, and take it as if their Devotion had access to this domain. The Cleric may not take a divine domain that is in direct opposition to their Devotion’s standard domains. See the Divine Domains document for more information. Opposed Domains: Chaos Order Destruction Creation Manipulation Expression Death Life Light Shadow Peace War",
+        "requiredLevel": 10,
+        "requiredClass": "Cleric"
       }
     ],
     "rightHandPowers": [],
@@ -3047,7 +3105,9 @@
         "requirement": "Druid Level 1",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Druid can spend a Short Rest in meditation, feeling the strength of nature all around them, and drawing from its power and majesty. The Druid can perform this special meditation and refresh all of their expended Druid spell-slots. If the Druid has used any other Innate Power from another class to refresh their Divine spell slots this long rest they may not use Commune with Nature. Additional benefits come if this meditation is done in an area of special natural power, sometimes called a Natural Locus. Doing so, the Druid gains three additional Divine Novice-tier Spell-Slots. These Spell-Slots last until the Druid completes a Long Rest. Additional benefits may be possible (see the Skills, Perks, and Flaws document for more details)."
+        "description": "The Druid can spend a Short Rest in meditation, feeling the strength of nature all around them, and drawing from its power and majesty. The Druid can perform this special meditation and refresh all of their expended Druid spell-slots. If the Druid has used any other Innate Power from another class to refresh their Divine spell slots this long rest they may not use Commune with Nature. Additional benefits come if this meditation is done in an area of special natural power, sometimes called a Natural Locus. Doing so, the Druid gains three additional Divine Novice-tier Spell-Slots. These Spell-Slots last until the Druid completes a Long Rest. Additional benefits may be possible (see the Skills, Perks, and Flaws document for more details).",
+        "requiredLevel": 1,
+        "requiredClass": "Druid"
       },
       {
         "name": "Nature’s Understanding",
@@ -3066,7 +3126,9 @@
         "requirement": "Druid Level 2",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "This power allows the character to determine if a targeted creature is a beast of nature, and its intent. The power lasts until the Druid moves their right foot or takes a Short Rest, whichever comes first. Until it ends, the Druid can ask any of the following questions as often as desired of any number of targets that they can see, but may only ask each target each question once. • Do you have the Animal Type? • What kind of Animal are you? • Why are you here? • What are you feeling? • Do you mean me harm? • What is one of your Vulnerabilities?"
+        "description": "This power allows the character to determine if a targeted creature is a beast of nature, and its intent. The power lasts until the Druid moves their right foot or takes a Short Rest, whichever comes first. Until it ends, the Druid can ask any of the following questions as often as desired of any number of targets that they can see, but may only ask each target each question once. • Do you have the Animal Type? • What kind of Animal are you? • Why are you here? • What are you feeling? • Do you mean me harm? • What is one of your Vulnerabilities?",
+        "requiredLevel": 2,
+        "requiredClass": "Druid"
       },
       {
         "name": "Message of the Flowers",
@@ -3085,7 +3147,9 @@
         "requirement": "Druid Level 3",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Druid may leave a note locked with a Black Key marker and Has Foraging Skill on it at any Bloom or Night Prize Patch."
+        "description": "The Druid may leave a note locked with a Black Key marker and Has Foraging Skill on it at any Bloom or Night Prize Patch.",
+        "requiredLevel": 3,
+        "requiredClass": "Druid"
       },
       {
         "name": "Earth’s Vitality",
@@ -3104,7 +3168,9 @@
         "requirement": "Druid Level 5",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Druid gains Long Grant +1 Maximum Life Points after spending at least 5 minutes communing with Nature outside. They may do this while taking a nature walk, meditating in their Grove, or other such activities."
+        "description": "The Druid gains Long Grant +1 Maximum Life Points after spending at least 5 minutes communing with Nature outside. They may do this while taking a nature walk, meditating in their Grove, or other such activities.",
+        "requiredLevel": 5,
+        "requiredClass": "Druid"
       },
       {
         "name": "Natural Cycle",
@@ -3123,7 +3189,9 @@
         "requirement": "Druid Level 9",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "Once per Event, after the Druid believes they have killed a creature (including and most often through a successful Deathblow) they remove the restriction on their ability to Revive.  This restriction to return someone to life in a particular Long Rest is common among spells that have the Revive effect. This power will only lift the restriction once, and one it has does so, will not do so again. If the Druid knows the target was not killed this power fails to refresh their ability to Revive another, however, the power is not wasted. Note: This power does not refresh the Spell-Slot used to Revive, it just removes the restriction the spell or power might have against doing so."
+        "description": "Once per Event, after the Druid believes they have killed a creature (including and most often through a successful Deathblow) they remove the restriction on their ability to Revive.  This restriction to return someone to life in a particular Long Rest is common among spells that have the Revive effect. This power will only lift the restriction once, and one it has does so, will not do so again. If the Druid knows the target was not killed this power fails to refresh their ability to Revive another, however, the power is not wasted. Note: This power does not refresh the Spell-Slot used to Revive, it just removes the restriction the spell or power might have against doing so.",
+        "requiredLevel": 9,
+        "requiredClass": "Druid"
       },
       {
         "name": "Grove",
@@ -3142,7 +3210,9 @@
         "requirement": "Druid Level 10",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Druid can create a special area that is their grove. To do this, the Druid should do a small sanctification rite of their choosing, role-playing creating a connection with the grove for at least a minute. The grove will last until the beginning of the next Event (even if the Druid is not in attendance). The area must either be marked off with a border of green material (rope, engineering tape, etc.) not to exceed 100 ft long, or be an obvious area (such as an actual clearing). The area may not have any permanent structures in it but may overlap with Druid groves that already exist, as long as the other Grove’s owner consents. The area should have some natural significance or beauty; just putting it on the lawn in front of the Tavern may cause Staff to claim the Grove is defunct. The Druid must provide an easily visible item card for the grove, indicating that it is a special place, its effects, the name of the Druid who created it, and any others presently attuned to it, which must be posted somewhere easily visible in the center of the grove itself. The grove has a number of properties: • The plants and vegetation there grow particularly well, as if perfectly watered with plenty of sunlight. • Plants and small animals within the grove are cheered, and generally feel safe and happy. • Plants and small animals within the grove are unusually hardy and difficult to be blighted, diseased, or harmed by outside magic. • The area is considered a Natural Locus, and should be conspicuously noted as such on the card. • Once ever, when the Druid discorporates, they may Resurrect with 1 Life Point at their Grove instead of moving to the Spirit River. • While within the Grove, the Druid may deliver the Cure effect at-will via Touch. If this is used to cure the Taint condition, this ability is suppressed until the druid takes a Short Rest."
+        "description": "The Druid can create a special area that is their grove. To do this, the Druid should do a small sanctification rite of their choosing, role-playing creating a connection with the grove for at least a minute. The grove will last until the beginning of the next Event (even if the Druid is not in attendance). The area must either be marked off with a border of green material (rope, engineering tape, etc.) not to exceed 100 ft long, or be an obvious area (such as an actual clearing). The area may not have any permanent structures in it but may overlap with Druid groves that already exist, as long as the other Grove’s owner consents. The area should have some natural significance or beauty; just putting it on the lawn in front of the Tavern may cause Staff to claim the Grove is defunct. The Druid must provide an easily visible item card for the grove, indicating that it is a special place, its effects, the name of the Druid who created it, and any others presently attuned to it, which must be posted somewhere easily visible in the center of the grove itself. The grove has a number of properties: • The plants and vegetation there grow particularly well, as if perfectly watered with plenty of sunlight. • Plants and small animals within the grove are cheered, and generally feel safe and happy. • Plants and small animals within the grove are unusually hardy and difficult to be blighted, diseased, or harmed by outside magic. • The area is considered a Natural Locus, and should be conspicuously noted as such on the card. • Once ever, when the Druid discorporates, they may Resurrect with 1 Life Point at their Grove instead of moving to the Spirit River. • While within the Grove, the Druid may deliver the Cure effect at-will via Touch. If this is used to cure the Taint condition, this ability is suppressed until the druid takes a Short Rest.",
+        "requiredLevel": 10,
+        "requiredClass": "Druid"
       }
     ],
     "utility": [],
@@ -3167,7 +3237,9 @@
         "requirement": "Druid Level 1",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "Early in every Druid’s life comes the time in which they must defend themselves, whether from the natural denizens of forest, or the “civilized” of the cities. Many learn that always having a means of defense at a moment’s notice can mean the difference between life and death. The Druid may manifest up to two Short Claws as Natural weapons and can use them proficiently. These claws should be no longer than 36” long."
+        "description": "Early in every Druid’s life comes the time in which they must defend themselves, whether from the natural denizens of forest, or the “civilized” of the cities. Many learn that always having a means of defense at a moment’s notice can mean the difference between life and death. The Druid may manifest up to two Short Claws as Natural weapons and can use them proficiently. These claws should be no longer than 36” long.",
+        "requiredLevel": 1,
+        "requiredClass": "Druid"
       },
       {
         "name": "Favored Form",
@@ -3186,7 +3258,9 @@
         "requirement": "Druid Level 2",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The character chooses one of the three Forms (Hulking Bear, Hunting Panther, Striking Serpent) and can cast one Form Spell that grants that Form without expending a Spell-Slot."
+        "description": "The character chooses one of the three Forms (Hulking Bear, Hunting Panther, Striking Serpent) and can cast one Form Spell that grants that Form without expending a Spell-Slot.",
+        "requiredLevel": 2,
+        "requiredClass": "Druid"
       },
       {
         "name": "Find the Path",
@@ -3205,7 +3279,9 @@
         "requirement": "Druid Level 2",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "Upon using this power, the character may ask the trees what they have seen, and follow specific paths. They can see and follow green flags marked with a white circle (called a “Halo”) until they have finished a Short Rest. This Power must be cast while within Touch range of a tree of any size, but its benefits may be used anywhere. If the Druid later purchases the Tracking Skill, they may refund this skill."
+        "description": "Upon using this power, the character may ask the trees what they have seen, and follow specific paths. They can see and follow green flags marked with a white circle (called a “Halo”) until they have finished a Short Rest. This Power must be cast while within Touch range of a tree of any size, but its benefits may be used anywhere. If the Druid later purchases the Tracking Skill, they may refund this skill.",
+        "requiredLevel": 2,
+        "requiredClass": "Druid"
       },
       {
         "name": "Hunter",
@@ -3224,7 +3300,9 @@
         "requirement": "Druid Level 2",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Druid gains the Projectile Weapon Skill, but does not gain proficiency with crossbows. Anything that lists Projectile Weapon Skill as a prerequisite works normally."
+        "description": "The Druid gains the Projectile Weapon Skill, but does not gain proficiency with crossbows. Anything that lists Projectile Weapon Skill as a prerequisite works normally.",
+        "requiredLevel": 2,
+        "requiredClass": "Druid"
       },
       {
         "name": "Wyvern’s Tooth and Claw",
@@ -3243,7 +3321,12 @@
         "requirement": "Druid Level 3, Red in Tooth and Claw",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Druid can manifest up to two Natural Long Weapons or one Natural Great Weapon proficiently."
+        "description": "The Druid can manifest up to two Natural Long Weapons or one Natural Great Weapon proficiently.",
+        "requiredLevel": 3,
+        "requiredClass": "Druid",
+        "requiresEntity": [
+          "Red in Tooth and Claw"
+        ]
       },
       {
         "name": "Cantrip Scholar",
@@ -3269,6 +3352,8 @@
             "n": 1
           }
         ],
+        "requiredLevel": 6,
+        "requiredClass": "Druid",
         "sharedWith": [
           "Cleric",
           "Druid",
@@ -3293,7 +3378,12 @@
         "requirement": "Druid Level 6, Favored Form",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "Once per Long Rest, the Druid can cast one Form Spell from their Favored Form without expending a Spell-Slot and without the “out-of-combat” restriction. This is often used to pop out of the Form, cast other Spells, and then dive right back in."
+        "description": "Once per Long Rest, the Druid can cast one Form Spell from their Favored Form without expending a Spell-Slot and without the “out-of-combat” restriction. This is often used to pop out of the Form, cast other Spells, and then dive right back in.",
+        "requiredLevel": 6,
+        "requiredClass": "Druid",
+        "requiresEntity": [
+          "Favored Form"
+        ]
       }
     ],
     "rightHandPowers": [],
@@ -4337,7 +4427,9 @@
         "requirement": "Fighter Level 1",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Fighter can use shattered weapons to block and do 1 point of damage. Using a shattered weapon will never do more than 1 point, regardless of other modifiers and enhancements. When a Shatter is taken to a wielded weapon that the Fighter will continue to use with this Power, they should call “Altered, Deadly Remnant,” to convey that the Shatter was taken, and altered. In addition, when picking up a shield from the ground that the character does not know the status of, they can treat the shield as if it were intact unless they are informed otherwise."
+        "description": "The Fighter can use shattered weapons to block and do 1 point of damage. Using a shattered weapon will never do more than 1 point, regardless of other modifiers and enhancements. When a Shatter is taken to a wielded weapon that the Fighter will continue to use with this Power, they should call “Altered, Deadly Remnant,” to convey that the Shatter was taken, and altered. In addition, when picking up a shield from the ground that the character does not know the status of, they can treat the shield as if it were intact unless they are informed otherwise.",
+        "requiredLevel": 1,
+        "requiredClass": "Fighter"
       },
       {
         "name": "Parry Blow",
@@ -4356,7 +4448,9 @@
         "requirement": "Fighter Level 3",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "While wielding a weapon or shield, a character may use Parry Blow to Counter any weapon delivered attack, by calling “Counter, Parry.”"
+        "description": "While wielding a weapon or shield, a character may use Parry Blow to Counter any weapon delivered attack, by calling “Counter, Parry.”",
+        "requiredLevel": 3,
+        "requiredClass": "Fighter"
       },
       {
         "name": "Fighting Instructor",
@@ -4375,7 +4469,9 @@
         "requirement": "Fighter Level 4",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "After spending at least 5 uninterrupted minutes instructing another character in how to fight using specific weapons or styles, the Instructor may grant the target a temporary Skill. Regardless of the Instructor's own skills, they may grant the following Skills to the target until their next Long Rest: Basic Martial Weapons, Short Weapons, Great Weapons, Projectile Weapons, Thrown Weapons, Basic Shields, Advanced Shields, or Two Weapon Style. If the Instructor has proficiency with Long Weapons or Great Shields, they may teach one of those instead."
+        "description": "After spending at least 5 uninterrupted minutes instructing another character in how to fight using specific weapons or styles, the Instructor may grant the target a temporary Skill. Regardless of the Instructor's own skills, they may grant the following Skills to the target until their next Long Rest: Basic Martial Weapons, Short Weapons, Great Weapons, Projectile Weapons, Thrown Weapons, Basic Shields, Advanced Shields, or Two Weapon Style. If the Instructor has proficiency with Long Weapons or Great Shields, they may teach one of those instead.",
+        "requiredLevel": 4,
+        "requiredClass": "Fighter"
       },
       {
         "name": "Mountain of Steel",
@@ -4394,7 +4490,9 @@
         "requirement": "Fighter Level 8",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Fighter may Sacrifice 5 Points of Physical Armor (not Barrier, Summoned Armor, or Natural armors) to Refresh the Parry Blow Power instantly. The character should call “Refresh, Parry Blow” when they use this power. This ability may be used a number of times equal to half the character’s Fighter class-levels per Short Rest."
+        "description": "The Fighter may Sacrifice 5 Points of Physical Armor (not Barrier, Summoned Armor, or Natural armors) to Refresh the Parry Blow Power instantly. The character should call “Refresh, Parry Blow” when they use this power. This ability may be used a number of times equal to half the character’s Fighter class-levels per Short Rest.",
+        "requiredLevel": 8,
+        "requiredClass": "Fighter"
       },
       {
         "name": "Warrior Spirit",
@@ -4444,7 +4542,9 @@
             "stat": "armor",
             "n": 1
           }
-        ]
+        ],
+        "requiredLevel": 10,
+        "requiredClass": "Fighter"
       }
     ],
     "utility": [
@@ -4490,7 +4590,9 @@
         "requirement": "Fighter Level 10",
         "prerequisites": "Armored Shell Utility Power",
         "skillsAndOptions": null,
-        "description": "Once the Fighter reaches 10th level, they gain +1 to their Armor Point total as long as they are wearing at least one point of Physical Armor."
+        "description": "Once the Fighter reaches 10th level, they gain +1 to their Armor Point total as long as they are wearing at least one point of Physical Armor.",
+        "requiredLevel": 10,
+        "requiredClass": "Fighter"
       },
       {
         "name": "Bowyer",
@@ -4866,7 +4968,10 @@
         "requirement": "Parry Blow",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "Once per Long Rest, after having their physical armor repaired with a Patch Kit, the Fighter may refresh Parry Blow."
+        "description": "Once per Long Rest, after having their physical armor repaired with a Patch Kit, the Fighter may refresh Parry Blow.",
+        "requiresEntity": [
+          "Parry Blow"
+        ]
       },
       {
         "name": "Raging Blows",
@@ -5083,7 +5188,10 @@
         "requirement": "Parry Blow",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "Once per Long Rest, the Fighter may refresh Parry Blow."
+        "description": "Once per Long Rest, the Fighter may refresh Parry Blow.",
+        "requiresEntity": [
+          "Parry Blow"
+        ]
       },
       {
         "name": "Hammer Down",
@@ -5381,7 +5489,9 @@
         "requirement": "Fighter Level 3",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "Whenever the Fighter's physical armor is repaired by any type of crafted Patch Kit they may Refresh all powers with the [Reinforce] tag. The Fighter can benefit from this ability a number of times equal to their Fighter Class-Levels per Long Rest."
+        "description": "Whenever the Fighter's physical armor is repaired by any type of crafted Patch Kit they may Refresh all powers with the [Reinforce] tag. The Fighter can benefit from this ability a number of times equal to their Fighter Class-Levels per Long Rest.",
+        "requiredLevel": 3,
+        "requiredClass": "Fighter"
       },
       {
         "name": "Accuracy",
@@ -5400,7 +5510,9 @@
         "requirement": "Fighter Level 4",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "Whenever they are using Thrown or Projectile Weapons, the Fighter’s Base Damage increases by 1."
+        "description": "Whenever they are using Thrown or Projectile Weapons, the Fighter’s Base Damage increases by 1.",
+        "requiredLevel": 4,
+        "requiredClass": "Fighter"
       },
       {
         "name": "Field Maintenance",
@@ -5419,7 +5531,9 @@
         "requirement": "Fighter Level 5",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "Knowing how to properly maintain one’s equipment can mean the difference between life and death. The Fighter gains a pool of Maintenance Points equal to 10 plus their Fighter Class-Level that refreshes upon the completion of a Long Rest. They may spend a Focus Quick 100 roleplaying patching their own armor and use any amount of Points to apply them as Mending to their worn armor. When the character uses the Reinforce Skill, they gain two Maintenance Points."
+        "description": "Knowing how to properly maintain one’s equipment can mean the difference between life and death. The Fighter gains a pool of Maintenance Points equal to 10 plus their Fighter Class-Level that refreshes upon the completion of a Long Rest. They may spend a Focus Quick 100 roleplaying patching their own armor and use any amount of Points to apply them as Mending to their worn armor. When the character uses the Reinforce Skill, they gain two Maintenance Points.",
+        "requiredLevel": 5,
+        "requiredClass": "Fighter"
       },
       {
         "name": "Healthy",
@@ -5444,7 +5558,9 @@
             "stat": "lifePoints",
             "n": 1
           }
-        ]
+        ],
+        "requiredLevel": 6,
+        "requiredClass": "Fighter"
       },
       {
         "name": "Utilitarian",
@@ -5470,6 +5586,8 @@
             "n": 1
           }
         ],
+        "requiredLevel": 6,
+        "requiredClass": "Fighter",
         "sharedWith": [
           "Artisan",
           "Fighter",
@@ -5494,7 +5612,9 @@
         "requirement": "Fighter Level 9",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "Whenever the Fighter is Healed by another, they are Healed an additional Life Point. Thus, two points of Healing would heal the Fighter three Life Points."
+        "description": "Whenever the Fighter is Healed by another, they are Healed an additional Life Point. Thus, two points of Healing would heal the Fighter three Life Points.",
+        "requiredLevel": 9,
+        "requiredClass": "Fighter"
       }
     ],
     "rightHandPowers": [],
@@ -5609,7 +5729,9 @@
         "requirement": "Mage Level 1",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Mage can meditate and realign their theoretical constructs to rebuild focus and refresh their Arcane Spell-slots. The Mage can spend a Short Rest studying their spellbook, making notes on spells, or practicing their incants quietly. The Mage can perform this special study and refresh all of their expended Arcane spell-slots. If the Mage has used any other Innate Power from another class to refresh their Arcane spell slots this long rest they may not use Arcane Study. Additional benefits come if this study is done in an area of powerful arcane magic (such as an Arcane Locus), and performs a personal rite (determined by the Mage). Doing so, the Mage gains three additional Arcane Novice-tier Spell-Slots. These Spell-Slots last until the Mage completes a Long Rest. Additional benefits may be possible (see the Skills, Perks, and Flaws document for more details)."
+        "description": "The Mage can meditate and realign their theoretical constructs to rebuild focus and refresh their Arcane Spell-slots. The Mage can spend a Short Rest studying their spellbook, making notes on spells, or practicing their incants quietly. The Mage can perform this special study and refresh all of their expended Arcane spell-slots. If the Mage has used any other Innate Power from another class to refresh their Arcane spell slots this long rest they may not use Arcane Study. Additional benefits come if this study is done in an area of powerful arcane magic (such as an Arcane Locus), and performs a personal rite (determined by the Mage). Doing so, the Mage gains three additional Arcane Novice-tier Spell-Slots. These Spell-Slots last until the Mage completes a Long Rest. Additional benefits may be possible (see the Skills, Perks, and Flaws document for more details).",
+        "requiredLevel": 1,
+        "requiredClass": "Mage"
       },
       {
         "name": "Replicate Enhancement",
@@ -5628,7 +5750,9 @@
         "requirement": "Mage Level 2",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "When casting a non-damaging touch Mage spell, the number of targets is increased by one. The spell must have a target of Individual, shield, or armor, and the listed Delivery must be Touch (Packet Spells cast as Touch do not get this benefit). Once they achieve 7th level Mage they may add one additional target per cast. At 12th, they gain a third additional target."
+        "description": "When casting a non-damaging touch Mage spell, the number of targets is increased by one. The spell must have a target of Individual, shield, or armor, and the listed Delivery must be Touch (Packet Spells cast as Touch do not get this benefit). Once they achieve 7th level Mage they may add one additional target per cast. At 12th, they gain a third additional target.",
+        "requiredLevel": 2,
+        "requiredClass": "Mage"
       },
       {
         "name": "Ritual Affinity",
@@ -5660,6 +5784,8 @@
             "atLevel": 12
           }
         ],
+        "requiredLevel": 3,
+        "requiredClass": "Mage",
         "sharedWith": [
           "Cleric",
           "Mage"
@@ -5682,7 +5808,9 @@
         "requirement": "Mage Level 5",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Mage can call upon the powers of the Arcane to grant an individual one Barrier by Touch. This Power refreshes whenever the Mage casts a Spell (not Cantrip) from their list of Mage spells or after a Long Rest. Once they achieve 10th level Mage this Power instead grants two Barrier. At 15th level Mage it instead grants three Barrier."
+        "description": "The Mage can call upon the powers of the Arcane to grant an individual one Barrier by Touch. This Power refreshes whenever the Mage casts a Spell (not Cantrip) from their list of Mage spells or after a Long Rest. Once they achieve 10th level Mage this Power instead grants two Barrier. At 15th level Mage it instead grants three Barrier.",
+        "requiredLevel": 5,
+        "requiredClass": "Mage"
       },
       {
         "name": "Cantrip Mastery",
@@ -5701,7 +5829,9 @@
         "requirement": "Mage Level 8",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "All damaging Cantrips cast by the Mage do one additional point of damage."
+        "description": "All damaging Cantrips cast by the Mage do one additional point of damage.",
+        "requiredLevel": 8,
+        "requiredClass": "Mage"
       },
       {
         "name": "Practiced Sight",
@@ -5720,7 +5850,12 @@
         "requirement": "Mage Level 9, Apprentice Ritual Magic",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "When the Mage is a Primary Ritualist in a Ritual, when they pull their Final Card from the Dark Territory Hand, they may also pull one additional card from the Hand. When the second card is revealed, the Marshal will give them a premonition of the outcome of the second card. This premonition is given by the attending Marshal as “Weal (Success), Woe (Failure), or Alteration.“ This does not replace the first drawn card, merely suggests what the outcome of the second card might have been."
+        "description": "When the Mage is a Primary Ritualist in a Ritual, when they pull their Final Card from the Dark Territory Hand, they may also pull one additional card from the Hand. When the second card is revealed, the Marshal will give them a premonition of the outcome of the second card. This premonition is given by the attending Marshal as “Weal (Success), Woe (Failure), or Alteration.“ This does not replace the first drawn card, merely suggests what the outcome of the second card might have been.",
+        "requiredLevel": 9,
+        "requiredClass": "Mage",
+        "requiresEntity": [
+          "Apprentice Ritual Magic"
+        ]
       },
       {
         "name": "Channel the Arcane",
@@ -5739,7 +5874,9 @@
         "requirement": "Mage Level 10",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "This Mage power gives them incredible versatility and ability to continue their arcane assistance in battle in exchange for some obvious vulnerability during the channeling process. Once per Event, without access to their book or the normal meditation process Mage may engage in an incredibly obvious and loud magical gathering of essence for about 1 minute and then announce loudly “Beginning to Channel Arcane Energies” and begin a Focus for a Quick 100. At the end of this entire process the Mage instantaneously Refreshes all their Arcane Novice and Adept Spell Slots. If interrupted during this Focus Quick count the power is considered expended so the Mage should do this in an area they are certain they will not be interrupted. Upon attaining the 15th level in Mage this Innate Power also refreshes Arcane Greater spell slots."
+        "description": "This Mage power gives them incredible versatility and ability to continue their arcane assistance in battle in exchange for some obvious vulnerability during the channeling process. Once per Event, without access to their book or the normal meditation process Mage may engage in an incredibly obvious and loud magical gathering of essence for about 1 minute and then announce loudly “Beginning to Channel Arcane Energies” and begin a Focus for a Quick 100. At the end of this entire process the Mage instantaneously Refreshes all their Arcane Novice and Adept Spell Slots. If interrupted during this Focus Quick count the power is considered expended so the Mage should do this in an area they are certain they will not be interrupted. Upon attaining the 15th level in Mage this Innate Power also refreshes Arcane Greater spell slots.",
+        "requiredLevel": 10,
+        "requiredClass": "Mage"
       }
     ],
     "utility": [],
@@ -5764,7 +5901,9 @@
         "requirement": "Mage Level 2",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "While before, the nuances of the arcane might have been foreign to the Mage, now, it’s become second nature. The four arcane affinities: Flame, Ice, Lightning, and Acid, are now always close to the Mage’s fingertips. When casting the Mage Bolt Cantrip, the Mage may choose to use the Acid, Flame, Ice, or Lightning Accent instead of Force."
+        "description": "While before, the nuances of the arcane might have been foreign to the Mage, now, it’s become second nature. The four arcane affinities: Flame, Ice, Lightning, and Acid, are now always close to the Mage’s fingertips. When casting the Mage Bolt Cantrip, the Mage may choose to use the Acid, Flame, Ice, or Lightning Accent instead of Force.",
+        "requiredLevel": 2,
+        "requiredClass": "Mage"
       },
       {
         "name": "Arcane Charge",
@@ -5783,7 +5922,9 @@
         "requirement": "Mage Level 4",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "When the Replicate Enhancement Innate Power is used, the Mage may choose to reduce the number of targets by one and instead place the additional charge granted into a Spell-Packet. This allows the Mage to retain the charge for later use, or deliver the charge at range."
+        "description": "When the Replicate Enhancement Innate Power is used, the Mage may choose to reduce the number of targets by one and instead place the additional charge granted into a Spell-Packet. This allows the Mage to retain the charge for later use, or deliver the charge at range.",
+        "requiredLevel": 4,
+        "requiredClass": "Mage"
       },
       {
         "name": "Cantrip Scholar",
@@ -5809,6 +5950,8 @@
             "n": 1
           }
         ],
+        "requiredLevel": 6,
+        "requiredClass": "Mage",
         "sharedWith": [
           "Cleric",
           "Druid",
@@ -6829,7 +6972,9 @@
         "requirement": "Rogue Level 1",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Rogue can Counter any thrown weapon or projectile attack made from another character as long as the Rogue catches or deflects with their hands the Thrown Weapon or Projectile before it hits a part of the Rogue that isn’t their hands, ground, or comes to rest."
+        "description": "The Rogue can Counter any thrown weapon or projectile attack made from another character as long as the Rogue catches or deflects with their hands the Thrown Weapon or Projectile before it hits a part of the Rogue that isn’t their hands, ground, or comes to rest.",
+        "requiredLevel": 1,
+        "requiredClass": "Rogue"
       },
       {
         "name": "Backstab",
@@ -6848,7 +6993,9 @@
         "requirement": "Rogue Level 2",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "Whenever the Rogue performs a Spike attack from behind, the attack does 1 additional point of Base Damage. Certain additional levels of Rogue cause the Backstab to do 1 additional point of Base Damage. (+2 points at 5th level, +3 points at 10th level, +4 points at 15th level). This damage is increased by an additional +1 Base Damage if the only weapon Wielded is a Hand weapon."
+        "description": "Whenever the Rogue performs a Spike attack from behind, the attack does 1 additional point of Base Damage. Certain additional levels of Rogue cause the Backstab to do 1 additional point of Base Damage. (+2 points at 5th level, +3 points at 10th level, +4 points at 15th level). This damage is increased by an additional +1 Base Damage if the only weapon Wielded is a Hand weapon.",
+        "requiredLevel": 2,
+        "requiredClass": "Rogue"
       },
       {
         "name": "Loot",
@@ -6867,7 +7014,9 @@
         "requirement": "Rogue Level 4",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "Instead of searching a target, the Rogue can quickly size up a helpless or willing creature and determine where to search. Please note that, like searching, this should not include any actual touching without express pre-negotiated consent. The Rogue can search instantaneously, rather than waiting the Quick 100. This ability refreshes when loot is collected or the target indicates they have none."
+        "description": "Instead of searching a target, the Rogue can quickly size up a helpless or willing creature and determine where to search. Please note that, like searching, this should not include any actual touching without express pre-negotiated consent. The Rogue can search instantaneously, rather than waiting the Quick 100. This ability refreshes when loot is collected or the target indicates they have none.",
+        "requiredLevel": 4,
+        "requiredClass": "Rogue"
       },
       {
         "name": "Dodge",
@@ -6886,7 +7035,9 @@
         "requirement": "Rogue Level 5",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "Dodge is a Counter to any attack made with a Weapon or Packet delivery. Upon being struck with such an attack the player should call “Counter, Dodge” and consider the attack Prevented."
+        "description": "Dodge is a Counter to any attack made with a Weapon or Packet delivery. Upon being struck with such an attack the player should call “Counter, Dodge” and consider the attack Prevented.",
+        "requiredLevel": 5,
+        "requiredClass": "Rogue"
       },
       {
         "name": "Escape Plan",
@@ -6905,7 +7056,9 @@
         "requirement": "Rogue Level 8",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The character can escape from a space they would otherwise have difficulty escaping from. Once per Event, they can go insubstantial by calling “Insubstantial to Self” and must then immediately walk slowly out of the space. Once outside the space, they no longer need to walk, and can remain insubstantial for a Slow 60 before calling “Dispel Insubstantial to Self.”"
+        "description": "The character can escape from a space they would otherwise have difficulty escaping from. Once per Event, they can go insubstantial by calling “Insubstantial to Self” and must then immediately walk slowly out of the space. Once outside the space, they no longer need to walk, and can remain insubstantial for a Slow 60 before calling “Dispel Insubstantial to Self.”",
+        "requiredLevel": 8,
+        "requiredClass": "Rogue"
       },
       {
         "name": "Sinister Strike",
@@ -6924,7 +7077,9 @@
         "requirement": "Rogue Level 10",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "Once per Short Rest when they would be able to perform a Backstab, the Rogue instead performs a Sinister Strike which doubles the damage the attack normally would do. This damage bonus is calculated after the bonus granted by Backstab.  If this attack is Prevented, the Refresh is changed to Focus Quick 30."
+        "description": "Once per Short Rest when they would be able to perform a Backstab, the Rogue instead performs a Sinister Strike which doubles the damage the attack normally would do. This damage bonus is calculated after the bonus granted by Backstab.  If this attack is Prevented, the Refresh is changed to Focus Quick 30.",
+        "requiredLevel": 10,
+        "requiredClass": "Rogue"
       }
     ],
     "utility": [
@@ -7021,7 +7176,9 @@
         "requirement": "Rogue Level 6",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Rogue can listen intently for a moment and then pinpoint living creatures around them, even those hidden in the shadows or bushes."
+        "description": "The Rogue can listen intently for a moment and then pinpoint living creatures around them, even those hidden in the shadows or bushes.",
+        "requiredLevel": 6,
+        "requiredClass": "Rogue"
       },
       {
         "name": "Mine",
@@ -7821,7 +7978,9 @@
         "requirement": "Rogue Level 3",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Rogue can tie people up so well that it is almost impossible for them to escape on their own, this may only be done on someone that is Helpless. The bindings can be shackles, ropes, or similar, but the person tied up will not be able to get out without outside aid - remember that the character should be restrained, and not the player."
+        "description": "The Rogue can tie people up so well that it is almost impossible for them to escape on their own, this may only be done on someone that is Helpless. The bindings can be shackles, ropes, or similar, but the person tied up will not be able to get out without outside aid - remember that the character should be restrained, and not the player.",
+        "requiredLevel": 3,
+        "requiredClass": "Rogue"
       },
       {
         "name": "Mask of Deception",
@@ -7840,7 +7999,9 @@
         "requirement": "Rogue Level 5",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "If your form is hidden by appropriate clothing, you may circumvent attempts to expose your location. You must be masked and hooded to use this skill, and you cannot have any skin showing except for the eye holes or eye slit in your mask or cowl. While you are dressed this way, you may expend a Spike to gain Obfuscate vs Expose once. As with all Obfuscate Powers, you do not need to announce when you are using this Power."
+        "description": "If your form is hidden by appropriate clothing, you may circumvent attempts to expose your location. You must be masked and hooded to use this skill, and you cannot have any skin showing except for the eye holes or eye slit in your mask or cowl. While you are dressed this way, you may expend a Spike to gain Obfuscate vs Expose once. As with all Obfuscate Powers, you do not need to announce when you are using this Power.",
+        "requiredLevel": 5,
+        "requiredClass": "Rogue"
       },
       {
         "name": "Trap Sense",
@@ -7859,7 +8020,9 @@
         "requirement": "Rogue Level 6",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "Any time the Rogue is affected by a trap, they can use this Power to reduce the effects of the trap. If the trap does enough damage that the Rogue would drop to 0 or fewer Life Points, instead they are reduced to one Life Point. If the Rogue takes a Death Effect, they take a Drain Effect and drop to one Life Point instead. Any other Effects and damage are taken normally. A Final trap effect cannot be stopped by Trap Sense."
+        "description": "Any time the Rogue is affected by a trap, they can use this Power to reduce the effects of the trap. If the trap does enough damage that the Rogue would drop to 0 or fewer Life Points, instead they are reduced to one Life Point. If the Rogue takes a Death Effect, they take a Drain Effect and drop to one Life Point instead. Any other Effects and damage are taken normally. A Final trap effect cannot be stopped by Trap Sense.",
+        "requiredLevel": 6,
+        "requiredClass": "Rogue"
       },
       {
         "name": "Utilitarian",
@@ -7885,6 +8048,8 @@
             "n": 1
           }
         ],
+        "requiredLevel": 6,
+        "requiredClass": "Rogue",
         "sharedWith": [
           "Artisan",
           "Fighter",
@@ -7909,7 +8074,9 @@
         "requirement": "Rogue Level 8",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "After the character has recovered from a Dying state (not Dead), they may immediately go insubstantial for a Slow 30. They must move towards a location that is outside melee range of any perceived enemies. At the end of thirty seconds, they must Cure their insubstantial Condition by calling Cure Insubstantial. Recall that when insubstantial, the player has a duty to inform anyone that inspects, closely interacts with, or plans to attack their character."
+        "description": "After the character has recovered from a Dying state (not Dead), they may immediately go insubstantial for a Slow 30. They must move towards a location that is outside melee range of any perceived enemies. At the end of thirty seconds, they must Cure their insubstantial Condition by calling Cure Insubstantial. Recall that when insubstantial, the player has a duty to inform anyone that inspects, closely interacts with, or plans to attack their character.",
+        "requiredLevel": 8,
+        "requiredClass": "Rogue"
       }
     ],
     "rightHandPowers": [],
@@ -8046,7 +8213,9 @@
             "cat": "basic",
             "n": 1
           }
-        ]
+        ],
+        "requiredLevel": 2,
+        "requiredClass": "Socialite"
       },
       {
         "name": "Heart of the Group",
@@ -8065,7 +8234,9 @@
         "requirement": "Socialite Level 3",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "Socialites tend to find themselves at the center of social cliques. Acting as the cog of a wheel can confer many benefits to its members, including organization, information disbursement, and even mental health. A Socialite may extend a formal invitation after spending 5-10 minutes discussing the group with the potential new member. Invitees must accept of their own free will, and this Power cannot be used if the Socialite knows the invited individual is compelled in any way. The new member gains the Inherent Type: Member of [Group Name] (the Socialite should feel free to name the group). A member may leave at any time by informing the Socialite or by notifying Staff between games. If the Socialite is asked about leaving, or informed that the member was under a compulsion when they accepted, the Socialite must volunteer information about leaving. The Socialite gains a number of Counters equal to their levels in Socialite usable against any attack or Power targeting them that originated from a member of their group. The Socialite must inform Staff when a group is created (before any recruiting happens), disbanded, and when a new member is inducted (immediacy is not necessary). Without Powers or items to create an exception, the Socialite may have up to their Socialite level in members, and may only be the Heart of a single group. A Socialite's bodyguard, and the Socialite themselves, may be included in the group without counting against the total limit."
+        "description": "Socialites tend to find themselves at the center of social cliques. Acting as the cog of a wheel can confer many benefits to its members, including organization, information disbursement, and even mental health. A Socialite may extend a formal invitation after spending 5-10 minutes discussing the group with the potential new member. Invitees must accept of their own free will, and this Power cannot be used if the Socialite knows the invited individual is compelled in any way. The new member gains the Inherent Type: Member of [Group Name] (the Socialite should feel free to name the group). A member may leave at any time by informing the Socialite or by notifying Staff between games. If the Socialite is asked about leaving, or informed that the member was under a compulsion when they accepted, the Socialite must volunteer information about leaving. The Socialite gains a number of Counters equal to their levels in Socialite usable against any attack or Power targeting them that originated from a member of their group. The Socialite must inform Staff when a group is created (before any recruiting happens), disbanded, and when a new member is inducted (immediacy is not necessary). Without Powers or items to create an exception, the Socialite may have up to their Socialite level in members, and may only be the Heart of a single group. A Socialite's bodyguard, and the Socialite themselves, may be included in the group without counting against the total limit.",
+        "requiredLevel": 3,
+        "requiredClass": "Socialite"
       },
       {
         "name": "Stern Willed",
@@ -8084,7 +8255,9 @@
         "requirement": "Socialite Level 4",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The mind of a Socialite is known for its ability to keep its secrets and push past the lesser wills that would hinder it. The Socialite may call “Counter, Stern Will” to Counter a Berserk, Charm, or Dominate Effect used on them. Once the character has 10 levels of Socialite, they can also Counter the Obey Effect with this Power."
+        "description": "The mind of a Socialite is known for its ability to keep its secrets and push past the lesser wills that would hinder it. The Socialite may call “Counter, Stern Will” to Counter a Berserk, Charm, or Dominate Effect used on them. Once the character has 10 levels of Socialite, they can also Counter the Obey Effect with this Power.",
+        "requiredLevel": 4,
+        "requiredClass": "Socialite"
       },
       {
         "name": "Smuggler’s Powdercase",
@@ -8103,7 +8276,9 @@
         "requirement": "Socialite Level 5",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Socialite may designate one pouch (no more than 8” in any one dimension) as their Powdercase. The Powdercase can only contain Wealth, Hide, Harvest, Ore, Rare Minerals, Bloom, and Night Prizes. Once marked with a White Halo Marker, the contents of the pouch are immune to searches and Powers and are excluded when answering Discern questions. The Power does not need to be announced, and can be ignored by the Socialite. The Socialite may only hold a maximum of 200 wealth in this pouch until they reach Socialite level 10 in Socialite and then there is no limit. Any amount of Hide, Harvest, Ingots, Rare Minerals, Bloom, and Night Prizes may be contained in this pouch up to the physical space limits of the pouch. Once the character has 15 levels of Socialite, Mithril Ore, Golden Blossom, and Raw Scales may be held in the Smuggler’s Powdercase as well."
+        "description": "The Socialite may designate one pouch (no more than 8” in any one dimension) as their Powdercase. The Powdercase can only contain Wealth, Hide, Harvest, Ore, Rare Minerals, Bloom, and Night Prizes. Once marked with a White Halo Marker, the contents of the pouch are immune to searches and Powers and are excluded when answering Discern questions. The Power does not need to be announced, and can be ignored by the Socialite. The Socialite may only hold a maximum of 200 wealth in this pouch until they reach Socialite level 10 in Socialite and then there is no limit. Any amount of Hide, Harvest, Ingots, Rare Minerals, Bloom, and Night Prizes may be contained in this pouch up to the physical space limits of the pouch. Once the character has 15 levels of Socialite, Mithril Ore, Golden Blossom, and Raw Scales may be held in the Smuggler’s Powdercase as well.",
+        "requiredLevel": 5,
+        "requiredClass": "Socialite"
       },
       {
         "name": "Of Sound Mind",
@@ -8122,7 +8297,9 @@
         "requirement": "Socialite Level 7",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Socialite may Counter an Obey effect once per Long Rest. To do so, they must call out the nerve of the offender with a retort of at least ten words immediately after calling the counter."
+        "description": "The Socialite may Counter an Obey effect once per Long Rest. To do so, they must call out the nerve of the offender with a retort of at least ten words immediately after calling the counter.",
+        "requiredLevel": 7,
+        "requiredClass": "Socialite"
       },
       {
         "name": "Sharp Dagger, Sharper Tongue",
@@ -8141,7 +8318,9 @@
         "requirement": "Socialite Level 8",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "Social butterflies with bright garish colors make for excellent distractions, especially for the Bodyguard with a sharp, poisoned knife. By using this power, the Socialite may draw the attention, briefly, of an opponent while their Bodyguard sneaks in for the kill. This ability requires a roleplay of at least ten words audibly taunting the target."
+        "description": "Social butterflies with bright garish colors make for excellent distractions, especially for the Bodyguard with a sharp, poisoned knife. By using this power, the Socialite may draw the attention, briefly, of an opponent while their Bodyguard sneaks in for the kill. This ability requires a roleplay of at least ten words audibly taunting the target.",
+        "requiredLevel": 8,
+        "requiredClass": "Socialite"
       },
       {
         "name": "The Last Toast",
@@ -8160,7 +8339,9 @@
         "requirement": "Socialite Level 9",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "Across the lands, the Socialite is well versed in appearing hospitable, but always with an escape plan or hidden agenda. Among the most feared and lethal tools at their disposal is the wide array of poisons easily procured in even the most out-of-the-way locations. Beware a proffered drink from a Socialite, as that sickly sweet taste might be your last. All ingested poisons the Socialite places into drinks are modified to add the “Final” tag. Additionally, once per Event, the Socialite may poison a drink with “Heal to Full and Cure all Conditions by Poison Final”"
+        "description": "Across the lands, the Socialite is well versed in appearing hospitable, but always with an escape plan or hidden agenda. Among the most feared and lethal tools at their disposal is the wide array of poisons easily procured in even the most out-of-the-way locations. Beware a proffered drink from a Socialite, as that sickly sweet taste might be your last. All ingested poisons the Socialite places into drinks are modified to add the “Final” tag. Additionally, once per Event, the Socialite may poison a drink with “Heal to Full and Cure all Conditions by Poison Final”",
+        "requiredLevel": 9,
+        "requiredClass": "Socialite"
       },
       {
         "name": "Enduring Inspiration",
@@ -8179,7 +8360,9 @@
         "requirement": "Socialite Level 10",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "After a pep talk of thirty seconds or more, the encouraging words of the Socialite lift the target's spirit, mend their wounds, and cure their ailments. The target receives all the following benefits: • Heal to Full • Cure All Conditions • Refresh Spikes • Refresh one Power with a Refresh of Short or Long Rest (Note: this cannot be used on Powers that themselves have the Refresh effect)."
+        "description": "After a pep talk of thirty seconds or more, the encouraging words of the Socialite lift the target's spirit, mend their wounds, and cure their ailments. The target receives all the following benefits: • Heal to Full • Cure All Conditions • Refresh Spikes • Refresh one Power with a Refresh of Short or Long Rest (Note: this cannot be used on Powers that themselves have the Refresh effect).",
+        "requiredLevel": 10,
+        "requiredClass": "Socialite"
       }
     ],
     "utility": [
@@ -8219,7 +8402,10 @@
         "requirement": "Profession - Journeyman skill",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Socialite gains the Profession - Master skill. The Socialite has mastered their trade and expanded their business throughout the region. They have connections in many places, who can offer means of transportation and services that may be difficult to find otherwise. This has no mechanical advantage on its own, but should be used when you believe it may benefit a scene. Finally, the caravan often comes with odd stories and tales from the outside world, which they gladly share with the Socialite. The Socialite gains the ability to refresh Bits and Pieces if they have the Perk, once per event."
+        "description": "The Socialite gains the Profession - Master skill. The Socialite has mastered their trade and expanded their business throughout the region. They have connections in many places, who can offer means of transportation and services that may be difficult to find otherwise. This has no mechanical advantage on its own, but should be used when you believe it may benefit a scene. Finally, the caravan often comes with odd stories and tales from the outside world, which they gladly share with the Socialite. The Socialite gains the ability to refresh Bits and Pieces if they have the Perk, once per event.",
+        "requiresEntity": [
+          "Profession - Journeyman"
+        ]
       },
       {
         "name": "Implicit Truths",
@@ -8276,7 +8462,9 @@
         "requirement": "Socialite Level 6",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "After engaging another in interaction for a minute or two, the Socialite can use a Discern to determine if the other character is demonstrating an in-game Core Skill.  A Core Skill is a Skill from the “Skills, Perks, and Flaws” document, therefore Class Skills may not be duplicated. This might be showing the Socialite how to use a Long weapon, or might be expounding on a particular type of Lore. If, after the interaction, and the Discern, the target gives the name of a Skill, the Socialite can “have” that Skill until they complete a Long Rest. This may require further questions on the part of the Socialite to determine how the Skill actually works mechanically and these can be asked as Discerns or the Socialite may give an “Instruction: Tell me how that Skill works.” The Skill is gained at whatever Rank is explained by the target. If the answer that comes back from the Discern is not an in-game Skill (the name need not match perfectly), no Skill is gained, but this Power can be Refreshed by completing a Short Rest. The Socialite may need to direct the mind of the target to thinking of the Skill in question in order to most effectively use this Power."
+        "description": "After engaging another in interaction for a minute or two, the Socialite can use a Discern to determine if the other character is demonstrating an in-game Core Skill.  A Core Skill is a Skill from the “Skills, Perks, and Flaws” document, therefore Class Skills may not be duplicated. This might be showing the Socialite how to use a Long weapon, or might be expounding on a particular type of Lore. If, after the interaction, and the Discern, the target gives the name of a Skill, the Socialite can “have” that Skill until they complete a Long Rest. This may require further questions on the part of the Socialite to determine how the Skill actually works mechanically and these can be asked as Discerns or the Socialite may give an “Instruction: Tell me how that Skill works.” The Skill is gained at whatever Rank is explained by the target. If the answer that comes back from the Discern is not an in-game Skill (the name need not match perfectly), no Skill is gained, but this Power can be Refreshed by completing a Short Rest. The Socialite may need to direct the mind of the target to thinking of the Skill in question in order to most effectively use this Power.",
+        "requiredLevel": 6,
+        "requiredClass": "Socialite"
       },
       {
         "name": "Pit Master",
@@ -9042,7 +9230,9 @@
         "requirement": "Socialite Level 2",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Socialite may always choose to answer “Unreadable” to any Discern that attempts to determine their emotional state, whether they intend harm to another, or whether they are cheating at a game."
+        "description": "The Socialite may always choose to answer “Unreadable” to any Discern that attempts to determine their emotional state, whether they intend harm to another, or whether they are cheating at a game.",
+        "requiredLevel": 2,
+        "requiredClass": "Socialite"
       },
       {
         "name": "The Right Hand",
@@ -9061,7 +9251,9 @@
         "requirement": "Socialite Level 2",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Socialite is a creature of beauty, a flower in a field, and a damsel in distress… when they want to be. Otherwise they have a Bodyguard. After a detailed conversation and a written contract, a Socialite may bind their target into an agreement to protect them from harm. The contract must stipulate that the Bodyguard will only provide that service for one individual: the Socialite. This contract is valid for at least a Long Rest, but may be extended automatically and indefinitely. A Socialite may only retain one Bodyguard at a time, unless they have purchased a Power such as “Additional Bodyguard” which overrides this limitation. The Power can be ended at any time either by the stipulations of the contract or by mutual agreement of Bodyguard and Socialite.Socialites that have purchased The Right Hand may purchase one Power from the Right Hand Powers list for Build Points, and may purchase another every 3 levels (4th, 7th, 10th, 13th, etc.) of Socialite they have. For Example: Lord Kendrynn takes The Right Hand at Socialite level 2. He immediately may purchase one class power for which he meets the prerequisites and which has Requirement: The Right Hand. When Lord Kendrynn takes his 4th level in Socialite, he will pick an additional class power for which he meets the requirements and which has Requirement: The Right Hand. This is true for level 7, 10, 13, etc."
+        "description": "The Socialite is a creature of beauty, a flower in a field, and a damsel in distress… when they want to be. Otherwise they have a Bodyguard. After a detailed conversation and a written contract, a Socialite may bind their target into an agreement to protect them from harm. The contract must stipulate that the Bodyguard will only provide that service for one individual: the Socialite. This contract is valid for at least a Long Rest, but may be extended automatically and indefinitely. A Socialite may only retain one Bodyguard at a time, unless they have purchased a Power such as “Additional Bodyguard” which overrides this limitation. The Power can be ended at any time either by the stipulations of the contract or by mutual agreement of Bodyguard and Socialite.Socialites that have purchased The Right Hand may purchase one Power from the Right Hand Powers list for Build Points, and may purchase another every 3 levels (4th, 7th, 10th, 13th, etc.) of Socialite they have. For Example: Lord Kendrynn takes The Right Hand at Socialite level 2. He immediately may purchase one class power for which he meets the prerequisites and which has Requirement: The Right Hand. When Lord Kendrynn takes his 4th level in Socialite, he will pick an additional class power for which he meets the requirements and which has Requirement: The Right Hand. This is true for level 7, 10, 13, etc.",
+        "requiredLevel": 2,
+        "requiredClass": "Socialite"
       },
       {
         "name": "Additional Bodyguard",
@@ -9113,7 +9305,9 @@
               "text": "“Grant Protect vs Packets by Mind” The Socialite may give themself any or all of these boons upon completion of the speech."
             }
           ]
-        }
+        },
+        "requiredLevel": 7,
+        "requiredClass": "Socialite"
       },
       {
         "name": "Utilitarian",
@@ -9139,6 +9333,8 @@
             "n": 1
           }
         ],
+        "requiredLevel": 6,
+        "requiredClass": "Socialite",
         "sharedWith": [
           "Artisan",
           "Fighter",
@@ -9167,7 +9363,10 @@
         "requirement": "The Right Hand",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "A Bodyguard wearing the favor of their charge feels the weight of responsibility and can shrug off wounds in the name of duty. A trinket, token, necklace or similar adornment needs to be gifted to the Bodyguard during a time of peace (out of combat) so they may be reminded of what they fight for later. At this same time, the Bodyguard should be reminded about the effects of this Power. The Socialite may, “Grant One Barrier to Bodyguard” at-will (after the Refresh) while the Bodyguard is visibly displaying the object of their ward’s favor. Out-of-combat, the Socialite can Grant 3 Barrier all at once by Calling “Grant Three Barrier to Bodyguard”. Stacking limits will still apply."
+        "description": "A Bodyguard wearing the favor of their charge feels the weight of responsibility and can shrug off wounds in the name of duty. A trinket, token, necklace or similar adornment needs to be gifted to the Bodyguard during a time of peace (out of combat) so they may be reminded of what they fight for later. At this same time, the Bodyguard should be reminded about the effects of this Power. The Socialite may, “Grant One Barrier to Bodyguard” at-will (after the Refresh) while the Bodyguard is visibly displaying the object of their ward’s favor. Out-of-combat, the Socialite can Grant 3 Barrier all at once by Calling “Grant Three Barrier to Bodyguard”. Stacking limits will still apply.",
+        "requiresEntity": [
+          "The Right Hand"
+        ]
       },
       {
         "name": "Holding Out For a Hero",
@@ -9188,7 +9387,10 @@
         "requirement": "The Right Hand",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "After speaking for a few moments with their Bodyguard, the Socialite may ask them “Subtle Discern by Mind: Would you save me if I were in danger?” If the response is yes, the Socialite may Grant them the Save the Day Power below by explaining the Power to them."
+        "description": "After speaking for a few moments with their Bodyguard, the Socialite may ask them “Subtle Discern by Mind: Would you save me if I were in danger?” If the response is yes, the Socialite may Grant them the Save the Day Power below by explaining the Power to them.",
+        "requiresEntity": [
+          "The Right Hand"
+        ]
       },
       {
         "name": "Save the Day",
@@ -9228,7 +9430,10 @@
         "requirement": "The Right Hand",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "Socialites don’t make a habit of wandering around on their own, and seeing to their Bodyguard’s safety is mutually beneficial. Once per Short Rest the Socialite may bolster a Bodyguard. The Socialite grants a Protect vs. Damage. The Socialite may not give this Protect to the same Bodyguard more than once per Long Rest."
+        "description": "Socialites don’t make a habit of wandering around on their own, and seeing to their Bodyguard’s safety is mutually beneficial. Once per Short Rest the Socialite may bolster a Bodyguard. The Socialite grants a Protect vs. Damage. The Socialite may not give this Protect to the same Bodyguard more than once per Long Rest.",
+        "requiresEntity": [
+          "The Right Hand"
+        ]
       },
       {
         "name": "Magical Empowerment",
@@ -9249,7 +9454,10 @@
         "requirement": "The Right Hand",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "Bodyguards may be inspired and call upon their inner reserves to accomplish more than they thought possible. The Bodyguard may Refresh 1 Novice or Adept Spell Slot after a quick pep talk with the Socialite."
+        "description": "Bodyguards may be inspired and call upon their inner reserves to accomplish more than they thought possible. The Bodyguard may Refresh 1 Novice or Adept Spell Slot after a quick pep talk with the Socialite.",
+        "requiresEntity": [
+          "The Right Hand"
+        ]
       },
       {
         "name": "Rise Above This",
@@ -9270,7 +9478,10 @@
         "requirement": "The Right Hand",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Socialite knows how to rouse their companions, and their words can keep even the most desperate from teetering from the ledge. After a word or two of motivation or encouragement, they may call “[Bodyguard’s Name or Description] Heal 1 to Dying.”"
+        "description": "The Socialite knows how to rouse their companions, and their words can keep even the most desperate from teetering from the ledge. After a word or two of motivation or encouragement, they may call “[Bodyguard’s Name or Description] Heal 1 to Dying.”",
+        "requiresEntity": [
+          "The Right Hand"
+        ]
       },
       {
         "name": "Steel Yourself",
@@ -9291,7 +9502,10 @@
         "requirement": "The Right Hand",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Socialite knows how to convince their Bodyguard that everything will be alright, granting them one Protect vs Mind with a short pep talk."
+        "description": "The Socialite knows how to convince their Bodyguard that everything will be alright, granting them one Protect vs Mind with a short pep talk.",
+        "requiresEntity": [
+          "The Right Hand"
+        ]
       },
       {
         "name": "Training Regiment",
@@ -9312,7 +9526,10 @@
         "requirement": "The Right Hand",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "Through training with their Bodyguard, the Socialite learns their potential and drives them to excel martially even when the Bodyguard is at a breaking point. The Bodyguard may Refresh 1 Short Rest martial power after a quick pep talk with the Socialite."
+        "description": "Through training with their Bodyguard, the Socialite learns their potential and drives them to excel martially even when the Bodyguard is at a breaking point. The Bodyguard may Refresh 1 Short Rest martial power after a quick pep talk with the Socialite.",
+        "requiresEntity": [
+          "The Right Hand"
+        ]
       },
       {
         "name": "Hidden Weapon",
@@ -9333,7 +9550,12 @@
         "requirement": "The Right Hand, Socialite Level 6",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "Bodyguards aren’t particularly useful if they cannot defend the Socialite. The pair are used to taking advantage of the Socialite’s quick diversions to sneak weapons into places they are normally forbidden. To use this Power, the Socialite must give the Bodyguard a brightly colored cloth to attach or tie to a weapon. At this time, the Power should be explained to the Bodyguard."
+        "description": "Bodyguards aren’t particularly useful if they cannot defend the Socialite. The pair are used to taking advantage of the Socialite’s quick diversions to sneak weapons into places they are normally forbidden. To use this Power, the Socialite must give the Bodyguard a brightly colored cloth to attach or tie to a weapon. At this time, the Power should be explained to the Bodyguard.",
+        "requiredLevel": 6,
+        "requiredClass": "Socialite",
+        "requiresEntity": [
+          "The Right Hand"
+        ]
       },
       {
         "name": "Concealed Weapon",
@@ -9373,7 +9595,12 @@
         "requirement": "The Right Hand, Socialite Level 6",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "When muscles tire and the will to continue flags, a voice of encouragement can be the best thing at your back. Most Socialites are experts in knowing exactly what to say to keep a stalwart soldier fighting… or goading them on into cleaning up a fight, at least. The Socialite Refreshes two of their Bodyguard’s Spikes with quick verbal encouragement."
+        "description": "When muscles tire and the will to continue flags, a voice of encouragement can be the best thing at your back. Most Socialites are experts in knowing exactly what to say to keep a stalwart soldier fighting… or goading them on into cleaning up a fight, at least. The Socialite Refreshes two of their Bodyguard’s Spikes with quick verbal encouragement.",
+        "requiredLevel": 6,
+        "requiredClass": "Socialite",
+        "requiresEntity": [
+          "The Right Hand"
+        ]
       },
       {
         "name": "Third Hand",
@@ -9394,7 +9621,12 @@
         "requirement": "The Right Hand, Socialite Level 6",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "After a brief inspection of the Bodyguard’s materia, and an explanation of this Power, the Socialite becomes able to hold charged Packets that their Bodyguard has cast. The Socialite and the Bodyguard can pass Packets back and forth without them being discharged. The Socialite cannot use the Packets, only hold them. Packets held by the Socialite will not discharge or lose their charge if the Bodyguard casts other Spells. The Socialite is subject to all the rules for holding the Packet, but once the Socialite completes a Short Rest and this Power ends, any Packets still being held will also become inert. When the Packet is passed back and forth, the two should remind each other of the Call held within the Packet.For Example: Trobriand is the Bodyguard for Jheshyra, who has activated Third Hand. Trobriand, an Artificer, creates a charged Packet with Acid-Soak. He hands it to Jheshyra and says “Reminder: Wounding 8 by Acid”. He then does some other things, including creating other Packets and throwing them, before asking for the Packet back. Jheshyra hands him the Packet and says “Reminder: Wounding 8 by Acid”."
+        "description": "After a brief inspection of the Bodyguard’s materia, and an explanation of this Power, the Socialite becomes able to hold charged Packets that their Bodyguard has cast. The Socialite and the Bodyguard can pass Packets back and forth without them being discharged. The Socialite cannot use the Packets, only hold them. Packets held by the Socialite will not discharge or lose their charge if the Bodyguard casts other Spells. The Socialite is subject to all the rules for holding the Packet, but once the Socialite completes a Short Rest and this Power ends, any Packets still being held will also become inert. When the Packet is passed back and forth, the two should remind each other of the Call held within the Packet.For Example: Trobriand is the Bodyguard for Jheshyra, who has activated Third Hand. Trobriand, an Artificer, creates a charged Packet with Acid-Soak. He hands it to Jheshyra and says “Reminder: Wounding 8 by Acid”. He then does some other things, including creating other Packets and throwing them, before asking for the Packet back. Jheshyra hands him the Packet and says “Reminder: Wounding 8 by Acid”.",
+        "requiredLevel": 6,
+        "requiredClass": "Socialite",
+        "requiresEntity": [
+          "The Right Hand"
+        ]
       },
       {
         "name": "Guard and Savior",
@@ -9415,7 +9647,12 @@
         "requirement": "The Right Hand, Socialite Level 8",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "After the Socialite gives the Bodyguard instructions on when to use this Power, they should give the Call and any additional explanation needed. This lets the Bodyguard Heal the Socialite for 5 Points by Touch. Once used, the Socialite can give the Power again as long as they have completed a Short Rest. Remember that one can not have more than one Imbued Power at a time."
+        "description": "After the Socialite gives the Bodyguard instructions on when to use this Power, they should give the Call and any additional explanation needed. This lets the Bodyguard Heal the Socialite for 5 Points by Touch. Once used, the Socialite can give the Power again as long as they have completed a Short Rest. Remember that one can not have more than one Imbued Power at a time.",
+        "requiredLevel": 8,
+        "requiredClass": "Socialite",
+        "requiresEntity": [
+          "The Right Hand"
+        ]
       },
       {
         "name": "This Is My Bodyguard",
@@ -9436,7 +9673,12 @@
         "requirement": "The Right Hand, Socialite Level 10",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Socialite may make allowances for their Bodyguard in any space they themselves are welcome. If a venue would try to prohibit the Bodyguard from entering with the Socialite, the Socialite may pull the contract to ensure their passage."
+        "description": "The Socialite may make allowances for their Bodyguard in any space they themselves are welcome. If a venue would try to prohibit the Bodyguard from entering with the Socialite, the Socialite may pull the contract to ensure their passage.",
+        "requiredLevel": 10,
+        "requiredClass": "Socialite",
+        "requiresEntity": [
+          "The Right Hand"
+        ]
       }
     ],
     "cantrips": [],
@@ -9555,7 +9797,9 @@
         "requirement": "Sourcerer Level 1",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Sourcerer can meditate and recenter their connection to magic’s undercurrents to rebuild focus and refresh their Arcane Spell-slots. The Sourcerer can spend a Short Rest communing with themselves, contemplating their Source, or practicing their incantations quietly. The Sourcerer can perform this special study and refresh all of their expended Arcane spell-slots. If the Sourcerer has used any other Innate Power from another class to refresh their Arcane spell slots this long rest they may not use Internal Battery. Additional benefits come if this study is done in an area of powerful arcane magic (such as an Arcane Locus), and performs a personal rite (determined by the Sourcerer). Doing so, the Sourcerer gains three additional Arcane Novice-tier Spell-Slots. These Spell-Slots last until the Sourcerer completes a Long Rest. Additional benefits may be possible (see the Skills, Perks, and Flaws document for more details).Finally, if the Sourcerer has not worn non-Barrier armor at any point prior to the use of this Power this event they may once per Event refresh Internal Battery immediately. In doing so they lose the ability to wear non-Barrier armor for the remainder of the Event."
+        "description": "The Sourcerer can meditate and recenter their connection to magic’s undercurrents to rebuild focus and refresh their Arcane Spell-slots. The Sourcerer can spend a Short Rest communing with themselves, contemplating their Source, or practicing their incantations quietly. The Sourcerer can perform this special study and refresh all of their expended Arcane spell-slots. If the Sourcerer has used any other Innate Power from another class to refresh their Arcane spell slots this long rest they may not use Internal Battery. Additional benefits come if this study is done in an area of powerful arcane magic (such as an Arcane Locus), and performs a personal rite (determined by the Sourcerer). Doing so, the Sourcerer gains three additional Arcane Novice-tier Spell-Slots. These Spell-Slots last until the Sourcerer completes a Long Rest. Additional benefits may be possible (see the Skills, Perks, and Flaws document for more details).Finally, if the Sourcerer has not worn non-Barrier armor at any point prior to the use of this Power this event they may once per Event refresh Internal Battery immediately. In doing so they lose the ability to wear non-Barrier armor for the remainder of the Event.",
+        "requiredLevel": 1,
+        "requiredClass": "Sourcerer"
       },
       {
         "name": "Arcane Source",
@@ -9777,6 +10021,8 @@
             "n": 1
           }
         ],
+        "requiredLevel": 6,
+        "requiredClass": "Sourcerer",
         "sharedWith": [
           "Cleric",
           "Druid",
@@ -9801,7 +10047,9 @@
         "requirement": "Sourcerer Level 10",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Sourcerer may post an information card on their bunk or bed, stating to others that they are insubstantial while in that bed. This Power can only be activated by Focusing while in the bed for a Slow Count of 60. It then lasts until the Sourcerer says “Cure Insubstantial” and takes down the card, or leaves the bed."
+        "description": "The Sourcerer may post an information card on their bunk or bed, stating to others that they are insubstantial while in that bed. This Power can only be activated by Focusing while in the bed for a Slow Count of 60. It then lasts until the Sourcerer says “Cure Insubstantial” and takes down the card, or leaves the bed.",
+        "requiredLevel": 10,
+        "requiredClass": "Sourcerer"
       }
     ],
     "rightHandPowers": [],
