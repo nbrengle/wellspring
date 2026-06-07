@@ -381,7 +381,8 @@ export function buildXlsxCharacter(character, report) {
 
   data.push(["Innate Powers:"]);
   data.push(["Name"]);
-  for (const item of (character.innatePowers || [])) {
+  const innateItems = (report?.owned?.innatePowers || character.innatePowers || []).map((ip) => ip.name || ip);
+  for (const item of innateItems) {
     const suffix = bpSuffix(item, 'innatePowers', report);
     data.push([`${item}${suffix}`]);
   }
