@@ -96,35 +96,6 @@ function applyClassStartingAbilities(character, className, level = 1) {
     nextCharacter = rebuildStartingSkills(nextCharacter, className);
   }
 
-  // Gather active innate powers from ALL classes on the character
-  const activeInnateNames = new Set();
-  for (const c of nextCharacter.classes || []) {
-    const innate = CLASS_POWERS[c.name]?.innate || [];
-    for (const p of innate) {
-      const reqMatch = String(p.requirement || p.tier || '').match(/\b(?:L|level)\s*(\d+)\b/i)
-        || String(p.prereq || p.prerequisites || '').match(/\b(?:L|level)\s*(\d+)\b/i);
-      const reqLvl = reqMatch ? parseInt(reqMatch[1], 10) : 1;
-      const effectiveLvl = c.name === className ? level : c.level;
-      if (effectiveLvl >= reqLvl) {
-        activeInnateNames.add(p.name);
-      }
-    }
-  }
-
-  const allClassInnateNames = new Set(
-    (nextCharacter.classes || []).flatMap(c => (CLASS_POWERS[c.name]?.innate || []).map(p => p.name))
-  );
-
-  // Keep user-added innate powers (which are not class-innate)
-  // and add all active class-innate powers.
-  const nextInnate = (nextCharacter.innatePowers || []).filter(name => !allClassInnateNames.has(name));
-  for (const name of activeInnateNames) {
-    if (!nextInnate.includes(name)) {
-      nextInnate.push(name);
-    }
-  }
-
-  nextCharacter.innatePowers = nextInnate;
   return nextCharacter;
 }
 

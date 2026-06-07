@@ -142,12 +142,8 @@ export function ownedGrantSources(character) {
     sources.push({ id: `perks:${base}`, name: base, kind: 'perk' });
   }
   // Class innate powers the character has at level (automatic features).
-  for (const { name: cls, level } of getClasses(character)) {
-    for (const p of (CLASS_POWERS[cls]?.innate || [])) {
-      if (level >= requiredLevel(p)) {
-        sources.push({ id: `powers:${p.name}`, name: p.name, kind: 'feature' });
-      }
-    }
+  for (const ip of activeInnatePowers(character)) {
+    sources.push({ id: `powers:${ip.name}`, name: ip.name, kind: 'feature' });
   }
   // Powers the character has actually selected into slots (any tier) — a chosen
   // power can itself grant an ability (e.g. Implicit Truths → Insight).
@@ -342,6 +338,51 @@ export function primaryClass(character) {
   return getClasses(character)[0]?.name || null;
 }
 
+// Active innate powers for the character. Derives all class-innate powers
+// whose level requirements are met, and merges any stored non-class innate powers.
+export function activeInnatePowers(character) {
+  const list = [];
+  const seen = new Set();
+
+  // 1. Class-innate powers that are active at their respective class levels.
+  for (const { name: cls, level } of getClasses(character)) {
+    for (const p of (CLASS_POWERS[cls]?.innate || [])) {
+      if (level >= requiredLevel(p)) {
+        const cleanName = cleanItemName(p.name);
+        if (!seen.has(cleanName)) {
+          seen.add(cleanName);
+          list.push({
+            name: p.name,
+            entity: p,
+            cls,
+            source: 'class'
+          });
+        }
+      }
+    }
+  }
+
+  // 2. Stored user-added innate powers (which are not class-innate or not active).
+  (character?.innatePowers || []).forEach((item, index) => {
+    const cleanName = cleanItemName(item);
+    if (!seen.has(cleanName)) {
+      seen.add(cleanName);
+      const ent = lookupEntity(`powers:${cleanName}`);
+      const cls = pickClass(character, 'innatePowers', index, item);
+      list.push({
+        name: item,
+        entity: ent || null,
+        cls: cls || ent?.parentClass || null,
+        source: 'class',
+        index
+      });
+    }
+  });
+
+  return list;
+}
+
+
 // bareSkill helper is now imported from ./resolver.js
 
 // DERIVED multi-class grants — a pure function of the character's classes, so the
@@ -466,9 +507,14 @@ export function classifyOwnedItems(character) {
   });
 
   // Innate powers are free class-granted powers.
-  (character.innatePowers || []).forEach((item, index) => {
-    const ent = lookupEntity(`powers:${cleanItemName(item)}`);
-    innatePowers.push({ name: item, field: 'innatePowers', index, source: 'class', cls: ent?.parentClass || null });
+  activeInnatePowers(character).forEach((ip) => {
+    innatePowers.push({
+      name: ip.name,
+      field: 'innatePowers',
+      index: ip.index !== undefined ? ip.index : -1,
+      source: 'class',
+      cls: ip.cls
+    });
   });
 
   const mcGrants = multiclassGrants(character);
@@ -793,12 +839,13 @@ export function discountSources(character) {
   // power's levelDiscount whose atLevel is met) — like slotGrants/statMods. The id
   // is suffixed with the class so applyDiscounts' per-source cap keeps multiclass
   // tracks (Cleric vs Mage) independent.
-  for (const { name: cls, level } of getClasses(character)) {
-    for (const p of (CLASS_POWERS[cls]?.innate || [])) {
-      for (const ld of (p.levelDiscounts || [])) {
-        if (level >= ld.atLevel) {
+  for (const ip of activeInnatePowers(character)) {
+    if (ip.cls && ip.entity?.levelDiscounts) {
+      const clsLevel = getClasses(character).find((c) => c.name === ip.cls)?.level || 0;
+      for (const ld of (ip.entity.levelDiscounts || [])) {
+        if (clsLevel >= ld.atLevel) {
           out.push({
-            id: `powers:${p.name}@${cls}`, name: p.name,
+            id: `powers:${ip.name}@${ip.cls}`, name: ip.name,
             amount: ld.amount, cap: null, min: 0, refundIfFree: true, exclusions: [],
             scope: { kind: 'namedSkill', value: ld.skill },
           });
@@ -1064,9 +1111,9 @@ function slotGrants(character) {
   // powers granting slots (Artisan "Brilliant Thinker" → +1 Basic). The
   // progression "Innate Bonus Cantrip" is NOT a slot — it grants the specific
   // locked cantrip, handled by innateBonusCantrips(), so it never bumps the cap.
-  for (const { name: cls, level: clsLevel } of classes) {
-    for (const p of (CLASS_POWERS[cls]?.innate || [])) {
-      if (requiredLevel(p) <= clsLevel) for (const { cat, n } of (p.slotGrants || [])) addTo(cls, cat, n);
+  for (const ip of activeInnatePowers(character)) {
+    if (ip.cls && ip.entity?.slotGrants) {
+      for (const { cat, n } of (ip.entity.slotGrants || [])) addTo(ip.cls, cat, n);
     }
   }
 
@@ -1330,11 +1377,9 @@ export function wealthState(character) {
   }
   // Owned/selected powers (Pit Master, etc.) + innate at level.
   const ownedPowerNames = new Set();
-  for (const { name: cls } of getClasses(character)) {
-    for (const p of (CLASS_POWERS[cls]?.innate || [])) {
-      ownedPowerNames.add(p.name);
-      const w = wealthFrom(p); if (w) add(p.name, w.n, w.note);
-    }
+  for (const ip of activeInnatePowers(character)) {
+    ownedPowerNames.add(ip.name);
+    const w = wealthFrom(ip.entity); if (w) add(ip.name, w.n, w.note);
   }
   for (const field of POWER_SOURCE_FIELDS) {
     for (const item of (character[field] || [])) {
@@ -1398,10 +1443,8 @@ export function statMods(character) {
     }
   }
   // Innate class powers held at level, then selected/slotted powers.
-  for (const { name: cls, level: clsLevel } of getClasses(character)) {
-    for (const p of (CLASS_POWERS[cls]?.innate || [])) {
-      if (requiredLevel(p) <= clsLevel) apply(p.name, p);
-    }
+  for (const ip of activeInnatePowers(character)) {
+    if (ip.entity) apply(ip.name, ip.entity);
   }
   for (const field of POWER_SOURCE_FIELDS) {
     for (const item of (character[field] || [])) {

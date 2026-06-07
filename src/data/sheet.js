@@ -127,7 +127,10 @@ export function formatCharacterSheet(character, report) {
 
   // ── Powers / spells ── (domain/class powers may be BP-bought)
   for (const [field, label] of POWER_SECTIONS) {
-    if (character[field]?.length) line(label, joinItems(character[field], field, report));
+    const items = field === 'innatePowers'
+      ? (report?.owned?.innatePowers || character.innatePowers || []).map((ip) => ip.name || ip)
+      : character[field];
+    if (items?.length) line(label, joinItems(items, field, report));
   }
 
 
