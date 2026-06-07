@@ -435,6 +435,48 @@ test('Patron discounts gift-eligible perks by 1, excludes Strong Bloodline + Gif
   eq(s.byItem['purchasedPerks:Strong Bloodline'].cost, 3, 'Strong Bloodline excluded');
 });
 
+// ─── Ritual Affinity: per-class level-gated BP discount ──────────────────────────
+// The innate power (Cleric+Mage) makes Journeyman Ritual Magic cost 1 less at the
+// GRANTING class's L7, and Greater at L12, refunding retroactively (auto via
+// recompute). Gate is per granting class, so a multiclass discounts each track
+// independently. Parser emits levelDiscounts; validate applies them per class.
+test('Ritual Affinity discounts Ritual Magic at the granting class level', () => {
+  const cost = (c, skill) => {
+    const s = computeSpend(c);
+    const k = Object.keys(s.byItem).find((x) => x.endsWith(`:${skill}`));
+    return s.byItem[k]?.cost;
+  };
+  eq(cost({ classLevels: 'Cleric 4', purchasedSkills: ['Journeyman Ritual Magic'] }, 'Journeyman Ritual Magic'), 2, 'L4: gate not met, full 2');
+  eq(cost({ classLevels: 'Cleric 7', purchasedSkills: ['Journeyman Ritual Magic'] }, 'Journeyman Ritual Magic'), 1, 'L7: Journeyman 2→1');
+  eq(cost({ classLevels: 'Cleric 7', purchasedSkills: ['Greater Ritual Magic'] }, 'Greater Ritual Magic'), 3, 'L7: Greater gate (L12) not met, full 3');
+  eq(cost({ classLevels: 'Cleric 12', purchasedSkills: ['Greater Ritual Magic'] }, 'Greater Ritual Magic'), 2, 'L12: Greater 3→2');
+  // Multiclass: Cleric track at 12 gates Greater; the discount fires once.
+  eq(cost({ classes: [{ name: 'Cleric', level: 12 }, { name: 'Mage', level: 4 }], purchasedSkills: ['Greater Ritual Magic'] }, 'Greater Ritual Magic'), 2, 'Cleric12 track discounts Greater');
+  // No Ritual Affinity → no discount; no leak to similarly-named skills.
+  eq(cost({ classLevels: 'Fighter 7', purchasedSkills: ['Journeyman Ritual Magic'] }, 'Journeyman Ritual Magic'), 2, 'no RA → full');
+  eq(cost({ classLevels: 'Cleric 12', purchasedSkills: ['Greater Alchemy'] }, 'Greater Alchemy'), 5, 'no leak to Greater Alchemy');
+});
+
+// ─── shared powers: same-named cross-class powers stay mechanically equivalent ───
+// A/B distinction is in the parser: `sharedWith` lists every offering class; a
+// per-class level-scaled discount is `levelDiscounts`. Shared powers must be
+// mechanically equivalent (cost/refresh) EXCEPT where they carry levelDiscounts
+// (Ritual Affinity) — so a future edit that makes a shared copy diverge fails loud.
+test('shared powers are mechanically equivalent unless level-scaled', () => {
+  const TIERS = ['innate','utility','basic','advanced','veteran','classSkills','rightHandPowers','cantrips','noviceSpells','adeptSpells','greaterSpells'];
+  const copies = {}; // name -> [{cost, refresh, hasLD}]
+  for (const c of CLASSES_JSON) for (const t of TIERS) for (const p of (c[t] || [])) {
+    (copies[p.name] = copies[p.name] || []).push({ cost: p.cost ?? null, refresh: p.refresh ?? null, hasLD: !!p.levelDiscounts, sharedWith: p.sharedWith });
+  }
+  for (const [name, cs] of Object.entries(copies)) {
+    if (cs.length < 2) continue;            // shared only
+    ok(cs.every((x) => Array.isArray(x.sharedWith) && x.sharedWith.length >= 2), `${name} copies tagged sharedWith`);
+    if (cs.some((x) => x.hasLD)) continue;   // level-scaled (Ritual Affinity) may differ per class
+    eq(new Set(cs.map((x) => JSON.stringify(x.cost))).size, 1, `${name} copies share one cost`);
+    eq(new Set(cs.map((x) => JSON.stringify(x.refresh))).size, 1, `${name} copies share one refresh`);
+  }
+});
+
 // ─── xN on unlimited-ranks skills → distinct instances, not rank N ────────────
 test('import expands "Lore x2" into two distinct Lore instances', () => {
   const c = parseCharacterSheet('M\nClass Levels: Mage 4\nPurchased Skills: Lore x2');

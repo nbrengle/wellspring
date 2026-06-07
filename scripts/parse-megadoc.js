@@ -743,11 +743,33 @@ function extractSlotGrants(entity) {
   if (highest) entity.highestSlot = true;
 }
 
+// ─── LEVEL-GATED BUILD-POINT DISCOUNTS (prose → structured) ────────────────────
+// Some innate powers make a named skill cheaper once the character reaches a level
+// in THE GRANTING CLASS (Ritual Affinity: Journeyman Ritual Magic −1 BP at class L7,
+// Greater −1 BP at L12). The gate is the granting class's own level, so this can't
+// live as a flat refs edge — it's emitted per-power here and applied per class in
+// validate.js (mirroring slotGrants/statMods). Each entry: { skill, amount, atLevel }.
+// Anchored on the doc's exact phrasing "…Nth level <Class>… for one fewer Build
+// Point", which matches ONLY genuine level-gated discounts (not effect-scaling).
+function extractLevelDiscounts(entity) {
+  const text = entity.description || entity.desc || '';
+  if (!/fewer\s+Build\s+Point/i.test(text)) return;
+  const out = [];
+  const re = /(?:once\s+(?:they|the\s+\w+)\s+(?:achieve|reach(?:es)?)\s+)?(\d+)(?:st|nd|rd|th)\s+level\s+\w+,?\s+(?:they\s+can\s+)?purchase\s+(.+?)\s+(?:skill\s+)?for\s+(\d+|one)\s+fewer\s+Build\s+Point/gi;
+  let m;
+  while ((m = re.exec(text))) {
+    const amount = /^\d+$/.test(m[3]) ? parseInt(m[3], 10) : 1;
+    out.push({ skill: m[2].trim(), amount, atLevel: parseInt(m[1], 10) });
+  }
+  if (out.length) entity.levelDiscounts = out;
+}
+
 // Run every per-entity mechanical extractor over an entity with a description.
 function enrichMechanics(entity) {
   extractStatMods(entity);
   extractWealthIncome(entity);
   extractSlotGrants(entity);
+  extractLevelDiscounts(entity);
 }
 
 // Powers offering "choose one of the following: • … • …". Two flavors:
@@ -782,6 +804,21 @@ const CLASSES_OUT = parseClasses();
 for (const c of CLASSES_OUT) {
   for (const arr of Object.values(c)) {
     if (Array.isArray(arr)) for (const p of arr) if (p && p.description) { extractPowerBenefits(p); extractChooseOne(p); enrichMechanics(p); }
+  }
+}
+// Cross-class pass: a power offered by more than one class is the SAME shared power
+// repeated in the doc. Tag each copy with sharedWith:[classes] so downstream code
+// (entity index merge, guard test) can treat them as one ability. Only true power
+// tiers count — multiclassGrants lists skill NAMES, not power entities.
+{
+  const POWER_TIERS = ['innate','utility','basic','advanced','veteran','classSkills','rightHandPowers','cantrips','noviceSpells','adeptSpells','greaterSpells'];
+  const offeredBy = {}; // power name -> Set(class names)
+  for (const c of CLASSES_OUT) for (const t of POWER_TIERS) for (const p of (c[t] || [])) {
+    if (p?.name) (offeredBy[p.name] ||= new Set()).add(c.name);
+  }
+  for (const c of CLASSES_OUT) for (const t of POWER_TIERS) for (const p of (c[t] || [])) {
+    const classes = p?.name && offeredBy[p.name];
+    if (classes && classes.size > 1) p.sharedWith = [...classes];
   }
 }
 write('classes.json', CLASSES_OUT);

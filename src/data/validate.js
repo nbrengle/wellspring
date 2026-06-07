@@ -787,6 +787,25 @@ export function discountSources(character) {
     const id = `skills:${cleanItemName(name)}`;
     if (D[id]) out.push({ id, name: cleanItemName(name), ...D[id] });
   }
+  // Level-gated discounts from innate class powers (Ritual Affinity: Journeyman
+  // Ritual Magic −1 BP at class L7, Greater −1 BP at L12). The gate is the GRANTING
+  // class's own level, so emit one source per (class the character has × that
+  // power's levelDiscount whose atLevel is met) — like slotGrants/statMods. The id
+  // is suffixed with the class so applyDiscounts' per-source cap keeps multiclass
+  // tracks (Cleric vs Mage) independent.
+  for (const { name: cls, level } of getClasses(character)) {
+    for (const p of (CLASS_POWERS[cls]?.innate || [])) {
+      for (const ld of (p.levelDiscounts || [])) {
+        if (level >= ld.atLevel) {
+          out.push({
+            id: `powers:${p.name}@${cls}`, name: p.name,
+            amount: ld.amount, cap: null, min: 0, refundIfFree: true, exclusions: [],
+            scope: { kind: 'namedSkill', value: ld.skill },
+          });
+        }
+      }
+    }
+  }
   return out;
 }
 
@@ -807,6 +826,12 @@ function discountApplies(src, item, ent, pos) {
   if (src.scope.kind === 'skillRanks') {
     // Every rank of one named skill is discounted (Sharp Mind → Lore). No limit.
     return new RegExp(`^${src.scope.value}\\b`, 'i').test(cleanItemName(item));
+  }
+  if (src.scope.kind === 'namedSkill') {
+    // Exactly one specific skill (Ritual Affinity → "Journeyman Ritual Magic").
+    // EXACT name match, not a prefix — a prefix on "Greater"/"Journeyman" would
+    // leak to Greater Alchemy / other Journeyman skills.
+    return bareSkill(cleanItemName(item)) === src.scope.value;
   }
   if (src.scope.kind === 'prereq') {
     // Item lists the source's named perk as a prerequisite (e.g. Patron Gifts).

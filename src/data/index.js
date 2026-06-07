@@ -173,6 +173,8 @@ function powerEntry(p) {
     wealthIncome: p.wealthIncome ?? null,
     slotGrants: p.slotGrants ?? [],
     highestSlot: p.highestSlot ?? false,
+    levelDiscounts: p.levelDiscounts ?? [],
+    sharedWith: p.sharedWith ?? [],
   };
 }
 

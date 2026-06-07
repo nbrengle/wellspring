@@ -1708,6 +1708,12 @@
             "cat": "utility",
             "n": 1
           }
+        ],
+        "sharedWith": [
+          "Artisan",
+          "Fighter",
+          "Rogue",
+          "Socialite"
         ]
       },
       {
@@ -1933,7 +1939,23 @@
         "requirement": "Cleric Level 3",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Cleric can use their understanding of Divine magic to help navigate the complexities of Ritual magic. They receive the Apprentice Ritual Magic skill at no cost. Once they achieve 7th level Cleric, they can purchase Journeyman Ritual Magic skill for one fewer Build Point. Once they achieve 12th level Cleric, they can purchase Greater Ritual Magic skill for one fewer Build Point. If they have already purchased either of these skills, they get one Build Point back for each."
+        "description": "The Cleric can use their understanding of Divine magic to help navigate the complexities of Ritual magic. They receive the Apprentice Ritual Magic skill at no cost. Once they achieve 7th level Cleric, they can purchase Journeyman Ritual Magic skill for one fewer Build Point. Once they achieve 12th level Cleric, they can purchase Greater Ritual Magic skill for one fewer Build Point. If they have already purchased either of these skills, they get one Build Point back for each.",
+        "levelDiscounts": [
+          {
+            "skill": "Journeyman Ritual Magic",
+            "amount": 1,
+            "atLevel": 7
+          },
+          {
+            "skill": "Greater Ritual Magic",
+            "amount": 1,
+            "atLevel": 12
+          }
+        ],
+        "sharedWith": [
+          "Cleric",
+          "Mage"
+        ]
       },
       {
         "name": "Shield of Faith",
@@ -2059,6 +2081,12 @@
             "cat": "cantrips",
             "n": 1
           }
+        ],
+        "sharedWith": [
+          "Cleric",
+          "Druid",
+          "Mage",
+          "Sourcerer"
         ]
       },
       {
@@ -2176,7 +2204,13 @@
         "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "This  cantrip takes the power out of a Spell-Packet (or multiple Spell-Packets) that has already been charged and returns that power to the caster. The Spell-Packet becomes inert, and the caster refreshes the Spell-Slot that was used to charge the Spell-Packet. If the Spell charges more than one Spell-Packet, all the Spell-Packets must still be charged in order to cancel the Spell."
+        "description": "This  cantrip takes the power out of a Spell-Packet (or multiple Spell-Packets) that has already been charged and returns that power to the caster. The Spell-Packet becomes inert, and the caster refreshes the Spell-Slot that was used to charge the Spell-Packet. If the Spell charges more than one Spell-Packet, all the Spell-Packets must still be charged in order to cancel the Spell.",
+        "sharedWith": [
+          "Cleric",
+          "Druid",
+          "Mage",
+          "Sourcerer"
+        ]
       },
       {
         "name": "Curing Prayer",
@@ -3234,6 +3268,12 @@
             "cat": "cantrips",
             "n": 1
           }
+        ],
+        "sharedWith": [
+          "Cleric",
+          "Druid",
+          "Mage",
+          "Sourcerer"
         ]
       },
       {
@@ -3294,7 +3334,13 @@
         "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "This minor cantrip takes the power out of a Spell-Packet (or multiple Spell-Packets) that has already been charged and returns that power to the caster. The Spell-Packet becomes inert, and the caster refreshes the spell-slot that was used to charge the Spell-Packet. If the spell charges more than one Spell-Packet, all the Spell-Packets must still be charged in order to cancel the spell."
+        "description": "This minor cantrip takes the power out of a Spell-Packet (or multiple Spell-Packets) that has already been charged and returns that power to the caster. The Spell-Packet becomes inert, and the caster refreshes the spell-slot that was used to charge the Spell-Packet. If the spell charges more than one Spell-Packet, all the Spell-Packets must still be charged in order to cancel the spell.",
+        "sharedWith": [
+          "Cleric",
+          "Druid",
+          "Mage",
+          "Sourcerer"
+        ]
       },
       {
         "name": "Care for the Fallen",
@@ -4577,7 +4623,11 @@
         "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Fighter can only use this ability after moving off to a location removed from combat. They then go insubstantial and can return to the battle and collect projectile ammunition or thrown weapons. Once they have collected a maximum of six, they must return to their original location and Cure their insubstantial Condition by calling Cure Insubstantial. While insubstantial the fighter can do nothing besides collect projectile ammunition or thrown weapons and return."
+        "description": "The Fighter can only use this ability after moving off to a location removed from combat. They then go insubstantial and can return to the battle and collect projectile ammunition or thrown weapons. Once they have collected a maximum of six, they must return to their original location and Cure their insubstantial Condition by calling Cure Insubstantial. While insubstantial the fighter can do nothing besides collect projectile ammunition or thrown weapons and return.",
+        "sharedWith": [
+          "Fighter",
+          "Rogue"
+        ]
       },
       {
         "name": "Renowned Soldier",
@@ -5166,7 +5216,11 @@
         "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Fighter refreshes 3 of their Spikes to no higher than their current Maximum Spikes."
+        "description": "The Fighter refreshes 3 of their Spikes to no higher than their current Maximum Spikes.",
+        "sharedWith": [
+          "Fighter",
+          "Rogue"
+        ]
       },
       {
         "name": "Rest",
@@ -5415,6 +5469,12 @@
             "cat": "utility",
             "n": 1
           }
+        ],
+        "sharedWith": [
+          "Artisan",
+          "Fighter",
+          "Rogue",
+          "Socialite"
         ]
       },
       {
@@ -5587,7 +5647,23 @@
         "requirement": "Mage Level 3",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Mage can use their understanding of Arcane magic to help navigate the complexities of Ritual magic. They gain the Apprentice Ritual Magic skill at no cost. Once they achieve 7th level Mage, they can purchase Journeyman Ritual Magic skill for one fewer Build Point. Once they achieve 12th level Mage, they can purchase Greater Ritual Magic skill for one fewer Build Point. If the Mage has already purchased either of these skills, they get one Build Point back for each."
+        "description": "The Mage can use their understanding of Arcane magic to help navigate the complexities of Ritual magic. They gain the Apprentice Ritual Magic skill at no cost. Once they achieve 7th level Mage, they can purchase Journeyman Ritual Magic skill for one fewer Build Point. Once they achieve 12th level Mage, they can purchase Greater Ritual Magic skill for one fewer Build Point. If the Mage has already purchased either of these skills, they get one Build Point back for each.",
+        "levelDiscounts": [
+          {
+            "skill": "Journeyman Ritual Magic",
+            "amount": 1,
+            "atLevel": 7
+          },
+          {
+            "skill": "Greater Ritual Magic",
+            "amount": 1,
+            "atLevel": 12
+          }
+        ],
+        "sharedWith": [
+          "Cleric",
+          "Mage"
+        ]
       },
       {
         "name": "Arcane Barrier",
@@ -5732,6 +5808,12 @@
             "cat": "cantrips",
             "n": 1
           }
+        ],
+        "sharedWith": [
+          "Cleric",
+          "Druid",
+          "Mage",
+          "Sourcerer"
         ]
       }
     ],
@@ -5754,7 +5836,13 @@
         "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "This minor cantrip takes the power out of a Spell-Packet (or multiple Spell-Packets) that has already been charged and returns that power to the caster. The Spell-Packet becomes inert, and the caster refreshes the Spell-Slot that was used to charge the Spell-Packet. If the Spell charges more than one Spell-Packet, all the Spell-Packets must still be charged in order to cancel the Spell."
+        "description": "This minor cantrip takes the power out of a Spell-Packet (or multiple Spell-Packets) that has already been charged and returns that power to the caster. The Spell-Packet becomes inert, and the caster refreshes the Spell-Slot that was used to charge the Spell-Packet. If the Spell charges more than one Spell-Packet, all the Spell-Packets must still be charged in order to cancel the Spell.",
+        "sharedWith": [
+          "Cleric",
+          "Druid",
+          "Mage",
+          "Sourcerer"
+        ]
       },
       {
         "name": "Force Shield",
@@ -7034,7 +7122,11 @@
         "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Rogue can only use this ability after moving off to a location removed from combat. They then go insubstantial and can return to the battle and collect their personally owned projectile ammunition, thrown weapons, or Spell-Packets. Once they have collected a maximum of six, they must return to their original location and Cure their insubstantial Condition by calling Cure Insubstantial. While insubstantial the Rogue can do nothing besides collect their personal objects listed above."
+        "description": "The Rogue can only use this ability after moving off to a location removed from combat. They then go insubstantial and can return to the battle and collect their personally owned projectile ammunition, thrown weapons, or Spell-Packets. Once they have collected a maximum of six, they must return to their original location and Cure their insubstantial Condition by calling Cure Insubstantial. While insubstantial the Rogue can do nothing besides collect their personal objects listed above.",
+        "sharedWith": [
+          "Fighter",
+          "Rogue"
+        ]
       },
       {
         "name": "Throat Slit",
@@ -7646,7 +7738,11 @@
         "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Rogue refreshes their Spikes to their current Maximum."
+        "description": "The Rogue refreshes their Spikes to their current Maximum.",
+        "sharedWith": [
+          "Fighter",
+          "Rogue"
+        ]
       },
       {
         "name": "Reversal",
@@ -7788,6 +7884,12 @@
             "cat": "utility",
             "n": 1
           }
+        ],
+        "sharedWith": [
+          "Artisan",
+          "Fighter",
+          "Rogue",
+          "Socialite"
         ]
       },
       {
@@ -9036,6 +9138,12 @@
             "cat": "utility",
             "n": 1
           }
+        ],
+        "sharedWith": [
+          "Artisan",
+          "Fighter",
+          "Rogue",
+          "Socialite"
         ]
       }
     ],
@@ -9668,6 +9776,12 @@
             "cat": "cantrips",
             "n": 1
           }
+        ],
+        "sharedWith": [
+          "Cleric",
+          "Druid",
+          "Mage",
+          "Sourcerer"
         ]
       },
       {
@@ -9709,7 +9823,13 @@
         "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "This minor cantrip takes the power out of a Spell-Packet (or multiple Spell-Packets) that has already been charged and returns that power to the caster. The Spell-Packet becomes inert, and the caster refreshes the spell-slot that was used to charge the Spell-Packet. If the spell charges more than one Spell-Packet, all the Spell-Packets must still be charged in order to cancel the spell."
+        "description": "This minor cantrip takes the power out of a Spell-Packet (or multiple Spell-Packets) that has already been charged and returns that power to the caster. The Spell-Packet becomes inert, and the caster refreshes the spell-slot that was used to charge the Spell-Packet. If the spell charges more than one Spell-Packet, all the Spell-Packets must still be charged in order to cancel the spell.",
+        "sharedWith": [
+          "Cleric",
+          "Druid",
+          "Mage",
+          "Sourcerer"
+        ]
       },
       {
         "name": "Charge",
