@@ -748,6 +748,41 @@ function enrichMechanics(entity) {
   extractStatMods(entity);
   extractWealthIncome(entity);
   extractSlotGrants(entity);
+  extractRequirement(entity);
+}
+
+// ─── POWER REQUIREMENT (prose → structured) ────────────────────────────────────
+// A power's `requirement` field is free text the validator used to re-parse on
+// every call to gate availability — and it only handled "<Class> Level N", silently
+// treating entity prerequisites ("Parry Blow", "The Right Hand") as level 0. Parse
+// it ONCE here into:
+//   entity.requiredLevel  — number (0 if none)
+//   entity.requiredClass  — the class the level refers to (or null)
+//   entity.requiresEntity — [names] of prerequisite powers/skills (or [])
+// Grammar (comma-separated parts): "<Class> Level N", a bare entity name, or both.
+const REQ_CLASS_LEVEL = /^(Artisan|Cleric|Druid|Fighter|Mage|Rogue|Socialite|Sourcerer)\s+Level\s+(\d+)/i;
+function extractRequirement(entity) {
+  const raw = entity.requirement;
+  if (!raw) return;
+  let requiredLevel = 0, requiredClass = null;
+  const requiresEntity = [];
+  for (let part of String(raw).split(',')) {
+    part = part.trim();
+    if (!part) continue;
+    const m = part.match(REQ_CLASS_LEVEL);
+    if (m) {
+      // Take only the "<Class> Level N" head — guards against run-on capture like
+      // "Artisan Level 4Skills and Options: …" where the field fused with prose.
+      requiredLevel = parseInt(m[2], 10);
+      requiredClass = m[1];
+    } else {
+      // A named prerequisite entity. Strip a trailing " skill" noise word.
+      const nm = part.replace(/\s+skill$/i, '').trim();
+      if (nm && !/^level\b/i.test(nm)) requiresEntity.push(nm);
+    }
+  }
+  if (requiredLevel) { entity.requiredLevel = requiredLevel; entity.requiredClass = requiredClass; }
+  if (requiresEntity.length) entity.requiresEntity = requiresEntity;
 }
 
 // Powers offering "choose one of the following: • … • …". Two flavors:
