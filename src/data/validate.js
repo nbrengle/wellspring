@@ -181,9 +181,14 @@ export function grantedAbilities(character) {
 
   const list = [];
   const bySource = {};
+  const CHOICE_RE = /\b(?:choose\s+one|gains?\s+one\s+of|one\s+of\s+the\s+following|gains?\s+one\s+skill)\b/i;
   for (const src of sources) {
     const ent = lookupEntity(src.id);
-    if (ent?.chooseOne?.kind === 'build') continue;
+    const isChoice = ent?.chooseOne?.kind === 'build' ||
+      CHOICE_RE.test(ent?.requirement || '') ||
+      CHOICE_RE.test(ent?.description || '') ||
+      CHOICE_RE.test(ent?.skillsAndOptions || '');
+    if (isChoice) continue;
     const targets = grants[src.id];
     if (!targets) continue;
     for (const ability of targets) {
@@ -731,6 +736,13 @@ function effectiveCost(item, field, character, idx, granted) {
   const authored = character.effectiveBP?.[field]?.[idx];
   const rank = rankOf(character, field, idx);
 
+  // No authored sidecar grant — derive it from the grant index (the single
+  // computation shared with grantedAbilities). An item the character gains free
+  // from an owned source (e.g. Medium Armor from the Linked Armor power) zeroes
+  // its cost without a hand-tagged sidecar.
+  const derived = derivedGrant(item, field, ent, granted);
+  if (derived && (typeof authored !== 'number' || authored > 0)) return { cost: 0, base, grant: derived, rank };
+
   // Trust the author's stated cost when present — it already reflects the full
   // rank. (Discounts are applied uniformly by applyDiscounts; authored costs that
   // pre-bake a discount are no longer special-cased — unlimited-ranks skills are
@@ -754,12 +766,6 @@ function effectiveCost(item, field, character, idx, granted) {
     if (grant.amount == null) return { cost: full, base, grant, rank };
     return { cost: Math.max(0, full - grant.amount), base, grant, rank };
   }
-  // No authored sidecar grant — derive it from the grant index (the single
-  // computation shared with grantedAbilities). An item the character gains free
-  // from an owned source (e.g. Medium Armor from the Linked Armor power) zeroes
-  // its cost without a hand-tagged sidecar.
-  const derived = derivedGrant(item, field, ent, granted);
-  if (derived) return { cost: 0, base, grant: derived, rank };
   return { cost: full, base, grant: null, rank };
 }
 
