@@ -7,9 +7,9 @@
 // by the validate.js barrel.
 
 import { lookupEntity, CLASS_POWERS, CLASS_PROGRESSION, CLASS_POWER_SLOTS, SPELLCASTERS, LINEAGES } from '../index.js';
-import { cleanItemName, resolveId } from '../resolver.js';
+import { cleanItemName, resolveId, getClasses } from '../resolver.js';
 import {
-  getClasses, rankOf, pickClass, countPicksForClass, progressionRow,
+  rankOf, pickClass, countPicksForClass, progressionRow,
   activeInnatePowers, CASTER_SLOT_FIELDS, MARTIAL_SLOT_FIELDS,
 } from './core.js';
 

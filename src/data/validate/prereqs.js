@@ -7,9 +7,9 @@
 // Re-exported by the validate.js barrel.
 
 import { lookupEntity, REFS, CLASS_POWERS, SPELLCASTERS, BASE_CLASSES } from '../index.js';
-import { cleanItemName, bareSkill, resolveId, idName, entityType } from '../resolver.js';
+import { cleanItemName, bareSkill, resolveId, idName, entityType, getClasses } from '../resolver.js';
 import {
-  getClasses, characterLevel, rankOf, grantedAbilities, ENTITY_FIELDS,
+  characterLevel, rankOf, grantedAbilities, ENTITY_FIELDS,
 } from './core.js';
 import { spellSlots } from './slots.js';
 
