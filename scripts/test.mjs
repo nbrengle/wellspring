@@ -559,10 +559,15 @@ test('power level requirement is enforced', () => {
   ok(!at.prereqs.issues.some((i) => i.item === 'Warrior Spirit'), 'clears at level');
 });
 test('power entity requirement is enforced (Expert Parry needs Parry Blow)', () => {
-  const missing = validate({ classLevels: 'Fighter 6', advancedPowers: ['Expert Parry'] });
+  // Parry Blow is a Fighter innate at L3. A Fighter 2 doesn't have it yet, so
+  // Expert Parry's requiresEntity is unmet → flagged.
+  const missing = validate({ classLevels: 'Fighter 2', advancedPowers: ['Expert Parry'] });
   ok(missing.prereqs.issues.some((i) => i.item === 'Expert Parry' && i.requiresEntity === 'Parry Blow'), 'flagged without prerequisite');
-  const ok2 = validate({ classLevels: 'Fighter 6', innatePowers: ['Parry Blow'], advancedPowers: ['Expert Parry'] });
-  ok(!ok2.prereqs.issues.some((i) => i.item === 'Expert Parry'), 'clears with prerequisite');
+  // A Fighter 6 AUTO-gets Parry Blow (innate), which satisfies the requirement —
+  // the prereq check now sees auto-granted innates (graph-derived ownedIds), so it
+  // clears without needing to separately select Parry Blow.
+  const auto = validate({ classLevels: 'Fighter 6', advancedPowers: ['Expert Parry'] });
+  ok(!auto.prereqs.issues.some((i) => i.item === 'Expert Parry'), 'clears when the prerequisite is auto-granted as an innate');
 });
 test('shared power name resolves requirement per owning class (no false positive)', () => {
   // "Ritual Affinity" exists for both Cleric (Cleric L3) and Mage (Mage L3). A

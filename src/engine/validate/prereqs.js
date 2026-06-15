@@ -12,44 +12,43 @@ import {
   characterLevel, rankOf, ENTITY_FIELDS,
 } from './core.js';
 import { spellSlots } from './slots.js';
-import { grantedAbilities } from '../graph.js';
+import { grantedAbilities, resolveCharacterGraph } from '../graph.js';
 
-// All entity ids the character owns, for satisfying skill-prereqs.
+// All entity ids the character owns, for satisfying skill-prereqs. DERIVED from
+// the character graph (single source of truth — it already walks every owned
+// field) plus granted abilities. For each owned item we add its resolved id and a
+// spread of name-aliases so a prereq stated against any equivalent id
+// (powers:/perks:/skills:, full or bare name) resolves.
 function ownedIds(character) {
   const owned = new Set();
-  for (const field of ENTITY_FIELDS) {
-    for (const item of character[field] || []) {
-      const id = resolveId(item, field, character);
-      owned.add(id);
-
-      const clean = cleanItemName(item);
-      const bare = bareSkill(clean);
-      const candidates = [
-        id,
-        `${entityType(field)}:${bare}`,
-        `powers:${clean}`,
-        `perks:${clean}`,
-        `skills:${clean}`,
-        `powers:${bare}`,
-        `perks:${bare}`,
-        `skills:${bare}`
-      ];
-      for (const cand of candidates) {
-        const ent = lookupEntity(cand);
-        if (ent) {
-          owned.add(ent.id);
-          owned.add(`${ent.type}:${bareSkill(ent.name)}`);
-        }
-      }
+  const addAliases = (rawString, field, nodeId, ent) => {
+    if (nodeId) owned.add(nodeId);
+    const fieldId = resolveId(rawString, field, character);
+    if (fieldId) owned.add(fieldId);
+    const clean = cleanItemName(rawString);
+    const bare = bareSkill(clean);
+    const candidates = [
+      `${entityType(field)}:${bare}`,
+      `powers:${clean}`, `perks:${clean}`, `skills:${clean}`,
+      `powers:${bare}`, `perks:${bare}`, `skills:${bare}`,
+    ];
+    for (const cand of candidates) {
+      const e = lookupEntity(cand);
+      if (e) { owned.add(e.id); owned.add(`${e.type}:${bareSkill(e.name)}`); }
     }
+    if (ent) { owned.add(ent.id); owned.add(`${ent.type}:${bareSkill(ent.name)}`); }
+  };
+
+  const graph = resolveCharacterGraph(character);
+  for (const node of graph.items) {
+    if (node.field === 'flaws' || node.field === 'synthetic') continue;
+    addAliases(node.rawString, node.field, node.id, node.entity);
   }
-  // Also add granted abilities so they satisfy prerequisites
+  // Granted abilities also satisfy prerequisites.
   for (const g of grantedAbilities(character).list) {
     owned.add(g.ability);
     const ent = lookupEntity(g.ability);
-    if (ent) {
-      owned.add(`${ent.type}:${bareSkill(ent.name)}`);
-    }
+    if (ent) owned.add(`${ent.type}:${bareSkill(ent.name)}`);
   }
   return owned;
 }
