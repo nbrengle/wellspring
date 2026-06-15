@@ -17,7 +17,7 @@ import {
 } from '../src/data/validate.js';
 import { bareSkill, cleanItemName } from '../src/data/resolver.js';
 import { formatCharacterSheet, parseCharacterSheet } from '../src/data/sheet.js';
-import { solveCrafting, RECIPES } from '../src/data/recipe-solver.js';
+import { solveCrafting, RECIPES, resolveRecipe, classifyIngredient, buildCraftTree } from '../src/data/recipe-solver.js';
 import { readFileSync } from 'node:fs';
 import { lookupEntity, eligiblePowers, DEVOTIONS, DOMAINS, REFS, CLASSES, LINEAGES } from '../src/data/index.js';
 import {
@@ -1063,6 +1063,41 @@ test('recipe solver resolves recursive and alternative recipes', () => {
   const moteReq = enchantWeapon.requirements[0]['Mote of Power'];
   eq(moteReq, 1, 'requires 1 Mote of Power, parsed correctly without parenthetical commas splitting it');
   ok(!('may not be substituted)' in enchantWeapon.requirements[0]), 'does not contain split-up noise fields');
+});
+
+test('classifier: parameterized intermediate resolves to its recipe (raw vs crafted)', () => {
+  // "Essence Infusion - Energy" is a parameterized form of the "Essence Infusion"
+  // recipe; it must NOT be treated as a raw resource.
+  const ei = resolveRecipe('Essence Infusion - Energy');
+  ok(ei && ei.name === 'Essence Infusion', 'parameterized ingredient resolves to Essence Infusion recipe');
+  eq(classifyIngredient('Essence Infusion - Energy').kind, 'crafted', 'classified as crafted');
+  eq(classifyIngredient('Bloom').kind, 'raw', 'a real resource is raw');
+  // A fused data artifact still matches the leading recipe and does not throw.
+  ok(resolveRecipe('Essence Infusion - Thought 5 Hide')?.name === 'Essence Infusion', 'fused artifact resolves to leading recipe');
+});
+
+test('adding a crafted intermediate to inventory unlocks a dependent recipe', () => {
+  const raws = { 'Raw Scale': 5, 'Night Prize': 20, 'Rare Mineral': 20, 'Hide': 20, 'Harvest': 20, 'Bloom': 20 };
+  // Cure Raw Scale needs a Vial of Transformation (itself a recipe). With a prebuilt
+  // Vial in inventory, the solver uses it instead of re-crafting.
+  const withVial = solveCrafting('Cure Raw Scale', 1, { ...raws, 'Vial of Transformation': 1 });
+  ok(withVial.success, 'Cure Raw Scale is craftable with a prebuilt Vial in inventory');
+  ok(withVial.steps.some(s => /vial of transformation/i.test(s.item) && s.source === 'inventory'),
+     'the prebuilt Vial is consumed from inventory, not re-crafted');
+});
+
+test('buildCraftTree exposes the full nested raw/crafted stack', () => {
+  const tree = buildCraftTree('Caustic Glob', 1, {});
+  eq(tree.kind, 'crafted', 'target is crafted');
+  const craftedChildren = tree.children.filter(c => c.kind === 'crafted').map(c => c.name).sort();
+  ok(craftedChildren.includes('Adderstrike Venom') && craftedChildren.includes('Hardening Lacquer'),
+     'crafted intermediates are nested as crafted nodes');
+  const adder = tree.children.find(c => c.name === 'Adderstrike Venom');
+  ok(adder.children.every(c => c.kind === 'raw'), 'intermediate expands to raw leaves');
+  // With the intermediate already in inventory, that branch collapses to "have".
+  const treeWithInv = buildCraftTree('Caustic Glob', 1, { 'Adderstrike Venom': 5 });
+  const adder2 = treeWithInv.children.find(c => c.name === 'Adderstrike Venom');
+  eq(adder2.kind, 'have', 'an owned intermediate shows as in-inventory, not re-crafted');
 });
 
 // ─── Weapon Specialization & Advanced Classes validation ───────────────────────

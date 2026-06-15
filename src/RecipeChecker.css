@@ -660,3 +660,114 @@
   line-height: 1.45;
   white-space: pre-line;
 }
+
+/* ── Crafting inventory: raw vs crafted, add-to-inventory, nested tree ───────── */
+
+/* Inventory group labels + crafted items */
+.b-inv-group-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--b-amber, #e0b04a);
+  margin: 0.75rem 0 0.25rem;
+}
+.b-inv-group-label:first-child { margin-top: 0; }
+.b-inv-group-hint {
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--b-muted, #9a8f7a);
+  font-weight: normal;
+}
+.b-inventory-item.is-crafted {
+  border-color: rgba(120, 170, 255, 0.35);
+  background: rgba(120, 170, 255, 0.04);
+}
+
+/* Add-to-inventory button in the recipe detail drawer */
+.b-recipe-detail-titlerow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+.b-recipe-add-inv-btn {
+  background: rgba(120, 170, 255, 0.12);
+  border: 1px solid rgba(120, 170, 255, 0.4);
+  color: #aaccff;
+  padding: 0.35rem 0.6rem;
+  border-radius: 0.375rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+.b-recipe-add-inv-btn:hover {
+  background: rgba(120, 170, 255, 0.22);
+}
+
+/* Raw / craftable ingredient badges */
+.b-ing-kind {
+  display: inline-block;
+  font-size: 0.68rem;
+  padding: 0.05rem 0.35rem;
+  border-radius: 0.75rem;
+  border: 1px solid transparent;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+.b-ing-kind.is-raw {
+  color: #8fd49a;
+  border-color: rgba(143, 212, 154, 0.4);
+  background: rgba(143, 212, 154, 0.08);
+}
+.b-ing-kind.is-crafted {
+  color: #aaccff;
+  border-color: rgba(120, 170, 255, 0.4);
+  background: rgba(120, 170, 255, 0.08);
+  cursor: pointer;
+}
+button.b-ing-kind.is-crafted:hover { background: rgba(120, 170, 255, 0.2); }
+
+.b-ingredient-badges { list-style: none; padding: 0; margin: 0.5rem 0 0; }
+.b-ingredient-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.2rem 0;
+}
+.b-ingredient-qty { color: var(--b-muted, #9a8f7a); min-width: 1.8rem; }
+.b-ingredient-name { flex: 1; }
+.b-ingredient-alt-note { color: var(--b-muted, #9a8f7a); font-size: 0.72rem; font-style: italic; margin-bottom: 0.2rem; }
+
+/* Nested craft tree */
+.b-tree-legend { font-size: 0.72rem; color: var(--b-muted, #9a8f7a); margin: 0 0 0.6rem; display: flex; gap: 0.3rem; flex-wrap: wrap; align-items: center; }
+.b-tree-have-tag { color: #d8c79a; }
+.b-craft-tree-node { margin-top: 0.2rem; }
+.b-craft-tree-children {
+  border-left: 1px dashed var(--b-border, #3a332a);
+  padding-left: 0.5rem;
+  margin-left: 0.4rem;
+}
+.b-craft-tree-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.25rem 0.4rem;
+  border-radius: 0.3rem;
+}
+.b-craft-tree-row.is-crafted { background: rgba(120, 170, 255, 0.05); }
+.b-craft-tree-row.is-have { background: rgba(216, 199, 154, 0.06); }
+.b-craft-tree-icon { font-size: 0.9rem; }
+.b-craft-tree-qty { color: var(--b-muted, #9a8f7a); min-width: 1.8rem; }
+.b-craft-tree-name { font-weight: 500; }
+.b-craft-tree-name.is-link {
+  background: none;
+  border: none;
+  color: #aaccff;
+  cursor: pointer;
+  padding: 0;
+  font: inherit;
+  text-decoration: underline dotted;
+}
+.b-craft-tree-tag { color: var(--b-muted, #9a8f7a); font-size: 0.72rem; margin-left: auto; }

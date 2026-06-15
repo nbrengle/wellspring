@@ -163,6 +163,36 @@ for (const r of RITUALS || []) {
   });
 }
 
+// Resolve an ingredient/target NAME to its recipe, if any. Match order:
+//   1. exact (case-insensitive) — "Essence Infusion"
+//   2. parameterized — strip a trailing " - <variant>" and retry, so an ingredient
+//      reference like "Essence Infusion - Energy" resolves to the "Essence Infusion"
+//      recipe. (The data also contains fused artifacts like "Essence Infusion -
+//      Thought 5 Hide"; the leading-recipe match still works and we don't crash.)
+// Returns the recipe object from RECIPES, or null when the name is a raw resource.
+export function resolveRecipe(name) {
+  if (!name) return null;
+  const want = name.trim().toLowerCase();
+  let key = Array.from(RECIPES.keys()).find((k) => k.toLowerCase() === want);
+  if (key) return RECIPES.get(key);
+  // Parameterized form: take the segment before the first " - " / " – " dash.
+  const base = name.split(/\s+[-–]\s+/)[0].trim().toLowerCase();
+  if (base && base !== want) {
+    key = Array.from(RECIPES.keys()).find((k) => k.toLowerCase() === base);
+    if (key) return RECIPES.get(key);
+  }
+  return null;
+}
+
+// Classify an ingredient as a raw resource (gathered) or a crafted intermediate
+// (made from a recipe). `recipe` is the resolved recipe for crafted ingredients.
+export function classifyIngredient(name) {
+  const recipe = resolveRecipe(name);
+  return recipe
+    ? { kind: 'crafted', recipe, canonical: recipe.name }
+    : { kind: 'raw', recipe: null, canonical: normalizeResourceName(name) };
+}
+
 // Build list of reverse lookups (which recipes use each resource as an ingredient)
 export const REVERSE_LOOKUP = new Map();
 for (const recipe of RECIPES.values()) {
@@ -201,10 +231,10 @@ export function solveCrafting(targetName, targetQty, inventory, path = []) {
   // We need to craft the remaining quantity
   const needed = targetQty - available;
   
-  // Find recipe for target
-  const recipeKey = Array.from(RECIPES.keys()).find(k => k.toLowerCase() === targetLower);
-  const recipe = recipeKey ? RECIPES.get(recipeKey) : null;
-  
+  // Find recipe for target (exact OR a parameterized "- variant" form, so an
+  // ingredient like "Essence Infusion - Energy" recurses into its recipe).
+  const recipe = resolveRecipe(targetName);
+
   if (!recipe || path.includes(recipe.name)) {
     return { success: false };
   }
@@ -256,6 +286,48 @@ export function solveCrafting(targetName, targetQty, inventory, path = []) {
   }
   
   return { success: false };
+}
+
+// Build a NESTED dependency tree for a target, for visualization. Unlike
+// solveCrafting (which returns a flat, ordered build list), this preserves the
+// stack shape: a crafted node's `children` are the ingredients of its first
+// requirement set, recursing down to raw leaves.
+//
+// Each node: { name, qty, kind, recipe?, batches?, have, need, children: [] }
+//   kind: 'have'    — fully covered by inventory (no crafting needed)
+//         'raw'     — a raw resource that must be gathered (shortfall in `need`)
+//         'crafted' — an intermediate that must be crafted (children expanded)
+// `inventory` is consumed greedily as the tree is walked so a resource shared by
+// two branches isn't double-counted. Cycles are guarded via `path`.
+export function buildCraftTree(name, qty, inventory, path = [], inv = null) {
+  const stock = inv || { ...inventory };
+  const invKey = Object.keys(stock).find((k) => k.toLowerCase() === name.toLowerCase());
+  const available = invKey ? stock[invKey] : 0;
+  const fromStock = Math.min(available, qty);
+  if (invKey && fromStock > 0) stock[invKey] -= fromStock;
+  const need = qty - fromStock;
+
+  // Fully covered by inventory.
+  if (need <= 0) {
+    return { name, qty, kind: 'have', have: qty, need: 0, children: [] };
+  }
+
+  const recipe = resolveRecipe(name);
+  if (!recipe || path.includes(recipe.name)) {
+    // Raw resource (or an unresolvable / cyclic recipe): a leaf shortfall.
+    return { name, qty, kind: 'raw', have: fromStock, need, children: [] };
+  }
+
+  const batchYield = recipe.yield === 9999 ? need : recipe.yield;
+  const batches = recipe.yield === 9999 ? 1 : Math.ceil(need / batchYield);
+  const reqSet = recipe.requirements[0] || {};
+  const children = Object.entries(reqSet).map(([reqName, reqQty]) =>
+    buildCraftTree(reqName, reqQty * batches, stock, [...path, recipe.name], stock)
+  );
+  return {
+    name, qty, kind: 'crafted', recipe, batches,
+    have: fromStock, need, children,
+  };
 }
 
 // Calculate details for a target recipe that cannot be made

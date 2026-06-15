@@ -1,11 +1,13 @@
 import React, { useState, useMemo } from "react";
 import resourcesJson from "./data/resources.json";
-import { 
-  RECIPES, 
-  REVERSE_LOOKUP, 
-  solveCrafting, 
-  getRecipeDeficit, 
-  normalizeResourceName 
+import {
+  RECIPES,
+  REVERSE_LOOKUP,
+  solveCrafting,
+  getRecipeDeficit,
+  normalizeResourceName,
+  classifyIngredient,
+  buildCraftTree
 } from "./data/recipe-solver.js";
 import "./RecipeChecker.css";
 
@@ -21,6 +23,64 @@ const DISCIPLINE_LABELS = {
   "Blacksmithing": "Blacksmithing",
   "Ritual Magic": "Ritual Magic"
 };
+
+// A small badge marking an ingredient as a raw material (🌿 gathered) or a
+// craftable intermediate (🔨 made from a recipe). For craftable ingredients the
+// badge is a button that jumps to that recipe's detail.
+function IngredientKind({ name, onJump }) {
+  const c = classifyIngredient(name);
+  if (c.kind === 'crafted') {
+    return (
+      <button
+        type="button"
+        className="b-ing-kind is-crafted"
+        title={`Craftable — made via the "${c.recipe.name}" recipe. Click to view.`}
+        onClick={(e) => { e.stopPropagation(); onJump && onJump(c.recipe.name); }}
+      >
+        🔨 Craftable
+      </button>
+    );
+  }
+  return <span className="b-ing-kind is-raw" title="Raw material — must be gathered">🌿 Raw</span>;
+}
+
+// Recursively render a buildCraftTree node as an indented tree. Each node shows its
+// quantity, a raw/crafted/have marker, and (for crafted nodes) expands its children
+// down to raw leaves — so the whole dependency stack is visible at a glance.
+function CraftTreeNode({ node, onJump, depth }) {
+  const icon = node.kind === 'have' ? '📦' : node.kind === 'crafted' ? '🔨' : '🌿';
+  const cls = node.kind === 'have' ? 'is-have' : node.kind === 'crafted' ? 'is-crafted' : 'is-raw';
+  const craftable = node.kind === 'crafted';
+  return (
+    <div className="b-craft-tree-node" style={{ marginLeft: depth ? 18 : 0 }}>
+      <div className={`b-craft-tree-row ${cls}`}>
+        <span className="b-craft-tree-icon">{icon}</span>
+        <span className="b-craft-tree-qty">{node.qty}×</span>
+        {craftable ? (
+          <button type="button" className="b-craft-tree-name is-link"
+                  title={`Craftable via "${node.recipe.name}"${node.batches ? ` — ${node.batches} batch${node.batches === 1 ? '' : 'es'}` : ''}. Click to view.`}
+                  onClick={() => onJump && onJump(node.recipe.name)}>
+            {node.name}
+          </button>
+        ) : (
+          <span className="b-craft-tree-name">{node.name}</span>
+        )}
+        <span className="b-craft-tree-tag">
+          {node.kind === 'have' ? 'in inventory'
+            : node.kind === 'crafted' ? `craft${node.have > 0 ? ` (${node.have} on hand)` : ''}`
+            : `gather${node.have > 0 ? ` (${node.have} on hand, need ${node.need})` : ''}`}
+        </span>
+      </div>
+      {node.children && node.children.length > 0 && (
+        <div className="b-craft-tree-children">
+          {node.children.map((child, i) => (
+            <CraftTreeNode key={`${child.name}-${i}`} node={child} onJump={onJump} depth={depth + 1} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function RecipeChecker({ onClose }) {
   // Inventory: maps name to quantity
@@ -92,15 +152,34 @@ export default function RecipeChecker({ onClose }) {
     });
   };
 
-  // Get active inventory resources list (ignoring zero-count standard ones, but keeping standard keys visible)
-  const inventoryKeys = useMemo(() => {
-    return Object.keys(inventory).sort((a, b) => {
+  // Add a CRAFTED recipe output to inventory as a possessed intermediate. Keyed by
+  // the recipe's canonical name so solveCrafting credits it (and higher recipes that
+  // need it light up). One click adds a full batch yield.
+  const handleAddCrafted = (recipeName) => {
+    const recipe = RECIPES.get(recipeName);
+    if (!recipe) return;
+    const add = recipe.yield && recipe.yield !== 9999 ? recipe.yield : 1;
+    setInventory(prev => ({ ...prev, [recipe.name]: (prev[recipe.name] || 0) + add }));
+  };
+
+  // Split inventory into RAW resources (standard + custom non-recipe items) and
+  // CRAFTED intermediates (keys that match a recipe), so the UI groups them. Within
+  // raw, standard resources sort first.
+  const inventoryGroups = useMemo(() => {
+    const raw = [];
+    const crafted = [];
+    for (const name of Object.keys(inventory)) {
+      (classifyIngredient(name).kind === 'crafted' ? crafted : raw).push(name);
+    }
+    raw.sort((a, b) => {
       const aStd = STANDARD_RESOURCES.includes(a);
       const bStd = STANDARD_RESOURCES.includes(b);
       if (aStd && !bStd) return -1;
       if (!aStd && bStd) return 1;
       return a.localeCompare(b);
     });
+    crafted.sort((a, b) => a.localeCompare(b));
+    return { raw, crafted };
   }, [inventory]);
 
   // Solve all recipes to see what can be crafted
@@ -150,12 +229,14 @@ export default function RecipeChecker({ onClose }) {
 
     const solverResult = solveCrafting(recipe.name, 1, inventory);
     const deficitResult = getRecipeDeficit(recipe, inventory);
+    const tree = buildCraftTree(recipe.name, 1, inventory);
 
     return {
       recipe,
       success: solverResult.success,
       steps: solverResult.steps || [],
-      deficit: deficitResult
+      deficit: deficitResult,
+      tree
     };
   }, [selectedCalcRecipe, inventory]);
 
@@ -169,6 +250,28 @@ export default function RecipeChecker({ onClose }) {
   const recipeSearchList = useMemo(() => {
     return Array.from(RECIPES.keys()).sort();
   }, []);
+
+  // One inventory row. `kind`: 'raw' (standard, no delete) | 'custom' (deletable) |
+  // 'crafted' (deletable intermediate, distinct styling).
+  const renderInvItem = (name, kind) => {
+    const qty = inventory[name] || 0;
+    const deletable = kind !== "raw";
+    return (
+      <div key={name} className={`b-inventory-item ${qty > 0 ? "is-owned" : ""} ${kind === "crafted" ? "is-crafted" : kind === "custom" ? "is-custom" : ""}`}>
+        <div className="b-inv-info">
+          <span className="b-inv-name">{name}</span>
+          {deletable && (
+            <button className="b-inv-delete" onClick={() => handleDeleteCustomItem(name)} title="Remove from inventory">✕</button>
+          )}
+        </div>
+        <div className="b-inv-control">
+          <button className="b-inv-btn" onClick={() => handleQtyChange(name, -1)} disabled={qty === 0}>-</button>
+          <input type="number" min="0" className="b-inv-input" value={qty} onChange={(e) => handleQtySet(name, e.target.value)} />
+          <button className="b-inv-btn" onClick={() => handleQtyChange(name, 1)}>+</button>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="b-explorer b-recipes">
@@ -188,48 +291,18 @@ export default function RecipeChecker({ onClose }) {
         <div className="b-recipes-inventory">
           <h3 className="b-sidebar-title">Resource Inventory</h3>
           <div className="b-inventory-list">
-            {inventoryKeys.map(name => {
-              const qty = inventory[name] || 0;
+            <p className="b-inv-group-label">🌿 Raw Materials <span className="b-inv-group-hint">(gathered)</span></p>
+            {inventoryGroups.raw.map(name => {
               const isStd = STANDARD_RESOURCES.includes(name);
-              return (
-                <div key={name} className={`b-inventory-item ${qty > 0 ? "is-owned" : ""} ${!isStd ? "is-custom" : ""}`}>
-                  <div className="b-inv-info">
-                    <span className="b-inv-name">{name}</span>
-                    {!isStd && (
-                      <button 
-                        className="b-inv-delete"
-                        onClick={() => handleDeleteCustomItem(name)}
-                        title="Remove custom resource"
-                      >
-                        ✕
-                      </button>
-                    )}
-                  </div>
-                  <div className="b-inv-control">
-                    <button 
-                      className="b-inv-btn"
-                      onClick={() => handleQtyChange(name, -1)}
-                      disabled={qty === 0}
-                    >
-                      -
-                    </button>
-                    <input 
-                      type="number"
-                      min="0"
-                      className="b-inv-input"
-                      value={qty}
-                      onChange={(e) => handleQtySet(name, e.target.value)}
-                    />
-                    <button 
-                      className="b-inv-btn"
-                      onClick={() => handleQtyChange(name, 1)}
-                    >
-                      +
-                    </button>
-                  </div>
-                </div>
-              );
+              return renderInvItem(name, isStd ? "raw" : "custom");
             })}
+
+            {inventoryGroups.crafted.length > 0 && (
+              <>
+                <p className="b-inv-group-label">🔨 Crafted / Intermediate <span className="b-inv-group-hint">(made from recipes)</span></p>
+                {inventoryGroups.crafted.map(name => renderInvItem(name, "crafted"))}
+              </>
+            )}
           </div>
 
           <form className="b-inventory-custom-form" onSubmit={handleAddCustomItem}>
@@ -408,31 +481,20 @@ export default function RecipeChecker({ onClose }) {
                       </div>
                     )}
 
-                    {/* Step-by-Step Crafting Tree */}
+                    {/* Nested dependency tree: the full stack from the target down to
+                        raw leaves, each node marked raw vs crafted, have vs needed. */}
                     <div className="b-calc-section">
-                      <h4 className="b-recipe-section-title">Ingredients Breakdown & Process</h4>
-                      
-                      {targetCalculation.success ? (
-                        <div className="b-calc-tree">
-                          <p className="b-tree-header">Follow these steps in order:</p>
-                          <ol className="b-tree-list">
-                            {targetCalculation.steps.map((step, idx) => {
-                              if (step.source === 'inventory') {
-                                return (
-                                  <li key={idx} className="b-tree-step is-inv">
-                                    Take <strong>{step.qty} {step.item}</strong> from your inventory.
-                                  </li>
-                                );
-                              }
-                              return (
-                                <li key={idx} className="b-tree-step is-craft">
-                                  Use the <strong>{step.discipline} ({step.tier})</strong> craft to build <strong>{step.qty} {step.item}</strong> ({step.batches} batch{step.batches === 1 ? "" : "es"}).
-                                </li>
-                              );
-                            })}
-                          </ol>
-                        </div>
-                      ) : (
+                      <h4 className="b-recipe-section-title">Crafting Tree</h4>
+                      <p className="b-tree-legend">
+                        <span className="b-ing-kind is-raw">🌿 Raw</span> gather ·
+                        <span className="b-ing-kind is-crafted"> 🔨 Craftable</span> make from a recipe ·
+                        <span className="b-tree-have-tag"> 📦 In inventory</span>
+                      </p>
+                      <CraftTreeNode node={targetCalculation.tree} onJump={setInspectedRecipeName} depth={0} />
+                    </div>
+
+                    {/* Missing-ingredient summary for the closest alternative. */}
+                    {!targetCalculation.success && (
                         <div className="b-calc-deficit-list">
                           <p className="b-tree-header">Missing ingredients for the closest recipe alternative:</p>
                           <table className="b-deficit-table">
@@ -447,7 +509,7 @@ export default function RecipeChecker({ onClose }) {
                             <tbody>
                               {targetCalculation.deficit.items.map(item => (
                                 <tr key={item.name} className={item.missing > 0 ? "row-missing" : "row-ok"}>
-                                  <td>{item.name}</td>
+                                  <td>{item.name} <IngredientKind name={item.name} onJump={setInspectedRecipeName} /></td>
                                   <td>{item.required}</td>
                                   <td>{item.available}</td>
                                   <td>
@@ -463,10 +525,9 @@ export default function RecipeChecker({ onClose }) {
                           </table>
                         </div>
                       )}
-                    </div>
-                    
+
                     {/* Select for right drawer view */}
-                    <button 
+                    <button
                       className="b-calc-inspect-btn"
                       onClick={() => setInspectedRecipeName(targetCalculation.recipe.name)}
                     >
@@ -541,7 +602,16 @@ export default function RecipeChecker({ onClose }) {
         <div className="b-recipes-reader">
           {inspectedRecipe ? (
             <div className="b-recipe-detail-pane">
-              <h3 className="b-recipe-detail-name">{inspectedRecipe.name}</h3>
+              <div className="b-recipe-detail-titlerow">
+                <h3 className="b-recipe-detail-name">{inspectedRecipe.name}</h3>
+                <button
+                  className="b-recipe-add-inv-btn"
+                  onClick={() => handleAddCrafted(inspectedRecipe.name)}
+                  title={`Add ${inspectedRecipe.yield === 9999 ? 1 : inspectedRecipe.yield} ${inspectedRecipe.name} to your inventory as a crafted intermediate`}
+                >
+                  + Add to inventory
+                </button>
+              </div>
               <div className="b-recipe-detail-facts">
                 <div className="b-fact-row">
                   <span className="b-fact-label">Type</span>
@@ -566,6 +636,20 @@ export default function RecipeChecker({ onClose }) {
               <div className="b-recipe-detail-section">
                 <h4 className="b-recipe-detail-section-title">Ingredients List</h4>
                 <p className="b-recipe-detail-materials">{inspectedRecipe.materialsStr}</p>
+                {(inspectedRecipe.requirements?.[0]) && (
+                  <ul className="b-ingredient-badges">
+                    {inspectedRecipe.requirements.length > 1 && (
+                      <li className="b-ingredient-alt-note">(showing the first of {inspectedRecipe.requirements.length} alternatives)</li>
+                    )}
+                    {Object.entries(inspectedRecipe.requirements[0]).map(([ing, qty]) => (
+                      <li key={ing} className="b-ingredient-row">
+                        <span className="b-ingredient-qty">{qty}×</span>
+                        <span className="b-ingredient-name">{ing}</span>
+                        <IngredientKind name={ing} onJump={setInspectedRecipeName} />
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
 
               {inspectedRecipe.raw.description && (
