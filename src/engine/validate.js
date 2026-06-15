@@ -49,6 +49,7 @@ import { wealthState as computeWealthState } from './validate/wealth-income.js';
 
 import { checkPrereqs } from './validate/prereqs.js';
 export { prereqStatus, checkLevelConstraint } from './validate/prereqs.js';
+import { CRAFT_DISCIPLINES, CRAFTING_TIERS } from './config.js';
 
 // Wellspring has three distinct "consequence" kinds, kept separate by design:
 //   1. GRANT-OF-ENTITY — a source gives you a named Perk/Power/Skill for free
@@ -306,8 +307,6 @@ export function classifyOwnedItems(character) {
 // REFS.prereqs), so the highest owned tier in a discipline unlocks that tier and
 // every tier below it. Ritual Magic gates the ritual recipe list the same way.
 const CRAFT_TIER_RANK = { Apprentice: 1, Journeyman: 2, Greater: 3 };
-// Discipline name (as it appears on recipes) ⇐ the skill-name stem that grants it.
-const CRAFT_DISCIPLINES = { Alchemy: 'Alchemy', Tinkering: 'Tinkering', Enchanting: 'Enchanting' };
 
 // Every skill the character possesses (starting + purchased + granted), bare of
 // any "(parameter)" suffix. Shared basis for capability checks.
@@ -331,7 +330,7 @@ export function craftingCapability(character) {
   const owned = ownedSkillNames(character);
   const topTier = (stem) => {
     let best = 0;
-    for (const t of ['Apprentice', 'Journeyman', 'Greater']) {
+    for (const t of CRAFTING_TIERS) {
       if (owned.has(`${t} ${stem}`)) best = Math.max(best, CRAFT_TIER_RANK[t]);
     }
     return best; // 0 = none

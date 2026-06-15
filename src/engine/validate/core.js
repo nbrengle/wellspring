@@ -16,30 +16,15 @@
 import { LEVEL_TABLE, lookupEntity, REFS, CLASS_POWERS, CLASS_PROGRESSION, CLASS_POWER_SLOTS, EVENTS_TABLE } from "../../data/index.js";
 import { cleanItemName, bareSkill, resolveId, entityType, idName, getClasses, primaryClass } from '../resolver.js';
 
-// ─── Economy / level constants ──────────────────────────────────────────────
+import {
+  MAX_LBP, MAX_FLAW_BP, BACKSTORY_BP, MAX_DOMAINS, DEFAULT_WEALTH, LEVEL_CAP
+} from '../config.js';
 
-// Max Lineage Build Points a character can be awarded from challenges (MegaDoc:
-// "up to 10 awarded LBP").
-export const MAX_LBP = 10;
-
-// Max BP a character can be awarded from flaws (MegaDoc: "up to 5 awarded BP").
-export const MAX_FLAW_BP = 5;
-
-// BP granted for a plot-team-approved backstory (MegaDoc: "Approved backstories
-// provide the character with 2 additional BP").
-export const BACKSTORY_BP = 2;
-
-export const MAX_DOMAINS = 2;
-
-export const DEFAULT_WEALTH = 8;
+export { MAX_LBP, MAX_FLAW_BP, BACKSTORY_BP, MAX_DOMAINS, DEFAULT_WEALTH, LEVEL_CAP };
 
 // The lowest level the level table documents — the legal campaign floor (4).
 export const LEGAL_MIN_LEVEL = LEVEL_TABLE.length
   ? Math.min(...LEVEL_TABLE.map((l) => l.level)) : 4;
-
-// Current total-level cap (10). The only path past 10 is Advanced Classes, which
-// aren't published yet. Not enforced by the builder — only flagged.
-export const LEVEL_CAP = 10;
 
 export { EVENTS_TABLE };
 
@@ -49,44 +34,15 @@ export { EVENTS_TABLE };
 // sublineage matches across challenges, advantages, and the sublineage list.
 export const subKey = (s) => String(s || '').split(' (')[0].trim().toLowerCase();
 
-// ─── Field-list constants ───────────────────────────────────────────────────
+import {
+  BP_FIELDS, BP_POWER_FIELDS, MARTIAL_SLOT_FIELDS, CASTER_SLOT_FIELDS,
+  ENTITY_FIELDS, CLASS_POWER_TIERS, POWER_SOURCE_FIELDS
+} from '../config.js';
 
-export const BP_FIELDS = ['purchasedSkills', 'purchasedPerks'];
-
-// Power fields that hold BP-bought powers (domain powers, class-skill powers, and
-// form powers). Powers listed in these fields are evaluated for BP cost.
-export const BP_POWER_FIELDS = ['domainPowers', 'classPowers', 'formPowers'];
-
-// Power fields grouped by the slot category they consume.
-export const MARTIAL_SLOT_FIELDS = {
-  utility: 'utilityPowers',
-  basic: 'basicPowers',
-  advanced: 'advancedPowers',
-  veteran: 'veteranPowers',
+export {
+  BP_FIELDS, BP_POWER_FIELDS, MARTIAL_SLOT_FIELDS, CASTER_SLOT_FIELDS,
+  ENTITY_FIELDS, CLASS_POWER_TIERS, POWER_SOURCE_FIELDS
 };
-export const CASTER_SLOT_FIELDS = {
-  cantrips: 'cantrips',
-  // spellsKnown is the combined budget across the three learnable spell tiers.
-  spellsKnown: ['noviceSpells', 'adeptSpells', 'greaterSpells'],
-};
-
-// Every field whose items are resolvable entities, for prereq checking.
-export const ENTITY_FIELDS = [
-  'startingSkills', 'purchasedSkills', 'purchasedPerks',
-  'innatePowers', 'utilityPowers', 'basicPowers', 'advancedPowers',
-  'veteranPowers', 'classPowers', 'rightHandPowers', 'cantrips',
-  'noviceSpells', 'adeptSpells', 'greaterSpells', 'bookSpells',
-  'domainPowers', 'formPowers',
-];
-
-export const CLASS_POWER_TIERS = new Set(['Class', 'classSkills']);
-
-// Power fields a character fills by choice — any of these can be a grant source.
-export const POWER_SOURCE_FIELDS = [
-  'innatePowers', 'utilityPowers', 'basicPowers', 'advancedPowers',
-  'veteranPowers', 'classPowers', 'rightHandPowers', 'domainPowers', 'formPowers',
-  'cantrips', 'noviceSpells', 'adeptSpells', 'greaterSpells', 'bookSpells',
-];
 
 // ─── Class / level primitives ───────────────────────────────────────────────
 

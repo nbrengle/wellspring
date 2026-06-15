@@ -12,6 +12,7 @@ import {
   characterLevel, rankOf, grantedAbilities, ENTITY_FIELDS,
 } from './core.js';
 import { spellSlots } from './slots.js';
+import { ARMOR_SKILLS } from '../config.js';
 
 // All entity ids the character owns, for satisfying skill-prereqs.
 function ownedIds(character) {
@@ -130,8 +131,7 @@ export function checkLevelConstraint(character, constraintStr, owned) {
 
   // 7. "At least one Armor Proficiency"
   if (/At\s+least\s+one\s+Armor\s+Proficiency/i.test(constraintStr)) {
-    const armorSkills = ['Basic Armor', 'Light Armor', 'Medium Armor', 'Heavy Armor', 'Ironclad Armor'];
-    return armorSkills.some(name => owned.has(`skills:${name}`));
+    return ARMOR_SKILLS.some(name => owned.has(`skills:${name}`));
   }
 
   // 8. "One Novice-level spell-slot", "One Adept spell-slot", "One Greater spell-slot", etc.
