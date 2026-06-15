@@ -51,6 +51,29 @@ const PROFESSIONS = (() => {
   return m ? m[1].split(/,|\band\b/).map((s) => s.replace(/\s+with Staff approval.*/i, "").trim()).filter(Boolean) : [];
 })();
 
+const LOST_LIFE_SUGGESTIONS = (() => {
+  const suggestions = [];
+  for (const [linName, lin] of Object.entries(LINEAGES || {})) {
+    if (linName === "Lost") continue;
+    for (const c of lin.challenges || []) {
+      if (c.repped) {
+        suggestions.push(`${c.baseName || c.name} (${c.lbp} LBP)`);
+      }
+    }
+  }
+  return [...new Set(suggestions)].sort();
+})();
+
+const cleanChallengeName = (s) => {
+  const firstOpen = s.indexOf('(');
+  const lastClose = s.lastIndexOf(')');
+  let clean = s;
+  if (firstOpen !== -1 && lastClose > firstOpen) {
+    clean = (s.slice(0, firstOpen) + s.slice(lastClose + 1)).trim();
+  }
+  return clean.replace(/\s*\[[^\]]+\]/g, '').trim();
+};
+
 const PARAMETER_SUGGESTIONS = {
   "Lore": LORE_AREAS,
   "Worship": DEVOTION_NAMES,
@@ -77,7 +100,9 @@ const PARAMETER_SUGGESTIONS = {
   "Minor Fame": [],
   "Manse": [],
   "Mild Allergy": ["Cloth", "Copper", "Gold", "Harvest", "Hide", "Ingot", "Iron", "Leather", "Materia", "Night Prize", "Other Common Allergen", "Other Uncommon Allergen", "Rare Minerals", "Scale", "Silver"],
-  "Severe Allergy": ["Cloth", "Copper", "Gold", "Harvest", "Hide", "Ingot", "Iron", "Leather", "Materia", "Night Prize", "Other Common Allergen", "Other Uncommon Allergen", "Rare Minerals", "Scale", "Silver"]
+  "Severe Allergy": ["Cloth", "Copper", "Gold", "Harvest", "Hide", "Ingot", "Iron", "Leather", "Materia", "Night Prize", "Other Common Allergen", "Other Uncommon Allergen", "Rare Minerals", "Scale", "Silver"],
+  "Lost Life": LOST_LIFE_SUGGESTIONS,
+  "Additional Lost Life": LOST_LIFE_SUGGESTIONS
 };
 
 function formatParameterizedName(baseName, parameter, originalName) {
@@ -1994,7 +2019,9 @@ function LineagePanel({ character, report, onSetLineage, onSetSublineage, onTogg
   });
 
   const Row = ({ it, field, kind }) => {
-    const chosen = (character[field] || []).includes(it.name);
+    const chosen = (character[field] || []).some(name => {
+      return name === it.name || cleanChallengeName(name) === cleanChallengeName(it.name);
+    });
     // Named abilities this item grants (advantages mostly): resolve the build-time
     // grant edge so the picker shows "grants: Magical Resilience" before you take it.
     const srcId = `${kind === "challenge" ? "challenges" : "advantages"}:${character.lineage} - ${it.baseName || it.name}`;
@@ -2419,7 +2446,13 @@ export default function Builder() {
   const handleToggleLineageItem = useCallback((field, name) => {
     setCharacter((c) => {
       const cur = c[field] || [];
-      return { ...c, [field]: cur.includes(name) ? cur.filter((x) => x !== name) : [...cur, name] };
+      const clean = cleanChallengeName(name);
+      const exists = cur.some((x) => cleanChallengeName(x) === clean);
+      if (exists) {
+        return { ...c, [field]: cur.filter((x) => cleanChallengeName(x) !== clean) };
+      } else {
+        return { ...c, [field]: [...cur, name] };
+      }
     });
   }, []);
 

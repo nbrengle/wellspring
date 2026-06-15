@@ -296,8 +296,27 @@ test('LBP: overspend is invalid', () => {
   ok(s.overspent, 'overspent (1 awarded, 4 spent)');
 });
 test('LBP: missing required challenge is invalid', () => {
-  const s = validate({ lineage: 'Lost', lineageChallenges: ['Lost Life'], lineageAdvantages: [] }).lbp;
+  const s = validate({ lineage: 'Lost', lineageChallenges: ['Lost Life [Repped]'], lineageAdvantages: [] }).lbp;
   ok(s.missingRequired.length > 0, 'required challenge flagged');
+});
+test('LBP: Lost Life / Additional Lost Life dynamic LBP calculation', () => {
+  // Lost Life (Pointed Ears (1 LBP)) should award 1 LBP
+  let s = validate({
+    lineage: 'Lost',
+    lineageChallenges: ['Born of the Void [Required]', 'Scarred by the Void [Repped] [Required]', 'Lost Life [Repped] (Pointed Ears (1 LBP))'],
+    lineageAdvantages: []
+  }).lbp;
+  // Born of the Void = 0, Scarred by the Void = 3, Lost Life = 1. Total = 4.
+  eq(s.rawAwarded, 4, 'Lost Life parsed from LBP suffix');
+
+  // Lost Life (Horns) should lookup Horns in Chimera lineage (3 LBP) and award 3 LBP
+  s = validate({
+    lineage: 'Lost',
+    lineageChallenges: ['Born of the Void [Required]', 'Scarred by the Void [Repped] [Required]', 'Lost Life [Repped] (Horns)'],
+    lineageAdvantages: []
+  }).lbp;
+  // Born of the Void = 0, Scarred by the Void = 3, Horns = 3. Total = 6.
+  eq(s.rawAwarded, 6, 'Lost Life looked up by challenge name');
 });
 test('sublineage: same sublineage (inconsistent strings) is NOT mixed', () => {
   const a = LINEAGES.Aewen;
