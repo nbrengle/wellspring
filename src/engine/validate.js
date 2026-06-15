@@ -31,6 +31,7 @@ export {
   LEGAL_MIN_LEVEL, LEVEL_CAP, subKey,
   getClasses, primaryClass, characterLevel, getLegalMinLevel,
   getMaxRanks, pickClass,
+
 };
 export { EVENTS_TABLE } from './validate/core.js';
 import { lbpState } from './validate/lbp.js';
@@ -382,6 +383,7 @@ export function budgetFor(level, legalMinLevel = 4) {
 export function bonusBudgetFor(level) {
   return level;
 }
+
 
 export function validate(character) {
   const level = characterLevel(character);
