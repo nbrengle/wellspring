@@ -10,7 +10,7 @@ import "./RecipeChecker.css";
 
 const STANDARD_RESOURCES = [
   "Bloom", "Hide", "Ingot", "Night Prize", "Harvest", "Rare Mineral", 
-  "Golden Blossom", "Raw Scale", "Mithril Bar", "Enchanted Hyperium", "Wealth"
+  "Golden Blossom", "Raw Scale", "Mithril Bar", "Enchanted Hyperium", "Mote of Power", "Wealth"
 ];
 
 const DISCIPLINE_LABELS = {
