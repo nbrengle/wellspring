@@ -1999,3 +1999,33 @@ export function validate(character) {
       && (!lbp || lbp.valid),
   };
 }
+
+export function validityReasons(report) {
+  if (!report) return [];
+  const out = [];
+  if (report.belowFloor) out.push(`Below the level-${report.legalMinLevel} minimum`);
+  if (report.aboveCap) out.push(`Above the level-${report.levelCap} cap (Advanced Classes pending)`);
+  if (report.overBudget) out.push(`Over budget by ${report.spend.net - report.budget} BP`);
+  for (const s of report.slots || []) {
+    if (s.over) out.push(`${s.label}: ${s.used}/${s.allowed} (over by ${s.used - s.allowed})`);
+  }
+  for (const iss of report.prereqs?.issues || []) {
+    if (iss.text && !iss.missing) { out.push(`${iss.item}: ${iss.text}`); continue; }
+    const need = [
+      ...(iss.missing || []).map((m) => m.name),
+      ...(iss.anyOf || []).map((g) => g.map((m) => m.name).join(" or ")),
+    ].join(", ");
+    out.push(`${iss.item} needs: ${need}`);
+  }
+  const lbp = report.lbp;
+  if (lbp) {
+    if (lbp.overspent) out.push(`Lineage: ${lbp.spent - lbp.awarded} LBP overspent`);
+    if (lbp.mixedSublineage) out.push("Lineage: items from more than one sublineage");
+    if (lbp.needsSublineage) out.push(`Lineage: select the ${lbp.requiredSublineages.join("/")} sublineage to take its items`);
+    if (lbp.missingRequired?.length) out.push(`Lineage: missing required ${lbp.missingRequired.map((c) => c.baseName).join(", ")}`);
+  }
+  for (const n of report.prereqs?.notes || []) {
+    out.push(`Note (${n.item}): ${n.text}`);
+  }
+  return out;
+}
