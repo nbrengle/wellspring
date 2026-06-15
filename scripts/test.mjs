@@ -17,7 +17,7 @@ import {
 } from '../src/data/validate.js';
 import { bareSkill, cleanItemName } from '../src/data/resolver.js';
 import { formatCharacterSheet, parseCharacterSheet } from '../src/data/sheet.js';
-import { solveCrafting } from '../src/data/recipe-solver.js';
+import { solveCrafting, RECIPES } from '../src/data/recipe-solver.js';
 import { readFileSync } from 'node:fs';
 import { lookupEntity, eligiblePowers, DEVOTIONS, DOMAINS, REFS, CLASSES, LINEAGES } from '../src/data/index.js';
 import {
@@ -1056,6 +1056,13 @@ test('recipe solver resolves recursive and alternative recipes', () => {
   // 4. Crafting fails when ingredients are missing
   res = solveCrafting('Adderstrike Venom', 1, inventory);
   ok(!res.success, 'cannot craft Adderstrike Venom without Night Prizes');
+
+  // 5. Enchant Weapon (Greater) requirements are parsed correctly (parenthetical commas did not split Mote of Power)
+  const enchantWeapon = RECIPES.get('Enchant Weapon (Greater)');
+  ok(enchantWeapon, 'Enchant Weapon (Greater) recipe exists');
+  const moteReq = enchantWeapon.requirements[0]['Mote of Power'];
+  eq(moteReq, 1, 'requires 1 Mote of Power, parsed correctly without parenthetical commas splitting it');
+  ok(!('may not be substituted)' in enchantWeapon.requirements[0]), 'does not contain split-up noise fields');
 });
 
 // ─── Weapon Specialization & Advanced Classes validation ───────────────────────

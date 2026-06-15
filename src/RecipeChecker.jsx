@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from "react";
+import resourcesJson from "./data/resources.json";
 import { 
   RECIPES, 
   REVERSE_LOOKUP, 
@@ -9,8 +10,8 @@ import {
 import "./RecipeChecker.css";
 
 const STANDARD_RESOURCES = [
-  "Bloom", "Hide", "Ingot", "Night Prize", "Harvest", "Rare Mineral", 
-  "Golden Blossom", "Raw Scale", "Mithril Bar", "Enchanted Hyperium", "Wealth"
+  ...resourcesJson.map(r => normalizeResourceName(r.name)),
+  "Wealth"
 ];
 
 const DISCIPLINE_LABELS = {
