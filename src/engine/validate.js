@@ -389,6 +389,9 @@ export function bonusBudgetFor(level) {
 
 
 
+export function computeSpend(character) {
+  return computeBP(resolveCharacterGraph(character), character);
+}
 
 export function validate(character) {
   const level = characterLevel(character);
