@@ -16,8 +16,9 @@ import {
   STARTING_CHOICES_CONFIG, hasStartingChoices, reconcileStartingChoices, rebuildStartingSkills
 } from "./data/starting-choices.js";
 import {
-  EMPTY_CHARACTER, applyClassStartingAbilities, loadArchetype, useCharacterState
+  EMPTY_CHARACTER, applyClassStartingAbilities, loadArchetype
 } from "./engine/character-state.js";
+import { useCharacterState } from "./hooks/useCharacterState.js";
 import RulesExplorer from "./RulesExplorer.jsx";
 import RecipeChecker from "./RecipeChecker.jsx";
 import "./Builder.css";

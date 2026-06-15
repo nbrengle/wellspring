@@ -112,7 +112,7 @@ function charForEntity(type, name) {
 // owns it and assert the bump registers. Reports the ones the builder IGNORES —
 // real candidate bugs (a rule the doc states but the rail doesn't apply). ───────
 if (auditStats) {
-  const { validate } = await import('../src/data/validate.js');
+  const { validate } = await import('../src/engine/validate.js');
   // Phrasings that denote a PERMANENT max-stat bump. Three shapes the doc uses:
   //   "+N (Base) Maximum <stat>" / "N additional ... Maximum <stat>"
   //   "(Base) Maximum <stat> is/are increased"
