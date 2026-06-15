@@ -1,5 +1,5 @@
 import { lookupEntity, LINEAGES, CLASS_PROGRESSION, REFS } from "../data/index.js";
-import { cleanItemName, bareSkill, resolveId, entityType, getClasses } from './resolver.js';
+import { cleanItemName, bareSkill, resolveId, entityType, getClasses, idName } from './resolver.js';
 import { 
   characterLevel, parseTrailingRank, rankOf, 
   BP_FIELDS, BP_POWER_FIELDS, POWER_SOURCE_FIELDS, 
@@ -228,4 +228,54 @@ export function resolveCharacterGraph(character) {
     characterLevel: charLevel,
     classes
   };
+}
+
+// Map a graph node's source to the `sourceKind` the grant consumers expect.
+// (Mirrors the kinds the old ownedGrantSources produced: advantage/perk/feature/
+// power, plus 'choice' for build-time choose-one grants.)
+function nodeGrantKind(node) {
+  if (node.sourceType === 'lineage') return 'advantage';
+  if (node.sourceType === 'innate') return 'feature';
+  if (node.field === 'purchasedPerks') return 'perk';
+  return 'power';
+}
+
+// Named abilities the character GAINS FOR FREE from a source they own, DERIVED
+// from the character graph (single source of truth) rather than a separate walk.
+// Returns { list, bySource }; list is [{ ability, abilityName, abilityType,
+// source, sourceId, sourceKind }], bySource groups list by sourceId. Because it
+// reads the graph, it sees grant sources the old per-field walk missed (e.g. a
+// Right Hand power bought into purchasedSkills, like "Holding Out for a Hero").
+export function grantedAbilities(character) {
+  const graph = resolveCharacterGraph(character);
+  const list = [];
+  const bySource = {};
+
+  const addRow = (ability, sourceName, sourceId, sourceKind) => {
+    const ent = lookupEntity(ability);
+    const row = {
+      ability,
+      abilityName: ent?.name || idName(ability),
+      abilityType: ability.slice(0, ability.indexOf(':')),
+      source: sourceName,
+      sourceId,
+      sourceKind,
+    };
+    list.push(row);
+    (bySource[sourceId] = bySource[sourceId] || { source: sourceName, sourceKind, abilities: [] })
+      .abilities.push(row);
+  };
+
+  for (const node of graph.items) {
+    for (const eff of node.effects) {
+      if (eff.type !== 'GRANT_SOURCE') continue;
+      // Choose-one build grants are surfaced by the graph as a GRANT_SOURCE on the
+      // choosing power itself; tag those 'choice' to match the legacy shape.
+      const isChoiceGrant = node.entity?.chooseOne?.kind === 'build';
+      const kind = isChoiceGrant ? 'choice' : nodeGrantKind(node);
+      const sourceId = isChoiceGrant ? `powers:${node.name}` : node.id;
+      for (const ability of eff.grants) addRow(ability, node.name, sourceId, kind);
+    }
+  }
+  return { list, bySource };
 }

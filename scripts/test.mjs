@@ -421,6 +421,17 @@ test('a slot-grant advantage is NOT a named entity grant (Aewen Deep Reserves)',
   const c = { lineage: 'Aewen', lineageAdvantages: ['Deep Reserves'] };
   eq(grantedAbilities(c).list.length, 0, 'no named-entity grant');
 });
+test('grants from a granting power bought into purchasedSkills are seen (graph-derived)', () => {
+  // Regression: the old per-field grant walk skipped purchasedSkills, so a Right
+  // Hand power like "Holding Out for a Hero" (bought as a skill) didn't surface the
+  // "Save the Day" it grants. The graph-derived grantedAbilities catches it.
+  const c = { classLevels: 'Socialite 10', purchasedSkills: ['The Right Hand', 'Holding Out for a Hero'] };
+  const g = grantedAbilities(c);
+  // source is the canonical entity name ("...For a Hero"), resolved from the raw
+  // input ("...for a Hero") — the graph normalizes via lookupEntity.
+  ok(g.list.some((x) => x.ability === 'powers:Save the Day' && /^Holding Out [Ff]or a Hero$/.test(x.source)),
+     'Save the Day is granted by the purchased Holding Out for a Hero');
+});
 test('a selected power that grants a perk zeroes that perk (Implicit Truths → Insight)', () => {
   const c = { classLevels: 'Socialite 4', utilityPowers: ['Implicit Truths'], purchasedPerks: ['Insight'] };
   const eff = computeSpend(c).byItem['purchasedPerks:Insight'];
