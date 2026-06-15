@@ -35,14 +35,7 @@
   {
     "name": "Essences",
     "discipline": "Enchanting",
-    "description": "The most important materials for the enchanter are Essences - physical manifestations of the core building blocks of the universe. These Essences can either be immediately used (in Enchanting or other crafting skills) or may be stored for longer periods in Essence Infusions (see Alchemy). There are five types of known essences: • Weave - raw magic, volatile and awe inspiring. • Energy - electricity, heat, and dissolution. • Thought - mental energy, will, and attention. • Life - representation of life everlasting. • Spirit - the consistency of sentience after life.",
-    "tools": [
-      "Weave - raw magic, volatile and awe inspiring.",
-      "Energy - electricity, heat, and dissolution.",
-      "Thought - mental energy, will, and attention.",
-      "Life - representation of life everlasting.",
-      "Spirit - the consistency of sentience after life."
-    ]
+    "description": "The most important materials for the enchanter are Essences - physical manifestations of the core building blocks of the universe. These Essences can either be immediately used (in Enchanting or other crafting skills) or may be stored for longer periods in Essence Infusions (see Alchemy). There are five types of known essences:"
   },
   {
     "name": "Drawing",

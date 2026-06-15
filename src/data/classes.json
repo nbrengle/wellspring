@@ -2221,7 +2221,7 @@
         "requirement": "Cleric Level 10",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Cleric has gained enough mastery over the interpretation of their doctrine that they can begin offering less… common interpretations of their Divine Domain. They may choose a single domain not within their Devotion’s standard domains, and take it as if their Devotion had access to this domain. The Cleric may not take a divine domain that is in direct opposition to their Devotion’s standard domains. See the Divine Domains document for more information. Opposed Domains: Chaos Order Destruction Creation Manipulation Expression Death Life Light Shadow Peace War",
+        "description": "The Cleric has gained enough mastery over the interpretation of their doctrine that they can begin offering less… common interpretations of their Divine Domain. They may choose a single domain not within their Devotion’s standard domains, and take it as if their Devotion had access to this domain. The Cleric may not take a divine domain that is in direct opposition to their Devotion’s standard domains. See the Divine Domains document for more information. Opposed Domains:",
         "requiredLevel": 10,
         "requiredClass": "Cleric"
       }
@@ -3034,7 +3034,7 @@
         "cantrips": 1,
         "spellsKnown": 2,
         "slots": "2/0/0",
-        "bonus": "Innate Bonus Cantrip: Cancel, Nature’s Understanding",
+        "bonus": "Innate Bonus Cantrip: Cancel,Nature’s Understanding",
         "innateCantrips": [
           "Cancel",
           "Nature’s Understanding"
@@ -4403,13 +4403,7 @@
         "basic": 4,
         "advanced": 3,
         "veteran": 0,
-        "bonus": "Warrior Spirit *+1 Armor point as long as the Fighter is wearing at least 1 point of Physical Armor",
-        "statMods": [
-          {
-            "stat": "armor",
-            "n": 1
-          }
-        ]
+        "bonus": "Warrior Spirit"
       }
     },
     "specializations": [],
@@ -9719,13 +9713,13 @@
         "cantrips": 0,
         "spellsKnown": 1,
         "slots": "1/0/0",
-        "bonus": "Internal Battery Arcane Source"
+        "bonus": "Internal BatteryArcane Source"
       },
       "2": {
         "cantrips": 1,
         "spellsKnown": 2,
         "slots": "2/0/0",
-        "bonus": "Innate Bonus Cantrip: Cancel, Astride the Weave",
+        "bonus": "Innate Bonus Cantrip: Cancel,Astride the Weave",
         "innateCantrips": [
           "Cancel",
           "Astride the Weave"
@@ -9965,7 +9959,7 @@
         "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "Requirements: Sourcerer Level 4 Incantation: None Call: None Target: Self                                        Duration: Passive Delivery: None                                        Refresh: None The Sourcerer can bend the elemental forces of reality itself to mold to their purpose. Many cantrips and spells have optional modes or bonuses that only apply when the accent matches a specific requirement. This skill allows the Sourcerer to gain the benefits of these options with another Accent. This skill may be purchased multiple times, each time allowing the Sourcerer to choose from the substitution list below. Arcane Accent Substituted Effect Agony Acid Shadow Acid Force Flame Radiant Flame Fear Ice Void Ice Divine Lightning Mind Lightning For Example: Trivian the Sourcerer is wielding his Arcane Source with the Agony accent. When casting a spell that has a special effect that benefits from the Acid Accent, the Agony Accent counts as the Acid Accent for purposes of that spell. Note that this does not change the accent of that spell."
+        "description": "Requirements: Sourcerer Level 4 Incantation: None Call: None Target: Self                                        Duration: Passive Delivery: None                                        Refresh: None The Sourcerer can bend the elemental forces of reality itself to mold to their purpose. Many cantrips and spells have optional modes or bonuses that only apply when the accent matches a specific requirement. This skill allows the Sourcerer to gain the benefits of these options with another Accent. This skill may be purchased multiple times, each time allowing the Sourcerer to choose from the substitution list below. For Example: Trivian the Sourcerer is wielding his Arcane Source with the Agony accent. When casting a spell that has a special effect that benefits from the Acid Accent, the Agony Accent counts as the Acid Accent for purposes of that spell. Note that this does not change the accent of that spell."
       },
       {
         "name": "Unsuppressable",
