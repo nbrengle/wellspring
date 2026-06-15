@@ -113,35 +113,8 @@ function applyClassStartingAbilities(character, className, level = 1) {
     nextCharacter = rebuildStartingSkills(nextCharacter, className);
   }
 
-  // Gather active innate powers from ALL classes on the character
-  const activeInnateNames = new Set();
-  for (const c of nextCharacter.classes || []) {
-    const innate = CLASS_POWERS[c.name]?.innate || [];
-    for (const p of innate) {
-      // Level gate comes from the parser-extracted field (p.requiredLevel), not a
-      // runtime regex over the requirement prose. 0 = ungated (available at L1).
-      const reqLvl = p.requiredLevel || 0;
-      const effectiveLvl = c.name === className ? level : c.level;
-      if (effectiveLvl >= reqLvl) {
-        activeInnateNames.add(p.name);
-      }
-    }
-  }
-
-  const allClassInnateNames = new Set(
-    (nextCharacter.classes || []).flatMap(c => (CLASS_POWERS[c.name]?.innate || []).map(p => p.name))
-  );
-
-  // Keep user-added innate powers (which are not class-innate)
-  // and add all active class-innate powers.
-  const nextInnate = (nextCharacter.innatePowers || []).filter(name => !allClassInnateNames.has(name));
-  for (const name of activeInnateNames) {
-    if (!nextInnate.includes(name)) {
-      nextInnate.push(name);
-    }
-  }
-
-  nextCharacter.innatePowers = nextInnate;
+  // Innate powers are no longer materialized into character state here — they're
+  // derived on read by activeInnatePowers() in the engine (validate.js).
   return nextCharacter;
 }
 
@@ -1251,12 +1224,27 @@ function powerPickerSpec(slot, character) {
   // "taken" spans every tier field for spells-known so chosen spells are marked.
   const takenFields = category === "spellsKnown"
     ? ["noviceSpells", "adeptSpells", "greaterSpells"] : [field];
+  const taken = new Set();
+  const counts = {};
+  for (const f of takenFields) {
+    for (const powerName of (character[f] || [])) {
+      if (powerName) {
+        counts[powerName] = (counts[powerName] || 0) + 1;
+      }
+    }
+  }
+  for (const name of Object.keys(counts)) {
+    const maxR = getMaxRanks(name, field, character);
+    if (counts[name] >= maxR) {
+      taken.add(name);
+    }
+  }
   return {
     kind: "power", entityType: "powers",
     title: `Choose a ${label} power`,
     subtitle: `${candidates.length} options for ${cls}`,
     candidates,
-    taken: new Set(takenFields.flatMap((f) => character[f] || [])),
+    taken,
     onChoose: (name) => slot.onChoose(name, fieldFor(name)),
   };
 }
