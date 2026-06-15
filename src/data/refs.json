@@ -1,6 +1,6 @@
 {
   "generatedFrom": "src/data/*.json",
-  "entities": 1346,
+  "entities": 1347,
   "mentions": {
     "skills:Basic Martial Weapons": [
       "terms:Proficiency"
@@ -1720,6 +1720,9 @@
     "resources:Enchanted Hyperium": [
       "creature-types:Construct",
       "skills:Apprentice Tinkering"
+    ],
+    "resources:Mote of Power": [
+      "skills:Greater Enchanting"
     ],
     "accents:Agony": [
       "powers:Wrack"
@@ -8860,6 +8863,7 @@
       "skills:Thrown Weapons",
       "terms:Signature Item",
       "resources:Golden Blossom",
+      "resources:Mote of Power",
       "resources:Mithril Bar",
       "skills:Apprentice Tinkering",
       "rules-concepts:Sacrifice",
@@ -8869,7 +8873,6 @@
       "resources:Ingots",
       "domains:Energy",
       "rules-concepts:Ashbin",
-      "terms:Power",
       "effects:Cure"
     ],
     "recipes:Scribe Adept Scroll": [
@@ -10978,6 +10981,7 @@
       "archetypes:Mystic Artisan"
     ],
     "skills:Greater Enchanting": [
+      "resources:Mote of Power",
       "powers:Expert Craft"
     ],
     "skills:Apprentice Ritual Magic": [
@@ -12717,7 +12721,6 @@
       "recipes:Malleable Beauty",
       "recipes:Harvest Essence",
       "recipes:Night Prize Essence",
-      "recipes:Enchant Weapon (Greater)",
       "recipes:Hide Plates",
       "recipes:Ingot Plates",
       "recipes:Air Blade",
@@ -14990,6 +14993,9 @@
       "recipes:Enchant Talisman (Rod / Orb / Wand / Source)",
       "recipes:Enchant Weapon (Greater)",
       "recipes:Refine Hyperium"
+    ],
+    "resources:Mote of Power": [
+      "recipes:Enchant Weapon (Greater)"
     ],
     "accents:Agony": [
       "skills:Thrown Weaponcraft",

@@ -2151,6 +2151,7 @@ function parseResources() {
       if (next.type === 'heading') break;
       if (next.type === 'text') {
         if (/\((Basic|Uncommon|Advanced)\)/.test(next.text)) break;
+        if (/^Named Resources/i.test(next.text)) break;
         description += (description ? ' ' : '') + next.text;
       }
       j++;
@@ -2158,6 +2159,14 @@ function parseResources() {
     out.push({ name, tier, description });
     i = j - 1;
   }
+
+  // Append Named Resources that are referenced by recipes
+  out.push({
+    name: "Mote of Power",
+    tier: "Named",
+    description: "A rare, unique named resource required for Greater Enchanting. May not be substituted."
+  });
+
   return out;
 }
 
