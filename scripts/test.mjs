@@ -574,6 +574,21 @@ test('flaw BP award is capped at 5 (extra flaws give no more BP)', () => {
   ok(s.flawCapped, 'flawCapped flagged');
 });
 
+test('flaws RAISE the budget rather than lowering spend', () => {
+  // Flaw BP is awarded BP: it should lift the displayed cap (spent of base+flaws),
+  // not net out of spend (which would make the build look like it spent less).
+  const base = { classLevels: 'Fighter 4', purchasedSkills: [], purchasedPerks: [] };
+  const none = validate({ ...base, flaws: [] });
+  const five = validate({ ...base, flaws: ['Nightmares', 'Pliant'] }); // 3 + 2 = 5
+  eq(five.budget, none.budget + 5, 'budget lifts by the 5 awarded flaw BP');
+  eq(five.spend.net, none.spend.net, 'spend is unchanged by flaws (not netted down)');
+  eq(five.remaining, none.remaining + 5, 'remaining grows by the flaw award');
+  ok(!five.overBudget, 'awarding budget headroom does not flag over-budget');
+  // The lift is capped at MAX_FLAW_BP just like the award.
+  const eight = validate({ ...base, flaws: ['Nightmares', 'Pliant', 'Outdoor Discomfort'] }); // 3+2+3=8
+  eq(eight.budget, none.budget + 5, 'budget lift is capped at 5 even with more flaw BP');
+});
+
 test('allergy flaws calculate awards dynamically based on parameter', () => {
   const s1 = computeSpend({ classLevels: 'Fighter 10', flaws: ['Mild Allergy (Iron)'] });
   eq(s1.rawAwarded, 2, 'common mild allergy awards 2 BP');

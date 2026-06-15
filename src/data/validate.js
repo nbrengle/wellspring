@@ -1063,7 +1063,10 @@ export function computeSpend(character) {
   return {
     spent, awarded, rawAwarded, flawCapped: rawAwarded > MAX_FLAW_BP,
     refunded, discountFreeBP, discountsApplied,
-    net: spent - awarded - refunded - discountFreeBP, byItem,
+    // Flaw awards (`awarded`) are NOT netted out of spend — they raise the BUDGET
+    // instead (see validate()), so the display reads "spent of (base+flaws)". Only
+    // refunds and discount free-BP reduce spend.
+    net: spent - refunded - discountFreeBP, byItem,
   };
 }
 
@@ -1880,10 +1883,14 @@ export function validate(character) {
   // budget by a fixed +2 rather than free spend.
   const backstoryBP = character.backstoryApproved ? BACKSTORY_BP : 0;
   const extraMaxBP = character.extraMaxBP || 0;
-  const budget = budgetFor(level, legalMinLevel) + freeBP + backstoryBP + extraMaxBP;
+  const spend = computeSpend(character);
+  // Flaws AWARD BP: they raise the build budget rather than offsetting spend, so a
+  // character with 5 flaw BP shows "spent of (base + 5)" — more headroom — instead
+  // of looking like they spent 5 less. `spend.awarded` is already capped at
+  // MAX_FLAW_BP, so the lift is capped too.
+  const budget = budgetFor(level, legalMinLevel) + freeBP + backstoryBP + extraMaxBP + spend.awarded;
   const bonusBudget = bonusBudgetFor(level);
   const maxBudget = budget + bonusBudget;
-  const spend = computeSpend(character);
   const slots = computeSlots(character);
   const spellSlotCounts = spellSlots(character);
   const bookcasterOptions = bookcasterSpellOptions(character);
