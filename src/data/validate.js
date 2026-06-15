@@ -11,7 +11,7 @@
 
 import { LEVEL_TABLE, lookupEntity, REFS, CLASS_POWER_SLOTS, CLASS_POWERS, CLASS_PROGRESSION, SPELLCASTERS, DEVOTIONS, DOMAINS, CLASSES, LINEAGES, CRAFTING, RITUALS, EVENTS_TABLE, UNLIMITED_SKILLS, BASE_CLASSES } from './index.js';
 import { startingSkillGrants } from './starting-choices.js';
-import { cleanItemName, bareSkill, resolveId, idName, entityType } from './resolver.js';
+import { cleanItemName, bareSkill, resolveId, idName, entityType, getClasses, primaryClass } from './resolver.js';
 
 // Max Lineage Build Points a character can be awarded from challenges (MegaDoc:
 // "up to 10 awarded LBP").
@@ -357,33 +357,7 @@ const ENTITY_FIELDS = [
   'domainPowers', 'formPowers',
 ];
 
-// Normalization functions cleanItemName, resolveId, idName, and entityType are now imported from ./resolver.js
-
-// Normalize a character's class/level info into [{ name, level }], the canonical
-// multi-class form. Accepts either the new `classes` array or the legacy
-// `classLevels` string ("Fighter 4", or "Fighter 2 / Rogue 2"). This is the one
-// place that understands both shapes; everything else reads through it.
-export function getClasses(character) {
-  if (Array.isArray(character?.classes) && character.classes.length) {
-    return character.classes
-      .filter((c) => c && c.name)
-      .map((c) => ({ name: c.name, level: c.level || 0 }));
-  }
-  const str = character?.classLevels;
-  if (typeof str === 'string' && str.trim()) {
-    return str.split('/').map((part) => {
-      const m = part.trim().match(/^(.+?)\s+(\d+)$/);
-      return m ? { name: m[1].trim(), level: parseInt(m[2], 10) } : null;
-    }).filter(Boolean);
-  }
-  return [];
-}
-
-// The character's PRIMARY (first) class — used for spell-slot tier shape and as
-// the default context where a single class is assumed.
-export function primaryClass(character) {
-  return getClasses(character)[0]?.name || null;
-}
+// Normalization functions getClasses and primaryClass are now imported from ./resolver.js
 
 // Active innate powers for the character. Derives all class-innate powers
 // whose level requirements are met, and merges any stored non-class innate powers.

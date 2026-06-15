@@ -10,12 +10,12 @@
 //   - xN rank multipliers, spell-tier routing, per-class slots (multiclass)
 
 import {
-  validate, getClasses, characterLevel, budgetFor, computeSlots, spellSlots,
+  validate, characterLevel, budgetFor, computeSlots, spellSlots,
   devotionState, prereqStatus, LEVEL_CAP, LEGAL_MIN_LEVEL,
   grantedAbilities, computeSpend, discountSources, getMaxRanks,
   bookcasterSpellOptions
 } from '../src/data/validate.js';
-import { bareSkill, cleanItemName } from '../src/data/resolver.js';
+import { bareSkill, cleanItemName, getClasses } from '../src/data/resolver.js';
 import { formatCharacterSheet, parseCharacterSheet } from '../src/data/sheet.js';
 import { solveCrafting, RECIPES, resolveRecipe, classifyIngredient, buildCraftTree } from '../src/data/recipe-solver.js';
 import { readFileSync } from 'node:fs';

@@ -5,9 +5,9 @@ import {
   UNLIMITED_SKILLS, REFS
 } from "../data/index.js";
 import {
-  getClasses, MAX_DOMAINS, EVENTS_TABLE, getMaxRanks, pickClass
+  MAX_DOMAINS, EVENTS_TABLE, getMaxRanks, pickClass
 } from "../data/validate.js";
-import { bareSkill, cleanItemName } from "../data/resolver.js";
+import { bareSkill, cleanItemName, getClasses } from "../data/resolver.js";
 import {
   STARTING_CHOICES_CONFIG, reconcileStartingChoices
 } from "../data/starting-choices.js";

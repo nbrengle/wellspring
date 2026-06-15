@@ -12,8 +12,7 @@
 
 import classesJson from './classes.json';
 import { lookupEntity, ALL_SKILLS } from './index.js';
-import { getClasses } from './validate.js';
-import { bareSkill, cleanItemName } from './resolver.js';
+import { bareSkill, cleanItemName, getClasses } from './resolver.js';
 
 // ─── STARTING SKILLS, DERIVED FROM THE PARSED MEGADOC ──────────────────────────
 // The MegaDoc is the single source of truth. The parser already captures each
