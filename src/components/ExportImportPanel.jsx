@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { formatCharacterSheet, parseCharacterSheet } from "../data/sheet.js";
-import { validate, validityReasons } from "../data/validate.js";
+import { validate, validityReasons } from "../engine/validate.js";
 
 export default function ExportImportPanel({ character, report, onImport, onClose }) {
   const exported = useMemo(() => formatCharacterSheet(character, report), [character, report]);

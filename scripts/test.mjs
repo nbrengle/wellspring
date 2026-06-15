@@ -12,10 +12,10 @@
 import {
   validate, characterLevel, budgetFor, computeSlots, spellSlots,
   devotionState, prereqStatus, LEVEL_CAP, LEGAL_MIN_LEVEL,
-  grantedAbilities, computeSpend, discountSources, getMaxRanks,
+  grantedAbilities, computeSpend, getMaxRanks,
   bookcasterSpellOptions
-} from '../src/data/validate.js';
-import { bareSkill, cleanItemName, getClasses } from '../src/data/resolver.js';
+} from "../src/engine/validate.js";
+import { bareSkill, cleanItemName, getClasses } from "../src/engine/resolver.js";
 import { formatCharacterSheet, parseCharacterSheet } from '../src/data/sheet.js';
 import { solveCrafting, RECIPES, resolveRecipe, classifyIngredient, buildCraftTree } from '../src/data/recipe-solver.js';
 import { readFileSync } from 'node:fs';
@@ -442,10 +442,7 @@ test('Lost Wisdom of Many discounts only the first three Lore skills', () => {
   eq(s.byItem['purchasedSkills:Lore (Arcana)'].cost, 1, '3rd discounted');
   eq(s.byItem['purchasedSkills:Lore (Nature)'].cost, 2, '4th full');
 });
-test('discountSources lists owned sources only', () => {
-  eq(discountSources({}).length, 0, 'none by default');
-  ok(discountSources({ lineage: 'Human', lineageAdvantages: ['Environmental Mastery'] }).length === 1, 'one when owned');
-});
+
 test('Patron discounts gift-eligible perks by 1, excludes Strong Bloodline + Gifts', () => {
   const c = { classLevels: 'Cleric 4', purchasedPerks: ['Patron', 'Greedy Soul', 'Strong Bloodline'] };
   const s = computeSpend(c);

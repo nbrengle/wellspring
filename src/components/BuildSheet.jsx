@@ -6,8 +6,8 @@ import {
 } from "../data/index.js";
 import {
   MAX_DOMAINS, EVENTS_TABLE, getMaxRanks, pickClass
-} from "../data/validate.js";
-import { bareSkill, cleanItemName, getClasses } from "../data/resolver.js";
+} from "../engine/validate.js";
+import { bareSkill, cleanItemName, getClasses } from "../engine/resolver.js";
 import {
   STARTING_CHOICES_CONFIG, reconcileStartingChoices
 } from "../data/starting-choices.js";
