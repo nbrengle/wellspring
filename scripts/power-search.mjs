@@ -13,9 +13,8 @@
 //   4. LBP economy             — challenges fund advantages (Strong Bloodline +3).
 //   5. Free-BP redundancies    — a grant for something already owned → free BP.
 
-import {
-  validate, budgetFor, bonusBudgetFor, computeSpend, grantedAbilities, discountSources,
-} from "../src/engine/validate.js";
+import { validate } from "../src/engine/validate.js";
+import { budgetFor, bonusBudgetFor, computeSpend, grantedAbilities } from "../src/engine/testing.js";
 import {
   ALL_SKILLS, ALL_PERKS, ALL_FLAWS, REFS, LINEAGES, CLASS_POWERS, lookupEntity,
 } from '../src/data/index.js';

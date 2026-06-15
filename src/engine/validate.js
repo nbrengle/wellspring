@@ -31,7 +31,6 @@ export {
   LEGAL_MIN_LEVEL, LEVEL_CAP, subKey,
   getClasses, primaryClass, characterLevel, getLegalMinLevel,
   getMaxRanks, pickClass,
-  activeInnatePowers, ownedGrantSources, grantedAbilities,
 };
 export { EVENTS_TABLE } from './validate/core.js';
 import { lbpState } from './validate/lbp.js';
@@ -41,14 +40,14 @@ export { lbpState };
 // (validate/prereqs.js) — extracted leaves. Import the ones the orchestrator calls
 // internally; re-export the public surface so the barrel keeps its API.
 import { computeSlots, spellSlots, bookcasterSpellOptions } from './validate/slots.js';
-export { computeSlots, spellSlots, bookcasterSpellOptions, innateBonusCantrips } from './validate/slots.js';
+export { innateBonusCantrips } from './validate/slots.js';
 import { resolveCharacterGraph } from './graph.js';
 import { computeBP } from './validate/bp-accounting.js';
 import { statMods as computeStatMods, levelStats as computeLevelStats } from './validate/derived-stats.js';
 import { wealthState as computeWealthState } from './validate/wealth-income.js';
 
 import { checkPrereqs } from './validate/prereqs.js';
-export { checkPrereqs, prereqStatus, checkLevelConstraint } from './validate/prereqs.js';
+export { prereqStatus, checkLevelConstraint } from './validate/prereqs.js';
 
 // Wellspring has three distinct "consequence" kinds, kept separate by design:
 //   1. GRANT-OF-ENTITY — a source gives you a named Perk/Power/Skill for free
@@ -382,15 +381,6 @@ export function budgetFor(level, legalMinLevel = 4) {
 // build that exceeds base but stays within base+bonus is "legal with bonus BP".
 export function bonusBudgetFor(level) {
   return level;
-}
-
-
-
-
-
-
-export function computeSpend(character) {
-  return computeBP(resolveCharacterGraph(character), character);
 }
 
 export function validate(character) {
