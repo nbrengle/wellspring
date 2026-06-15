@@ -46,13 +46,23 @@ function stripTags(s) {
 // Headings become { type:'heading', level, text }.
 // <li> items become { type:'list', items:[...] } groups.
 // <p> / <span> text becomes { type:'text', text }.
-// Table cells (<td>) become { type:'cell', text } — used for tab-table equivalents.
+// Table cells become { type:'cell', text }; each table row ends with a
+// { type:'rowEnd' } marker so readers can reconstruct rows.
+//
+// IMPORTANT: Google Docs wraps cell content in a nested <p> INSIDE the <td>
+// (`<td><p><span>…</span></p></td>`). A naive walker treats the inner <p> as the
+// block and never sees the <td>, flattening tables into plain text and losing all
+// row structure. So when we're inside a cell we IGNORE nested block tags and keep
+// buffering until the matching </td>/</th>.
 function parseHTML() {
   const nodes = [];
   // Match tags we care about. Everything else is consumed as inter-tag text.
   const TAG = /<(\/?)([a-zA-Z][a-zA-Z0-9]*)[^>]*>/g;
   let pos = 0;
-  let inTag = null;      // current open block tag being accumulated
+  let inTag = null;      // current open block tag being accumulated (non-cell)
+  let inCell = null;     // 'td' | 'th' when inside a table cell (overrides inTag)
+  let cellBuf = '';      // full raw buffer of the current cell (→ flat `text`)
+  let cellParts = [];    // inner-<p> segments of the current cell, in order
   let inList = false;
   let listItems = [];
 
@@ -69,13 +79,47 @@ function parseHTML() {
   TAG.lastIndex = 0;
   while ((match = TAG.exec(raw)) !== null) {
     const between = raw.slice(pos, match.index);
-    if (inTag) buf += between;
+    if (inCell) { cellBuf += between; buf += between; }
+    else if (inTag) buf += between;
     pos = match.index + match[0].length;
 
     const closing = match[1] === '/';
     const tag = match[2].toLowerCase();
 
-    if (!closing && BLOCK_TAGS.has(tag)) {
+    // ── Inside a table cell: buffer everything until </td>/</th>; ignore the
+    // nested <p>/<span> wrappers — EXCEPT we snapshot each inner <p> boundary into
+    // `parts` so a reader that needs the original paragraph structure (sub-power
+    // stat blocks, see parseSubPowerCell) can recover it. `text` is still the whole
+    // cell stripped in one pass, so the existing cell readers are byte-for-byte
+    // unaffected (`buf` accumulates per-<p>; `cellBuf` holds the full cell). ──
+    if (inCell) {
+      if (closing && tag === inCell) {
+        const seg = stripTags(buf).trim();
+        if (seg) cellParts.push(seg);
+        nodes.push({ type: 'cell', text: stripTags(cellBuf).trim(), parts: cellParts });  // keep empty cells (real columns)
+        buf = '';
+        cellBuf = '';
+        cellParts = [];
+        inCell = null;
+      } else if (closing && tag === 'p') {
+        // End of an inner paragraph: snapshot it as one cell part, reset the
+        // per-<p> buffer (cellBuf keeps accumulating for the flat `text`).
+        const seg = stripTags(buf).trim();
+        if (seg) cellParts.push(seg);
+        buf = '';
+      }
+      continue;
+    }
+
+    if (!closing && (tag === 'td' || tag === 'th')) {
+      if (listItems.length) flushList();
+      buf = '';
+      cellBuf = '';
+      cellParts = [];
+      inCell = tag;
+    } else if (closing && tag === 'tr') {
+      nodes.push({ type: 'rowEnd' });
+    } else if (!closing && BLOCK_TAGS.has(tag)) {
       buf = '';
       inTag = tag;
     } else if (closing && inTag === tag) {
@@ -90,8 +134,6 @@ function parseHTML() {
         if (listItems.length && tag !== 'li') flushList();
         if (/^h[1-6]$/.test(tag)) {
           nodes.push({ type: 'heading', level: +tag[1], text });
-        } else if (tag === 'td' || tag === 'th') {
-          nodes.push({ type: 'cell', text });
         } else {
           nodes.push({ type: 'text', text });
         }
@@ -281,13 +323,17 @@ let _subPowerNames = null;
 function subPowerNames() {
   if (_subPowerNames) return _subPowerNames;
   _subPowerNames = new Set();
-  const text = nodes.filter((n) => n.type === 'text').map((n) => n.text).join(' ');
+  // Include cell text — some power descriptions live inside table cells now.
+  const text = nodes.filter((n) => n.type === 'text' || n.type === 'cell').map((n) => n.text).join(' ');
   for (const m of text.matchAll(/Grant Power:\s*([A-Z][\w’' ]+?)\s*(?:[”"”,]|$)/g)) _subPowerNames.add(m[1].trim());
   for (const m of text.matchAll(/\bthe\s+([A-Z][\w’' ]+?)\s+Power\s+below\b/g)) _subPowerNames.add(m[1].trim());
   return _subPowerNames;
 }
 
 const STAT_FIELD = /^(Incantation|Incant|Call|Target|Duration|Delivery|Refresh|Accent|Effect|Requirement|Prerequisites?|Skills and Options):\s*(.*)$/;
+// Same field labels, unanchored — used to find where a stat block starts within a
+// run-on string (sub-power cells glue the power NAME onto the first field label).
+const STAT_LABEL = /(Incantation|Incant|Call|Target|Duration|Delivery|Refresh|Accent|Effect|Requirement|Prerequisites?|Skills and Options):/;
 const STAT_TWO = /^(Target|Delivery|Accent):\s*(.+?)\s{2,}(Duration|Refresh|Effect):\s*(.+)$/;
 const statKey = l => l.toLowerCase().replace(/^incant$/, 'incantation').replace(/\s+/g, '_').replace(/s$/, '');
 
@@ -322,6 +368,43 @@ function parsePowerNodes(powerNodes) {
   return {
     fields,
     description: lines.slice(descStart).join(' '),
+  };
+}
+
+// SUB-POWER DEFINITION CELLS: a granted sub-power (Curious Balm, Holy Rest, …) has
+// no [Tier]-tagged H4 heading — its whole stat block lives in a single table cell,
+// with the sub-power NAME prefixed onto the first field:
+//   "Curious Balm" · "Incantation: Quick 100" · "Call: …" · … · "Effect: Heal, Drain" · "<prose>"
+// The cell's `parts` array preserves those inner-<p> boundaries (the flat `text`
+// concatenates them with no separator). Parse the parts like a normal power body:
+// the first part is the name, the rest are stat-field lines + trailing description.
+// Returns a power object (tier 'SubPower') or null if `cell` isn't a sub-power def.
+function parseSubPowerCell(cell, subNames) {
+  if (!cell || cell.type !== 'cell' || !Array.isArray(cell.parts) || cell.parts.length < 2) return null;
+  // The name is glued to the first stat field inside the leading <p>
+  // ("Curious BalmIncantation: Quick 100"). Split at the first stat-field label.
+  const first = cell.parts[0];
+  const labelAt = first.search(STAT_LABEL);
+  if (labelAt <= 0) return null;
+  const name = first.slice(0, labelAt).trim();
+  if (!subNames.has(name)) return null;
+  // Re-attach the trailing stat field as the first body line, then parse the rest.
+  const bodyNodes = [{ type: 'text', text: first.slice(labelAt) }, ...cell.parts.slice(1).map(text => ({ type: 'text', text }))];
+  const { fields, description } = parsePowerNodes(bodyNodes);
+  return {
+    name, tier: 'SubPower', tags: [], maxRanks: 1, cost: null,
+    incantation: fields['incantation'] ?? null,
+    call: fields['call'] ?? null,
+    target: fields['target'] ?? null,
+    duration: fields['duration'] ?? null,
+    delivery: fields['delivery'] ?? null,
+    refresh: fields['refresh'] ?? null,
+    accent: fields['accent'] ?? null,
+    effect: fields['effect'] ?? null,
+    requirement: fields['requirement'] ?? null,
+    prerequisites: fields['prerequisite'] ?? fields['prerequisites'] ?? null,
+    skillsAndOptions: fields['skills_and_option'] ?? null,
+    description,
   };
 }
 
@@ -361,9 +444,16 @@ function parsePowersInRange(start, end) {
       // "…at various Levels:" colon as a <ul> (Adept Ritualist, Druid Forms). They
       // are separate nodes the walker captured; dropping them here is what left
       // those descriptions truncated at the colon. Prose headings → text too.
-      const bodyNodes = nodes.slice(i + 1, bodyEnd === -1 ? end : Math.min(bodyEnd, end))
+      const bodyTo = bodyEnd === -1 ? end : Math.min(bodyEnd, end);
+      const bodyRange = nodes.slice(i + 1, bodyTo);
+      const bodyNodes = bodyRange
         .filter(m => m.type === 'text' || m.type === 'list' || isProseHeading(m))
         .map(m => isProseHeading(m) ? { type: 'text', text: m.text } : m);
+      // A granted sub-power's stat block lives in a table cell INSIDE the granting
+      // power's body (between this heading and the next). Emit those as their own
+      // SubPower entries; they're filtered out of `bodyNodes` above so they don't
+      // pollute the parent's description.
+      const subCells = bodyRange.map(m => parseSubPowerCell(m, subNames)).filter(Boolean);
       // Sub-powers have no tier tag; mark them so they're identifiable + parseable.
       const parsed = parsePowerHeading(n.text);
       const { name, tags, maxRanks, cost } = parsed;
@@ -384,7 +474,8 @@ function parsePowersInRange(start, end) {
         skillsAndOptions: fields['skills_and_option'] ?? null,
         description,
       });
-      i = bodyEnd === -1 ? end : Math.min(bodyEnd, end);
+      powers.push(...subCells);
+      i = bodyTo;
     } else {
       i++;
     }
@@ -507,78 +598,60 @@ function parseClasses() {
   return classes;
 }
 
-// Class progression table: read cell nodes under the "Class Progression Table" H2.
+// Class progression table: read the real table rows under the "Class Progression
+// Table" H2. Each row is a sequence of `'cell'` nodes terminated by `'rowEnd'`.
+// Columns (martial): [Class?] Level, Utility, Basic, Advanced, Veteran, Class Bonuses.
+// Columns (caster):  [Class?] Level, Cantrips, Spells Known, Spell Slots, Class Bonuses.
+// (Martial tables carry a leading empty "Class" column; we key off the Level column
+// by finding the first numeric cell, so the leading column doesn't matter.)
 function parseProgressionTable(clsStart, clsEnd) {
   const tableIdx = nodes.findIndex((n, i) =>
     i > clsStart && i < clsEnd && n.type === 'heading' && n.level === 2 && n.text === 'Class Progression Table'
   );
   if (tableIdx === -1) return {};
-
   const tableEnd = nodes.findIndex((n, i) => i > tableIdx && n.type === 'heading' && n.level <= 2);
   const end = tableEnd === -1 ? clsEnd : Math.min(tableEnd, clsEnd);
-  // Table exported as text nodes (not <td>).
-  const cells = nodes.slice(tableIdx + 1, end).filter(n => n.type === 'text').map(n => n.text);
 
-  // Drop column headers. "BasicPowers" / "AdvancedPowers" / "VeteranPowers" have no
-  // space in the export.
-  const HEADER = /^(Class|Level|Utility ?Powers|Basic ?Powers|Advanced ?Powers|Veteran ?Powers|Cantrips?|Spells? Known|Spell Slots|Class Bonuses?)$/i;
-  const data = cells.filter(v => !HEADER.test(v));
+  // Gather rows: arrays of cell texts split on 'rowEnd'.
+  const rows = [];
+  let cur = [];
+  for (let i = tableIdx + 1; i < end; i++) {
+    const n = nodes[i];
+    if (n.type === 'rowEnd') { if (cur.length) rows.push(cur); cur = []; }
+    else if (n.type === 'cell') cur.push(n.text);
+  }
+  if (cur.length) rows.push(cur);
+  if (!rows.length) return {};
 
-  const isCaster = cells.some(v => /cantrip|spell/i.test(v));
-  // numeric cols per row (excluding bonus): caster = level + cantrips + spellsKnown + slots(string) = 4,
-  // martial = level + utility + basic + advanced + veteran = 5.
-  // The bonus cell can split across multiple text nodes (commas, dashes), so we
-  // anchor on the level number and collapse anything between the last numeric/dash
-  // col and the next level marker into the bonus.
+  const HEADER = /^(Class|Level|Utility ?Powers|Basic ?Powers|Advanced ?Powers|Veteran ?Powers|Cantrips?|Spells? Known|Spell ?Slots?|Class Bonuses?)$/i;
+  const isCaster = rows.flat().some(v => /cantrip|spell/i.test(v));
   const num = v => parseInt(v) || 0;
   const orNull = v => (!v || v === '-' ? null : v);
-  const isLevelStart = (arr, i, expected) => {
-    if (arr[i] !== String(expected)) return false;
-    // Next N entries must look like numeric / dash / slot-string cells.
-    const cols = isCaster ? 3 : 4;
-    for (let k = 1; k <= cols; k++) {
-      const v = arr[i + k];
-      if (v === undefined) return false;
-      if (!/^(\d+|-|\d+\/\d+\/\d+)$/.test(v)) return false;
-    }
-    return true;
-  };
 
   const progression = {};
-  let i = 0;
-  while (i < data.length && data[i] !== '1') i++;
-  let level = 1;
-  while (i < data.length && level <= 20) {
-    if (!isLevelStart(data, i, level)) break;
-    const numericCols = isCaster ? 3 : 4;
-    const cols = data.slice(i + 1, i + 1 + numericCols);
-    // Bonus runs from after the numeric block to the next level start (or end).
-    let j = i + 1 + numericCols;
-    const nextLevelIdx = (() => {
-      for (let k = j; k < data.length; k++) {
-        if (isLevelStart(data, k, level + 1)) return k;
-      }
-      return data.length;
-    })();
-    // Stop the bonus span at any meta paragraph like "Note: ..." that follows the table.
-    let stopAt = nextLevelIdx;
-    for (let k = j; k < nextLevelIdx; k++) {
-      if (/^(Note|Notes|Footnote):/i.test(data[k])) { stopAt = k; break; }
-    }
-    const bonusParts = data.slice(j, stopAt).filter(v => v && v !== '-');
-    const bonus = bonusParts.length ? bonusParts.join(' ').replace(/,\s*$/, '').trim() : null;
+  for (const cells of rows) {
+    // Header rows: every cell matches a known header label. Skip.
+    if (cells.every(c => !c || HEADER.test(c))) continue;
+    // The level is the first purely-numeric cell; data columns follow it, the
+    // Class Bonuses cell is last. (A leading empty "Class" cell is skipped.)
+    const lvlIdx = cells.findIndex(c => /^\d+$/.test(c));
+    if (lvlIdx === -1) continue;
+    const level = parseInt(cells[lvlIdx], 10);
+    if (level < 1 || level > 20) continue;
+    const cols = cells.slice(lvlIdx + 1, lvlIdx + 1 + (isCaster ? 3 : 4));
+    const bonusRaw = cells.slice(lvlIdx + 1 + (isCaster ? 3 : 4)).join(' ').trim();
+    const bonus = bonusRaw && bonusRaw !== '-' ? bonusRaw.replace(/,\s*$/, '') : null;
 
-    // The "Class Bonuses" column states permanent stat boosts as prose ("+1 Base
-    // Maximum Life Points" at Fighter L2). Extract them structurally here so the
+    // The "Class Bonuses" cell states permanent stat boosts as prose ("+1 Base
+    // Maximum Life Points" at Fighter L2). Extract them structurally so the
     // validator reads progression[lvl].statMods instead of re-regexing the prose.
     const { mods: bonusStatMods } = statModsFromText(bonus);
     const row = {};
     if (bonusStatMods.length) row.statMods = bonusStatMods;
-    // "Innate Bonus Cantrip: <name>[, <name>]" in the bonus column → structured
-    // list (the validator filters these against the class's real cantrips).
+    // "Innate Bonus Cantrip: <name>[, <name>]" → structured list.
     const icm = bonus && bonus.match(/innate\s+bonus\s+cantrip:\s*(.+)$/i);
     if (icm) {
-      const names = icm[1].split(/[,\n]/).map((s) => s.trim()).filter(Boolean);
+      const names = icm[1].split(/[,\n]/).map(s => s.trim()).filter(Boolean);
       if (names.length) row.innateCantrips = names;
     }
     if (isCaster) {
@@ -586,8 +659,6 @@ function parseProgressionTable(clsStart, clsEnd) {
     } else {
       progression[level] = { utility: num(cols[0]), basic: num(cols[1]), advanced: num(cols[2]), veteran: num(cols[3]), bonus, ...row };
     }
-    i = nextLevelIdx;
-    level++;
   }
   return progression;
 }
@@ -1059,9 +1130,9 @@ function parsePerkFlawSection(sectionName, valueKey) {
 }
 
 // Perks and Flaws each have a "Perks List" / "Flaws List" H2 under Character Options.
-// Entries are H4 under H3 category headings.
-// Perks/Flaws export as 5-column flat text (not <td>): Name, Cost/Award, Ranks, Prereq, Desc.
-// Each row is 5 consecutive text nodes under an H3 category. Header rows are "Name","Cost",etc.
+// They are real tables: 5 columns (Name, Cost/Award, Ranks, Prerequisites, Description),
+// one `'cell'` node per column, terminated by a `'rowEnd'` marker per row. Header rows
+// ("Name","Cost",…) are skipped. H3 headings between sub-tables set the category.
 const PERK_HEADER = /^(Name|Cost|Award|Ranks?|Pre-?requisites?|Prerequisites?|Description)$/i;
 
 function parsePerkFlawList(listH2Text, valueKey) {
@@ -1075,11 +1146,11 @@ function parsePerkFlawList(listH2Text, valueKey) {
 
   const results = [];
   let currentCat = '';
-  let i = h2 + 1;
   let cells = [];
 
   const flushRow = () => {
-    if (cells.length >= 2 && !PERK_HEADER.test(cells[0])) {
+    // A data row has a name + at least a value, and isn't the header row.
+    if (cells.length >= 2 && cells[0] && !PERK_HEADER.test(cells[0])) {
       const rawVal = cells[1];
       const value = /^\d+$/.test(rawVal) ? parseInt(rawVal) : rawVal;
       results.push({
@@ -1094,20 +1165,18 @@ function parsePerkFlawList(listH2Text, valueKey) {
     cells = [];
   };
 
-  while (i < end) {
+  for (let i = h2 + 1; i < end; i++) {
     const n = nodes[i];
     if (n.type === 'heading' && n.level === 3) {
       flushRow();
       currentCat = n.text.replace(/\s+(Perks|Flaws)$/, '');
-      i++; continue;
-    }
-    if (n.type === 'heading' && n.level <= 2) break;
-    if (n.type === 'text') {
-      if (PERK_HEADER.test(n.text)) { i++; continue; }
+    } else if (n.type === 'heading' && n.level <= 2) {
+      break;
+    } else if (n.type === 'rowEnd') {
+      flushRow();
+    } else if (n.type === 'cell') {
       cells.push(n.text);
-      if (cells.length === 5) flushRow();
     }
-    i++;
   }
   flushRow();
   return results.filter(r => r.name && !PERK_HEADER.test(r.name));
@@ -1231,30 +1300,30 @@ console.log('\nParsing devotions...');
 const normDevName = (s) => s.toLowerCase().replace(/[^a-z]/g, '');
 function parseDevotionDomains(devNames) {
   const known = new Set(devNames.map(normDevName));
-  // Locate the table header text node ("God" or "Devotion") and the run after it.
-  const hdr = nodes.findIndex((n) => n.type === 'text' && /^(God|Devotion)$/i.test(n.text));
+  // The devotion→domain mapping is a real table. Locate its header cell ("God" or
+  // "Devotion") and read the cells that follow, split into rows by 'rowEnd'. Each
+  // data row is [Name, Locality, Domain, Domain, …].
+  const hdr = nodes.findIndex((n) => n.type === 'cell' && /^(God|Devotion)$/i.test(n.text));
   if (hdr === -1) return {};
-  // Read forward, collecting tokens until we leave the table (a heading, a long
-  // prose paragraph, or the "See the Devotions & Divine Beings" note).
-  const tokens = [];
+  const rows = [];
+  let cur = [];
   for (let j = hdr; j < nodes.length; j++) {
     const n = nodes[j];
-    if (n.type !== 'text') break;
-    if (/^See the Devotions/i.test(n.text) || n.text.length > 60) break;
-    tokens.push(n.text.trim());
-  }
-  // Drop the 6 header labels.
-  const body = tokens.slice(6);
-  const map = {};
-  let cur = null;
-  for (const tok of body) {
-    if (known.has(normDevName(tok))) {
-      cur = { name: tok, locality: null, domains: [] };
-      map[normDevName(tok)] = cur;
-    } else if (cur) {
-      if (cur.locality === null) cur.locality = tok;   // first token after name
-      else cur.domains.push(tok);                      // rest are domains
+    if (n.type === 'rowEnd') { if (cur.length) rows.push(cur); cur = []; continue; }
+    if (n.type !== 'cell') {
+      // Leaving the table (a heading or the trailing note ends it).
+      if (n.type === 'heading' || /^See the Devotions/i.test(n.text || '')) break;
+      continue;
     }
+    cur.push(n.text.trim());
+  }
+  if (cur.length) rows.push(cur);
+
+  const map = {};
+  for (const cells of rows) {
+    const [name, locality, ...domains] = cells.filter(Boolean);
+    if (!name || !known.has(normDevName(name))) continue;   // skip header / stray rows
+    map[normDevName(name)] = { name, locality: locality || null, domains: domains.filter(Boolean) };
   }
   return map;
 }
@@ -1484,12 +1553,12 @@ function parseLevelTable() {
   );
   if (tableH === -1) return [];
   const tableEnd = nodes.findIndex((n, i) => i > tableH && n.type === 'heading' && n.level <= 2);
-  // Table exported as text nodes (not <td>)
-  const texts = nodes.slice(tableH + 1, tableEnd === -1 ? nodes.length : tableEnd)
-    .filter(n => n.type === 'text').map(n => n.text);
+  // Real table: read the cell values (5 numeric columns per row).
+  const cells = nodes.slice(tableH + 1, tableEnd === -1 ? nodes.length : tableEnd)
+    .filter(n => n.type === 'cell').map(n => n.text);
 
   const HEADER = /^(Character Level|Total XP|Base BP|LP|Spikes|Level|XP|BP)$/i;
-  const nums = texts.filter(v => /^\d+$/.test(v) && !HEADER.test(v)).map(Number);
+  const nums = cells.filter(v => /^\d+$/.test(v) && !HEADER.test(v)).map(Number);
   const rows = [];
   for (let i = 0; i + 4 < nums.length; i += 5) {
     rows.push({ level: nums[i], xp: nums[i+1], bp: nums[i+2], lp: nums[i+3], spikes: nums[i+4] });
@@ -1509,11 +1578,11 @@ function parseEventsTable() {
   );
   if (tableH === -1) return [];
   const tableEnd = nodes.findIndex((n, i) => i > tableH && n.type === 'heading' && n.level <= 2);
-  const texts = nodes.slice(tableH + 1, tableEnd === -1 ? nodes.length : tableEnd)
-    .filter(n => n.type === 'text').map(n => n.text);
+  const cells = nodes.slice(tableH + 1, tableEnd === -1 ? nodes.length : tableEnd)
+    .filter(n => n.type === 'cell').map(n => n.text);
 
   const HEADER = /^(Event Number|Level Floor|Starting BP)$/i;
-  const nums = texts.filter(v => /^\d+$/.test(v) && !HEADER.test(v)).map(Number);
+  const nums = cells.filter(v => /^\d+$/.test(v) && !HEADER.test(v)).map(Number);
   const rows = [];
   for (let i = 0; i + 2 < nums.length; i += 3) {
     rows.push({ event: nums[i], level: nums[i+1], bp: nums[i+2] });
@@ -2186,7 +2255,9 @@ function parseRitualConcepts() {
     const firstChild = nodes.findIndex((m, j) => j > i && j < cEnd && m.type === 'heading' && m.level > n.level);
     const proseEnd = firstChild === -1 ? cEnd : firstChild;
     const proseNodes = nodes.slice(i + 1, proseEnd);
-    const prose = proseNodes.filter(m => m.type === 'text').map(m => m.text).join(' ');
+    // A concept's body may include a small table (e.g. Ritual Point Options): fold
+    // 'cell' text into the prose alongside 'text' nodes so it isn't lost.
+    const prose = proseNodes.filter(m => m.type === 'text' || m.type === 'cell').map(m => m.text).join(' ');
     const bullets = proseNodes.filter(m => m.type === 'list').flatMap(m => m.items);
 
     // Sub-concepts: deeper headings inside this concept's range.
@@ -2199,7 +2270,7 @@ function parseRitualConcepts() {
         const sEnd = subEnd === -1 ? cEnd : Math.min(subEnd, cEnd);
         subConcepts.push({
           name: m.text,
-          description: nodes.slice(k + 1, sEnd).filter(x => x.type === 'text').map(x => x.text).join(' '),
+          description: nodes.slice(k + 1, sEnd).filter(x => x.type === 'text' || x.type === 'cell').map(x => x.text).join(' '),
         });
         k = sEnd;
       } else {

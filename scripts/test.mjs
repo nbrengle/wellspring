@@ -1149,11 +1149,16 @@ test('effect coverage G2: Warrior Spirit innate at level 10', () => {
   eq(r9.stats.armor, 1, 'Fighter L9 has 1 armor (Fighter L4 bonus)');
   eq(r9.stats.naturalArmor, 0, 'Fighter L9 has 0 natural armor');
 
-  // Fighter L10 with Warrior Spirit innate active: LP +1, armor +1, naturalArmor +1 (plus Fighter L10 gets +1 Armor)
+  // Fighter L10 with Warrior Spirit innate active: LP +1, armor +1, naturalArmor +1.
+  // Armor = 1 (Fighter L4 bonus) + 1 (Warrior Spirit innate). The L4 bonus carries a
+  // "*" footnote ("+1 Armor point as long as the Fighter is wearing at least 1 point
+  // of Physical Armor") that only makes the L4 point conditional — it is NOT a second,
+  // L10 armor bonus. (The old text-flattening parser swept the footnote into the L10
+  // row and double-counted it; the cell-aware parser keeps them separate.)
   const f10 = { classes: [{ name: 'Fighter', level: 10 }] };
   const r10 = validate(f10);
   eq(r10.stats.lifePoints, 6, 'Fighter L10 has 6 LP (4 base + 1 Fighter L2 bonus + 1 Warrior Spirit)');
-  eq(r10.stats.armor, 3, 'Fighter L10 has 3 armor (1 L4 bonus + 1 L10 bonus + 1 Warrior Spirit)');
+  eq(r10.stats.armor, 2, 'Fighter L10 has 2 armor (1 Fighter L4 bonus + 1 Warrior Spirit)');
   eq(r10.stats.naturalArmor, 1, 'Fighter L10 has 1 natural armor (Warrior Spirit)');
 });
 
