@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect, useCallback } from "react";
 import { getAllEntities, lookupEntity } from "./data/index.js";
 import { bareSkill, cleanItemName } from "./data/resolver.js";
-import { EntityBody } from "./Builder.jsx";
+import { EntityBody } from "./components/DetailPane.jsx";
 import "./RulesExplorer.css";
 
 const HIGH_LEVEL_GROUPS = [
