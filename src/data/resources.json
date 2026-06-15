@@ -47,6 +47,11 @@
   {
     "name": "Enchanted Hyperium",
     "tier": "Advanced",
-    "description": "Enchanted Hyperium is a constructed resource, with a number of processes to refine and craft it. The final result is a silvery-white powder after having been alchemically purified from the raw ore, subjected to high heat by tinkering, and then magically enchanted. Named ResourcesThe Basic and Advanced Resources above are not the only items that can be required for crafting. Certain recipes may call for a “named” resource. Often, Named Resources will require investigation, danger, and a quest or task to obtain."
+    "description": "Enchanted Hyperium is a constructed resource, with a number of processes to refine and craft it. The final result is a silvery-white powder after having been alchemically purified from the raw ore, subjected to high heat by tinkering, and then magically enchanted."
+  },
+  {
+    "name": "Mote of Power",
+    "tier": "Named",
+    "description": "A rare, unique named resource required for Greater Enchanting. May not be substituted."
   }
 ]

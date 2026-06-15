@@ -20,6 +20,7 @@ export function normalizeResourceName(name) {
   if (name.toLowerCase() === 'ritual wands') name = 'Ritual Wand';
   if (name.toLowerCase() === 'life points') name = 'Life Point';
   if (name.toLowerCase() === 'wealth') name = 'Wealth';
+  if (name.toLowerCase() === 'motes of power') name = 'Mote of Power';
 
   // Normalize casing for known resources
   const lower = name.toLowerCase();
@@ -37,6 +38,7 @@ export function normalizeResourceName(name) {
   if (lower === 'wealth') return 'Wealth';
   if (lower === 'ritual powder') return 'Ritual Powder';
   if (lower === 'ritual wand') return 'Ritual Wand';
+  if (lower === 'mote of power') return 'Mote of Power';
 
   return name;
 }
@@ -70,7 +72,7 @@ export function parseRequirements(str) {
     if (bracketMatches.length > 0) {
       return bracketMatches.map(groupStr => {
         const reqs = {};
-        groupStr.split(',').forEach(p => {
+        groupStr.split(/,(?![^(]*\))/).forEach(p => {
           const parsed = parseSingleComponent(p);
           if (parsed) reqs[parsed.name] = (reqs[parsed.name] || 0) + parsed.qty;
         });
@@ -84,7 +86,7 @@ export function parseRequirements(str) {
   // 2. Clear lists of single-item alternatives:
   // e.g. "1 Bloom, 1 Night Prize, or 1 Harvest" or "1 Ingot or 1 Hide"
   if (lowerStr.includes(' or ') && !lowerStr.includes(' and ')) {
-    const parts = str.split(/(?:,|\s+or\s+|\s+OR\s+)+/i).map(p => p.trim()).filter(Boolean);
+    const parts = str.split(/(?:,(?![^(]*\))|\s+or\s+|\s+OR\s+)+/i).map(p => p.trim()).filter(Boolean);
     const parsedParts = parts.map(p => parseSingleComponent(p)).filter(Boolean);
     if (parsedParts.length === parts.length) {
       return parsedParts.map(p => ({ [p.name]: p.qty }));
@@ -98,7 +100,7 @@ export function parseRequirements(str) {
     const baseStr = bracketOrMatch[1];
     const choicesStr = bracketOrMatch[2];
     const baseReqs = {};
-    baseStr.split(',').forEach(p => {
+    baseStr.split(/,(?![^(]*\))/).forEach(p => {
       const parsed = parseSingleComponent(p);
       if (parsed) baseReqs[parsed.name] = (baseReqs[parsed.name] || 0) + parsed.qty;
     });
@@ -114,7 +116,7 @@ export function parseRequirements(str) {
   }
 
   // 4. Default simple split
-  const parts = str.split(',');
+  const parts = str.split(/,(?![^(]*\))/);
   const reqs = {};
   parts.forEach(p => {
     const parsed = parseSingleComponent(p);
