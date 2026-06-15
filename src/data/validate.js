@@ -39,11 +39,53 @@ export function lbpState(character) {
   if (!lin) return null;
   const chosenC = character.lineageChallenges || [];
   const chosenA = character.lineageAdvantages || [];
+  const stripParameter = (s) => {
+    const firstOpen = s.indexOf('(');
+    const lastClose = s.lastIndexOf(')');
+    if (firstOpen !== -1 && lastClose > firstOpen) {
+      return (s.slice(0, firstOpen) + s.slice(lastClose + 1)).trim();
+    }
+    return s.trim();
+  };
+
   // Match a chosen item-name back to its lineage entry (names may carry [Repped]
   // / sublineage tags; compare on the display name the data exposes).
-  const findIn = (list, name) => list.find((x) => x.name === name || x.baseName === name);
+  const findIn = (list, name) => {
+    const clean = stripParameter(name);
+    return list.find((x) => x.name === clean || x.baseName === clean || x.name === name || x.baseName === name);
+  };
 
-  const challenges = chosenC.map((n) => findIn(lin.challenges, n)).filter(Boolean);
+  const challenges = chosenC.map((n) => {
+    const c = findIn(lin.challenges, n);
+    if (!c) return null;
+    
+    // If it's Lost Life or Additional Lost Life, compute the LBP dynamically
+    if (c.baseName === 'Lost Life' || c.baseName === 'Additional Lost Life') {
+      const firstOpen = n.indexOf('(');
+      const lastClose = n.lastIndexOf(')');
+      const param = (firstOpen !== -1 && lastClose > firstOpen) ? n.slice(firstOpen + 1, lastClose) : '';
+      let lbpVal = 0;
+      if (param) {
+        const numMatch = param.match(/(\d+)\s*LBP/i) || param.match(/(\d+)/);
+        if (numMatch) {
+          lbpVal = parseInt(numMatch[1], 10);
+        } else {
+          const cleanParam = param.trim();
+          for (const otherLin of Object.values(LINEAGES)) {
+            const found = otherLin.challenges.find(x => x.name === cleanParam || x.baseName === cleanParam);
+            if (found && typeof found.lbp === 'number') {
+              lbpVal = found.lbp;
+              break;
+            }
+          }
+        }
+      }
+      return { ...c, name: n, lbp: lbpVal };
+    }
+    
+    return { ...c, name: n };
+  }).filter(Boolean);
+
   const advantages = chosenA.map((n) => findIn(lin.advantages, n)).filter(Boolean);
 
   // Perks that modify the LBP economy (Strong Bloodline: +3 LBP, cap 10→13). Sum
