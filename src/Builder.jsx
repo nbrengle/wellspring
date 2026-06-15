@@ -1251,12 +1251,27 @@ function powerPickerSpec(slot, character) {
   // "taken" spans every tier field for spells-known so chosen spells are marked.
   const takenFields = category === "spellsKnown"
     ? ["noviceSpells", "adeptSpells", "greaterSpells"] : [field];
+  const taken = new Set();
+  const counts = {};
+  for (const f of takenFields) {
+    for (const powerName of (character[f] || [])) {
+      if (powerName) {
+        counts[powerName] = (counts[powerName] || 0) + 1;
+      }
+    }
+  }
+  for (const name of Object.keys(counts)) {
+    const maxR = getMaxRanks(name, field, character);
+    if (counts[name] >= maxR) {
+      taken.add(name);
+    }
+  }
   return {
     kind: "power", entityType: "powers",
     title: `Choose a ${label} power`,
     subtitle: `${candidates.length} options for ${cls}`,
     candidates,
-    taken: new Set(takenFields.flatMap((f) => character[f] || [])),
+    taken,
     onChoose: (name) => slot.onChoose(name, fieldFor(name)),
   };
 }
