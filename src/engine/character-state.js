@@ -3,7 +3,7 @@ import { getClasses } from "./resolver.js";
 import { validate } from "./validate.js";
 import {
   STARTING_CHOICES_CONFIG, hasStartingChoices, reconcileStartingChoices, rebuildStartingSkills
-} from "./starting-choices.js";
+} from "../data/starting-choices.js";
 
 // ─── INITIAL STATE TEMPLATE ──────────────────────────────────────────────────
 export const EMPTY_CHARACTER = {

@@ -15,7 +15,7 @@
 
 import {
   validate, budgetFor, bonusBudgetFor, computeSpend, grantedAbilities, discountSources,
-} from '../src/data/validate.js';
+} from "../src/engine/validate.js";
 import {
   ALL_SKILLS, ALL_PERKS, ALL_FLAWS, REFS, LINEAGES, CLASS_POWERS, lookupEntity,
 } from '../src/data/index.js';

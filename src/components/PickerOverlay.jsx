@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { REFS, lookupEntity, UNLIMITED_SKILLS } from "../data/index.js";
-import { prereqStatus } from "../data/validate.js";
+import { prereqStatus } from "../engine/validate.js";
 import { EntityBody } from "./DetailPane.jsx";
 
 function Tag({ label, tone = "amber" }) {

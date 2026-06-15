@@ -7,7 +7,7 @@
 import { writeFileSync, mkdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { validate, grantedAbilities } from '../src/data/validate.js';
+import { validate, grantedAbilities } from "../src/engine/validate.js";
 import { formatCharacterSheet } from '../src/data/sheet.js';
 import { CLASS_POWERS, REFS, ALL_PERKS, LINEAGES, lookupEntity } from '../src/data/index.js';
 import { classPowers, rawPower } from './effect-score.mjs';

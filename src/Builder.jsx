@@ -10,14 +10,14 @@ import {
 import {
   validate, characterLevel, pickClass, MAX_DOMAINS,
   EVENTS_TABLE, getMaxRanks, validityReasons
-} from "./data/validate.js";
-import { bareSkill, cleanItemName, getClasses } from "./data/resolver.js";
+} from "./engine/validate.js";
+import { bareSkill, cleanItemName, getClasses } from "./engine/resolver.js";
 import {
   STARTING_CHOICES_CONFIG, hasStartingChoices, reconcileStartingChoices, rebuildStartingSkills
 } from "./data/starting-choices.js";
 import {
   EMPTY_CHARACTER, applyClassStartingAbilities, loadArchetype, useCharacterState
-} from "./data/character-state.js";
+} from "./engine/character-state.js";
 import RulesExplorer from "./RulesExplorer.jsx";
 import RecipeChecker from "./RecipeChecker.jsx";
 import "./Builder.css";

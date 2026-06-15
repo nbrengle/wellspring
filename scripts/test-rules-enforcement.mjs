@@ -1,5 +1,5 @@
 // scripts/test-rules-enforcement.mjs
-import { validate } from '../src/data/validate.js';
+import { validate } from "../src/engine/validate.js";
 import { REFS } from '../src/data/index.js';
 import { readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';

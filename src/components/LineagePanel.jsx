@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { REFS, LINEAGES, lookupEntity } from "../data/index.js";
-import { subKey } from "../data/validate.js";
+import { subKey } from "../engine/validate.js";
 
 export const cleanChallengeName = (s) => {
   const firstOpen = s.indexOf('(');

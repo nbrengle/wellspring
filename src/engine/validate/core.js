@@ -13,7 +13,7 @@
 //
 // Pure functions, no React. Re-exported by the validate.js barrel.
 
-import { LEVEL_TABLE, lookupEntity, REFS, CLASS_POWERS, CLASS_PROGRESSION, CLASS_POWER_SLOTS, EVENTS_TABLE } from '../index.js';
+import { LEVEL_TABLE, lookupEntity, REFS, CLASS_POWERS, CLASS_PROGRESSION, CLASS_POWER_SLOTS, EVENTS_TABLE } from "../../data/index.js";
 import { cleanItemName, bareSkill, resolveId, entityType, idName, getClasses, primaryClass } from '../resolver.js';
 
 // ─── Economy / level constants ──────────────────────────────────────────────

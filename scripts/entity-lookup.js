@@ -80,7 +80,7 @@ export function buildLookup(entities) {
 }
 
 // Additional imports for consolidated resolution
-import { cleanItemName, bareSkill } from "../src/data/resolver.js";
+import { cleanItemName, bareSkill } from "../src/engine/resolver.js";
 
 // Strip the decorations archetype/character data carries around an entity
 // reference: BP cost suffixes, parenthesized parameters, "xN" rank
