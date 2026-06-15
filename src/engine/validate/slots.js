@@ -8,6 +8,7 @@
 
 import { lookupEntity, CLASS_POWERS, CLASS_PROGRESSION, CLASS_POWER_SLOTS, SPELLCASTERS, LINEAGES } from "../../data/index.js";
 import { cleanItemName, resolveId, getClasses } from '../resolver.js';
+import { SPELL_TIERS, SLOT_CATS, BOOKCASTER_TIER_FIELD, KNOWN_SPELL_FIELDS } from '../config.js';
 import {
   rankOf, pickClass, countPicksForClass, progressionRow,
   activeInnatePowers, CASTER_SLOT_FIELDS, MARTIAL_SLOT_FIELDS,
@@ -21,9 +22,9 @@ export function slotGrants(character) {
   const grants = {};
   // computeSlots categories only. Raw spell-tier grants (novice/adept/greater) are
   // the province of spellSlots(), not the slot-cap budget here — skip them.
-  const SLOT_CATS = new Set(['cantrips', 'spellsKnown', 'utility', 'basic', 'advanced', 'veteran']);
+  const cats = new Set(SLOT_CATS);
   const addTo = (cls, cat, n) => {
-    if (!cls || !SLOT_CATS.has(cat)) return;
+    if (!cls || !cats.has(cat)) return;
     const k = `${cls}:${cat}`;
     grants[k] = (grants[k] || 0) + n;
   };
@@ -148,7 +149,7 @@ export function spellSlots(character) {
   // Additional spell-slot grants from owned skills/perks/advantages are
   // parser-extracted (ent.slotGrants for novice/adept/greater; ent.highestSlot for
   // a floating "highest-level" slot).
-  const SPELL_TIERS = new Set(['novice', 'adept', 'greater']);
+  const spellTiers = new Set(SPELL_TIERS);
   let highestSlots = 0;
   const applySpellGrants = (ent, rank = 1) => {
     if (!ent) return;
@@ -187,8 +188,7 @@ export function spellSlots(character) {
 }
 
 // Spells a Bookcaster can select, split into { known, other } for the picker.
-const BOOKCASTER_TIER_FIELD = { novice: 'noviceSpells', adept: 'adeptSpells', greater: 'greaterSpells' };
-const KNOWN_SPELL_FIELDS = ['noviceSpells', 'adeptSpells', 'greaterSpells'];
+
 export function bookcasterSpellOptions(character) {
   const casters = getClasses(character).filter((c) => SPELLCASTERS.has(c.name));
   if (!casters.length) return { known: [], other: [] };
