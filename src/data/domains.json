@@ -2,7 +2,7 @@
   {
     "name": "Chaos",
     "label": "Chaos",
-    "accent": null,
+    "accent": "Lightning",
     "powers": [
       {
         "name": "The Path Less Travelled",
@@ -32,14 +32,14 @@
         "accent": "Lightning",
         "effect": "Drain",
         "prerequisites": null,
-        "description": "The character disrupts a target’s natural processes with a jolt of chaotic energy. The target is drained for a Quick 100. The first time this spell is cast each long rest, it will not consume a spell slot. Dissolution - 2 BP Once per short rest, whenever the character uses an attack with an Accent, they may spend one Spike to change the Accent to another Accent of their choice. They may spend an additional Spike to refresh this power immediately. If the attack lands and is not Prevented, they may then use the following Power: Untangle Weakness Call: “Discern by Divine: Are you Vulnerable to [Accent of the previous attack]?” Target: Individual                Duration: Instantaneous Delivery: Verbal                Refresh: Special Accent: Divine                  Effect: Discern Viewing the impact of their attack, the character may determine if the target is weak to the wielded Accent."
+        "description": "The character disrupts a target’s natural processes with a jolt of chaotic energy. The target is drained for a Quick 100. The first time this spell is cast each long rest, it will not consume a spell slot. Dissolution - 2 BP Once per short rest, whenever the character uses an attack with an Accent, they may spend one Spike to change the Accent to another Accent of their choice. They may spend an additional Spike to refresh this power immediately. If the attack lands and is not Prevented, they may then use the following Power:"
       }
     ]
   },
   {
     "name": "Creation",
     "label": "Creation",
-    "accent": null,
+    "accent": "Flame",
     "powers": [
       {
         "name": "Waste Not",
@@ -61,7 +61,7 @@
   {
     "name": "Death",
     "label": "Death",
-    "accent": null,
+    "accent": "Shadow",
     "powers": [
       {
         "name": "The Balance of Life",
@@ -83,7 +83,7 @@
   {
     "name": "Destruction",
     "label": "Destruction",
-    "accent": null,
+    "accent": "Acid",
     "powers": [
       {
         "name": "Dissolve",
@@ -157,7 +157,7 @@
   {
     "name": "Expression",
     "label": "Expression",
-    "accent": null,
+    "accent": "Mind",
     "powers": [
       {
         "name": "Emotional Attunement",
@@ -209,7 +209,7 @@
   {
     "name": "Life",
     "label": "Life",
-    "accent": null,
+    "accent": "Life",
     "powers": [
       {
         "name": "Lifeline",
@@ -231,7 +231,7 @@
   {
     "name": "Light",
     "label": "Light",
-    "accent": null,
+    "accent": "Radiant",
     "powers": [
       {
         "name": "No Stone Unturned",
@@ -283,7 +283,7 @@
   {
     "name": "Knowledge",
     "label": "Knowledge",
-    "accent": null,
+    "accent": "Mind",
     "powers": [
       {
         "name": "Well Read",
@@ -305,7 +305,7 @@
   {
     "name": "Manipulation",
     "label": "Manipulation",
-    "accent": null,
+    "accent": "Mind",
     "powers": [
       {
         "name": "Mind Wipe",
@@ -342,7 +342,7 @@
   {
     "name": "Nature",
     "label": "Nature",
-    "accent": null,
+    "accent": "Poison",
     "powers": [
       {
         "name": "Tree Teleport",
@@ -364,7 +364,7 @@
   {
     "name": "Order",
     "label": "Order",
-    "accent": null,
+    "accent": "Ice",
     "powers": [
       {
         "name": "Orderly Conduct",
@@ -386,7 +386,7 @@
   {
     "name": "Peace",
     "label": "Peace",
-    "accent": null,
+    "accent": "Life",
     "powers": [
       {
         "name": "Non-Aggression Pact",
@@ -408,7 +408,7 @@
   {
     "name": "Protection",
     "label": "Protection",
-    "accent": null,
+    "accent": "Divine",
     "powers": [
       {
         "name": "Unbreakable",
@@ -430,7 +430,7 @@
   {
     "name": "Shadow",
     "label": "Shadow",
-    "accent": null,
+    "accent": "Shadow",
     "powers": [
       {
         "name": "Slippery Tongue",
@@ -467,7 +467,7 @@
   {
     "name": "War",
     "label": "War",
-    "accent": null,
+    "accent": "Force",
     "powers": []
   }
 ]

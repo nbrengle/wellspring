@@ -1,6 +1,6 @@
 {
   "generatedFrom": "src/data/*.json",
-  "entities": 1347,
+  "entities": 1346,
   "mentions": {
     "skills:Basic Martial Weapons": [
       "terms:Proficiency"
@@ -1837,10 +1837,7 @@
       "effects:Drain"
     ],
     "crafting-concepts:Essences": [
-      "recipes:Essence Infusion",
-      "creature-types:Spirit",
-      "domains:Energy",
-      "accents:Life"
+      "recipes:Essence Infusion"
     ],
     "crafting-concepts:Drawing": [
       "crafting-concepts:The Enchanting Forge",
@@ -1981,13 +1978,6 @@
       "ritual-concepts:Primary Ritualist",
       "rules-concepts:Dark Territory",
       "ritual-concepts:Ritual Points",
-      "rules-concepts:Modifiers",
-      "terms:Marshal"
-    ],
-    "ritual-concepts:Ritual Point Options": [
-      "ritual-concepts:Primary Ritualist",
-      "rules-concepts:Dark Territory",
-      "ritual-concepts:Ritual Points",
       "ritual-concepts:Participant",
       "ritual-concepts:Ritualists",
       "rules-concepts:Modifiers",
@@ -2023,19 +2013,13 @@
       "rules-concepts:“Quick X” Count",
       "terms:Short Rest",
       "terms:Spell-slots",
-      "conditions:Vulnerable",
       "terms:Long Rest",
       "terms:Prevented",
       "accents:Lightning",
-      "terms:Delivery",
-      "effects:Weakness",
       "powers:Disrupt",
-      "rules-concepts:Duration",
       "terms:Refresh",
-      "effects:Discern",
       "effects:Drain",
       "terms:Accent",
-      "accents:Divine",
       "domains:Energy",
       "terms:Power",
       "rules-concepts:Spikes"
@@ -4263,21 +4247,9 @@
       "modifiers:Self"
     ],
     "powers:Divine Substitution": [
-      "domains:Manipulation",
-      "domains:Destruction",
-      "domains:Expression",
-      "domains:Creation",
       "rules-concepts:Devotions & Divine Beings",
       "accents:Divine",
-      "accents:Shadow",
-      "classes:Cleric",
-      "effects:Death",
-      "domains:Chaos",
-      "domains:Light",
-      "domains:Order",
-      "domains:Peace",
-      "accents:Life",
-      "domains:War"
+      "classes:Cleric"
     ],
     "powers:Blade Blessing": [
       "rules-concepts:Uncalled Damage",
@@ -7553,27 +7525,16 @@
     "powers:Accent Substantiation": [
       "powers:Arcane Source",
       "terms:Incantation",
-      "accents:Lightning",
       "classes:Sourcerer",
       "terms:Cantrip",
       "terms:Delivery",
       "terms:Wielding",
       "rules-concepts:Duration",
       "terms:Refresh",
-      "accents:Radiant",
-      "skills:Basic Arcane",
       "terms:Accent",
-      "accents:Divine",
-      "accents:Shadow",
       "accents:Agony",
-      "accents:Flame",
-      "accents:Force",
       "accents:Acid",
-      "accents:Fear",
-      "accents:Mind",
-      "accents:Void",
-      "modifiers:Self",
-      "accents:Ice"
+      "modifiers:Self"
     ],
     "powers:Unsuppressable": [
       "terms:Incantation",
@@ -9893,9 +9854,7 @@
       "terms:Cantrip",
       "terms:Power"
     ],
-    "rules-concepts:Level Progression Table": [
-      "rules-concepts:Spikes"
-    ],
+    "rules-concepts:Level Progression Table": [],
     "rules-concepts:Level Floor": [],
     "rules-concepts:Multi-Classing": [],
     "rules-concepts:Advanced Classes": [
@@ -10183,40 +10142,8 @@
       "terms:Focus"
     ],
     "rules-concepts:Devotions & Divine Beings": [
-      "devotions:The Howl at the End",
-      "devotions:The Witch of Webs",
-      "devotions:The Song in Iron",
-      "devotions:The Divine Bloom",
-      "devotions:The Great Mind",
-      "devotions:The Pale Star",
-      "devotions:The Librarian",
-      "domains:Manipulation",
-      "domains:Destruction",
-      "domains:Expression",
-      "domains:Protection",
-      "devotions:The Mother",
-      "devotions:The Dancer",
-      "accents:Lightning",
-      "domains:Knowledge",
-      "devotions:The Steed",
-      "domains:Creation",
-      "devotions:Druidism",
-      "devotions:Devourer",
-      "devotions:Wildfire",
       "accents:Divine",
-      "accents:Shadow",
-      "domains:Energy",
-      "domains:Nature",
-      "effects:Death",
-      "domains:Chaos",
-      "domains:Light",
-      "domains:Order",
-      "domains:Peace",
-      "accents:Acid",
-      "accents:Life",
-      "devotions:Dave",
-      "accents:Ice",
-      "domains:War"
+      "domains:Nature"
     ],
     "rules-concepts:Out-of-Game": [],
     "rules-concepts:Non-Combatant": [
@@ -10373,22 +10300,11 @@
       "rules-concepts:Traps"
     ],
     "rules-concepts:Wealth": [
-      "recipes:Essence Infusion",
-      "resources:Golden Blossom",
-      "recipes:Ritual Powder",
-      "resources:Rare Minerals",
-      "resources:Night Prizes",
-      "recipes:Ritual Wand",
-      "resources:Raw Scale",
-      "resources:Harvest",
       "powers:Sources",
       "terms:Power",
       "domains:Nature",
       "powers:Share",
-      "rules-concepts:Green",
-      "resources:Bloom",
-      "resources:Ingots",
-      "resources:Hide"
+      "rules-concepts:Green"
     ],
     "rules-concepts:What is LARP?": [
       "ritual-concepts:Participant",
@@ -10669,7 +10585,6 @@
       "powers:Astride the Weave",
       "powers:Power of Magic",
       "powers:Rote Invocation",
-      "powers:Accent Substantiation",
       "powers:Wild Bolt",
       "powers:Energy Shield",
       "powers:Infuriate",
@@ -11861,7 +11776,6 @@
       "conditions:Immunity",
       "defenses:Protect",
       "defenses:Immune",
-      "powers:Disruption",
       "powers:Ensnare",
       "powers:Replicate Enhancement",
       "powers:Time to Go",
@@ -12456,7 +12370,6 @@
       "ritual-concepts:Dark Territory Adjustments",
       "ritual-concepts:Ritual Points",
       "ritual-concepts:Potential Success",
-      "ritual-concepts:Ritual Point Options",
       "powers:Analysis",
       "powers:Hiatus",
       "powers:Zenith of Knowledge",
@@ -13511,7 +13424,6 @@
       "devotions:The Howl at the End",
       "challenges:Lost - Divine Tenet",
       "powers:Soulhold Survival",
-      "powers:Divine Substitution",
       "powers:Form of the Hunting Panther",
       "powers:Execute",
       "powers:Rest",
@@ -13523,7 +13435,6 @@
       "recipes:Aerial Doom Powder",
       "recipes:Delve Reality (Intermediate)",
       "rituals:Projection",
-      "rules-concepts:Devotions & Divine Beings",
       "rules-concepts:Spirit Form",
       "rules-concepts:Table of Contents"
     ],
@@ -13585,7 +13496,6 @@
       "perks:Heartbond",
       "perks:Medium",
       "conditions:Obfuscated",
-      "powers:Disruption",
       "powers:Emotional Attunement",
       "powers:No Stone Unturned",
       "advantages:Human - Telepathy",
@@ -14324,7 +14234,6 @@
       "recipes:Smelt Mithril Ore"
     ],
     "effects:Weakness": [
-      "powers:Disruption",
       "devotions:The Steed",
       "powers:Critique Construction",
       "powers:Spitting Venom",
@@ -14508,7 +14417,6 @@
       "perks:Elemental Affinity",
       "flaws:Fragile Bones",
       "flaws:Divine Vulnerability",
-      "powers:Disruption",
       "challenges:Aewen - Like Attracts Like",
       "challenges:Chimera - Prey Animal",
       "challenges:Forged - Backdoor Vulnerability",
@@ -14628,7 +14536,6 @@
       "effects:Shatter",
       "conditions:Dominated",
       "defenses:No Effect",
-      "crafting-concepts:Essences",
       "powers:The Balance of Life",
       "devotions:The Song in Iron",
       "devotions:Wildfire",
@@ -14747,8 +14654,7 @@
       "rituals:Transmutation",
       "rituals:Beckon",
       "rituals:Blessing of Faith",
-      "rituals:Ritual Trap",
-      "rules-concepts:Wealth"
+      "rituals:Ritual Trap"
     ],
     "resources:Hide": [
       "skills:Bookcaster",
@@ -14819,8 +14725,7 @@
       "rituals:Transmutation",
       "rituals:Beckon",
       "archetypes:Form Fighter Druid",
-      "rules-concepts:Calculating Physical Armor Points",
-      "rules-concepts:Wealth"
+      "rules-concepts:Calculating Physical Armor Points"
     ],
     "resources:Ingots": [
       "skills:Prospect I",
@@ -14892,8 +14797,7 @@
       "rituals:Transmutation",
       "rituals:Divine Hammer",
       "rituals:Lesser Consecrate / Lesser Desecrate",
-      "rituals:Transpose Skeleton",
-      "rules-concepts:Wealth"
+      "rituals:Transpose Skeleton"
     ],
     "resources:Night Prizes": [
       "skills:Forage I",
@@ -14945,8 +14849,7 @@
       "recipes:Delve Reality (Intermediate)",
       "recipes:Empower Arcane Bracelet",
       "recipes:Enchant Materia",
-      "recipes:Base Talisman",
-      "rules-concepts:Wealth"
+      "recipes:Base Talisman"
     ],
     "resources:Harvest": [
       "skills:Scavenge I",
@@ -14997,8 +14900,7 @@
       "recipes:Fume Hood",
       "recipes:Lifepot",
       "recipes:Smelt Mithril Ore",
-      "rituals:Bless Food",
-      "rules-concepts:Wealth"
+      "rituals:Bless Food"
     ],
     "resources:Rare Minerals": [
       "skills:Prospect I",
@@ -15056,8 +14958,7 @@
       "rituals:Blessing of Faith",
       "rituals:Divine Hammer",
       "rituals:Transpose Skeleton",
-      "rituals:Greater Consecration / Greater Desecration",
-      "rules-concepts:Wealth"
+      "rituals:Greater Consecration / Greater Desecration"
     ],
     "resources:Golden Blossom": [
       "skills:Forage III",
@@ -15067,15 +14968,13 @@
       "recipes:Lifestrike Sunshine",
       "recipes:Enchant Talisman (Rod / Orb / Wand / Source)",
       "recipes:Enchant Weapon (Greater)",
-      "recipes:Lifepot",
-      "rules-concepts:Wealth"
+      "recipes:Lifepot"
     ],
     "resources:Raw Scale": [
       "skills:Scavenge I",
       "powers:Smuggler’s Powdercase",
       "recipes:Cure Raw Scale",
-      "rituals:Ritual Trap",
-      "rules-concepts:Wealth"
+      "rituals:Ritual Trap"
     ],
     "resources:Mithril Bar": [
       "recipes:Empower Arcane Bracelet",
@@ -15134,8 +15033,7 @@
       "recipes:Caustic Glob",
       "recipes:Elemental Protection Potion",
       "recipes:Rebuild Item",
-      "rituals:Blessing of Faith",
-      "rules-concepts:Devotions & Divine Beings"
+      "rituals:Blessing of Faith"
     ],
     "accents:Disease": [
       "advantages:Forged - Artificial Anatomy",
@@ -15163,7 +15061,6 @@
       "flaws:Divine Vulnerability",
       "terms:Sphere",
       "ritual-concepts:The Lesser Arcana",
-      "powers:Disruption",
       "powers:Waste Not",
       "powers:The Balance of Life",
       "powers:Dissolve",
@@ -15227,7 +15124,6 @@
       "powers:Commune with Nature",
       "powers:Identify",
       "powers:Improved Identification",
-      "powers:Accent Substantiation",
       "recipes:Holy Oil",
       "recipes:Bless Holy Symbol",
       "recipes:Improve Talisman",
@@ -15252,7 +15148,6 @@
       "powers:Liquid Courage",
       "powers:Save the Day",
       "powers:This Is My Bodyguard",
-      "powers:Accent Substantiation",
       "recipes:Euphoria"
     ],
     "accents:Flame": [
@@ -15284,7 +15179,6 @@
       "powers:Elemental Survival",
       "powers:Succumb",
       "powers:Arcane Source",
-      "powers:Accent Substantiation",
       "powers:Circle of Four",
       "powers:Warpfire",
       "powers:Smothering Ash",
@@ -15370,7 +15264,6 @@
       "powers:Blunt End",
       "powers:Hamstring",
       "powers:Incapacitate",
-      "powers:Accent Substantiation",
       "powers:Deteriorate",
       "powers:Warpfire",
       "powers:Restful Prison"
@@ -15394,23 +15287,19 @@
       "powers:Elemental Survival",
       "powers:Succumb",
       "powers:Arcane Source",
-      "powers:Accent Substantiation",
       "powers:Circle of Four",
       "powers:Everflowing Shield",
       "recipes:Elemental Protection Potion",
       "rituals:Blessing of Faith",
       "rules-concepts:Damage Calls",
-      "rules-concepts:Verbal Delivery",
-      "rules-concepts:Devotions & Divine Beings"
+      "rules-concepts:Verbal Delivery"
     ],
     "accents:Life": [
-      "crafting-concepts:Essences",
       "devotions:The Mother",
       "devotions:Dave",
       "challenges:Lost - Lost Life",
       "challenges:Lost - Additional Lost Life",
       "powers:Advanced Treatment",
-      "powers:Divine Substitution",
       "recipes:Agony Elixir",
       "recipes:Double Brew",
       "recipes:Lifestrike Sunshine",
@@ -15425,8 +15314,7 @@
       "rituals:Reforge",
       "rituals:Transpose Skeleton",
       "rituals:Disjunction",
-      "archetypes:Balanced Cleric",
-      "rules-concepts:Devotions & Divine Beings"
+      "archetypes:Balanced Cleric"
     ],
     "accents:Lightning": [
       "perks:Elemental Affinity",
@@ -15447,14 +15335,12 @@
       "powers:Elemental Survival",
       "powers:Succumb",
       "powers:Arcane Source",
-      "powers:Accent Substantiation",
       "powers:Circle of Four",
       "powers:Coalesce Scales",
       "powers:Galvanic Shield",
       "powers:Arcane Backlash",
       "recipes:Elemental Protection Potion",
-      "rituals:Blessing of Faith",
-      "rules-concepts:Devotions & Divine Beings"
+      "rituals:Blessing of Faith"
     ],
     "accents:Mind": [
       "skills:Chronic Hobbyist",
@@ -15530,7 +15416,6 @@
       "powers:Holding Out For a Hero",
       "powers:Steel Yourself",
       "powers:Concealed Weapon",
-      "powers:Accent Substantiation",
       "powers:Startle"
     ],
     "accents:Poison": [
@@ -15575,7 +15460,6 @@
     ],
     "accents:Radiant": [
       "challenges:Underkin - Radiant Vulnerability",
-      "powers:Accent Substantiation",
       "recipes:Holy Oil",
       "recipes:Lifestrike Sunshine",
       "rituals:Blessing of Faith",
@@ -15586,13 +15470,10 @@
       "perks:Will to Live",
       "terms:Accent",
       "ritual-concepts:The Lesser Arcana",
-      "powers:Divine Substitution",
       "classes:Rogue",
       "powers:Retreat",
-      "powers:Accent Substantiation",
       "powers:Aethereal Fade",
-      "rituals:Blessing of Faith",
-      "rules-concepts:Devotions & Divine Beings"
+      "rituals:Blessing of Faith"
     ],
     "accents:Void": [
       "perks:Draconic Heritage",
@@ -15609,8 +15490,7 @@
       "challenges:Lost - Visions of Stars",
       "challenges:Lost - Ragdoll",
       "challenges:Lost - Something to Prove",
-      "challenges:Lost - Void-filled Gaps",
-      "powers:Accent Substantiation"
+      "challenges:Lost - Void-filled Gaps"
     ],
     "defenses:Counter": [
       "skills:Shield Expertise",
@@ -15790,7 +15670,7 @@
       "conditions:Vulnerable",
       "defenses:Altered",
       "crafting-concepts:Unravelling Essence",
-      "ritual-concepts:Ritual Point Options",
+      "ritual-concepts:Potential Success",
       "powers:Pyrrhic Strike",
       "powers:Unbreakable",
       "challenges:Forged - Vulnerable Construction",
@@ -16232,7 +16112,7 @@
       "ritual-concepts:Participant",
       "ritual-concepts:Dark Territory Adjustments",
       "ritual-concepts:Ritual Points",
-      "ritual-concepts:Ritual Point Options",
+      "ritual-concepts:Potential Success",
       "ritual-concepts:The Major Arcana",
       "classes:Mystic",
       "powers:Grand Ritualist",
@@ -16259,7 +16139,6 @@
       "ritual-concepts:Automatic Failure",
       "ritual-concepts:Ritual Points",
       "ritual-concepts:Potential Success",
-      "ritual-concepts:Ritual Point Options",
       "powers:Grand Ritualist",
       "powers:Hiatus",
       "powers:Zenith of Knowledge",
@@ -16294,7 +16173,7 @@
       "ritual-concepts:Primary Ritualist",
       "ritual-concepts:Secondary Ritualist",
       "ritual-concepts:Ritual Points",
-      "ritual-concepts:Ritual Point Options",
+      "ritual-concepts:Potential Success",
       "powers:Divine Performance",
       "powers:Non-Aggression Pact",
       "powers:Grand Ritualist",
@@ -16327,20 +16206,15 @@
     "ritual-concepts:Ritual Points": [
       "ritual-concepts:Beginning the Ritual",
       "ritual-concepts:Automatic Failure",
-      "ritual-concepts:Potential Success",
-      "ritual-concepts:Ritual Point Options"
+      "ritual-concepts:Potential Success"
     ],
     "ritual-concepts:Potential Success": [],
-    "ritual-concepts:Ritual Point Options": [],
     "ritual-concepts:Arms: Physical": [],
     "ritual-concepts:Gems: Mental": [],
     "ritual-concepts:Implements: Magical": [],
     "ritual-concepts:The Lesser Arcana": [],
     "ritual-concepts:The Major Arcana": [],
-    "domains:Chaos": [
-      "powers:Divine Substitution",
-      "rules-concepts:Devotions & Divine Beings"
-    ],
+    "domains:Chaos": [],
     "powers:The Path Less Travelled": [],
     "powers:Disruption": [
       "rules-concepts:Blue"
@@ -16358,7 +16232,6 @@
       "devotions:The Great Mind",
       "powers:Custom Brew",
       "powers:Weapon Upkeep Specialist",
-      "powers:Divine Substitution",
       "powers:Mine",
       "powers:Safebox",
       "recipes:Alcohol",
@@ -16371,8 +16244,7 @@
       "recipes:High Quality Skinning Knife",
       "recipes:Refine Hyperium",
       "rituals:Divine Hammer",
-      "rules-concepts:Expiration",
-      "rules-concepts:Devotions & Divine Beings"
+      "rules-concepts:Expiration"
     ],
     "powers:Waste Not": [],
     "domains:Death": [],
@@ -16381,9 +16253,7 @@
       "powers:Dissolve",
       "powers:Orderly Conduct",
       "devotions:Devourer",
-      "devotions:Wildfire",
-      "powers:Divine Substitution",
-      "rules-concepts:Devotions & Divine Beings"
+      "devotions:Wildfire"
     ],
     "powers:Dissolve": [
       "recipes:Malleable Beauty"
@@ -16398,7 +16268,6 @@
       "resources:Golden Blossom",
       "accents:Divine",
       "accents:Life",
-      "crafting-concepts:Essences",
       "crafting-concepts:Drawing",
       "crafting-concepts:Measuring Time & Chants",
       "crafting-concepts:The Enchanting Forge",
@@ -16459,17 +16328,14 @@
       "rituals:Transmutation",
       "rituals:Divine Hammer",
       "rituals:Minor Disjunction",
-      "rituals:Disjunction",
-      "rules-concepts:Devotions & Divine Beings"
+      "rituals:Disjunction"
     ],
     "powers:Overflowing Energy": [],
     "powers:Energistic Adaptation": [],
     "domains:Expression": [
       "perks:Draconic Heritage",
       "accents:Divine",
-      "powers:Divine Performance",
-      "powers:Divine Substitution",
-      "rules-concepts:Devotions & Divine Beings"
+      "powers:Divine Performance"
     ],
     "powers:Emotional Attunement": [],
     "powers:Divine Performance": [],
@@ -16498,7 +16364,6 @@
       "devotions:The Pale Star",
       "devotions:Devourer",
       "challenges:Aewen - Arcane Glow",
-      "powers:Divine Substitution",
       "powers:Aethereal Fade",
       "recipes:Nyte Tea",
       "recipes:Spellnaught Elixir",
@@ -16512,8 +16377,7 @@
       "rituals:Health to the Company",
       "rituals:Projection",
       "rules-concepts:Blue",
-      "rules-concepts:Crafting Process",
-      "rules-concepts:Devotions & Divine Beings"
+      "rules-concepts:Crafting Process"
     ],
     "powers:No Stone Unturned": [
       "devotions:The Divine Bloom"
@@ -16547,18 +16411,15 @@
       "rituals:Reforge",
       "rituals:Projection",
       "rules-concepts:Building a New Character After Permadeath",
-      "rules-concepts:Dark Territory",
-      "rules-concepts:Devotions & Divine Beings"
+      "rules-concepts:Dark Territory"
     ],
     "powers:Well Read": [],
     "domains:Manipulation": [
       "challenges:Human - Hotheaded",
       "powers:Strange Token",
-      "powers:Divine Substitution",
       "powers:Alone But Not Lonely",
       "powers:Additional Bodyguard",
-      "powers:Additional Source",
-      "rules-concepts:Devotions & Divine Beings"
+      "powers:Additional Source"
     ],
     "powers:Mind Wipe": [],
     "powers:Dominating Presence": [],
@@ -16607,7 +16468,7 @@
       "perks:Hearth",
       "terms:Incantation",
       "crafting-concepts:Measuring Time & Chants",
-      "ritual-concepts:Ritual Point Options",
+      "ritual-concepts:Potential Success",
       "powers:Non-Aggression Pact",
       "devotions:Dorne, Bringer of Law",
       "challenges:Forged - Imprinted",
@@ -16616,7 +16477,6 @@
       "challenges:Human - Frail of Body",
       "challenges:Human - Energy Vampire",
       "challenges:Lost - Unstable Form [Repped][",
-      "powers:Divine Substitution",
       "powers:Cancel",
       "powers:Retributive Protection",
       "powers:Town Portal",
@@ -16640,7 +16500,6 @@
       "rules-concepts:Speed of Combat",
       "rules-concepts:Carrying",
       "rules-concepts:Crafting Materials",
-      "rules-concepts:Devotions & Divine Beings",
       "rules-concepts:Power Requirements",
       "rules-concepts:Incanting",
       "rules-concepts:What is LARP?"
@@ -16650,9 +16509,7 @@
       "perks:Peaceful Hearth",
       "flaws:Binding Oath of Peace",
       "powers:Non-Aggression Pact",
-      "powers:Divine Substitution",
-      "powers:Commission of Protection",
-      "rules-concepts:Devotions & Divine Beings"
+      "powers:Commission of Protection"
     ],
     "powers:Non-Aggression Pact": [],
     "domains:Protection": [
@@ -16665,8 +16522,7 @@
       "powers:Magekey",
       "powers:Flat Catch",
       "powers:Mystic Mirror",
-      "rituals:Blessing of Faith",
-      "rules-concepts:Devotions & Divine Beings"
+      "rituals:Blessing of Faith"
     ],
     "powers:Unbreakable": [],
     "domains:Shadow": [],
@@ -16679,19 +16535,15 @@
       "devotions:Mille, Muse of Creation",
       "devotions:The Song in Iron",
       "challenges:Human - Nervous Fidgeting",
-      "powers:Divine Substitution",
       "powers:Renowned Soldier",
-      "powers:Mostly Harmless",
-      "rules-concepts:Devotions & Divine Beings"
+      "powers:Mostly Harmless"
     ],
     "devotions:The Mother": [
-      "archetypes:Balanced Cleric",
-      "rules-concepts:Devotions & Divine Beings"
+      "archetypes:Balanced Cleric"
     ],
     "devotions:The Steed": [
       "powers:Custom Creation",
-      "powers:Augury",
-      "rules-concepts:Devotions & Divine Beings"
+      "powers:Augury"
     ],
     "devotions:Senri, Voice of Mercy": [],
     "devotions:Dorne, Bringer of Law": [],
@@ -16700,48 +16552,29 @@
     "devotions:The Song in Iron": [
       "advantages:Underkin - Iron Touch",
       "advantages:Underkin - Smiths of Legend",
-      "challenges:Underkin - Drawn to Song",
-      "rules-concepts:Devotions & Divine Beings"
+      "challenges:Underkin - Drawn to Song"
     ],
     "devotions:Dave": [
-      "ritual-concepts:Ritual Point Options",
-      "rules-concepts:Devotions & Divine Beings"
+      "ritual-concepts:Potential Success"
     ],
     "devotions:The Great Mind": [
       "advantages:Forged - Read the Feed",
       "challenges:Forged - Uplink Jack",
-      "challenges:Forged - Backdoor Vulnerability",
-      "rules-concepts:Devotions & Divine Beings"
+      "challenges:Forged - Backdoor Vulnerability"
     ],
     "devotions:Druidism": [
-      "devotions:Wildfire",
-      "rules-concepts:Devotions & Divine Beings"
+      "devotions:Wildfire"
     ],
-    "devotions:The Howl at the End": [
-      "rules-concepts:Devotions & Divine Beings"
-    ],
-    "devotions:The Divine Bloom": [
-      "rules-concepts:Devotions & Divine Beings"
-    ],
-    "devotions:The Witch of Webs": [
-      "rules-concepts:Devotions & Divine Beings"
-    ],
-    "devotions:The Pale Star": [
-      "rules-concepts:Devotions & Divine Beings"
-    ],
-    "devotions:Devourer": [
-      "rules-concepts:Devotions & Divine Beings"
-    ],
+    "devotions:The Howl at the End": [],
+    "devotions:The Divine Bloom": [],
+    "devotions:The Witch of Webs": [],
+    "devotions:The Pale Star": [],
+    "devotions:Devourer": [],
     "devotions:The Librarian": [
-      "powers:Well Read",
-      "rules-concepts:Devotions & Divine Beings"
+      "powers:Well Read"
     ],
-    "devotions:Wildfire": [
-      "rules-concepts:Devotions & Divine Beings"
-    ],
-    "devotions:The Dancer": [
-      "rules-concepts:Devotions & Divine Beings"
-    ],
+    "devotions:Wildfire": [],
+    "devotions:The Dancer": [],
     "advantages:Aewen - Deep Reserves": [],
     "advantages:Aewen - Arcane Aptitude": [],
     "advantages:Aewen - Mystic Resilience": [],
@@ -18602,8 +18435,7 @@
       "recipes:Catspaw Boots",
       "recipes:Shield of Deflecting",
       "recipes:Fortified Cask",
-      "recipes:Improve Talisman",
-      "rules-concepts:Wealth"
+      "recipes:Improve Talisman"
     ],
     "recipes:Hardening Lacquer": [
       "recipes:Caustic Glob"
@@ -18665,8 +18497,7 @@
       "rituals:Disjunction",
       "rituals:Greater Consecration / Greater Desecration",
       "rituals:Health to the Company",
-      "rituals:Projection",
-      "rules-concepts:Wealth"
+      "rituals:Projection"
     ],
     "recipes:Spellnaught Elixir": [],
     "recipes:Steel Oil": [],
@@ -18758,8 +18589,7 @@
       "rituals:Minor Disjunction",
       "rituals:Disjunction",
       "rituals:Greater Consecration / Greater Desecration",
-      "rituals:Projection",
-      "rules-concepts:Wealth"
+      "rituals:Projection"
     ],
     "recipes:Sharpening Stone": [
       "powers:Weapon Upkeep Specialist",
@@ -18965,7 +18795,6 @@
       "defenses:Reduced",
       "crafting-concepts:Mana Sickness",
       "ritual-concepts:Automatic Failure",
-      "powers:Disruption",
       "advantages:Aewen - Master of Rites",
       "advantages:Chimera - Heightened Flight",
       "advantages:Forged - Mass Production",
@@ -19322,7 +19151,6 @@
       "ritual-concepts:Dark Territory Adjustments",
       "ritual-concepts:Ritual Points",
       "ritual-concepts:Potential Success",
-      "ritual-concepts:Ritual Point Options",
       "powers:Mind Wipe",
       "powers:Unbreakable",
       "powers:Aegis of the Unknown / Sundering of the Unknown",
@@ -19573,7 +19401,6 @@
       "recipes:Enchant Sharpening Stone",
       "recipes:Sharpening Stone",
       "recipes:Black Arrow",
-      "rules-concepts:Level Progression Table",
       "rules-concepts:Character Creation",
       "rules-concepts:Table of Contents"
     ],
@@ -19765,7 +19592,7 @@
     "rules-concepts:Ashbin": [
       "skills:Bookcaster",
       "crafting-concepts:The Hermetic Laboratory",
-      "ritual-concepts:Ritual Point Options",
+      "ritual-concepts:Potential Success",
       "powers:Forged From Steel",
       "powers:Acid Soak",
       "powers:Antidote",
@@ -19819,7 +19646,6 @@
       "ritual-concepts:Dark Territory Adjustments",
       "ritual-concepts:Automatic Failure",
       "ritual-concepts:Potential Success",
-      "ritual-concepts:Ritual Point Options",
       "advantages:Aewen - Master of Rites",
       "challenges:Aewen - Bugs in the Sigils",
       "challenges:Human - Nervous Fidgeting",
