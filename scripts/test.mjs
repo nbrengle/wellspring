@@ -1244,6 +1244,30 @@ test('every entity referenced by a rules relation resolves (no dangling refs)', 
     `${dangling.length} dangling rule reference(s) — referenced by a rule but not in the entity index:\n        ${dangling.join('\n        ')}`);
 });
 
+// ─── perks and powers bug fixes ───────────────────────────────────────────────
+test('Execute power makes Hard to Kill free even if sheet has positive authored cost', () => {
+  const char = {
+    archetypeName: 'Custom Fighter',
+    classLevels: 'Fighter 4',
+    utilityPowers: ['Execute'],
+    purchasedPerks: ['Hard to Kill'],
+    effectiveBP: {
+      purchasedPerks: [1]
+    }
+  };
+  const r = validate(char);
+  const costInfo = r.spend.byItem['purchasedPerks:Hard to Kill'];
+  ok(costInfo, 'costInfo for Hard to Kill exists');
+  eq(costInfo.cost, 0, 'Hard to Kill is free');
+  eq(costInfo.grant?.source, 'Execute', 'Granted by Execute');
+});
+
+test('Othersleep has base cost of 1', () => {
+  const ent = lookupEntity('perks:Othersleep');
+  ok(ent, 'Othersleep exists');
+  eq(ent.cost, 1, 'Othersleep cost is 1');
+});
+
 // ─── report ───────────────────────────────────────────────────────────────────
 console.log(`\n${passed} passed, ${failures.length} failed`);
 if (failures.length) {
