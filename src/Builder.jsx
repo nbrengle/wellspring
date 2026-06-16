@@ -252,6 +252,16 @@ export default function Builder() {
     });
   }, []);
 
+  // Record a per-advantage choice (e.g. the free Cantrip an Aewen's "Divine Magic"
+  // advantage grants). Stored under character.advantageChoices[<advantage>] and
+  // consumed by the engine (graph.js → GRANT_SOURCE, slots.js → granted cantrip).
+  const handleSetAdvantageChoice = useCallback((advantage, value) => {
+    setCharacter((c) => ({
+      ...c,
+      advantageChoices: { ...(c.advantageChoices || {}), [advantage]: value },
+    }));
+  }, []);
+
   const handleStartBlank = useCallback(() => {
     const candidates = Object.keys(CLASS_POWER_SLOTS).map((name) => ({
       name, desc: CLASSES[name]?.description || "", cat: CLASSES[name]?.type || "Class",
