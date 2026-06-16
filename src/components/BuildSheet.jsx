@@ -151,10 +151,16 @@ export function IdentityRail({ character, report, onClickField, onRestart,
               sources={statSources(report.stats, "spikes")} onInspect={onInspect} />
         {(() => {
           const physStr = character.armorPoints ? String(character.armorPoints) : "";
-          const phys = parseInt(physStr.match(/^\s*(\d+)/)?.[1] ?? "0", 10);
-          const natFixed = report.stats?.naturalArmor || 0;
-          const natNotes = (report.stats?.mods?.notes || []).filter((n) => n.stat === "naturalArmor");
+          const physInput = parseInt(physStr.match(/^\s*(\d+)/)?.[1] ?? "0", 10);
+          
+          const armorSrcRows = statSources(report.stats, "armor");
+          const physSkill = Math.max(0, ...armorSrcRows.map(s => s.n));
+          const phys = Math.max(physInput, physSkill);
+
           const natSrcRows = statSources(report.stats, "naturalArmor");
+          const natFixed = Math.max(0, ...natSrcRows.map(s => s.n));
+          const natNotes = (report.stats?.mods?.notes || []).filter((n) => n.stat === "naturalArmor");
+          
           const hasNat = natFixed > 0 || natNotes.length > 0;
           let value, type;
           if (hasNat && (natFixed > phys || (natNotes.length && phys === 0))) {
@@ -162,13 +168,16 @@ export function IdentityRail({ character, report, onClickField, onRestart,
           } else {
             value = String(phys); type = phys > 0 ? "physical" : "—";
           }
-          const tip = hasNat
-            ? `Armor doesn't stack — pick one. Showing best (${type}).`
-            : (physStr || "Physical Armor Points");
           const sources = [];
-          if (phys > 0) sources.push({ name: "Physical armor", n: phys, note: type === "physical" ? "in use" : "not in use" });
-          for (const s of natSrcRows) sources.push({ ...s, note: `natural${type === "natural" ? ", in use" : ""}` });
+          if (physInput > 0) sources.push({ name: "Manual Entry", n: physInput, note: type === "physical" && physInput === phys ? "in use" : "not in use" });
+          for (const s of armorSrcRows) sources.push({ ...s, note: `physical${type === "physical" && s.n === phys ? ", in use" : ""}` });
+          for (const s of natSrcRows) sources.push({ ...s, note: `natural${type === "natural" && s.n === natFixed ? ", in use" : ""}` });
           for (const n of natNotes) sources.push({ name: n.name, n: 0, note: "natural, variable", type: sourceType(n.name) });
+          
+          const tip = (hasNat || armorSrcRows.length > 0)
+            ? `Armor doesn't stack — pick one. Showing best (${type}). Sources: ${sources.map(s => `${s.n} ${s.name} (${s.note})`).join(', ')}`
+            : (physStr || "Physical Armor Points");
+            
           return <StatWithSources label="Armor" title={tip} value={value} sources={sources} onInspect={onInspect} />;
         })()}
         {(() => {

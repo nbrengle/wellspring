@@ -708,6 +708,7 @@ const STAT_MOD_PATTERNS = [
   { stat: 'armor', re: /benefit\s+from\s+up\s+to\s+(two|four|six|eight|\d+)\s+Armor\s+Points/i },
   { stat: 'spikes', re: /(?:\+?(\d+)|\bone)\s+(?:(?:Base|Bonus)\s+)?Maximum\s+Spikes?\b/i },
   { stat: 'spikes', re: /(?:Base\s+)?Maximum\s+Spikes?\s+(?:is|are)\s+increased\s+by\s+(?:\+?(\d+)|\bone)/i },
+  { stat: 'spikes', re: /gains?\s+(?:\+?(\d+)|\bone|two|three)\s+additional\s+Spikes?/i },
 ];
 const STAT_WORD_N = { one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8 };
 const statNum = (w) => /^\d+$/.test(String(w)) ? parseInt(w, 10) : (STAT_WORD_N[String(w).toLowerCase()] || 0);
@@ -750,6 +751,8 @@ function statModsFromText(text) {
 // opt out — those are not permanent build stats.
 function extractStatMods(entity) {
   if ((entity.tags || []).includes('Form')) return;
+  // Skip tactical spells and rituals — only durable build stats belong on the character sheet
+  if (/\b(?:Spell|Spell-?Slot|Ritual)\b/i.test(entity.refresh || '')) return;
   const { mods, variableNaturalArmor } = statModsFromText(entity.description || entity.desc || '');
   if (mods.length) entity.statMods = mods;
   if (variableNaturalArmor) (entity.statModNotes ||= []).push({ stat: 'naturalArmor', text: 'variable' });
