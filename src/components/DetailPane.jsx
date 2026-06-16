@@ -357,14 +357,14 @@ export function EntityBody({ entity, view, report, choices, onSetChoice, onUpdat
             </h3>
             <ul className="b-choose-list">
               {co.options.map((o, i) => {
-                const key = o.grantsSkill || o.text;
-                const sel = build && (chosen === key);
+                const key = o.text;
+                const sel = build && (chosen === key || o.grants?.includes(chosen));
                 return (
                   <li key={i} className={`b-choose-opt ${build ? "is-selectable" : ""} ${sel ? "is-chosen" : ""}`}>
                     {build && onSetChoice
                       ? <button className="b-choose-btn" onClick={() => onSetChoice(powerId, key)}>
                           <span className="b-choose-mark">{sel ? "●" : "○"}</span> {o.text}
-                          {o.grantsSkill && <span className="b-choose-free"> · free</span>}
+                          {o.grants?.length > 0 && <span className="b-choose-free"> · free</span>}
                         </button>
                       : <span className="b-choose-text">• {o.text}</span>}
                   </li>

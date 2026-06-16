@@ -69,15 +69,21 @@ export function resolveCharacterGraph(character) {
       }
     }
     
-    // Choose-one powers (Expert Craft) grant the selected skill
+    // Choose-one powers (Expert Craft) grant the selected skill(s)
     if (ent?.chooseOne?.kind === 'build') {
       const chosen = character.choices?.[`powers:${ent.name}`];
       if (chosen) {
-        const opt = ent.chooseOne.options.find((o) => o.grantsSkill === chosen || o.text === chosen);
-        if (opt?.grantsSkill) {
-          effects.push({ type: 'GRANT_SOURCE', grants: [`skills:${opt.grantsSkill}`] });
+        // Find the option by direct text match, or by seeing if one of its granted skills matches the chosen string.
+        const opt = ent.chooseOne.options.find((o) => o.text === chosen || o.grants?.includes(chosen));
+        if (opt?.grants && opt.grants.length > 0) {
+          effects.push({ type: 'GRANT_SOURCE', grants: opt.grants.map(s => `skills:${s}`) });
         }
       }
+    }
+
+    // Divine Magic advantage grants the selected cantrip
+    if (ent?.name === "Divine Magic" && character.advantageChoices?.["Divine Magic"]) {
+      effects.push({ type: 'GRANT_SOURCE', grants: [`powers:${character.advantageChoices["Divine Magic"]}`] });
     }
 
     items.push({
