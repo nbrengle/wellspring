@@ -6,7 +6,7 @@
 // spell-slot capacity (spellSlots), and the Bookcaster spell options. Re-exported
 // by the validate.js barrel.
 
-import { lookupEntity, CLASS_POWERS, CLASS_PROGRESSION, CLASS_POWER_SLOTS, SPELLCASTERS, LINEAGES } from "../../data/index.js";
+import { lookupEntity, CLASS_POWERS, CLASS_PROGRESSION, CLASS_POWER_SLOTS, SPELLCASTERS, LINEAGES } from '../data.js';
 import { cleanItemName, resolveId, getClasses } from '../resolver.js';
 import { SPELL_TIERS, SLOT_CATS, BOOKCASTER_TIER_FIELD, KNOWN_SPELL_FIELDS } from '../config.js';
 import {

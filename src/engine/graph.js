@@ -1,4 +1,4 @@
-import { lookupEntity, LINEAGES, CLASS_PROGRESSION, REFS } from "../data/index.js";
+import { lookupEntity, LINEAGES, CLASS_PROGRESSION, REFS } from '../engine/data.js';
 import { cleanItemName, bareSkill, resolveId, entityType, getClasses } from './resolver.js';
 import { COMMON_ALLERGENS } from './config.js';
 import { 

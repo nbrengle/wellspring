@@ -14,10 +14,7 @@ export const MAX_DOMAINS = 2;
 export const DEFAULT_WEALTH = 8;
 export const LEVEL_CAP = 10;
 
-// ─── Class & Magic Systems ──────────────────────────────────────────────────
-export const SPELLCASTERS = new Set([
-  'Mage', 'Shaman', 'Spellsword', 'Beguiler', 'Ranger', 'Priest'
-]);
+
 
 export const SPELL_TIERS = new Set(['novice', 'adept', 'greater']);
 export const SLOT_CATS = ['cantrips', 'spellsKnown', 'utility', 'basic', 'advanced', 'veteran'];

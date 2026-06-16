@@ -6,7 +6,7 @@
 // requirements). Depends on core primitives + slots (for spell-slot constraints).
 // Re-exported by the validate.js barrel.
 
-import { lookupEntity, REFS, CLASS_POWERS, SPELLCASTERS, BASE_CLASSES } from "../../data/index.js";
+import { lookupEntity, REFS, CLASS_POWERS, SPELLCASTERS, BASE_CLASSES } from '../data.js';
 import { cleanItemName, bareSkill, resolveId, idName, entityType, getClasses } from '../resolver.js';
 import {
   characterLevel, rankOf, grantedAbilities, ENTITY_FIELDS,

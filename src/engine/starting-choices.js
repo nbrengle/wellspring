@@ -10,9 +10,9 @@
 // the implicit choice shows as selected and stays editable — the same control a
 // from-scratch build gets.
 
-import classesJson from './classes.json';
-import { lookupEntity, ALL_SKILLS } from './index.js';
-import { bareSkill, cleanItemName, getClasses } from '../engine/resolver.js';
+import classesJson from '../data/classes.json';
+import { lookupEntity, ALL_SKILLS } from './data.js';
+import { bareSkill, cleanItemName, getClasses } from './resolver.js';
 
 // ─── STARTING SKILLS, DERIVED FROM THE PARSED MEGADOC ──────────────────────────
 // The MegaDoc is the single source of truth. The parser already captures each
