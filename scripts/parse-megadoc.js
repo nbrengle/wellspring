@@ -1470,14 +1470,19 @@ function parseDivineDomains() {
     const domEnd = nodes.findIndex((m, j) => j > i && m.type === 'heading' && m.level <= 2);
     const dEnd = domEnd === -1 ? end : Math.min(domEnd, end);
 
-    // Powers: H3 "Name - N BP" pattern
-    const DOMAIN_PWR = /-\s*\d+\s*BP\s*$/;
+    // Powers: H3 or bold text "Name - N BP" pattern
+    const DOMAIN_PWR = /-\s*\d+\s*BP\s*$/i;
+    const isPwr = (x) => (x.type === 'heading' && x.level <= 4 && DOMAIN_PWR.test(x.text)) || 
+                         (x.type === 'text' && DOMAIN_PWR.test(x.text) && x.text.length < 100);
+
     const powers = [];
     let j = i + 1;
     while (j < dEnd) {
       const m = nodes[j];
-      if (m.type === 'heading' && m.level === 3 && DOMAIN_PWR.test(m.text)) {
-        const pwrEnd = nodes.findIndex((x, k) => k > j && x.type === 'heading' && x.level <= 3);
+      if (isPwr(m)) {
+        const pwrEnd = nodes.findIndex((x, k) => k > j && (
+          (x.type === 'heading' && x.level <= 2) || isPwr(x)
+        ));
         const bodyNodes = nodes.slice(j + 1, pwrEnd === -1 ? dEnd : Math.min(pwrEnd, dEnd))
           .filter(x => x.type === 'text');
         const header = m.text;
