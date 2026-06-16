@@ -80,6 +80,11 @@ export function innateBonusCantrips(character) {
       }
     }
   }
+
+  if (character.advantageChoices?.["Divine Magic"]) {
+    out.push({ cls: "ALL", name: character.advantageChoices["Divine Magic"] });
+  }
+
   return out;
 }
 
@@ -108,7 +113,7 @@ export function computeSlots(character) {
       };
     };
     if (isCaster) {
-      const granted = grantedCantrips.filter((g) => g.cls === cls).map((g) => g.name);
+      const granted = grantedCantrips.filter((g) => g.cls === cls || g.cls === 'ALL').map((g) => g.name);
       // A granted (innate) cantrip never consumes a choosable slot, even if it
       // appears in the character's cantrip pick list. Exclude it from `used`.
       const used = (character.cantrips || []).reduce((n, name, i) =>
