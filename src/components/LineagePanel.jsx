@@ -1,6 +1,17 @@
 import React, { useEffect } from "react";
-import { REFS, LINEAGES, lookupEntity } from '../engine/data.js';
+import { REFS, LINEAGES, lookupEntity, CLASSES, CLASS_POWERS } from "../engine/data.js";
 import { subKey } from "../engine/validate.js";
+
+const DIVINE_CANTRIPS = (() => {
+  const divineClasses = Object.entries(CLASSES).filter(([_, c]) => c.type === 'Spellcaster' && c.magicType === 'Divine').map(([name, _]) => name);
+  const cantrips = new Set();
+  for (const c of divineClasses) {
+    if (CLASS_POWERS[c] && CLASS_POWERS[c].cantrips) {
+      for (const p of CLASS_POWERS[c].cantrips) cantrips.add(p.name);
+    }
+  }
+  return Array.from(cantrips).sort();
+})();
 
 export const cleanChallengeName = (s) => {
   const firstOpen = s.indexOf('(');
@@ -12,9 +23,33 @@ export const cleanChallengeName = (s) => {
   return clean.replace(/\s*\[[^\]]+\]/g, '').trim();
 };
 
-export default function LineagePanel({ character, report, onSetLineage, onSetSublineage, onToggle, onInspect, onClose }) {
+
+// Lost Life / Additional Lost Life carry no fixed LBP — the player "reps" a
+// physical [Repped] challenge from another lineage and earns THAT challenge's LBP
+// instead. These are stored parameterized as "Lost Life (Chosen Challenge)" and
+// resolved by lbpState. baseName is how the engine special-cases them.
+const REPPED_PARENTS = new Set(['Lost Life', 'Additional Lost Life']);
+const needsRep = (it) => REPPED_PARENTS.has(it.baseName || it.name);
+
+// Extract the chosen rep from a stored name ("Lost Life (Runic Lattice)" → "Runic
+// Lattice"); '' when none picked yet.
+const repParameterOf = (name) => {
+  const m = name && name.match(/\(([^)]+)\)\s*$/);
+  return m ? m[1].trim() : '';
+};
+
+// Every physical [Repped] challenge from lineages OTHER than Lost, grouped by
+// source lineage — the option list a Lost character may rep. Computed once.
+const repOptionsByLineage = () =>
+  Object.entries(LINEAGES)
+    .filter(([name]) => name !== 'Lost')
+    .map(([name, lin]) => [name, (lin.challenges || []).filter((c) => c.repped)])
+    .filter(([, challenges]) => challenges.length > 0);
+
+export default function LineagePanel({ character, report, onSetLineage, onSetSublineage, onToggle, onSetRep, onInspect, onClose, onSetAdvantageChoice }) {
   const lbp = report.lbp;
   const lin = character.lineage ? LINEAGES[character.lineage] : null;
+  const repOptions = repOptionsByLineage();
 
   useEffect(() => {
     const onKey = (e) => { if (e.key === "Escape") onClose(); };
@@ -29,15 +64,24 @@ export default function LineagePanel({ character, report, onSetLineage, onSetSub
   });
 
   const Row = ({ it, field, kind }) => {
-    const chosen = (character[field] || []).some(name => {
-      return name === it.name || cleanChallengeName(name) === cleanChallengeName(it.name);
-    });
+    // The stored name for this row (carries the rep parameter for Lost Life).
+    const storedName = (character[field] || []).find(name =>
+      name === it.name || cleanChallengeName(name) === cleanChallengeName(it.name));
+    const chosen = storedName !== undefined;
     const srcId = `${kind === "challenge" ? "challenges" : "advantages"}:${character.lineage} - ${it.baseName || it.name}`;
     const grantIds = (REFS.grants || {})[srcId] || [];
+
+    const isRepChallenge = needsRep(it);
+    const repParam = isRepChallenge && storedName ? repParameterOf(storedName) : '';
+    // Resolved (rep-derived) LBP for a Lost Life row — lbpState computed it.
+    const resolvedLbp = isRepChallenge && chosen
+      ? (lbp?.chosenChallenges?.find(c => cleanChallengeName(c.name) === cleanChallengeName(it.name))?.lbp ?? 0)
+      : it.lbp;
+
     return (
       <li className={`b-lin-row ${chosen ? "is-on" : ""}`}>
         <div className="b-lin-row-head">
-          <button className="b-lin-toggle" onClick={() => onToggle(field, it.name)}
+          <button className="b-lin-toggle" onClick={() => onToggle(field, isRepChallenge && repParam ? `${it.baseName || it.name} (${repParam})` : (it.baseName || it.name))}
                   title={chosen ? "Remove" : "Take"}>{chosen ? "✓" : "+"}</button>
           <button className="b-lin-name" onClick={() => onInspect(it.name, field, kind === "challenge" ? "flaws" : "perks")}>
             {it.baseName || it.name}
@@ -45,9 +89,29 @@ export default function LineagePanel({ character, report, onSetLineage, onSetSub
             {it.repped && <span className="b-lin-repped">repped</span>}
           </button>
           <span className={`b-lin-lbp ${kind === "challenge" ? "is-award" : "is-cost"}`}>
-            {kind === "challenge" ? `+${it.lbp}` : `−${it.lbp}`} LBP
+            {kind === "challenge" ? `+${resolvedLbp}` : `−${resolvedLbp}`} LBP
           </span>
         </div>
+        {/* Lost Life / Additional Lost Life: pick which other-lineage [Repped]
+            challenge you're repping — its LBP becomes this challenge's award. */}
+        {isRepChallenge && chosen && (
+          <div className="b-lin-rep-pick">
+            <label className="b-lin-rep-label">Repping:</label>
+            <select className="b-lin-rep-select" value={repParam}
+                    onChange={(e) => onSetRep(field, it.baseName || it.name, e.target.value)}>
+              <option value="">— choose a challenge to rep —</option>
+              {repOptions.map(([linName, challenges]) => (
+                <optgroup key={linName} label={linName}>
+                  {challenges.map((c) => (
+                    <option key={`${linName}:${c.baseName || c.name}`} value={c.baseName || c.name}>
+                      {c.baseName || c.name} (+{c.lbp})
+                    </option>
+                  ))}
+                </optgroup>
+              ))}
+            </select>
+          </div>
+        )}
         {(it.desc || it.description) && <p className="b-lin-desc">{it.desc || it.description}</p>}
         {grantIds.length > 0 && (
           <p className="b-lin-grants">
@@ -63,6 +127,21 @@ export default function LineagePanel({ character, report, onSetLineage, onSetSub
               );
             })}
           </p>
+        )}
+        {it.name === "Divine Magic" && chosen && (
+          <div style={{ marginTop: '0.5rem' }}>
+            <label style={{ display: 'block', fontSize: '14px', marginBottom: '4px', color: '#666' }}>
+              Select your free Cantrip:
+            </label>
+            <select
+              className="b-spec-select"
+              value={character.advantageChoices?.["Divine Magic"] || ""}
+              onChange={(e) => onSetAdvantageChoice("Divine Magic", e.target.value)}
+            >
+              <option value="" disabled>Select a cantrip...</option>
+              {DIVINE_CANTRIPS.map(c => <option key={c} value={c}>{c}</option>)}
+            </select>
+          </div>
         )}
       </li>
     );

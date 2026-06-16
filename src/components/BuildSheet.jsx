@@ -8,6 +8,7 @@ import {
   MAX_DOMAINS, EVENTS_TABLE, getMaxRanks, pickClass
 } from "../engine/validate.js";
 import { bareSkill, cleanItemName, getClasses } from "../engine/resolver.js";
+import { lookupCost } from "../engine/validate/cost-key.js";
 import {
   STARTING_CHOICES_CONFIG, reconcileStartingChoices
 } from '../engine/starting-choices.js';
@@ -736,8 +737,8 @@ function ClassifiedRows({ rows, resolveType, report, onClick, isFocused, onRemov
     <ul className="b-rows">
       {rows.map((row) => {
         const { name, field, index, source, grantedBy, cls, refundedBP, specialty, floor } = row;
-        const costKey = field === 'startingSkills' ? `${field}:${index}:${name}` : `${field}:${name}`;
-        const cost = report?.spend.byItem[costKey];
+        // Cost is attached to the row by validate() (from the BP ledger).
+        const cost = row.cost;
         const fromClass = source === "class";
         const canRemove = !fromClass && index >= 0;
         const rank = cost?.rank || (index >= 0 ? character.ranks?.[field]?.[index] : null) || 1;
@@ -804,7 +805,7 @@ function EditableRows({ items, field, onClick, isFocused, resolveType, report, r
   return (
     <ul className="b-rows">
       {items.map((item, i) => {
-        const cost = report?.spend.byItem[`${field}:${item}`];
+        const cost = lookupCost(report?.spend.byItem, field, item, i);
         const canRemove = removable ? removable(i) : false;
         const rank = cost?.rank || 1;
 
