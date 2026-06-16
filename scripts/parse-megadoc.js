@@ -1470,14 +1470,19 @@ function parseDivineDomains() {
     const domEnd = nodes.findIndex((m, j) => j > i && m.type === 'heading' && m.level <= 2);
     const dEnd = domEnd === -1 ? end : Math.min(domEnd, end);
 
-    // Powers: H3 "Name - N BP" pattern
-    const DOMAIN_PWR = /-\s*\d+\s*BP\s*$/;
+    // Powers: H3 or bold text "Name - N BP" pattern
+    const DOMAIN_PWR = /-\s*\d+\s*BP\s*$/i;
+    const isPwr = (x) => (x.type === 'heading' && x.level <= 4 && DOMAIN_PWR.test(x.text)) || 
+                         (x.type === 'text' && DOMAIN_PWR.test(x.text) && x.text.length < 100);
+
     const powers = [];
     let j = i + 1;
     while (j < dEnd) {
       const m = nodes[j];
-      if (m.type === 'heading' && m.level === 3 && DOMAIN_PWR.test(m.text)) {
-        const pwrEnd = nodes.findIndex((x, k) => k > j && x.type === 'heading' && x.level <= 3);
+      if (isPwr(m)) {
+        const pwrEnd = nodes.findIndex((x, k) => k > j && (
+          (x.type === 'heading' && x.level <= 2) || isPwr(x)
+        ));
         const bodyNodes = nodes.slice(j + 1, pwrEnd === -1 ? dEnd : Math.min(pwrEnd, dEnd))
           .filter(x => x.type === 'text');
         const header = m.text;
@@ -1562,6 +1567,26 @@ function parseLineages() {
         const required = tags.some(t => /^required$/i.test(t));
         const repped = tags.some(t => /^repped$/i.test(t));
         const lbp = costStr === 'Variable' ? null : parseInt(costStr);
+        let fullDesc = desc.trim();
+        let k = j + 1;
+        while (k < sEnd) {
+          const nxt = nodes[k];
+          if (nxt.type === 'heading' && nxt.level <= 3) break;
+          if (nxt.type === 'text' && ITEM_LINE.test(nxt.text)) break;
+          if (nxt.text) {
+            let txt = nxt.text.trim();
+            // Inject newlines before standard power fields to fix squashed text nodes
+            txt = txt.replace(/(Call:|Target:|Delivery:|Accent:|Duration:|Refresh:|Effect:)/g, '\n$1');
+            // Clean up missing space before Call if it got squashed
+            txt = txt.replace(/\]Call:/g, ']\nCall:');
+            // Remove huge blocks of spaces (like between Self and Duration)
+            txt = txt.replace(/ {5,}/g, ' ');
+            fullDesc += '\n\n' + txt;
+          }
+          k++;
+        }
+        j = k - 1;
+
         items.push({
           name: rawName.trim(),
           lbp,
@@ -1569,7 +1594,7 @@ function parseLineages() {
           repped,
           tags: tags.filter(t => !/^(required|repped)$/i.test(t)),
           sublineage: currentGroup,
-          description: desc.trim(),
+          description: fullDesc,
         });
       }
       return items;

@@ -21,6 +21,7 @@ export const EMPTY_CHARACTER = {
   purchasedSkills: [],
   purchasedPerks: [],
   flaws: [],
+  advantageChoices: {},
   innatePowers: [], utilityPowers: [], basicPowers: [],
   advancedPowers: [], veteranPowers: [], classPowers: [],
   rightHandPowers: [], cantrips: [],

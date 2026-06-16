@@ -7,6 +7,7 @@
 
 import { bareSkill, cleanItemName, getClasses } from '../engine/resolver.js';
 import { ARCHETYPES, UNLIMITED_SKILLS, BASE_CLASSES } from './data.js';
+import { lookupCost } from './validate/cost-key.js';
 import {
   LABEL_FIELD, SCALAR_FIELDS, ITEM_FIELDS, fieldForLabel, cleanItem, splitItems,
   expandInstances, CHOICE_DEFAULTS,
@@ -17,18 +18,7 @@ import {
 // cost (purchased skills/perks, BP-bought powers, refund-bearing starting skills,
 // flaws) round-trips. Returns '' when the item has no cost/grant of note.
 function bpSuffix(name, field, report, idx) {
-  let e = null;
-  if (field === 'startingSkills') {
-    if (idx !== undefined) {
-      e = report?.spend.byItem[`startingSkills:${idx}:${name}`];
-    }
-    if (!e) {
-      const match = Object.keys(report?.spend.byItem || {}).find(k => k.startsWith('startingSkills:') && k.endsWith(`:${name}`));
-      if (match) e = report.spend.byItem[match];
-    }
-  } else {
-    e = report?.spend.byItem[`${field}:${name}`];
-  }
+  const e = lookupCost(report?.spend.byItem, field, name, idx);
   if (!e) return '';
   // Flaws award BP; a starting-skill refund is also a negative cost on a free item.
   if (e.cost < 0) {
@@ -53,12 +43,7 @@ function bpSuffix(name, field, report, idx) {
 function joinItems(items, field, report) {
   if (!items || !items.length) return 'None';
   return items.map((n, i) => {
-    let costInfo = null;
-    if (field === 'startingSkills') {
-      costInfo = report?.spend.byItem[`startingSkills:${i}:${n}`];
-    } else {
-      costInfo = report?.spend.byItem[`${field}:${n}`];
-    }
+    const costInfo = lookupCost(report?.spend.byItem, field, n, i);
     const rank = costInfo?.rank || 1;
     const baseName = bareSkill(cleanItemName(n));
     const showRank = rank > 1 && !UNLIMITED_SKILLS.has(baseName);

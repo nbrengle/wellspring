@@ -1,6 +1,7 @@
 import { startingSkillGrants } from "../starting-choices.js";
 import { cleanItemName, bareSkill } from '../resolver.js';
 import { MAX_FLAW_BP } from './core.js';
+import { costKey } from './cost-key.js';
 import { REFS } from '../data.js';
 
 // Determine if a discount source applies to a specific graph item
@@ -63,11 +64,8 @@ export function computeBP(graph, character) {
   for (let idx = 0; idx < graph.items.length; idx++) {
     const node = graph.items[idx];
     
-    // Determine the key for UI rendering (backwards compatible with validate.js)
-    let key = `${node.field}:${node.rawString}`;
-    if (node.field === 'startingSkills') {
-      key = `startingSkills:${node.index}:${node.rawString}`; 
-    }
+    // Ledger key (shared scheme — see cost-key.js).
+    const key = costKey(node.field, node.rawString, node.index);
 
     if (node.field === 'flaws') {
       byItem[key] = { cost: node.baseCost, base: node.baseCost, grant: null };
@@ -144,11 +142,7 @@ export function computeBP(graph, character) {
   for (const node of graph.items) {
     if (node.field !== 'purchasedSkills' && node.field !== 'purchasedPerks' && node.field !== 'startingSkills') continue;
     
-    let key = `${node.field}:${node.rawString}`;
-    if (node.field === 'startingSkills') {
-      key = `startingSkills:${node.index}:${node.rawString}`;
-    }
-
+    const key = costKey(node.field, node.rawString, node.index);
     const eff = byItem[key];
     if (!eff || eff.authored) continue;
 
@@ -189,8 +183,7 @@ export function computeBP(graph, character) {
   
   for (const node of graph.items) {
     if (costFields.includes(node.field)) {
-      const key = `${node.field}:${node.rawString}`;
-      const eff = byItem[key];
+      const eff = byItem[costKey(node.field, node.rawString, node.index)];
       if (eff && eff.cost > 0) {
         spent += eff.cost;
       }
