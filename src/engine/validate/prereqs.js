@@ -9,9 +9,10 @@
 import { lookupEntity, REFS, CLASS_POWERS, SPELLCASTERS, BASE_CLASSES } from "../../data/index.js";
 import { cleanItemName, bareSkill, resolveId, idName, entityType, getClasses } from '../resolver.js';
 import {
-  characterLevel, rankOf, grantedAbilities, ENTITY_FIELDS,
+  characterLevel, rankOf, ENTITY_FIELDS,
 } from './core.js';
 import { spellSlots } from './slots.js';
+import { grantedAbilities } from '../graph.js';
 
 // All entity ids the character owns, for satisfying skill-prereqs.
 function ownedIds(character) {

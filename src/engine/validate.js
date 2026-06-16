@@ -24,7 +24,7 @@ import {
   characterLevel, getLegalMinLevel,
   parseTrailingRank, rankOf, getMaxRanks, requiredLevel,
   pickClass, countPicksForClass, maxProgressionLevel, progressionRow,
-  activeInnatePowers, ownedGrantSources, grantedAbilities, grantIndex, derivedGrant,
+  activeInnatePowers,
 } from './validate/core.js';
 export {
   MAX_LBP, MAX_FLAW_BP, BACKSTORY_BP, MAX_DOMAINS, DEFAULT_WEALTH,
@@ -42,7 +42,8 @@ export { lbpState };
 // internally; re-export the public surface so the barrel keeps its API.
 import { computeSlots, spellSlots, bookcasterSpellOptions } from './validate/slots.js';
 export { innateBonusCantrips } from './validate/slots.js';
-import { resolveCharacterGraph } from './graph.js';
+import { resolveCharacterGraph, grantedAbilities } from './graph.js';
+export { grantedAbilities };
 import { computeBP } from './validate/bp-accounting.js';
 import { statMods as computeStatMods, levelStats as computeLevelStats } from './validate/derived-stats.js';
 import { wealthState as computeWealthState } from './validate/wealth-income.js';

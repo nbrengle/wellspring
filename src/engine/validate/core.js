@@ -14,7 +14,7 @@
 // Pure functions, no React. Re-exported by the validate.js barrel.
 
 import { LEVEL_TABLE, lookupEntity, REFS, CLASS_POWERS, CLASS_PROGRESSION, CLASS_POWER_SLOTS, EVENTS_TABLE } from "../../data/index.js";
-import { cleanItemName, bareSkill, resolveId, entityType, idName, getClasses, primaryClass } from '../resolver.js';
+import { cleanItemName, bareSkill, resolveId, entityType, getClasses, primaryClass } from '../resolver.js';
 
 // ─── Economy / level constants ──────────────────────────────────────────────
 
@@ -238,114 +238,4 @@ export function activeInnatePowers(character) {
   });
 
   return list;
-}
-
-// Grant/discount SOURCES the character owns: lineage advantages, purchased perks,
-// and class innate powers held at level. Returns [{ id, name, kind }].
-export function ownedGrantSources(character) {
-  const sources = [];
-  // Lineage advantages: registry id is "advantages:<Lineage> - <baseName>".
-  if (character?.lineage) {
-    for (const name of (character.lineageAdvantages || [])) {
-      const base = cleanItemName(name);
-      sources.push({ id: `advantages:${character.lineage} - ${base}`, name: base, kind: 'advantage' });
-    }
-  }
-  // Owned perks (purchased or class-granted).
-  for (const name of (character?.purchasedPerks || [])) {
-    const base = cleanItemName(name);
-    sources.push({ id: `perks:${base}`, name: base, kind: 'perk' });
-  }
-  // Class innate powers the character has at level (automatic features).
-  for (const ip of activeInnatePowers(character)) {
-    sources.push({ id: `powers:${ip.name}`, name: ip.name, kind: 'feature' });
-  }
-  // Powers the character has actually selected into slots (any tier) — a chosen
-  // power can itself grant an ability (e.g. Implicit Truths → Insight).
-  const seen = new Set(sources.map((s) => s.id));
-  for (const field of POWER_SOURCE_FIELDS) {
-    for (const item of (character[field] || [])) {
-      const id = `powers:${cleanItemName(item)}`;
-      if (!seen.has(id)) { seen.add(id); sources.push({ id, name: cleanItemName(item), kind: 'power' }); }
-    }
-  }
-  return sources;
-}
-
-// Named abilities the character GAINS FOR FREE from a source they own. Returns
-// { list, bySource }; list is [{ ability, abilityName, abilityType, source,
-// sourceId, sourceKind }], bySource groups list by sourceId.
-export function grantedAbilities(character) {
-  const grants = REFS.grants || {};
-  // Only sources that actually grant something (have a grants edge).
-  const sources = ownedGrantSources(character).filter((s) => grants[s.id]);
-
-  const list = [];
-  const bySource = {};
-  const CHOICE_RE = /\b(?:choose\s+one|gains?\s+one\s+of|one\s+of\s+the\s+following|gains?\s+one\s+skill)\b/i;
-  for (const src of sources) {
-    const ent = lookupEntity(src.id);
-    const isChoice = ent?.chooseOne?.kind === 'build' ||
-      CHOICE_RE.test(ent?.requirement || '') ||
-      CHOICE_RE.test(ent?.description || '') ||
-      CHOICE_RE.test(ent?.skillsAndOptions || '');
-    if (isChoice) continue;
-    const targets = grants[src.id];
-    if (!targets) continue;
-    for (const ability of targets) {
-      const ent = lookupEntity(ability);
-      const row = {
-        ability,
-        abilityName: ent?.name || idName(ability),
-        abilityType: ability.slice(0, ability.indexOf(':')),
-        source: src.name,
-        sourceId: src.id,
-        sourceKind: src.kind,
-      };
-      list.push(row);
-      (bySource[src.id] = bySource[src.id] || { source: src.name, sourceKind: src.kind, abilities: [] })
-        .abilities.push(row);
-    }
-  }
-
-  // Choice-driven grants: a build-time choose-one power (Expert Craft) grants the
-  // skill the player SELECTED for free. The choice is recorded on the character;
-  // resolve it to the same grant shape so it zeroes the skill's cost like any grant.
-  const push = (ability, src) => {
-    const ent = lookupEntity(ability);
-    const row = { ability, abilityName: ent?.name || idName(ability),
-      abilityType: ability.slice(0, ability.indexOf(':')), source: src, sourceId: `powers:${src}`, sourceKind: 'choice' };
-    list.push(row);
-    (bySource[row.sourceId] = bySource[row.sourceId] || { source: src, sourceKind: 'choice', abilities: [] }).abilities.push(row);
-  };
-  for (const field of POWER_SOURCE_FIELDS) {
-    for (const item of (character[field] || [])) {
-      const ent = lookupEntity(`powers:${cleanItemName(item)}`);
-      if (ent?.chooseOne?.kind !== 'build') continue;
-      const chosen = character.choices?.[`powers:${ent.name}`];
-      const opt = ent.chooseOne.options.find((o) => o.grantsSkill === chosen || o.text === chosen);
-      if (opt?.grantsSkill) push(`skills:${opt.grantsSkill}`, ent.name);
-    }
-  }
-  return { list, bySource };
-}
-
-// Index the character's granted abilities by target entity id → granting source
-// name. SAME computation as grantedAbilities() (the single source of truth);
-// cost-zeroing consumes this index rather than re-joining the grant graph.
-export function grantIndex(character) {
-  const idx = {};
-  for (const g of grantedAbilities(character).list) {
-    if (!(g.ability in idx)) idx[g.ability] = g.source;
-  }
-  return idx;
-}
-
-// Is this item granted-free by a source the character owns? Looks the item up in
-// the precomputed grant index. Returns a grant note {kind,source} for the badge,
-// or null. `ent` may be undefined.
-export function derivedGrant(item, field, ent, granted) {
-  const itemId = ent?.id || `${entityType(field)}:${bareSkill(cleanItemName(item))}`;
-  const source = granted?.[itemId];
-  return source ? { kind: 'grant', amount: null, source, derived: true } : null;
 }
