@@ -9,6 +9,7 @@ import {
 } from "../engine/validate.js";
 import { bareSkill, cleanItemName, getClasses } from "../engine/resolver.js";
 import { lookupCost } from "../engine/validate/cost-key.js";
+import { useBuilderState, useBuilderActions } from "./builder-context.jsx";
 import {
   STARTING_CHOICES_CONFIG, reconcileStartingChoices
 } from '../engine/starting-choices.js';
@@ -84,10 +85,13 @@ function grantSourceRole(grant) {
 }
 
 // ─── IDENTITY RAIL ───────────────────────────────────────────────────────────
-export function IdentityRail({ character, report, onClickField, onRestart,
-                               onSetClassLevel, onRemoveClass, onAddClass,
-                               onPickDevotion, onToggleDomain, onClearDevotion, onOpenLineage,
-                               onToggleBackstory, onInspect, onSetEvent, onSetExtraBP }) {
+export function IdentityRail() {
+  const { character, report } = useBuilderState();
+  const {
+    onClickField, onRestart, onSetClassLevel, onRemoveClass, onAddClass,
+    onPickDevotion, onToggleDomain, onClearDevotion, onOpenLineage,
+    onToggleBackstory, onInspect, onSetEvent, onSetExtraBP,
+  } = useBuilderActions();
   const classes = getClasses(character);
   return (
     <aside className="b-rail b-rail-left">
@@ -137,9 +141,7 @@ export function IdentityRail({ character, report, onClickField, onRestart,
         </span>
       </button>
 
-      <DevotionCard character={character} devotion={report.devotion}
-                    onPick={onPickDevotion} onToggleDomain={onToggleDomain}
-                    onClear={onClearDevotion} onInspect={() => onClickField("devotion")} />
+      <DevotionCard />
 
       <div className="b-stat-strip">
         <StatWithSources label="Life" title={statTitle(report.stats, "lifePoints", "Life Points")}
@@ -201,7 +203,7 @@ export function IdentityRail({ character, report, onClickField, onRestart,
 
       {report.spellSlots && <SpellSlotStrip slots={report.spellSlots} />}
 
-      <BudgetMeter report={report} character={character} onToggleBackstory={onToggleBackstory} onSetExtraBP={onSetExtraBP} />
+      <BudgetMeter />
 
       <button className="b-restart" onClick={onRestart}>
         <span className="b-restart-icon">↺</span> Start over
@@ -241,7 +243,11 @@ function ClassCard({ classes, spec, onSetLevel, onRemove, onAdd, onInspect }) {
   );
 }
 
-function DevotionCard({ character, devotion, onPick, onToggleDomain, onClear, onInspect }) {
+function DevotionCard() {
+  const { character, report } = useBuilderState();
+  const { onPickDevotion: onPick, onToggleDomain, onClearDevotion: onClear, onClickField } = useBuilderActions();
+  const devotion = report.devotion;
+  const onInspect = () => onClickField("devotion");
   if (!character.devotion || !devotion) {
     return (
       <button className="b-id-card is-empty" onClick={onPick}>
@@ -356,7 +362,9 @@ function SpellSlotStrip({ slots }) {
   );
 }
 
-function BudgetMeter({ report, character, onToggleBackstory, onSetExtraBP }) {
+function BudgetMeter() {
+  const { character, report } = useBuilderState();
+  const { onToggleBackstory, onSetExtraBP } = useBuilderActions();
   const { spend, budget, remaining, overBudget } = report;
   const pct = budget ? Math.min(100, (spend.net / budget) * 100) : 0;
 
@@ -414,7 +422,9 @@ function BudgetMeter({ report, character, onToggleBackstory, onSetExtraBP }) {
 }
 
 // ─── BUILD SHEET ─────────────────────────────────────────────────────────────
-function LineageSummary({ character, report, onInspect, onOpenLineage }) {
+function LineageSummary() {
+  const { character, report } = useBuilderState();
+  const { onInspect, onOpenLineage } = useBuilderActions();
   if (!character.lineage) return null;
   const lbp = report.lbp;
   const chosen = lbp?.chosenAdvantages || [];
@@ -476,7 +486,9 @@ function LineageSummary({ character, report, onInspect, onOpenLineage }) {
   );
 }
 
-function StartingChoicesSection({ character, onSetSpecialty }) {
+function StartingChoicesSection() {
+  const { character } = useBuilderState();
+  const { onSetSpecialty } = useBuilderActions();
   const primary = getClasses(character)[0]?.name;
   const configs = (primary && STARTING_CHOICES_CONFIG[primary]) || [];
   const selected = useMemo(() => {
@@ -514,13 +526,12 @@ function StartingChoicesSection({ character, onSetSpecialty }) {
   );
 }
 
-export default function BuildSheet({ character, report, view, onPickArchetype, onStartBlank, onInspect, onOpenSlot, onOpenAdd, onRemoveEntity, onSetName, onOpenLineage, onSetRank, onSetSpecialty }) {
+export default function BuildSheet() {
+  const { character, report } = useBuilderState();
+  const { onPickArchetype, onStartBlank, onInspect, onOpenAdd, onSetName } = useBuilderActions();
   if (!character.archetypeName) {
     return <ArchetypePicker onPick={onPickArchetype} onStartBlank={onStartBlank} />;
   }
-  const isFocused = (item, field) =>
-    view?.mode === "inspect" && view.item === item && view.field === field;
-
   const owned = report.owned || { skills: [], perks: [], classPowers: [], innatePowers: [] };
 
   return (
@@ -541,19 +552,17 @@ export default function BuildSheet({ character, report, view, onPickArchetype, o
         </p>
       </header>
 
-      <StartingChoicesSection character={character} onSetSpecialty={onSetSpecialty} />
+      <StartingChoicesSection />
 
       <Section title="Skills" tone="amber" onAdd={() => onOpenAdd("skill")}>
-        <ClassifiedRows rows={owned.skills} resolveType="skills" report={report}
-          onClick={onInspect} isFocused={isFocused} onRemove={onRemoveEntity} onSetRank={onSetRank} character={character} />
+        <ClassifiedRows rows={owned.skills} resolveType="skills" />
       </Section>
 
       <Section title="Perks" tone="teal" onAdd={() => onOpenAdd("perk")}>
-        <ClassifiedRows rows={owned.perks} resolveType="perks" report={report}
-          onClick={onInspect} isFocused={isFocused} onRemove={onRemoveEntity} onSetRank={onSetRank} character={character} />
+        <ClassifiedRows rows={owned.perks} resolveType="perks" />
       </Section>
 
-      <LineageSummary character={character} report={report} onInspect={onInspect} onOpenLineage={onOpenLineage} />
+      <LineageSummary />
 
       {report.devotion?.chosen.length > 0 && (
         <Section title={`Domain Powers — ${report.devotion.chosen.join(" · ")}`} tone="purple"
@@ -561,42 +570,33 @@ export default function BuildSheet({ character, report, view, onPickArchetype, o
           {!report.devotion.worship && (
             <p className="b-empty">Take the Worship skill to purchase domain powers.</p>
           )}
-          <EditableRows
-            items={character.domainPowers} field="domainPowers" resolveType="powers" report={report}
-            onClick={onInspect} isFocused={isFocused}
-            removable={() => true} onRemove={(i) => onRemoveEntity("domainPowers", i)} onSetRank={onSetRank} character={character} />
+          <EditableRows items={character.domainPowers} field="domainPowers" resolveType="powers" removable={() => true} />
         </Section>
       )}
 
       {getClasses(character).length > 0 && (
         <Section title="Class Powers" tone="purple" onAdd={() => onOpenAdd("classPower")}>
-          <ClassifiedRows rows={owned.classPowers} resolveType="powers" report={report}
-            onClick={onInspect} isFocused={isFocused} onRemove={onRemoveEntity} showClass onSetRank={onSetRank} character={character} />
+          <ClassifiedRows rows={owned.classPowers} resolveType="powers" showClass />
         </Section>
       )}
 
       {owned.innatePowers && owned.innatePowers.length > 0 && (
         <Section title="Innate Powers" tone="purple">
-          <ClassifiedRows rows={owned.innatePowers} resolveType="powers" report={report}
-            onClick={onInspect} isFocused={isFocused} onRemove={onRemoveEntity} showClass onSetRank={onSetRank} character={character} />
+          <ClassifiedRows rows={owned.innatePowers} resolveType="powers" showClass />
         </Section>
       )}
 
       {report.slots.length > 0 && (
         <Section title="Powers" tone="purple">
           {report.slots.map((slot) => (
-            <SlotBlock key={`${slot.cls}-${slot.category}`} slot={slot} character={character}
-                       onInspect={onInspect} onOpenSlot={onOpenSlot} isFocused={isFocused}
+            <SlotBlock key={`${slot.cls}-${slot.category}`} slot={slot}
                        pickClassOf={(field, i, name) => pickClass(character, field, i, name)} />
           ))}
         </Section>
       )}
 
       <Section title="Flaws" tone="red" onAdd={() => onOpenAdd("flaw")}>
-        <EditableRows
-          items={character.flaws} field="flaws" resolveType="flaws" report={report}
-          onClick={onInspect} isFocused={isFocused}
-          removable={() => true} onRemove={(i) => onRemoveEntity("flaws", i)} onSetRank={onSetRank} character={character} />
+        <EditableRows items={character.flaws} field="flaws" resolveType="flaws" removable={() => true} />
       </Section>
 
       {report.crafting?.any && (
@@ -648,7 +648,11 @@ function Section({ title, tone = "amber", onAdd, children }) {
   );
 }
 
-function SlotBlock({ slot, character, onInspect, onOpenSlot, isFocused, pickClassOf }) {
+function SlotBlock({ slot, pickClassOf }) {
+  const { character, view } = useBuilderState();
+  const { onInspect, onOpenSlot } = useBuilderActions();
+  const isFocused = (item, field) =>
+    view?.mode === "inspect" && view.item === item && view.field === field;
   const fields = slot.category === "spellsKnown"
     ? ["noviceSpells", "adeptSpells", "greaterSpells"]
     : [SLOT_FIELD[slot.category]];
@@ -731,7 +735,11 @@ function CostBadge({ cost }) {
   return <span className={`b-row-bp ${cost.cost === 0 ? "is-free" : ""}`}>{cost.cost === 0 ? "free" : `${cost.cost} BP`}</span>;
 }
 
-function ClassifiedRows({ rows, resolveType, report, onClick, isFocused, onRemove, showClass, onSetRank, character }) {
+function ClassifiedRows({ rows, resolveType, showClass }) {
+  const { character, view } = useBuilderState();
+  const { onInspect: onClick, onRemoveEntity: onRemove, onSetRank } = useBuilderActions();
+  const isFocused = (item, field) =>
+    view?.mode === "inspect" && view.item === item && view.field === field;
   if (!rows || rows.length === 0) return <p className="b-empty">none</p>;
   return (
     <ul className="b-rows">
@@ -798,7 +806,11 @@ function ClassifiedRows({ rows, resolveType, report, onClick, isFocused, onRemov
   );
 }
 
-function EditableRows({ items, field, onClick, isFocused, resolveType, report, removable, onRemove, onSetRank, character }) {
+function EditableRows({ items, field, resolveType, removable }) {
+  const { character, report, view } = useBuilderState();
+  const { onInspect: onClick, onRemoveEntity, onSetRank } = useBuilderActions();
+  const isFocused = (item, fld) =>
+    view?.mode === "inspect" && view.item === item && view.field === fld;
   if (!items || items.length === 0) {
     return <p className="b-empty">none</p>;
   }
@@ -820,7 +832,7 @@ function EditableRows({ items, field, onClick, isFocused, resolveType, report, r
             </button>
             <CostBadge cost={cost} />
             {canRemove && (
-              <button className="b-row-remove" title="Remove" aria-label={`Remove ${item}`} onClick={() => onRemove(i)}>×</button>
+              <button className="b-row-remove" title="Remove" aria-label={`Remove ${item}`} onClick={() => onRemoveEntity(field, i)}>×</button>
             )}
           </li>
         );
