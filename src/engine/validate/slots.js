@@ -11,7 +11,7 @@ import { cleanItemName, resolveId, getClasses } from '../resolver.js';
 import { SPELL_TIERS, SLOT_CATS, BOOKCASTER_TIER_FIELD, KNOWN_SPELL_FIELDS } from '../config.js';
 import {
   rankOf, pickClass, countPicksForClass, progressionRow,
-  activeInnatePowers, CASTER_SLOT_FIELDS, MARTIAL_SLOT_FIELDS,
+  activeInnatePowers, CASTER_SLOT_FIELDS, MARTIAL_SLOT_FIELDS, POWER_SOURCE_FIELDS
 } from './core.js';
 
 // Bonus slots, keyed PER CLASS as "class:category" → count. Class features
@@ -38,10 +38,11 @@ export function slotGrants(character) {
   //    Extended Capacity, Spell-Scholar). The grants are parser-extracted
   //    (ent.slotGrants); attribute each to the relevant class and multiply by the
   //    item's rank ("Extended Capacity - Novice x2" → +2).
-  for (const field of ['startingSkills', 'purchasedSkills']) {
+  for (const field of ['startingSkills', 'purchasedSkills', ...POWER_SOURCE_FIELDS]) {
     (character[field] || []).forEach((item, idx) => {
       const ent = lookupEntity(resolveId(item, field, character))
-        || lookupEntity(`skills:${cleanItemName(item)}`);
+        || lookupEntity(`skills:${cleanItemName(item)}`)
+        || lookupEntity(`powers:${cleanItemName(item)}`);
       const rank = rankOf(character, field, idx);
       for (const { cat, n } of (ent?.slotGrants || [])) addTo(classFor(cat), cat, n * rank);
     });

@@ -85,7 +85,13 @@
     "prereq": "None",
     "ranks": null,
     "category": "Martial",
-    "description": "The character can benefit from up to two Armor Points of repped armor. Their total armor can still be altered by character Skills and Powers, which may increase their armor above this repped armor maximum."
+    "description": "The character can benefit from up to two Armor Points of repped armor. Their total armor can still be altered by character Skills and Powers, which may increase their armor above this repped armor maximum.",
+    "statMods": [
+      {
+        "stat": "armor",
+        "n": 2
+      }
+    ]
   },
   {
     "name": "Light Armor",
@@ -93,7 +99,13 @@
     "prereq": "Basic Armor",
     "ranks": null,
     "category": "Martial",
-    "description": "The character can benefit from up to four Armor Points of repped armor. Their total armor can still be altered by character Skills and Powers, which may increase their armor above this repped armor maximum."
+    "description": "The character can benefit from up to four Armor Points of repped armor. Their total armor can still be altered by character Skills and Powers, which may increase their armor above this repped armor maximum.",
+    "statMods": [
+      {
+        "stat": "armor",
+        "n": 4
+      }
+    ]
   },
   {
     "name": "Medium Armor",
@@ -101,7 +113,13 @@
     "prereq": "Light Armor",
     "ranks": null,
     "category": "Martial",
-    "description": "The character can benefit from up to six Armor Points of repped armor. Their total armor can still be altered by character Skills and Powers, which may increase their armor above this repped armor maximum."
+    "description": "The character can benefit from up to six Armor Points of repped armor. Their total armor can still be altered by character Skills and Powers, which may increase their armor above this repped armor maximum.",
+    "statMods": [
+      {
+        "stat": "armor",
+        "n": 6
+      }
+    ]
   },
   {
     "name": "Heavy Armor",
@@ -109,7 +127,13 @@
     "prereq": "Medium Armor",
     "ranks": null,
     "category": "Martial",
-    "description": "The character can benefit from up to eight Armor Points of repped armor. Their total armor can still be altered by character Skills and Powers, which may increase their armor above this repped armor maximum."
+    "description": "The character can benefit from up to eight Armor Points of repped armor. Their total armor can still be altered by character Skills and Powers, which may increase their armor above this repped armor maximum.",
+    "statMods": [
+      {
+        "stat": "armor",
+        "n": 8
+      }
+    ]
   },
   {
     "name": "Ironclad Armor",
