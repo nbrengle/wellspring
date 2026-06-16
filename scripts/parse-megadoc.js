@@ -751,6 +751,8 @@ function statModsFromText(text) {
 // opt out — those are not permanent build stats.
 function extractStatMods(entity) {
   if ((entity.tags || []).includes('Form')) return;
+  // Skip tactical spells and rituals — only durable build stats belong on the character sheet
+  if (/\b(?:Spell|Spell-?Slot|Ritual)\b/i.test(entity.refresh || '')) return;
   const { mods, variableNaturalArmor } = statModsFromText(entity.description || entity.desc || '');
   if (mods.length) entity.statMods = mods;
   if (variableNaturalArmor) (entity.statModNotes ||= []).push({ stat: 'naturalArmor', text: 'variable' });
