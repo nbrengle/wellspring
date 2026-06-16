@@ -43,6 +43,7 @@ export { innateBonusCantrips } from './validate/slots.js';
 import { resolveCharacterGraph, grantedAbilities } from './graph.js';
 export { grantedAbilities };
 import { computeBP } from './validate/bp-accounting.js';
+import { lookupCost } from './validate/cost-key.js';
 import { statMods as computeStatMods, levelStats as computeLevelStats } from './validate/derived-stats.js';
 import { wealthState as computeWealthState } from './validate/wealth-income.js';
 
@@ -384,6 +385,13 @@ export function validate(character) {
   const granted = grantedAbilities(character);
   const crafting = craftingCapability(character);
   const owned = classifyOwnedItems(character);
+  // Attach each classified row's computed cost record (from the BP ledger) so the
+  // UI reads `row.cost` directly instead of reconstructing a ledger key per row.
+  for (const bucket of ['skills', 'perks', 'classPowers']) {
+    for (const row of owned[bucket]) {
+      row.cost = lookupCost(spend.byItem, row.field, row.name, row.index);
+    }
+  }
   const powerBenefits = activePowerBenefits(character);
   const prereqs = checkPrereqs(character);
   const slotsOver = slots.some((s) => s.over);
