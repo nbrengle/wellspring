@@ -282,15 +282,21 @@
           "options": [
             {
               "text": "Greater Alchemy (5)",
-              "grantsSkill": "Greater Alchemy"
+              "grants": [
+                "Greater Alchemy"
+              ]
             },
             {
               "text": "Greater Enchanting (5)",
-              "grantsSkill": "Greater Enchanting"
+              "grants": [
+                "Greater Enchanting"
+              ]
             },
             {
               "text": "Greater Tinkering (5)",
-              "grantsSkill": "Greater Tinkering"
+              "grants": [
+                "Greater Tinkering"
+              ]
             }
           ]
         },
@@ -6041,7 +6047,33 @@
         "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The caster must immediately drop everything they are holding and will go insubstantial. They then have a Slow Count of 15 to perform one action and return to the approximate spot where they completed the incant. At the end of the Slow Count of 15 the caster must immediately return to where they were at the start of the spell, and cure their insubstantial Condition. The action must be one of the following: pushing a spot with one finger, picking up a small object (no larger than two fists) and placing it/throwing it, pulling on something with one hand, gesturing to another individual with one hand, or tapping a character on the shoulder (if the character has prior explicit consent only). If this movement triggers a trap, the Mage will be considered to have tripped the trap while momentarily physical, and therefore take the effects of the trap per the normal Insubstantial rules. This cantrip can only be cast out of combat. Note: This spell offers interaction normally unavailable to Insubstantial creatures."
+        "description": "The caster must immediately drop everything they are holding and will go insubstantial. They then have a Slow Count of 15 to perform one action and return to the approximate spot where they completed the incant. At the end of the Slow Count of 15 the caster must immediately return to where they were at the start of the spell, and cure their insubstantial Condition. The action must be one of the following: pushing a spot with one finger, picking up a small object (no larger than two fists) and placing it/throwing it, pulling on something with one hand, gesturing to another individual with one hand, or tapping a character on the shoulder (if the character has prior explicit consent only). If this movement triggers a trap, the Mage will be considered to have tripped the trap while momentarily physical, and therefore take the effects of the trap per the normal Insubstantial rules. This cantrip can only be cast out of combat. Note: This spell offers interaction normally unavailable to Insubstantial creatures.",
+        "chooseOne": {
+          "kind": "play",
+          "options": [
+            {
+              "text": "pushing a spot with one finger"
+            },
+            {
+              "text": "picking up a small object (no larger than two fists) and placing it/throwing it"
+            },
+            {
+              "text": "pulling on something with one hand"
+            },
+            {
+              "text": "gesturing to another individual with one hand"
+            },
+            {
+              "text": "tapping a character on the shoulder (if the character has prior explicit consent only). If this movement triggers a trap"
+            },
+            {
+              "text": "the Mage will be considered to have tripped the trap while momentarily physical"
+            },
+            {
+              "text": "and therefore take the effects of the trap per the normal Insubstantial rules. This cantrip can only be cast out of combat. Note: This spell offers interaction normally unavailable to Insubstantial creatures"
+            }
+          ]
+        }
       },
       {
         "name": "Identify",
@@ -7340,7 +7372,33 @@
         "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Rogue gains the Two Weapon Style (2) and Weapon Specialization (4) in one of the following weapons: Swords, Thrown Weapons, or Daggers."
+        "description": "The Rogue gains the Two Weapon Style (2) and Weapon Specialization (4) in one of the following weapons: Swords, Thrown Weapons, or Daggers.",
+        "chooseOne": {
+          "kind": "build",
+          "options": [
+            {
+              "text": "Swords",
+              "grantsSkills": [
+                "Weapon Specialization - Swords",
+                "Two Weapon Style"
+              ]
+            },
+            {
+              "text": "Thrown Weapons",
+              "grantsSkills": [
+                "Weapon Specialization - Thrown Weapons",
+                "Two Weapon Style"
+              ]
+            },
+            {
+              "text": "Daggers",
+              "grantsSkills": [
+                "Weapon Specialization - Daggers",
+                "Two Weapon Style"
+              ]
+            }
+          ]
+        }
       }
     ],
     "basic": [
@@ -9000,7 +9058,18 @@
         "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Socialite is the master of their mind and is able to steel themself against mental trials. Choose one of the following Accents when this power is used: Fear or Mind. The Socialite may then Focus for a Quick 100 to Grant themselves a Protect vs the chosen Accent. They may re-apply this Protect by Focusing for another Quick 100 until they complete a Short Rest."
+        "description": "The Socialite is the master of their mind and is able to steel themself against mental trials. Choose one of the following Accents when this power is used: Fear or Mind. The Socialite may then Focus for a Quick 100 to Grant themselves a Protect vs the chosen Accent. They may re-apply this Protect by Focusing for another Quick 100 until they complete a Short Rest.",
+        "chooseOne": {
+          "kind": "play",
+          "options": [
+            {
+              "text": "Fear"
+            },
+            {
+              "text": "Mind. The Socialite may then Focus for a Quick 100 to Grant themselves a Protect vs the chosen Accent. They may re-apply this Protect by Focusing for another Quick 100 until they complete a Short Rest"
+            }
+          ]
+        }
       },
       {
         "name": "Hard to Read",
@@ -9820,7 +9889,66 @@
         "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "Requirements: Sourcerer Level 1 Incantation: None Call: None Target: Self                                        Duration: Instantaneous Delivery: None                                        Refresh: Immediate The Sourcerer has an item (See Arcane Source, above) that is special to them. The character may begin with an object of their choice empowered as a Source. Arcane Sources must be a solid durable object at least 5” in one dimension and 1” in the others. After completing a Long Rest, a Sourcerer may empower a new object as their Source (the other one loses its Source properties). This Source must follow all rules defining an appropriate object. If that object is not an Empowered Source, it is attuned to one of the following Accents: Acid, Ice, Flame, or Lightning, chosen at the time of designation as a Source. This Chosen Accent is called their Arcane Accent. The Sorcerer may only have one Source at any one time, and this Source will only work for the Sourcerer who designated it. However, the Source comes with some risk: should the Sourcerer find themself without an Arcane Source, they will lose access to all Sourcerer Spell-Slots and Known Spells until the Arcane Source is back in hand or a new object is designated (at a Long Rest, see above). Once per Short Rest, the Sourcerer may re-Empower a broken or shattered Arcane Source by performing a personal rite over the Source. If it was Shattered, the Source must first be Rebuilt. Once the Sourcerer has reached 10th Sourcerer level, when empowering an Arcane Source, the Sourcerer may choose an additional Arcane Accent for the Source. While wielding the enhanced Source, the caster may use either Accent when the [Arcane Accent] is noted. When choosing this Arcane Accent for a given Power, all instances of the [Arcane Accent] must be the same Accent. Note: The Sourcerer’s Arcane Source takes the place of the Basic Arcane Spellbook. The Sourcerer cannot use Powers or Skills that rely on a Spellbook for their Sourcerer Spells."
+        "description": "Requirements: Sourcerer Level 1 Incantation: None Call: None Target: Self                                        Duration: Instantaneous Delivery: None                                        Refresh: Immediate The Sourcerer has an item (See Arcane Source, above) that is special to them. The character may begin with an object of their choice empowered as a Source. Arcane Sources must be a solid durable object at least 5” in one dimension and 1” in the others. After completing a Long Rest, a Sourcerer may empower a new object as their Source (the other one loses its Source properties). This Source must follow all rules defining an appropriate object. If that object is not an Empowered Source, it is attuned to one of the following Accents: Acid, Ice, Flame, or Lightning, chosen at the time of designation as a Source. This Chosen Accent is called their Arcane Accent. The Sorcerer may only have one Source at any one time, and this Source will only work for the Sourcerer who designated it. However, the Source comes with some risk: should the Sourcerer find themself without an Arcane Source, they will lose access to all Sourcerer Spell-Slots and Known Spells until the Arcane Source is back in hand or a new object is designated (at a Long Rest, see above). Once per Short Rest, the Sourcerer may re-Empower a broken or shattered Arcane Source by performing a personal rite over the Source. If it was Shattered, the Source must first be Rebuilt. Once the Sourcerer has reached 10th Sourcerer level, when empowering an Arcane Source, the Sourcerer may choose an additional Arcane Accent for the Source. While wielding the enhanced Source, the caster may use either Accent when the [Arcane Accent] is noted. When choosing this Arcane Accent for a given Power, all instances of the [Arcane Accent] must be the same Accent. Note: The Sourcerer’s Arcane Source takes the place of the Basic Arcane Spellbook. The Sourcerer cannot use Powers or Skills that rely on a Spellbook for their Sourcerer Spells.",
+        "chooseOne": {
+          "kind": "play",
+          "options": [
+            {
+              "text": "Acid"
+            },
+            {
+              "text": "Ice"
+            },
+            {
+              "text": "Flame"
+            },
+            {
+              "text": "Lightning"
+            },
+            {
+              "text": "chosen at the time of designation as a Source. This Chosen Accent is called their Arcane Accent. The Sorcerer may only have one Source at any one time"
+            },
+            {
+              "text": "and this Source will only work for the Sourcerer who designated it. However"
+            },
+            {
+              "text": "the Source comes with some risk: should the Sourcerer find themself without an Arcane Source"
+            },
+            {
+              "text": "they will lose access to all Sourcerer Spell-Slots and Known Spells until the Arcane Source is back in hand"
+            },
+            {
+              "text": "a new object is designated (at a Long Rest"
+            },
+            {
+              "text": "see above). Once per Short Rest"
+            },
+            {
+              "text": "the Sourcerer may re-Empower a broken"
+            },
+            {
+              "text": "shattered Arcane Source by performing a personal rite over the Source. If it was Shattered"
+            },
+            {
+              "text": "the Source must first be Rebuilt. Once the Sourcerer has reached 10th Sourcerer level"
+            },
+            {
+              "text": "when empowering an Arcane Source"
+            },
+            {
+              "text": "the Sourcerer may choose an additional Arcane Accent for the Source. While wielding the enhanced Source"
+            },
+            {
+              "text": "the caster may use either Accent when the [Arcane Accent] is noted. When choosing this Arcane Accent for a given Power"
+            },
+            {
+              "text": "all instances of the [Arcane Accent] must be the same Accent. Note: The Sourcerer’s Arcane Source takes the place of the Basic Arcane Spellbook. The Sourcerer cannot use Powers"
+            },
+            {
+              "text": "Skills that rely on a Spellbook for their Sourcerer Spells"
+            }
+          ]
+        }
       },
       {
         "name": "Astride the Weave",

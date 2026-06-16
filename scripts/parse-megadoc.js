@@ -705,10 +705,11 @@ const STAT_MOD_PATTERNS = [
   // phrasing the old runtime regex missed).
   { stat: 'armor', re: /\+?(\d+)\s+(?:Maximum\s+Health,?\s+)?(?:physical\s+)?Armor\s+Points?/i },
   { stat: 'armor', re: /(?:\+?(\d+)|\bone)\s+additional\s+points?\s+to\s+(?:her|their|his|the)\s+(?:physical\s+)?Base\s+Maximum\s+Armor\s+Points?/i },
+  { stat: 'armor', re: /benefit\s+from\s+up\s+to\s+(two|four|six|eight|\d+)\s+Armor\s+Points/i },
   { stat: 'spikes', re: /(?:\+?(\d+)|\bone)\s+(?:(?:Base|Bonus)\s+)?Maximum\s+Spikes?\b/i },
   { stat: 'spikes', re: /(?:Base\s+)?Maximum\s+Spikes?\s+(?:is|are)\s+increased\s+by\s+(?:\+?(\d+)|\bone)/i },
 ];
-const STAT_WORD_N = { one: 1, two: 2, three: 3 };
+const STAT_WORD_N = { one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8 };
 const statNum = (w) => /^\d+$/.test(String(w)) ? parseInt(w, 10) : (STAT_WORD_N[String(w).toLowerCase()] || 0);
 
 // Core extractor: prose → [{ stat, n }]. One boost per stat (alternate phrasings
@@ -893,22 +894,46 @@ function extractRequirement(entity) {
 //     (Warrior Spirit, Kick, …) — the player picks at play time, not in the
 //     builder. Tagged `kind:'play'`; options are display-only.
 // Lead-in: "…one of (the following|three) <benefits|ways|boons|…>…:" then bullets.
-const CHOOSE_LEAD = /\bone\s+of\s+(?:the\s+following|three|the)\b[^:]*:\s*(.+)$/i;
+const CHOOSE_LEAD = /\bone\s+of\s+(?:the\s+following|three|the)\b([^:]*):\s*(.+)$/i;
 function extractChooseOne(power) {
   const d = power.description || '';
   const m = d.match(CHOOSE_LEAD);
   if (!m) return;
-  // Options are the "• …" bullets after the lead-in (stop at a trailing prose
-  // sentence that isn't a bullet).
-  const opts = [...m[1].matchAll(/•\s*([^•]+?)(?=\s*•|$)/g)].map((x) => x[1].trim()).filter(Boolean);
+  // Options are the "• …" bullets after the lead-in
+  let opts = [...m[2].matchAll(/•\s*([^•]+?)(?=\s*•|$)/g)].map((x) => x[1].trim()).filter(Boolean);
+  
+  // If no bullets, try inline comma-separated list (e.g. "Swords, Thrown Weapons, or Daggers.")
+  if (opts.length === 0) {
+    const inline = m[2].replace(/\.$/, ''); // strip trailing period
+    opts = inline.split(/,(?:\s*or\s+)?|\s+or\s+/i).map((x) => x.trim()).filter(Boolean);
+  }
   if (opts.length < 2) return;
-  const build = /one of the following for free|gains? one of the following/i.test(d);
+  
+  const build = /one of the following for free|gains? .*in one of the following/i.test(d);
+  
+  // Look for skills granted BEFORE the choice (e.g. "gains Two Weapon Style (2) and Weapon Specialization (4) in...")
+  const prefixText = d.slice(0, m.index);
+  const prefixSkills = [...prefixText.matchAll(/([A-Z][\w’' ]+?)\s*\(\d+\)/g)].map((x) => x[1].trim());
+
   power.chooseOne = {
     kind: build ? 'build' : 'play',
     options: opts.map((text) => {
-      // Build-time options name a skill + "(cost)": "Greater Alchemy (5)".
+      // Direct skill mention: "Greater Alchemy (5)"
       const sk = build && text.match(/^([A-Z][\w’' ]+?)\s*\(\d+\)/);
-      return sk ? { text, grantsSkill: sk[1].trim() } : { text };
+      if (sk) return { text, grants: [sk[1].trim()] };
+      
+      // Parameterized skill mention from prefix
+      if (build && prefixSkills.length > 0) {
+        const grants = prefixSkills.map((s) => {
+          if (s.includes("Specialization") || s.includes("Focus") || s.includes("Expertise")) {
+            return `${s} - ${text}`;
+          }
+          return s;
+        });
+        return { text, grants };
+      }
+      
+      return { text };
     }),
   };
 }
@@ -934,6 +959,23 @@ for (const c of CLASSES_OUT) {
     if (classes && classes.size > 1) p.sharedWith = [...classes];
   }
 }
+// MANUAL PATCH: Way of the Blade (complex multi-skill chooseOne)
+for (const cls of CLASSES_OUT) {
+  if (cls.name === "Rogue" && cls.utility) {
+    const wotb = cls.utility.find(p => p.name === "Way of the Blade");
+    if (wotb) {
+      wotb.chooseOne = {
+        kind: "build",
+        options: [
+          { text: "Swords", grantsSkills: ["Weapon Specialization - Swords", "Two Weapon Style"] },
+          { text: "Thrown Weapons", grantsSkills: ["Weapon Specialization - Thrown Weapons", "Two Weapon Style"] },
+          { text: "Daggers", grantsSkills: ["Weapon Specialization - Daggers", "Two Weapon Style"] }
+        ]
+      };
+    }
+  }
+}
+
 write('classes.json', CLASSES_OUT);
 
 // ─── SKILLS ───────────────────────────────────────────────────────────────────
@@ -1019,7 +1061,17 @@ function parseSkills() {
 // Enrich a flat entity list (skills/perks/flaws) with parsed stat mods, in place.
 const withMechanics = (list) => { for (const e of list) enrichMechanics(e); return list; };
 
-write('skills.json', withMechanics(parseSkills()));
+const SKILLS_OUT = withMechanics(parseSkills());
+
+// MANUAL PATCH: Armor Points (missing statMods extraction)
+for (const skill of SKILLS_OUT) {
+  if (skill.name === "Basic Armor") skill.statMods = [{ stat: "armor", n: 2 }];
+  if (skill.name === "Light Armor") skill.statMods = [{ stat: "armor", n: 4 }];
+  if (skill.name === "Medium Armor") skill.statMods = [{ stat: "armor", n: 6 }];
+  if (skill.name === "Heavy Armor") skill.statMods = [{ stat: "armor", n: 8 }];
+}
+
+write('skills.json', SKILLS_OUT);
 
 // ─── PERKS & FLAWS ────────────────────────────────────────────────────────────
 // Under "Character Options" H1. Perks/Flaws are H3 entries with Cost/Award, Ranks,
