@@ -1567,6 +1567,26 @@ function parseLineages() {
         const required = tags.some(t => /^required$/i.test(t));
         const repped = tags.some(t => /^repped$/i.test(t));
         const lbp = costStr === 'Variable' ? null : parseInt(costStr);
+        let fullDesc = desc.trim();
+        let k = j + 1;
+        while (k < sEnd) {
+          const nxt = nodes[k];
+          if (nxt.type === 'heading' && nxt.level <= 3) break;
+          if (nxt.type === 'text' && ITEM_LINE.test(nxt.text)) break;
+          if (nxt.text) {
+            let txt = nxt.text.trim();
+            // Inject newlines before standard power fields to fix squashed text nodes
+            txt = txt.replace(/(Call:|Target:|Delivery:|Accent:|Duration:|Refresh:|Effect:)/g, '\n$1');
+            // Clean up missing space before Call if it got squashed
+            txt = txt.replace(/\]Call:/g, ']\nCall:');
+            // Remove huge blocks of spaces (like between Self and Duration)
+            txt = txt.replace(/ {5,}/g, ' ');
+            fullDesc += '\n\n' + txt;
+          }
+          k++;
+        }
+        j = k - 1;
+
         items.push({
           name: rawName.trim(),
           lbp,
@@ -1574,7 +1594,7 @@ function parseLineages() {
           repped,
           tags: tags.filter(t => !/^(required|repped)$/i.test(t)),
           sublineage: currentGroup,
-          description: desc.trim(),
+          description: fullDesc,
         });
       }
       return items;
