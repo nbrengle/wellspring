@@ -1,9 +1,10 @@
 import { lookupEntity, LINEAGES, CLASS_PROGRESSION, REFS } from "../data/index.js";
+import { startingSkillGrants } from "../data/starting-choices.js";
 import { cleanItemName, bareSkill, resolveId, entityType, getClasses, idName } from './resolver.js';
-import { 
-  characterLevel, parseTrailingRank, rankOf, 
-  BP_FIELDS, BP_POWER_FIELDS, POWER_SOURCE_FIELDS, 
-  activeInnatePowers
+import {
+  characterLevel, parseTrailingRank, rankOf,
+  BP_FIELDS, BP_POWER_FIELDS, POWER_SOURCE_FIELDS,
+  activeInnatePowers, multiclassGrants
 } from './validate/core.js';
 
 // Convert the flat character dictionary into a list of typed CharacterItems
@@ -11,6 +12,10 @@ export function resolveCharacterGraph(character) {
   const items = [];
   const charLevel = characterLevel(character);
   const classes = getClasses(character);
+  // Starting-skill provenance (which specialty block granted it) and the free-rank
+  // floor — DERIVED from the class config, keyed by startingSkills index. Attached
+  // to starting-skill nodes so consumers (classifyOwnedItems) read it off the graph.
+  const ssGrants = startingSkillGrants(character);
 
   const attachGlobalEffects = (id, effects, ent) => {
     if (REFS.discounts?.[id]) {
@@ -86,7 +91,11 @@ export function resolveCharacterGraph(character) {
       authoredCost,
       grantSidecar,
       entity: ent,
-      effects
+      effects,
+      // Starting-skill provenance (specialty block + free-rank floor), null/0 for
+      // other fields. Lets classifyOwnedItems read provenance straight off the graph.
+      specialty: field === 'startingSkills' ? (ssGrants.specialty[index] || null) : null,
+      floor: field === 'startingSkills' ? (ssGrants.floor[index] || 0) : 0,
     });
   };
 
@@ -166,7 +175,8 @@ export function resolveCharacterGraph(character) {
         rawString: ip.name,
         field: 'innatePowers',
         sourceType: 'innate',
-        index: -1,
+        cls: ip.cls ?? null,
+        index: ip.index !== undefined ? ip.index : -1,
         rank: 1,
         entity: ent,
         effects
@@ -200,6 +210,31 @@ export function resolveCharacterGraph(character) {
         effects
       });
     }
+  }
+
+  // 4.5 Multi-class-granted SKILLS — free skills a 2nd+ class grants. These are
+  // genuinely OWNED items (like innates/advantages), so they belong in the graph.
+  // (The matching `freeBP` — when a grant duplicates an owned skill — is a budget
+  // DERIVATION, not an item, and stays in validate(). computeBP already treats
+  // field 'multiclassGrant' as cost-0/derived-granted.)
+  const mcGrants = multiclassGrants(character);
+  for (const g of mcGrants.skills) {
+    const ent = lookupEntity(`skills:${bareSkill(cleanItemName(g.name))}`);
+    items.push({
+      id: ent?.id || `skills:${cleanItemName(g.name)}`,
+      name: g.name,
+      rawString: g.name,
+      field: 'multiclassGrant',
+      sourceType: 'multiclass',
+      grantedBy: g.source,
+      index: -1,
+      rank: 1,
+      baseCost: 0,
+      entity: ent,
+      effects: [],
+      specialty: null,
+      floor: 0,
+    });
   }
 
   // 5. Add Synthetic Item for Tax Evasion

@@ -9,8 +9,7 @@
 // Pure functions, no React, so the UI calls them in a useMemo and they stay
 // unit-testable. The character shape is the flat object from Builder.jsx.
 
-import { LEVEL_TABLE, lookupEntity, REFS, CLASS_POWER_SLOTS, CLASS_POWERS, CLASS_PROGRESSION, SPELLCASTERS, DEVOTIONS, DOMAINS, CLASSES, LINEAGES, CRAFTING, RITUALS, EVENTS_TABLE, UNLIMITED_SKILLS, BASE_CLASSES } from "../data/index.js";
-import { startingSkillGrants } from "../data/starting-choices.js";
+import { LEVEL_TABLE, lookupEntity, REFS, CLASS_POWER_SLOTS, CLASS_POWERS, CLASS_PROGRESSION, SPELLCASTERS, DEVOTIONS, DOMAINS, LINEAGES, CRAFTING, RITUALS, EVENTS_TABLE, UNLIMITED_SKILLS, BASE_CLASSES } from "../data/index.js";
 import { cleanItemName, bareSkill, resolveId, idName, entityType, getClasses, primaryClass } from './resolver.js';
 
 // Shared primitives now live in validate/core.js (hotspot split). Import the ones
@@ -24,7 +23,6 @@ import {
   characterLevel, getLegalMinLevel,
   parseTrailingRank, rankOf, getMaxRanks, requiredLevel,
   pickClass, countPicksForClass, maxProgressionLevel, progressionRow,
-  activeInnatePowers,
 } from './validate/core.js';
 export {
   MAX_LBP, MAX_FLAW_BP, BACKSTORY_BP, MAX_DOMAINS, DEFAULT_WEALTH,
@@ -129,40 +127,11 @@ export function devotionState(character) {
 
 // bareSkill helper is now imported from ./resolver.js
 
-// DERIVED multi-class grants — a pure function of the character's classes, so the
-// same rule drives both the forward path (materialize grants when a class is
-// added) and the reflective path (validate). Each class AFTER the first grants
-// its Multi-Class Skills; a granted skill the character already has instead
-// awards "free BP" equal to its cost (the "multiclass discount").
-// Returns { skills:[{name,source}], freeBP, freeBPItems:[{skill,source,bp}] }.
-// `skills` are the genuinely-new free skills; the caller decides whether to
-// display/merge them. Nothing here is cached on the character.
-export function multiclassGrants(character) {
-  const classes = getClasses(character);
-  const skills = [];
-  const freeBPItems = [];
-  let freeBP = 0;
-  // Skills the character already has from elsewhere (starting + purchased + the
-  // first class isn't re-granted). Track as we go so two classes granting the
-  // same skill only grant it once (second one becomes free BP).
-  const owned = new Set([
-    ...(character.startingSkills || []),
-    ...(character.purchasedSkills || []),
-  ].map(bareSkill));
-
-  classes.slice(1).forEach(({ name }) => {
-    for (const g of (CLASSES[name]?.multiclassGrants || [])) {
-      if (owned.has(bareSkill(g.name))) {
-        freeBP += g.cost || 0;
-        freeBPItems.push({ skill: g.name, source: name, bp: g.cost || 0 });
-      } else {
-        skills.push({ name: g.name, source: name });
-        owned.add(bareSkill(g.name));
-      }
-    }
-  });
-  return { skills, freeBP, freeBPItems };
-}
+// multiclassGrants moved to validate/core.js (the graph emits its `skills` as
+// owned items; validate() consumes its `freeBP` as a budget derivation). Import
+// for internal use and re-export to preserve the public API.
+import { multiclassGrants } from './validate/core.js';
+export { multiclassGrants };
 
 
 export function classifyOwnedItems(character) {
@@ -192,66 +161,64 @@ export function classifyOwnedItems(character) {
   // carries that block's label as provenance. DERIVED from the class config +
   // chosen options (not a persisted sidecar), so badges work on imported / hash-
   // loaded characters too, not only freshly-rebuilt ones.
-  const specialtyByIndex = startingSkillGrants(character).specialty;
-  const startFloors = startingSkillGrants(character).floor;
-  const specialtyOf = (field, index) =>
-    field === 'startingSkills' ? (specialtyByIndex[index] || null) : null;
-  const floorOf = (field, index) =>
-    field === 'startingSkills' ? (startFloors[index] || 0) : 0;
+  // Categorize each OWNED item (from the character graph — the single source of
+  // truth) into skills / perks / classPowers / innate. The graph already walks
+  // every owned field (incl. innates and multiclass-granted skills) and carries
+  // each item's field/index/specialty/floor, so this no longer re-walks the
+  // character. `source` is derived from the node's sourceType.
+  const SOURCE_OF = { starting: 'class', purchased: 'purchased', power: 'purchased', innate: 'class', multiclass: 'class' };
+  const graph = resolveCharacterGraph(character);
+  for (const node of graph.items) {
+    if (node.field === 'flaws' || node.field === 'synthetic' || node.field === 'lineageAdvantages') continue;
+    const { field, index } = node;
+    const source = SOURCE_OF[node.sourceType] || 'purchased';
+    const specialty = node.specialty || null;
+    const floor = node.floor || 0;
 
-  const classify = (field, source) => {
-    (character[field] || []).forEach((item, index) => {
-      const ent = resolve(item, field);
-      const t = ent?.type;
-      const specialty = specialtyOf(field, index);
-      const floor = floorOf(field, index);
-      // A class power (classSkills/Class tier) belonging to one of the character's
-      // classes → route to classPowers and suppress from the skills list.
-      if (t === 'powers' && CLASS_POWER_TIERS.has(ent.tier)
-          && (!ent.parentClass || classNames.has(ent.parentClass))) {
-        classPowers.push({ name: item, field, index, source, cls: ent.parentClass || null, specialty, floor });
-        flag(field, index);
-        return;
-      }
-      if (t === 'perks') {
-        perks.push({ name: item, field, index, source, cls: source === 'class' ? primary : null, specialty, floor });
-        if (field !== 'purchasedPerks') flag(field, index);
-        return;
-      }
-      // Genuine skill (or unresolved → treat as skill, its storage field).
-      skills.push({ name: item, field, index, source, cls: source === 'class' ? primary : null, specialty, floor });
-    });
-  };
+    // Innate powers: free class features.
+    if (node.sourceType === 'innate') {
+      innatePowers.push({ name: node.name, field: 'innatePowers', index, source: 'class', cls: node.cls ?? null });
+      continue;
+    }
+    // Multiclass-granted skills: free class features (carry their granting class).
+    if (node.sourceType === 'multiclass') {
+      skills.push({ name: node.name, field, index, source: 'class', grantedBy: node.grantedBy });
+      continue;
+    }
+    // Class powers stored in their own field are class powers by definition.
+    if (field === 'classPowers') {
+      classPowers.push({ name: node.rawString, field, index, source: 'purchased', cls: node.entity?.parentClass || null });
+      continue;
+    }
+    // Other chosen powers (utility/basic/spells/etc.) aren't part of the skill/perk
+    // /classPower buckets this function reports — skip them.
+    if (POWER_SOURCE_FIELDS.includes(field)) continue;
 
-  // First class grants startingSkills for free; purchased ones cost BP.
-  classify('startingSkills', 'class');
-  classify('purchasedSkills', 'purchased');
-  classify('purchasedPerks', 'purchased');
-  // Class powers stored in their own field are class powers by definition — add
-  // directly (no re-routing) so the Class Powers section is the union of the
-  // dedicated field and any class powers misfiled into the skill lists above.
-  (character.classPowers || []).forEach((item, index) => {
-    const ent = lookupEntity(`powers:${cleanItemName(item)}`);
-    classPowers.push({ name: item, field: 'classPowers', index, source: 'purchased', cls: ent?.parentClass || null });
-  });
-
-  // Innate powers are free class-granted powers.
-  activeInnatePowers(character).forEach((ip) => {
-    innatePowers.push({
-      name: ip.name,
-      field: 'innatePowers',
-      index: ip.index !== undefined ? ip.index : -1,
-      source: 'class',
-      cls: ip.cls
-    });
-  });
-
-  const mcGrants = multiclassGrants(character);
-  // Multiclass-granted skills are free class features.
-  for (const g of mcGrants.skills) {
-    skills.push({ name: g.name, field: 'multiclassGrant', index: -1, source: 'class', grantedBy: g.source });
+    // Skill/perk fields (startingSkills, purchasedSkills, purchasedPerks): resolve
+    // the item's real type to route it, matching the original fallback order.
+    const ent = resolve(node.rawString, field);
+    const t = ent?.type;
+    const item = node.rawString;
+    // A class power (classSkills/Class tier) misfiled into a skill field → route to
+    // classPowers and suppress from the skills list.
+    if (t === 'powers' && CLASS_POWER_TIERS.has(ent.tier)
+        && (!ent.parentClass || classNames.has(ent.parentClass))) {
+      classPowers.push({ name: item, field, index, source, cls: ent.parentClass || null, specialty, floor });
+      flag(field, index);
+      continue;
+    }
+    if (t === 'perks') {
+      perks.push({ name: item, field, index, source, cls: source === 'class' ? primary : null, specialty, floor });
+      if (field !== 'purchasedPerks') flag(field, index);
+      continue;
+    }
+    // Genuine skill (or unresolved → treat as skill, its storage field).
+    skills.push({ name: item, field, index, source, cls: source === 'class' ? primary : null, specialty, floor });
   }
-  for (const g of mcGrants.freeBPItems) {
+
+  // Refunded multiclass grants (a grant that duplicates an owned skill → free BP,
+  // not an item) are a DERIVATION, not graph items — surface them as display rows.
+  for (const g of multiclassGrants(character).freeBPItems) {
     skills.push({ name: g.skill, field: 'multiclassGrant', index: -1, source: 'class', grantedBy: g.source, refundedBP: g.bp });
   }
 

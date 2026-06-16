@@ -13,7 +13,7 @@
 //
 // Pure functions, no React. Re-exported by the validate.js barrel.
 
-import { LEVEL_TABLE, lookupEntity, REFS, CLASS_POWERS, CLASS_PROGRESSION, CLASS_POWER_SLOTS, EVENTS_TABLE } from "../../data/index.js";
+import { LEVEL_TABLE, lookupEntity, REFS, CLASS_POWERS, CLASS_PROGRESSION, CLASS_POWER_SLOTS, EVENTS_TABLE, CLASSES } from "../../data/index.js";
 import { cleanItemName, bareSkill, resolveId, entityType, getClasses, primaryClass } from '../resolver.js';
 
 // ─── Economy / level constants ──────────────────────────────────────────────
@@ -238,4 +238,36 @@ export function activeInnatePowers(character) {
   });
 
   return list;
+}
+
+// DERIVED multi-class grants — a pure function of the character's classes. Each
+// class AFTER the first grants its Multi-Class Skills; a granted skill the
+// character already has instead awards "free BP" equal to its cost. Returns
+// { skills:[{name,source}], freeBP, freeBPItems:[{skill,source,bp}] }. The
+// graph emits `skills` as owned items; validate() consumes `freeBP` as budget.
+export function multiclassGrants(character) {
+  const classes = getClasses(character);
+  const skills = [];
+  const freeBPItems = [];
+  let freeBP = 0;
+  // Skills the character already has from elsewhere (starting + purchased; the
+  // first class isn't re-granted). Track as we go so two classes granting the
+  // same skill only grant it once (the second becomes free BP).
+  const owned = new Set([
+    ...(character.startingSkills || []),
+    ...(character.purchasedSkills || []),
+  ].map(bareSkill));
+
+  classes.slice(1).forEach(({ name }) => {
+    for (const g of (CLASSES[name]?.multiclassGrants || [])) {
+      if (owned.has(bareSkill(g.name))) {
+        freeBP += g.cost || 0;
+        freeBPItems.push({ skill: g.name, source: name, bp: g.cost || 0 });
+      } else {
+        skills.push({ name: g.name, source: name });
+        owned.add(bareSkill(g.name));
+      }
+    }
+  });
+  return { skills, freeBP, freeBPItems };
 }
