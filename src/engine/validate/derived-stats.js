@@ -1,4 +1,4 @@
-import { LEVEL_TABLE, CLASS_PROGRESSION } from "../../data/index.js";
+import { LEVEL_TABLE, CLASS_PROGRESSION } from '../data.js';
 
 export function statMods(graph) {
   const mods = { lifePoints: 0, spikes: 0, naturalArmor: 0, armor: 0 };

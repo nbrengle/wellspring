@@ -7,7 +7,7 @@
 // lineage data + shared constants, so it lives in its own module and is re-exported
 // by the validate.js barrel for unchanged imports.
 
-import { LINEAGES, REFS } from '../../data/index.js';
+import { LINEAGES, REFS } from '../data.js';
 import { cleanItemName } from '../resolver.js';
 import { MAX_LBP, subKey } from './core.js';
 

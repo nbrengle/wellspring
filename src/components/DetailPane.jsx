@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo, useRef, Fragment } from "react";
 import {
   lookupEntity, REFS, DEVOTIONS, DOMAINS,
   UNLIMITED_SKILLS, ALL_SKILLS, LINEAGES
-} from "../data/index.js";
+} from '../engine/data.js';
 
 // Devotion names + Lore areas + Profession suggestions are derived from parsed data
 const DEVOTION_NAMES = DEVOTIONS.map((d) => d.name);

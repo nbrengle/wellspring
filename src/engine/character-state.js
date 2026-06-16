@@ -1,7 +1,7 @@
 import { getClasses } from "./resolver.js";
 import {
   STARTING_CHOICES_CONFIG, hasStartingChoices, reconcileStartingChoices, rebuildStartingSkills
-} from "../data/starting-choices.js";
+} from '../engine/starting-choices.js';
 
 // ─── INITIAL STATE TEMPLATE ──────────────────────────────────────────────────
 export const EMPTY_CHARACTER = {

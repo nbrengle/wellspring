@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from "react";
-import { REFS, lookupEntity, UNLIMITED_SKILLS } from "../data/index.js";
+import { REFS, lookupEntity, UNLIMITED_SKILLS } from '../engine/data.js';
 import { prereqStatus } from "../engine/validate.js";
 import { EntityBody } from "./DetailPane.jsx";
 

@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { REFS, LINEAGES, lookupEntity } from "../data/index.js";
+import { REFS, LINEAGES, lookupEntity } from '../engine/data.js';
 import { subKey } from "../engine/validate.js";
 
 export const cleanChallengeName = (s) => {

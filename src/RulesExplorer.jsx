@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect, useCallback } from "react";
-import { getAllEntities, lookupEntity } from "./data/index.js";
+import { getAllEntities, lookupEntity } from './engine/data.js';
 import { bareSkill, cleanItemName } from "./engine/resolver.js";
 import { EntityBody } from "./components/DetailPane.jsx";
 import "./RulesExplorer.css";
