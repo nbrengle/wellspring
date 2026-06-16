@@ -242,6 +242,31 @@ export function eligiblePowers(className, category) {
     .map(p => ({ ...p, tierList: tier })));
 }
 
+// Cantrip names a "Divine Magic" lineage advantage may grant: every cantrip of a
+// Divine spellcasting class. Rules knowledge — kept in the engine so the UI picker
+// doesn't re-derive it from CLASSES/CLASS_POWERS. Sorted, de-duped.
+export function divineCantripOptions() {
+  const divineClasses = Object.entries(CLASSES)
+    .filter(([, c]) => c.type === 'Spellcaster' && c.magicType === 'Divine')
+    .map(([name]) => name);
+  const cantrips = new Set();
+  for (const cls of divineClasses) {
+    for (const p of (CLASS_POWERS[cls]?.cantrips || [])) cantrips.add(p.name);
+  }
+  return [...cantrips].sort();
+}
+
+// The [Repped] challenges a Lost character may rep, grouped by source lineage
+// (every lineage other than Lost). Returns [[lineageName, challenges[]], …] for
+// lineages that have at least one repped challenge. Rules knowledge — see Lost
+// Life / Additional Lost Life.
+export function lineageRepOptions() {
+  return Object.entries(LINEAGES)
+    .filter(([name]) => name !== 'Lost')
+    .map(([name, lin]) => [name, (lin.challenges || []).filter((c) => c.repped)])
+    .filter(([, challenges]) => challenges.length > 0);
+}
+
 // Power-slot counts at the starting level come from the progression table's
 // level-4 row, so they stay in sync with the source rather than being hardcoded.
 export const CLASS_POWER_SLOTS = Object.fromEntries(
