@@ -314,6 +314,15 @@ Format per item:
 
 ---
 
+## 13. Domain Powers — formatted as plain text instead of H3 headings
+
+- **What:** Several domain powers are formatted as bold text inside a regular paragraph instead of using the H3 heading style.
+- **Where:** Divine Domains (e.g., Nature's Form, Moving Grove, Purposed to Death).
+- **Parser workaround:** The parser regex now accepts the `Name - N BP` pattern inside standard text nodes (if they are short enough) to catch these.
+- **Wanted edit:** Style all domain powers as consistent H3 headings to match their peers.
+
+---
+
 ## Meta-question: Google Docs export quirks vs author choices
 
 Many of these (flat text vs `<td>`, BasicPowers vs Basic Powers) seem to be
