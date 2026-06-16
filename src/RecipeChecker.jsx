@@ -8,7 +8,7 @@ import {
   normalizeResourceName,
   classifyIngredient,
   buildCraftTree
-} from "./data/recipe-solver.js";
+} from "./engine/recipe-solver.js";
 import "./RecipeChecker.css";
 
 const STANDARD_RESOURCES = [

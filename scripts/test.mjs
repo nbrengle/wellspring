@@ -18,15 +18,15 @@ import {
   getMaxRanks, bookcasterSpellOptions
 } from "../src/engine/testing.js";
 import { bareSkill, cleanItemName, getClasses } from "../src/engine/resolver.js";
-import { formatCharacterSheet, parseCharacterSheet } from '../src/data/sheet.js';
-import { solveCrafting, RECIPES, resolveRecipe, classifyIngredient, buildCraftTree } from '../src/data/recipe-solver.js';
+import { formatCharacterSheet, parseCharacterSheet } from '../src/engine/sheet.js';
+import { solveCrafting, RECIPES, resolveRecipe, classifyIngredient, buildCraftTree } from '../src/engine/recipe-solver.js';
 import { readFileSync } from 'node:fs';
-import { lookupEntity, eligiblePowers, DEVOTIONS, DOMAINS, REFS, CLASSES, LINEAGES } from '../src/data/index.js';
+import { lookupEntity, eligiblePowers, DEVOTIONS, DOMAINS, REFS, CLASSES, LINEAGES } from '../src/engine/data.js';
 import {
   hasStartingChoices, reconcileStartingChoices, rebuildStartingSkills,
   STARTING_CHOICES_CONFIG, optionSkills, resolveSkill,
   configSkillKeys, sourceStartingSkillKeys,
-} from '../src/data/starting-choices.js';
+} from '../src/engine/starting-choices.js';
 import ARCHETYPES from '../src/data/archetypes.json' with { type: 'json' };
 import CLASSES_JSON from '../src/data/classes.json' with { type: 'json' };
 

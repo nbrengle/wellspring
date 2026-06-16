@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { REFS, LINEAGES, lookupEntity, CLASSES, CLASS_POWERS } from "../data/index.js";
+import { REFS, LINEAGES, lookupEntity, CLASSES, CLASS_POWERS } from "../engine/data.js";
 import { subKey } from "../engine/validate.js";
 
 const DIVINE_CANTRIPS = (() => {

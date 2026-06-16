@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from "react";
-import { formatCharacterSheet, parseCharacterSheet } from "../data/sheet.js";
+import { formatCharacterSheet, parseCharacterSheet } from "../engine/sheet.js";
 import { validate, validityReasons } from "../engine/validate.js";
 
 export default function ExportImportPanel({ character, report, onImport, onClose }) {
@@ -13,7 +13,7 @@ export default function ExportImportPanel({ character, report, onImport, onClose
     if (!file) return;
     try {
       const buf = await file.arrayBuffer();
-      const { parseXlsxCharacter } = await import("../data/xlsx-import.js");
+      const { parseXlsxCharacter } = await import('../engine/xlsx-import.js');
       setXlsx({ parsed: parseXlsxCharacter(buf) });
     } catch (err) {
       setXlsx({ error: String(err.message || err) });
@@ -49,7 +49,7 @@ export default function ExportImportPanel({ character, report, onImport, onClose
   const downloadXlsx = async () => {
     try {
       setXlsxError(null);
-      const { buildXlsxCharacter } = await import("../data/xlsx-import.js");
+      const { buildXlsxCharacter } = await import('../engine/xlsx-import.js');
       downloadBlob(buildXlsxCharacter(character, report),
         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "xlsx");
     } catch (err) {
