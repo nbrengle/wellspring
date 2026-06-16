@@ -51,6 +51,56 @@ async function run() {
       throw new Error(`Expected title to include "Pick a starting character", got "${titleText}"`);
     }
 
+    // --- CHARACTER CREATOR SMOKE TEST ---
+    // Drive the interactive build surface. The panels/pickers below are where a
+    // render-time crash (e.g. an undefined handler) actually surfaces — initial
+    // page load alone does NOT exercise them. Any pageerror/console error raised
+    // during these interactions is caught by the final assertion below.
+    console.log("Testing Character Creator: pick archetype, open panels...");
+    // Pick the first archetype to enter the builder.
+    await page.click('.b-archetype-card, .b-lin-card, button.b-pick-archetype', { timeout: 5000 }).catch(async () => {
+      // Fallback: click the first archetype-looking button.
+      await page.locator('button').filter({ hasText: /Fighter|Cleric|Rogue|Mage|Artisan|Sword/i }).first().click();
+    });
+    await page.waitForTimeout(300);
+
+    // Open the Lineage panel and pick a lineage — the exact path that regressed
+    // (LineagePanel referenced an undefined handler → whole tree unmounted).
+    const lineageOpener = page.locator('button').filter({ hasText: /lineage/i }).first();
+    if (await lineageOpener.count()) {
+      await lineageOpener.click();
+      await page.waitForSelector('.b-lin-card, .b-lin-list', { timeout: 5000 });
+      const firstLineage = page.locator('.b-lin-card').first();
+      if (await firstLineage.count()) {
+        await firstLineage.click();
+        await page.waitForTimeout(300);
+        // Picking a lineage must render its challenges/advantages, not a blank panel.
+        const rows = await page.locator('.b-lin-row').count();
+        if (rows === 0) {
+          throw new Error("Lineage panel rendered no challenge/advantage rows after picking a lineage (panel crashed?)");
+        }
+      }
+      // Close the panel.
+      await page.locator('.b-picker-x').first().click().catch(() => {});
+      await page.waitForTimeout(200);
+    }
+
+    // Open an "Add" picker (skill/perk) — exercises PickerOverlay.
+    const addBtn = page.locator('button').filter({ hasText: /^\s*\+/ }).first();
+    if (await addBtn.count()) {
+      await addBtn.click().catch(() => {});
+      await page.waitForTimeout(300);
+      await page.keyboard.press('Escape').catch(() => {});
+      await page.waitForTimeout(200);
+    }
+
+    // Fail loudly if ANY error fired during the creator interactions above.
+    if (errors.length > 0) {
+      console.error("FAIL: errors during Character Creator interaction:");
+      errors.forEach(e => console.error(e.message || e));
+      process.exit(1);
+    }
+
     // --- RULES EXPLORER TESTS ---
     console.log("Testing Rules Explorer mode switching...");
     await page.click('button:has-text("Rules Explorer")');
@@ -111,7 +161,17 @@ async function run() {
     // Switch back to creator
     console.log("Testing switching back to Character Creator...");
     await page.click('button:has-text("Character Creator")');
-    await page.waitForSelector('.b-sheet-title');
+    // The creator shows the build sheet (a character was picked above), so wait on
+    // the identity rail / sheet container rather than the "pick a character" title.
+    await page.waitForSelector('.b-id-value, .b-sheet-title, .b-build', { timeout: 5000 });
+
+    // Final gate: NO page/console error may have fired at any point in the run.
+    // This is the check that would have caught the lineage-panel crash.
+    if (errors.length > 0) {
+      console.error("FAIL: page/console errors detected during the session:");
+      errors.forEach(e => console.error(e.message || e));
+      process.exit(1);
+    }
 
     console.log("✓ Browser integration test passed successfully!");
   } catch (err) {
