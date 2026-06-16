@@ -51,6 +51,110 @@ async function run() {
       throw new Error(`Expected title to include "Pick a starting character", got "${titleText}"`);
     }
 
+    // --- CHARACTER CREATOR SMOKE TEST ---
+    // Drive EVERY top-level flow of the build surface. The panels/pickers below are
+    // where a render-time crash (e.g. an undefined handler) actually surfaces —
+    // initial page load alone does NOT exercise them. Each flow is opened, asserted
+    // to render something, and closed; any pageerror/console error during these
+    // interactions is caught by the assertion at the end of this block.
+    console.log("Testing Character Creator: every top-level flow...");
+
+    // Exercise a flow: click its trigger and let it render. The HARD gate for every
+    // flow is the page-error/console-error collector asserted at the end of this
+    // block — that's what catches a render crash like the lineage-panel regression.
+    // We do NOT require the overlay to appear, because whether a picker opens can
+    // depend on mutable build state (e.g. a devotion card that's already set shows
+    // inspect/clear instead of the picker); requiring it would make the test brittle
+    // without improving crash detection. The trigger MUST exist, though — a renamed
+    // selector should fail here, not silently skip the flow it guards.
+    const flow = async (label, trigger, closeFn) => {
+      console.log(`  · ${label}`);
+      const loc = typeof trigger === 'function' ? null : page.locator(trigger);
+      if (loc && (await loc.count()) === 0) {
+        throw new Error(`Flow "${label}": trigger "${trigger}" not found (selector changed?)`);
+      }
+      if (loc) await loc.first().click().catch(() => {});
+      else await trigger();
+      await page.waitForTimeout(300);
+      if (closeFn) { await closeFn(); await page.waitForTimeout(150); }
+    };
+
+    // Enter the builder via a CASTER archetype (Cleric): a caster exposes every
+    // top-level flow — devotion card + an open spell-slot picker — that a martial
+    // build hides. So one archetype exercises lineage, devotion, add-pickers,
+    // power-slot picker, export, and the mode tabs.
+    await page.locator('button, .b-archetype-card').filter({ hasText: /Cleric/i }).first().click()
+      .catch(async () => { await page.locator('button').filter({ hasText: /Fighter|Mage|Rogue|Artisan|Sword/i }).first().click(); });
+    // Entering the builder renders <Builder> — a render-time crash (the lineage
+    // regression was an undefined handler referenced here) fires a pageerror and
+    // unmounts the tree. Catch it immediately, with a clear message.
+    await page.waitForSelector('.b-id-card', { timeout: 5000 }).catch(() => {
+      throw new Error("Build sheet (.b-id-card) never rendered after picking an archetype — Builder crashed on render?");
+    });
+    if (errors.length > 0) {
+      console.error("FAIL: errors on entering the builder:");
+      errors.forEach(e => console.error(e.message || e));
+      process.exit(1);
+    }
+
+    const esc = async () => { await page.keyboard.press('Escape').catch(() => {}); };
+    const clickX = async () => { await page.locator('.b-picker-x, .b-overlay-close, [aria-label="Close"]').first().click().catch(() => {}); };
+
+    // 1. Lineage panel FIRST — open it and PICK a lineage. This is the exact path
+    //    that regressed (LineagePanel referenced an undefined handler → the whole
+    //    tree unmounted on open). Run on a clean build sheet so the failure points
+    //    straight here. HARD-assert the panel opens AND renders rows (not blank).
+    console.log("  · Lineage panel (+ pick)");
+    await page.locator('.b-id-card:has-text("Lineage")').first().click();
+    await page.waitForSelector('.b-lin-card, .b-lin-list', { timeout: 5000 }).catch(() => {
+      throw new Error("Lineage panel did not open after clicking the Lineage card — Builder crashed on opening it?");
+    });
+    const firstLineage = page.locator('.b-lin-card').first();
+    if (await firstLineage.count()) {
+      await firstLineage.click();
+      await page.waitForTimeout(300);
+      if ((await page.locator('.b-lin-row').count()) === 0) {
+        throw new Error("Lineage panel rendered no rows after picking a lineage (panel crashed?)");
+      }
+    }
+    await clickX();
+    await page.waitForTimeout(150);
+
+    // 2. Devotion card (caster) — opens the picker when empty, inspect/clear when set.
+    await flow('Devotion card', '.b-id-card:has-text("Devotion")', esc);
+
+    // 3. Add-entity pickers: Skill, Perk, Flaw, class, domain power, etc.
+    const addButtons = page.locator('.b-section-add, .b-class-add');
+    const addCount = await addButtons.count();
+    if (addCount === 0) throw new Error("No add pickers (.b-section-add/.b-class-add) found — build sheet didn't render?");
+    for (let i = 0; i < addCount; i++) {
+      await flow(`Add picker #${i + 1}`, () => addButtons.nth(i).click().catch(() => {}), esc);
+    }
+
+    // 4. Power-slot picker (Cantrip/Spell/Utility/etc.) — click the first open slot.
+    const slotAdd = page.locator('.b-slot-add');
+    if (await slotAdd.count()) {
+      await flow('Power-slot picker', () => slotAdd.first().click().catch(() => {}), esc);
+    }
+
+    // 5. Export / Import panel.
+    await flow('Export/Import panel', 'button:has-text("Export")', esc);
+
+    // 6. Recipe Explorer mode.
+    await flow('Recipe Explorer mode', 'button:has-text("Recipe")');
+    await page.waitForSelector('.b-recipes, .b-explorer', { timeout: 5000 }).catch(() => {
+      throw new Error("Recipe Explorer did not render after switching mode");
+    });
+    await page.click('button:has-text("Character Creator")').catch(() => {});
+    await page.waitForTimeout(200);
+
+    // Fail loudly if ANY error fired during the creator interactions above.
+    if (errors.length > 0) {
+      console.error("FAIL: errors during Character Creator interaction:");
+      errors.forEach(e => console.error(e.message || e));
+      process.exit(1);
+    }
+
     // --- RULES EXPLORER TESTS ---
     console.log("Testing Rules Explorer mode switching...");
     await page.click('button:has-text("Rules Explorer")');
@@ -111,7 +215,17 @@ async function run() {
     // Switch back to creator
     console.log("Testing switching back to Character Creator...");
     await page.click('button:has-text("Character Creator")');
-    await page.waitForSelector('.b-sheet-title');
+    // The creator shows the build sheet (a character was picked above), so wait on
+    // the identity rail / sheet container rather than the "pick a character" title.
+    await page.waitForSelector('.b-id-value, .b-sheet-title, .b-build', { timeout: 5000 });
+
+    // Final gate: NO page/console error may have fired at any point in the run.
+    // This is the check that would have caught the lineage-panel crash.
+    if (errors.length > 0) {
+      console.error("FAIL: page/console errors detected during the session:");
+      errors.forEach(e => console.error(e.message || e));
+      process.exit(1);
+    }
 
     console.log("✓ Browser integration test passed successfully!");
   } catch (err) {
