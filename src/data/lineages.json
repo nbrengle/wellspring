@@ -302,7 +302,7 @@
         "repped": true,
         "tags": [],
         "sublineage": "General",
-        "description": "The Chimera has eyes that resemble their mixed species. These can"
+        "description": "The Chimera has eyes that resemble their mixed species. These can\n\nbe catlike-slits, goat elongated pupils or unusual eye colors. Scleral contacts are not\n\nallowed for safety reasons."
       },
       {
         "name": "Incompatible Vocal Cords",
@@ -311,7 +311,7 @@
         "repped": false,
         "tags": [],
         "sublineage": "General",
-        "description": "The Chimera’s vocal chords no longer allow for human"
+        "description": "The Chimera’s vocal chords no longer allow for human\n\nspeech. They are able to make vocalizations that mimic their animal sides. This, for some reason that confounds even the greatest of scholars, does not prevent the character from incanting spells."
       },
       {
         "name": "Prey Animal",
@@ -333,7 +333,7 @@
           "Requires Wings"
         ],
         "sublineage": "General",
-        "description": "The Chimera can use their wings to fly in short bursts."
+        "description": "The Chimera can use their wings to fly in short bursts.\n\nFlight [Lineage]\nCall: “Grant Flying”\nTarget: Self \nDuration: Slow 10\nDelivery: None \nRefresh: Quick 100\nAccent: None \nEffect: Grant FlyingThis Lineage Power allows the Character to gain the flying condition for a Slow 10 count. They may attack other flying creatures while flying, but may only use the hand not indicating their flying condition."
       },
       {
         "name": "Heightened Flight",
@@ -393,7 +393,7 @@
         "repped": false,
         "tags": [],
         "sublineage": "General",
-        "description": "The Chimera’s animal aspects allow for exceptional perception. This"
+        "description": "The Chimera’s animal aspects allow for exceptional perception. This\n\nCharacter has the Tracking Skill from the Skills, Perks, and Flaws document as a Lineage Advantage."
       },
       {
         "name": "Bestial Strength",
@@ -527,7 +527,7 @@
         "repped": true,
         "tags": [],
         "sublineage": "Construct",
-        "description": "The Construct has a minimum 1 foot long and 8 inches thick"
+        "description": "The Construct has a minimum 1 foot long and 8 inches thick\n\nsource of power worn on their back. If their power source is Shattered, they take a Sleep\n\nFinal until their power source is repaired."
       },
       {
         "name": "Imprinted",
@@ -630,7 +630,7 @@
         "repped": false,
         "tags": [],
         "sublineage": "Technarchist (Civilization: The Unified Technarchy)",
-        "description": "The character gains the Quickhack Lineage power:"
+        "description": "The character gains the Quickhack Lineage power:\n\nQuickhack [Lineage]\nCall: “[Name or Description], Short Dominate to Construct by Lightning”\nTarget: Individual (Construct) \nDuration: Short Rest\nDelivery: Verbal \nRefresh: Long Rest\nAccent: Lightning \nEffect: DominateThe Technarchist can overload their internal processors to attempt to assert control over a foreign piece of tech."
       },
       {
         "name": "Automatic Repair System",
@@ -833,7 +833,7 @@
         "repped": false,
         "tags": [],
         "sublineage": "General",
-        "description": "The character gains the Rallying Cry Power:"
+        "description": "The character gains the Rallying Cry Power:\n\nRallying Cry [Lineage]Incant: RP - an inspiring speech or call to arms for at least a Quick 30\nCall: “By My Voice to Humans, Grant 2 Barrier”\nTarget: Group of Humans \nDuration: Until Used\nDelivery: Voice \nRefresh: Long Rest\nAccent: None \nEffect: Grant BarrierThe character can rally their fellow Humans once per long rest."
       },
       {
         "name": "Heart Full of Greed",
@@ -878,7 +878,7 @@
         "repped": false,
         "tags": [],
         "sublineage": "Psionic",
-        "description": "The character gains the Telekinesis Power:"
+        "description": "The character gains the Telekinesis Power:\n\nTelekinesis [Lineage]\nCall: “Quick Repel by Mind” or “Quick Root by Mind”\nTarget: Individual \nDuration: Quick 100\nDelivery: Packet \nRefresh: Focus Quick 100\nAccent: Mind \nEffect: Repel, RootThis psion’s mental mastery allows them to push around the bodies of their foes. The character can spend a Spike to charge one packet with their choice of “Quick Repel by Mind” or “Quick Root by Mind”."
       },
       {
         "name": "Mental Bastion",
@@ -1097,7 +1097,7 @@
         "repped": false,
         "tags": [],
         "sublineage": "General",
-        "description": "The Lost can consume the life force of any helpless target."
+        "description": "The Lost can consume the life force of any helpless target.\n\nConsume [Lineage]Incant: Mimicking sucking the essence out of the target for at least a Focus Slow 30\nCall: “Death to Helpless”, “Heal Three to Self by Void”, “Refresh One Spike by Void”\nTarget: Individual, Self \nDuration: Instantaneous\nDelivery: RP, None \nRefresh: Short Rest\nAccent: Void, None \nEffect: Death, Heal, RefreshThis Lineage Power allows the Character to mimic eating a helpless target, killing it. If the Death is not Prevented, the character heals three Life Points and restores a Spike."
       },
       {
         "name": "Creature of Void",
@@ -1276,7 +1276,7 @@
         "repped": false,
         "tags": [],
         "sublineage": "Astari (Civilization: The Astari)",
-        "description": "The Astari swear to protect the woods for the Oak Father. They must:"
+        "description": "The Astari swear to protect the woods for the Oak Father. They must:\n\nIf they feel that they have broken this oath, they take a -1 penalty to their maximum Life Points until they feel they have atoned. In general, the terms of this atonement is decided on by the player, but should take at least five minutes (if not more) to complete."
       },
       {
         "name": "Weakened Immune System",
@@ -1350,7 +1350,7 @@
         "repped": false,
         "tags": [],
         "sublineage": "General",
-        "description": "Once per short rest, the Dryad may use the Vines Lineage Power:"
+        "description": "Once per short rest, the Dryad may use the Vines Lineage Power:\n\nVines [Lineage]\nCall: “[Name or Description], Quick Root by Life”\nTarget: Individual \nDuration: Quick 100\nDelivery: Verbal \nRefresh: Short Rest\nAccent: Life \nEffect: RootThe Dryad calls on their connection to the plants in the ground to grow up and restrain their foes."
       },
       {
         "name": "Nature’s Bite",
@@ -1383,7 +1383,7 @@
         "repped": false,
         "tags": [],
         "sublineage": "Astari (Civilization: The Astari)",
-        "description": "The Oak Father looks after all of his children; the Astari is blessed with the ability to move unseen when necessary. Once per long rest, they gain the use of a Short Obfuscate."
+        "description": "The Oak Father looks after all of his children; the Astari is blessed with the ability to move unseen when necessary. Once per long rest, they gain the use of a Short Obfuscate.\n\nOak Father’s Aegis [Lineage]\nCall: “Short Obfuscate to Self by Divine”\nTarget: Self \nDuration: Short\nDelivery: Verbal \nRefresh: Long Rest\nAccent: Divine \nEffect: ObfuscateThe Astari calls on the blessing of the Oak Father to move unseen."
       },
       {
         "name": "Shepherd of Life",
@@ -1401,7 +1401,7 @@
         "repped": false,
         "tags": [],
         "sublineage": "Astari (Civilization: The Astari)",
-        "description": "The Astari uses their connection to the Oak Father to ease the maladies of those around them. The character can spend two Spikes to deliver a Cure effect to a character other than themselves."
+        "description": "The Astari uses their connection to the Oak Father to ease the maladies of those around them. The character can spend two Spikes to deliver a Cure effect to a character other than themselves.\n\nNatural Healer [Lineage]\nCall: “[Name or Description], Cure [Condition] By Divine”\nTarget: Individual (Other) \nDuration: Instantaneous\nDelivery: Verbal \nRefresh: Focus Quick 100\nAccent: Divine \nEffect: CureThe Astari spends two Spikes to Cure another individual of their maladies."
       },
       {
         "name": "Hardened Flesh",
@@ -1447,7 +1447,7 @@
         "repped": false,
         "tags": [],
         "sublineage": "Dryad",
-        "description": "The Dryad may assist in returning dead bodies to the cycle of decomposition."
+        "description": "The Dryad may assist in returning dead bodies to the cycle of decomposition.\n\nDecompose [Lineage]Incant: RP - Miming sprinkling spores onto the bodies and casting magic at them to grow, for at least a Focus Slow 30\nCall: “Shatter Corpses, Heal [X] to Self by Poison”\nTarget: Group of Corpses \nDuration: Instantaneous\nDelivery: RP \nRefresh: Short Rest\nAccent: Poison \nEffect: Shatter Corpse, HealThis Lineage Power allows the Character to decompose bodies, returning them to the cycle. The Dryad Heals 1 for each body affected in this way."
       }
     ]
   },
@@ -1587,7 +1587,7 @@
         "repped": false,
         "tags": [],
         "sublineage": "General.",
-        "description": "Ogrim heal from any wound. The character gains the Regenerate Power:"
+        "description": "Ogrim heal from any wound. The character gains the Regenerate Power:\n\nRegenerate [Lineage]\nCall: “Heal 1 to Self by Life”\nTarget: Self \nDuration: Instant\nDelivery: None \nRefresh: Quick 100\nAccent: Life \nEffect: HealThe Ogrim may spend one Spike to heal through wounds in battle. This ability may not be used while Dying.\n\n."
       },
       {
         "name": "Undeniable Fortitude",
@@ -1632,7 +1632,7 @@
         "repped": false,
         "tags": [],
         "sublineage": "Shorn Wilder (Civilization: The Shorn)",
-        "description": "While out of combat, the Wilder may use the Assess Your Foes Power below:"
+        "description": "While out of combat, the Wilder may use the Assess Your Foes Power below:\n\nAssess Your Foes [Lineage]\nCall: “[Name or description], Discern: What are your current Life Points and Armor Points?”\nTarget: Other \nDuration: Instant\nDelivery: Verbal \nRefresh: Focus Quick 100\nAccent: None \nEffect: DiscernThis Lineage Power allows the Wilder to size up their opponents before choosing to engage in violence or diplomacy. This Power may only be used out of combat."
       },
       {
         "name": "Great Endurance",
@@ -1650,7 +1650,7 @@
         "repped": false,
         "tags": [],
         "sublineage": "Shorn Wilder (Civilization: The Shorn)",
-        "description": "The Shorn Wilders can swear oaths on their word and bond in a way that is obvious to all that they intend to honor it."
+        "description": "The Shorn Wilders can swear oaths on their word and bond in a way that is obvious to all that they intend to honor it.\n\nBind Oath [Lineage]\nCall: “Obvious Obey Final to Self: [Explain oath]”\nTarget: Self \nDuration: Permanent\nDelivery: RP \nRefresh: Immediate\nAccent: None \nEffect: ObeyThis Lineage Power allows the Character to swear an oath to all who witness it.If the Wilder fails to uphold their Oath, they suffer a -1 penalty to their maximum Life Points until they feel they have restored their honor. The Wilder may only have a number of these binding oaths active equal to their maximum Life Points minus 1."
       },
       {
         "name": "Bone Claws",
@@ -1849,7 +1849,7 @@
         "repped": false,
         "tags": [],
         "sublineage": "General",
-        "description": "The Underkin have the keenest of senses in darkness, and may use the Darksight Power once per short rest:"
+        "description": "The Underkin have the keenest of senses in darkness, and may use the Darksight Power once per short rest:\n\nDarksight [Lineage]\nCall: “[Name or Description], Subtle Expose”\nTarget: Individual \nDuration: Instant\nDelivery: Verbal \nRefresh: Short Rest\nAccent: None \nEffect: ExposeThe Underkin can spend a Spike to Expose one target. The target must be in total darkness."
       },
       {
         "name": "Structural Awareness",
