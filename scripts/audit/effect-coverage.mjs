@@ -17,7 +17,7 @@
 
 import {
   ALL_SKILLS, ALL_PERKS, ALL_FLAWS, CLASS_POWERS, CLASS_PROGRESSION, LINEAGES, lookupEntity,
-} from '../../src/data/index.js';
+} from '../../src/engine/data.js';
 
 // Full description for an ability — the ALL_* collections carry `desc`, class
 // power buckets are stripped (resolve via lookupEntity), progression rows carry

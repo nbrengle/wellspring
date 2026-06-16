@@ -3,14 +3,14 @@ import {
   ARCHETYPES, lookupEntity, ALL_SKILLS, ALL_PERKS, ALL_FLAWS,
   CLASS_POWER_SLOTS, CLASSES, DEVOTIONS, DOMAINS, LINEAGES,
   UNLIMITED_SKILLS, REFS
-} from "../data/index.js";
+} from '../engine/data.js';
 import {
   MAX_DOMAINS, EVENTS_TABLE, getMaxRanks, pickClass
 } from "../engine/validate.js";
 import { bareSkill, cleanItemName, getClasses } from "../engine/resolver.js";
 import {
   STARTING_CHOICES_CONFIG, reconcileStartingChoices
-} from "../data/starting-choices.js";
+} from '../engine/starting-choices.js';
 
 const DEFAULT_WEALTH = 8;
 const DEVOTION_NAMES = DEVOTIONS.map((d) => d.name);

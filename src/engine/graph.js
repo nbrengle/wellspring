@@ -1,5 +1,5 @@
-import { lookupEntity, LINEAGES, CLASS_PROGRESSION, REFS } from "../data/index.js";
-import { startingSkillGrants } from "../data/starting-choices.js";
+import { lookupEntity, LINEAGES, CLASS_PROGRESSION, REFS } from '../engine/data.js';
+import { startingSkillGrants } from '../engine/starting-choices.js';
 import { cleanItemName, bareSkill, resolveId, entityType, getClasses, idName } from './resolver.js';
 import { COMMON_ALLERGENS } from './config.js';
 import {

@@ -6,7 +6,7 @@
 // the source archetype format.
 
 import { bareSkill, cleanItemName, getClasses } from '../engine/resolver.js';
-import { ARCHETYPES, UNLIMITED_SKILLS, BASE_CLASSES } from './index.js';
+import { ARCHETYPES, UNLIMITED_SKILLS, BASE_CLASSES } from './data.js';
 import {
   LABEL_FIELD, SCALAR_FIELDS, ITEM_FIELDS, fieldForLabel, cleanItem, splitItems,
   expandInstances, CHOICE_DEFAULTS,

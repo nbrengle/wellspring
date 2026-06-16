@@ -3,48 +3,48 @@
 // the UI stays decoupled from the parser's exact schema. Re-running the parser
 // (npm run parse) refreshes everything downstream automatically.
 
-import classesJson from './classes.json';
-import skillsJson from './skills.json';
-import perksJson from './perks.json';
-import flawsJson from './flaws.json';
-import devotionsJson from './devotions.json';
-import lineagesJson from './lineages.json';
-import levelTableJson from './level-table.json';
-import eventsTableJson from './events-table.json';
-import domainsJson from './domains.json';
-import craftingJson from './crafting-recipes.json';
-import ritualsJson from './ritual-recipes.json';
-import archetypesJson from './archetypes.json';
-import refsJson from './refs.json';
+import classesJson from '../data/classes.json';
+import skillsJson from '../data/skills.json';
+import perksJson from '../data/perks.json';
+import flawsJson from '../data/flaws.json';
+import devotionsJson from '../data/devotions.json';
+import lineagesJson from '../data/lineages.json';
+import levelTableJson from '../data/level-table.json';
+import eventsTableJson from '../data/events-table.json';
+import domainsJson from '../data/domains.json';
+import craftingJson from '../data/crafting-recipes.json';
+import ritualsJson from '../data/ritual-recipes.json';
+import archetypesJson from '../data/archetypes.json';
+import refsJson from '../data/refs.json';
 
 // Concept content files — the glossary and rules-reference data the linker emits
 // references to (terms:, rules-concepts:, effects:, accents:, …). Indexed below
 // so those reference links resolve and open instead of dead-ending.
-import glossaryJson from './glossary.json';
-import effectsJson from './effects.json';
-import accentsJson from './accents.json';
-import resourcesJson from './resources.json';
-import modifiersJson from './modifiers.json';
-import conditionsJson from './conditions.json';
-import defenseCallsJson from './defense-calls.json';
-import craftingConceptsJson from './crafting-concepts.json';
-import ritualConceptsJson from './ritual-concepts.json';
-import creatureTypesJson from './types.json';
-import coreRulesJson from './core-rules.json';
-import combatRulesJson from './combat-rules.json';
-import restsJson from './rests.json';
-import powerWordsJson from './power-words-and-power-phrases.json';
-import callsJson from './calls.json';
-import gameMarkersJson from './game-markers-and-signals.json';
-import coreRulesMiscJson from './core-rules-miscellaneous.json';
-import craftingAllJson from './crafting-all.json';
-import advancementJson from './advancement.json';
-import deathDyingJson from './death-and-dying.json';
-import wealthJson from './wealth.json';
-import powersJson from './powers.json';
-import metaJson from './meta.json';
-import devotionsBeingsJson from './devotions-divine-beings.json';
-import introductionJson from './introduction.json';
+import glossaryJson from '../data/glossary.json';
+import effectsJson from '../data/effects.json';
+import accentsJson from '../data/accents.json';
+import resourcesJson from '../data/resources.json';
+import modifiersJson from '../data/modifiers.json';
+import conditionsJson from '../data/conditions.json';
+import defenseCallsJson from '../data/defense-calls.json';
+import craftingConceptsJson from '../data/crafting-concepts.json';
+import ritualConceptsJson from '../data/ritual-concepts.json';
+import creatureTypesJson from '../data/types.json';
+import coreRulesJson from '../data/core-rules.json';
+import combatRulesJson from '../data/combat-rules.json';
+import restsJson from '../data/rests.json';
+import powerWordsJson from '../data/power-words-and-power-phrases.json';
+import callsJson from '../data/calls.json';
+import gameMarkersJson from '../data/game-markers-and-signals.json';
+import coreRulesMiscJson from '../data/core-rules-miscellaneous.json';
+import craftingAllJson from '../data/crafting-all.json';
+import advancementJson from '../data/advancement.json';
+import deathDyingJson from '../data/death-and-dying.json';
+import wealthJson from '../data/wealth.json';
+import powersJson from '../data/powers.json';
+import metaJson from '../data/meta.json';
+import devotionsBeingsJson from '../data/devotions-divine-beings.json';
+import introductionJson from '../data/introduction.json';
 
 export const LEVEL_TABLE = levelTableJson;
 export const EVENTS_TABLE = eventsTableJson;
