@@ -9,6 +9,8 @@ export function normalizeResourceName(name) {
   name = name.replace(/^(Optional:)\s*/i, '');
   name = name.replace(/\s+per\s+.*$/i, '');
   name = name.replace(/\s+worth\s+.*$/i, '');
+  // Strip volume units that aren't part of the resource name
+  name = name.replace(/^(?:bags?\s+of|blocks?\s+of)\s+/i, '');
   
   // Plurals to singular
   if (name.toLowerCase() === 'blooms') name = 'Bloom';
