@@ -320,6 +320,17 @@ test('LBP: Lost Life / Additional Lost Life dynamic LBP calculation', () => {
   // Born of the Void = 0, Scarred by the Void = 3, Horns = 3. Total = 6.
   eq(s.rawAwarded, 6, 'Lost Life looked up by challenge name');
 });
+test('LBP: Lost Life picker storage format (base name + rep param) resolves', () => {
+  // The Lost Life rep PICKER stores "Lost Life (<rep>)" using the bare baseName
+  // (no [Repped] tag). Confirm that exact shape resolves the rep's LBP, and that
+  // an un-repped Lost Life awards 0 (the bug the picker fixes).
+  const req = ['Born of the Void [Required]', 'Scarred by the Void [Repped] [Required]'];
+  const repped = validate({ lineage: 'Lost', lineageChallenges: [...req, 'Lost Life (Horns)'], lineageAdvantages: [] }).lbp;
+  eq(repped.rawAwarded, 6, 'picker-stored "Lost Life (Horns)" awards Horns\' LBP (0+3+3)');
+
+  const bare = validate({ lineage: 'Lost', lineageChallenges: [...req, 'Lost Life'], lineageAdvantages: [] }).lbp;
+  eq(bare.rawAwarded, 3, 'un-repped "Lost Life" awards 0 (just the required Scarred=3)');
+});
 test('sublineage: same sublineage (inconsistent strings) is NOT mixed', () => {
   const a = LINEAGES.Aewen;
   const accC = a.challenges.find((c) => /^Accented/.test(c.sublineage));

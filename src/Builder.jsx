@@ -238,6 +238,20 @@ export default function Builder() {
     });
   }, []);
 
+  // Set/replace the [Repped] parameter on a Lost Life-style challenge already taken
+  // (e.g. base "Lost Life" → stored "Lost Life (Runic Lattice)"). Keyed by the base
+  // name so changing the rep replaces in place rather than adding a duplicate.
+  const handleSetLineageRep = useCallback((field, baseName, rep) => {
+    setCharacter((c) => {
+      const cur = c[field] || [];
+      const next = (rep && rep.trim()) ? `${baseName} (${rep.trim()})` : baseName;
+      const i = cur.findIndex((x) => cleanChallengeName(x) === cleanChallengeName(baseName));
+      const out = [...cur];
+      if (i === -1) out.push(next); else out[i] = next;
+      return { ...c, [field]: out };
+    });
+  }, []);
+
   const handleStartBlank = useCallback(() => {
     const candidates = Object.keys(CLASS_POWER_SLOTS).map((name) => ({
       name, desc: CLASSES[name]?.description || "", cat: CLASSES[name]?.type || "Class",
@@ -615,7 +629,7 @@ export default function Builder() {
       {lineageOpen && (
         <LineagePanel character={character} report={report} onInspect={handleInspect}
           onSetLineage={handleSetLineage} onSetSublineage={handleSetSublineage}
-          onToggle={handleToggleLineageItem} onClose={() => setLineageOpen(false)} />
+          onToggle={handleToggleLineageItem} onSetRep={handleSetLineageRep} onClose={() => setLineageOpen(false)} />
       )}
       <SiteFooter />
     </div>
