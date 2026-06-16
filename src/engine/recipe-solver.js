@@ -1,4 +1,4 @@
-import { CRAFTING, RITUALS } from "./index.js";
+import { CRAFTING, RITUALS } from './data.js';
 
 // Helper to normalize resource names
 export function normalizeResourceName(name) {

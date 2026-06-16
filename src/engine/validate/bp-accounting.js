@@ -1,7 +1,7 @@
-import { startingSkillGrants } from "../../data/starting-choices.js";
+import { startingSkillGrants } from "../starting-choices.js";
 import { cleanItemName, bareSkill } from '../resolver.js';
 import { MAX_FLAW_BP } from './core.js';
-import { REFS } from "../../data/index.js";
+import { REFS } from '../data.js';
 
 // Determine if a discount source applies to a specific graph item
 function discountApplies(src, itemNode, pos) {

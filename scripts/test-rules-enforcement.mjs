@@ -1,6 +1,6 @@
 // scripts/test-rules-enforcement.mjs
 import { validate } from "../src/engine/validate.js";
-import { REFS } from '../src/data/index.js';
+import { REFS } from '../src/engine/data.js';
 import { readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';

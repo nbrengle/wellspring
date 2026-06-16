@@ -3,7 +3,7 @@
 // build-sheets.mjs (build generation) so the two can't drift — and so the
 // cantrip/accent weighting (#64) applies everywhere. All factors live in
 // effect-weights.json (effects/conditions/defenses + tierMultiplier + accentRarity).
-import { REFS, CLASS_POWERS } from '../src/data/index.js';
+import { REFS, CLASS_POWERS } from '../src/engine/data.js';
 import EFFECT_WEIGHTS from '../src/data/effect-weights.json' with { type: 'json' };
 
 const WEIGHT = { effects: EFFECT_WEIGHTS.effects, conditions: EFFECT_WEIGHTS.conditions, defenses: EFFECT_WEIGHTS.defenses };

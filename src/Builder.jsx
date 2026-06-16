@@ -6,7 +6,7 @@ import {
   DEVOTIONS, DOMAINS, ALL_SKILLS, ALL_PERKS, ALL_FLAWS,
   CLASS_POWER_SLOTS, CLASSES, META, UNLIMITED_SKILLS, LEVEL_TABLE,
   eligiblePowers
-} from "./data/index.js";
+} from './engine/data.js';
 import {
   validate, characterLevel, pickClass, MAX_DOMAINS,
   EVENTS_TABLE, getMaxRanks, validityReasons
@@ -14,7 +14,7 @@ import {
 import { bareSkill, cleanItemName, getClasses } from "./engine/resolver.js";
 import {
   STARTING_CHOICES_CONFIG, hasStartingChoices, reconcileStartingChoices, rebuildStartingSkills
-} from "./data/starting-choices.js";
+} from './engine/starting-choices.js';
 import {
   EMPTY_CHARACTER, applyClassStartingAbilities, loadArchetype
 } from "./engine/character-state.js";
@@ -629,7 +629,8 @@ export default function Builder() {
       {lineageOpen && (
         <LineagePanel character={character} report={report} onInspect={handleInspect}
           onSetLineage={handleSetLineage} onSetSublineage={handleSetSublineage}
-          onToggle={handleToggleLineageItem} onSetRep={handleSetLineageRep} onClose={() => setLineageOpen(false)} />
+          onToggle={handleToggleLineageItem} onSetRep={handleSetLineageRep} onClose={() => setLineageOpen(false)}
+          onSetAdvantageChoice={handleSetAdvantageChoice} />
       )}
       <SiteFooter />
     </div>

@@ -1,6 +1,7 @@
-import { lookupEntity, LINEAGES, CLASS_PROGRESSION, REFS } from "../data/index.js";
-import { startingSkillGrants } from "../data/starting-choices.js";
+import { lookupEntity, LINEAGES, CLASS_PROGRESSION, REFS } from '../engine/data.js';
+import { startingSkillGrants } from '../engine/starting-choices.js';
 import { cleanItemName, bareSkill, resolveId, entityType, getClasses, idName } from './resolver.js';
+import { COMMON_ALLERGENS } from './config.js';
 import {
   characterLevel, parseTrailingRank, rankOf,
   BP_FIELDS, BP_POWER_FIELDS, POWER_SOURCE_FIELDS,
@@ -79,6 +80,11 @@ export function resolveCharacterGraph(character) {
       }
     }
 
+    // Divine Magic advantage grants the selected cantrip
+    if (ent?.name === "Divine Magic" && character.advantageChoices?.["Divine Magic"]) {
+      effects.push({ type: 'GRANT_SOURCE', grants: [`powers:${character.advantageChoices["Divine Magic"]}`] });
+    }
+
     items.push({
       id: ent?.id || id,
       name: ent?.name || cleanName,
@@ -112,8 +118,7 @@ export function resolveCharacterGraph(character) {
     let bp = 0;
     if (ent) {
       if (ent.baseName === "Mild Allergy" || ent.baseName === "Severe Allergy") {
-        const common = ["cloth", "iron", "leather", "materia", "other common allergen"];
-        const isCommon = common.includes(String(ent.parameter || "").toLowerCase().trim());
+        const isCommon = COMMON_ALLERGENS.includes(String(ent.parameter || "").toLowerCase().trim());
         bp = ent.baseName === "Mild Allergy" ? (isCommon ? 2 : 1) : (isCommon ? 3 : 2);
       } else {
         bp = typeof ent.bp === 'number' ? ent.bp : parseInt(String(ent.bp), 10) || 0;
