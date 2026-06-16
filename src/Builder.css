@@ -1058,6 +1058,14 @@
 /* Inline rules text + "grants:" links so you can judge a pick without a click. */
 .b-lin-desc { margin: 0 0 0 2rem; font-size: 0.72rem; color: var(--b-muted); line-height: 1.4; }
 .b-lin-grants { margin: 0.1rem 0 0 2rem; font-size: 0.68rem; color: var(--b-dim); }
+.b-lin-rep-pick { display: flex; align-items: center; gap: 0.4rem; margin: 0.3rem 0 0.1rem 2rem; }
+.b-lin-rep-label { font-size: 0.72rem; color: var(--b-muted); }
+.b-lin-rep-select {
+  flex: 1; min-width: 0; font-size: 0.75rem; padding: 0.2rem 0.35rem;
+  background: rgba(255,255,255,0.03); color: var(--b-text, #e8dcc8);
+  border: 1px solid var(--b-border, #3a332a); border-radius: 0.3rem;
+}
+.b-lin-rep-select:focus { outline: none; border-color: var(--b-amber); }
 .b-lin-grant-link {
   background: transparent; border: none; cursor: pointer; padding: 0;
   color: var(--b-green); font-family: inherit; font-size: 0.68rem;
