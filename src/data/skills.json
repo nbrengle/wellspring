@@ -187,7 +187,13 @@
     "prereq": "Basic Martial Weapons",
     "ranks": null,
     "category": "Martial",
-    "description": "The character must choose from the following list: Daggers, Swords, Maces, Axes, Projectile Weapons, Thrown Weapons, Staves, or Polearms. After each Short Rest, the character gains one additional Spike that can only be used while the character is wielding a weapon of that type (although the actual attack need not come from that weapon). A character may only have Weapon Specialization with one weapon type."
+    "description": "The character must choose from the following list: Daggers, Swords, Maces, Axes, Projectile Weapons, Thrown Weapons, Staves, or Polearms. After each Short Rest, the character gains one additional Spike that can only be used while the character is wielding a weapon of that type (although the actual attack need not come from that weapon). A character may only have Weapon Specialization with one weapon type.",
+    "statMods": [
+      {
+        "stat": "spikes",
+        "n": 1
+      }
+    ]
   },
   {
     "name": "Axecraft",
