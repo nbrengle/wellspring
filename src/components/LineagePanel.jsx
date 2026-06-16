@@ -1,6 +1,17 @@
 import React, { useEffect } from "react";
-import { REFS, LINEAGES, lookupEntity } from '../engine/data.js';
+import { REFS, LINEAGES, lookupEntity, CLASSES, CLASS_POWERS } from "../engine/data.js";
 import { subKey } from "../engine/validate.js";
+
+const DIVINE_CANTRIPS = (() => {
+  const divineClasses = Object.entries(CLASSES).filter(([_, c]) => c.type === 'Spellcaster' && c.magicType === 'Divine').map(([name, _]) => name);
+  const cantrips = new Set();
+  for (const c of divineClasses) {
+    if (CLASS_POWERS[c] && CLASS_POWERS[c].cantrips) {
+      for (const p of CLASS_POWERS[c].cantrips) cantrips.add(p.name);
+    }
+  }
+  return Array.from(cantrips).sort();
+})();
 
 export const cleanChallengeName = (s) => {
   const firstOpen = s.indexOf('(');
@@ -12,7 +23,7 @@ export const cleanChallengeName = (s) => {
   return clean.replace(/\s*\[[^\]]+\]/g, '').trim();
 };
 
-export default function LineagePanel({ character, report, onSetLineage, onSetSublineage, onToggle, onInspect, onClose }) {
+export default function LineagePanel({ character, report, onSetLineage, onSetSublineage, onToggle, onInspect, onClose, onSetAdvantageChoice }) {
   const lbp = report.lbp;
   const lin = character.lineage ? LINEAGES[character.lineage] : null;
 
@@ -63,6 +74,21 @@ export default function LineagePanel({ character, report, onSetLineage, onSetSub
               );
             })}
           </p>
+        )}
+        {it.name === "Divine Magic" && chosen && (
+          <div style={{ marginTop: '0.5rem' }}>
+            <label style={{ display: 'block', fontSize: '14px', marginBottom: '4px', color: '#666' }}>
+              Select your free Cantrip:
+            </label>
+            <select
+              className="b-spec-select"
+              value={character.advantageChoices?.["Divine Magic"] || ""}
+              onChange={(e) => onSetAdvantageChoice("Divine Magic", e.target.value)}
+            >
+              <option value="" disabled>Select a cantrip...</option>
+              {DIVINE_CANTRIPS.map(c => <option key={c} value={c}>{c}</option>)}
+            </select>
+          </div>
         )}
       </li>
     );

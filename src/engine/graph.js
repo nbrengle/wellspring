@@ -80,6 +80,11 @@ export function resolveCharacterGraph(character) {
       }
     }
 
+    // Divine Magic advantage grants the selected cantrip
+    if (ent?.name === "Divine Magic" && character.advantageChoices?.["Divine Magic"]) {
+      effects.push({ type: 'GRANT_SOURCE', grants: [`powers:${character.advantageChoices["Divine Magic"]}`] });
+    }
+
     items.push({
       id: ent?.id || id,
       name: ent?.name || cleanName,

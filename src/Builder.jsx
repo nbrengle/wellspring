@@ -615,7 +615,8 @@ export default function Builder() {
       {lineageOpen && (
         <LineagePanel character={character} report={report} onInspect={handleInspect}
           onSetLineage={handleSetLineage} onSetSublineage={handleSetSublineage}
-          onToggle={handleToggleLineageItem} onClose={() => setLineageOpen(false)} />
+          onToggle={handleToggleLineageItem} onClose={() => setLineageOpen(false)}
+          onSetAdvantageChoice={handleSetAdvantageChoice} />
       )}
       <SiteFooter />
     </div>
