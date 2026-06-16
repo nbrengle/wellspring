@@ -1,6 +1,7 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { REFS, LINEAGES, lookupEntity, CLASSES, CLASS_POWERS } from "../engine/data.js";
 import { subKey } from "../engine/validate.js";
+import Overlay from "./ui/Overlay.jsx";
 
 const DIVINE_CANTRIPS = (() => {
   const divineClasses = Object.entries(CLASSES).filter(([_, c]) => c.type === 'Spellcaster' && c.magicType === 'Divine').map(([name, _]) => name);
@@ -50,12 +51,6 @@ export default function LineagePanel({ character, report, onSetLineage, onSetSub
   const lbp = report.lbp;
   const lin = character.lineage ? LINEAGES[character.lineage] : null;
   const repOptions = repOptionsByLineage();
-
-  useEffect(() => {
-    const onKey = (e) => { if (e.key === "Escape") onClose(); };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [onClose]);
 
   const picked = character.sublineage ? subKey(character.sublineage) : null;
   const visible = (items) => (items || []).filter((it) => {
@@ -148,8 +143,7 @@ export default function LineagePanel({ character, report, onSetLineage, onSetSub
   };
 
   return (
-    <div className="b-overlay b-overlay-dock" role="dialog" aria-modal="false" aria-label="Lineage">
-      <div className="b-picker b-picker-dock" onClick={(e) => e.stopPropagation()}>
+    <Overlay onClose={onClose} overlayClassName="b-overlay-dock" panelClassName="b-picker b-picker-dock" modal={false} closeOnBackdrop={false} ariaLabel="Lineage">
         <header className="b-picker-head">
           <div>
             <h2 className="b-picker-title">Lineage</h2>
@@ -229,7 +223,6 @@ export default function LineagePanel({ character, report, onSetLineage, onSetSub
             </div>
           </>
         )}
-      </div>
-    </div>
+    </Overlay>
   );
 }
