@@ -21,7 +21,7 @@ import { bareSkill, cleanItemName, getClasses } from "../src/engine/resolver.js"
 import { formatCharacterSheet, parseCharacterSheet } from '../src/engine/sheet.js';
 import { solveCrafting, RECIPES, resolveRecipe, classifyIngredient, buildCraftTree } from '../src/engine/recipe-solver.js';
 import { readFileSync } from 'node:fs';
-import { lookupEntity, eligiblePowers, DEVOTIONS, DOMAINS, REFS, CLASSES, LINEAGES } from '../src/engine/data.js';
+import { lookupEntity, eligiblePowers, DEVOTIONS, DOMAINS, REFS, CLASSES, LINEAGES, lineageChoiceSpec, lineageItemImpact } from '../src/engine/data.js';
 import {
   hasStartingChoices, reconcileStartingChoices, rebuildStartingSkills,
   STARTING_CHOICES_CONFIG, optionSkills, resolveSkill,
@@ -330,6 +330,35 @@ test('LBP: Lost Life picker storage format (base name + rep param) resolves', ()
 
   const bare = validate({ lineage: 'Lost', lineageChallenges: [...req, 'Lost Life'], lineageAdvantages: [] }).lbp;
   eq(bare.rawAwarded, 3, 'un-repped "Lost Life" awards 0 (just the required Scarred=3)');
+});
+
+const findLin = (ln, nm) => {
+  const l = LINEAGES[ln];
+  for (const k of ['challenges', 'advantages']) for (const it of (l[k] || [])) if ((it.baseName || it.name) === nm) return it;
+};
+
+test('lineageChoiceSpec classifies sub-choice items by kind', () => {
+  eq(lineageChoiceSpec(findLin('Lost', 'Divine Magic')).kind, 'cantrip', 'Divine Magic = cantrip');
+  eq(lineageChoiceSpec(findLin('Human', 'Psionic Cantrip')).kind, 'cantrip', 'Psionic Cantrip = cantrip');
+  ok(lineageChoiceSpec(findLin('Human', 'Psionic Cantrip')).pool.includes('Arcane'), 'Psionic pool includes Arcane');
+  ok(!lineageChoiceSpec(findLin('Lost', 'Divine Magic')).pool.includes('Arcane'), 'Divine Magic pool is Divine-only');
+  eq(lineageChoiceSpec(findLin('Lost', 'Lost Life')).kind, 'rep', 'Lost Life = rep');
+  eq(lineageChoiceSpec(findLin('Aewen', 'Elemental Expression')).kind, 'flavor', 'Elemental Expression = flavor');
+  eq(lineageChoiceSpec(findLin('Aewen', 'Deep Reserves')), null, 'an ordinary advantage has no choice spec');
+});
+
+test('cantrip-choice lineage items grant + slot the chosen cantrip (Divine Magic + the previously-broken Psionic Cantrip)', () => {
+  const dm = validate({ classLevels: 'Cleric 4', lineage: 'Lost', lineageAdvantages: ['Divine Magic'], advantageChoices: { 'Divine Magic': 'Cancel' } });
+  ok(dm.grantedAbilities.list.some(g => g.ability === 'powers:Cancel'), 'Divine Magic grants the chosen cantrip (unchanged)');
+  // Psionic Cantrip was hardcoded-out before; the generalized path fixes it.
+  const pc = validate({ classLevels: 'Mage 4', lineage: 'Human', sublineage: 'Psionic', lineageAdvantages: ['Psionic Cantrip'], advantageChoices: { 'Psionic Cantrip': 'Cancel' } });
+  ok(pc.grantedAbilities.list.some(g => g.ability === 'powers:Cancel'), 'Psionic Cantrip now grants the chosen cantrip');
+});
+
+test('lineageItemImpact summarizes mechanical effect', () => {
+  eq(lineageItemImpact(findLin('Aewen', 'Deep Reserves'), 'Aewen')[0], '+1 highest spell-slot', 'slot impact');
+  ok(lineageItemImpact(findLin('Aewen', 'Mystic Resilience'), 'Aewen').some(s => /grants Magical Resilience/.test(s)), 'grant impact');
+  ok(lineageItemImpact(findLin('Lost', 'Divine Magic'), 'Lost')[0].includes('cantrip'), 'cantrip-choice impact');
 });
 test('sublineage: same sublineage (inconsistent strings) is NOT mixed', () => {
   const a = LINEAGES.Aewen;

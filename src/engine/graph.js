@@ -1,4 +1,4 @@
-import { lookupEntity, LINEAGES, CLASS_PROGRESSION, REFS } from '../engine/data.js';
+import { lookupEntity, LINEAGES, CLASS_PROGRESSION, REFS, lineageChoiceSpec } from '../engine/data.js';
 import { startingSkillGrants } from '../engine/starting-choices.js';
 import { cleanItemName, bareSkill, resolveId, entityType, getClasses, idName } from './resolver.js';
 import { COMMON_ALLERGENS } from './config.js';
@@ -81,10 +81,6 @@ export function resolveCharacterGraph(character) {
       }
     }
 
-    // Divine Magic advantage grants the selected cantrip
-    if (ent?.name === "Divine Magic" && character.advantageChoices?.["Divine Magic"]) {
-      effects.push({ type: 'GRANT_SOURCE', grants: [`powers:${character.advantageChoices["Divine Magic"]}`] });
-    }
 
     items.push({
       id: ent?.id || id,
@@ -203,6 +199,12 @@ export function resolveCharacterGraph(character) {
         for (const mod of ent.statMods) {
           effects.push({ type: 'STAT', stat: mod.stat, amount: mod.n });
         }
+      }
+      // A cantrip-choice advantage (Divine Magic, Psionic Cantrip, …) grants the
+      // chosen cantrip. Data-driven via lineageChoiceSpec — no per-name special case.
+      if (lineageChoiceSpec(ent)?.kind === 'cantrip') {
+        const picked = character.advantageChoices?.[ent?.baseName || ent?.name];
+        if (picked) effects.push({ type: 'GRANT_SOURCE', grants: [`powers:${picked}`] });
       }
       items.push({
         id,
