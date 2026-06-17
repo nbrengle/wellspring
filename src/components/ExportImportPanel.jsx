@@ -1,6 +1,7 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo } from "react";
 import { formatCharacterSheet, parseCharacterSheet } from "../engine/sheet.js";
 import { validate, validityReasons } from "../engine/validate.js";
+import Overlay from "./ui/Overlay.jsx";
 
 export default function ExportImportPanel({ character, report, onImport, onClose }) {
   const exported = useMemo(() => formatCharacterSheet(character, report), [character, report]);
@@ -57,15 +58,8 @@ export default function ExportImportPanel({ character, report, onImport, onClose
     }
   };
 
-  useEffect(() => {
-    const onKey = (e) => { if (e.key === "Escape") onClose(); };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [onClose]);
-
   return (
-    <div className="b-overlay" role="dialog" aria-modal="true" onClick={onClose}>
-      <div className="b-export" onClick={(e) => e.stopPropagation()}>
+    <Overlay onClose={onClose} panelClassName="b-export">
         <header className="b-picker-head">
           <h2 className="b-picker-title">Export / Import</h2>
           <button className="b-picker-x" aria-label="Close" onClick={onClose}>×</button>
@@ -111,7 +105,6 @@ export default function ExportImportPanel({ character, report, onImport, onClose
             </button>
           </div>
         </div>
-      </div>
-    </div>
+    </Overlay>
   );
 }

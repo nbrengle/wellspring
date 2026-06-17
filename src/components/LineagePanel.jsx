@@ -1,17 +1,7 @@
-import React, { useEffect } from "react";
-import { REFS, LINEAGES, lookupEntity, CLASSES, CLASS_POWERS } from "../engine/data.js";
+import React from "react";
+import { REFS, LINEAGES, lookupEntity, divineCantripOptions, lineageRepOptions } from "../engine/data.js";
 import { subKey } from "../engine/validate.js";
-
-const DIVINE_CANTRIPS = (() => {
-  const divineClasses = Object.entries(CLASSES).filter(([_, c]) => c.type === 'Spellcaster' && c.magicType === 'Divine').map(([name, _]) => name);
-  const cantrips = new Set();
-  for (const c of divineClasses) {
-    if (CLASS_POWERS[c] && CLASS_POWERS[c].cantrips) {
-      for (const p of CLASS_POWERS[c].cantrips) cantrips.add(p.name);
-    }
-  }
-  return Array.from(cantrips).sort();
-})();
+import Overlay from "./ui/Overlay.jsx";
 
 export const cleanChallengeName = (s) => {
   const firstOpen = s.indexOf('(');
@@ -38,24 +28,12 @@ const repParameterOf = (name) => {
   return m ? m[1].trim() : '';
 };
 
-// Every physical [Repped] challenge from lineages OTHER than Lost, grouped by
-// source lineage — the option list a Lost character may rep. Computed once.
-const repOptionsByLineage = () =>
-  Object.entries(LINEAGES)
-    .filter(([name]) => name !== 'Lost')
-    .map(([name, lin]) => [name, (lin.challenges || []).filter((c) => c.repped)])
-    .filter(([, challenges]) => challenges.length > 0);
-
 export default function LineagePanel({ character, report, onSetLineage, onSetSublineage, onToggle, onSetRep, onInspect, onClose, onSetAdvantageChoice }) {
   const lbp = report.lbp;
   const lin = character.lineage ? LINEAGES[character.lineage] : null;
-  const repOptions = repOptionsByLineage();
-
-  useEffect(() => {
-    const onKey = (e) => { if (e.key === "Escape") onClose(); };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [onClose]);
+  // Rep options (Lost Life) + divine cantrip options (Divine Magic) are rules
+  // knowledge — derived by the engine, not re-computed here.
+  const repOptions = lineageRepOptions();
 
   const picked = character.sublineage ? subKey(character.sublineage) : null;
   const visible = (items) => (items || []).filter((it) => {
@@ -139,7 +117,7 @@ export default function LineagePanel({ character, report, onSetLineage, onSetSub
               onChange={(e) => onSetAdvantageChoice("Divine Magic", e.target.value)}
             >
               <option value="" disabled>Select a cantrip...</option>
-              {DIVINE_CANTRIPS.map(c => <option key={c} value={c}>{c}</option>)}
+              {divineCantripOptions().map(c => <option key={c} value={c}>{c}</option>)}
             </select>
           </div>
         )}
@@ -148,8 +126,7 @@ export default function LineagePanel({ character, report, onSetLineage, onSetSub
   };
 
   return (
-    <div className="b-overlay b-overlay-dock" role="dialog" aria-modal="false" aria-label="Lineage">
-      <div className="b-picker b-picker-dock" onClick={(e) => e.stopPropagation()}>
+    <Overlay onClose={onClose} overlayClassName="b-overlay-dock" panelClassName="b-picker b-picker-dock" modal={false} closeOnBackdrop={false} ariaLabel="Lineage">
         <header className="b-picker-head">
           <div>
             <h2 className="b-picker-title">Lineage</h2>
@@ -229,7 +206,6 @@ export default function LineagePanel({ character, report, onSetLineage, onSetSub
             </div>
           </>
         )}
-      </div>
-    </div>
+    </Overlay>
   );
 }
