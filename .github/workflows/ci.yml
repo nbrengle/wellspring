@@ -10,7 +10,29 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build:
+  test-unit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: node --import ./scripts/register-json.mjs scripts/test.mjs
+
+  test-rules:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: node --import ./scripts/register-json.mjs scripts/test-rules-enforcement.mjs
+
+  test-browser:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -20,5 +42,21 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npx playwright install chromium --with-deps
-      - run: npm test
+      - run: node scripts/test-browser.mjs
+
+  vite-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
       - run: npm run build
+
+  build:
+    needs: [test-unit, test-rules, test-browser, vite-build]
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "All checks passed!"
