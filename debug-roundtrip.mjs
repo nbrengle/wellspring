@@ -1,5 +1,5 @@
-import { validate } from './src/data/validate.js';
-import { buildXlsxCharacter, parseXlsxCharacter } from './src/data/xlsx-import.js';
+import { validate } from './src/engine/validate.js';
+import { buildXlsxCharacter, parseXlsxCharacter } from './src/engine/xlsx-import.js';
 import ARCHETYPES from './src/data/archetypes.json' with { type: 'json' };
 
 const fromArchetype = (a) => ({ ...a, archetypeName: a.name });

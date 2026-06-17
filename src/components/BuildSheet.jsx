@@ -108,7 +108,7 @@ function grantSourceRole(grant) {
 
 export default function BuildSheet() {
   const { character, report } = useBuilderState();
-  const { onPickArchetype, onStartBlank, onInspect, onOpenAdd, onSetName } = useBuilderActions();
+  const { onPickArchetype, onStartBlank, onInspect, onOpenAdd, onSetName, onChangeArchetype } = useBuilderActions();
   if (!character.archetypeName) {
     return <ArchetypePicker onPick={onPickArchetype} onStartBlank={onStartBlank} />;
   }
@@ -130,6 +130,12 @@ export default function BuildSheet() {
                 {ARCHETYPES.find((a) => a.name === character.archetypeName)?.tagline}</>
             : ARCHETYPES.find((a) => a.name === character.archetypeName)?.tagline}
         </p>
+        <button className="b-btn-change-archetype" onClick={onChangeArchetype} style={{
+          background: 'none', border: 'none', color: 'var(--b-amber)', cursor: 'pointer',
+          fontSize: '0.85em', padding: '0', marginTop: '0.25rem', textDecoration: 'underline'
+        }}>
+          ‹ Change Archetype
+        </button>
       </header>
 
       <StartingChoicesSection />
