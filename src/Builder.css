@@ -1307,3 +1307,90 @@
   margin-top: 0.4rem !important;
   padding-top: 0.4rem;
 }
+
+/* ── Lineage redesign: widened workspace, gallery, two-pane detail ─────────── */
+.b-lin-panel { width: min(64rem, 98vw); display: flex; flex-direction: column; }
+.b-lin-panel .b-picker-head { flex: 0 0 auto; }
+
+/* Step 1 — gallery */
+.b-lin-gallery { display: flex; flex-direction: column; min-height: 0; flex: 1; }
+.b-lin-gallery-controls {
+  display: flex; align-items: center; gap: 0.75rem; padding: 0.8rem 1.1rem;
+  border-bottom: 1px solid var(--b-border); flex-wrap: wrap;
+}
+.b-lin-search {
+  flex: 1; min-width: 12rem; background: rgba(255,255,255,0.03);
+  border: 1px solid var(--b-border); border-radius: 0.4rem; padding: 0.45rem 0.6rem;
+  color: var(--b-text, #e8dcc8); font-size: 0.85rem;
+}
+.b-lin-search:focus { outline: none; border-color: var(--b-amber-deep); }
+.b-lin-sort { font-size: 0.72rem; color: var(--b-dim); display: flex; align-items: center; gap: 0.35rem; }
+.b-lin-sort select { background: rgba(255,255,255,0.03); color: var(--b-text,#e8dcc8); border: 1px solid var(--b-border); border-radius: 0.3rem; padding: 0.25rem; }
+.b-lin-gallery-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  gap: 0.6rem; padding: 0.9rem 1.1rem; overflow-y: auto;
+}
+.b-lin-gallery-card {
+  display: flex; flex-direction: column; gap: 0.3rem; text-align: left;
+  background: rgba(255,255,255,0.02); border: 1px solid var(--b-border);
+  border-radius: 0.5rem; padding: 0.75rem 0.85rem; cursor: pointer; transition: all 0.15s ease;
+}
+.b-lin-gallery-card:hover { border-color: rgba(111,191,115,0.5); background: rgba(111,191,115,0.07); transform: translateY(-1px); }
+.b-lin-gallery-name { font-family: "Cinzel", serif; font-size: 1.05rem; color: var(--b-green); }
+.b-lin-gallery-subs { font-size: 0.72rem; color: var(--b-purple); }
+.b-lin-gallery-lore { font-size: 0.74rem; color: var(--b-muted); line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.b-lin-gallery-cost { font-size: 0.7rem; color: var(--b-amber); }
+.b-lin-gallery-counts { font-size: 0.68rem; color: var(--b-dim); margin-top: auto; }
+
+/* Step 2 — two-pane detail */
+.b-lin-detail { display: grid; grid-template-columns: minmax(16rem, 22rem) 1fr; min-height: 0; flex: 1; }
+.b-lin-identity { border-right: 1px solid var(--b-border); padding: 1rem 1.1rem; overflow-y: auto; display: flex; flex-direction: column; gap: 0.7rem; }
+.b-lin-back { align-self: flex-start; background: none; border: none; color: var(--b-dim); cursor: pointer; font-size: 0.78rem; padding: 0; }
+.b-lin-back:hover { color: var(--b-amber); }
+.b-lin-identity-name { font-family: "Cinzel", serif; font-size: 1.4rem; color: var(--b-green); margin: 0; }
+.b-lin-identity-lore { font-size: 0.8rem; color: var(--b-muted); line-height: 1.55; margin: 0; }
+.b-lin-identity-cost { font-size: 0.74rem; color: var(--b-amber); margin: 0; line-height: 1.45; }
+.b-lin-cost-icon { margin-right: 0.2rem; }
+
+/* Sublineage picker — prominent cards (was tiny chips) */
+.b-lin-sub-section { display: flex; flex-direction: column; gap: 0.4rem; margin-top: 0.3rem; }
+.b-lin-sub-heading { font-family: "Cinzel", serif; font-size: 0.9rem; color: var(--b-text,#e8dcc8); margin: 0; }
+.b-lin-sub-note { font-size: 0.68rem; color: var(--b-dim); margin: 0; }
+.b-lin-sub-cards { display: flex; flex-direction: column; gap: 0.4rem; }
+.b-lin-sub-card {
+  display: flex; flex-direction: column; gap: 0.15rem; text-align: left;
+  background: rgba(255,255,255,0.02); border: 1px solid var(--b-border);
+  border-radius: 0.45rem; padding: 0.55rem 0.7rem; cursor: pointer; transition: all 0.15s ease;
+}
+.b-lin-sub-card:hover { border-color: rgba(176,143,208,0.5); }
+.b-lin-sub-card.is-on { background: rgba(176,143,208,0.16); border-color: rgba(176,143,208,0.6); }
+.b-lin-sub-card-name { font-size: 0.9rem; color: var(--b-purple); font-weight: 600; }
+.b-lin-sub-card-ctx { font-size: 0.68rem; color: var(--b-muted); }
+.b-lin-sub-card-count { font-size: 0.66rem; color: var(--b-dim); }
+.b-lin-sub-distinct { font-size: 0.72rem; line-height: 1.45; padding: 0.5rem 0.6rem; background: rgba(176,143,208,0.08); border-radius: 0.4rem; }
+.b-lin-sub-distinct-label { display: block; color: var(--b-purple); font-weight: 600; margin-bottom: 0.15rem; }
+.b-lin-sub-distinct-list { color: var(--b-muted); }
+
+/* Choices pane */
+.b-lin-choices { display: flex; flex-direction: column; min-height: 0; overflow-y: auto; padding: 0 0 1rem; }
+.b-lin-choices-controls { position: sticky; top: 0; z-index: 1; background: var(--b-panel, #1c1813); display: flex; gap: 0.6rem; padding: 0.8rem 1.1rem; border-bottom: 1px solid var(--b-border); flex-wrap: wrap; align-items: center; }
+.b-lin-filters { display: flex; gap: 0.25rem; }
+.b-lin-filter { background: rgba(255,255,255,0.03); border: 1px solid var(--b-border); color: var(--b-dim); border-radius: 0.75rem; padding: 0.2rem 0.6rem; font-size: 0.72rem; cursor: pointer; }
+.b-lin-filter.is-on { background: rgba(184,130,31,0.16); border-color: rgba(184,130,31,0.5); color: var(--b-amber); }
+.b-lin-choices-group { padding: 0.6rem 1.1rem 0; }
+.b-lin-group-head { font-family: "Cinzel", serif; font-size: 0.82rem; color: var(--b-text,#e8dcc8); margin: 0 0 0.3rem; text-transform: uppercase; letter-spacing: 0.04em; }
+.b-lin-group-note { color: var(--b-dim); font-weight: 400; text-transform: none; letter-spacing: 0; }
+
+/* Row tags + impact chips */
+.b-lin-row-tags { display: flex; gap: 0.25rem; margin-left: auto; }
+.b-lin-tag { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.04em; padding: 0.05rem 0.3rem; border-radius: 0.6rem; border: 1px solid transparent; }
+.b-lin-req { color: var(--b-red); border-color: rgba(217,117,107,0.4); }
+.b-lin-repped { color: var(--b-purple); border-color: rgba(176,143,208,0.4); }
+.b-lin-impact { list-style: none; display: flex; flex-wrap: wrap; gap: 0.3rem; margin: 0.3rem 0 0 2rem; padding: 0; }
+.b-lin-impact-chip { font-size: 0.68rem; color: var(--b-green); background: rgba(111,191,115,0.1); border: 1px solid rgba(111,191,115,0.3); border-radius: 0.6rem; padding: 0.05rem 0.4rem; }
+
+/* Generalized sub-choice chooser */
+.b-lin-subchoice { display: flex; align-items: center; gap: 0.4rem; margin: 0.35rem 0 0.1rem 2rem; }
+.b-lin-subchoice-label { font-size: 0.72rem; color: var(--b-muted); white-space: nowrap; }
+.b-lin-subchoice-select { flex: 1; min-width: 0; background: rgba(255,255,255,0.03); color: var(--b-text,#e8dcc8); border: 1px solid var(--b-border); border-radius: 0.3rem; padding: 0.25rem 0.35rem; font-size: 0.78rem; }
+.b-lin-subchoice-select:focus { outline: none; border-color: var(--b-amber); }
