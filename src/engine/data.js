@@ -242,18 +242,24 @@ export function eligiblePowers(className, category) {
     .map(p => ({ ...p, tierList: tier })));
 }
 
-// Cantrip names a "Divine Magic" lineage advantage may grant: every cantrip of a
-// Divine spellcasting class. Rules knowledge — kept in the engine so the UI picker
-// doesn't re-derive it from CLASSES/CLASS_POWERS. Sorted, de-duped.
-export function divineCantripOptions() {
-  const divineClasses = Object.entries(CLASSES)
-    .filter(([, c]) => c.type === 'Spellcaster' && c.magicType === 'Divine')
+// Cantrip names from spellcasting classes of the given magic type(s) — the option
+// pool a "learn a cantrip of your choice" lineage choice offers. Rules knowledge,
+// kept in the engine so the UI doesn't re-derive it. Sorted, de-duped.
+export function cantripOptions(magicTypes) {
+  const want = new Set(magicTypes);
+  const classes = Object.entries(CLASSES)
+    .filter(([, c]) => c.type === 'Spellcaster' && want.has(c.magicType))
     .map(([name]) => name);
   const cantrips = new Set();
-  for (const cls of divineClasses) {
+  for (const cls of classes) {
     for (const p of (CLASS_POWERS[cls]?.cantrips || [])) cantrips.add(p.name);
   }
   return [...cantrips].sort();
+}
+
+// Divine-only pool (Divine Magic). Thin wrapper over cantripOptions.
+export function divineCantripOptions() {
+  return cantripOptions(['Divine']);
 }
 
 // The [Repped] challenges a Lost character may rep, grouped by source lineage
@@ -265,6 +271,97 @@ export function lineageRepOptions() {
     .filter(([name]) => name !== 'Lost')
     .map(([name, lin]) => [name, (lin.challenges || []).filter((c) => c.repped)])
     .filter(([, challenges]) => challenges.length > 0);
+}
+
+// A lineage challenge/advantage that requires the player to record a SUB-CHOICE.
+// Returns null for ordinary items, else { kind, ... }:
+//   'cantrip' — learns a chosen, castable cantrip (granted + given a slot). `pool`
+//               is the magic-type filter for cantripOptions. Divine Magic (Divine),
+//               Psionic Cantrip (Arcane + Divine).
+//   'rep'     — Lost Life / Additional Lost Life: rep a [Repped] challenge from
+//               another lineage; its LBP becomes the award.
+//   'flavor'  — a recorded string with NO mechanical effect (like a Lore parameter):
+//               Elemental Expression (an Accent), Favored Gem (a gem).
+// Keyed by baseName so the same mechanic is one code path, not a per-name special
+// case. New choice items only need an entry here (no new component / wiring).
+const LINEAGE_CHOICE_SPECS = {
+  'Divine Magic':        { kind: 'cantrip', pool: ['Divine'] },
+  'Psionic Cantrip':     { kind: 'cantrip', pool: ['Arcane', 'Divine'] },
+  'Lost Life':           { kind: 'rep' },
+  'Additional Lost Life':{ kind: 'rep' },
+  'Elemental Expression':{ kind: 'flavor', label: 'Accent' },
+  'Favored Gem':         { kind: 'flavor', label: 'Gemstone' },
+};
+export function lineageChoiceSpec(item) {
+  const base = item?.baseName || item?.name;
+  return base ? (LINEAGE_CHOICE_SPECS[base] || null) : null;
+}
+
+// Lineage cantrip CHOICES the character has actually recorded — the chosen cantrip
+// for each owned cantrip-kind item (Divine Magic, Psionic Cantrip, …). Drives both
+// the grant (graph.js) and the casting slot (slots.js) so neither special-cases a
+// name. Returns [{ item: <baseName>, cantrip }]. Looks up the item across the
+// character's lineage challenges + advantages.
+// Human-readable mechanical impact of a lineage challenge/advantage, derived from
+// its parser-extracted fields + grant edges. Returns a list of short strings the UI
+// shows inline so a choice's effect on the character is obvious (pain #7). `lineage`
+// is needed to resolve the grant-edge id. A `cantrip`/`rep`/`flavor` sub-choice item
+// reports its choice nature instead of fixed mechanics.
+const STAT_LABELS = {
+  lifePoints: 'Max Life', spikes: 'Max Spikes', armor: 'Armor',
+  naturalArmor: 'Natural Armor', wealth: 'Wealth',
+};
+export function lineageItemImpact(item, lineage) {
+  const spec = lineageChoiceSpec(item);
+  if (spec?.kind === 'cantrip') return ['grants a chosen cantrip (+slot to cast it)'];
+  if (spec?.kind === 'rep') return ['reps another lineage’s challenge for its LBP'];
+  if (spec?.kind === 'flavor') {
+    const label = spec.label || 'detail';
+    const article = /^[aeiou]/i.test(label) ? 'an' : 'a';
+    return [`pick ${article} ${label} (flavor)`];
+  }
+
+  const out = [];
+  for (const m of (item.statMods || [])) {
+    const label = STAT_LABELS[m.stat] || m.stat;
+    out.push(`${m.n >= 0 ? '+' : ''}${m.n} ${label}`);
+  }
+  for (const note of (item.statModNotes || [])) {
+    if (note?.text) out.push(note.text);
+  }
+  for (const g of (item.slotGrants || [])) {
+    out.push(`+${g.n} ${g.cat} slot${g.n === 1 ? '' : 's'}`);
+  }
+  if (item.highestSlot) out.push('+1 highest spell-slot');
+  if (item.wealthIncome?.n) out.push(`+${item.wealthIncome.n} Wealth`);
+  // Fixed grants (Telekinesis Power, Magical Resilience perk, …).
+  const base = item.baseName || item.name;
+  const gid = lineage ? `advantages:${lineage} - ${base}` : null;
+  const grants = gid ? (REFS.grants?.[gid] || REFS.grants?.[`challenges:${lineage} - ${base}`]) : null;
+  for (const tid of (grants || [])) {
+    const ent = lookupEntity(tid);
+    out.push(`grants ${ent?.name || idNameLocal(tid)}`);
+  }
+  return out;
+}
+function idNameLocal(id) {
+  const i = id.indexOf(':');
+  return i >= 0 ? id.slice(i + 1) : id;
+}
+
+export function lineageCantripChoices(character) {
+  const choices = character?.advantageChoices || {};
+  const lin = character?.lineage && LINEAGES[character.lineage];
+  if (!lin) return [];
+  const out = [];
+  for (const it of [...(lin.challenges || []), ...(lin.advantages || [])]) {
+    const base = it.baseName || it.name;
+    const spec = LINEAGE_CHOICE_SPECS[base];
+    if (spec?.kind === 'cantrip' && choices[base]) {
+      out.push({ item: base, cantrip: choices[base] });
+    }
+  }
+  return out;
 }
 
 // Power-slot counts at the starting level come from the progression table's

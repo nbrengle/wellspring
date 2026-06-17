@@ -6,7 +6,7 @@
 // spell-slot capacity (spellSlots), and the Bookcaster spell options. Re-exported
 // by the validate.js barrel.
 
-import { lookupEntity, CLASS_POWERS, CLASS_PROGRESSION, CLASS_POWER_SLOTS, SPELLCASTERS, LINEAGES } from '../data.js';
+import { lookupEntity, CLASS_POWERS, CLASS_PROGRESSION, CLASS_POWER_SLOTS, SPELLCASTERS, LINEAGES, lineageCantripChoices } from '../data.js';
 import { cleanItemName, resolveId, getClasses } from '../resolver.js';
 import { SPELL_TIERS, SLOT_CATS, BOOKCASTER_TIER_FIELD, KNOWN_SPELL_FIELDS } from '../config.js';
 import {
@@ -83,8 +83,10 @@ export function innateBonusCantrips(character) {
     }
   }
 
-  if (character.advantageChoices?.["Divine Magic"]) {
-    out.push({ cls: "ALL", name: character.advantageChoices["Divine Magic"] });
+  // Cantrips granted by a lineage cantrip-choice (Divine Magic, Psionic Cantrip, …)
+  // are known/castable. Data-driven — no per-name special case.
+  for (const { cantrip } of lineageCantripChoices(character)) {
+    out.push({ cls: "ALL", name: cantrip });
   }
 
   return out;
