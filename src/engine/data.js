@@ -133,7 +133,6 @@ export const ALL_FLAWS = flawsJson.map(f => ({
 // parser-extracted field. A MegaDoc change to the class roster flows through here
 // without edits. BASE_CLASSES is the canonical base-class set, shared by the
 // validator and sheet logic so the list lives in exactly one place.
-export const SPELLCASTERS = new Set(classesJson.filter(c => c.type === 'Spellcaster').map(c => c.name));
 const MAGIC_TYPE = Object.fromEntries(classesJson.filter(c => c.magicType).map(c => [c.name, c.magicType]));
 // Base (non-advanced) classes. Today every parsed class is a base class — Advanced
 // Classes aren't in the MegaDoc yet ("published when the campaign draws closer").
@@ -148,7 +147,7 @@ export const CLASSES = Object.fromEntries(
     c.name,
     {
       type: c.type,
-      spellcaster: SPELLCASTERS.has(c.name),
+      spellcaster: c.type === 'Spellcaster',
       magicType: c.magicType || MAGIC_TYPE[c.name] || null,
       description: c.description,
       startingSkills: c.startingSkills,
@@ -272,7 +271,7 @@ export function lineageRepOptions() {
 export const CLASS_POWER_SLOTS = Object.fromEntries(
   classesJson.map(c => {
     const lvl4 = c.progression?.['4'] || {};
-    if (SPELLCASTERS.has(c.name)) {
+    if (c.type === 'Spellcaster') {
       return [c.name, {
         cantrips: lvl4.cantrips ?? 0,
         spellsKnown: lvl4.spellsKnown ?? 0,

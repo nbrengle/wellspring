@@ -6,7 +6,7 @@
 // spell-slot capacity (spellSlots), and the Bookcaster spell options. Re-exported
 // by the validate.js barrel.
 
-import { lookupEntity, CLASS_POWERS, CLASS_PROGRESSION, CLASS_POWER_SLOTS, SPELLCASTERS, LINEAGES } from '../data.js';
+import { lookupEntity, CLASS_POWERS, CLASS_PROGRESSION, CLASS_POWER_SLOTS, CLASSES, LINEAGES } from '../data.js';
 import { cleanItemName, resolveId, getClasses } from '../resolver.js';
 import { SPELL_TIERS, SLOT_CATS, BOOKCASTER_TIER_FIELD, KNOWN_SPELL_FIELDS } from '../config.js';
 import {
@@ -29,8 +29,8 @@ export function slotGrants(character) {
     grants[k] = (grants[k] || 0) + n;
   };
   const classes = getClasses(character);
-  const casterClass = classes.find((c) => SPELLCASTERS.has(c.name))?.name;
-  const martialClass = classes.find((c) => !SPELLCASTERS.has(c.name))?.name;
+  const casterClass = classes.find((c) => CLASSES[c.name]?.spellcaster)?.name;
+  const martialClass = classes.find((c) => !CLASSES[c.name]?.spellcaster)?.name;
   // Route a category to the class whose slot it belongs to.
   const classFor = (cat) => (cat === 'cantrips' || cat === 'spellsKnown') ? casterClass : martialClass;
 
@@ -106,7 +106,7 @@ export function computeSlots(character) {
   for (const { name: cls, level } of classes) {
     // Clamp to the highest documented progression level (base classes cap at 10).
     const prog = progressionRow(cls, level);
-    const isCaster = SPELLCASTERS.has(cls);
+    const isCaster = CLASSES[cls]?.spellcaster;
     const mkRow = (category, label, used, baseVal) => {
       const b = bonus[`${cls}:${category}`] || 0;
       return {
@@ -139,7 +139,7 @@ export function computeSlots(character) {
 // cantrips/spells-known). Returns null for non-casters, else
 // { novice, adept, greater }.
 export function spellSlots(character) {
-  const casters = getClasses(character).filter((c) => SPELLCASTERS.has(c.name));
+  const casters = getClasses(character).filter((c) => CLASSES[c.name]?.spellcaster);
   if (!casters.length) return null; // not a caster
 
   // Sum each caster class's progression "N/N/N" slots at its own level.
@@ -196,7 +196,7 @@ export function spellSlots(character) {
 // Spells a Bookcaster can select, split into { known, other } for the picker.
 
 export function bookcasterSpellOptions(character) {
-  const casters = getClasses(character).filter((c) => SPELLCASTERS.has(c.name));
+  const casters = getClasses(character).filter((c) => CLASSES[c.name]?.spellcaster);
   if (!casters.length) return { known: [], other: [] };
   const slots = spellSlots(character) || { novice: 0, adept: 0, greater: 0 };
   const accessibleTiers = Object.keys(BOOKCASTER_TIER_FIELD).filter((t) => (slots[t] || 0) > 0);
