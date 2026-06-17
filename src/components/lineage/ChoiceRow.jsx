@@ -13,6 +13,7 @@ const repParamOf = (name) => {
 
 export default function ChoiceRow({
   item, lineage, kind, chosen, storedName, resolvedLbp,
+  subLabel, dimmed,
   onToggle, onInspect, onSetChoice, onSetRep, advantageChoices,
 }) {
   const field = kind === "challenge" ? "lineageChallenges" : "lineageAdvantages";
@@ -29,15 +30,14 @@ export default function ChoiceRow({
   const choiceValue = spec?.kind === "rep" ? repParam : (advantageChoices?.[base] || "");
 
   return (
-    <li className={`b-lin-row ${chosen ? "is-on" : ""}`}>
+    <li className={`b-lin-row ${chosen ? "is-on" : ""} ${dimmed ? "is-dimmed" : ""}`}
+        title={dimmed ? `Belongs to the ${subLabel} sublineage — select it to take this.` : undefined}>
       <div className="b-lin-row-head">
         <button className="b-lin-toggle" title={chosen ? "Remove" : "Take"}
                 onClick={() => onToggle(field, toggleValue)}>{chosen ? "✓" : "+"}</button>
-        <button className="b-lin-name"
-                onClick={() => onInspect(item.name, field, kind === "challenge" ? "flaws" : "perks")}>
-          {base}
-        </button>
+        <span className="b-lin-name">{base}</span>
         <span className="b-lin-row-tags">
+          {subLabel && <span className="b-lin-tag b-lin-subtag">{subLabel}</span>}
           {item.required && <span className="b-lin-tag b-lin-req">required</span>}
           {item.repped && <span className="b-lin-tag b-lin-repped">repped</span>}
         </span>

@@ -3058,3 +3058,8 @@
 .b-lin-subchoice-label { font-size: 0.72rem; color: var(--b-muted); white-space: nowrap; }
 .b-lin-subchoice-select { flex: 1; min-width: 0; background: rgba(255,255,255,0.03); color: var(--b-text,#e8dcc8); border: 1px solid var(--b-border); border-radius: 0.3rem; padding: 0.25rem 0.35rem; font-size: 0.78rem; }
 .b-lin-subchoice-select:focus { outline: none; border-color: var(--b-amber); }
+
+/* Sublineage tag on a row + dimming for off-sublineage items */
+.b-lin-subtag { color: var(--b-purple); border-color: rgba(176,143,208,0.4); }
+.b-lin-row.is-dimmed { opacity: 0.45; }
+.b-lin-row.is-dimmed:hover { opacity: 0.8; }

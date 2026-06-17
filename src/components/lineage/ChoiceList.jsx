@@ -1,17 +1,23 @@
 // The choices pane: one unified, SEARCHABLE/FILTERABLE list of a lineage's
 // challenges + advantages (pain #3 crowding, #4 no search/filter). Grouped by
 // challenges (award LBP) / advantages (spend LBP); each item is a ChoiceRow.
-import React, { useState, useMemo } from "react";
+import React, { useState } from "react";
 import { subKey } from "../../engine/validate.js";
 import { cleanChallengeName } from "../LineagePanel.jsx";
+import { parseSublineage } from "./lineage-helpers.js";
 import ChoiceRow from "./ChoiceRow.jsx";
 
 const FILTERS = [
   { id: "all", label: "All" },
-  { id: "available", label: "Available" }, // matches sublineage / general
   { id: "taken", label: "Taken" },
   { id: "required", label: "Required" },
 ];
+
+// Clean display label for an item's sublineage ("Accented (…)" → "Accented").
+const subLabel = (s) => (s ? parseSublineage(s).name : "");
+// Sort rank within a group: General (0) → picked sublineage's own (handled by the
+// dimming, kept with available) → off-sublineage last.
+const rank = (info) => (info.general ? 0 : info.offSublineage ? 2 : 1);
 
 export default function ChoiceList({
   lin, lineage, character, lbp, pickedSub,
@@ -26,30 +32,42 @@ export default function ChoiceList({
   const resolvedLbpFor = (it) =>
     lbp?.chosenChallenges?.find((c) => cleanChallengeName(c.name) === cleanChallengeName(it.name))?.lbp;
 
+  // An item's sublineage facts: its key, whether it's General, and whether it's
+  // "off-sublineage" — scoped to a DIFFERENT sublineage than the one picked (those
+  // rows are dimmed so you still discover them, but see they're not yours).
+  const subInfo = (it) => {
+    const k = subKey(it.sublineage);
+    const general = !k || k === "general";
+    const offSublineage = !general && pickedSub && k !== pickedSub;
+    return { general, offSublineage, label: subLabel(it.sublineage) };
+  };
+
   const matches = (it, field) => {
     const q = query.trim().toLowerCase();
     if (q && !((it.baseName || it.name).toLowerCase().includes(q) || (it.desc || "").toLowerCase().includes(q))) return false;
-    const k = subKey(it.sublineage);
-    const available = !k || k === "general" || !pickedSub || k === pickedSub;
-    const taken = storedFor(field, it) !== undefined;
-    if (filter === "available") return available;
-    if (filter === "taken") return taken;
+    if (filter === "taken") return storedFor(field, it) !== undefined;
     if (filter === "required") return !!it.required;
-    return true; // all
+    return true; // 'all' — sublineage scoping is shown via dimming, not hiding
   };
 
   const rows = (list, field, kind) =>
-    (list || []).filter((it) => matches(it, field)).map((it) => {
-      const storedName = storedFor(field, it);
-      return (
-        <ChoiceRow key={it.name} item={it} lineage={lineage} kind={kind}
-                   chosen={storedName !== undefined} storedName={storedName}
-                   resolvedLbp={resolvedLbpFor(it)}
-                   onToggle={onToggle} onInspect={onInspect}
-                   onSetChoice={onSetChoice} onSetRep={onSetRep}
-                   advantageChoices={character.advantageChoices} />
-      );
-    });
+    (list || []).filter((it) => matches(it, field))
+      // General first, then this sublineage, then off-sublineage — relevant rises.
+      .sort((a, b) => rank(subInfo(a)) - rank(subInfo(b)))
+      .map((it) => {
+        const storedName = storedFor(field, it);
+        const info = subInfo(it);
+        return (
+          <ChoiceRow key={it.name} item={it} lineage={lineage} kind={kind}
+                     chosen={storedName !== undefined} storedName={storedName}
+                     resolvedLbp={resolvedLbpFor(it)}
+                     subLabel={info.general ? null : info.label}
+                     dimmed={info.offSublineage}
+                     onToggle={onToggle} onInspect={onInspect}
+                     onSetChoice={onSetChoice} onSetRep={onSetRep}
+                     advantageChoices={character.advantageChoices} />
+        );
+      });
 
   const ch = rows(lin.challenges, "lineageChallenges", "challenge");
   const adv = rows(lin.advantages, "lineageAdvantages", "advantage");
