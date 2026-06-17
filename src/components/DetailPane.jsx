@@ -79,7 +79,7 @@ function sourceType(name) {
 export default function DetailPane({ view, report, choices, onSetChoice, onUpdateParameter, onInspect, onBack, onClose }) {
   if (!view) {
     return (
-      <aside className="b-rail b-rail-right">
+      <aside className="b-rail b-rail-right is-empty">
         <div className="b-detail-empty">
           <p className="b-detail-hint">Click any item to see what it does, or click an empty power slot to choose one.</p>
         </div>
