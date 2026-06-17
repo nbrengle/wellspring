@@ -576,6 +576,13 @@ export default function Builder() {
     }
   }, []);
 
+  const handleChangeArchetype = useCallback(() => {
+    if (window.confirm("Select a different archetype? Any changes you've made to this character will be lost.")) {
+      setCharacter(EMPTY_CHARACTER);
+      setView(null); setHistory([]);
+    }
+  }, []);
+
   const handleClickIdentityField = useCallback((field) => {
     if (field === "class") {
       const primary = getClasses(character)[0]?.name;
@@ -597,6 +604,7 @@ export default function Builder() {
     onInspect: handleInspect,
     onClickField: handleClickIdentityField,
     onRestart: handleRestart,
+    onChangeArchetype: handleChangeArchetype,
     onSetClassLevel: handleSetClassLevel,
     onRemoveClass: handleRemoveClass,
     onAddClass: handleOpenClassPicker,
