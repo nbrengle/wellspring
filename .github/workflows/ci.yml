@@ -44,7 +44,7 @@ jobs:
       - run: npx playwright install chromium --with-deps
       - run: node scripts/test-browser.mjs
 
-  build:
+  vite-build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -54,3 +54,9 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
+
+  build:
+    needs: [test-unit, test-rules, test-browser, vite-build]
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "All checks passed!"
