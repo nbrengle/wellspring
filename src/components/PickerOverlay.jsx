@@ -1,7 +1,8 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo } from "react";
 import { REFS, lookupEntity, UNLIMITED_SKILLS } from '../engine/data.js';
 import { prereqStatus } from "../engine/validate.js";
 import { EntityBody } from "./DetailPane.jsx";
+import Overlay from "./ui/Overlay.jsx";
 
 function Tag({ label, tone = "amber" }) {
   return <span className={`b-tag b-tag-${tone}`}>{label}</span>;
@@ -109,15 +110,8 @@ export default function PickerOverlay({ spec, character, onClose }) {
   const selectedLocked = selected && lockedOf(selected);
   const selectedTaken = selected && taken.has(selected) && !UNLIMITED_SKILLS.has(selected);
 
-  useEffect(() => {
-    const onKey = (e) => { if (e.key === "Escape") onClose(); };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [onClose]);
-
   return (
-    <div className="b-overlay" role="dialog" aria-modal="true" onClick={onClose}>
-      <div className="b-picker" onClick={(e) => e.stopPropagation()}>
+    <Overlay onClose={onClose} panelClassName="b-picker">
         <header className="b-picker-head">
           <div>
             <h2 className="b-picker-title">{title}</h2>
@@ -208,7 +202,6 @@ export default function PickerOverlay({ spec, character, onClose }) {
             )}
           </div>
         </div>
-      </div>
-    </div>
+    </Overlay>
   );
 }

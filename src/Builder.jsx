@@ -29,6 +29,7 @@ import ExportImportPanel from "./components/ExportImportPanel.jsx";
 import PickerOverlay from "./components/PickerOverlay.jsx";
 import DetailPane, { formatParameterizedName } from "./components/DetailPane.jsx";
 import BuildSheet, { IdentityRail } from "./components/BuildSheet.jsx";
+import { BuilderProvider } from "./components/builder-context.jsx";
 
 // ─── SLOT MODEL ──────────────────────────────────────────────────────────────
 const SLOT_FIELD = {
@@ -585,6 +586,49 @@ export default function Builder() {
     if (item) handleInspect(item, null, field);
   }, [character, handleInspect]);
 
+  // ─── CONTEXT BUNDLES ──────────────────────────────────────────────────────
+  // State changes per keystroke; actions are (mostly) stable. Split into two
+  // contexts so action-only components don't re-render on every state change.
+  const builderState = useMemo(() => ({ character, report, view }), [character, report, view]);
+  const builderActions = useMemo(() => ({
+    onPickArchetype: handlePickArchetype,
+    onStartBlank: handleStartBlank,
+    onSetName: handleSetName,
+    onInspect: handleInspect,
+    onClickField: handleClickIdentityField,
+    onRestart: handleRestart,
+    onSetClassLevel: handleSetClassLevel,
+    onRemoveClass: handleRemoveClass,
+    onAddClass: handleOpenClassPicker,
+    onPickDevotion: handlePickDevotion,
+    onToggleDomain: handleToggleDomain,
+    onClearDevotion: handleClearDevotion,
+    onToggleBackstory: handleToggleBackstory,
+    onSetEvent: handleSetEvent,
+    onSetExtraBP: handleSetExtraBP,
+    onOpenSlot: handleOpenSlot,
+    onOpenAdd: handleOpenAdd,
+    onRemoveEntity: handleRemoveEntity,
+    onSetRank: handleSetRank,
+    onSetSpecialty: handleSetSpecialty,
+    onSetChoice: handleSetChoice,
+    onUpdateParameter: handleUpdateParameter,
+    onSetLineage: handleSetLineage,
+    onSetSublineage: handleSetSublineage,
+    onToggleLineageItem: handleToggleLineageItem,
+    onSetLineageRep: handleSetLineageRep,
+    onSetAdvantageChoice: handleSetAdvantageChoice,
+    onOpenLineage: () => setLineageOpen(true),
+  }), [
+    handlePickArchetype, handleStartBlank, handleSetName, handleInspect,
+    handleClickIdentityField, handleRestart, handleSetClassLevel, handleRemoveClass,
+    handleOpenClassPicker, handlePickDevotion, handleToggleDomain, handleClearDevotion,
+    handleToggleBackstory, handleSetEvent, handleSetExtraBP, handleOpenSlot,
+    handleOpenAdd, handleRemoveEntity, handleSetRank, handleSetSpecialty,
+    handleSetChoice, handleUpdateParameter, handleSetLineage, handleSetSublineage,
+    handleToggleLineageItem, handleSetLineageRep, handleSetAdvantageChoice,
+  ]);
+
   return (
     <div className="b-root">
       <BTopBar mode={mode} setMode={setMode} character={character} report={report} onLevelChange={handleLevelChange}
@@ -594,27 +638,17 @@ export default function Builder() {
       ) : mode === "recipes" ? (
         <RecipeChecker onClose={() => setMode("builder")} />
       ) : (
-        <div className="b-cols">
-          <IdentityRail character={character} report={report}
-                        onClickField={handleClickIdentityField} onRestart={handleRestart}
-                        onSetClassLevel={handleSetClassLevel} onRemoveClass={handleRemoveClass}
-                        onAddClass={handleOpenClassPicker}
-                        onPickDevotion={handlePickDevotion} onToggleDomain={handleToggleDomain}
-                        onClearDevotion={handleClearDevotion} onOpenLineage={() => setLineageOpen(true)}
-                        onToggleBackstory={handleToggleBackstory} onInspect={handleInspect}
-                        onSetEvent={handleSetEvent} onSetExtraBP={handleSetExtraBP} />
-          <BuildSheet character={character} report={report} view={view}
-                      onPickArchetype={handlePickArchetype} onStartBlank={handleStartBlank}
-                      onInspect={handleInspect} onOpenSlot={handleOpenSlot}
-                      onOpenAdd={handleOpenAdd} onRemoveEntity={handleRemoveEntity}
-                      onSetName={handleSetName} onOpenLineage={() => setLineageOpen(true)}
-                      onSetRank={handleSetRank} onSetSpecialty={handleSetSpecialty} />
-          <DetailPane view={view} report={report}
-                      choices={character.choices} onSetChoice={handleSetChoice}
-                      onUpdateParameter={handleUpdateParameter}
-                      onInspect={handleInspect}
-                      onBack={history.length ? handleBack : null} onClose={handleClose} />
-        </div>
+        <BuilderProvider state={builderState} actions={builderActions}>
+          <div className="b-cols">
+            <IdentityRail />
+            <BuildSheet />
+            <DetailPane view={view} report={report}
+                        choices={character.choices} onSetChoice={handleSetChoice}
+                        onUpdateParameter={handleUpdateParameter}
+                        onInspect={handleInspect}
+                        onBack={history.length ? handleBack : null} onClose={handleClose} />
+          </div>
+        </BuilderProvider>
       )}
       {picking && (
         <PickerOverlay spec={picking} character={character} onClose={() => setPicking(null)} />
