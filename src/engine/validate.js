@@ -9,7 +9,7 @@
 // Pure functions, no React, so the UI calls them in a useMemo and they stay
 // unit-testable. The character shape is the flat object from Builder.jsx.
 
-import { LEVEL_TABLE, lookupEntity, REFS, CLASS_POWER_SLOTS, CLASS_POWERS, CLASS_PROGRESSION, SPELLCASTERS, DEVOTIONS, DOMAINS, LINEAGES, CRAFTING, RITUALS, EVENTS_TABLE, UNLIMITED_SKILLS, BASE_CLASSES } from '../engine/data.js';
+import { LEVEL_TABLE, lookupEntity, REFS, CLASS_POWER_SLOTS, CLASS_POWERS, CLASS_PROGRESSION, DEVOTIONS, DOMAINS, LINEAGES, CRAFTING, RITUALS, EVENTS_TABLE, UNLIMITED_SKILLS, BASE_CLASSES } from '../engine/data.js';
 import { cleanItemName, bareSkill, resolveId, idName, entityType, getClasses, primaryClass } from './resolver.js';
 
 // Shared primitives now live in validate/core.js (hotspot split). Import the ones

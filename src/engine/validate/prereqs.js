@@ -6,7 +6,7 @@
 // requirements). Depends on core primitives + slots (for spell-slot constraints).
 // Re-exported by the validate.js barrel.
 
-import { lookupEntity, REFS, CLASS_POWERS, SPELLCASTERS, BASE_CLASSES } from '../data.js';
+import { lookupEntity, REFS, CLASS_POWERS, CLASSES, BASE_CLASSES } from '../data.js';
 import { cleanItemName, bareSkill, resolveId, idName, entityType, getClasses } from '../resolver.js';
 import {
   characterLevel, rankOf, ENTITY_FIELDS,
@@ -89,7 +89,7 @@ export function checkLevelConstraint(character, constraintStr, owned) {
   if (m) {
     const required = parseInt(m[1], 10);
     const martialLevels = charClasses
-      .filter(c => !SPELLCASTERS.has(c.name))
+      .filter(c => !CLASSES[c.name]?.spellcaster)
       .reduce((sum, c) => sum + c.level, 0);
     return martialLevels >= required;
   }
@@ -97,7 +97,7 @@ export function checkLevelConstraint(character, constraintStr, owned) {
   // 2. "One level in a non-casting class"
   m = constraintStr.match(/^(one|1)\s+level\s+in\s+a\s+non-casting\s+class/i);
   if (m) {
-    return charClasses.some(c => !SPELLCASTERS.has(c.name) && c.level >= 1);
+    return charClasses.some(c => !CLASSES[c.name]?.spellcaster && c.level >= 1);
   }
 
   // 3. "class-levels in at least two Base Classes"
@@ -111,14 +111,14 @@ export function checkLevelConstraint(character, constraintStr, owned) {
   m = constraintStr.match(/^(\d+)\s+levels?\s+in\s+any\s+one\s+spell-casting\s+class/i);
   if (m) {
     const required = parseInt(m[1], 10);
-    return charClasses.some(c => SPELLCASTERS.has(c.name) && c.level >= required);
+    return charClasses.some(c => CLASSES[c.name]?.spellcaster && c.level >= required);
   }
 
   // 5. "N levels in a single casting class."
   m = constraintStr.match(/^(\d+)\s+levels?\s+in\s+a\s+single\s+casting\s+class/i);
   if (m) {
     const required = parseInt(m[1], 10);
-    return charClasses.some(c => SPELLCASTERS.has(c.name) && c.level >= required);
+    return charClasses.some(c => CLASSES[c.name]?.spellcaster && c.level >= required);
   }
 
   // 6. "Character Level N", "Requires Level N", "character-level N", "Nth character-level", "Nth level character"
