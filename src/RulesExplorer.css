@@ -35,7 +35,7 @@
 }
 
 .b-sidebar-title {
-  font-family: "Cinzel", serif;
+  font-family: Cinzel, serif;
   font-size: 0.72rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -67,13 +67,13 @@
 }
 
 .b-group-tab:hover {
-  background: rgba(255, 255, 255, 0.03);
+  background: rgb(255, 255, 255, 3%);
   color: var(--b-amber);
 }
 
 .b-group-tab.is-active {
-  background: rgba(229, 169, 59, 0.08);
-  border-color: rgba(229, 169, 59, 0.3);
+  background: rgb(229, 169, 59, 8%);
+  border-color: rgb(229, 169, 59, 30%);
   color: var(--b-amber);
   font-weight: 600;
 }
@@ -84,18 +84,19 @@
   gap: 0.45rem;
   max-height: 250px;
   overflow-y: auto;
-  padding-right: 0.4rem;
   border: 1px solid var(--b-border, #3a332a);
-  background: rgba(0, 0, 0, 0.15);
+  background: rgb(0, 0, 0, 15%);
   border-radius: 0.375rem;
   padding: 0.5rem;
+  padding-right: 0.4rem;
 }
 
 .b-type-filters::-webkit-scrollbar {
   width: 4px;
 }
+
 .b-type-filters::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgb(255, 255, 255, 10%);
   border-radius: 2px;
 }
 
@@ -164,7 +165,7 @@
   display: flex;
   align-items: center;
   position: relative;
-  background: rgba(0, 0, 0, 0.12);
+  background: rgb(0, 0, 0, 12%);
 }
 
 .b-explorer-search {
@@ -182,8 +183,8 @@
 
 .b-explorer-search:focus {
   border-color: var(--b-amber);
-  background: rgba(0, 0, 0, 0.25);
-  box-shadow: 0 0 0 2px rgba(229, 169, 59, 0.15);
+  background: rgb(0, 0, 0, 25%);
+  box-shadow: 0 0 0 2px rgb(229, 169, 59, 15%);
 }
 
 .b-search-clear {
@@ -219,7 +220,7 @@
 }
 
 .b-explorer-group-label {
-  font-family: "Cinzel", serif;
+  font-family: Cinzel, serif;
   font-size: 0.75rem;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -255,13 +256,13 @@
 }
 
 .b-explorer-row:hover {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.1);
+  background: rgb(255, 255, 255, 5%);
+  border-color: rgb(255, 255, 255, 10%);
 }
 
 .b-explorer-row.is-selected {
-  background: rgba(229, 169, 59, 0.12);
-  border-color: rgba(229, 169, 59, 0.4);
+  background: rgb(229, 169, 59, 12%);
+  border-color: rgb(229, 169, 59, 40%);
   color: var(--b-amber);
   font-weight: 600;
 }
@@ -280,15 +281,15 @@
   text-transform: uppercase;
   padding: 0.1rem 0.35rem;
   border-radius: 0.25rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgb(255, 255, 255, 5%);
+  border: 1px solid rgb(255, 255, 255, 8%);
   color: var(--b-muted);
   flex: none;
 }
 
 .b-explorer-row.is-selected .b-explorer-row-badge {
-  background: rgba(229, 169, 59, 0.1);
-  border-color: rgba(229, 169, 59, 0.25);
+  background: rgb(229, 169, 59, 10%);
+  border-color: rgb(229, 169, 59, 25%);
   color: var(--b-amber);
 }
 
@@ -315,7 +316,7 @@
 }
 
 .b-explorer-detail-title {
-  font-family: "Cinzel", serif;
+  font-family: Cinzel, serif;
   font-size: 1.5rem;
   font-weight: 700;
   margin: 0.3rem 0;
@@ -334,8 +335,8 @@
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--b-purple, #b08fd0);
-  background: rgba(176,143,208,0.1);
-  border: 1px solid rgba(176,143,208,0.25);
+  background: rgb(176, 143, 208, 10%);
+  border: 1px solid rgb(176, 143, 208, 25%);
   padding: 0.15rem 0.45rem;
   border-radius: 0.25rem;
   font-weight: 600;
@@ -346,8 +347,8 @@
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--b-amber);
-  background: rgba(229,169,59,0.08);
-  border: 1px solid rgba(229,169,59,0.25);
+  background: rgb(229, 169, 59, 8%);
+  border: 1px solid rgb(229, 169, 59, 25%);
   padding: 0.15rem 0.45rem;
   border-radius: 0.25rem;
   font-weight: 600;
@@ -405,12 +406,12 @@
 .b-explorer-list-container::-webkit-scrollbar-thumb,
 .b-explorer-detail-body::-webkit-scrollbar-thumb,
 .b-explorer-sidebar::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgb(255, 255, 255, 8%);
   border-radius: 3px;
 }
 
 .b-explorer-list-container::-webkit-scrollbar-thumb:hover,
 .b-explorer-detail-body::-webkit-scrollbar-thumb:hover,
 .b-explorer-sidebar::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgb(255, 255, 255, 15%);
 }
