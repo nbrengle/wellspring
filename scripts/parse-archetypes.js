@@ -12,7 +12,7 @@
 import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
-import { LABEL_FIELD, CHOICE_DEFAULTS } from '../src/data/sheet-schema.js';
+import { LABEL_FIELD, CHOICE_DEFAULTS } from '../src/engine/sheet-schema.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
