@@ -1,7 +1,7 @@
 import React from "react";
 import { useBuilderState, useBuilderActions } from "../builder-context.jsx";
 import { StatWithSources, Stat } from "./SharedUI.jsx";
-import { statTitle, statSources } from "./utils.js";
+import { statTitle, statSources, sourceType } from "./utils.js";
 import { getClasses } from "../../engine/resolver.js";
 import { EVENTS_TABLE } from "../../engine/data.js";
 import { MAX_DOMAINS } from "../../engine/validate.js";
@@ -11,9 +11,19 @@ const DEFAULT_WEALTH = 8;
 export function IdentityRail() {
   const { character, report } = useBuilderState();
   const {
-    onClickField, onRestart, onSetClassLevel, onRemoveClass, onAddClass,
-    onPickDevotion, onToggleDomain, onClearDevotion, onOpenLineage,
-    onToggleBackstory, onInspect, onSetEvent, onSetExtraBP,
+    onClickField,
+    onRestart,
+    onSetClassLevel,
+    onRemoveClass,
+    onAddClass,
+    onPickDevotion,
+    onToggleDomain,
+    onClearDevotion,
+    onOpenLineage,
+    onToggleBackstory,
+    onInspect,
+    onSetEvent,
+    onSetExtraBP,
   } = useBuilderActions();
   const classes = getClasses(character);
   return (
@@ -21,7 +31,9 @@ export function IdentityRail() {
       <header className="b-rail-header">
         <h2 className="b-rail-title">Identity</h2>
         {character.archetypeName && (
-          <p className="b-rail-sub">Based on <em>{character.archetypeName}</em></p>
+          <p className="b-rail-sub">
+            Based on <em>{character.archetypeName}</em>
+          </p>
         )}
       </header>
 
@@ -44,9 +56,14 @@ export function IdentityRail() {
         </span>
       </div>
 
-      <ClassCard classes={classes} spec={character.specialization}
-                 onSetLevel={onSetClassLevel} onRemove={onRemoveClass} onAdd={onAddClass}
-                 onInspect={() => onClickField("class")} />
+      <ClassCard
+        classes={classes}
+        spec={character.specialization}
+        onSetLevel={onSetClassLevel}
+        onRemove={onRemoveClass}
+        onAdd={onAddClass}
+        onInspect={() => onClickField("class")}
+      />
 
       {/* Lineage card */}
       <button className={`b-id-card ${character.lineage ? "is-set" : "is-empty"}`} onClick={onOpenLineage}>
@@ -56,8 +73,10 @@ export function IdentityRail() {
           <span className="b-id-value">{character.lineage || <em>+ choose a lineage</em>}</span>
           {character.sublineage && <span className="b-id-sub">{character.sublineage}</span>}
           {report.lbp && (report.lbp.chosenChallenges.length > 0 || report.lbp.chosenAdvantages.length > 0) && (
-            <span className={`b-id-sub ${report.lbp.valid ? "" : "b-lbp-warn"}`}
-                  title={`${report.lbp.awarded} LBP earned from challenges − ${report.lbp.spent} spent on advantages`}>
+            <span
+              className={`b-id-sub ${report.lbp.valid ? "" : "b-lbp-warn"}`}
+              title={`${report.lbp.awarded} LBP earned from challenges − ${report.lbp.spent} spent on advantages`}
+            >
               {report.lbp.remaining} LBP left
             </span>
           )}
@@ -67,60 +86,95 @@ export function IdentityRail() {
       <DevotionCard />
 
       <div className="b-stat-strip">
-        <StatWithSources label="Life" title={statTitle(report.stats, "lifePoints", "Life Points")}
-              value={report.stats?.lifePoints ?? character.lifePoints ?? "—"}
-              base={report.stats?.baseLifePoints} baseLabel={`level ${report.level} base`}
-              sources={statSources(report.stats, "lifePoints")} onInspect={onInspect} />
-        <StatWithSources label="Spikes" title={statTitle(report.stats, "spikes", "Maximum Spikes")}
-              value={report.stats?.spikes ?? character.spikes ?? "—"}
-              base={report.stats?.baseSpikes} baseLabel={`level ${report.level} base`}
-              sources={statSources(report.stats, "spikes")} onInspect={onInspect} />
+        <StatWithSources
+          label="Life"
+          title={statTitle(report.stats, "lifePoints", "Life Points")}
+          value={report.stats?.lifePoints ?? character.lifePoints ?? "—"}
+          base={report.stats?.baseLifePoints}
+          baseLabel={`level ${report.level} base`}
+          sources={statSources(report.stats, "lifePoints")}
+          onInspect={onInspect}
+        />
+        <StatWithSources
+          label="Spikes"
+          title={statTitle(report.stats, "spikes", "Maximum Spikes")}
+          value={report.stats?.spikes ?? character.spikes ?? "—"}
+          base={report.stats?.baseSpikes}
+          baseLabel={`level ${report.level} base`}
+          sources={statSources(report.stats, "spikes")}
+          onInspect={onInspect}
+        />
         {(() => {
           const physStr = character.armorPoints ? String(character.armorPoints) : "";
           const physInput = parseInt(physStr.match(/^\s*(\d+)/)?.[1] ?? "0", 10);
-          
+
           const armorSrcRows = statSources(report.stats, "armor");
-          const physSkill = Math.max(0, ...armorSrcRows.map(s => s.n));
+          const physSkill = Math.max(0, ...armorSrcRows.map((s) => s.n));
           const phys = Math.max(physInput, physSkill);
 
           const natSrcRows = statSources(report.stats, "naturalArmor");
-          const natFixed = Math.max(0, ...natSrcRows.map(s => s.n));
+          const natFixed = Math.max(0, ...natSrcRows.map((s) => s.n));
           const natNotes = (report.stats?.mods?.notes || []).filter((n) => n.stat === "naturalArmor");
-          
+
           const hasNat = natFixed > 0 || natNotes.length > 0;
           let value, type;
           if (hasNat && (natFixed > phys || (natNotes.length && phys === 0))) {
-            value = natFixed > 0 ? String(natFixed) : "※"; type = "natural";
+            value = natFixed > 0 ? String(natFixed) : "※";
+            type = "natural";
           } else {
-            value = String(phys); type = phys > 0 ? "physical" : "—";
+            value = String(phys);
+            type = phys > 0 ? "physical" : "—";
           }
           const sources = [];
-          if (physInput > 0) sources.push({ name: "Manual Entry", n: physInput, note: type === "physical" && physInput === phys ? "in use" : "not in use" });
-          for (const s of armorSrcRows) sources.push({ ...s, note: `physical${type === "physical" && s.n === phys ? ", in use" : ""}` });
-          for (const s of natSrcRows) sources.push({ ...s, note: `natural${type === "natural" && s.n === natFixed ? ", in use" : ""}` });
-          for (const n of natNotes) sources.push({ name: n.name, n: 0, note: "natural, variable", type: sourceType(n.name) });
-          
-          const tip = (hasNat || armorSrcRows.length > 0)
-            ? `Armor doesn't stack — pick one. Showing best (${type}). Sources: ${sources.map(s => `${s.n} ${s.name} (${s.note})`).join(', ')}`
-            : (physStr || "Physical Armor Points");
-            
+          if (physInput > 0)
+            sources.push({
+              name: "Manual Entry",
+              n: physInput,
+              note: type === "physical" && physInput === phys ? "in use" : "not in use",
+            });
+          for (const s of armorSrcRows)
+            sources.push({ ...s, note: `physical${type === "physical" && s.n === phys ? ", in use" : ""}` });
+          for (const s of natSrcRows)
+            sources.push({ ...s, note: `natural${type === "natural" && s.n === natFixed ? ", in use" : ""}` });
+          for (const n of natNotes)
+            sources.push({ name: n.name, n: 0, note: "natural, variable", type: sourceType(n.name) });
+
+          const tip =
+            hasNat || armorSrcRows.length > 0
+              ? `Armor doesn't stack — pick one. Showing best (${type}). Sources: ${sources.map((s) => `${s.n} ${s.name} (${s.note})`).join(", ")}`
+              : physStr || "Physical Armor Points";
+
           return <StatWithSources label="Armor" title={tip} value={value} sources={sources} onInspect={onInspect} />;
         })()}
         {(() => {
-          const w = report.wealth || { base: character.wealth ?? DEFAULT_WEALTH, income: 0, total: character.wealth ?? DEFAULT_WEALTH, sources: [] };
-          const tip = w.income > 0
-            ? `Wealth at your first event: ${w.base} starting + ${w.income} from sources = ${w.total}.`
-            : "Wealth at your first event (default 8 starting; perks/professions add income).";
-          return <StatWithSources label="Wealth" title={tip}
-                       value={w.income > 0 ? `${w.total}` : w.base}
-                       base={w.base} baseLabel="starting"
-                       sources={w.sources.map((s) => ({ name: s.name, n: s.n, note: s.note, type: sourceType(s.name) }))}
-                       onInspect={onInspect} />;
+          const w = report.wealth || {
+            base: character.wealth ?? DEFAULT_WEALTH,
+            income: 0,
+            total: character.wealth ?? DEFAULT_WEALTH,
+            sources: [],
+          };
+          const tip =
+            w.income > 0
+              ? `Wealth at your first event: ${w.base} starting + ${w.income} from sources = ${w.total}.`
+              : "Wealth at your first event (default 8 starting; perks/professions add income).";
+          return (
+            <StatWithSources
+              label="Wealth"
+              title={tip}
+              value={w.income > 0 ? `${w.total}` : w.base}
+              base={w.base}
+              baseLabel="starting"
+              sources={w.sources.map((s) => ({ name: s.name, n: s.n, note: s.note, type: sourceType(s.name) }))}
+              onInspect={onInspect}
+            />
+          );
         })()}
         {character.resources && (
-          <Stat label="Resources"
-                title="Resources available to the character (free-form; from the sheet)."
-                value={character.resources} />
+          <Stat
+            label="Resources"
+            title="Resources available to the character (free-form; from the sheet)."
+            value={character.resources}
+          />
         )}
       </div>
 
@@ -141,26 +195,50 @@ function ClassCard({ classes, spec, onSetLevel, onRemove, onAdd, onInspect }) {
       <span className="b-id-icon">⚔</span>
       <span className="b-id-body">
         <span className="b-id-label">{classes.length > 1 ? "Classes" : "Class"}</span>
-        {classes.length === 0 && <span className="b-id-value"><em>not set</em></span>}
+        {classes.length === 0 && (
+          <span className="b-id-value">
+            <em>not set</em>
+          </span>
+        )}
         {classes.map((c, i) => (
           <span key={c.name} className="b-class-row">
             <button className="b-class-name" onClick={() => onInspect(c.name)} title="Inspect class">
-              {c.name}{i === 0 && spec ? ` (${spec})` : ""}
+              {c.name}
+              {i === 0 && spec ? ` (${spec})` : ""}
             </button>
             <span className="b-class-lvl">
-              <button className="b-level-btn" disabled={c.level <= 1} aria-label={`Lower ${c.name} level`}
-                      onClick={() => onSetLevel(c.name, c.level - 1)}>−</button>
+              <button
+                className="b-level-btn"
+                disabled={c.level <= 1}
+                aria-label={`Lower ${c.name} level`}
+                onClick={() => onSetLevel(c.name, c.level - 1)}
+              >
+                −
+              </button>
               <strong>{c.level}</strong>
-              <button className="b-level-btn" aria-label={`Raise ${c.name} level`}
-                      onClick={() => onSetLevel(c.name, c.level + 1)}>+</button>
+              <button
+                className="b-level-btn"
+                aria-label={`Raise ${c.name} level`}
+                onClick={() => onSetLevel(c.name, c.level + 1)}
+              >
+                +
+              </button>
             </span>
             {classes.length > 1 && (
-              <button className="b-class-remove" title="Remove class" aria-label={`Remove ${c.name}`}
-                      onClick={() => onRemove(c.name)}>×</button>
+              <button
+                className="b-class-remove"
+                title="Remove class"
+                aria-label={`Remove ${c.name}`}
+                onClick={() => onRemove(c.name)}
+              >
+                ×
+              </button>
             )}
           </span>
         ))}
-        <button className="b-class-add" onClick={onAdd}>+ add class</button>
+        <button className="b-class-add" onClick={onAdd}>
+          + add class
+        </button>
       </span>
     </div>
   );
@@ -177,7 +255,9 @@ function DevotionCard() {
         <span className="b-id-icon">🌟</span>
         <span className="b-id-body">
           <span className="b-id-label">Devotion</span>
-          <span className="b-id-value"><em>+ choose a devotion</em></span>
+          <span className="b-id-value">
+            <em>+ choose a devotion</em>
+          </span>
         </span>
       </button>
     );
@@ -189,21 +269,30 @@ function DevotionCard() {
       <span className="b-id-body">
         <span className="b-id-label">Devotion</span>
         <span className="b-devotion-head">
-          <button className="b-class-name" onClick={onInspect} title="Inspect devotion">{character.devotion}</button>
-          <button className="b-class-remove" title="Clear devotion" aria-label="Clear devotion" onClick={onClear}>×</button>
+          <button className="b-class-name" onClick={onInspect} title="Inspect devotion">
+            {character.devotion}
+          </button>
+          <button className="b-class-remove" title="Clear devotion" aria-label="Clear devotion" onClick={onClear}>
+            ×
+          </button>
         </span>
         {available.length > 0 && (
           <>
-            <span className="b-devotion-sub">Domains ({chosen.length}/{MAX_DOMAINS}):</span>
+            <span className="b-devotion-sub">
+              Domains ({chosen.length}/{MAX_DOMAINS}):
+            </span>
             <span className="b-domain-chips">
               {available.map((d) => {
                 const on = chosen.includes(d);
                 const full = chosen.length >= MAX_DOMAINS && !on;
                 return (
-                  <button key={d} disabled={full}
-                          className={`b-domain-chip ${on ? "is-on" : ""}`}
-                          onClick={() => onToggleDomain(d)}
-                          title={full ? `Pick up to ${MAX_DOMAINS} domains` : on ? "Remove domain" : "Add domain"}>
+                  <button
+                    key={d}
+                    disabled={full}
+                    className={`b-domain-chip ${on ? "is-on" : ""}`}
+                    onClick={() => onToggleDomain(d)}
+                    title={full ? `Pick up to ${MAX_DOMAINS} domains` : on ? "Remove domain" : "Add domain"}
+                  >
                     {d}
                   </button>
                 );
@@ -212,7 +301,9 @@ function DevotionCard() {
           </>
         )}
         {!worship && <span className="b-devotion-flag">⚑ needs Worship skill to buy domain powers</span>}
-        <button className="b-class-add" onClick={onPick}>change devotion</button>
+        <button className="b-class-add" onClick={onPick}>
+          change devotion
+        </button>
       </span>
     </div>
   );
@@ -259,29 +350,43 @@ function BudgetMeter() {
         <span className="b-budget-label">Build Points</span>
         <span className="b-budget-nums">
           <strong>{spend.net}</strong> / {budget}
-          {spend.awarded > 0 && <span className="b-budget-flaws"> (+{spend.awarded} from flaws{spend.flawCapped ? ", capped at 5" : ""})</span>}
-          {Object.entries(refundsByClass).map(([clsName, amount]) => (
-            amount > 0 && <span key={clsName} className="b-budget-flaws"> +{amount} {clsName}</span>
-          ))}
+          {spend.awarded > 0 && (
+            <span className="b-budget-flaws">
+              {" "}
+              (+{spend.awarded} from flaws{spend.flawCapped ? ", capped at 5" : ""})
+            </span>
+          )}
+          {Object.entries(refundsByClass).map(
+            ([clsName, amount]) =>
+              amount > 0 && (
+                <span key={clsName} className="b-budget-flaws">
+                  {" "}
+                  +{amount} {clsName}
+                </span>
+              ),
+          )}
           {report.backstoryBP > 0 && <span className="b-budget-flaws"> +{report.backstoryBP} backstory</span>}
           {character.extraMaxBP > 0 && <span className="b-budget-flaws"> +{character.extraMaxBP} extra</span>}
         </span>
       </div>
-      <div className="b-budget-bar"><div className="b-budget-fill" style={{ width: `${pct}%` }} /></div>
-      <p className="b-budget-foot">
-        {overBudget
-          ? `${-remaining} BP over budget`
-          : `${remaining} BP remaining`}
-      </p>
+      <div className="b-budget-bar">
+        <div className="b-budget-fill" style={{ width: `${pct}%` }} />
+      </div>
+      <p className="b-budget-foot">{overBudget ? `${-remaining} BP over budget` : `${remaining} BP remaining`}</p>
       <div className="b-budget-extra-row">
         {onToggleBackstory && (
           <label className="b-budget-backstory" title="Approved backstories grant +2 BP (submit to the plot team).">
             <input type="checkbox" checked={!!character?.backstoryApproved} onChange={onToggleBackstory} />
-            <span>Approved backstory <span className="b-budget-flaws">+2 BP</span></span>
+            <span>
+              Approved backstory <span className="b-budget-flaws">+2 BP</span>
+            </span>
           </label>
         )}
         {onSetExtraBP && (
-          <div className="b-budget-extra-control" title="Add extra Build Points (e.g. from service points, NPC shifts, or donations).">
+          <div
+            className="b-budget-extra-control"
+            title="Add extra Build Points (e.g. from service points, NPC shifts, or donations)."
+          >
             <span>Extra BP:</span>
             <input
               type="number"
@@ -297,5 +402,3 @@ function BudgetMeter() {
     </div>
   );
 }
-
-
