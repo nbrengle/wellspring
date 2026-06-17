@@ -89,6 +89,9 @@ async function run() {
     // regression was an undefined handler referenced here) fires a pageerror and
     // unmounts the tree. Catch it immediately, with a clear message.
     await page.waitForSelector('.b-id-card', { timeout: 5000 }).catch(() => {
+      if (errors.length > 0) {
+        console.error("FAIL: errors on entering the builder:", errors);
+      }
       throw new Error("Build sheet (.b-id-card) never rendered after picking an archetype — Builder crashed on render?");
     });
     if (errors.length > 0) {
