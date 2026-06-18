@@ -24,10 +24,19 @@ export default function SubChoice({ spec, item, field, value, onSetChoice, onSet
     return (
       <label className="b-lin-subchoice">
         <span className="b-lin-subchoice-label">Cantrip</span>
-        <select className="b-lin-subchoice-select" value={value || ""}
-                onChange={(e) => onSetChoice(item, e.target.value)}>
-          <option value="" disabled>Choose a cantrip…</option>
-          {cantripOptions(spec.pool).map((c) => <option key={c} value={c}>{c}</option>)}
+        <select
+          className="b-lin-subchoice-select"
+          value={value || ""}
+          onChange={(e) => onSetChoice(item, e.target.value)}
+        >
+          <option value="" disabled>
+            Choose a cantrip…
+          </option>
+          {cantripOptions(spec.pool).map((c) => (
+            <option key={c} value={c}>
+              {c}
+            </option>
+          ))}
         </select>
       </label>
     );
@@ -37,8 +46,11 @@ export default function SubChoice({ spec, item, field, value, onSetChoice, onSet
     return (
       <label className="b-lin-subchoice">
         <span className="b-lin-subchoice-label">Repping</span>
-        <select className="b-lin-subchoice-select" value={value || ""}
-                onChange={(e) => onSetRep(field, item, e.target.value)}>
+        <select
+          className="b-lin-subchoice-select"
+          value={value || ""}
+          onChange={(e) => onSetRep(field, item, e.target.value)}
+        >
           <option value="">Choose a challenge to rep…</option>
           {lineageRepOptions().map(([linName, challenges]) => (
             <optgroup key={linName} label={linName}>
@@ -60,15 +72,28 @@ export default function SubChoice({ spec, item, field, value, onSetChoice, onSet
     <label className="b-lin-subchoice">
       <span className="b-lin-subchoice-label">{spec.label || "Choice"}</span>
       {opts ? (
-        <select className="b-lin-subchoice-select" value={value || ""}
-                onChange={(e) => onSetChoice(item, e.target.value)}>
-          <option value="" disabled>Choose…</option>
-          {opts.map((o) => <option key={o} value={o}>{o}</option>)}
+        <select
+          className="b-lin-subchoice-select"
+          value={value || ""}
+          onChange={(e) => onSetChoice(item, e.target.value)}
+        >
+          <option value="" disabled>
+            Choose…
+          </option>
+          {opts.map((o) => (
+            <option key={o} value={o}>
+              {o}
+            </option>
+          ))}
         </select>
       ) : (
-        <input className="b-lin-subchoice-select" type="text" value={value || ""}
-               placeholder={`Your ${(spec.label || "choice").toLowerCase()}…`}
-               onChange={(e) => onSetChoice(item, e.target.value)} />
+        <input
+          className="b-lin-subchoice-select"
+          type="text"
+          value={value || ""}
+          placeholder={`Your ${(spec.label || "choice").toLowerCase()}…`}
+          onChange={(e) => onSetChoice(item, e.target.value)}
+        />
       )}
     </label>
   );

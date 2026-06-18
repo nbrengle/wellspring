@@ -3,21 +3,37 @@
 
 import { useState, useEffect, useMemo, useCallback } from "react";
 import {
-  DEVOTIONS, DOMAINS, ALL_SKILLS, ALL_PERKS, ALL_FLAWS,
-  CLASS_POWER_SLOTS, CLASSES, META, UNLIMITED_SKILLS, LEVEL_TABLE,
-  eligiblePowers
-} from './engine/data.js';
+  DEVOTIONS,
+  DOMAINS,
+  ALL_SKILLS,
+  ALL_PERKS,
+  ALL_FLAWS,
+  CLASS_POWER_SLOTS,
+  CLASSES,
+  META,
+  UNLIMITED_SKILLS,
+  LEVEL_TABLE,
+  LINEAGES,
+  eligiblePowers,
+} from "./engine/data.js";
 import {
-  validate, characterLevel, pickClass, MAX_DOMAINS,
-  EVENTS_TABLE, getMaxRanks, validityReasons
+  validate,
+  characterLevel,
+  pickClass,
+  MAX_DOMAINS,
+  EVENTS_TABLE,
+  getMaxRanks,
+  validityReasons,
+  subKey,
 } from "./engine/validate.js";
 import { bareSkill, cleanItemName, getClasses } from "./engine/resolver.js";
 import {
-  STARTING_CHOICES_CONFIG, hasStartingChoices, reconcileStartingChoices, rebuildStartingSkills
-} from './engine/starting-choices.js';
-import {
-  EMPTY_CHARACTER, applyClassStartingAbilities, loadArchetype
-} from "./engine/character-state.js";
+  STARTING_CHOICES_CONFIG,
+  hasStartingChoices,
+  reconcileStartingChoices,
+  rebuildStartingSkills,
+} from "./engine/starting-choices.js";
+import { EMPTY_CHARACTER, applyClassStartingAbilities, loadArchetype } from "./engine/character-state.js";
 import { useCharacterState } from "./hooks/useCharacterState.js";
 import RulesExplorer from "./RulesExplorer.jsx";
 import RecipeChecker from "./RecipeChecker.jsx";
@@ -26,6 +42,7 @@ import "./Builder.css";
 
 // Components
 import LineagePanel, { cleanChallengeName } from "./components/LineagePanel.jsx";
+import { requiredChallengeNames } from "./components/lineage/lineage-helpers.js";
 import ExportImportPanel from "./components/ExportImportPanel.jsx";
 import PickerOverlay from "./components/PickerOverlay.jsx";
 import DetailPane, { formatParameterizedName } from "./components/DetailPane.jsx";
@@ -46,8 +63,6 @@ const MAX_LEVEL = LEVEL_TABLE.length ? Math.max(...LEVEL_TABLE.map((l) => l.leve
 const MIN_LEVEL = 1;
 const LEVEL_CAP = 10;
 
-
-
 // ─── ROOT COMPONENT ─────────────────────────────────────────────────────────
 
 export default function Builder() {
@@ -60,7 +75,8 @@ export default function Builder() {
 
   const handlePickArchetype = useCallback((archetype) => {
     setCharacter(loadArchetype(archetype));
-    setView(null); setHistory([]);
+    setView(null);
+    setHistory([]);
   }, []);
 
   const handleSetName = useCallback((name) => {
@@ -70,34 +86,40 @@ export default function Builder() {
   // ─── DEVOTION ────────────────────────────────────────────────────────────
   const handlePickDevotion = useCallback(() => {
     const candidates = DEVOTIONS.map((d) => ({
-      name: d.name, desc: d.lore || (d.tenets || []).join(" "),
+      name: d.name,
+      desc: d.lore || (d.tenets || []).join(" "),
       cat: d.locality || "Devotion",
     }));
-    setPicking(entityPickerSpec({
-      kind: "devotion", entityType: "devotions", candidates, title: "Choose a devotion",
-      taken: new Set(character.devotion ? [character.devotion] : []),
-      onChoose: (name) => {
-        const dev = DEVOTIONS.find((d) => d.name === name);
-        setCharacter((c) => {
-          const updateWorship = (list) => {
-            return list.map(s => {
-              if (/^worship\b/i.test(s)) {
-                return formatParameterizedName("Worship", name, s);
-              }
-              return s;
-            });
-          };
-          return {
-            ...c,
-            devotion: name,
-            divineDomains: (c.divineDomains || []).filter((dn) => dev?.domains.includes(dn)),
-            startingSkills: updateWorship(c.startingSkills || []),
-            purchasedSkills: updateWorship(c.purchasedSkills || []),
-          };
-        });
-        setPicking(null);
-      },
-    }));
+    setPicking(
+      entityPickerSpec({
+        kind: "devotion",
+        entityType: "devotions",
+        candidates,
+        title: "Choose a devotion",
+        taken: new Set(character.devotion ? [character.devotion] : []),
+        onChoose: (name) => {
+          const dev = DEVOTIONS.find((d) => d.name === name);
+          setCharacter((c) => {
+            const updateWorship = (list) => {
+              return list.map((s) => {
+                if (/^worship\b/i.test(s)) {
+                  return formatParameterizedName("Worship", name, s);
+                }
+                return s;
+              });
+            };
+            return {
+              ...c,
+              devotion: name,
+              divineDomains: (c.divineDomains || []).filter((dn) => dev?.domains.includes(dn)),
+              startingSkills: updateWorship(c.startingSkills || []),
+              purchasedSkills: updateWorship(c.purchasedSkills || []),
+            };
+          });
+          setPicking(null);
+        },
+      }),
+    );
   }, [character.devotion]);
 
   const handleToggleDomain = useCallback((domain) => {
@@ -107,8 +129,11 @@ export default function Builder() {
         const nextDomains = cur.filter((d) => d !== domain);
         const domPowers = (DOMAINS.find((x) => x.name === domain)?.powers || []).map((p) => p.name);
         return {
-          ...c, divineDomains: nextDomains,
-          domainPowers: (c.domainPowers || []).filter((p) => !domPowers.includes(p.replace(/\s*\(.+\)$/, "")) && !domPowers.includes(p)),
+          ...c,
+          divineDomains: nextDomains,
+          domainPowers: (c.domainPowers || []).filter(
+            (p) => !domPowers.includes(p.replace(/\s*\(.+\)$/, "")) && !domPowers.includes(p),
+          ),
         };
       }
       if (cur.length >= MAX_DOMAINS) return c;
@@ -119,7 +144,7 @@ export default function Builder() {
   const handleClearDevotion = useCallback(() => {
     setCharacter((c) => {
       const clearWorship = (list) => {
-        return list.map(s => {
+        return list.map((s) => {
           if (/^worship\b/i.test(s)) {
             return "Worship";
           }
@@ -167,12 +192,46 @@ export default function Builder() {
   const [lineageOpen, setLineageOpen] = useState(false);
 
   const handleSetLineage = useCallback((name) => {
-    setCharacter((c) => name === c.lineage ? c
-      : { ...c, lineage: name, sublineage: null, lineageChallenges: [], lineageAdvantages: [] });
+    setCharacter((c) =>
+      name === c.lineage
+        ? c
+        : // Seed the General required challenges so the player never hunts for the
+          // mandatory ones (sublineage-scoped requireds are added when their sublineage
+          // is picked, in handleSetSublineage).
+          {
+            ...c,
+            lineage: name,
+            sublineage: null,
+            lineageChallenges: requiredChallengeNames(LINEAGES[name], null),
+            lineageAdvantages: [],
+          },
+    );
   }, []);
 
+  // Pick / switch / clear a sublineage. Free-swap, no lock-in: clearing or switching
+  // DROPS the old sublineage's taken items (so no orphaned picks linger), then
+  // auto-adds the new sublineage's required challenges so they behave like General
+  // requireds. Toggling the current one off clears to "no sublineage".
   const handleSetSublineage = useCallback((sub) => {
-    setCharacter((c) => ({ ...c, sublineage: c.sublineage === sub ? null : sub }));
+    setCharacter((c) => {
+      const next = c.sublineage === sub ? null : sub;
+      const lin = LINEAGES[c.lineage];
+      const nextKey = next ? subKey(next) : null;
+      // Keep General items + items of the new sublineage; drop other-sublineage items.
+      const keep = (names, list) =>
+        (names || []).filter((n) => {
+          const item = (list || []).find((x) => cleanChallengeName(n) === cleanChallengeName(x.baseName || x.name));
+          const k = item ? subKey(item.sublineage) : null;
+          return !k || k === "general" || k === nextKey;
+        });
+      const challenges = keep(c.lineageChallenges, lin?.challenges);
+      const advantages = keep(c.lineageAdvantages, lin?.advantages);
+      // Auto-add the new sublineage's required challenges (merged, no duplicates).
+      for (const r of requiredChallengeNames(lin, next)) {
+        if (!challenges.some((x) => cleanChallengeName(x) === cleanChallengeName(r))) challenges.push(r);
+      }
+      return { ...c, sublineage: next, lineageChallenges: challenges, lineageAdvantages: advantages };
+    });
   }, []);
 
   const handleSetChoice = useCallback((powerId, option) => {
@@ -203,10 +262,11 @@ export default function Builder() {
   const handleSetLineageRep = useCallback((field, baseName, rep) => {
     setCharacter((c) => {
       const cur = c[field] || [];
-      const next = (rep && rep.trim()) ? `${baseName} (${rep.trim()})` : baseName;
+      const next = rep && rep.trim() ? `${baseName} (${rep.trim()})` : baseName;
       const i = cur.findIndex((x) => cleanChallengeName(x) === cleanChallengeName(baseName));
       const out = [...cur];
-      if (i === -1) out.push(next); else out[i] = next;
+      if (i === -1) out.push(next);
+      else out[i] = next;
       return { ...c, [field]: out };
     });
   }, []);
@@ -223,33 +283,50 @@ export default function Builder() {
 
   const handleStartBlank = useCallback(() => {
     const candidates = Object.keys(CLASS_POWER_SLOTS).map((name) => ({
-      name, desc: CLASSES[name]?.description || "", cat: CLASSES[name]?.type || "Class",
+      name,
+      desc: CLASSES[name]?.description || "",
+      cat: CLASSES[name]?.type || "Class",
     }));
-    setPicking(entityPickerSpec({
-      kind: "class", entityType: "classes", candidates,
-      title: "Start blank — choose your class", taken: new Set(),
-      onChoose: (name) => {
-        const char = {
-          ...EMPTY_CHARACTER,
-          archetypeName: "Custom Build",
-          classes: [{ name, level: 1 }],
-        };
-        setCharacter(applyClassStartingAbilities(char, name, 1));
-        setView(null); setHistory([]); setPicking(null);
-      },
-    }));
+    setPicking(
+      entityPickerSpec({
+        kind: "class",
+        entityType: "classes",
+        candidates,
+        title: "Start blank — choose your class",
+        taken: new Set(),
+        onChoose: (name) => {
+          const char = {
+            ...EMPTY_CHARACTER,
+            archetypeName: "Custom Build",
+            classes: [{ name, level: 1 }],
+          };
+          setCharacter(applyClassStartingAbilities(char, name, 1));
+          setView(null);
+          setHistory([]);
+          setPicking(null);
+        },
+      }),
+    );
   }, []);
 
-  const handleInspect = useCallback((item, field, resolveType, slot = null, index = null) => {
-    setView((cur) => {
-      if (cur) setHistory((h) => [...h, cur]);
-      return {
-        mode: "inspect", item, field, resolveType,
-        archetypeName: character.archetypeName,
-        category: slot?.category, index: index !== null ? index : slot?.index, choosable: !!slot,
-      };
-    });
-  }, [character.archetypeName]);
+  const handleInspect = useCallback(
+    (item, field, resolveType, slot = null, index = null) => {
+      setView((cur) => {
+        if (cur) setHistory((h) => [...h, cur]);
+        return {
+          mode: "inspect",
+          item,
+          field,
+          resolveType,
+          archetypeName: character.archetypeName,
+          category: slot?.category,
+          index: index !== null ? index : slot?.index,
+          choosable: !!slot,
+        };
+      });
+    },
+    [character.archetypeName],
+  );
 
   const handleUpdateParameter = useCallback((field, oldName, newName, index = null) => {
     setCharacter((c) => {
@@ -258,14 +335,14 @@ export default function Builder() {
       if (idx < 0) return c;
       const next = [...list];
       next[idx] = newName;
-      
+
       let nextChar = { ...c, [field]: next };
 
       let baseName = "";
       let paramVal = "";
       let paramMatch = newName.match(/^(.*?)\s*\(([^()]*)\)\s*$/);
       if (!paramMatch) {
-        const dashIdx = newName.indexOf(' - ');
+        const dashIdx = newName.indexOf(" - ");
         if (dashIdx > 0) {
           baseName = newName.slice(0, dashIdx).trim();
           paramVal = newName.slice(dashIdx + 3).trim();
@@ -283,10 +360,11 @@ export default function Builder() {
           nextChar.divineDomains = [];
           nextChar.domainPowers = [];
         } else {
-          const dev = DEVOTIONS.find(d =>
-            d.name.toLowerCase() === paramVal.toLowerCase() ||
-            d.name.toLowerCase().startsWith(paramVal.toLowerCase()) ||
-            paramVal.toLowerCase().startsWith(d.name.toLowerCase())
+          const dev = DEVOTIONS.find(
+            (d) =>
+              d.name.toLowerCase() === paramVal.toLowerCase() ||
+              d.name.toLowerCase().startsWith(paramVal.toLowerCase()) ||
+              paramVal.toLowerCase().startsWith(d.name.toLowerCase()),
           );
           const canonicalDevName = dev ? dev.name : paramVal;
           nextChar.devotion = canonicalDevName;
@@ -295,9 +373,9 @@ export default function Builder() {
             const remainingDomains = nextChar.divineDomains;
             nextChar.domainPowers = (c.domainPowers || []).filter((p) => {
               const basePower = p.replace(/\s*\(.+\)$/, "");
-              return remainingDomains.some(dn => {
-                const dom = DOMAINS.find(x => x.name === dn);
-                return dom?.powers.some(x => x.name === basePower || x.name === p);
+              return remainingDomains.some((dn) => {
+                const dom = DOMAINS.find((x) => x.name === dn);
+                return dom?.powers.some((x) => x.name === basePower || x.name === p);
               });
             });
           }
@@ -306,7 +384,7 @@ export default function Builder() {
 
       return nextChar;
     });
-    setView((v) => v ? { ...v, item: newName } : null);
+    setView((v) => (v ? { ...v, item: newName } : null));
   }, []);
 
   const setSlotPick = useCallback((slot, flatIndex, powerName, fieldOverride) => {
@@ -323,23 +401,31 @@ export default function Builder() {
     setPicking(null);
   }, []);
 
-  const handleOpenSlot = useCallback((slot, flatIndex, clear = false, fieldHint) => {
-    const field = fieldHint || SLOT_FIELD[slot.category];
-    if (clear) {
-      setCharacter((c) => {
-        const next = [...(c[field] || [])];
-        next.splice(flatIndex, 1);
-        const pc = { ...(c.powerClass || {}) };
-        if (pc[field]) { pc[field] = [...pc[field]]; pc[field].splice(flatIndex, 1); }
-        return { ...c, [field]: next, powerClass: pc };
-      });
-      return;
-    }
-    setPicking(powerPickerSpec(
-      { ...slot, onChoose: (name, fieldOverride) => setSlotPick(slot, flatIndex, name, fieldOverride) },
-      character,
-    ));
-  }, [character, setSlotPick]);
+  const handleOpenSlot = useCallback(
+    (slot, flatIndex, clear = false, fieldHint) => {
+      const field = fieldHint || SLOT_FIELD[slot.category];
+      if (clear) {
+        setCharacter((c) => {
+          const next = [...(c[field] || [])];
+          next.splice(flatIndex, 1);
+          const pc = { ...(c.powerClass || {}) };
+          if (pc[field]) {
+            pc[field] = [...pc[field]];
+            pc[field].splice(flatIndex, 1);
+          }
+          return { ...c, [field]: next, powerClass: pc };
+        });
+        return;
+      }
+      setPicking(
+        powerPickerSpec(
+          { ...slot, onChoose: (name, fieldOverride) => setSlotPick(slot, flatIndex, name, fieldOverride) },
+          character,
+        ),
+      );
+    },
+    [character, setSlotPick],
+  );
 
   const handleAddEntity = useCallback((field, name) => {
     setCharacter((c) => {
@@ -386,9 +472,10 @@ export default function Builder() {
     setCharacter((c) => {
       const primary = getClasses(c)[0]?.name;
       if (!primary) return c;
-      const base = c.startingChoices && Object.keys(c.startingChoices).length
-        ? c.startingChoices
-        : reconcileStartingChoices(c, primary);
+      const base =
+        c.startingChoices && Object.keys(c.startingChoices).length
+          ? c.startingChoices
+          : reconcileStartingChoices(c, primary);
       const nextChoices = { ...base, [choiceId]: optionLabel };
       return rebuildStartingSkills(c, primary, nextChoices);
     });
@@ -411,10 +498,9 @@ export default function Builder() {
   const handleSetClassLevel = useCallback((className, level) => {
     setCharacter((c0) => {
       const c = toClassesForm(c0);
-      const others = c.classes.filter((x) => x.name !== className)
-        .reduce((n, x) => n + x.level, 0);
+      const others = c.classes.filter((x) => x.name !== className).reduce((n, x) => n + x.level, 0);
       const lvl = Math.max(1, Math.min(MAX_LEVEL - others, level));
-      const nextClasses = c.classes.map((x) => x.name === className ? { ...x, level: lvl } : x);
+      const nextClasses = c.classes.map((x) => (x.name === className ? { ...x, level: lvl } : x));
       let updated = { ...c, classes: nextClasses };
       const primary = nextClasses[0];
       if (primary) {
@@ -447,8 +533,10 @@ export default function Builder() {
       const classes = c.classes.filter((x) => x.name !== className);
       const next = { ...c, classes };
       for (const field of Object.values(SLOT_FIELD)) {
-        const picks = c[field]; if (!picks) continue;
-        const keep = picks.map((name, i) => ({ name, i }))
+        const picks = c[field];
+        if (!picks) continue;
+        const keep = picks
+          .map((name, i) => ({ name, i }))
           .filter(({ name, i }) => pickClass(c, field, i, name) !== className);
         next[field] = keep.map((k) => k.name);
         if (c.powerClass?.[field]) {
@@ -465,91 +553,137 @@ export default function Builder() {
     });
   }, []);
 
-  const { handleOpenClassPicker, handleOpenAdd } = usePickers({ character, report, setPicking, handleAddClass, handleAddEntity });
+  const { handleOpenClassPicker, handleOpenAdd } = usePickers({
+    character,
+    report,
+    setPicking,
+    handleAddClass,
+    handleAddEntity,
+  });
 
   const handleBack = useCallback(() => {
     setHistory((h) => {
-      if (h.length === 0) { setView(null); return h; }
+      if (h.length === 0) {
+        setView(null);
+        return h;
+      }
       const prev = h[h.length - 1];
       setView(prev);
       return h.slice(0, -1);
     });
   }, []);
 
-  const handleClose = useCallback(() => { setView(null); setHistory([]); }, []);
+  const handleClose = useCallback(() => {
+    setView(null);
+    setHistory([]);
+  }, []);
 
   const handleRestart = useCallback(() => {
     if (window.confirm("Discard this character and start over?")) {
       setCharacter(EMPTY_CHARACTER);
-      setView(null); setHistory([]);
+      setView(null);
+      setHistory([]);
     }
   }, []);
 
   const handleChangeArchetype = useCallback(() => {
     if (window.confirm("Select a different archetype? Any changes you've made to this character will be lost.")) {
       setCharacter(EMPTY_CHARACTER);
-      setView(null); setHistory([]);
+      setView(null);
+      setHistory([]);
     }
   }, []);
 
-  const handleClickIdentityField = useCallback((field) => {
-    if (field === "class") {
-      const primary = getClasses(character)[0]?.name;
-      if (primary) handleInspect(primary, null, "classes");
-      return;
-    }
-    const item = character[field];
-    if (item) handleInspect(item, null, field);
-  }, [character, handleInspect]);
+  const handleClickIdentityField = useCallback(
+    (field) => {
+      if (field === "class") {
+        const primary = getClasses(character)[0]?.name;
+        if (primary) handleInspect(primary, null, "classes");
+        return;
+      }
+      const item = character[field];
+      if (item) handleInspect(item, null, field);
+    },
+    [character, handleInspect],
+  );
 
   // ─── CONTEXT BUNDLES ──────────────────────────────────────────────────────
   // State changes per keystroke; actions are (mostly) stable. Split into two
   // contexts so action-only components don't re-render on every state change.
   const builderState = useMemo(() => ({ character, report, view }), [character, report, view]);
-  const builderActions = useMemo(() => ({
-    onPickArchetype: handlePickArchetype,
-    onStartBlank: handleStartBlank,
-    onSetName: handleSetName,
-    onInspect: handleInspect,
-    onClickField: handleClickIdentityField,
-    onRestart: handleRestart,
-    onChangeArchetype: handleChangeArchetype,
-    onSetClassLevel: handleSetClassLevel,
-    onRemoveClass: handleRemoveClass,
-    onAddClass: handleOpenClassPicker,
-    onPickDevotion: handlePickDevotion,
-    onToggleDomain: handleToggleDomain,
-    onClearDevotion: handleClearDevotion,
-    onToggleBackstory: handleToggleBackstory,
-    onSetEvent: handleSetEvent,
-    onSetExtraBP: handleSetExtraBP,
-    onOpenSlot: handleOpenSlot,
-    onOpenAdd: handleOpenAdd,
-    onRemoveEntity: handleRemoveEntity,
-    onSetRank: handleSetRank,
-    onSetSpecialty: handleSetSpecialty,
-    onSetChoice: handleSetChoice,
-    onUpdateParameter: handleUpdateParameter,
-    onSetLineage: handleSetLineage,
-    onSetSublineage: handleSetSublineage,
-    onToggleLineageItem: handleToggleLineageItem,
-    onSetLineageRep: handleSetLineageRep,
-    onSetAdvantageChoice: handleSetAdvantageChoice,
-    onOpenLineage: () => setLineageOpen(true),
-  }), [
-    handlePickArchetype, handleStartBlank, handleSetName, handleInspect,
-    handleClickIdentityField, handleRestart, handleSetClassLevel, handleRemoveClass,
-    handleOpenClassPicker, handlePickDevotion, handleToggleDomain, handleClearDevotion,
-    handleToggleBackstory, handleSetEvent, handleSetExtraBP, handleOpenSlot,
-    handleOpenAdd, handleRemoveEntity, handleSetRank, handleSetSpecialty,
-    handleSetChoice, handleUpdateParameter, handleSetLineage, handleSetSublineage,
-    handleToggleLineageItem, handleSetLineageRep, handleSetAdvantageChoice,
-  ]);
+  const builderActions = useMemo(
+    () => ({
+      onPickArchetype: handlePickArchetype,
+      onStartBlank: handleStartBlank,
+      onSetName: handleSetName,
+      onInspect: handleInspect,
+      onClickField: handleClickIdentityField,
+      onRestart: handleRestart,
+      onChangeArchetype: handleChangeArchetype,
+      onSetClassLevel: handleSetClassLevel,
+      onRemoveClass: handleRemoveClass,
+      onAddClass: handleOpenClassPicker,
+      onPickDevotion: handlePickDevotion,
+      onToggleDomain: handleToggleDomain,
+      onClearDevotion: handleClearDevotion,
+      onToggleBackstory: handleToggleBackstory,
+      onSetEvent: handleSetEvent,
+      onSetExtraBP: handleSetExtraBP,
+      onOpenSlot: handleOpenSlot,
+      onOpenAdd: handleOpenAdd,
+      onRemoveEntity: handleRemoveEntity,
+      onSetRank: handleSetRank,
+      onSetSpecialty: handleSetSpecialty,
+      onSetChoice: handleSetChoice,
+      onUpdateParameter: handleUpdateParameter,
+      onSetLineage: handleSetLineage,
+      onSetSublineage: handleSetSublineage,
+      onToggleLineageItem: handleToggleLineageItem,
+      onSetLineageRep: handleSetLineageRep,
+      onSetAdvantageChoice: handleSetAdvantageChoice,
+      onOpenLineage: () => setLineageOpen(true),
+    }),
+    [
+      handlePickArchetype,
+      handleStartBlank,
+      handleSetName,
+      handleInspect,
+      handleClickIdentityField,
+      handleRestart,
+      handleSetClassLevel,
+      handleRemoveClass,
+      handleOpenClassPicker,
+      handlePickDevotion,
+      handleToggleDomain,
+      handleClearDevotion,
+      handleToggleBackstory,
+      handleSetEvent,
+      handleSetExtraBP,
+      handleOpenSlot,
+      handleOpenAdd,
+      handleRemoveEntity,
+      handleSetRank,
+      handleSetSpecialty,
+      handleSetChoice,
+      handleUpdateParameter,
+      handleSetLineage,
+      handleSetSublineage,
+      handleToggleLineageItem,
+      handleSetLineageRep,
+      handleSetAdvantageChoice,
+    ],
+  );
 
   return (
     <div className="b-root">
-      <BTopBar mode={mode} setMode={setMode} character={character} report={report} onLevelChange={handleLevelChange}
-               onExport={() => setExportOpen(true)} />
+      <BTopBar
+        mode={mode}
+        setMode={setMode}
+        character={character}
+        report={report}
+        onLevelChange={handleLevelChange}
+        onExport={() => setExportOpen(true)}
+      />
       {mode === "explorer" ? (
         <RulesExplorer onClose={() => setMode("builder")} />
       ) : mode === "recipes" ? (
@@ -559,20 +693,24 @@ export default function Builder() {
           <div className="b-cols">
             <IdentityRail />
             <BuildSheet />
-            <DetailPane view={view} report={report}
-                        choices={character.choices} onSetChoice={handleSetChoice}
-                        onUpdateParameter={handleUpdateParameter}
-                        onInspect={handleInspect}
-                        onBack={history.length ? handleBack : null} onClose={handleClose} />
+            <DetailPane
+              view={view}
+              report={report}
+              choices={character.choices}
+              onSetChoice={handleSetChoice}
+              onUpdateParameter={handleUpdateParameter}
+              onInspect={handleInspect}
+              onBack={history.length ? handleBack : null}
+              onClose={handleClose}
+            />
           </div>
         </BuilderProvider>
       )}
-      {picking && (
-        <PickerOverlay spec={picking} character={character} onClose={() => setPicking(null)} />
-      )}
+      {picking && <PickerOverlay spec={picking} character={character} onClose={() => setPicking(null)} />}
       {exportOpen && (
         <ExportImportPanel
-          character={character} report={report}
+          character={character}
+          report={report}
           onImport={(c) => {
             let prepared = { ...c };
             const primary = getClasses(prepared)[0]?.name;
@@ -585,13 +723,21 @@ export default function Builder() {
             setView(null);
             setHistory([]);
           }}
-          onClose={() => setExportOpen(false)} />
+          onClose={() => setExportOpen(false)}
+        />
       )}
       {lineageOpen && (
-        <LineagePanel character={character} report={report} onInspect={handleInspect}
-          onSetLineage={handleSetLineage} onSetSublineage={handleSetSublineage}
-          onToggle={handleToggleLineageItem} onSetRep={handleSetLineageRep} onClose={() => setLineageOpen(false)}
-          onSetAdvantageChoice={handleSetAdvantageChoice} />
+        <LineagePanel
+          character={character}
+          report={report}
+          onInspect={handleInspect}
+          onSetLineage={handleSetLineage}
+          onSetSublineage={handleSetSublineage}
+          onToggle={handleToggleLineageItem}
+          onSetRep={handleSetLineageRep}
+          onClose={() => setLineageOpen(false)}
+          onSetAdvantageChoice={handleSetAdvantageChoice}
+        />
       )}
       <SiteFooter />
     </div>
@@ -633,7 +779,10 @@ function BTopBar({ mode, setMode, character, report, onLevelChange, onExport }) 
         <button className={`b-topbar-tab ${mode === "builder" ? "is-active" : ""}`} onClick={() => setMode("builder")}>
           Character Creator
         </button>
-        <button className={`b-topbar-tab ${mode === "explorer" ? "is-active" : ""}`} onClick={() => setMode("explorer")}>
+        <button
+          className={`b-topbar-tab ${mode === "explorer" ? "is-active" : ""}`}
+          onClick={() => setMode("explorer")}
+        >
           Rules Explorer
         </button>
         <button className={`b-topbar-tab ${mode === "recipes" ? "is-active" : ""}`} onClick={() => setMode("recipes")}>
@@ -645,21 +794,44 @@ function BTopBar({ mode, setMode, character, report, onLevelChange, onExport }) 
           <>
             <span className="b-topbar-stat b-level">
               Level
-              <button className="b-level-btn" disabled={level <= MIN_LEVEL} aria-label="Level down"
-                      onClick={() => onLevelChange(level - 1)} title="Level down">−</button>
+              <button
+                className="b-level-btn"
+                disabled={level <= MIN_LEVEL}
+                aria-label="Level down"
+                onClick={() => onLevelChange(level - 1)}
+                title="Level down"
+              >
+                −
+              </button>
               <strong aria-live="polite">{level}</strong>
-              <button className="b-level-btn" disabled={level >= MAX_LEVEL} aria-label="Level up"
-                      onClick={() => onLevelChange(level + 1)} title="Level up">+</button>
+              <button
+                className="b-level-btn"
+                disabled={level >= MAX_LEVEL}
+                aria-label="Level up"
+                onClick={() => onLevelChange(level + 1)}
+                title="Level up"
+              >
+                +
+              </button>
             </span>
-            <span className="b-topbar-stat">Budget <strong>{report.budget} BP</strong></span>
-            <span className={`b-topbar-stat ${report.valid ? "is-valid" : "is-invalid"}`}
-                  title={report.valid ? "" : validityReasons(report).join("\n")}>
-              {report.valid ? "✓ legal build"
-                : report.belowFloor ? `⚠ below level ${report.legalMinLevel}`
-                : "⚠ check build"}
+            <span className="b-topbar-stat">
+              Budget <strong>{report.budget} BP</strong>
+            </span>
+            <span
+              className={`b-topbar-stat ${report.valid ? "is-valid" : "is-invalid"}`}
+              title={report.valid ? "" : validityReasons(report).join("\n")}
+            >
+              {report.valid
+                ? "✓ legal build"
+                : report.belowFloor
+                  ? `⚠ below level ${report.legalMinLevel}`
+                  : "⚠ check build"}
             </span>
             {report.aboveCap && (
-              <span className="b-topbar-stat is-note" title={`Total level ${report.level} exceeds the current cap of ${report.levelCap}. Advancing past ${report.levelCap} requires Advanced Classes, which aren't published yet; slots/stats are frozen at level ${report.levelCap}.`}>
+              <span
+                className="b-topbar-stat is-note"
+                title={`Total level ${report.level} exceeds the current cap of ${report.levelCap}. Advancing past ${report.levelCap} requires Advanced Classes, which aren't published yet; slots/stats are frozen at level ${report.levelCap}.`}
+              >
                 ⚑ above level {report.levelCap} cap (Advanced Classes pending)
               </span>
             )}
@@ -669,7 +841,9 @@ function BTopBar({ mode, setMode, character, report, onLevelChange, onExport }) 
       <div className="b-topbar-actions">
         {mode === "builder" ? (
           <>
-            <button className="b-topbar-btn" onClick={onExport}>Export / Import</button>
+            <button className="b-topbar-btn" onClick={onExport}>
+              Export / Import
+            </button>
             <button className={`b-topbar-btn ${linkCopied ? "is-copied" : ""}`} onClick={copyShareLink}>
               {linkCopied ? "Link copied!" : "Copy share link"}
             </button>

@@ -39,3 +39,45 @@ export function lineageTagline(lin) {
   const subs = (lin.sublineages || []).map((s) => parseSublineage(s).name).filter(Boolean);
   return subs.length ? subs.join(" · ") : "";
 }
+
+// Two kinds of sublineage: a CIVILIZATION origin (the note begins "Civilization:" —
+// playable only if your character is from there) vs. a mechanical TYPE (Intervened,
+// Psionic, …) that simply unlocks its options. The UI separates them.
+export function isCivSublineage(s) {
+  const ctx = parseSublineage(s).context || "";
+  const raw = typeof s === "string" ? s : s?.note || s?.name || "";
+  return /civilization:/i.test(ctx) || /civilization:/i.test(raw);
+}
+
+// The required challenges that apply RIGHT NOW for a lineage + chosen sublineage.
+// General requireds always apply; a sublineage-scoped required only applies once
+// that sublineage is selected (mirrors the validator's missingRequired rule, so
+// auto-adding can't add something the validator wouldn't demand). Returns base names.
+export function requiredChallengeNames(lin, sublineage) {
+  const picked = subKey(sublineage);
+  return (lin?.challenges || [])
+    .filter((c) => {
+      if (!c.required) return false;
+      const k = subKey(c.sublineage);
+      if (k && k !== "general") return k === picked; // scoped: only when its sub is chosen
+      return true; // general required
+    })
+    .map((c) => c.baseName || c.name);
+}
+
+// Live status of a lineage's costuming requirement. The structured requirement
+// (minimum [Repped] challenges + any specific one that must be included) is not in
+// the data yet — only embedded in description prose — so this returns null unless a
+// structured `lin.costumeReq` is present, and the UI hides cleanly when it's null.
+// `takenRepped` is the list of currently-taken [Repped] challenge names.
+export function costumeStatus(lin, takenReppedNames) {
+  const req = lin?.costumeReq;
+  if (!req) return null;
+  const have = takenReppedNames || [];
+  const haveMust = !req.mustInclude || have.includes(req.mustInclude);
+  const met = have.length >= (req.minRepped || 0) && haveMust;
+  const parts = [];
+  if (req.minRepped > 0) parts.push(`${have.length}/${req.minRepped} [Repped]`);
+  if (req.mustInclude) parts.push(`${haveMust ? "✓" : "needs"} ${req.mustInclude}`);
+  return { req, met, label: parts.join(" · ") || "no [Repped] needed" };
+}
