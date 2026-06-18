@@ -3744,6 +3744,101 @@
   background: var(--b-border);
 }
 
+/* ─── COMPACT PILLS ───────────────────────────────────────────────────────
+   A band is a flex-wrap row of compact pills (scannable, pickable). A pill is an
+   inline chip when collapsed; clicking its name expands it to full width to reveal
+   the description / impact / sub-choice in place. */
+.b-lin-pills {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.b-lin-pill {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--b-border-2);
+  border-radius: 1.2rem;
+  background: var(--b-panel-2);
+  padding: 0 0.2rem 0 0;
+}
+
+.b-lin-pill.is-expanded {
+  flex-basis: 100%;
+  border-radius: 0.5rem;
+  border-left: 3px solid var(--b-teal);
+  background: var(--b-panel);
+  padding-bottom: 0.5rem;
+}
+
+.b-lin-pill-head {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+/* Pill chrome: tighter toggle/name/lbp than the old full-width rows. The
+   .b-lin-pills ancestor keeps specificity from descending below the earlier
+   .b-lin-row.is-on .b-lin-toggle rule (stylelint no-descending-specificity). */
+.b-lin-pills .b-lin-pill .b-lin-toggle {
+  width: 1.4rem;
+  height: 1.4rem;
+  border-radius: 1.2rem;
+  font-size: 0.8rem;
+}
+
+.b-lin-pill .b-lin-name {
+  flex: 0 1 auto;
+  padding: 0.25rem 0;
+  font-size: 0.82rem;
+  white-space: nowrap;
+}
+
+.b-lin-pill.is-expanded .b-lin-name {
+  white-space: normal;
+}
+
+.b-lin-pill .b-lin-lbp {
+  padding-right: 0.5rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.b-lin-pill .b-lin-row-tags {
+  margin-left: 0;
+}
+
+.b-lin-pill.is-on {
+  border-color: rgb(184, 130, 31, 60%);
+  background: rgb(184, 130, 31, 14%);
+}
+
+.b-lin-col-earn .b-lin-pill.is-on {
+  border-color: rgb(111, 191, 115, 60%);
+  background: rgb(111, 191, 115, 12%);
+}
+
+.b-lin-pill.is-on .b-lin-toggle {
+  color: var(--b-green);
+  border-color: rgb(111, 191, 115, 50%);
+}
+
+.b-lin-pill.is-dimmed {
+  opacity: 0.4;
+}
+
+.b-lin-pill.is-dimmed:hover {
+  opacity: 0.75;
+}
+
+.b-lin-pill .b-lin-impact,
+.b-lin-pill .b-lin-desc {
+  margin-left: 1.7rem;
+  margin-right: 0.6rem;
+}
+
 /* Required-active items: locked, auto-included marker (matches General requireds). */
 .b-lin-toggle.is-locked {
   display: inline-flex;
@@ -3753,7 +3848,7 @@
   opacity: 0.65;
 }
 
-.b-lin-row.is-required .b-lin-toggle.is-locked {
+.b-lin-pill.is-required .b-lin-toggle.is-locked {
   color: var(--b-green);
 }
 
