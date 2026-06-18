@@ -18,7 +18,7 @@ jobs:
         run: |
           bash <(curl https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash)
           ./actionlint -color
-  lint:
+  lint-js:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -27,7 +27,28 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: npm run lint
+      - run: npm run lint:js
+
+  lint-css:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint:css
+
+  format-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
       - run: npm run format -- --check
   test-unit:
     runs-on: ubuntu-latest
@@ -75,7 +96,7 @@ jobs:
       - run: npm run build
 
   build:
-    needs: [actionlint, lint, test-unit, test-rules, test-browser, vite-build]
+    needs: [actionlint, lint-js, lint-css, format-check, test-unit, test-rules, test-browser, vite-build]
     runs-on: ubuntu-latest
     steps:
       - run: echo "All checks passed!"
