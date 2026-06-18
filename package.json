@@ -13,7 +13,9 @@
     "doc:feedback": "node scripts/doc-feedback.js",
     "test": "node --import ./scripts/register-json.mjs scripts/test.mjs && node --import ./scripts/register-json.mjs scripts/test-rules-enforcement.mjs && node scripts/test-browser.mjs",
     "shot": "node scripts/shot.mjs",
-    "lint": "eslint . && stylelint '**/*.css'",
+    "lint:js": "eslint .",
+    "lint:css": "stylelint '**/*.css'",
+    "lint": "npm run lint:js && npm run lint:css",
     "format": "prettier --write ."
   },
   "dependencies": {
