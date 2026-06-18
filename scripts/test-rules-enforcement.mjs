@@ -233,4 +233,24 @@ console.log("\nChecking no-duplicate-power enforcement...");
   }
 }
 
+// 7. Verify Elemental Affinity cap (≤2 instances, each a distinct element).
+console.log("\nChecking Elemental Affinity cap enforcement...");
+{
+  const base = { lineage: 'Human', classLevels: 'Fighter 4' };
+  const issuesFor = (perks) => validate({ ...base, purchasedPerks: perks }).prereqs.issues
+    .filter((i) => i.id === 'perks:Elemental Affinity');
+  // legal: two distinct elements
+  if (issuesFor(['Elemental Affinity (Flame)', 'Elemental Affinity (Ice)']).length) {
+    reportGap('Elemental-Affinity', 'two distinct', 'Flagged a legal pair of distinct elements.');
+  }
+  // illegal: three instances
+  if (!issuesFor(['Elemental Affinity (Flame)', 'Elemental Affinity (Ice)', 'Elemental Affinity (Acid)']).some((i) => /at most twice/.test(i.text))) {
+    reportGap('Elemental-Affinity', 'three instances', 'Taking it >2 times is not flagged.');
+  }
+  // illegal: same element twice
+  if (!issuesFor(['Elemental Affinity (Flame)', 'Elemental Affinity (Flame)']).some((i) => /different element/.test(i.text))) {
+    reportGap('Elemental-Affinity', 'duplicate element', 'Attuning to the same element twice is not flagged.');
+  }
+}
+
 console.log(`\n═══ Audit Complete. Found ${gapsCount} gaps. ═══`);

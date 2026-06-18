@@ -418,5 +418,30 @@ export function checkPrereqs(character) {
     }
   }
 
+  // ─── Elemental Affinity cap ───
+  // "This Perk can be taken up to twice, and each time the character may choose any
+  // element they desire, although they may not attune to more than one element at a
+  // time." → at most 2 instances, each a DISTINCT element. Enforce both.
+  const elemAffinities = (character.purchasedPerks || [])
+    .filter((p) => bareSkill(cleanItemName(p)) === 'Elemental Affinity');
+  if (elemAffinities.length) {
+    if (elemAffinities.length > 2) {
+      issues.push({
+        id: 'perks:Elemental Affinity', item: 'Elemental Affinity', field: 'purchasedPerks',
+        text: `taken ${elemAffinities.length} times — may be taken at most twice`,
+      });
+    }
+    const elements = elemAffinities
+      .map((p) => (p.match(/\(([^)]+)\)/) || [])[1]?.trim())
+      .filter(Boolean);
+    const dupElement = elements.find((e, i) => elements.findIndex((x) => x.toLowerCase() === e.toLowerCase()) !== i);
+    if (dupElement) {
+      issues.push({
+        id: 'perks:Elemental Affinity', item: 'Elemental Affinity', field: 'purchasedPerks',
+        text: `cannot attune to ${dupElement} twice — each Elemental Affinity must be a different element`,
+      });
+    }
+  }
+
   return { issues, notes };
 }
