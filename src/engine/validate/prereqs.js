@@ -138,8 +138,8 @@ export function checkLevelConstraint(character, constraintStr, owned) {
   m = constraintStr.match(/(?:one|1)\s+(Novice|Adept|Greater)(?:-level)?\s+spell-?slot/i);
   if (m) {
     const tier = m[1].toLowerCase();
-    const slotsObj = spellSlots(character) || { novice: 0, adept: 0, greater: 0 };
-    return (slotsObj[tier] || 0) >= 1;
+    const pools = spellSlots(character) || {};
+    return Object.values(pools).some(p => (p[tier] || 0) >= 1);
   }
 
   // 9. "Profession - [Any]"

@@ -144,25 +144,35 @@ export function spellSlots(character) {
   const casters = getClasses(character).filter((c) => CLASSES[c.name]?.spellcaster);
   if (!casters.length) return null; // not a caster
 
+  const pools = {};
+
   // Sum each caster class's progression "N/N/N" slots at its own level.
-  const total = { novice: 0, adept: 0, greater: 0 };
   for (const { name, level } of casters) {
+    const magicType = CLASSES[name]?.magicType || 'Unknown';
+    if (!pools[magicType]) pools[magicType] = { novice: 0, adept: 0, greater: 0 };
+
     const str = progressionRow(name, level)?.slots;
     if (typeof str === 'string') {
       const [n = 0, a = 0, g = 0] = str.split('/').map((x) => parseInt(x, 10) || 0);
-      total.novice += n; total.adept += a; total.greater += g;
+      pools[magicType].novice += n;
+      pools[magicType].adept += a;
+      pools[magicType].greater += g;
     }
   }
 
   // Additional spell-slot grants from owned skills/perks/advantages are
   // parser-extracted (ent.slotGrants for novice/adept/greater; ent.highestSlot for
   // a floating "highest-level" slot).
+  // We apply these general grants to the primary caster's magic type pool.
+  const primaryType = CLASSES[casters[0].name]?.magicType || 'Unknown';
+  if (!pools[primaryType]) pools[primaryType] = { novice: 0, adept: 0, greater: 0 };
+
   const spellTiers = new Set(SPELL_TIERS);
   let highestSlots = 0;
   const applySpellGrants = (ent, rank = 1) => {
     if (!ent) return;
     for (const { cat, n } of (ent.slotGrants || [])) {
-      if (SPELL_TIERS.has(cat)) total[cat] += n * rank;
+      if (SPELL_TIERS.has(cat)) pools[primaryType][cat] += n * rank;
     }
     if (ent.highestSlot) highestSlots += 1;
   };
@@ -185,14 +195,22 @@ export function spellSlots(character) {
   }
 
   // A "highest-level spell-slot" grant adds one slot at the character's highest
-  // accessible tier (greater, else adept, else novice).
+  // accessible tier in their primary pool.
   for (let i = 0; i < highestSlots; i++) {
-    if (total.greater > 0) total.greater += 1;
-    else if (total.adept > 0) total.adept += 1;
-    else if (total.novice > 0) total.novice += 1;
+    if (pools[primaryType].greater > 0) pools[primaryType].greater += 1;
+    else if (pools[primaryType].adept > 0) pools[primaryType].adept += 1;
+    else if (pools[primaryType].novice > 0) pools[primaryType].novice += 1;
   }
 
-  return total;
+  // Prune any empty pools
+  for (const t of Object.keys(pools)) {
+    if (pools[t].novice === 0 && pools[t].adept === 0 && pools[t].greater === 0) {
+      delete pools[t];
+    }
+  }
+
+  if (Object.keys(pools).length === 0) return null;
+  return pools;
 }
 
 // Spells a Bookcaster can select, split into { known, other } for the picker.
@@ -200,14 +218,18 @@ export function spellSlots(character) {
 export function bookcasterSpellOptions(character) {
   const casters = getClasses(character).filter((c) => CLASSES[c.name]?.spellcaster);
   if (!casters.length) return { known: [], other: [] };
-  const slots = spellSlots(character) || { novice: 0, adept: 0, greater: 0 };
-  const accessibleTiers = Object.keys(BOOKCASTER_TIER_FIELD).filter((t) => (slots[t] || 0) > 0);
+  const pools = spellSlots(character) || {};
 
-  // Every accessible spell from the caster classes' lists.
+  // Every accessible spell from the caster classes' lists, filtered by whether
+  // they have spell slots in that class's magic type.
   const accessible = new Set();
   for (const { name: cls } of casters) {
     const byTier = CLASS_POWERS[cls];
     if (!byTier) continue;
+    const magicType = CLASSES[cls]?.magicType || 'Unknown';
+    const slots = pools[magicType] || { novice: 0, adept: 0, greater: 0 };
+    const accessibleTiers = Object.keys(BOOKCASTER_TIER_FIELD).filter((t) => (slots[t] || 0) > 0);
+
     for (const tier of accessibleTiers) {
       for (const sp of (byTier[BOOKCASTER_TIER_FIELD[tier]] || [])) {
         // Skip placeholder rows the parser emits for undocumented tiers.
