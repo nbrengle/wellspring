@@ -394,6 +394,13 @@ export default function Builder() {
     });
   }, []);
 
+  const handleSetGrantedSelection = useCallback((selectionId, value) => {
+    setCharacter((c) => ({
+      ...c,
+      grantedSelections: { ...(c.grantedSelections || {}), [selectionId]: value }
+    }));
+  }, []);
+
   const handleLevelChange = useCallback((next) => {
     const level = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, next));
     setCharacter((c) => {
@@ -535,6 +542,7 @@ export default function Builder() {
     onToggleLineageItem: handleToggleLineageItem,
     onSetLineageRep: handleSetLineageRep,
     onSetAdvantageChoice: handleSetAdvantageChoice,
+    onSetGrantedSelection: handleSetGrantedSelection,
     onOpenLineage: () => setLineageOpen(true),
   }), [
     handlePickArchetype, handleStartBlank, handleSetName, handleInspect,
@@ -543,7 +551,7 @@ export default function Builder() {
     handleToggleBackstory, handleSetEvent, handleSetExtraBP, handleOpenSlot,
     handleOpenAdd, handleRemoveEntity, handleSetRank, handleSetSpecialty,
     handleSetChoice, handleUpdateParameter, handleSetLineage, handleSetSublineage,
-    handleToggleLineageItem, handleSetLineageRep, handleSetAdvantageChoice,
+    handleToggleLineageItem, handleSetLineageRep, handleSetAdvantageChoice, handleSetGrantedSelection
   ]);
 
   return (

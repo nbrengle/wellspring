@@ -353,6 +353,27 @@ export function bonusBudgetFor(level) {
 }
 
 
+export function computeActiveSelections(graph, lbp) {
+  const active = [];
+  const check = (name) => {
+    const ent = lookupEntity(name);
+    if (ent?.grantedSelections) {
+      for (const gs of ent.grantedSelections) {
+        active.push({ ...gs, sourceName: name });
+      }
+    }
+  };
+  for (const item of graph.items) {
+    if (item.field !== 'synthetic') {
+      check(item.name || item.rawString);
+    }
+  }
+  for (const a of lbp?.advantages || []) {
+    check(a.name || a.baseName);
+  }
+  return active;
+}
+
 export function validate(character) {
   const level = characterLevel(character);
   const legalMinLevel = getLegalMinLevel(character);
@@ -392,6 +413,7 @@ export function validate(character) {
       row.cost = lookupCost(spend.byItem, row.field, row.name, row.index);
     }
   }
+  const activeSelections = computeActiveSelections(graph, lbp);
   const powerBenefits = activePowerBenefits(character);
   const prereqs = checkPrereqs(character);
   const slotsOver = slots.some((s) => s.over);
@@ -437,6 +459,7 @@ export function validate(character) {
     grantedAbilities: granted,
     crafting,
     owned,
+    activeSelections,
     powerBenefits,
     prereqs,
     belowFloor,

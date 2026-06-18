@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import { useBuilderState, useBuilderActions } from "../builder-context.jsx";
 import { Section, CostBadge } from "./SharedUI.jsx";
 import { spellTierKey, spellTierLabel } from "./utils.js";
-import { ALL_SKILLS, LINEAGES, CRAFTING, RITUALS } from "../../engine/data.js";
+import { ALL_SKILLS, LINEAGES, CRAFTING, RITUALS, CLASSES, DOMAINS } from "../../engine/data.js";
 import { getMaxRanks, pickClass } from "../../engine/validate.js";
 import { bareSkill, getClasses, cleanItemName } from "../../engine/resolver.js";
 import { lookupCost } from "../../engine/validate/cost-key.js";
@@ -153,6 +153,68 @@ export function CraftingSection({ crafting, onInspect }) {
           </ul>
         </div>
       ))}
+    </Section>
+  );
+}
+
+function getSelectionOptions(sel) {
+  const opts = [];
+  if (sel.type === "power" && sel.source === "BaseClasses") {
+    for (const c of Object.values(CLASSES)) {
+      if (c.name === sel.excludeClass) continue;
+      const tierArray = c[sel.tier?.toLowerCase()] || [];
+      for (const p of tierArray) {
+        opts.push(`${p.name} (${c.name})`);
+      }
+    }
+  } else if (sel.type === "spell") {
+    for (const c of Object.values(CLASSES)) {
+      if (!c.spellSphere || c.spellSphere !== sel.sphere) continue;
+      if (sel.tier === "Cantrip") {
+         const tierArray = c.cantrips || [];
+         for (const s of tierArray) opts.push(`${s.name} (${c.name})`);
+      } else {
+         const allSpells = [...(c.noviceSpells||[]), ...(c.adeptSpells||[]), ...(c.greaterSpells||[])];
+         for (const s of allSpells) opts.push(`${s.name} (${c.name})`);
+      }
+    }
+  } else if (sel.type === "devotionAccent") {
+    for (const d of Object.values(DOMAINS)) {
+      if (d.accents) {
+        for (const a of d.accents) opts.push(`${a.name} (${d.name})`);
+      }
+    }
+  }
+  return opts.sort();
+}
+
+export function GrantedSelectionsSection() {
+  const { character, report } = useBuilderState();
+  const { onSetGrantedSelection } = useBuilderActions();
+  const active = report.activeSelections || [];
+  if (active.length === 0) return null;
+
+  return (
+    <Section title="Granted Selections" tone="purple">
+      <ul className="b-choices">
+        {active.map((sel, i) => {
+          const value = character.grantedSelections?.[sel.id] || "";
+          const options = getSelectionOptions(sel);
+          return (
+            <li key={i} className="b-choice-row">
+              <label className="b-choice-label">
+                {sel.sourceName} <span className="b-choice-desc">({sel.type === "devotionAccent" ? "Devotion Accent" : sel.type})</span>
+              </label>
+              <select className="b-select b-choice-select" value={value} onChange={(e) => onSetGrantedSelection(sel.id, e.target.value)}>
+                <option value="">-- Choose --</option>
+                {options.map((opt) => (
+                  <option key={opt} value={opt}>{opt}</option>
+                ))}
+              </select>
+            </li>
+          );
+        })}
+      </ul>
     </Section>
   );
 }
