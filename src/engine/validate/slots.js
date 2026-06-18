@@ -104,13 +104,19 @@ export function computeSlots(character) {
   // Free, locked cantrips granted by progression ("Innate Bonus Cantrip: Cancel").
   const grantedCantrips = innateBonusCantrips(character);
 
+  const agileTrades = character.agileLearnerTrades || {};
+
   const rows = [];
   for (const { name: cls, level } of classes) {
     // Clamp to the highest documented progression level (base classes cap at 10).
     const prog = progressionRow(cls, level);
     const isCaster = CLASSES[cls]?.spellcaster;
     const mkRow = (category, label, used, baseVal) => {
-      const b = bonus[`${cls}:${category}`] || 0;
+      let b = bonus[`${cls}:${category}`] || 0;
+      if (!isCaster) {
+        if (category === 'basic') b -= (agileTrades[cls] || 0);
+        if (category === 'advanced') b += (agileTrades[cls] || 0);
+      }
       return {
         cls, category, label: multi ? `${cls} ${label}` : label,
         used, base: baseVal, bonus: b, allowed: baseVal + b,
@@ -145,6 +151,7 @@ export function spellSlots(character) {
   if (!casters.length) return null; // not a caster
 
   const pools = {};
+  const agileTrades = character.agileLearnerTrades || {};
 
   // Sum each caster class's progression "N/N/N" slots at its own level.
   for (const { name, level } of casters) {
@@ -154,8 +161,8 @@ export function spellSlots(character) {
     const str = progressionRow(name, level)?.slots;
     if (typeof str === 'string') {
       const [n = 0, a = 0, g = 0] = str.split('/').map((x) => parseInt(x, 10) || 0);
-      pools[magicType].novice += n;
-      pools[magicType].adept += a;
+      pools[magicType].novice += n - (agileTrades[name] || 0);
+      pools[magicType].adept += a + (agileTrades[name] || 0);
       pools[magicType].greater += g;
     }
   }
