@@ -219,4 +219,18 @@ for (const [id, others] of Object.entries(REFS.excludes || {})) {
   }
 }
 
+// 6. Verify no-duplicate-power enforcement (the general rule behind ECT's "the
+//    Power cannot be one the character already has"). Selecting a power twice must
+//    be flagged; selecting it once must not.
+console.log("\nChecking no-duplicate-power enforcement...");
+{
+  const dup = validate({ lineage: 'Human', classLevels: 'Fighter 4', basicPowers: ['Parry Blow', 'Parry Blow'] });
+  const dupFlagged = dup.prereqs.issues.some((i) => i.duplicate && i.item === 'Parry Blow');
+  if (!dupFlagged) reportGap('Duplicate-Power', 'Parry Blow', 'Selecting the same power twice is not flagged.');
+  const single = validate({ lineage: 'Human', classLevels: 'Fighter 4', basicPowers: ['Parry Blow'] });
+  if (single.prereqs.issues.some((i) => i.duplicate)) {
+    reportGap('Duplicate-Power', 'Parry Blow', 'Flagged a duplicate while the power was selected only once.');
+  }
+}
+
 console.log(`\n═══ Audit Complete. Found ${gapsCount} gaps. ═══`);

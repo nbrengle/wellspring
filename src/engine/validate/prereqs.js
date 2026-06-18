@@ -394,5 +394,29 @@ export function checkPrereqs(character) {
     }
   }
 
+  // ─── No duplicate powers ───
+  // A power may not be selected more than once across all power fields. This is the
+  // general rule behind "the Power cannot be one the character already has" — e.g.
+  // Extensive Combat Training's bonus tier-power slot can't re-pick a power you own.
+  // (Class-granted powers live outside these selection fields, so multiclass grants
+  // don't false-positive.)
+  const powerCounts = new Map();
+  for (const field of POWER_REQ_FIELDS) {
+    for (const item of character[field] || []) {
+      const name = cleanItemName(item);
+      if (!name) continue;
+      powerCounts.set(name, (powerCounts.get(name) || 0) + 1);
+    }
+  }
+  for (const [name, count] of powerCounts) {
+    if (count > 1) {
+      issues.push({
+        id: `powers:${name}`, item: name, field: 'powers',
+        duplicate: count,
+        text: `selected ${count} times — a power may only be taken once`,
+      });
+    }
+  }
+
   return { issues, notes };
 }
