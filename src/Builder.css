@@ -2644,26 +2644,6 @@
   color: var(--b-amber);
 }
 
-.b-lin-req,
-.b-lin-repped {
-  font-size: 0.52rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  border-radius: 1rem;
-  padding: 0.05rem 0.35rem;
-  border: 1px solid;
-}
-
-.b-lin-req {
-  color: var(--b-red);
-  border-color: rgb(217, 117, 107, 40%);
-}
-
-.b-lin-repped {
-  color: var(--b-blue);
-  border-color: rgb(111, 168, 217, 40%);
-}
-
 .b-lin-lbp {
   flex: none;
   font-size: 0.7rem;
@@ -2973,93 +2953,822 @@
 }
 
 /* ── Lineage redesign: widened workspace, gallery, two-pane detail ─────────── */
-.b-lin-panel { width: min(64rem, 98vw); display: flex; flex-direction: column; }
-.b-lin-panel .b-picker-head { flex: 0 0 auto; }
+.b-lin-panel {
+  width: min(64rem, 98vw);
+  display: flex;
+  flex-direction: column;
+}
+
+.b-lin-panel .b-picker-head {
+  flex: 0 0 auto;
+}
 
 /* Step 1 — gallery */
-.b-lin-gallery { display: flex; flex-direction: column; min-height: 0; flex: 1; }
+.b-lin-gallery {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  flex: 1;
+}
+
 .b-lin-gallery-controls {
-  display: flex; align-items: center; gap: 0.75rem; padding: 0.8rem 1.1rem;
-  border-bottom: 1px solid var(--b-border); flex-wrap: wrap;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.8rem 1.1rem;
+  border-bottom: 1px solid var(--b-border);
+  flex-wrap: wrap;
 }
+
 .b-lin-search {
-  flex: 1; min-width: 12rem; background: rgba(255,255,255,0.03);
-  border: 1px solid var(--b-border); border-radius: 0.4rem; padding: 0.45rem 0.6rem;
-  color: var(--b-text, #e8dcc8); font-size: 0.85rem;
+  flex: 1;
+  min-width: 12rem;
+  background: rgb(255, 255, 255, 3%);
+  border: 1px solid var(--b-border);
+  border-radius: 0.4rem;
+  padding: 0.45rem 0.6rem;
+  color: var(--b-text, #e8dcc8);
+  font-size: 0.85rem;
 }
-.b-lin-search:focus { outline: none; border-color: var(--b-amber-deep); }
-.b-lin-sort { font-size: 0.72rem; color: var(--b-dim); display: flex; align-items: center; gap: 0.35rem; }
-.b-lin-sort select { background: rgba(255,255,255,0.03); color: var(--b-text,#e8dcc8); border: 1px solid var(--b-border); border-radius: 0.3rem; padding: 0.25rem; }
+
+.b-lin-search:focus {
+  outline: none;
+  border-color: var(--b-amber-deep);
+}
+
+.b-lin-sort {
+  font-size: 0.72rem;
+  color: var(--b-dim);
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.b-lin-sort select {
+  background: rgb(255, 255, 255, 3%);
+  color: var(--b-text, #e8dcc8);
+  border: 1px solid var(--b-border);
+  border-radius: 0.3rem;
+  padding: 0.25rem;
+}
+
 .b-lin-gallery-grid {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
-  gap: 0.6rem; padding: 0.9rem 1.1rem; overflow-y: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  gap: 0.6rem;
+  padding: 0.9rem 1.1rem;
+  overflow-y: auto;
 }
+
 .b-lin-gallery-card {
-  display: flex; flex-direction: column; gap: 0.3rem; text-align: left;
-  background: rgba(255,255,255,0.02); border: 1px solid var(--b-border);
-  border-radius: 0.5rem; padding: 0.75rem 0.85rem; cursor: pointer; transition: all 0.15s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  text-align: left;
+  background: rgb(255, 255, 255, 2%);
+  border: 1px solid var(--b-border);
+  border-radius: 0.5rem;
+  padding: 0.75rem 0.85rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
 }
-.b-lin-gallery-card:hover { border-color: rgba(111,191,115,0.5); background: rgba(111,191,115,0.07); transform: translateY(-1px); }
-.b-lin-gallery-name { font-family: "Cinzel", serif; font-size: 1.05rem; color: var(--b-green); }
-.b-lin-gallery-subs { font-size: 0.72rem; color: var(--b-purple); }
-.b-lin-gallery-lore { font-size: 0.74rem; color: var(--b-muted); line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-.b-lin-gallery-cost { font-size: 0.7rem; color: var(--b-amber); }
-.b-lin-gallery-counts { font-size: 0.68rem; color: var(--b-dim); margin-top: auto; }
+
+.b-lin-gallery-card:hover {
+  border-color: rgb(111, 191, 115, 50%);
+  background: rgb(111, 191, 115, 7%);
+  transform: translateY(-1px);
+}
+
+.b-lin-gallery-name {
+  font-family: Cinzel, serif;
+  font-size: 1.05rem;
+  color: var(--b-green);
+}
+
+.b-lin-gallery-subs {
+  font-size: 0.72rem;
+  color: var(--b-purple);
+}
+
+.b-lin-gallery-lore {
+  font-size: 0.74rem;
+  color: var(--b-muted);
+  line-height: 1.45;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.b-lin-gallery-cost {
+  font-size: 0.7rem;
+  color: var(--b-amber);
+}
+
+.b-lin-gallery-counts {
+  font-size: 0.68rem;
+  color: var(--b-dim);
+  margin-top: auto;
+}
 
 /* Step 2 — two-pane detail */
-.b-lin-detail { display: grid; grid-template-columns: minmax(16rem, 22rem) 1fr; min-height: 0; flex: 1; }
-.b-lin-identity { border-right: 1px solid var(--b-border); padding: 1rem 1.1rem; overflow-y: auto; display: flex; flex-direction: column; gap: 0.7rem; }
-.b-lin-back { align-self: flex-start; background: none; border: none; color: var(--b-dim); cursor: pointer; font-size: 0.78rem; padding: 0; }
-.b-lin-back:hover { color: var(--b-amber); }
-.b-lin-identity-name { font-family: "Cinzel", serif; font-size: 1.4rem; color: var(--b-green); margin: 0; }
-.b-lin-identity-lore { font-size: 0.8rem; color: var(--b-muted); line-height: 1.55; margin: 0; }
-.b-lin-identity-cost { font-size: 0.74rem; color: var(--b-amber); margin: 0; line-height: 1.45; }
-.b-lin-cost-icon { margin-right: 0.2rem; }
+.b-lin-detail {
+  display: grid;
+  grid-template-columns: minmax(16rem, 22rem) 1fr;
+  min-height: 0;
+  flex: 1;
+}
+
+.b-lin-identity {
+  border-right: 1px solid var(--b-border);
+  padding: 1rem 1.1rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.b-lin-back {
+  align-self: flex-start;
+  background: none;
+  border: none;
+  color: var(--b-dim);
+  cursor: pointer;
+  font-size: 0.78rem;
+  padding: 0;
+}
+
+.b-lin-back:hover {
+  color: var(--b-amber);
+}
+
+.b-lin-identity-name {
+  font-family: Cinzel, serif;
+  font-size: 1.4rem;
+  color: var(--b-green);
+  margin: 0;
+}
+
+.b-lin-identity-lore {
+  font-size: 0.8rem;
+  color: var(--b-muted);
+  line-height: 1.55;
+  margin: 0;
+}
+
+.b-lin-identity-cost {
+  font-size: 0.74rem;
+  color: var(--b-amber);
+  margin: 0;
+  line-height: 1.45;
+}
+
+.b-lin-cost-icon {
+  margin-right: 0.2rem;
+}
 
 /* Sublineage picker — prominent cards (was tiny chips) */
-.b-lin-sub-section { display: flex; flex-direction: column; gap: 0.4rem; margin-top: 0.3rem; }
-.b-lin-sub-heading { font-family: "Cinzel", serif; font-size: 0.9rem; color: var(--b-text,#e8dcc8); margin: 0; }
-.b-lin-sub-note { font-size: 0.68rem; color: var(--b-dim); margin: 0; }
-.b-lin-sub-cards { display: flex; flex-direction: column; gap: 0.4rem; }
-.b-lin-sub-card {
-  display: flex; flex-direction: column; gap: 0.15rem; text-align: left;
-  background: rgba(255,255,255,0.02); border: 1px solid var(--b-border);
-  border-radius: 0.45rem; padding: 0.55rem 0.7rem; cursor: pointer; transition: all 0.15s ease;
+.b-lin-sub-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-top: 0.3rem;
 }
-.b-lin-sub-card:hover { border-color: rgba(176,143,208,0.5); }
-.b-lin-sub-card.is-on { background: rgba(176,143,208,0.16); border-color: rgba(176,143,208,0.6); }
-.b-lin-sub-card-name { font-size: 0.9rem; color: var(--b-purple); font-weight: 600; }
-.b-lin-sub-card-ctx { font-size: 0.68rem; color: var(--b-muted); }
-.b-lin-sub-card-count { font-size: 0.66rem; color: var(--b-dim); }
-.b-lin-sub-distinct { font-size: 0.72rem; line-height: 1.45; padding: 0.5rem 0.6rem; background: rgba(176,143,208,0.08); border-radius: 0.4rem; }
-.b-lin-sub-distinct-label { display: block; color: var(--b-purple); font-weight: 600; margin-bottom: 0.15rem; }
-.b-lin-sub-distinct-list { color: var(--b-muted); }
+
+.b-lin-sub-heading {
+  font-family: Cinzel, serif;
+  font-size: 0.9rem;
+  color: var(--b-text, #e8dcc8);
+  margin: 0;
+}
+
+.b-lin-sub-note {
+  font-size: 0.68rem;
+  color: var(--b-dim);
+  margin: 0;
+}
+
+.b-lin-sub-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.b-lin-sub-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  text-align: left;
+  background: rgb(255, 255, 255, 2%);
+  border: 1px solid var(--b-border);
+  border-radius: 0.45rem;
+  padding: 0.55rem 0.7rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.b-lin-sub-card:hover {
+  border-color: rgb(176, 143, 208, 50%);
+}
+
+.b-lin-sub-card.is-on {
+  background: rgb(176, 143, 208, 16%);
+  border-color: rgb(176, 143, 208, 60%);
+}
+
+.b-lin-sub-card-name {
+  font-size: 0.9rem;
+  color: var(--b-purple);
+  font-weight: 600;
+}
+
+.b-lin-sub-card-ctx {
+  font-size: 0.68rem;
+  color: var(--b-muted);
+}
+
+.b-lin-sub-card-count {
+  font-size: 0.66rem;
+  color: var(--b-dim);
+}
+
+.b-lin-sub-distinct {
+  font-size: 0.72rem;
+  line-height: 1.45;
+  padding: 0.5rem 0.6rem;
+  background: rgb(176, 143, 208, 8%);
+  border-radius: 0.4rem;
+}
+
+.b-lin-sub-distinct-label {
+  display: block;
+  color: var(--b-purple);
+  font-weight: 600;
+  margin-bottom: 0.15rem;
+}
+
+.b-lin-sub-distinct-list {
+  color: var(--b-muted);
+}
 
 /* Choices pane */
-.b-lin-choices { display: flex; flex-direction: column; min-height: 0; overflow-y: auto; padding: 0 0 1rem; }
-.b-lin-choices-controls { position: sticky; top: 0; z-index: 1; background: var(--b-panel, #1c1813); display: flex; gap: 0.6rem; padding: 0.8rem 1.1rem; border-bottom: 1px solid var(--b-border); flex-wrap: wrap; align-items: center; }
-.b-lin-filters { display: flex; gap: 0.25rem; }
-.b-lin-filter { background: rgba(255,255,255,0.03); border: 1px solid var(--b-border); color: var(--b-dim); border-radius: 0.75rem; padding: 0.2rem 0.6rem; font-size: 0.72rem; cursor: pointer; }
-.b-lin-filter.is-on { background: rgba(184,130,31,0.16); border-color: rgba(184,130,31,0.5); color: var(--b-amber); }
-.b-lin-choices-group { padding: 0.6rem 1.1rem 0; }
-.b-lin-group-head { font-family: "Cinzel", serif; font-size: 0.82rem; color: var(--b-text,#e8dcc8); margin: 0 0 0.3rem; text-transform: uppercase; letter-spacing: 0.04em; }
-.b-lin-group-note { color: var(--b-dim); font-weight: 400; text-transform: none; letter-spacing: 0; }
+.b-lin-choices {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0 0 1rem;
+}
+
+.b-lin-choices-controls {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--b-panel, #1c1813);
+  display: flex;
+  gap: 0.6rem;
+  padding: 0.8rem 1.1rem;
+  border-bottom: 1px solid var(--b-border);
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.b-lin-filters {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.b-lin-filter {
+  background: rgb(255, 255, 255, 3%);
+  border: 1px solid var(--b-border);
+  color: var(--b-dim);
+  border-radius: 0.75rem;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.72rem;
+  cursor: pointer;
+}
+
+.b-lin-filter.is-on {
+  background: rgb(184, 130, 31, 16%);
+  border-color: rgb(184, 130, 31, 50%);
+  color: var(--b-amber);
+}
+
+.b-lin-choices-group {
+  padding: 0.6rem 1.1rem 0;
+}
+
+.b-lin-group-head {
+  font-family: Cinzel, serif;
+  font-size: 0.82rem;
+  color: var(--b-text, #e8dcc8);
+  margin: 0 0 0.3rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.b-lin-group-note {
+  color: var(--b-dim);
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+}
 
 /* Row tags + impact chips */
-.b-lin-row-tags { display: flex; gap: 0.25rem; margin-left: auto; }
-.b-lin-tag { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.04em; padding: 0.05rem 0.3rem; border-radius: 0.6rem; border: 1px solid transparent; }
-.b-lin-req { color: var(--b-red); border-color: rgba(217,117,107,0.4); }
-.b-lin-repped { color: var(--b-purple); border-color: rgba(176,143,208,0.4); }
-.b-lin-impact { list-style: none; display: flex; flex-wrap: wrap; gap: 0.3rem; margin: 0.3rem 0 0 2rem; padding: 0; }
-.b-lin-impact-chip { font-size: 0.68rem; color: var(--b-green); background: rgba(111,191,115,0.1); border: 1px solid rgba(111,191,115,0.3); border-radius: 0.6rem; padding: 0.05rem 0.4rem; }
+.b-lin-row-tags {
+  display: flex;
+  gap: 0.25rem;
+  margin-left: auto;
+}
+
+.b-lin-tag {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.05rem 0.3rem;
+  border-radius: 0.6rem;
+  border: 1px solid transparent;
+}
+
+.b-lin-req {
+  color: var(--b-red);
+  border-color: rgb(217, 117, 107, 40%);
+}
+
+.b-lin-repped {
+  color: var(--b-purple);
+  border-color: rgb(176, 143, 208, 40%);
+}
+
+.b-lin-impact {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin: 0.3rem 0 0 2rem;
+  padding: 0;
+}
+
+.b-lin-impact-chip {
+  font-size: 0.68rem;
+  color: var(--b-green);
+  background: rgb(111, 191, 115, 10%);
+  border: 1px solid rgb(111, 191, 115, 30%);
+  border-radius: 0.6rem;
+  padding: 0.05rem 0.4rem;
+}
 
 /* Generalized sub-choice chooser */
-.b-lin-subchoice { display: flex; align-items: center; gap: 0.4rem; margin: 0.35rem 0 0.1rem 2rem; }
-.b-lin-subchoice-label { font-size: 0.72rem; color: var(--b-muted); white-space: nowrap; }
-.b-lin-subchoice-select { flex: 1; min-width: 0; background: rgba(255,255,255,0.03); color: var(--b-text,#e8dcc8); border: 1px solid var(--b-border); border-radius: 0.3rem; padding: 0.25rem 0.35rem; font-size: 0.78rem; }
-.b-lin-subchoice-select:focus { outline: none; border-color: var(--b-amber); }
+.b-lin-subchoice {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0.35rem 0 0.1rem 2rem;
+}
+
+.b-lin-subchoice-label {
+  font-size: 0.72rem;
+  color: var(--b-muted);
+  white-space: nowrap;
+}
+
+.b-lin-subchoice-select {
+  flex: 1;
+  min-width: 0;
+  background: rgb(255, 255, 255, 3%);
+  color: var(--b-text, #e8dcc8);
+  border: 1px solid var(--b-border);
+  border-radius: 0.3rem;
+  padding: 0.25rem 0.35rem;
+  font-size: 0.78rem;
+}
+
+.b-lin-subchoice-select:focus {
+  outline: none;
+  border-color: var(--b-amber);
+}
 
 /* Sublineage tag on a row + dimming for off-sublineage items */
-.b-lin-subtag { color: var(--b-purple); border-color: rgba(176,143,208,0.4); }
-.b-lin-row.is-dimmed { opacity: 0.45; }
-.b-lin-row.is-dimmed:hover { opacity: 0.8; }
+.b-lin-subtag {
+  color: var(--b-purple);
+  border-color: rgb(176, 143, 208, 40%);
+}
+
+.b-lin-row.is-dimmed {
+  opacity: 0.45;
+}
+
+.b-lin-row.is-dimmed:hover {
+  opacity: 0.8;
+}
+
+/* ─── B5 FOCUS LAYOUT ─────────────────────────────────────────────────────
+   The lineage focus view: back/name, About strip, slim balance meter, the
+   OPTIONAL sublineage step (its own band), then two FACING columns so both the
+   earn and spend sides are always visible. Reuses the shared .b-budget meter +
+   existing row/tag/sub-card styles. */
+.b-lin-focus {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  flex: 1;
+}
+
+.b-lin-focus-top {
+  display: flex;
+  align-items: baseline;
+  gap: 0.7rem;
+  padding: 0.7rem 1.1rem 0.4rem;
+}
+
+.b-lin-focus-name {
+  font-family: Cinzel, serif;
+  font-size: 1.25rem;
+  color: var(--b-green);
+  margin: 0;
+}
+
+/* About strip — collapsible lineage lore + costuming status. */
+.b-lin-about {
+  border-bottom: 1px solid var(--b-border);
+  padding: 0.45rem 1.1rem;
+}
+
+.b-lin-about > summary {
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  font-size: 0.78rem;
+}
+
+.b-lin-about > summary::-webkit-details-marker {
+  display: none;
+}
+
+.b-lin-about-caret {
+  color: var(--b-dim);
+  font-size: 0.7rem;
+  transition: transform 0.15s;
+}
+
+.b-lin-about[open] .b-lin-about-caret {
+  transform: rotate(90deg);
+}
+
+.b-lin-about-title {
+  color: var(--b-text);
+  font-weight: 600;
+}
+
+.b-lin-about-peek {
+  color: var(--b-dim);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  flex: 1;
+  min-width: 0;
+}
+
+.b-lin-about-full {
+  font-size: 0.8rem;
+  color: var(--b-muted);
+  line-height: 1.55;
+  margin: 0.5rem 0 0;
+}
+
+.b-lin-about-cost {
+  font-size: 0.74rem;
+  margin: 0.45rem 0 0;
+}
+
+.b-lin-about-cost.is-met {
+  color: var(--b-green);
+}
+
+.b-lin-about-cost.is-unmet {
+  color: var(--b-amber);
+}
+
+.b-lin-about-cost-state {
+  font-weight: 700;
+}
+
+/* Slim balance meter (built on .b-budget). Centered gauge: green+centered when
+   even, slides LEFT when LBP to spend, RIGHT when overspent. */
+.b-lin-budget {
+  margin: 0;
+  border: none;
+  border-bottom: 1px solid var(--b-border);
+  border-radius: 0;
+  padding: 0.6rem 1.1rem;
+}
+
+.b-lin-budget .b-budget-head {
+  align-items: center;
+}
+
+.b-lin-budget .b-budget-nums .is-award {
+  color: var(--b-green);
+}
+
+.b-lin-budget .b-budget-nums .is-cost {
+  color: var(--b-amber);
+}
+
+.b-lin-bp-op {
+  color: var(--b-dim);
+}
+
+.b-lin-gauge {
+  position: relative;
+  height: 0.5rem;
+  background: var(--b-panel);
+  border: 1px solid var(--b-border);
+  border-radius: 0.25rem;
+  overflow: hidden;
+}
+
+.b-lin-gauge-tick {
+  position: absolute;
+  left: 50%;
+  top: -1px;
+  bottom: -1px;
+  width: 1px;
+  background: var(--b-border-2);
+  transform: translateX(-0.5px);
+}
+
+.b-lin-gauge-fill {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  transition:
+    width 0.18s ease,
+    background 0.18s;
+}
+
+.b-lin-budget.is-even .b-lin-gauge-fill {
+  left: 50%;
+  width: 0;
+  background: var(--b-green);
+}
+
+.b-lin-budget.is-even .b-lin-gauge {
+  background: rgb(111, 191, 115, 22%);
+}
+
+.b-lin-budget.is-under .b-lin-gauge-fill {
+  right: 50%;
+  background: var(--b-green);
+}
+
+.b-lin-budget.is-over .b-lin-gauge-fill {
+  left: 50%;
+  background: var(--b-amber);
+}
+
+.b-lin-gauge-foot {
+  margin: 0.35rem 0 0;
+  font-size: 0.74rem;
+  color: var(--b-muted);
+}
+
+.b-lin-budget.is-even .b-lin-gauge-foot {
+  color: var(--b-green);
+}
+
+.b-lin-budget.is-over .b-lin-gauge-foot {
+  color: var(--b-amber);
+}
+
+.b-lin-budget-note {
+  margin: 0.3rem 0 0;
+  font-size: 0.7rem;
+  color: var(--b-amber);
+  line-height: 1.4;
+}
+
+/* Persistent costuming-requirement chip beside the budget numbers. */
+.b-lin-cost-chip {
+  margin-left: auto;
+  font-size: 0.7rem;
+  white-space: nowrap;
+  border-radius: 1rem;
+  padding: 0.1rem 0.55rem;
+  border: 1px solid;
+}
+
+.b-lin-cost-chip.is-met {
+  color: var(--b-green);
+  border-color: rgb(111, 191, 115, 50%);
+}
+
+.b-lin-cost-chip.is-unmet {
+  color: var(--b-amber);
+  border-color: rgb(184, 130, 31, 60%);
+  background: rgb(184, 130, 31, 10%);
+}
+
+/* Sublineage step — its own band, separate from the columns. */
+.b-lin-sub-step {
+  padding: 0.7rem 1.1rem 0.8rem;
+  border-bottom: 1px solid var(--b-border);
+  border-top: 2px solid rgb(176, 143, 208, 60%);
+  background: linear-gradient(var(--b-panel-2), var(--b-panel));
+}
+
+.b-lin-sub-step .b-lin-sub-heading {
+  color: var(--b-purple);
+  font-size: 0.66rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.b-lin-sub-step .b-lin-sub-note {
+  margin: 0.15rem 0 0.6rem;
+  font-size: 0.74rem;
+  color: var(--b-muted);
+  line-height: 1.45;
+}
+
+.b-lin-sub-step .b-lin-sub-cards {
+  flex-flow: row wrap;
+}
+
+.b-lin-sub-step .b-lin-sub-card {
+  flex: 1;
+  min-width: 11rem;
+}
+
+.b-lin-sub-card-desc {
+  font-size: 0.68rem;
+  color: var(--b-dim);
+  line-height: 1.4;
+}
+
+.b-lin-sub-card.is-none {
+  border-style: dashed;
+}
+
+.b-lin-sub-card.is-none.is-on {
+  background: var(--b-panel-3);
+  border-color: var(--b-border-2);
+  box-shadow: inset 0 0 0 1px var(--b-border-2);
+}
+
+.b-lin-sub-card.is-none .b-lin-sub-card-name {
+  color: var(--b-text);
+}
+
+.b-lin-sub-card.is-civ .b-lin-sub-card-name {
+  color: var(--b-teal);
+}
+
+.b-lin-sub-card.is-civ:hover {
+  border-color: rgb(79, 184, 168, 50%);
+}
+
+.b-lin-sub-card.is-civ.is-on {
+  background: rgb(79, 184, 168, 12%);
+  border-color: rgb(79, 184, 168, 60%);
+}
+
+.b-lin-sub-kind {
+  font-size: 0.6rem;
+  color: var(--b-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin: 0.7rem 0 0.35rem;
+}
+
+/* Divider banner: marks the earn/spend axis as separate from the nature step. */
+.b-lin-options-banner {
+  padding: 0.4rem 1.1rem;
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--b-dim);
+  border-bottom: 1px solid var(--b-border);
+}
+
+/* Two facing columns, each scrolls; price-banded inside. */
+.b-lin-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 0;
+  flex: 1;
+}
+
+.b-lin-col {
+  padding: 0.7rem 0.9rem;
+  overflow-y: auto;
+}
+
+.b-lin-col-earn {
+  border-right: 2px solid var(--b-border);
+}
+
+.b-lin-col-head {
+  position: sticky;
+  top: 0;
+  background: var(--b-panel);
+  padding-bottom: 0.4rem;
+  z-index: 1;
+}
+
+.b-lin-col-tot {
+  float: right;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.85rem;
+}
+
+.b-lin-col-earn .b-lin-col-tot {
+  color: var(--b-green);
+}
+
+.b-lin-col-spend .b-lin-col-tot {
+  color: var(--b-amber);
+}
+
+.b-lin-col-title {
+  font-family: Cinzel, serif;
+  font-size: 0.98rem;
+  margin: 0;
+}
+
+.b-lin-col-earn .b-lin-col-title {
+  color: var(--b-green);
+}
+
+.b-lin-col-spend .b-lin-col-title {
+  color: var(--b-amber);
+}
+
+.b-lin-col-sub {
+  font-size: 0.7rem;
+  color: var(--b-muted);
+  margin: 0.1rem 0 0;
+}
+
+.b-lin-band {
+  margin: 0.5rem 0 0.3rem;
+}
+
+.b-lin-band-head {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0.2rem 0 0.3rem;
+}
+
+.b-lin-band-v {
+  font-weight: 700;
+  font-size: 0.72rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.b-lin-col-earn .b-lin-band-v {
+  color: var(--b-green);
+}
+
+.b-lin-col-spend .b-lin-band-v {
+  color: var(--b-amber);
+}
+
+.b-lin-band-line {
+  flex: 1;
+  height: 1px;
+  background: var(--b-border);
+}
+
+/* Required-active items: locked, auto-included marker (matches General requireds). */
+.b-lin-toggle.is-locked {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: default;
+  opacity: 0.65;
+}
+
+.b-lin-row.is-required .b-lin-toggle.is-locked {
+  color: var(--b-green);
+}
+
+/* Mobile: stack the facing columns. */
+@media (width <= 640px) {
+  .b-lin-cols {
+    grid-template-columns: 1fr;
+  }
+
+  .b-lin-col-earn {
+    border-right: none;
+    border-bottom: 2px solid var(--b-border);
+  }
+
+  .b-lin-sub-step .b-lin-sub-cards {
+    flex-direction: column;
+  }
+}
