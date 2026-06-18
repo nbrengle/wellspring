@@ -174,6 +174,7 @@ export default function BuildSheet() {
 
       {report.slots.length > 0 && (
         <Section title="Powers" tone="purple">
+          <AgileLearnerSection />
           {report.slots.map((slot) => (
             <SlotBlock key={`${slot.cls}-${slot.category}`} slot={slot}
                        pickClassOf={(field, i, name) => pickClass(character, field, i, name)} />
