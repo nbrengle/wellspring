@@ -178,7 +178,9 @@ export function IdentityRail() {
         )}
       </div>
 
-      {report.spellSlots && <SpellSlotStrip slots={report.spellSlots} />}
+      {report.spellSlots && Object.entries(report.spellSlots).map(([magicType, slots]) => (
+        <SpellSlotStrip key={magicType} magicType={Object.keys(report.spellSlots).length > 1 ? magicType : null} slots={slots} />
+      ))}
 
       <BudgetMeter />
 
@@ -309,7 +311,7 @@ function DevotionCard() {
   );
 }
 
-function SpellSlotStrip({ slots }) {
+function SpellSlotStrip({ magicType, slots }) {
   const tiers = [
     { key: "novice", label: "Novice" },
     { key: "adept", label: "Adept" },
@@ -317,7 +319,7 @@ function SpellSlotStrip({ slots }) {
   ];
   return (
     <div className="b-spellslots">
-      <span className="b-spellslots-label">Spell Slots (per rest)</span>
+      <span className="b-spellslots-label">{magicType ? `${magicType} Spell Slots` : 'Spell Slots'} (per rest)</span>
       <div className="b-spellslots-row">
         {tiers.map((t) => (
           <div key={t.key} className={`b-spellslot b-tier-${t.key} ${slots[t.key] ? "" : "is-zero"}`}>

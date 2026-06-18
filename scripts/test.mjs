@@ -263,7 +263,7 @@ test('multiclass grants are derived (new skills free, redundant → free BP)', (
 
 // ─── spell-slots + tiers ──────────────────────────────────────────────────────
 test('Cleric spell-slots grow with level (L4 4/0/0 → L6 6/2/0)', () => {
-  const ss = (lvl) => spellSlots({ classes: [{ name: 'Cleric', level: lvl }] });
+  const ss = (lvl) => spellSlots({ classes: [{ name: 'Cleric', level: lvl }] })?.Divine;
   eq(ss(4).novice, 4, 'L4 novice'); eq(ss(4).adept, 0, 'L4 adept');
   eq(ss(6).novice, 6, 'L6 novice'); eq(ss(6).adept, 2, 'L6 adept');
 });
@@ -1291,7 +1291,7 @@ test('effect coverage G4: Aewen Deep Reserves spell slot grant', () => {
   // Caster class (Mage L1 has 1 Novice, 0 Adept, 0 Greater spell slots)
   const mageBase = { classes: [{ name: 'Mage', level: 1 }] };
   const rMage = validate(mageBase);
-  eq(rMage.spellSlots.novice, 1, 'Mage L1 has 1 novice spell slot');
+  eq(rMage.spellSlots.Arcane.novice, 1, 'Mage L1 has 1 novice spell slot');
 
   // Caster Aewen + Deep Reserves -> +1 at highest tier (Novice in this case)
   const aewenCaster = {
@@ -1300,7 +1300,7 @@ test('effect coverage G4: Aewen Deep Reserves spell slot grant', () => {
     lineageAdvantages: ['Deep Reserves']
   };
   const rAewenCaster = validate(aewenCaster);
-  eq(rAewenCaster.spellSlots.novice, 2, 'Deep Reserves increases novice slots to 2');
+  eq(rAewenCaster.spellSlots.Arcane.novice, 2, 'Deep Reserves increases novice slots to 2');
 
   // Non-caster Aewen -> spellSlots is null, unaffected
   const aewenNonCaster = {

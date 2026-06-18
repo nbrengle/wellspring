@@ -119,10 +119,12 @@ export function formatCharacterSheet(character, report) {
 
   // ── Spell slots (casters), shown like the source's "Novice Spell-slots: N" ──
   if (report.spellSlots) {
-    const { novice, adept, greater } = report.spellSlots;
-    if (novice) line('Novice Spell-slots', novice);
-    if (adept) line('Adept Spell-slots', adept);
-    if (greater) line('Greater Spell-slots', greater);
+    for (const [magicType, slots] of Object.entries(report.spellSlots)) {
+      const prefix = Object.keys(report.spellSlots).length > 1 ? `${magicType} ` : '';
+      if (slots.novice) line(`${prefix}Novice Spell-slots`, slots.novice);
+      if (slots.adept) line(`${prefix}Adept Spell-slots`, slots.adept);
+      if (slots.greater) line(`${prefix}Greater Spell-slots`, slots.greater);
+    }
   }
 
   // ── Build summary footer (not in the source, but useful on an export) ──
