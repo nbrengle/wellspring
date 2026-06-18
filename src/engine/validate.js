@@ -168,7 +168,7 @@ export function classifyOwnedItems(character) {
   // every owned field (incl. innates and multiclass-granted skills) and carries
   // each item's field/index/specialty/floor, so this no longer re-walks the
   // character. `source` is derived from the node's sourceType.
-  const SOURCE_OF = { starting: 'class', purchased: 'purchased', power: 'purchased', innate: 'class', multiclass: 'class' };
+  const SOURCE_OF = { starting: 'class', purchased: 'purchased', power: 'purchased', innate: 'class', multiclass: 'class', grantedSelection: 'class' };
   const graph = resolveCharacterGraph(character);
   for (const node of graph.items) {
     if (node.field === 'flaws' || node.field === 'synthetic' || node.field === 'lineageAdvantages') continue;
@@ -204,7 +204,7 @@ export function classifyOwnedItems(character) {
     // A class power (classSkills/Class tier) misfiled into a skill field → route to
     // classPowers and suppress from the skills list.
     if (t === 'powers' && CLASS_POWER_TIERS.has(ent.tier)
-        && (!ent.parentClass || classNames.has(ent.parentClass))) {
+        && (!ent.parentClass || classNames.has(ent.parentClass) || node.sourceType === 'grantedSelection')) {
       classPowers.push({ name: item, field, index, source, cls: ent.parentClass || null, specialty, floor });
       flag(field, index);
       continue;
