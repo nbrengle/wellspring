@@ -7,7 +7,7 @@
 // by the validate.js barrel.
 
 import { lookupEntity, CLASS_POWERS, CLASS_PROGRESSION, CLASS_POWER_SLOTS, CLASSES, LINEAGES, lineageCantripChoices } from '../data.js';
-import { cleanItemName, resolveId, getClasses } from '../resolver.js';
+import { cleanItemName, resolveId, getClasses, bareSkill } from '../resolver.js';
 import { SPELL_TIERS, SLOT_CATS, BOOKCASTER_TIER_FIELD, KNOWN_SPELL_FIELDS } from '../config.js';
 import {
   rankOf, pickClass, countPicksForClass, progressionRow,
@@ -40,11 +40,36 @@ export function slotGrants(character) {
   //    item's rank ("Extended Capacity - Novice x2" → +2).
   for (const field of ['startingSkills', 'purchasedSkills', ...POWER_SOURCE_FIELDS]) {
     (character[field] || []).forEach((item, idx) => {
+      const clean = cleanItemName(item);
+      const bare = bareSkill(clean);
       const ent = lookupEntity(resolveId(item, field, character))
-        || lookupEntity(`skills:${cleanItemName(item)}`)
-        || lookupEntity(`powers:${cleanItemName(item)}`);
+        || lookupEntity(`skills:${clean}`)
+        || lookupEntity(`powers:${clean}`)
+        || lookupEntity(`powers:${bare}`);
       const rank = rankOf(character, field, idx);
-      for (const { cat, n } of (ent?.slotGrants || [])) addTo(classFor(cat), cat, n * rank);
+
+      // If this is a class power granting slots (like Studied Focus), the slots
+      // belong to the class that owns the power, not just the primary martial class.
+      let targetCls = null;
+      if (ent && ent.id && ent.id.startsWith('powers:')) {
+         // Find which class has this power
+         for (const c of classes) {
+           const byTier = CLASS_POWERS[c.name];
+           if (byTier) {
+             for (const t of Object.values(byTier)) {
+               if (t.some(p => p.name === ent.name)) {
+                 targetCls = c.name;
+                 break;
+               }
+             }
+           }
+           if (targetCls) break;
+         }
+      }
+
+      for (const { cat, n } of (ent?.slotGrants || [])) {
+         addTo(targetCls || classFor(cat), cat, n * rank);
+      }
     });
   }
 
