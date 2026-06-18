@@ -306,6 +306,39 @@ export function checkPrereqs(character) {
     });
   }
 
+  // ─── Mutual exclusions (perks/flaws that "cannot be taken along with" each other) ───
+  // REFS.excludes is a symmetric map of entity-id → [excluded ids]. The relationship
+  // crosses categories (a perk can exclude a flaw), and flaws are excluded from the
+  // prereq-satisfaction `owned` set, so derive owned perk+flaw ids straight from the
+  // graph. A character holding BOTH halves of an exclusion is illegal; report it once
+  // per unordered pair.
+  const excludes = REFS.excludes || {};
+  if (Object.keys(excludes).length) {
+    const ownedExcl = new Set();
+    for (const node of resolveCharacterGraph(character).items) {
+      if (node.field === 'purchasedPerks' || node.field === 'flaws' || node.field === 'innatePerks') {
+        if (node.id) ownedExcl.add(node.id);
+      }
+    }
+    for (const g of grantedAbilities(character).list) {
+      if (/^(perks|flaws):/.test(g.ability)) ownedExcl.add(g.ability);
+    }
+    const reportedPairs = new Set();
+    for (const id of ownedExcl) {
+      for (const other of excludes[id] || []) {
+        if (!ownedExcl.has(other)) continue;
+        const pairKey = [id, other].sort().join('|');
+        if (reportedPairs.has(pairKey)) continue;
+        reportedPairs.add(pairKey);
+        issues.push({
+          id, item: idName(id), field: id.split(':')[0],
+          excludes: other,
+          text: `cannot be taken along with ${idName(other)}`,
+        });
+      }
+    }
+  }
+
   // ─── Power requirements (parser-extracted: requiredLevel + requiresEntity) ───
   // A selected power may require a minimum class level and/or another owned entity
   // (e.g. Expert Parry → Parry Blow). Resolve each owned power IN THE CONTEXT OF

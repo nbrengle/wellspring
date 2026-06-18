@@ -193,4 +193,30 @@ for (const f of flaws) {
   }
 }
 
+// 5. Verify mutual-exclusion enforcement (perks/flaws that "cannot be taken with"
+//    each other). For each unordered exclusion pair, a character holding BOTH halves
+//    must produce a validation issue; and holding just one must NOT.
+console.log("\nChecking mutual-exclusion enforcement...");
+const fieldFor = (id) => (id.startsWith('flaws:') ? 'flaws' : 'purchasedPerks');
+const seenPairs = new Set();
+for (const [id, others] of Object.entries(REFS.excludes || {})) {
+  for (const other of others) {
+    const key = [id, other].sort().join('|');
+    if (seenPairs.has(key)) continue;
+    seenPairs.add(key);
+    const a = idName(id), b = idName(other);
+    // Both halves → must be flagged.
+    const both = { lineage: 'Human', classLevels: 'Fighter 4' };
+    (both[fieldFor(id)] = both[fieldFor(id)] || []).push(a);
+    (both[fieldFor(other)] = both[fieldFor(other)] || []).push(b);
+    const flagged = validate(both).prereqs.issues.some((i) => i.excludes === id || i.excludes === other);
+    if (!flagged) reportGap('Mutual-Exclusion', `${a} ⊗ ${b}`, 'Holding both halves is not flagged.');
+    // One half → must NOT be flagged.
+    const oneChar = { lineage: 'Human', classLevels: 'Fighter 4' };
+    (oneChar[fieldFor(id)] = oneChar[fieldFor(id)] || []).push(a);
+    const falsePos = validate(oneChar).prereqs.issues.some((i) => i.excludes);
+    if (falsePos) reportGap('Mutual-Exclusion', a, 'Flagged an exclusion while holding only one half.');
+  }
+}
+
 console.log(`\n═══ Audit Complete. Found ${gapsCount} gaps. ═══`);

@@ -469,9 +469,12 @@ function ForwardLinks({ entity, onInspect }) {
   const prereqIds = pr ? [...(pr.skills || []), ...((pr.anyOf || []).flat())] : [];
   const unlockIds = REFS.unlocks[entity.id] || [];
   const mentionIds = REFS.mentions[entity.id] || [];
+  // Mutually-exclusive perks/flaws — "cannot be taken along with" each other.
+  const excludeIds = (REFS.excludes || {})[entity.id] || [];
   return (
     <>
       <LinkList title="Requires" ids={prereqIds} tone="red" onInspect={onInspect} />
+      <LinkList title="Cannot combine with" ids={excludeIds} tone="red" onInspect={onInspect} />
       <LinkList title="Unlocks" ids={unlockIds} tone="green" onInspect={onInspect} />
       <LinkList title="References" ids={mentionIds} tone="blue" onInspect={onInspect} />
     </>
