@@ -1160,7 +1160,22 @@
         "repped": false,
         "tags": [],
         "sublineage": "Intervened",
-        "description": "The Intervened learns one Cantrip from any basic Divine spellcasting class without fulfilling any other prerequisites. If the spell references a [Devotion Accent] and the character has no Devotion, they may choose one Devotion Accent from a divine domain associated with the Divine Being that intervened for the character, at the time of purchasing this advantage."
+        "description": "The Intervened learns one Cantrip from any basic Divine spellcasting class without fulfilling any other prerequisites. If the spell references a [Devotion Accent] and the character has no Devotion, they may choose one Devotion Accent from a divine domain associated with the Divine Being that intervened for the character, at the time of purchasing this advantage.",
+        "grantedSelections": [
+          {
+            "id": "intervened_cantrip",
+            "type": "spell",
+            "tier": "Cantrip",
+            "sphere": "Divine",
+            "bypassPrereqs": [
+              "class"
+            ]
+          },
+          {
+            "id": "intervened_accent",
+            "type": "devotionAccent"
+          }
+        ]
       },
       {
         "name": "Wisdom of Many",

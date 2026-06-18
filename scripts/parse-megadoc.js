@@ -853,6 +853,75 @@ function enrichMechanics(entity) {
   extractSlotGrants(entity);
   extractLevelDiscounts(entity);
   extractRequirement(entity);
+  extractGrantedSelections(entity);
+  extractManualParameterizations(entity);
+}
+
+// ─── MANUAL PARAMETERIZATIONS (For powers that need `options` arrays) ──────────
+function extractManualParameterizations(entity) {
+  if (entity.name === "Efficient Crafting") {
+    entity.options = ["Alchemy", "Enchanting", "Tinkering"];
+  } else if (entity.name === "Batch Process") {
+    entity.options = ["Alchemy", "Ritual Magic", "Enchanting", "Tinkering"];
+  } else if (entity.name === "Studied Focus") {
+    entity.options = ["Artificer", "Crafter", "Mystic"];
+  }
+}
+
+// ─── GRANTED SELECTIONS (Dynamic picks) ────────────────────────────────────────
+function extractGrantedSelections(entity) {
+  const text = entity.description || entity.desc;
+  if (!text) return;
+  const selections = [];
+
+  // 1. Broad Study: "choose one Basic-Tier Power from any other non-Artisan Base Class"
+  let m = text.match(/choose one (Basic|Advanced|Veteran)(?:-Tier)? Power from any other non-(\w+) Base Class/i);
+  if (m) {
+    selections.push({
+      id: "broad_study_power",
+      type: "power",
+      tier: m[1].charAt(0).toUpperCase() + m[1].slice(1).toLowerCase(),
+      source: "BaseClasses",
+      excludeClass: m[2],
+      bypassPrereqs: ["class", "level"]
+    });
+  }
+
+  // 2. Arcane Secret: "choose one arcane spell at a rank they are capable of casting"
+  m = text.match(/choose one (arcane|divine) spell at a rank they are capable of casting/i);
+  if (m) {
+    selections.push({
+      id: "arcane_secret_spell",
+      type: "spell",
+      sphere: m[1].charAt(0).toUpperCase() + m[1].slice(1).toLowerCase(),
+      maxTier: "HighestAccessible",
+      bypassPrereqs: ["class"]
+    });
+  }
+
+  // 3. Intervened: "learns one Cantrip from any basic Divine spellcasting class"
+  m = text.match(/learns one Cantrip from any basic (Divine|Arcane) spellcasting class/i);
+  if (m) {
+    selections.push({
+      id: "intervened_cantrip",
+      type: "spell",
+      tier: "Cantrip",
+      sphere: m[1].charAt(0).toUpperCase() + m[1].slice(1).toLowerCase(),
+      bypassPrereqs: ["class"]
+    });
+  }
+
+  // 4. Intervened Accent: "choose one Devotion Accent"
+  if (text.match(/choose one Devotion Accent/i)) {
+    selections.push({
+      id: "intervened_accent",
+      type: "devotionAccent"
+    });
+  }
+
+  if (selections.length > 0) {
+    entity.grantedSelections = selections;
+  }
 }
 
 // ─── POWER REQUIREMENT (prose → structured) ────────────────────────────────────
