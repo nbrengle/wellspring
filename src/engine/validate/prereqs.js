@@ -443,5 +443,54 @@ export function checkPrereqs(character) {
     }
   }
 
+  // ─── Lineage-specific constraints ───
+  const sublineages = character.sublineages || {};
+  
+  // "Hot Blooded" cannot be purchased along with the "Pliant" flaw.
+  if (sublineages["Hot Blooded"] && (character.flaws || []).includes("Pliant")) {
+    issues.push({
+      id: 'flaws:Pliant', item: 'Pliant', field: 'flaws',
+      text: `cannot be taken along with the Hot Blooded lineage challenge`,
+    });
+  }
+
+  // "Anti-magic" restricts spellcasting classes and Ritual Magic.
+  if (sublineages["Anti-magic"]) {
+    const spellcastingLevels = (character.classes || []).filter(c => CLASSES[c.name]?.spellcaster && c.level > 0);
+    if (spellcastingLevels.length > 0) {
+      issues.push({
+        id: 'classes:' + spellcastingLevels[0].name, item: spellcastingLevels[0].name, field: 'classes',
+        text: `cannot take class levels in spellcasting classes due to Anti-magic lineage challenge`,
+      });
+    }
+    if ((character.startingSkills || []).includes("Ritual Magic") || (character.purchasedSkills || []).includes("Ritual Magic")) {
+      issues.push({
+        id: 'skills:Ritual Magic', item: 'Ritual Magic', field: 'skills',
+        text: `cannot purchase Ritual Magic due to Anti-magic lineage challenge`,
+      });
+    }
+  }
+
+  // "The Fractured" reduces max LP by 1, cannot be taken if character has 1 max LP.
+  // We'll enforce that maxLifePoints >= 1, or that taking it didn't push it below 1.
+  // Wait, Wellspring base LP is 3 for Humans, etc. The builder engine computes maxLifePoints.
+  if (sublineages["The Fractured"]) {
+    const stats = character.stats || {};
+    if (stats.maxLifePoints < 1) {
+      issues.push({
+        id: 'lineage:The Fractured', item: 'The Fractured', field: 'lineage',
+        text: `cannot be taken if the character already has 1 maximum Life Point (would reduce below 1)`,
+      });
+    }
+  }
+
+  // "Divinity's Scourge" cannot take Divine Vulnerability flaw.
+  if (sublineages["Divinity's Scourge"] && (character.flaws || []).includes("Divine Vulnerability")) {
+    issues.push({
+      id: 'flaws:Divine Vulnerability', item: 'Divine Vulnerability', field: 'flaws',
+      text: `cannot be taken along with the Divinity's Scourge lineage challenge`,
+    });
+  }
+
   return { issues, notes };
 }
