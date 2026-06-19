@@ -26,6 +26,7 @@ export default function ChoiceRow({
   resolvedLbp,
   subLabel,
   dimmed,
+  locked,
   requiredActive,
   expanded,
   onExpand,
@@ -51,13 +52,20 @@ export default function ChoiceRow({
 
   return (
     <li
-      className={`b-lin-pill ${chosen ? "is-on" : ""} ${dimmed ? "is-dimmed" : ""} ${requiredActive ? "is-required" : ""} ${expanded ? "is-expanded" : ""}`}
-      title={dimmed ? `Belongs to the ${subLabel} sublineage — select it to take this.` : undefined}
+      className={`b-lin-pill ${chosen ? "is-on" : ""} ${dimmed ? "is-dimmed" : ""} ${locked ? "is-locked-sub" : ""} ${requiredActive ? "is-required" : ""} ${expanded ? "is-expanded" : ""}`}
+      title={locked ? `Belongs to the ${subLabel} sublineage — select it above to take this.` : undefined}
     >
       <div className="b-lin-pill-head">
         {requiredActive ? (
           <span className="b-lin-toggle is-locked" title="Required — automatically included">
             ✓
+          </span>
+        ) : locked ? (
+          // Off-sublineage: not takeable until that sublineage is chosen. Show a lock
+          // marker (not a +) so "General can't buy sublineage items" is enforced, not
+          // just hinted — but the item stays visible + readable for discovery.
+          <span className="b-lin-toggle is-locked" title={`Select the ${subLabel} sublineage to take this`}>
+            🔒
           </span>
         ) : (
           <button
