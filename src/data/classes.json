@@ -1625,6 +1625,13 @@
         "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
+        "options": ["Artificer", "Crafter", "Mystic"],
+        "slotGrants": [
+          {
+            "cat": "basic",
+            "n": 2
+          }
+        ],
         "description": "Instead of taking an Advanced Power, the Artisan can choose two Basic-tier Powers from the Artisan Base Class with the same Specialty Tag (ie: Artificer, Crafter, Mystic)."
       },
       {
