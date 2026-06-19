@@ -5,6 +5,7 @@
 // dimmed/locked until their sublineage is picked. Each item is a ChoiceRow.
 import React, { useState } from "react";
 import { subKey } from "../../engine/validate.js";
+import { lineageItemImpact } from "../../engine/data.js";
 import { cleanChallengeName } from "../LineagePanel.jsx";
 import { parseSublineage } from "./lineage-helpers.js";
 import ChoiceRow from "./ChoiceRow.jsx";
@@ -15,21 +16,34 @@ const FILTERS = [
   { id: "required", label: "Required" },
 ];
 
-const subLabel = (s) => (s ? parseSublineage(s).name : "");
+const GROUP_OPTS = [
+  { id: "band", label: "Cost band" },
+  { id: "effect", label: "Build effect" },
+  { id: "sublineage", label: "Sublineage" },
+];
 
-// Group items into LBP-value bands, highest value first, with variable-cost (null
-// lbp) items in a trailing "Variable" band.
-function bandsOf(items) {
-  const map = new Map();
-  for (const it of items) {
-    const v = typeof it.lbp === "number" ? it.lbp : "var";
-    if (!map.has(v)) map.set(v, []);
-    map.get(v).push(it);
-  }
-  const nums = [...map.keys()].filter((v) => v !== "var").sort((a, b) => b - a);
-  const order = map.has("var") ? [...nums, "var"] : nums;
-  return order.map((v) => ({ value: v, items: map.get(v) }));
-}
+// The catch-all bucket for items whose effect ISN'T a build-time / derived-stat
+// change. These items still have real mechanical effects — they're in-play (a
+// granted power, an accent, a domain) — so the label must NOT imply "does nothing".
+const OTHER_EFFECT_LABEL = "Other (in-play) effects";
+const SORT_OPTS = [
+  { id: "cost", label: "Cost" },
+  { id: "az", label: "A–Z" },
+  { id: "effect", label: "Effect" },
+];
+
+const subLabel = (s) => (s ? parseSublineage(s).name : "");
+const itemName = (it) => it.baseName || it.name;
+const itemLbp = (it) => (typeof it.lbp === "number" ? it.lbp : -1);
+
+// The primary BUILD-effect label of an item (its first parsed impact, e.g. "+3
+// Natural Armor"). lineageItemImpact only knows build-time / derived effects, so
+// items with none still have real IN-PLAY effects — bucket them honestly, never as
+// "no effect".
+const effectKey = (it, lineage) => {
+  const imp = lineageItemImpact(it, lineage);
+  return imp.length ? imp[0] : OTHER_EFFECT_LABEL;
+};
 
 export default function ChoiceList({
   lin,
@@ -44,6 +58,11 @@ export default function ChoiceList({
 }) {
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState("all");
+  // Pill management: how to group (cost band / effect / sublineage), how to sort
+  // within a group, and whether to hide locked off-sublineage options.
+  const [groupBy, setGroupBy] = useState("band");
+  const [sort, setSort] = useState("cost");
+  const [hideLocked, setHideLocked] = useState(false);
   // Which item's detail is expanded ("field|name"), so pills stay compact and
   // pickable; clicking a pill's name expands its description/mechanics in place.
   const [expandedKey, setExpandedKey] = useState(null);
@@ -109,11 +128,49 @@ export default function ChoiceList({
     );
   };
 
-  const column = (list, field, kind) => {
-    const visible = (list || []).filter((it) => matches(it, field));
-    const bands = bandsOf(visible);
+  // Sort comparator within a group, per the chosen sort axis.
+  const cmp = (a, b) => {
+    if (sort === "az") return itemName(a).localeCompare(itemName(b));
+    if (sort === "effect") {
+      const ea = lineageItemImpact(a, lineage).length, eb = lineageItemImpact(b, lineage).length;
+      if (ea !== eb) return eb - ea; // items WITH effects first
+      return itemName(a).localeCompare(itemName(b));
+    }
+    return itemLbp(b) - itemLbp(a) || itemName(a).localeCompare(itemName(b)); // cost desc
+  };
+
+  // Bucket the visible items into labelled groups per the chosen axis, then sort
+  // both the groups and the items within them.
+  const groupsOf = (items, kind) => {
     const sign = kind === "challenge" ? "+" : "−";
-    const earned = kind === "challenge" ? lbp.awarded : null;
+    const map = new Map();
+    const add = (key, label, order, it) => {
+      if (!map.has(key)) map.set(key, { label, order, items: [] });
+      map.get(key).items.push(it);
+    };
+    for (const it of items) {
+      if (groupBy === "sublineage") {
+        const info = subInfo(it);
+        add(info.general ? "_general" : info.label, info.general ? "General" : info.label, info.general ? -1 : 0, it);
+      } else if (groupBy === "effect") {
+        const e = effectKey(it, lineage);
+        add(e, e, e === OTHER_EFFECT_LABEL ? 1 : 0, it); // in-play bucket sorts last
+      } else {
+        const v = typeof it.lbp === "number" ? it.lbp : -1;
+        add(v, v < 0 ? "Variable" : `${sign}${v} LBP`, v < 0 ? -Infinity : v, it);
+      }
+    }
+    const groups = [...map.values()];
+    // Cost bands high→low; effect/sublineage groups by their order then label.
+    groups.sort((a, b) => (groupBy === "band" ? b.order - a.order : a.order - b.order || a.label.localeCompare(b.label)));
+    for (const g of groups) g.items.sort(cmp);
+    return groups;
+  };
+
+  const column = (list, field, kind) => {
+    let visible = (list || []).filter((it) => matches(it, field));
+    if (hideLocked) visible = visible.filter((it) => !subInfo(it).offSublineage);
+    const groups = groupsOf(visible, kind);
     return (
       <div className={`b-lin-col b-lin-col-${kind === "challenge" ? "earn" : "spend"}`}>
         <div className="b-lin-col-head">
@@ -123,16 +180,16 @@ export default function ChoiceList({
             {kind === "challenge" ? "Take these to build your LBP budget." : "Buy these with earned LBP."}
           </p>
         </div>
-        {bands.length === 0 ? (
+        {groups.length === 0 ? (
           <p className="b-empty">No matching {kind === "challenge" ? "challenges" : "advantages"}.</p>
         ) : (
-          bands.map((b) => (
-            <div key={b.value} className="b-lin-band">
+          groups.map((g) => (
+            <div key={g.label} className="b-lin-band">
               <div className="b-lin-band-head">
-                <span className="b-lin-band-v">{b.value === "var" ? "Variable" : `${sign}${b.value} LBP`}</span>
+                <span className="b-lin-band-v">{g.label}</span>
                 <span className="b-lin-band-line" />
               </div>
-              <ul className="b-lin-pills">{b.items.map((it) => renderRow(it, field, kind))}</ul>
+              <ul className="b-lin-pills">{g.items.map((it) => renderRow(it, field, kind))}</ul>
             </div>
           ))
         )}
@@ -161,6 +218,35 @@ export default function ChoiceList({
               {f.label}
             </button>
           ))}
+        </div>
+        {/* Group / Sort / Hide-locked — reuses the power picker's control classes
+            (b-picker-sortrow/sortlabel/sortsel/toggle) so the whole app's browse
+            controls look and read the same. */}
+        <div className="b-picker-sortrow">
+          <label className="b-picker-sortlabel">
+            Group
+            <select className="b-picker-sortsel" value={groupBy} onChange={(e) => setGroupBy(e.target.value)}>
+              {GROUP_OPTS.map((o) => (
+                <option key={o.id} value={o.id}>
+                  {o.label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="b-picker-sortlabel">
+            Sort
+            <select className="b-picker-sortsel" value={sort} onChange={(e) => setSort(e.target.value)}>
+              {SORT_OPTS.map((o) => (
+                <option key={o.id} value={o.id}>
+                  {o.label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="b-picker-toggle">
+            <input type="checkbox" checked={hideLocked} onChange={(e) => setHideLocked(e.target.checked)} />
+            Hide locked
+          </label>
         </div>
       </div>
       <div className="b-lin-cols">
