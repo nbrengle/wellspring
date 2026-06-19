@@ -2,7 +2,13 @@
   {
     "name": "Aewen",
     "description": "While the Arcane touches all lineages, none are as profoundly imbued as the Aewen. Tapping into the deepest part of the Weave, the Aewen access the Arcane at a more fundamental level. This natural aptitude comes at a cost – the vast swaths of Arcane energy coursing through their veins cause the Aewen to age and mature more rapidly than the other lineages. Aewen rarely reach ages older than 30 - their lives are brief, radiant and impactful. Wielders of complex arcane sigils that tattoo their spell constructs onto their skin and clothes, Shorn Urbanites are inheritors of the collective history of generations of spellwork designed to accomplish everything from land terraforming to laundry. Occasionally these spells go haywire due to inaccuracies seeping in from modifications and updates to the core structures that they depend upon, which requires the ever-vigilant work of the sharpest minds their generation has to offer to maintain. Having absorbed strongly accented arcane power for long periods of time, the Accented have had their physiology shifted to wield their accented power and this energy emanates from their very being. Depending on the Accent, this can be a blessing or a curse. Costuming Challenge: Hard - The Aewen must have at least 2 [Repped] Challenges. If the character is Accented, one of these Challenges must be Elemental Expression (see below).",
-    "costume": "",
+    "costume": {
+      "difficulty": "Hard",
+      "minRepped": 2,
+      "mustInclude": "Elemental Expression",
+      "mustIncludeIf": "Accented",
+      "text": "The Aewen must have at least 2 [Repped] Challenges. If the character is Accented, one of these Challenges must be Elemental Expression (see below)."
+    },
     "sublineages": [
       {
         "name": "Shorn Urbanite",
@@ -229,7 +235,13 @@
   {
     "name": "Chimera",
     "description": "Created through intense spiritual rites, bred into a subset of the population, or genetically spliced, Chimera are humanoids that exhibit the traits of other species, typically to enhance survivability and take on positive evolutionary characteristics of other Fauna. Some Chimera appear to resemble a specific animal, where others exhibit a plethora of traits and features from across a variety of species. Costuming Challenge: Hard - The Chimera requires at least 2 [Repped] Challenges.",
-    "costume": "",
+    "costume": {
+      "difficulty": "Hard",
+      "minRepped": 2,
+      "mustInclude": null,
+      "mustIncludeIf": null,
+      "text": "The Chimera requires at least 2 [Repped] Challenges."
+    },
     "sublineages": [],
     "challenges": [
       {
@@ -409,7 +421,13 @@
   {
     "name": "Forged",
     "description": "Whether humanoids augmented with mechanical parts or sapient creatures made wholesale from technology, the Forged thrive in an existence in-between the artificial and real. Scholars debate whether full Constructs have an internal experience or if they are only perfectly mimicking sentience, which is a question only Construct’s self, if it exists, knows the answer to. Forged can be made from any number of materials, from treated wood woven with spellwork to metal facsimile with steam powered internals and even synthesized flesh over an alloy skeleton. They also can have a wide variety of expression and behavior, from stiff automata to fully conversant. Members of a civilization elevated by an advanced general intelligence known as the Great Mind, Technarchist Augmented interface with their machine god via query feeds to offload mental processing. Biological expression varies across the augmented, with some only holding on to the barest veneer of their old biological forms and others appearing as fully humanoid with only a few jacks and exhaust ports visible from their internal implants. Whether elaborate mechanical beings, ironwood strapped together with runes, or simplified biological recreations, constructs are humanoid-shaped automata made in the image of other lineages. Costuming Challenge: Hard - The Forged must have at least 2 [Repped] Challenges.",
-    "costume": "",
+    "costume": {
+      "difficulty": "Hard",
+      "minRepped": 2,
+      "mustInclude": null,
+      "mustIncludeIf": null,
+      "text": "The Forged must have at least 2 [Repped] Challenges."
+    },
     "sublineages": [
       {
         "name": "Technarchist",
@@ -677,7 +695,13 @@
   {
     "name": "Human",
     "description": "The common format of biological expression - humans are found across the Wellspring, and in almost all civilizations. Very rarely some humans develop brains capable of innately controlling and influencing the world around them. Their gifts, neither divine or arcanely inspired, often inspire fear and distrust from their kin. A people who fought off the full might of the Void for almost a decade with the assistance of their Goddess, The Mother. Their hardy and resilient nature is due to having lived in a world with unpredictable seasons, and for having paid for their survival with sweat, tears, and blood. Costuming Challenge: Easy - Humans do not require any [Repped] Challenges.",
-    "costume": "",
+    "costume": {
+      "difficulty": "Easy",
+      "minRepped": 0,
+      "mustInclude": null,
+      "mustIncludeIf": null,
+      "text": "Humans do not require any [Repped] Challenges."
+    },
     "sublineages": [
       {
         "name": "Psionic",
@@ -939,7 +963,13 @@
   {
     "name": "Lost",
     "description": "All civilizations have had close contact with the Void since the Wellspring appeared. All have lost lives to the constant threat that the Void presents, and many have died. Rarely, those lost will return to us either by divine intervention or tenacity of mind and spirit. The Lost now must contend with a great hunger that threatens to overwhelm them at any moment. Lost can resemble any lineage, however they only have access to the Lost lineage challenges and advantages. When Divine Beings have a vested interest in a mortal lost to the Void, they may use their influence to pull the Lost back into their embrace. Those rescued in this fashion have markings of the divine upon their flesh as well as a deep debt and connection to the Divine Being that rescued them. In some cases, the Divine Being that the Intervened worships and the Divine Being that rescued them are two separate entities - and this fact has inspired many soap operas in The Traveling Star. Sometimes pieces of those Lost band together and assemble themselves into a new humanoid, with multiple minds sharing the same cobbled together body. These Fractured often have amnesia, with slight pieces of their past coming to light in situations that remind them of the selves they used to be. Costuming Challenge: Hard - The Lost require at least 2 [Repped] Challenges, one of which must be Scarred by the Void.",
-    "costume": "",
+    "costume": {
+      "difficulty": "Hard",
+      "minRepped": 2,
+      "mustInclude": "Scarred by the Void",
+      "mustIncludeIf": null,
+      "text": "The Lost require at least 2 [Repped] Challenges, one of which must be Scarred by the Void."
+    },
     "sublineages": [
       {
         "name": "Intervened",
@@ -1203,7 +1233,13 @@
   {
     "name": "Oaksworn",
     "description": "Creatures touched by nature or nature spirits made manifest, the Oaksworn are highly in tune with the needs of the Flora and Land. The Oaksworn are staunch defenders of the natural cycles of growth and decay and detest creatures that attempt to escape this cycle. Some civilizations venerate Oaksworn as representatives of Divine Beings and natural forces, following their leadership in order to better join with nature. In others where nature holds less sway in the civilization’s zeitgeist, Oaksworn are appointed and created in secret and attempt to subvert those in power to preserve what they can of the natural order. Worshippers of a deific figure of nature, the Oak Father, Astari Oaksworn guide their people to lead lives of harmony with their surroundings, a task necessitated by their long lives spent riding on the back of the Star Ray, Ash’Haie, covered in a closed natural system. Now at the wellspring, the Astari guard the Oak Father and his lands while his Star Rays make their way home. Animated spirits of trees, plants and flowers, Dryads closely resemble humanoids covered by pieces of their plant selves. Some Dryads are bound to the physical plant they originated from, where others may be able to anchor themselves to similar plants or travel free from their roots altogether. Costuming Challenge: Medium - The Oaksworn must have at least 1 [Repped] Challenge.",
-    "costume": "",
+    "costume": {
+      "difficulty": "Medium",
+      "minRepped": 1,
+      "mustInclude": null,
+      "mustIncludeIf": null,
+      "text": "The Oaksworn must have at least 1 [Repped] Challenge."
+    },
     "sublineages": [
       {
         "name": "Astari",
@@ -1454,7 +1490,13 @@
   {
     "name": "Ogrim",
     "description": "An evolutionary byproduct of humanoids surviving through prolonged periods of war and violence, the Ogrim have adapted to healing rapidly from injury, recovering from what many considered to be unsurvivable. The Ogrim’s bodies are warped by these repeated injuries, causing robust systems of scars as well as pronounced bulky features from broken and misshapen bones. This adaptation also allows the Ogrim to put on muscle much easier than other lineages, leading to, on average, a bulkier physique. A long standing Warrior society that fought over the most habitable bits of land on their small world, Shorn Wilders have a cultural honor for life and only kill other humanoids when absolutely forced to. Prior to the Shorn throwing off the yoke of their gods, the Wilders worshipped two major Divine Beings: the god of Polyamory and Familial Bonds, and the god of Wrath and Mercy. These cultural influences can still be found in their mannerisms and values, even if the gods that embodied those aspects are now dead. Bonelings are Ogrim that have overactive bone production, which causes bone spurs to erupt and pierce their skin, providing natural armor and weaponry. This adaptation is incredibly painful and often leads to an irascible population that bonds together over their shared pain. Once annually, Bonelings undergo a process called the Renewal, where they ritually shed all of their external bones and regrow an entire fresh set stronger than before. Costuming Challenge: Hard - The Ogrim must have at least 2 [Repped] Challenges.",
-    "costume": "",
+    "costume": {
+      "difficulty": "Hard",
+      "minRepped": 2,
+      "mustInclude": null,
+      "mustIncludeIf": null,
+      "text": "The Ogrim must have at least 2 [Repped] Challenges."
+    },
     "sublineages": [
       {
         "name": "Shorn Wilder",
@@ -1693,7 +1735,13 @@
   {
     "name": "Underkin",
     "description": "Long amounts of time away from the sun causes some humanoids to develop adaptations for living in the dark. This can happen when a group migrates underground for multiple generations or if someone with arcane potential is kept in dark captivity for long periods of time. After developing these adaptations to living in the dark catacombs of the earth, the Underkin have a difficult time operating above ground due to the harsh light, and must wear eye protection at all times. Underkin, on average, live to an age of 90, with some making it to a little over a quarter into their second century. Stocky and muscular from their massive amounts of underground mining, the People of Silver have resistance to acid from their long war against the insectoid Krushkar. Additionally, their blood naturally contains high levels of precious metals causing their wounds to heal and scar in silver. They hear the call of the Song in Iron, which inspires their smiths to create works on par with Divine Relics. Another manifested adaptation to underground existence are Stonewalkers, Underkin that have transitioned into hybrid organic and mineral-based lifeforms. They gain their nutrients from raw or processed metal and stone as well as plant and flesh matter. The longer a Stonewalker lives, the more rock-like they become and the slower they move, eventually transitioning into statues. Ossification often begins at 50, with major mobility issues setting in around 90, though depending on the amount of rocks in their diet, Stonewalkers can be further along in this process much earlier. Stonewalkers are capable of piercing and moving through even the hardest stone with their bare hands. Costuming Challenge: Hard - The Underkin must have at least 2 [Repped] Challenges.",
-    "costume": "",
+    "costume": {
+      "difficulty": "Hard",
+      "minRepped": 2,
+      "mustInclude": null,
+      "mustIncludeIf": null,
+      "text": "The Underkin must have at least 2 [Repped] Challenges."
+    },
     "sublineages": [
       {
         "name": "People of Silver",
