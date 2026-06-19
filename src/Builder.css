@@ -3089,16 +3089,20 @@
 }
 
 .b-lin-back {
-  align-self: flex-start;
-  background: none;
-  border: none;
-  color: var(--b-dim);
+  align-self: center;
+  background: var(--b-panel-2);
+  border: 1px solid var(--b-border-2);
+  border-radius: 1rem;
+  color: var(--b-muted);
   cursor: pointer;
-  font-size: 0.78rem;
-  padding: 0;
+  font-size: 0.74rem;
+  padding: 0.2rem 0.7rem;
+  white-space: nowrap;
+  flex: none;
 }
 
 .b-lin-back:hover {
+  border-color: var(--b-amber-deep);
   color: var(--b-amber);
 }
 
@@ -3253,6 +3257,7 @@
   border-color: rgb(184, 130, 31, 50%);
   color: var(--b-amber);
 }
+
 
 .b-lin-choices-group {
   padding: 0.6rem 1.1rem 0;
@@ -3656,26 +3661,6 @@
   color: var(--b-text);
 }
 
-.b-lin-sub-card.is-civ .b-lin-sub-card-name {
-  color: var(--b-teal);
-}
-
-.b-lin-sub-card.is-civ:hover {
-  border-color: rgb(79, 184, 168, 50%);
-}
-
-.b-lin-sub-card.is-civ.is-on {
-  background: rgb(79, 184, 168, 12%);
-  border-color: rgb(79, 184, 168, 60%);
-}
-
-.b-lin-sub-kind {
-  font-size: 0.6rem;
-  color: var(--b-dim);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  margin: 0.7rem 0 0.35rem;
-}
 
 /* Divider banner: marks the earn/spend axis as separate from the nature step. */
 .b-lin-options-banner {

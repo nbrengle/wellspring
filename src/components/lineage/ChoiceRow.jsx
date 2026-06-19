@@ -81,7 +81,7 @@ export default function ChoiceRow({
         </button>
         <span className="b-lin-row-tags">
           {subLabel && <span className="b-lin-tag b-lin-subtag">{subLabel}</span>}
-          {requiredActive && <span className="b-lin-tag b-lin-req">auto</span>}
+          {requiredActive && <span className="b-lin-tag b-lin-req">required</span>}
           {item.repped && <span className="b-lin-tag b-lin-repped">repped</span>}
         </span>
         <span className={`b-lin-lbp ${kind === "challenge" ? "is-award" : "is-cost"}`}>{lbpLabel}</span>

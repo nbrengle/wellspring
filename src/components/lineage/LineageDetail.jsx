@@ -45,7 +45,7 @@ export default function LineageDetail({
           lineage name + the earn→spend→balance one-liner. */}
       <header className="b-lin-focus-head">
         <button className="b-lin-back" onClick={onBack}>
-          ‹ All lineages
+          ‹ Change lineage
         </button>
         <div className="b-lin-focus-titles">
           <h2 className="b-lin-focus-name">{lineage}</h2>
