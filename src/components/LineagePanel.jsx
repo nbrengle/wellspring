@@ -31,33 +31,36 @@ export default function LineagePanel({
   const lineage = character.lineage;
   const lin = lineage ? LINEAGES[lineage] : null;
 
-  const subtitle = lin
-    ? `${lineage} · ${lbp.remaining} LBP left (${lbp.awarded} earned − ${lbp.spent} spent)${lbp.capped ? ", capped at 10" : ""}`
-    : "Discover your ancestry — what each lineage is, does, and costs";
-
   return (
     <Overlay onClose={onClose} overlayClassName="b-overlay-dock"
              panelClassName="b-picker b-picker-dock b-lin-panel" modal={false} ariaLabel="Lineage">
-      <header className="b-picker-head">
-        <div>
-          <h2 className="b-picker-title">Lineage</h2>
-          <p className="b-picker-sub">{subtitle}</p>
-        </div>
-        <button className="b-picker-x" aria-label="Close" onClick={onClose}>×</button>
-      </header>
-
+      {/* The focus view (LineageDetail) owns its own header, so we don't render the
+          generic picker-head there — that double bar was the clutter. Only the
+          gallery shows the "Lineage" picker-head. */}
       {lin ? (
-        <LineageDetail
-          lineage={lineage} lin={lin} character={character} lbp={lbp}
-          onBack={() => onSetLineage("")}
-          onSetSublineage={onSetSublineage}
-          onToggle={onToggle}
-          onInspect={onInspect}
-          onSetChoice={onSetAdvantageChoice}
-          onSetRep={onSetRep}
-        />
+        <>
+          <button className="b-lin-close" aria-label="Close" onClick={onClose}>×</button>
+          <LineageDetail
+            lineage={lineage} lin={lin} character={character} lbp={lbp}
+            onBack={() => onSetLineage("")}
+            onSetSublineage={onSetSublineage}
+            onToggle={onToggle}
+            onInspect={onInspect}
+            onSetChoice={onSetAdvantageChoice}
+            onSetRep={onSetRep}
+          />
+        </>
       ) : (
-        <LineageGallery onPick={onSetLineage} />
+        <>
+          <header className="b-picker-head">
+            <div>
+              <h2 className="b-picker-title">Lineage</h2>
+              <p className="b-picker-sub">Discover your ancestry — what each lineage is, does, and costs</p>
+            </div>
+            <button className="b-picker-x" aria-label="Close" onClick={onClose}>×</button>
+          </header>
+          <LineageGallery onPick={onSetLineage} />
+        </>
       )}
     </Overlay>
   );

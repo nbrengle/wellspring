@@ -27,6 +27,7 @@ export const EMPTY_CHARACTER = {
   rightHandPowers: [], cantrips: [],
   noviceSpells: [], adeptSpells: [], greaterSpells: [], bookSpells: [],
   domainPowers: [], formPowers: [],
+  agileLearnerTrades: {},
 };
 
 // ─── PURE STATE MODIFIERS ───────────────────────────────────────────────────

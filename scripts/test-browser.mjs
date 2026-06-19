@@ -109,16 +109,21 @@ async function run() {
     //    straight here. HARD-assert the panel opens AND renders rows (not blank).
     console.log("  · Lineage panel (+ pick)");
     await page.locator('.b-id-card:has-text("Lineage")').first().click();
-    await page.waitForSelector('.b-lin-card, .b-lin-list', { timeout: 5000 }).catch(() => {
+    // The panel opens to the GALLERY when no lineage is set, or straight to the
+    // FOCUS view when one already is (the Cleric archetype starts as Human). Accept
+    // either, then drive into focus and assert the choice pills render (not blank).
+    await page.waitForSelector('.b-lin-gallery-card, .b-lin-focus', { timeout: 5000 }).catch(() => {
       throw new Error("Lineage panel did not open after clicking the Lineage card — Builder crashed on opening it?");
     });
-    const firstLineage = page.locator('.b-lin-card').first();
-    if (await firstLineage.count()) {
-      await firstLineage.click();
-      await page.waitForTimeout(300);
-      if ((await page.locator('.b-lin-row').count()) === 0) {
-        throw new Error("Lineage panel rendered no rows after picking a lineage (panel crashed?)");
-      }
+    const galleryCard = page.locator('.b-lin-gallery-card').first();
+    if (await galleryCard.count()) {
+      await galleryCard.click();
+      await page.waitForSelector('.b-lin-focus', { timeout: 5000 }).catch(() => {
+        throw new Error("Lineage focus view did not render after picking a lineage (panel crashed?)");
+      });
+    }
+    if ((await page.locator('.b-lin-pill').count()) === 0) {
+      throw new Error("Lineage focus rendered no choice pills (panel crashed?)");
     }
     await clickX();
     await page.waitForTimeout(150);
