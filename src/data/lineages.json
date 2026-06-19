@@ -367,7 +367,13 @@
           "Requires Altered Skin"
         ],
         "sublineage": "General",
-        "description": "The Chimera’s altered skin is sturdy, granting them three points of Natural Armor."
+        "description": "The Chimera’s altered skin is sturdy, granting them three points of Natural Armor.",
+        "statMods": [
+          {
+            "stat": "naturalArmor",
+            "n": 3
+          }
+        ]
       },
       {
         "name": "Armored Carapace",
@@ -378,7 +384,13 @@
           "Requires Tough Hide"
         ],
         "sublineage": "General",
-        "description": "The Chimera’s hide protects against even the sharpest blade. The natural armor granted by Tough Hide increases to 4."
+        "description": "The Chimera’s hide protects against even the sharpest blade. The natural armor granted by Tough Hide increases to 4.",
+        "statMods": [
+          {
+            "stat": "naturalArmor",
+            "n": 4
+          }
+        ]
       },
       {
         "name": "Claws",
@@ -1107,7 +1119,13 @@
         "repped": false,
         "tags": [],
         "sublineage": "Fractured",
-        "description": "The Fractured is barely holding onto their physical form, and has 1 fewer maximum Life Point. This challenge cannot be taken if the character already has 1 maximum Life Point."
+        "description": "The Fractured is barely holding onto their physical form, and has 1 fewer maximum Life Point. This challenge cannot be taken if the character already has 1 maximum Life Point.",
+        "statMods": [
+          {
+            "stat": "lifePoints",
+            "n": -1
+          }
+        ]
       },
       {
         "name": "Unstable Form [Repped][",
@@ -1465,7 +1483,13 @@
           "Requires Hardened Flesh"
         ],
         "sublineage": "Dryad",
-        "description": "The natural armor granted by Hardened Flesh increases to 3."
+        "description": "The natural armor granted by Hardened Flesh increases to 3.",
+        "statMods": [
+          {
+            "stat": "naturalArmor",
+            "n": 3
+          }
+        ]
       },
       {
         "name": "Strength from Sunlight",

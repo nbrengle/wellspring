@@ -323,6 +323,36 @@ Format per item:
 
 ---
 
+## 14. Permanent stat changes — inconsistent phrasing breaks structured extraction
+
+- **What:** The doc states permanent Base-stat changes (Natural Armor, Maximum
+  Life Points, Spikes, Armor) in many free-form ways. Two shapes in particular
+  defeated the `statModsFromText` extractor, so the effect silently never applied
+  to the character sheet:
+  - **Verb + intervening pronoun + word-number:** "granting **them three** points
+    of Natural Armor" (the number doesn't immediately follow the verb, and is a
+    *word*, not a digit).
+  - **Decrement phrasing:** "has **1 fewer** maximum Life Point" (no current
+    increment pattern handles "fewer"; the generic "N maximum Life Points" pattern
+    would even mis-read it as **+1**).
+- **Where (instances found):**
+  - Chimera → **Tough Hide** ("granting them three points of Natural Armor") and
+    **Armored Carapace** ("natural armor … increases to 4").
+  - Lost → **Fragile Form** ("has 1 fewer maximum Life Point").
+  - (Druid spell-forms like Hide of the Rhino use the same word-number shape, but
+    those are temporary spell effects and are intentionally *not* extracted.)
+- **Parser workaround:** Widened the Natural-Armor patterns to allow an optional
+  pronoun after the verb and word-numbers one–eight; added an "…increases to N"
+  pattern; added a negative "N fewer maximum Life Point" pattern (sign −1); and
+  started enriching lineage **challenges** (not just advantages) so penalty
+  challenges get statMods.
+- **Wanted edit:** State permanent stat changes in a single consistent form, e.g.
+  "**Natural Armor +3**" / "**Maximum Life Points −1**" (stat name, sign, digit),
+  rather than prose like "granting them three points of …" or "has 1 fewer …".
+  This would let the extractor drop the phrasing-specific regexes.
+
+---
+
 ## Meta-question: Google Docs export quirks vs author choices
 
 Many of these (flat text vs `<td>`, BasicPowers vs Basic Powers) seem to be

@@ -220,6 +220,39 @@ export function resolveCharacterGraph(character) {
     }
   }
 
+  // 4b. Process Lineage Challenges — they can carry permanent stat effects too
+  // (e.g. Lost's Fragile Form: −1 Maximum Life Point). Names may carry a rep
+  // parameter ("Lost Life (…)"), so match on the cleaned base name.
+  if (character.lineage && character.lineageChallenges) {
+    const lin = LINEAGES[character.lineage];
+    for (const ch of character.lineageChallenges) {
+      const cleanCh = cleanItemName(ch);
+      const ent = (lin?.challenges || []).find(
+        (x) => x.name === cleanCh || x.baseName === cleanCh || x.name === ch || x.baseName === ch
+      );
+      if (!ent) continue;
+      const effects = [];
+      const id = `challenges:${character.lineage} - ${ent.baseName || cleanCh}`;
+      attachGlobalEffects(id, effects, ent);
+      if (ent.statMods) {
+        for (const mod of ent.statMods) {
+          effects.push({ type: 'STAT', stat: mod.stat, amount: mod.n });
+        }
+      }
+      items.push({
+        id,
+        name: ch,
+        rawString: ch,
+        field: 'lineageChallenges',
+        sourceType: 'lineage',
+        index: -1,
+        rank: 1,
+        entity: ent,
+        effects,
+      });
+    }
+  }
+
   // 4.5 Multi-class-granted SKILLS — free skills a 2nd+ class grants. These are
   // genuinely OWNED items (like innates/advantages), so they belong in the graph.
   // (The matching `freeBP` — when a grant duplicates an owned skill — is a budget
