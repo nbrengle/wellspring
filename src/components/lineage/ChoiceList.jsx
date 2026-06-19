@@ -44,6 +44,9 @@ export default function ChoiceList({
 }) {
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState("all");
+  // Which item's detail is expanded ("field|name"), so pills stay compact and
+  // pickable; clicking a pill's name expands its description/mechanics in place.
+  const [expandedKey, setExpandedKey] = useState(null);
 
   const storedFor = (field, it) =>
     (character[field] || []).find((n) => n === it.name || cleanChallengeName(n) === cleanChallengeName(it.name));
@@ -54,7 +57,10 @@ export default function ChoiceList({
   const subInfo = (it) => {
     const k = subKey(it.sublineage);
     const general = !k || k === "general";
-    const offSublineage = !general && pickedSub && k !== pickedSub;
+    // A sublineage-scoped item is OFF (locked) whenever it isn't the picked
+    // sublineage — including when none is picked (then every sublineage item is
+    // locked; "General only" really means General only).
+    const offSublineage = !general && k !== pickedSub;
     return { general, offSublineage, label: subLabel(it.sublineage) };
   };
 
@@ -78,6 +84,7 @@ export default function ChoiceList({
   const renderRow = (it, field, kind) => {
     const storedName = storedFor(field, it);
     const info = subInfo(it);
+    const key = `${field}|${it.name}`;
     return (
       <ChoiceRow
         key={it.name}
@@ -89,7 +96,10 @@ export default function ChoiceList({
         resolvedLbp={resolvedLbpFor(it)}
         subLabel={info.general ? null : info.label}
         dimmed={info.offSublineage}
+        locked={info.offSublineage}
         requiredActive={requiredActive(it)}
+        expanded={expandedKey === key}
+        onExpand={() => setExpandedKey((cur) => (cur === key ? null : key))}
         onToggle={onToggle}
         onInspect={onInspect}
         onSetChoice={onSetChoice}
@@ -122,7 +132,7 @@ export default function ChoiceList({
                 <span className="b-lin-band-v">{b.value === "var" ? "Variable" : `${sign}${b.value} LBP`}</span>
                 <span className="b-lin-band-line" />
               </div>
-              <ul className="b-lin-list">{b.items.map((it) => renderRow(it, field, kind))}</ul>
+              <ul className="b-lin-pills">{b.items.map((it) => renderRow(it, field, kind))}</ul>
             </div>
           ))
         )}

@@ -61,7 +61,12 @@ export default function LineageGallery({ onPick }) {
             <span className="b-lin-gallery-name">{name}</span>
             {tagline && <span className="b-lin-gallery-subs">{tagline}</span>}
             {lin.description && <span className="b-lin-gallery-lore">{lin.description}</span>}
-            {lin.costume && <span className="b-lin-gallery-cost">🎭 {lin.costume}</span>}
+            {lin.costume?.difficulty && (
+              <span className="b-lin-gallery-cost">
+                🎭 Costuming: {lin.costume.difficulty}
+                {lin.costume.minRepped > 0 ? ` · ${lin.costume.minRepped} [Repped]` : ""}
+              </span>
+            )}
             <span className="b-lin-gallery-counts">
               {nChallenges} challenges · {nAdvantages} advantages
             </span>
