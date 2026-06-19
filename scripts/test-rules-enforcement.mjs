@@ -193,4 +193,64 @@ for (const f of flaws) {
   }
 }
 
+// 5. Verify mutual-exclusion enforcement (perks/flaws that "cannot be taken with"
+//    each other). For each unordered exclusion pair, a character holding BOTH halves
+//    must produce a validation issue; and holding just one must NOT.
+console.log("\nChecking mutual-exclusion enforcement...");
+const fieldFor = (id) => (id.startsWith('flaws:') ? 'flaws' : 'purchasedPerks');
+const seenPairs = new Set();
+for (const [id, others] of Object.entries(REFS.excludes || {})) {
+  for (const other of others) {
+    const key = [id, other].sort().join('|');
+    if (seenPairs.has(key)) continue;
+    seenPairs.add(key);
+    const a = idName(id), b = idName(other);
+    // Both halves → must be flagged.
+    const both = { lineage: 'Human', classLevels: 'Fighter 4' };
+    (both[fieldFor(id)] = both[fieldFor(id)] || []).push(a);
+    (both[fieldFor(other)] = both[fieldFor(other)] || []).push(b);
+    const flagged = validate(both).prereqs.issues.some((i) => i.excludes === id || i.excludes === other);
+    if (!flagged) reportGap('Mutual-Exclusion', `${a} ⊗ ${b}`, 'Holding both halves is not flagged.');
+    // One half → must NOT be flagged.
+    const oneChar = { lineage: 'Human', classLevels: 'Fighter 4' };
+    (oneChar[fieldFor(id)] = oneChar[fieldFor(id)] || []).push(a);
+    const falsePos = validate(oneChar).prereqs.issues.some((i) => i.excludes);
+    if (falsePos) reportGap('Mutual-Exclusion', a, 'Flagged an exclusion while holding only one half.');
+  }
+}
+
+// 6. Verify no-duplicate-power enforcement (the general rule behind ECT's "the
+//    Power cannot be one the character already has"). Selecting a power twice must
+//    be flagged; selecting it once must not.
+console.log("\nChecking no-duplicate-power enforcement...");
+{
+  const dup = validate({ lineage: 'Human', classLevels: 'Fighter 4', basicPowers: ['Parry Blow', 'Parry Blow'] });
+  const dupFlagged = dup.prereqs.issues.some((i) => i.duplicate && i.item === 'Parry Blow');
+  if (!dupFlagged) reportGap('Duplicate-Power', 'Parry Blow', 'Selecting the same power twice is not flagged.');
+  const single = validate({ lineage: 'Human', classLevels: 'Fighter 4', basicPowers: ['Parry Blow'] });
+  if (single.prereqs.issues.some((i) => i.duplicate)) {
+    reportGap('Duplicate-Power', 'Parry Blow', 'Flagged a duplicate while the power was selected only once.');
+  }
+}
+
+// 7. Verify Elemental Affinity cap (≤2 instances, each a distinct element).
+console.log("\nChecking Elemental Affinity cap enforcement...");
+{
+  const base = { lineage: 'Human', classLevels: 'Fighter 4' };
+  const issuesFor = (perks) => validate({ ...base, purchasedPerks: perks }).prereqs.issues
+    .filter((i) => i.id === 'perks:Elemental Affinity');
+  // legal: two distinct elements
+  if (issuesFor(['Elemental Affinity (Flame)', 'Elemental Affinity (Ice)']).length) {
+    reportGap('Elemental-Affinity', 'two distinct', 'Flagged a legal pair of distinct elements.');
+  }
+  // illegal: three instances
+  if (!issuesFor(['Elemental Affinity (Flame)', 'Elemental Affinity (Ice)', 'Elemental Affinity (Acid)']).some((i) => /at most twice/.test(i.text))) {
+    reportGap('Elemental-Affinity', 'three instances', 'Taking it >2 times is not flagged.');
+  }
+  // illegal: same element twice
+  if (!issuesFor(['Elemental Affinity (Flame)', 'Elemental Affinity (Flame)']).some((i) => /different element/.test(i.text))) {
+    reportGap('Elemental-Affinity', 'duplicate element', 'Attuning to the same element twice is not flagged.');
+  }
+}
+
 console.log(`\n═══ Audit Complete. Found ${gapsCount} gaps. ═══`);

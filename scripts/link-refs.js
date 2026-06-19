@@ -644,6 +644,34 @@ for (const e of registry) {
 }
 for (const id of Object.keys(grantedBy)) grantedBy[id] = [...new Set(grantedBy[id])];
 
+// ─── MUTUAL-EXCLUSION EDGES ───────────────────────────────────────────────────
+// Some perks/flaws are mutually exclusive — "This cannot be taken along with X".
+// The relationship is symmetric (owning both is illegal), and crosses categories
+// (a perk can exclude a flaw, e.g. Deathgrip ⊗ Dies Alone), so we resolve the
+// named target against a combined perk+flaw lookup and record BOTH directions.
+const exclusionTargetLookup = buildLookup([
+  ...registry.filter((e) => e.type === "perks"),
+  ...registry.filter((e) => e.type === "flaws"),
+]);
+// "cannot/may not be taken (along) with <Name>" — capture the entity name that
+// follows. Bodies start the sentence with "This" (the owning entity).
+const EXCLUSION_RE = /\b(?:cannot|can ?not|may not|must not)\s+be\s+taken\s+(?:along\s+)?with\s+([A-Z][A-Za-z' -]+?)(?=[.,;]|\s+(?:and|or|when|while|if|at|in|to)\b|$)/gi;
+const excludes = {};
+const addExclusion = (a, b) => {
+  if (!a || !b || a === b) return;
+  (excludes[a] = excludes[a] || []);
+  if (!excludes[a].includes(b)) excludes[a].push(b);
+};
+for (const e of registry) {
+  if (e.type !== "perks" && e.type !== "flaws") continue;
+  for (const m of (e.body || "").matchAll(EXCLUSION_RE)) {
+    const { entity: other } = resolve(m[1].trim(), exclusionTargetLookup);
+    if (!other) continue;
+    addExclusion(e.id, other.id); // symmetric: both directions are illegal
+    addExclusion(other.id, e.id);
+  }
+}
+
 // ─── ARCHETYPE STRUCTURED REFS ───────────────────────────────────────────────
 // Resolve every skill/perk/power listed in each archetype to an entity id,
 // keyed by which field it came from. This is the typed, drift-tolerant
@@ -732,6 +760,7 @@ const result = {
   grantedBy,
   discounts,
   lbpBonuses,
+  excludes,
 };
 
 writeFileSync(join(DATA, "refs.json"), JSON.stringify(result, null, 2));
@@ -741,6 +770,7 @@ const totalPrereqEdges = Object.values(prereqs).reduce((a, p) => a + p.skills.le
 const totalGrants = Object.values(grants).reduce((a, g) => a + g.length, 0);
 console.log(`  ${registry.length} entities, ${totalRefs} body references, ${totalPrereqEdges} prereq edges`);
 console.log(`  ${totalGrants} bestowal edges, ${Object.keys(discounts).length} discount sources`);
+console.log(`  ${Object.keys(excludes).length} mutual-exclusion entities`);
 if (archetypeDrift.length) {
   console.log(`  ${archetypeDrift.length} archetype refs resolved via drift fallback (see validate-archetypes for detail).`);
 }

@@ -306,6 +306,39 @@ export function checkPrereqs(character) {
     });
   }
 
+  // ─── Mutual exclusions (perks/flaws that "cannot be taken along with" each other) ───
+  // REFS.excludes is a symmetric map of entity-id → [excluded ids]. The relationship
+  // crosses categories (a perk can exclude a flaw), and flaws are excluded from the
+  // prereq-satisfaction `owned` set, so derive owned perk+flaw ids straight from the
+  // graph. A character holding BOTH halves of an exclusion is illegal; report it once
+  // per unordered pair.
+  const excludes = REFS.excludes || {};
+  if (Object.keys(excludes).length) {
+    const ownedExcl = new Set();
+    for (const node of resolveCharacterGraph(character).items) {
+      if (node.field === 'purchasedPerks' || node.field === 'flaws' || node.field === 'innatePerks') {
+        if (node.id) ownedExcl.add(node.id);
+      }
+    }
+    for (const g of grantedAbilities(character).list) {
+      if (/^(perks|flaws):/.test(g.ability)) ownedExcl.add(g.ability);
+    }
+    const reportedPairs = new Set();
+    for (const id of ownedExcl) {
+      for (const other of excludes[id] || []) {
+        if (!ownedExcl.has(other)) continue;
+        const pairKey = [id, other].sort().join('|');
+        if (reportedPairs.has(pairKey)) continue;
+        reportedPairs.add(pairKey);
+        issues.push({
+          id, item: idName(id), field: id.split(':')[0],
+          excludes: other,
+          text: `cannot be taken along with ${idName(other)}`,
+        });
+      }
+    }
+  }
+
   // ─── Power requirements (parser-extracted: requiredLevel + requiresEntity) ───
   // A selected power may require a minimum class level and/or another owned entity
   // (e.g. Expert Parry → Parry Blow). Resolve each owned power IN THE CONTEXT OF
@@ -359,6 +392,104 @@ export function checkPrereqs(character) {
         }
       }
     }
+  }
+
+  // ─── No duplicate powers ───
+  // A power may not be selected more than once across all power fields. This is the
+  // general rule behind "the Power cannot be one the character already has" — e.g.
+  // Extensive Combat Training's bonus tier-power slot can't re-pick a power you own.
+  // (Class-granted powers live outside these selection fields, so multiclass grants
+  // don't false-positive.)
+  const powerCounts = new Map();
+  for (const field of POWER_REQ_FIELDS) {
+    for (const item of character[field] || []) {
+      const name = cleanItemName(item);
+      if (!name) continue;
+      powerCounts.set(name, (powerCounts.get(name) || 0) + 1);
+    }
+  }
+  for (const [name, count] of powerCounts) {
+    if (count > 1) {
+      issues.push({
+        id: `powers:${name}`, item: name, field: 'powers',
+        duplicate: count,
+        text: `selected ${count} times — a power may only be taken once`,
+      });
+    }
+  }
+
+  // ─── Elemental Affinity cap ───
+  // "This Perk can be taken up to twice, and each time the character may choose any
+  // element they desire, although they may not attune to more than one element at a
+  // time." → at most 2 instances, each a DISTINCT element. Enforce both.
+  const elemAffinities = (character.purchasedPerks || [])
+    .filter((p) => bareSkill(cleanItemName(p)) === 'Elemental Affinity');
+  if (elemAffinities.length) {
+    if (elemAffinities.length > 2) {
+      issues.push({
+        id: 'perks:Elemental Affinity', item: 'Elemental Affinity', field: 'purchasedPerks',
+        text: `taken ${elemAffinities.length} times — may be taken at most twice`,
+      });
+    }
+    const elements = elemAffinities
+      .map((p) => (p.match(/\(([^)]+)\)/) || [])[1]?.trim())
+      .filter(Boolean);
+    const dupElement = elements.find((e, i) => elements.findIndex((x) => x.toLowerCase() === e.toLowerCase()) !== i);
+    if (dupElement) {
+      issues.push({
+        id: 'perks:Elemental Affinity', item: 'Elemental Affinity', field: 'purchasedPerks',
+        text: `cannot attune to ${dupElement} twice — each Elemental Affinity must be a different element`,
+      });
+    }
+  }
+
+  // ─── Lineage-specific constraints ───
+  const sublineages = character.sublineages || {};
+  
+  // "Hot Blooded" cannot be purchased along with the "Pliant" flaw.
+  if (sublineages["Hot Blooded"] && (character.flaws || []).includes("Pliant")) {
+    issues.push({
+      id: 'flaws:Pliant', item: 'Pliant', field: 'flaws',
+      text: `cannot be taken along with the Hot Blooded lineage challenge`,
+    });
+  }
+
+  // "Anti-magic" restricts spellcasting classes and Ritual Magic.
+  if (sublineages["Anti-magic"]) {
+    const spellcastingLevels = (character.classes || []).filter(c => CLASSES[c.name]?.spellcaster && c.level > 0);
+    if (spellcastingLevels.length > 0) {
+      issues.push({
+        id: 'classes:' + spellcastingLevels[0].name, item: spellcastingLevels[0].name, field: 'classes',
+        text: `cannot take class levels in spellcasting classes due to Anti-magic lineage challenge`,
+      });
+    }
+    if ((character.startingSkills || []).includes("Ritual Magic") || (character.purchasedSkills || []).includes("Ritual Magic")) {
+      issues.push({
+        id: 'skills:Ritual Magic', item: 'Ritual Magic', field: 'skills',
+        text: `cannot purchase Ritual Magic due to Anti-magic lineage challenge`,
+      });
+    }
+  }
+
+  // "The Fractured" reduces max LP by 1, cannot be taken if character has 1 max LP.
+  // We'll enforce that maxLifePoints >= 1, or that taking it didn't push it below 1.
+  // Wait, Wellspring base LP is 3 for Humans, etc. The builder engine computes maxLifePoints.
+  if (sublineages["The Fractured"]) {
+    const stats = character.stats || {};
+    if (stats.maxLifePoints < 1) {
+      issues.push({
+        id: 'lineage:The Fractured', item: 'The Fractured', field: 'lineage',
+        text: `cannot be taken if the character already has 1 maximum Life Point (would reduce below 1)`,
+      });
+    }
+  }
+
+  // "Divinity's Scourge" cannot take Divine Vulnerability flaw.
+  if (sublineages["Divinity's Scourge"] && (character.flaws || []).includes("Divine Vulnerability")) {
+    issues.push({
+      id: 'flaws:Divine Vulnerability', item: 'Divine Vulnerability', field: 'flaws',
+      text: `cannot be taken along with the Divinity's Scourge lineage challenge`,
+    });
   }
 
   return { issues, notes };
