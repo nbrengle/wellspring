@@ -7,7 +7,7 @@
 // by the validate.js barrel.
 
 import { lookupEntity, CLASS_POWERS, CLASS_PROGRESSION, CLASS_POWER_SLOTS, CLASSES, LINEAGES, lineageCantripChoices } from '../data.js';
-import { cleanItemName, resolveId, getClasses } from '../resolver.js';
+import { cleanItemName, resolveId, getClasses, bareSkill } from '../resolver.js';
 import { SPELL_TIERS, SLOT_CATS, BOOKCASTER_TIER_FIELD, KNOWN_SPELL_FIELDS } from '../config.js';
 import {
   rankOf, pickClass, countPicksForClass, progressionRow,
@@ -40,11 +40,36 @@ export function slotGrants(character) {
   //    item's rank ("Extended Capacity - Novice x2" → +2).
   for (const field of ['startingSkills', 'purchasedSkills', ...POWER_SOURCE_FIELDS]) {
     (character[field] || []).forEach((item, idx) => {
+      const clean = cleanItemName(item);
+      const bare = bareSkill(clean);
       const ent = lookupEntity(resolveId(item, field, character))
-        || lookupEntity(`skills:${cleanItemName(item)}`)
-        || lookupEntity(`powers:${cleanItemName(item)}`);
+        || lookupEntity(`skills:${clean}`)
+        || lookupEntity(`powers:${clean}`)
+        || lookupEntity(`powers:${bare}`);
       const rank = rankOf(character, field, idx);
-      for (const { cat, n } of (ent?.slotGrants || [])) addTo(classFor(cat), cat, n * rank);
+
+      // If this is a class power granting slots (like Studied Focus), the slots
+      // belong to the class that owns the power, not just the primary martial class.
+      let targetCls = null;
+      if (ent && ent.id && ent.id.startsWith('powers:')) {
+         // Find which class has this power
+         for (const c of classes) {
+           const byTier = CLASS_POWERS[c.name];
+           if (byTier) {
+             for (const t of Object.values(byTier)) {
+               if (t.some(p => p.name === ent.name)) {
+                 targetCls = c.name;
+                 break;
+               }
+             }
+           }
+           if (targetCls) break;
+         }
+      }
+
+      for (const { cat, n } of (ent?.slotGrants || [])) {
+         addTo(targetCls || classFor(cat), cat, n * rank);
+      }
     });
   }
 
@@ -104,13 +129,19 @@ export function computeSlots(character) {
   // Free, locked cantrips granted by progression ("Innate Bonus Cantrip: Cancel").
   const grantedCantrips = innateBonusCantrips(character);
 
+  const agileTrades = character.agileLearnerTrades || {};
+
   const rows = [];
   for (const { name: cls, level } of classes) {
     // Clamp to the highest documented progression level (base classes cap at 10).
     const prog = progressionRow(cls, level);
     const isCaster = CLASSES[cls]?.spellcaster;
     const mkRow = (category, label, used, baseVal) => {
-      const b = bonus[`${cls}:${category}`] || 0;
+      let b = bonus[`${cls}:${category}`] || 0;
+      if (!isCaster) {
+        if (category === 'basic') b -= (agileTrades[cls] || 0);
+        if (category === 'advanced') b += (agileTrades[cls] || 0);
+      }
       return {
         cls, category, label: multi ? `${cls} ${label}` : label,
         used, base: baseVal, bonus: b, allowed: baseVal + b,
@@ -145,6 +176,7 @@ export function spellSlots(character) {
   if (!casters.length) return null; // not a caster
 
   const pools = {};
+  const agileTrades = character.agileLearnerTrades || {};
 
   // Sum each caster class's progression "N/N/N" slots at its own level.
   for (const { name, level } of casters) {
@@ -154,8 +186,8 @@ export function spellSlots(character) {
     const str = progressionRow(name, level)?.slots;
     if (typeof str === 'string') {
       const [n = 0, a = 0, g = 0] = str.split('/').map((x) => parseInt(x, 10) || 0);
-      pools[magicType].novice += n;
-      pools[magicType].adept += a;
+      pools[magicType].novice += n - (agileTrades[name] || 0);
+      pools[magicType].adept += a + (agileTrades[name] || 0);
       pools[magicType].greater += g;
     }
   }
