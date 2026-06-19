@@ -177,6 +177,13 @@ export function useCoreHandlers({ character, setCharacter, setPicking, setView }
     });
   }, [setCharacter]);
 
+  const handleSetGrantedSelection = useCallback((selectionId, value) => {
+    setCharacter((c) => ({
+      ...c,
+      grantedSelections: { ...(c.grantedSelections || {}), [selectionId]: value }
+    }));
+  }, [setCharacter]);
+
   return {
     handleSetChoice,
     handleUpdateParameter,
@@ -185,5 +192,6 @@ export function useCoreHandlers({ character, setCharacter, setPicking, setView }
     handleRemoveEntity,
     handleSetRank,
     handleSetSpecialty,
+    handleSetGrantedSelection,
   };
 }

@@ -128,6 +128,7 @@ export function useBuilderHandlers({
   const handleRemoveEntity = coreHandlers.handleRemoveEntity;
   const handleSetRank = coreHandlers.handleSetRank;
   const handleSetSpecialty = coreHandlers.handleSetSpecialty;
+  const handleSetGrantedSelection = coreHandlers.handleSetGrantedSelection;
 
   const classHandlers = useClassHandlers({ setCharacter });
   const handleLevelChange = classHandlers.handleLevelChange;
@@ -218,6 +219,7 @@ export function useBuilderHandlers({
     handleToggleLineageItem,
     handleSetLineageRep,
     handleSetAdvantageChoice,
+    handleSetGrantedSelection,
     handleStartBlank,
     handleInspect,
     handleUpdateParameter,

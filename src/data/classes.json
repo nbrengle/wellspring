@@ -1263,6 +1263,12 @@
         "prerequisites": null,
         "skillsAndOptions": null,
         "description": "When this power is chosen the Artisan can choose one Basic-Tier Power from any other non-Artisan Base Class. This choice is permanent, and the Power will have the same Incantation, requirements, etc. as it did in the original class. The Power cannot have a Refresh of “Spell”.",
+        "slotGrants": [
+          {
+            "cat": "basic",
+            "n": 1
+          }
+        ],
         "grantedSelections": [
           {
             "id": "broad_study_power",
@@ -1638,14 +1644,18 @@
         "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "options": ["Artificer", "Crafter", "Mystic"],
+        "description": "Instead of taking an Advanced Power, the Artisan can choose two Basic-tier Powers from the Artisan Base Class with the same Specialty Tag (ie: Artificer, Crafter, Mystic).",
         "slotGrants": [
           {
             "cat": "basic",
             "n": 2
           }
         ],
-        "description": "Instead of taking an Advanced Power, the Artisan can choose two Basic-tier Powers from the Artisan Base Class with the same Specialty Tag (ie: Artificer, Crafter, Mystic)."
+        "options": [
+          "Artificer",
+          "Crafter",
+          "Mystic"
+        ]
       },
       {
         "name": "Uninterrupted Creativity",
@@ -1729,8 +1739,12 @@
         "requirement": "Artisan Level 5",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "options": ["Alchemy", "Enchanting", "Tinkering"],
         "description": "The Artisan has found shortcuts and efficiencies in Plans after many hours spent honing and perfecting their craft. Choose one Craft: Alchemy, Enchanting, or Tinkering. The Artisan may reduce all mentions of “turns of the hourglass” by half, and single turns of the hourglass are reduced to a Quick Count of 30. All other repeated actions are reduced by half (rounded up). This power may be purchased once for each Craft. Note: This Power stacks with other time reduction skills for crafting, however, the reductions from this Power are calculated first.",
+        "options": [
+          "Alchemy",
+          "Enchanting",
+          "Tinkering"
+        ],
         "requiredLevel": 5,
         "requiredClass": "Artisan"
       },
@@ -1784,16 +1798,15 @@
         "requirement": "Artisan Level 7",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "options": ["Alchemy", "Ritual Magic", "Enchanting", "Tinkering"],
         "description": "Masters of their trade, Artisans craft some Plans so often that the patterns have become rote muscle memory, making it trivial to build several copies in parallel. Choose one Craft: Alchemy, Ritual Magic, Enchanting, or Tinkering. The Artisan may call “Batch Process” at the beginning of their crafting attempt to double the number of outputs from the crafting plan. This requires that the Artisan expend double the appropriate resources for the plan they are crafting. The Forgesource plan cannot be affected with this skill. Note: Crafting processes requiring a Dark Territory card pull must be pulled twice from the same hand. Resolve the first card before the second is pulled.",
-        "requiredLevel": 7,
-        "requiredClass": "Artisan",
         "options": [
           "Alchemy",
           "Ritual Magic",
           "Enchanting",
           "Tinkering"
-        ]
+        ],
+        "requiredLevel": 7,
+        "requiredClass": "Artisan"
       },
       {
         "name": "Quality Control",
