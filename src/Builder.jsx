@@ -119,6 +119,7 @@ export default function Builder() {
       onToggleLineageItem: handlers.handleToggleLineageItem,
       onSetLineageRep: handlers.handleSetLineageRep,
       onSetAdvantageChoice: handlers.handleSetAdvantageChoice,
+      onSetGrantedSelection: handlers.handleSetGrantedSelection,
       onOpenLineage: () => setLineageOpen(true),
     }),
     [handlers],
