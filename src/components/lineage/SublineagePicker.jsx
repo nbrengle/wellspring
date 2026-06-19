@@ -4,9 +4,11 @@
 // from at most one sublineage. Picking one SWAPS freely (no lock-in); the parent
 // handles dropping orphaned picks + auto-adding the new sublineage's requireds.
 //
-// Two kinds are separated: mechanical TYPES (unlock their options) and CIVILIZATION
-// origins (playable only if your character is from there). Descriptions show when
-// present (they aren't in the data yet — a parser follow-up — so they hide cleanly).
+// Per the rules, civilization sub-lineages aren't a separate category — they're
+// just sub-lineages whose title carries a civilization name, which you may only
+// play if your character is from that civilization. So they sit in the SAME list,
+// tagged with their required civilization (not hoisted into an "origin" section).
+// Descriptions show when present (parser follow-up — they hide cleanly when absent).
 import React from "react";
 import { subKey } from "../../engine/validate.js";
 import { parseSublineage, distinctiveFor, isCivSublineage } from "./lineage-helpers.js";
@@ -26,19 +28,21 @@ export default function SublineagePicker({ lin, selected, onSelect }) {
     });
   if (subs.length === 0) return null;
   const selKey = selected ? subKey(selected) : null;
-  const types = subs.filter((s) => !s.civ);
-  const civs = subs.filter((s) => s.civ);
 
-  const Card = (s, { civ } = {}) => {
+  const Card = (s) => {
     const on = selKey === subKey(s.label);
     return (
       <button
         key={s.label}
-        className={`b-lin-sub-card ${civ ? "is-civ" : ""} ${on ? "is-on" : ""}`}
+        className={`b-lin-sub-card ${s.civ ? "is-civ" : ""} ${on ? "is-on" : ""}`}
         onClick={() => onSelect(on ? null : s.label)}
       >
         <span className="b-lin-sub-card-name">{s.name}</span>
-        {s.context && <span className="b-lin-sub-card-ctx">{s.context}</span>}
+        {/* Civilization sub-lineages may only be played if you're from there. */}
+        {s.civ && s.context && (
+          <span className="b-lin-sub-card-ctx">Requires: {s.context.replace(/^Civilization:\s*/i, "")}</span>
+        )}
+        {!s.civ && s.context && <span className="b-lin-sub-card-ctx">{s.context}</span>}
         {s.desc && <span className="b-lin-sub-card-desc">{s.desc}</span>}
         {s.count > 0 && (
           <span className="b-lin-sub-card-count">
@@ -61,14 +65,8 @@ export default function SublineagePicker({ lin, selected, onSelect }) {
           <span className="b-lin-sub-card-name">None</span>
           <span className="b-lin-sub-card-ctx">General options only — no commitment</span>
         </button>
-        {types.map((s) => Card(s))}
+        {subs.map((s) => Card(s))}
       </div>
-      {civs.length > 0 && (
-        <>
-          <p className="b-lin-sub-kind">Or an origin (civilization — requires being from there)</p>
-          <div className="b-lin-sub-cards">{civs.map((s) => Card(s, { civ: true }))}</div>
-        </>
-      )}
     </div>
   );
 }

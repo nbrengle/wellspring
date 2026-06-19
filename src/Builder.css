@@ -3374,18 +3374,52 @@
   flex: 1;
 }
 
-.b-lin-focus-top {
+/* Single focus header (replaces the doubled top bar): back link, lineage name,
+   one-line earn→spend→balance tag. */
+.b-lin-focus-head {
   display: flex;
   align-items: baseline;
   gap: 0.7rem;
-  padding: 0.7rem 1.1rem 0.4rem;
+  padding: 0.85rem 2.4rem 0.5rem 1.1rem;
+  border-bottom: 1px solid var(--b-border);
+}
+
+.b-lin-focus-titles {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
 }
 
 .b-lin-focus-name {
   font-family: Cinzel, serif;
-  font-size: 1.25rem;
+  font-size: 1.3rem;
   color: var(--b-green);
   margin: 0;
+}
+
+.b-lin-focus-tag {
+  margin: 0;
+  font-size: 0.72rem;
+  color: var(--b-dim);
+}
+
+/* Close button floats top-right of the dock (no picker-head in focus view). */
+.b-lin-close {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.9rem;
+  z-index: 2;
+  background: transparent;
+  border: none;
+  color: var(--b-muted);
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0.1rem 0.3rem;
+}
+
+.b-lin-close:hover {
+  color: var(--b-amber);
 }
 
 /* About strip — collapsible lineage lore + costuming status. */
@@ -3833,6 +3867,17 @@
   opacity: 0.75;
 }
 
+/* Off-sublineage items: locked (not takeable until that sublineage is picked).
+   Visible + readable for discovery, but the lock marker can't take them. */
+.b-lin-pill.is-locked-sub {
+  opacity: 0.5;
+  border-style: dashed;
+}
+
+.b-lin-pill.is-locked-sub:hover {
+  opacity: 0.85;
+}
+
 .b-lin-pill .b-lin-impact,
 .b-lin-pill .b-lin-desc {
   margin-left: 1.7rem;
@@ -3846,6 +3891,13 @@
   justify-content: center;
   cursor: default;
   opacity: 0.65;
+}
+
+/* Off-sublineage lock marker: comes after the base .is-locked so specificity
+   doesn't descend (stylelint no-descending-specificity). */
+.b-lin-pill.is-locked-sub .b-lin-toggle.is-locked {
+  cursor: not-allowed;
+  font-size: 0.7rem;
 }
 
 .b-lin-pill.is-required .b-lin-toggle.is-locked {

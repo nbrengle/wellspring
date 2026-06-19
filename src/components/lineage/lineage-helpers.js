@@ -65,19 +65,24 @@ export function requiredChallengeNames(lin, sublineage) {
     .map((c) => c.baseName || c.name);
 }
 
-// Live status of a lineage's costuming requirement. The structured requirement
-// (minimum [Repped] challenges + any specific one that must be included) is not in
-// the data yet — only embedded in description prose — so this returns null unless a
-// structured `lin.costumeReq` is present, and the UI hides cleanly when it's null.
-// `takenRepped` is the list of currently-taken [Repped] challenge names.
-export function costumeStatus(lin, takenReppedNames) {
-  const req = lin?.costumeReq;
-  if (!req) return null;
+// Live status of a lineage's costuming requirement (parsed into lin.costume:
+// { difficulty, minRepped, mustInclude, mustIncludeIf, text }). Counts the taken
+// [Repped] challenges against the minimum, plus any specific challenge that must be
+// included. A conditional must-include (Aewen: "if Accented, must include Elemental
+// Expression") only applies when that sublineage is the picked one. Returns null if
+// the lineage has no structured requirement. `takenReppedNames` is the list of
+// currently-taken [Repped] challenge names; `pickedSubName` is the chosen sublineage.
+export function costumeStatus(lin, takenReppedNames, pickedSubName) {
+  const req = lin?.costume;
+  if (!req || typeof req !== "object") return null;
   const have = takenReppedNames || [];
-  const haveMust = !req.mustInclude || have.includes(req.mustInclude);
+  // The must-include applies unconditionally, or only when its sublineage is picked.
+  const mustApplies =
+    !!req.mustInclude && (!req.mustIncludeIf || subKey(req.mustIncludeIf) === subKey(pickedSubName));
+  const haveMust = !mustApplies || have.includes(req.mustInclude);
   const met = have.length >= (req.minRepped || 0) && haveMust;
   const parts = [];
   if (req.minRepped > 0) parts.push(`${have.length}/${req.minRepped} [Repped]`);
-  if (req.mustInclude) parts.push(`${haveMust ? "✓" : "needs"} ${req.mustInclude}`);
-  return { req, met, label: parts.join(" · ") || "no [Repped] needed" };
+  if (mustApplies) parts.push(`${haveMust ? "✓" : "needs"} ${req.mustInclude}`);
+  return { req, met, mustApplies, label: parts.join(" · ") || "no [Repped] needed" };
 }

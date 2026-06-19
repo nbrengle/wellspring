@@ -57,7 +57,10 @@ export default function ChoiceList({
   const subInfo = (it) => {
     const k = subKey(it.sublineage);
     const general = !k || k === "general";
-    const offSublineage = !general && pickedSub && k !== pickedSub;
+    // A sublineage-scoped item is OFF (locked) whenever it isn't the picked
+    // sublineage — including when none is picked (then every sublineage item is
+    // locked; "General only" really means General only).
+    const offSublineage = !general && k !== pickedSub;
     return { general, offSublineage, label: subLabel(it.sublineage) };
   };
 
@@ -93,6 +96,7 @@ export default function ChoiceList({
         resolvedLbp={resolvedLbpFor(it)}
         subLabel={info.general ? null : info.label}
         dimmed={info.offSublineage}
+        locked={info.offSublineage}
         requiredActive={requiredActive(it)}
         expanded={expandedKey === key}
         onExpand={() => setExpandedKey((cur) => (cur === key ? null : key))}

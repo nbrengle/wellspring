@@ -27,7 +27,7 @@ export default function LineageDetail({
   const pickedSub = character.sublineage ? subKey(character.sublineage) : null;
 
   // [Repped] challenges the character currently has taken — feeds the costuming
-  // requirement check (UI-only; null/hidden until the data carries a structured req).
+  // requirement check (counts toward the lineage's "at least N [Repped]" rule).
   const takenRepped = (lin.challenges || [])
     .filter(
       (c) =>
@@ -37,16 +37,21 @@ export default function LineageDetail({
         ),
     )
     .map((c) => c.baseName || c.name);
-  const costume = costumeStatus(lin, takenRepped);
+  const costume = costumeStatus(lin, takenRepped, character.sublineage);
 
   return (
     <div className="b-lin-focus">
-      <div className="b-lin-focus-top">
+      {/* Single header (replaces the Overlay's separate picker-head): back link +
+          lineage name + the earn→spend→balance one-liner. */}
+      <header className="b-lin-focus-head">
         <button className="b-lin-back" onClick={onBack}>
           ‹ All lineages
         </button>
-        <h2 className="b-lin-focus-name">{lineage}</h2>
-      </div>
+        <div className="b-lin-focus-titles">
+          <h2 className="b-lin-focus-name">{lineage}</h2>
+          <p className="b-lin-focus-tag">Earn LBP from Challenges → spend on Advantages → keep it balanced</p>
+        </div>
+      </header>
 
       <LineageAbout name={lineage} description={lin.description} costume={costume} />
 
