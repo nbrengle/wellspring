@@ -1594,6 +1594,27 @@ write('domains.json', parseDivineDomains());
 
 console.log('\nParsing lineages...');
 
+// Extract the structured costuming requirement from a lineage description's
+// "Costuming Challenge: <difficulty> - <text>" sentence. Returns
+// { difficulty, minRepped, mustInclude, mustIncludeIf, text } or null. The UI
+// (costumeStatus + the budget-bar chip) reads minRepped/mustInclude live.
+function parseCostume(description) {
+  const m = (description || '').match(/Costuming Challenge:\s*(Easy|Medium|Hard)\s*[-–—]\s*([^]*?\.(?:\s*[^.]*\.)?)/i);
+  if (!m) return null;
+  const difficulty = m[1];
+  const text = m[2].replace(/\s+/g, ' ').trim();
+  // "at least N [Repped]" → minimum; "do not require any" → 0.
+  const numM = text.match(/at least (\d+)\s*\[?Repped/i);
+  const minRepped = numM ? parseInt(numM[1], 10) : 0;
+  // "one of which must be X" (unconditional) or "If <cond>, one … must be X".
+  let mustInclude = null, mustIncludeIf = null;
+  const condM = text.match(/If the character is ([^,]+),\s*one of these Challenges must be ([^.(]+)/i);
+  const uncondM = text.match(/one of which must be ([^.(]+)/i);
+  if (condM) { mustIncludeIf = condM[1].trim(); mustInclude = condM[2].trim(); }
+  else if (uncondM) { mustInclude = uncondM[1].trim(); }
+  return { difficulty, minRepped, mustInclude, mustIncludeIf, text };
+}
+
 function parseLineages() {
   const start = findHeading('Lineages (All)', 1);
   const end = findHeading('Base Skills, Perks, and Flaws', 1, start);
@@ -1682,7 +1703,7 @@ function parseLineages() {
       if (!byName.has(sub.name) || (!byName.get(sub.name).note && sub.note)) byName.set(sub.name, sub);
     }
 
-    lineages.push({ name, description, costume: '', sublineages: [...byName.values()], challenges, advantages });
+    lineages.push({ name, description, costume: parseCostume(description), sublineages: [...byName.values()], challenges, advantages });
     i = lEnd;
   }
   return lineages;

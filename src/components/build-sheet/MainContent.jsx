@@ -157,6 +157,7 @@ export function CraftingSection({ crafting, onInspect }) {
   );
 }
 
+
 function getSelectionOptions(sel) {
   const opts = [];
   if (sel.type === "power" && sel.source === "BaseClasses") {
@@ -216,6 +217,58 @@ export function GrantedSelectionsSection() {
         })}
       </ul>
     </Section>
+  );
+}
+
+export function AgileLearnerSection() {
+  const { character, setCharacter } = useBuilderState();
+
+  let rank = 0;
+  for (const field of ['startingSkills', 'purchasedSkills', 'classSkills']) {
+    (character[field] || []).forEach((item, idx) => {
+      if (cleanItemName(item) === "Agile Learner") {
+        rank += character.ranks?.[field]?.[idx] || 1;
+      }
+    });
+  }
+
+  if (!rank) return null;
+
+  const trades = character.agileLearnerTrades || {};
+  const used = Object.values(trades).reduce((a, b) => a + b, 0);
+  const available = rank - used;
+  const classes = getClasses(character);
+
+  const addTrade = (cls) => setCharacter(c => ({
+    ...c, agileLearnerTrades: { ...(c.agileLearnerTrades || {}), [cls]: (c.agileLearnerTrades?.[cls] || 0) + 1 }
+  }));
+  const removeTrade = (cls) => setCharacter(c => ({
+    ...c, agileLearnerTrades: { ...(c.agileLearnerTrades || {}), [cls]: Math.max(0, (c.agileLearnerTrades?.[cls] || 0) - 1) }
+  }));
+
+  return (
+    <div className="b-slot-block">
+      <div className="b-slot-head">
+        <h3 className="b-slot-label">Agile Learner Trades</h3>
+        <span className="b-slot-count">{used} / {rank}</span>
+      </div>
+      <ul className="b-rows" style={{ marginTop: '0.5rem' }}>
+        {classes.map(c => {
+           const classTrades = trades[c.name] || 0;
+           return (
+             <li key={c.name} className="b-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+               <span>{c.name} <em style={{opacity:0.7, paddingLeft: '0.5rem'}}>(trade 1st-tier for 2nd-tier)</em></span>
+               <div className="b-row-rank-adjust">
+                 <button className="b-rank-btn" type="button" onClick={() => removeTrade(c.name)} disabled={classTrades <= 0}>-</button>
+                 <span className="b-rank-val" style={{ margin: '0 0.5rem' }}>{classTrades}</span>
+                 <button className="b-rank-btn" type="button" onClick={() => addTrade(c.name)} disabled={available <= 0}>+</button>
+               </div>
+             </li>
+           );
+        })}
+      </ul>
+    </div>
+
   );
 }
 
