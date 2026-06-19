@@ -1262,7 +1262,20 @@
         "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "When this power is chosen the Artisan can choose one Basic-Tier Power from any other non-Artisan Base Class. This choice is permanent, and the Power will have the same Incantation, requirements, etc. as it did in the original class. The Power cannot have a Refresh of “Spell”."
+        "description": "When this power is chosen the Artisan can choose one Basic-Tier Power from any other non-Artisan Base Class. This choice is permanent, and the Power will have the same Incantation, requirements, etc. as it did in the original class. The Power cannot have a Refresh of “Spell”.",
+        "grantedSelections": [
+          {
+            "id": "broad_study_power",
+            "type": "power",
+            "tier": "Basic",
+            "source": "BaseClasses",
+            "excludeClass": "Artisan",
+            "bypassPrereqs": [
+              "class",
+              "level"
+            ]
+          }
+        ]
       }
     ],
     "advanced": [
@@ -1774,7 +1787,13 @@
         "options": ["Alchemy", "Ritual Magic", "Enchanting", "Tinkering"],
         "description": "Masters of their trade, Artisans craft some Plans so often that the patterns have become rote muscle memory, making it trivial to build several copies in parallel. Choose one Craft: Alchemy, Ritual Magic, Enchanting, or Tinkering. The Artisan may call “Batch Process” at the beginning of their crafting attempt to double the number of outputs from the crafting plan. This requires that the Artisan expend double the appropriate resources for the plan they are crafting. The Forgesource plan cannot be affected with this skill. Note: Crafting processes requiring a Dark Territory card pull must be pulled twice from the same hand. Resolve the first card before the second is pulled.",
         "requiredLevel": 7,
-        "requiredClass": "Artisan"
+        "requiredClass": "Artisan",
+        "options": [
+          "Alchemy",
+          "Ritual Magic",
+          "Enchanting",
+          "Tinkering"
+        ]
       },
       {
         "name": "Quality Control",
