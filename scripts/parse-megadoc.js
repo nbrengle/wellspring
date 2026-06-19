@@ -817,12 +817,42 @@ function slotGrantsFromText(name, text) {
   const known = text.match(/\badds?\s+(\d+)\s+to\s+the\s+number\s+of\s+Known\s+Spells/i);
   if (known) grants.push({ cat: 'spellsKnown', n: parseInt(known[1], 10) });
   if (/additional\s+spell-?slot\s+of\s+their\s+highest[- ]level/i.test(text)) highest = true;
+
+  const chooseTier = text.match(/\bchoose\s+(two|three|one|four|\d+)\s+(Novice|Adept|Greater|Utility|Basic|Advanced|Veteran)(?:-tier)?\s+Powers?/i);
+  if (chooseTier) {
+    const numWords = { one: 1, two: 2, three: 3, four: 4 };
+    const n = numWords[chooseTier[1].toLowerCase()] || parseInt(chooseTier[1], 10) || 1;
+    const cat = SLOT_TIER_TO_CAT[chooseTier[2].toLowerCase()];
+    if (cat) grants.push({ cat, n });
+  }
+
   return { grants, highest };
 }
+
+function extractOptionsList(entity) {
+  const text = entity.description || entity.desc || '';
+  if (!text) return;
+  // Look for "Choose one Craft: X, Y, or Z."
+  let m = text.match(/Choose one Craft:\s*([^.]+)\./i);
+  if (m) {
+    const opts = m[1].split(/,(?:\s*or\s+)?|\s+or\s+/i).map(x => x.trim()).filter(Boolean);
+    entity.options = opts;
+    return;
+  }
+  // Look for Specialty Tag options e.g. "Specialty Tag (ie: Artificer, Crafter, Mystic)"
+  m = text.match(/Specialty Tag\s*\(i\.?e\.?:\s*([^)]+)\)/i);
+  if (m) {
+    const opts = m[1].split(/,\s*/i).map(x => x.trim()).filter(Boolean);
+    entity.options = opts;
+    return;
+  }
+}
+
 function extractSlotGrants(entity) {
   const { grants, highest } = slotGrantsFromText(entity.name, entity.description || entity.desc || '');
   if (grants.length) entity.slotGrants = grants;
   if (highest) entity.highestSlot = true;
+  extractOptionsList(entity);
 }
 
 // ─── LEVEL-GATED BUILD-POINT DISCOUNTS (prose → structured) ────────────────────
