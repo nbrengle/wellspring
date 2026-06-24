@@ -330,10 +330,10 @@ function subPowerNames() {
   return _subPowerNames;
 }
 
-const STAT_FIELD = /^(Incantation|Incant|Call|Target|Duration|Delivery|Refresh|Accent|Effect|Requirement|Prerequisites?|Skills and Options):\s*(.*)$/;
+const STAT_FIELD = /^(Incantation|Incant|Call|Target|Duration|Delivery|Refresh|Accent|Effect|Requirement|Requirements|Prerequisite|Prerequisites|Skills and Options):\s*(.*)$/;
 // Same field labels, unanchored — used to find where a stat block starts within a
 // run-on string (sub-power cells glue the power NAME onto the first field label).
-const STAT_LABEL = /(Incantation|Incant|Call|Target|Duration|Delivery|Refresh|Accent|Effect|Requirement|Prerequisites?|Skills and Options):/;
+const STAT_LABEL = /(Incantation|Incant|Call|Target|Duration|Delivery|Refresh|Accent|Effect|Requirement|Requirements|Prerequisite|Prerequisites|Skills and Options):/;
 const STAT_TWO = /^(Target|Delivery|Accent):\s*(.+?)\s{2,}(Duration|Refresh|Effect):\s*(.+)$/;
 const statKey = l => l.toLowerCase().replace(/^incant$/, 'incantation').replace(/\s+/g, '_').replace(/s$/, '');
 
@@ -341,9 +341,31 @@ function parsePowerNodes(powerNodes) {
   // powerNodes: text + list nodes belonging to one power (after its heading node).
   // A `list` node's items are flattened to bullet lines ("• …") so a power's
   // level/benefit list survives into the description instead of being dropped.
-  const lines = powerNodes
+  const rawLines = powerNodes
     .flatMap(n => n.type === 'list' ? n.items.map(it => `• ${it}`) : [n.text])
     .filter(Boolean);
+
+  const lines = [];
+  for (const line of rawLines) {
+    if (line.startsWith('•')) {
+      lines.push(line);
+      continue;
+    }
+    let current = line;
+    while (true) {
+      // Find a stat label that isn't at the very start of the string
+      const match = current.slice(1).match(STAT_LABEL);
+      if (match) {
+        const splitAt = match.index + 1;
+        lines.push(current.slice(0, splitAt).trim());
+        current = current.slice(splitAt).trim();
+      } else {
+        lines.push(current.trim());
+        break;
+      }
+    }
+  }
+
   const fields = {};
   let descStart = 0;
 
@@ -1024,7 +1046,9 @@ function extractChooseOne(power) {
   
   // If no bullets, try inline comma-separated list (e.g. "Swords, Thrown Weapons, or Daggers.")
   if (opts.length === 0) {
-    const inline = m[2].replace(/\.$/, ''); // strip trailing period
+    let inline = m[2];
+    const firstPeriod = inline.indexOf('.');
+    if (firstPeriod >= 0) inline = inline.slice(0, firstPeriod);
     opts = inline.split(/,(?:\s*or\s+)?|\s+or\s+/i).map((x) => x.trim()).filter(Boolean);
   }
   if (opts.length < 2) return;
