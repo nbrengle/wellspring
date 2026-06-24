@@ -51,7 +51,12 @@ export function slotGrants(character) {
       // If this is a class power granting slots (like Studied Focus), the slots
       // belong to the class that owns the power, not just the primary martial class.
       let targetCls = null;
-      if (ent && ent.id && ent.id.startsWith('powers:')) {
+      const paramMatch = item.match(/\((.*?)\)/);
+      if (paramMatch && CLASSES[paramMatch[1].trim()]) {
+        targetCls = paramMatch[1].trim();
+      }
+
+      if (!targetCls && ent && ent.id && ent.id.startsWith('powers:')) {
          // Find which class has this power
          for (const c of classes) {
            const byTier = CLASS_POWERS[c.name];
@@ -205,10 +210,13 @@ export function spellSlots(character) {
     if (!ent) return;
     
     let targetPool = primaryType;
-    if (itemName && /^Extended Capacity/i.test(itemName)) {
-      const match = itemName.match(/\((.*?)\)/);
-      if (match) {
-        targetPool = match[1].trim();
+    const paramMatch = itemName?.match(/\((.*?)\)/);
+    if (paramMatch) {
+      const p = paramMatch[1].trim();
+      if (p === 'Arcane' || p === 'Divine') {
+        targetPool = p;
+      } else if (CLASSES[p]?.magicType) {
+        targetPool = CLASSES[p].magicType;
       }
     }
 
