@@ -209,16 +209,9 @@
 /* ─── COLUMNS ─────────────────────────────────────────────────────────── */
 .b-cols {
   display: grid;
-  grid-template-columns: 18rem 1fr;
+  grid-template-columns: 18rem 1fr 22rem;
   gap: 0;
   min-height: calc(100vh - 4rem);
-  transition: grid-template-columns 0.18s ease;
-}
-
-/* The chase drawer is a transient 3rd column, present only while following a
-   chain of concept links from a detail body. Item detail itself renders inline. */
-.b-cols.is-chasing {
-  grid-template-columns: 18rem 1fr 22rem;
 }
 
 @media (width <= 1100px) {
@@ -3953,56 +3946,4 @@
   .b-lin-sub-step .b-lin-sub-cards {
     flex-direction: column;
   }
-}
-
-/* ─── INLINE DETAIL (R1) ──────────────────────────────────────────────────
-   Clicking a row unfolds its detail in place, right under it. Height-capped with
-   its own scroll so a long entity never shoves the rest of the list around. */
-.b-inline-detail {
-  list-style: none;
-  margin: 0.1rem 0 0.4rem;
-  border: 1px solid var(--b-border-2);
-  border-left: 3px solid var(--b-teal);
-  border-radius: 0.4rem;
-  background: var(--b-panel);
-  overflow: hidden;
-  animation: b-inline-in 0.15s ease;
-}
-
-@keyframes b-inline-in {
-  from {
-    opacity: 0;
-    transform: translateY(-4px);
-  }
-
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-
-.b-inline-detail-head {
-  display: flex;
-  align-items: baseline;
-  gap: 0.5rem;
-  padding: 0.6rem 0.85rem 0.3rem;
-}
-
-.b-inline-detail-name {
-  font-family: Cinzel, serif;
-  font-size: 0.95rem;
-  color: var(--b-text);
-}
-
-.b-inline-detail-type {
-  font-size: 0.6rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--b-amber);
-}
-
-.b-inline-detail-body {
-  padding: 0 0.85rem 0.7rem;
-  max-height: 14rem;
-  overflow-y: auto;
 }
