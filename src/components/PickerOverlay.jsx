@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from "react";
-import { REFS, lookupEntity, UNLIMITED_SKILLS } from '../engine/data.js';
+import { lookupEntity, UNLIMITED_SKILLS } from '../engine/data.js';
 import { prereqStatus } from "../engine/validate.js";
+import { browse, gameEffectAxes, axisApplies, otherBuckets } from "./browse/browse.js";
 import { EntityBody } from "./DetailPane.jsx";
 import Overlay from "./ui/Overlay.jsx";
 
@@ -41,24 +42,18 @@ const refreshBucket = (c) => {
   return c.refresh;
 };
 
-function candidateEffects(c) {
-  const id = `${/powers/.test(c.tierList || "") || c.tier ? "powers" : c.cat ? "skills" : "powers"}:${c.name}`;
-  const refs = (REFS.mentions && (REFS.mentions[`powers:${c.name}`] || REFS.mentions[id])) || [];
-  return refs.filter((t) => /^(effects|conditions|defenses):/.test(t)).map((t) => t.slice(t.indexOf(":") + 1));
-}
-
-const primaryEffect = (c) => candidateEffects(c)[0] || "—";
-
 const SPELL_TIER_BUCKET = { noviceSpells: "Novice", adeptSpells: "Adept", greaterSpells: "Greater", cantrips: "Cantrip" };
 
-const GROUP_AXES = {
-  tier: { label: "Tier", fn: (c) => SPELL_TIER_BUCKET[c.tierList] || c.tier || "—" },
-  category: { label: "Category", fn: (c) => c.cat || c.tierList || "Other" },
-  refresh: { label: "Refresh", fn: refreshBucket },
-  effect: { label: "Effect", fn: primaryEffect },
-  alphabetical: { label: "A–Z", fn: (c) => (c.name[0] || "#").toUpperCase() },
-  cost: { label: "Cost", fn: (c) => (typeof c.cost === "number" ? `${c.cost} BP` : "—") },
-};
+// Surface-specific axes (tier/category/refresh/cost/A–Z). The shared player-facing
+// game-effect axes (Effect / Damage type / Condition) are appended from useBrowse so
+// they read identically here and in the lineage choices.
+const SURFACE_AXES = [
+  { id: "tier",         label: "Tier",     key: (c) => SPELL_TIER_BUCKET[c.tierList] || c.tier || "—" },
+  { id: "category",     label: "Category", key: (c) => c.cat || c.tierList || "Other" },
+  { id: "refresh",      label: "Refresh",  key: refreshBucket },
+  { id: "alphabetical", label: "A–Z",      key: (c) => (c.name[0] || "#").toUpperCase() },
+  { id: "cost",         label: "Cost",     key: (c) => (typeof c.cost === "number" ? `${c.cost} BP` : "—") },
+];
 
 export default function PickerOverlay({ spec, character, onClose }) {
   const { entityType, title, subtitle, candidates, taken, onChoose } = spec;
@@ -74,29 +69,39 @@ export default function PickerOverlay({ spec, character, onClose }) {
 
   const lockedOf = (name) => !prereqStatus(character, `${entityType}:${name}`).met;
 
-  const groups = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    let list = candidates;
-    if (q) list = list.filter((c) => c.name.toLowerCase().includes(q) || (c.desc || "").toLowerCase().includes(q));
-    const decorated = list.map((c) => ({ ...c, locked: lockedOf(c.name) }));
-    const keyFn = (GROUP_AXES[groupMode] || GROUP_AXES.category).fn;
-    const buckets = new Map();
-    for (const c of decorated) {
-      const k = keyFn(c);
-      if (!buckets.has(k)) buckets.set(k, []);
-      buckets.get(k).push(c);
-    }
-    let entries = [...buckets.entries()];
-    if (hideLocked) entries = entries.map(([g, cs]) => [g, cs.filter((c) => !c.locked)]).filter(([, cs]) => cs.length);
-    const cmp = sortMode === "cost"
-      ? (a, b) => (a.cost ?? 999) - (b.cost ?? 999) || a.name.localeCompare(b.name)
-      : sortMode === "effect"
-        ? (a, b) => candidateEffects(b).length - candidateEffects(a).length || a.name.localeCompare(b.name)
-        : (a, b) => a.name.localeCompare(b.name);
-    for (const [, cs] of entries) cs.sort(cmp);
-    if (groupMode === "alphabetical") entries.sort((a, b) => a[0].localeCompare(b[0]));
-    return entries;
-  }, [candidates, query, hideLocked, character, entityType, groupMode, sortMode]);
+  // Surface axes + shared game-effect axes (resolved against this picker's entity
+  // type). Drop the Damage/Condition axes when no candidate carries that facet so
+  // they don't clutter a skill/perk picker.
+  const allAxes = useMemo(
+    () => [...SURFACE_AXES, ...gameEffectAxes(() => entityType)],
+    [entityType],
+  );
+  const availableAxes = useMemo(
+    () => allAxes.filter((a) => axisApplies(a, candidates)),
+    [allAxes, candidates],
+  );
+
+  const facetCount = (c, axis) => (axis?.multi ? (axis.keys(c)?.length || 0) : 0);
+  const { axis: groupAxis, groups } = useMemo(
+    () => browse({
+      items: candidates,
+      axes: availableAxes,
+      groupBy: groupMode,
+      query,
+      matches: (c, q) => c.name.toLowerCase().includes(q) || (c.desc || "").toLowerCase().includes(q),
+      sort: sortMode,
+      compare: (a, b, s, axis) =>
+        s === "cost"
+          ? (a.cost ?? 999) - (b.cost ?? 999) || a.name.localeCompare(b.name)
+          : s === "effect"
+            ? facetCount(b, axis) - facetCount(a, axis) || a.name.localeCompare(b.name)
+            : a.name.localeCompare(b.name),
+      decorate: (c) => ({ ...c, locked: lockedOf(c.name) }),
+      filter: hideLocked ? (c) => !lockedOf(c.name) : undefined,
+    }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [candidates, availableAxes, groupMode, query, sortMode, hideLocked, character, entityType],
+  );
 
   const readingEntity = useMemo(() => {
     if (readStack.length) return lookupEntity(readStack[readStack.length - 1]);
@@ -128,7 +133,7 @@ export default function PickerOverlay({ spec, character, onClose }) {
               <div className="b-picker-sortrow">
                 <label className="b-picker-sortlabel">Group
                   <select className="b-picker-sortsel" value={groupMode} onChange={(e) => setGroupMode(e.target.value)}>
-                    {Object.entries(GROUP_AXES).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
+                    {availableAxes.map((a) => <option key={a.id} value={a.id}>{a.label}</option>)}
                   </select>
                 </label>
                 <label className="b-picker-sortlabel">Sort
@@ -146,18 +151,26 @@ export default function PickerOverlay({ spec, character, onClose }) {
             </div>
             <div className="b-picker-groups">
               {groups.length === 0 && <p className="b-detail-missing">Nothing matches.</p>}
-              {groups.map(([group, items]) => (
+              {groups.map(({ key: group, items }) => (
                 <div key={group} className="b-picker-group">
                   <h3 className="b-picker-group-label">{group}</h3>
                   <ul className="b-picker-names">
                     {items.map((c) => {
                       const isTaken = taken.has(c.name);
+                      // When grouping by a game-effect axis, show the item's OTHER
+                      // facets so a multi-effect power explains why it's repeated.
+                      const also = otherBuckets(groupAxis, c, group);
                       return (
                         <li key={c.name}>
                           <button
                             className={`b-picker-row ${selected === c.name ? "is-selected" : ""} ${c.locked ? "is-locked" : ""} ${isTaken ? "is-taken" : ""}`}
                             onClick={() => selectCandidate(c.name)}>
                             <span className="b-picker-row-name">{c.name}</span>
+                            {also.length > 0 && (
+                              <span className="b-picker-row-also" title={`Also: ${also.join(", ")}`}>
+                                also {also.join(", ")}
+                              </span>
+                            )}
                             {spellTierKey(c) && <span className={`b-picker-row-tier b-tier-${spellTierKey(c)}`}>{spellTierLabel(c)}</span>}
                             {typeof c.cost === "number" && c.cost > 0 && <span className="b-picker-row-cost">{c.cost} BP</span>}
                             {typeof c.cost === "string" && /^var/i.test(c.cost) && <span className="b-picker-row-cost">Var BP</span>}
