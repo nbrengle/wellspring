@@ -9,29 +9,29 @@ export default function MakeableTab({
 }) {
   return (
     <div className="b-recipe-scrollable-content">
-      {/* Filters */}
-      <div className="b-recipe-filters">
-        <div className="b-filter-group">
-          <label>Discipline</label>
-          <select value={filterDiscipline} onChange={(e) => setFilterDiscipline(e.target.value)} className="b-parameter-input">
+      {/* Filters — reuse the shared browse control classes (b-picker-sortrow/
+          sortlabel/sortsel/toggle) so the recipe filters read like every other
+          pane's group/sort controls. */}
+      <div className="b-picker-sortrow">
+        <label className="b-picker-sortlabel">Discipline
+          <select className="b-picker-sortsel" value={filterDiscipline} onChange={(e) => setFilterDiscipline(e.target.value)}>
             <option value="all">All Crafts</option>
             {Object.entries(DISCIPLINE_LABELS).map(([k, v]) => (
               <option key={k} value={k}>{v}</option>
             ))}
           </select>
-        </div>
+        </label>
 
-        <div className="b-filter-group">
-          <label>Tier</label>
-          <select value={filterTier} onChange={(e) => setFilterTier(e.target.value)} className="b-parameter-input">
+        <label className="b-picker-sortlabel">Tier
+          <select className="b-picker-sortsel" value={filterTier} onChange={(e) => setFilterTier(e.target.value)}>
             <option value="all">All Tiers</option>
             <option value="apprentice">Apprentice</option>
             <option value="journeyman">Journeyman</option>
             <option value="master">Master</option>
           </select>
-        </div>
+        </label>
 
-        <label className="b-filter-checkbox">
+        <label className="b-picker-toggle">
           <input type="checkbox" checked={hideUncraftable} onChange={(e) => setHideUncraftable(e.target.checked)} />
           Hide close/uncraftable
         </label>

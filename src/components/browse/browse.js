@@ -93,12 +93,16 @@ export function browse({
   for (const g of entries) g.items.sort((a, b) => compare(a, b, sort, axis));
 
   // Bucket order: a custom `axis.order(bucketKey)` wins; otherwise alphabetical for
-  // multi-facet axes. The placeholder bucket always sinks last.
+  // multi-facet axes. `order` may return a number (sorted numerically) or a string
+  // (sorted lexically), so a surface can order bands by value OR by label. The
+  // placeholder bucket always sinks last.
   const ph = axis.placeholder;
+  const cmpOrder = (x, y) =>
+    typeof x === "number" && typeof y === "number" ? x - y : String(x).localeCompare(String(y));
   entries.sort((a, b) => {
     if (a.key === ph) return 1;
     if (b.key === ph) return -1;
-    if (axis.order) return axis.order(a.key) - axis.order(b.key) || a.label.localeCompare(b.label);
+    if (axis.order) return cmpOrder(axis.order(a.key), axis.order(b.key)) || a.label.localeCompare(b.label);
     return axis.multi ? a.label.localeCompare(b.label) : 0;
   });
 
