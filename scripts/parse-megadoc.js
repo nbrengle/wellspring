@@ -692,13 +692,21 @@ function extractPowerBenefits(power) {
 // reads a structured field instead of re-regexing descriptions at character-build
 // time. One extraction site, close to the doc, diffable against it.
 const STAT_MOD_PATTERNS = [
+  // Decrements first ("N fewer maximum Life Point" — Fragile Form), so the generic
+  // "N maximum Life Points" increment below doesn't mis-read it as +N. sign:-1.
+  { stat: 'lifePoints', sign: -1, re: /(?:has\s+)?(?:\+?(\d+)|\bone|two|three)\s+fewer\s+(?:Base\s+)?maximum\s+Life\s+Points?/i },
   { stat: 'lifePoints', re: /(?:additional\s+)?(?:\+?(\d+)|\bone)\s+(?:Base\s+)?maximum\s+Life\s+Points?/i },
   { stat: 'lifePoints', re: /(?:adds?|gains?)\s+(?:\+?(\d+)|\bone)\s+Life\s+Points?\s+to\s+(?:their\s+)?max(?:imum)?/i },
   { stat: 'lifePoints', re: /\+\s*(\d+)\s+(?:Base\s+)?Maximum\s+Life\s+Points?/i },
   { stat: 'lifePoints', re: /(?:Base\s+)?Maximum\s+Life\s+Points?\s+(?:is|are)\s+increased\s+by\s+(?:\+?(\d+)|\bone|two|three)\b/i },
   { stat: 'lifePoints', re: /(?:\+?(\d+)|\bone)\s+Maximum\s+Health\b/i },
-  { stat: 'naturalArmor', re: /(?:gains?|grant(?:ing|s)?)\s+(?:\+?(\d+)|\bone|three|two)\s+(?:points?\s+of\s+)?Natural\s+Armor/i },
-  { stat: 'naturalArmor', re: /(\d+)\s+points?\s+of\s+Natural\s+Armor/i },
+  // Allows an optional pronoun after the verb ("granting them three points …") and
+  // word-numbers (one–eight), so e.g. Chimera's Tough Hide ("granting them three
+  // points of Natural Armor") is extracted, not just "grants 3 Natural Armor".
+  { stat: 'naturalArmor', re: /(?:gains?|grant(?:ing|s)?)\s+(?:them|it|the\s+character)?\s*(?:\+?(\d+)|\b(?:one|two|three|four|five|six|seven|eight))\s+(?:points?\s+of\s+)?Natural\s+Armor/i },
+  { stat: 'naturalArmor', re: /(?:\+?(\d+)|\b(?:one|two|three|four|five|six|seven|eight))\s+points?\s+of\s+Natural\s+Armor/i },
+  // "natural armor … increases to N" (Chimera's Armored Carapace upgrades Tough Hide).
+  { stat: 'naturalArmor', re: /Natural\s+Armor[^.]*?increases?\s+to\s+(?:\+?(\d+)|\b(?:one|two|three|four|five|six|seven|eight))/i },
   { stat: 'naturalArmor', re: /\+?(\d+)\s+Maximum\s+Health,?\s+physical\s+Armor\s+Points?,?\s+and\s+Natural\s+Armor\s+Points?/i },
   // "+N physical Armor Point" AND "one additional point to ... (Base) Maximum
   // Armor Points" (Armor Expertise / Studded Leather — the conditional-on-wearing
@@ -719,7 +727,7 @@ function statModsFromText(text) {
   const mods = [];
   const seen = new Set();
   if (!text) return { mods, variableNaturalArmor: false };
-  for (const { stat, re } of STAT_MOD_PATTERNS) {
+  for (const { stat, re, sign = 1 } of STAT_MOD_PATTERNS) {
     if (seen.has(stat)) continue;
     const m = text.match(re);
     if (!m) continue;
@@ -736,9 +744,9 @@ function statModsFromText(text) {
     // "Bonus Maximum" (vs "Base Maximum") and a nearby "for the duration" both mark
     // a TEMPORARY buff — the doc reserves "Base" for permanent stat changes.
     if (/\bBonus\s+Maximum\b/i.test(m[0]) || /\bfor the duration\b/i.test(before)) continue;
-    const w = m[1] || (m[0].match(/\b(one|two|three)\b/i) || [])[1] || '0';
-    const n = statNum(w);
-    if (n > 0) { mods.push({ stat, n }); seen.add(stat); }
+    const w = m[1] || (m[0].match(/\b(one|two|three|four|five|six|seven|eight)\b/i) || [])[1] || '0';
+    const n = statNum(w) * sign;
+    if (n !== 0) { mods.push({ stat, n }); seen.add(stat); }
   }
   // Variable/contextual Natural Armor with no fixed number (Gift of Unbreakable
   // Flesh: "Gains Natural Armor from Patron").
@@ -966,24 +974,34 @@ function extractGrantedSelections(entity) {
 const REQ_CLASS_LEVEL = /^(Artisan|Cleric|Druid|Fighter|Mage|Rogue|Socialite|Sourcerer)\s+Level\s+(\d+)/i;
 function extractRequirement(entity) {
   const raw = entity.requirement;
-  if (!raw) return;
   let requiredLevel = 0, requiredClass = null;
   const requiresEntity = [];
-  for (let part of String(raw).split(',')) {
-    part = part.trim();
-    if (!part) continue;
-    const m = part.match(REQ_CLASS_LEVEL);
-    if (m) {
-      // Take only the "<Class> Level N" head — guards against run-on capture like
-      // "Artisan Level 4Skills and Options: …" where the field fused with prose.
-      requiredLevel = parseInt(m[2], 10);
-      requiredClass = m[1];
-    } else {
-      // A named prerequisite entity. Strip a trailing " skill" noise word.
-      const nm = part.replace(/\s+skill$/i, '').trim();
-      if (nm && !/^level\b/i.test(nm)) requiresEntity.push(nm);
+  if (raw) {
+    for (let part of String(raw).split(',')) {
+      part = part.trim();
+      if (!part) continue;
+      const m = part.match(REQ_CLASS_LEVEL);
+      if (m) {
+        // Take only the "<Class> Level N" head — guards against run-on capture like
+        // "Artisan Level 4Skills and Options: …" where the field fused with prose.
+        requiredLevel = parseInt(m[2], 10);
+        requiredClass = m[1];
+      } else {
+        // A named prerequisite entity. Strip a trailing " skill" noise word.
+        const nm = part.replace(/\s+skill$/i, '').trim();
+        if (nm && !/^level\b/i.test(nm)) requiresEntity.push(nm);
+      }
     }
   }
+
+  // Implicit tier-based level requirements for class powers.
+  if (!requiredLevel && entity.tier) {
+    const t = entity.tier.toLowerCase();
+    if (t === 'adept' || t === 'advanced') requiredLevel = 5;
+    else if (t === 'greater' || t === 'veteran') requiredLevel = 7;
+    else if (t === 'novice' || t === 'basic' || t === 'utility' || t === 'cantrip') requiredLevel = 1;
+  }
+
   if (requiredLevel) { entity.requiredLevel = requiredLevel; entity.requiredClass = requiredClass; }
   if (requiresEntity.length) entity.requiresEntity = requiresEntity;
 }
@@ -1722,7 +1740,9 @@ function parseLineages() {
 
     const challenges = parseItems('Challenges');
     const advantages = parseItems('Advantages');
-    for (const a of advantages) enrichMechanics(a); // structured mechanics
+    // Enrich BOTH — challenges can carry permanent stat penalties too (e.g. Lost's
+    // Fragile Form: "1 fewer maximum Life Point"), not just advantages.
+    for (const it of [...challenges, ...advantages]) enrichMechanics(it);
 
     // Derive sub-lineages from distinct non-General groups
     const byName = new Map();

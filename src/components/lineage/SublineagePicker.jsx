@@ -34,11 +34,12 @@ export default function SublineagePicker({ lin, selected, onSelect }) {
     return (
       <button
         key={s.label}
-        className={`b-lin-sub-card ${s.civ ? "is-civ" : ""} ${on ? "is-on" : ""}`}
+        className={`b-lin-sub-card ${on ? "is-on" : ""}`}
         onClick={() => onSelect(on ? null : s.label)}
       >
         <span className="b-lin-sub-card-name">{s.name}</span>
-        {/* Civilization sub-lineages may only be played if you're from there. */}
+        {/* Civilization sub-lineages aren't styled differently — they just carry a
+            "Requires: <civ>" note (you may only play them if you're from there). */}
         {s.civ && s.context && (
           <span className="b-lin-sub-card-ctx">Requires: {s.context.replace(/^Civilization:\s*/i, "")}</span>
         )}
@@ -63,7 +64,7 @@ export default function SublineagePicker({ lin, selected, onSelect }) {
       <div className="b-lin-sub-cards">
         <button className={`b-lin-sub-card is-none ${!selected ? "is-on" : ""}`} onClick={() => onSelect(null)}>
           <span className="b-lin-sub-card-name">None</span>
-          <span className="b-lin-sub-card-ctx">General options only — no commitment</span>
+          <span className="b-lin-sub-card-ctx">General options only</span>
         </button>
         {subs.map((s) => Card(s))}
       </div>
