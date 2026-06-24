@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from "react";
 import { lookupEntity, UNLIMITED_SKILLS } from '../engine/data.js';
 import { prereqStatus } from "../engine/validate.js";
-import { gameEffectFacets } from "../engine/game-effects.js";
+import { browse, gameEffectAxes, axisApplies, otherBuckets } from "./browse/browse.js";
 import { EntityBody } from "./DetailPane.jsx";
 import Overlay from "./ui/Overlay.jsx";
 
@@ -44,35 +44,16 @@ const refreshBucket = (c) => {
 
 const SPELL_TIER_BUCKET = { noviceSpells: "Novice", adeptSpells: "Adept", greaterSpells: "Greater", cantrips: "Cantrip" };
 
-// Group axes. Single-facet axes return ONE key via `key(c)`. The player-facing
-// game-effect axes are MULTI-facet: `keys(c, entityType)` returns every bucket the
-// item belongs to (a Flame power that also Roots lands in both Flame and Root), so
-// browsing "everything that can Root" actually shows everything that can Root.
-const GROUP_AXES = {
-  tier:         { label: "Tier",          key: (c) => SPELL_TIER_BUCKET[c.tierList] || c.tier || "—" },
-  category:     { label: "Category",      key: (c) => c.cat || c.tierList || "Other" },
-  refresh:      { label: "Refresh",       key: refreshBucket },
-  effect:       { label: "Effect",        multi: true, facet: "effect",    placeholder: "No targeted effect" },
-  damage:       { label: "Damage type",   multi: true, facet: "damage",    placeholder: "Untyped" },
-  condition:    { label: "Condition",     multi: true, facet: "condition", placeholder: "No condition" },
-  alphabetical: { label: "A–Z",           key: (c) => (c.name[0] || "#").toUpperCase() },
-  cost:         { label: "Cost",          key: (c) => (typeof c.cost === "number" ? `${c.cost} BP` : "—") },
-};
-
-// Buckets an item belongs to under an axis (always an array; single-facet axes
-// return [oneKey]). For a multi-facet axis with no matches, returns [placeholder].
-function bucketsFor(axis, c, entityType) {
-  if (!axis.multi) return [axis.key(c)];
-  const keys = gameEffectFacets(entityType, c.name)[axis.facet];
-  return keys.length ? keys : [axis.placeholder];
-}
-
-// The OTHER facets an item has on the current axis (for the "also: …" row badge),
-// excluding the bucket it's currently shown under.
-function otherFacets(axis, c, entityType, currentBucket) {
-  if (!axis.multi) return [];
-  return (gameEffectFacets(entityType, c.name)[axis.facet] || []).filter((k) => k !== currentBucket);
-}
+// Surface-specific axes (tier/category/refresh/cost/A–Z). The shared player-facing
+// game-effect axes (Effect / Damage type / Condition) are appended from useBrowse so
+// they read identically here and in the lineage choices.
+const SURFACE_AXES = [
+  { id: "tier",         label: "Tier",     key: (c) => SPELL_TIER_BUCKET[c.tierList] || c.tier || "—" },
+  { id: "category",     label: "Category", key: (c) => c.cat || c.tierList || "Other" },
+  { id: "refresh",      label: "Refresh",  key: refreshBucket },
+  { id: "alphabetical", label: "A–Z",      key: (c) => (c.name[0] || "#").toUpperCase() },
+  { id: "cost",         label: "Cost",     key: (c) => (typeof c.cost === "number" ? `${c.cost} BP` : "—") },
+];
 
 export default function PickerOverlay({ spec, character, onClose }) {
   const { entityType, title, subtitle, candidates, taken, onChoose } = spec;
@@ -88,51 +69,39 @@ export default function PickerOverlay({ spec, character, onClose }) {
 
   const lockedOf = (name) => !prereqStatus(character, `${entityType}:${name}`).met;
 
-  // Only offer a game-effect axis when some candidate actually carries that facet —
-  // the Damage/Condition axes are meaningless for a skill or perk picker, so they
-  // shouldn't clutter the dropdown there.
-  const availableAxes = useMemo(() => {
-    const hasFacet = (facet) => candidates.some((c) => gameEffectFacets(entityType, c.name)[facet].length > 0);
-    return Object.entries(GROUP_AXES).filter(([, v]) => !v.multi || hasFacet(v.facet));
-  }, [candidates, entityType]);
+  // Surface axes + shared game-effect axes (resolved against this picker's entity
+  // type). Drop the Damage/Condition axes when no candidate carries that facet so
+  // they don't clutter a skill/perk picker.
+  const allAxes = useMemo(
+    () => [...SURFACE_AXES, ...gameEffectAxes(() => entityType)],
+    [entityType],
+  );
+  const availableAxes = useMemo(
+    () => allAxes.filter((a) => axisApplies(a, candidates)),
+    [allAxes, candidates],
+  );
 
-  const groupAxis = GROUP_AXES[groupMode] || GROUP_AXES.category;
-
-  const groups = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    let list = candidates;
-    if (q) list = list.filter((c) => c.name.toLowerCase().includes(q) || (c.desc || "").toLowerCase().includes(q));
-    const decorated = list.map((c) => ({ ...c, locked: lockedOf(c.name) }));
-    const axis = GROUP_AXES[groupMode] || GROUP_AXES.category;
-    const placeholder = axis.placeholder;
-    // Expand into buckets: multi-facet axes drop an item into EACH bucket it matches.
-    const buckets = new Map();
-    for (const c of decorated) {
-      for (const k of bucketsFor(axis, c, entityType)) {
-        if (!buckets.has(k)) buckets.set(k, []);
-        buckets.get(k).push(c);
-      }
-    }
-    let entries = [...buckets.entries()];
-    if (hideLocked) entries = entries.map(([g, cs]) => [g, cs.filter((c) => !c.locked)]).filter(([, cs]) => cs.length);
-    const facetCount = (c) => (axis.multi ? (gameEffectFacets(entityType, c.name)[axis.facet]?.length || 0) : 0);
-    const cmp = sortMode === "cost"
-      ? (a, b) => (a.cost ?? 999) - (b.cost ?? 999) || a.name.localeCompare(b.name)
-      : sortMode === "effect"
-        ? (a, b) => facetCount(b) - facetCount(a) || a.name.localeCompare(b.name)
-        : (a, b) => a.name.localeCompare(b.name);
-    for (const [, cs] of entries) cs.sort(cmp);
-    // Alphabetize buckets for A–Z and the game-effect axes (so Charm, Drain, Heal…
-    // read predictably); always sink the "no facet" placeholder to the bottom.
-    if (groupMode === "alphabetical" || axis.multi) {
-      entries.sort((a, b) => {
-        if (a[0] === placeholder) return 1;
-        if (b[0] === placeholder) return -1;
-        return a[0].localeCompare(b[0]);
-      });
-    }
-    return entries;
-  }, [candidates, query, hideLocked, character, entityType, groupMode, sortMode]);
+  const facetCount = (c, axis) => (axis?.multi ? (axis.keys(c)?.length || 0) : 0);
+  const { axis: groupAxis, groups } = useMemo(
+    () => browse({
+      items: candidates,
+      axes: availableAxes,
+      groupBy: groupMode,
+      query,
+      matches: (c, q) => c.name.toLowerCase().includes(q) || (c.desc || "").toLowerCase().includes(q),
+      sort: sortMode,
+      compare: (a, b, s, axis) =>
+        s === "cost"
+          ? (a.cost ?? 999) - (b.cost ?? 999) || a.name.localeCompare(b.name)
+          : s === "effect"
+            ? facetCount(b, axis) - facetCount(a, axis) || a.name.localeCompare(b.name)
+            : a.name.localeCompare(b.name),
+      decorate: (c) => ({ ...c, locked: lockedOf(c.name) }),
+      filter: hideLocked ? (c) => !lockedOf(c.name) : undefined,
+    }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [candidates, availableAxes, groupMode, query, sortMode, hideLocked, character, entityType],
+  );
 
   const readingEntity = useMemo(() => {
     if (readStack.length) return lookupEntity(readStack[readStack.length - 1]);
@@ -164,7 +133,7 @@ export default function PickerOverlay({ spec, character, onClose }) {
               <div className="b-picker-sortrow">
                 <label className="b-picker-sortlabel">Group
                   <select className="b-picker-sortsel" value={groupMode} onChange={(e) => setGroupMode(e.target.value)}>
-                    {availableAxes.map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
+                    {availableAxes.map((a) => <option key={a.id} value={a.id}>{a.label}</option>)}
                   </select>
                 </label>
                 <label className="b-picker-sortlabel">Sort
@@ -182,7 +151,7 @@ export default function PickerOverlay({ spec, character, onClose }) {
             </div>
             <div className="b-picker-groups">
               {groups.length === 0 && <p className="b-detail-missing">Nothing matches.</p>}
-              {groups.map(([group, items]) => (
+              {groups.map(({ key: group, items }) => (
                 <div key={group} className="b-picker-group">
                   <h3 className="b-picker-group-label">{group}</h3>
                   <ul className="b-picker-names">
@@ -190,7 +159,7 @@ export default function PickerOverlay({ spec, character, onClose }) {
                       const isTaken = taken.has(c.name);
                       // When grouping by a game-effect axis, show the item's OTHER
                       // facets so a multi-effect power explains why it's repeated.
-                      const also = otherFacets(groupAxis, c, entityType, group);
+                      const also = otherBuckets(groupAxis, c, group);
                       return (
                         <li key={c.name}>
                           <button

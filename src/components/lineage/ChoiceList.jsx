@@ -3,23 +3,18 @@
 // Within each column, items are grouped into LBP-value bands (a price list you scan
 // by cost). One shared search/filter spans both. Sublineage-scoped items are shown
 // dimmed/locked until their sublineage is picked. Each item is a ChoiceRow.
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { subKey } from "../../engine/validate.js";
 import { lineageItemImpact } from "../../engine/data.js";
 import { cleanChallengeName } from "../LineagePanel.jsx";
 import { parseSublineage } from "./lineage-helpers.js";
+import { browse, gameEffectAxes, axisApplies } from "../browse/browse.js";
 import ChoiceRow from "./ChoiceRow.jsx";
 
 const FILTERS = [
   { id: "all", label: "All" },
   { id: "taken", label: "Taken" },
   { id: "required", label: "Required" },
-];
-
-const GROUP_OPTS = [
-  { id: "band", label: "Cost band" },
-  { id: "effect", label: "Build effect" },
-  { id: "sublineage", label: "Sublineage" },
 ];
 
 // The catch-all bucket for items whose effect ISN'T a build-time / derived-stat
@@ -128,10 +123,10 @@ export default function ChoiceList({
     );
   };
 
-  // Sort comparator within a group, per the chosen sort axis.
-  const cmp = (a, b) => {
-    if (sort === "az") return itemName(a).localeCompare(itemName(b));
-    if (sort === "effect") {
+  // Sort comparator within a group, per the chosen sort axis (shared by both columns).
+  const compare = (a, b, s) => {
+    if (s === "az") return itemName(a).localeCompare(itemName(b));
+    if (s === "effect") {
       const ea = lineageItemImpact(a, lineage).length, eb = lineageItemImpact(b, lineage).length;
       if (ea !== eb) return eb - ea; // items WITH effects first
       return itemName(a).localeCompare(itemName(b));
@@ -139,38 +134,51 @@ export default function ChoiceList({
     return itemLbp(b) - itemLbp(a) || itemName(a).localeCompare(itemName(b)); // cost desc
   };
 
-  // Bucket the visible items into labelled groups per the chosen axis, then sort
-  // both the groups and the items within them.
-  const groupsOf = (items, kind) => {
+  // The lineage's OWN axes (cost band / build effect / sublineage), expressed as
+  // browse axes, plus the shared game-effect axes (Effect / Damage type / Condition)
+  // so the same player-facing grouping lights up here as in the power picker. The
+  // band axis needs the +/− sign, so it's built per column (per `kind`).
+  const axesFor = (kind) => {
     const sign = kind === "challenge" ? "+" : "−";
-    const map = new Map();
-    const add = (key, label, order, it) => {
-      if (!map.has(key)) map.set(key, { label, order, items: [] });
-      map.get(key).items.push(it);
-    };
-    for (const it of items) {
-      if (groupBy === "sublineage") {
-        const info = subInfo(it);
-        add(info.general ? "_general" : info.label, info.general ? "General" : info.label, info.general ? -1 : 0, it);
-      } else if (groupBy === "effect") {
-        const e = effectKey(it, lineage);
-        add(e, e, e === OTHER_EFFECT_LABEL ? 1 : 0, it); // in-play bucket sorts last
-      } else {
-        const v = typeof it.lbp === "number" ? it.lbp : -1;
-        add(v, v < 0 ? "Variable" : `${sign}${v} LBP`, v < 0 ? -Infinity : v, it);
-      }
-    }
-    const groups = [...map.values()];
-    // Cost bands high→low; effect/sublineage groups by their order then label.
-    groups.sort((a, b) => (groupBy === "band" ? b.order - a.order : a.order - b.order || a.label.localeCompare(b.label)));
-    for (const g of groups) g.items.sort(cmp);
-    return groups;
+    const native = [
+      {
+        id: "band", label: "Cost band",
+        key: (it) => (typeof it.lbp === "number" ? `${sign}${it.lbp} LBP` : "Variable"),
+        // High LBP band first (ascending order on negated value); "Variable" last.
+        order: (label) => (label === "Variable" ? Infinity : -parseInt(String(label).replace(/[^\d]/g, ""), 10)),
+      },
+      {
+        id: "buildeffect", label: "Build effect",
+        key: (it) => { const imp = lineageItemImpact(it, lineage); return imp.length ? imp[0] : OTHER_EFFECT_LABEL; },
+        order: (label) => (label === OTHER_EFFECT_LABEL ? 1 : 0),
+      },
+      {
+        id: "sublineage", label: "Sublineage",
+        key: (it) => (subInfo(it).general ? "General" : subInfo(it).label),
+        order: (label) => (label === "General" ? -1 : 0),
+      },
+    ];
+    // Lineage items key in the refs graph as "<type>:<Lineage> - <baseName>"
+    // (e.g. "challenges:Aewen - Mana Lines"), so resolve facets with that qualified
+    // name + the matching type.
+    const facetType = kind === "challenge" ? "challenges" : "advantages";
+    const qualifiedName = (it) => `${lineage} - ${itemName(it)}`;
+    return [...native, ...gameEffectAxes(() => facetType, qualifiedName)];
   };
+
+  // Game-effect axes only appear when some item in EITHER column carries that facet.
+  const groupOptions = useMemo(() => {
+    const all = [...(lin.challenges || []), ...(lin.advantages || [])];
+    return axesFor("challenge").filter((a) => axisApplies(a, all));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lin, lineage, pickedSub]);
 
   const column = (list, field, kind) => {
     let visible = (list || []).filter((it) => matches(it, field));
     if (hideLocked) visible = visible.filter((it) => !subInfo(it).offSublineage);
-    const groups = groupsOf(visible, kind);
+    const { groups } = browse({
+      items: visible, axes: axesFor(kind), groupBy, sort, compare,
+    });
     return (
       <div className={`b-lin-col b-lin-col-${kind === "challenge" ? "earn" : "spend"}`}>
         <div className="b-lin-col-head">
@@ -226,7 +234,7 @@ export default function ChoiceList({
           <label className="b-picker-sortlabel">
             Group
             <select className="b-picker-sortsel" value={groupBy} onChange={(e) => setGroupBy(e.target.value)}>
-              {GROUP_OPTS.map((o) => (
+              {groupOptions.map((o) => (
                 <option key={o.id} value={o.id}>
                   {o.label}
                 </option>
