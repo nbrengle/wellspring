@@ -200,38 +200,51 @@ export function spellSlots(character) {
   if (!pools[primaryType]) pools[primaryType] = { novice: 0, adept: 0, greater: 0 };
 
   const spellTiers = new Set(SPELL_TIERS);
-  let highestSlots = 0;
-  const applySpellGrants = (ent, rank = 1) => {
+  let highestSlots = []; // array of target pool strings
+  const applySpellGrants = (ent, rank = 1, itemName = null) => {
     if (!ent) return;
-    for (const { cat, n } of (ent.slotGrants || [])) {
-      if (SPELL_TIERS.has(cat)) pools[primaryType][cat] += n * rank;
+    
+    let targetPool = primaryType;
+    if (itemName && /^Extended Capacity/i.test(itemName)) {
+      const match = itemName.match(/\((.*?)\)/);
+      if (match) {
+        targetPool = match[1].trim();
+      }
     }
-    if (ent.highestSlot) highestSlots += 1;
+
+    if (!pools[targetPool]) pools[targetPool] = { novice: 0, adept: 0, greater: 0 };
+
+    for (const { cat, n } of (ent.slotGrants || [])) {
+      if (SPELL_TIERS.has(cat)) pools[targetPool][cat] += n * rank;
+    }
+    if (ent.highestSlot) {
+      for (let i = 0; i < rank; i++) highestSlots.push(targetPool);
+    }
   };
 
   for (const field of ['startingSkills', 'purchasedSkills', 'classSkills']) {
     (character[field] || []).forEach((item, idx) => {
       const ent = lookupEntity(resolveId(item, field, character))
         || lookupEntity(`skills:${cleanItemName(item)}`);
-      applySpellGrants(ent, rankOf(character, field, idx));
+      applySpellGrants(ent, rankOf(character, field, idx), item);
     });
   }
   for (const item of (character.purchasedPerks || [])) {
-    applySpellGrants(lookupEntity(`perks:${cleanItemName(item)}`));
+    applySpellGrants(lookupEntity(`perks:${cleanItemName(item)}`), 1, item);
   }
   if (character.lineage) {
     const lin = LINEAGES[character.lineage];
     for (const name of (character.lineageAdvantages || [])) {
-      applySpellGrants((lin?.advantages || []).find((x) => x.name === name || x.baseName === name));
+      applySpellGrants((lin?.advantages || []).find((x) => x.name === name || x.baseName === name), 1, name);
     }
   }
 
   // A "highest-level spell-slot" grant adds one slot at the character's highest
-  // accessible tier in their primary pool.
-  for (let i = 0; i < highestSlots; i++) {
-    if (pools[primaryType].greater > 0) pools[primaryType].greater += 1;
-    else if (pools[primaryType].adept > 0) pools[primaryType].adept += 1;
-    else if (pools[primaryType].novice > 0) pools[primaryType].novice += 1;
+  // accessible tier in the granted pool.
+  for (const p of highestSlots) {
+    if (pools[p]?.greater > 0) pools[p].greater += 1;
+    else if (pools[p]?.adept > 0) pools[p].adept += 1;
+    else if (pools[p]?.novice > 0) pools[p].novice += 1;
   }
 
   // Prune any empty pools
