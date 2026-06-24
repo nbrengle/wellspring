@@ -8,9 +8,10 @@ export function statMods(graph) {
   const apply = (name, ent) => {
     if (!ent) return;
     for (const { stat, n } of (ent.statMods || [])) {
-      if (n > 0) { 
-        mods[stat] = (mods[stat] || 0) + n; 
-        sources.push({ name, stat, n }); 
+      // Apply both bonuses AND penalties (e.g. Fragile Form: −1 Maximum Life Point).
+      if (n !== 0) {
+        mods[stat] = (mods[stat] || 0) + n;
+        sources.push({ name, stat, n });
       }
     }
     for (const note of (ent.statModNotes || [])) {
