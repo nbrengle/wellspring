@@ -9,6 +9,8 @@ import { lookupCost } from "../../engine/validate/cost-key.js";
 import { STARTING_CHOICES_CONFIG, reconcileStartingChoices } from "../../engine/starting-choices.js";
 import { UNLIMITED_SKILLS } from "../../engine/data.js";
 import Tag from "./Tag.jsx";
+import InspectableRow from "./InspectableRow.jsx";
+import InlineDetail from "./InlineDetail.jsx";
 
 const SLOT_FIELD = {
   utility: "utilityPowers",
@@ -25,7 +27,7 @@ const SPELL_TIER_LABEL = {
 
 export function LineageSummary() {
   const { character, report } = useBuilderState();
-  const { onInspect, onOpenLineage } = useBuilderActions();
+  const { onOpenLineage } = useBuilderActions();
   if (!character.lineage) return null;
   const lbp = report.lbp;
   const chosen = lbp?.chosenAdvantages || [];
@@ -48,11 +50,10 @@ export function LineageSummary() {
             {challenges.map((ch, i) => {
               const name = ch.baseName || ch.name;
               return (
-                <li key={`ch-${i}-${name}`} className="b-row b-lin-adv-row">
-                  <button className="b-row-name" onClick={() => onInspect(name, "lineageChallenges", "flaws")}>{name}</button>
+                <InspectableRow key={`ch-${i}-${name}`} item={name} field="lineageChallenges" resolveType="flaws" className="b-lin-adv-row">
                   {ch.required && <span className="b-row-badge b-badge-granted">required</span>}
                   <span className="b-row-bp is-award">+{ch.lbp} LBP</span>
-                </li>
+                </InspectableRow>
               );
             })}
           </ul>
@@ -66,20 +67,17 @@ export function LineageSummary() {
           const name = adv.baseName || adv.name;
           const grants = grantedBySource[name] || [];
           return (
-            <li key={`adv-${i}-${name}`} className="b-lin-adv-group">
-              <div className="b-row b-lin-adv-row">
-                <button className="b-row-name" onClick={() => onInspect(name, "lineageAdvantages", "perks")}>{name}</button>
+            <React.Fragment key={`adv-${i}-${name}`}>
+              <InspectableRow item={name} field="lineageAdvantages" resolveType="perks" className="b-lin-adv-row">
                 <span className="b-row-bp is-cost">−{adv.lbp} LBP</span>
-              </div>
+              </InspectableRow>
               {grants.map((g) => (
-                <div key={g.ability} className="b-row b-lin-grant-row">
-                  <button className="b-row-name" onClick={() => onInspect(g.abilityName, g.abilityType, g.abilityType)}>
-                    ↳ {g.abilityName}
-                  </button>
+                <InspectableRow key={g.ability} item={g.abilityName} field={g.abilityType} resolveType={g.abilityType}
+                                className="b-lin-grant-row" label={<>↳ {g.abilityName}</>}>
                   <span className="b-row-bp is-free" title={`Granted by ${g.source}`}>free · {g.source}</span>
-                </div>
+                </InspectableRow>
               ))}
-            </li>
+            </React.Fragment>
           );
         })}
       </ul>
@@ -127,7 +125,7 @@ export function StartingChoicesSection() {
   );
 }
 
-export function CraftingSection({ crafting, onInspect }) {
+export function CraftingSection({ crafting }) {
   const groups = [
     ...crafting.crafting.map((c) => ({
       key: c.discipline, label: `${c.discipline} — ${c.tier}`,
@@ -145,10 +143,9 @@ export function CraftingSection({ crafting, onInspect }) {
           <h3 className="b-craft-head">{g.label} <span className="b-craft-count">{g.recipes.length}</span></h3>
           <ul className="b-craft-list">
             {g.recipes.map((r) => (
-              <li key={r.name} className="b-craft-row">
-                <button className="b-row-name" onClick={() => onInspect(r.name, null, g.resolveType)}>{r.name}</button>
+              <InspectableRow key={r.name} item={r.name} field={null} resolveType={g.resolveType} className="b-craft-row">
                 <span className="b-craft-tier">{r.tier}</span>
-              </li>
+              </InspectableRow>
             ))}
           </ul>
         </div>
@@ -296,27 +293,33 @@ export function SlotBlock({ slot, pickClassOf }) {
       </div>
       <ol className="b-slot-rows">
         {granted.map((name) => (
-          <li key={`granted-${name}`} className="b-slot-row is-filled is-granted">
-            <span className="b-slot-num" title="Granted by class">★</span>
-            <button className="b-slot-pick" onClick={() => onInspect(name, fields[0], "powers")}>{name}</button>
-            <span className="b-slot-tier b-slot-granted-tag">innate</span>
-          </li>
+          <React.Fragment key={`granted-${name}`}>
+            <li className="b-slot-row is-filled is-granted">
+              <span className="b-slot-num" title="Granted by class">★</span>
+              <button className="b-slot-pick" onClick={() => onInspect(name, fields[0], "powers")}>{name}</button>
+              <span className="b-slot-tier b-slot-granted-tag">innate</span>
+            </li>
+            <InlineDetail item={name} field={fields[0]} />
+          </React.Fragment>
         ))}
         {rows.map((pick, i) => {
           const over = i >= slot.allowed;
           if (pick) {
             return (
-              <li key={i} className={`b-slot-row is-filled ${over ? "is-over" : ""} ${isFocused(pick.name, pick.field) ? "is-focused" : ""}`}>
-                <span className="b-slot-num">{i + 1}</span>
-                <button className="b-slot-pick" onClick={() => onInspect(pick.name, pick.field, "powers")}>{pick.name}</button>
-                {slot.category === "spellsKnown" && spellTierKey({ tierList: pick.field }) && (
-                  <span className={`b-slot-tier b-tier-${spellTierKey({ tierList: pick.field })}`}>
-                    {SPELL_TIER_LABEL[pick.field]}
-                  </span>
-                )}
-                <button className="b-slot-action" title="Swap" aria-label={`Swap ${pick.name}`} onClick={() => onOpenSlot(slot, pick.flatIndex, false, pick.field)}>✎</button>
-                <button className="b-slot-action" title="Clear" aria-label={`Clear ${pick.name}`} onClick={() => onOpenSlot(slot, pick.flatIndex, true, pick.field)}>✕</button>
-              </li>
+              <React.Fragment key={i}>
+                <li className={`b-slot-row is-filled ${over ? "is-over" : ""} ${isFocused(pick.name, pick.field) ? "is-focused" : ""}`}>
+                  <span className="b-slot-num">{i + 1}</span>
+                  <button className="b-slot-pick" onClick={() => onInspect(pick.name, pick.field, "powers")}>{pick.name}</button>
+                  {slot.category === "spellsKnown" && spellTierKey({ tierList: pick.field }) && (
+                    <span className={`b-slot-tier b-tier-${spellTierKey({ tierList: pick.field })}`}>
+                      {SPELL_TIER_LABEL[pick.field]}
+                    </span>
+                  )}
+                  <button className="b-slot-action" title="Swap" aria-label={`Swap ${pick.name}`} onClick={() => onOpenSlot(slot, pick.flatIndex, false, pick.field)}>✎</button>
+                  <button className="b-slot-action" title="Clear" aria-label={`Clear ${pick.name}`} onClick={() => onOpenSlot(slot, pick.flatIndex, true, pick.field)}>✕</button>
+                </li>
+                <InlineDetail item={pick.name} field={pick.field} />
+              </React.Fragment>
             );
           }
           return (
@@ -334,10 +337,8 @@ export function SlotBlock({ slot, pickClassOf }) {
 }
 
 export function ClassifiedRows({ rows, resolveType, showClass }) {
-  const { character, view } = useBuilderState();
-  const { onInspect: onClick, onRemoveEntity: onRemove, onSetRank } = useBuilderActions();
-  const isFocused = (item, field) =>
-    view?.mode === "inspect" && view.item === item && view.field === field;
+  const { character } = useBuilderState();
+  const { onRemoveEntity: onRemove, onSetRank } = useBuilderActions();
   if (!rows || rows.length === 0) return <p className="b-empty">none</p>;
   return (
     <ul className="b-rows">
@@ -358,10 +359,9 @@ export function ClassifiedRows({ rows, resolveType, showClass }) {
         const hasRanks = (canRemove || canBuyUp) && maxR > 1 && !UNLIMITED_SKILLS.has(baseName);
 
         return (
-          <li key={`${field}-${index}-${name}-${grantedBy || cls || ''}`} className={`b-row ${isFocused(name, field) ? "is-focused" : ""}`}>
-            <button className="b-row-name" onClick={() => onClick(name, field, resolveType, null, index)}>
-              {name}{rank > 1 && !hasRanks && <span className="b-row-rank">×{rank}</span>}
-            </button>
+          <InspectableRow key={`${field}-${index}-${name}-${grantedBy || cls || ''}`}
+                          item={name} field={field} resolveType={resolveType} index={index}
+                          label={<>{name}{rank > 1 && !hasRanks && <span className="b-row-rank">×{rank}</span>}</>}>
             {showClass && cls && !fromClass && <span className="b-row-badge b-badge-class">{cls.toUpperCase()}</span>}
             {fromClass
               ? (() => {
@@ -397,7 +397,7 @@ export function ClassifiedRows({ rows, resolveType, showClass }) {
               <button className="b-row-remove" title="Remove" aria-label={`Remove ${name}`}
                       onClick={() => onRemove(field, index)}>×</button>
             )}
-          </li>
+          </InspectableRow>
         );
       })}
     </ul>
@@ -405,10 +405,8 @@ export function ClassifiedRows({ rows, resolveType, showClass }) {
 }
 
 export function EditableRows({ items, field, resolveType, removable }) {
-  const { character, report, view } = useBuilderState();
-  const { onInspect: onClick, onRemoveEntity, onSetRank } = useBuilderActions();
-  const isFocused = (item, fld) =>
-    view?.mode === "inspect" && view.item === item && view.field === fld;
+  const { character, report } = useBuilderState();
+  const { onRemoveEntity } = useBuilderActions();
   if (!items || items.length === 0) {
     return <p className="b-empty">none</p>;
   }
@@ -424,15 +422,13 @@ export function EditableRows({ items, field, resolveType, removable }) {
         const hasRanks = canRemove && maxR > 1 && !UNLIMITED_SKILLS.has(baseName);
 
         return (
-          <li key={`${field}-${i}-${item}`} className={`b-row ${isFocused(item, field) ? "is-focused" : ""}`}>
-            <button className="b-row-name" onClick={() => onClick(item, field, resolveType, null, i)}>
-              {item}{rank > 1 && !hasRanks && <span className="b-row-rank">×{rank}</span>}
-            </button>
+          <InspectableRow key={`${field}-${i}-${item}`} item={item} field={field} resolveType={resolveType} index={i}
+                          label={<>{item}{rank > 1 && !hasRanks && <span className="b-row-rank">×{rank}</span>}</>}>
             <CostBadge cost={cost} />
             {canRemove && (
               <button className="b-row-remove" title="Remove" aria-label={`Remove ${item}`} onClick={() => onRemoveEntity(field, i)}>×</button>
             )}
-          </li>
+          </InspectableRow>
         );
       })}
     </ul>
