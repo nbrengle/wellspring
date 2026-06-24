@@ -749,6 +749,21 @@ function statModsFromText(text) {
   const mods = [];
   const seen = new Set();
   if (!text) return { mods, variableNaturalArmor: false };
+
+  for (const match of text.matchAll(/Grants?\s*(?:a\s+)?\+?(\d+)\s+(?:to\s+)?(Life|Armor)/gi)) {
+    const stat = match[2].toLowerCase() === 'life' ? 'lifePoints' : 'armor';
+    if (!seen.has(stat)) { mods.push({ stat, n: parseInt(match[1]) }); seen.add(stat); }
+  }
+
+  for (const match of text.matchAll(/benefit from up to (two|four|six|eight|\d+) Armor Points/gi)) {
+    let val = parseInt(match[1]);
+    if (isNaN(val)) {
+      const words = { 'two': 2, 'four': 4, 'six': 6, 'eight': 8 };
+      val = words[match[1].toLowerCase()];
+    }
+    if (!seen.has('armor')) { mods.push({ stat: 'armor', n: val }); seen.add('armor'); }
+  }
+
   for (const { stat, re, sign = 1 } of STAT_MOD_PATTERNS) {
     if (seen.has(stat)) continue;
     const m = text.match(re);
@@ -919,11 +934,7 @@ function enrichMechanics(entity) {
 
 // ─── MANUAL PARAMETERIZATIONS (For powers that need `options` arrays) ──────────
 function extractManualParameterizations(entity) {
-  if (entity.name === "Efficient Crafting") {
-    entity.options = ["Alchemy", "Enchanting", "Tinkering"];
-  } else if (entity.name === "Batch Process") {
-    entity.options = ["Alchemy", "Ritual Magic", "Enchanting", "Tinkering"];
-  } else if (entity.name === "Studied Focus") {
+  if (entity.name === "Studied Focus") {
     entity.options = ["Artificer", "Crafter", "Mystic"];
   }
 }
@@ -1208,12 +1219,7 @@ const withMechanics = (list) => { for (const e of list) enrichMechanics(e); retu
 const SKILLS_OUT = withMechanics(parseSkills());
 
 // MANUAL PATCH: Armor Points (missing statMods extraction)
-for (const skill of SKILLS_OUT) {
-  if (skill.name === "Basic Armor") skill.statMods = [{ stat: "armor", n: 2 }];
-  if (skill.name === "Light Armor") skill.statMods = [{ stat: "armor", n: 4 }];
-  if (skill.name === "Medium Armor") skill.statMods = [{ stat: "armor", n: 6 }];
-  if (skill.name === "Heavy Armor") skill.statMods = [{ stat: "armor", n: 8 }];
-}
+
 
 write('skills.json', SKILLS_OUT);
 
