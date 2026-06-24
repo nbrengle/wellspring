@@ -495,13 +495,23 @@ for (const c of classesJson) {
 for (const d of domainsJson) for (const p of (d.powers || [])) {
   ENTITY_INDEX.set(`powers:${p.name}`, { ...p, id: `powers:${p.name}`, type: 'powers', domain: d.name });
 }
-// Lineage advantages. Keyed "advantages:<Lineage> - <name>" to match how the rules
-// relations reference them (REFS.grants/discounts) and how ownedGrantSources builds
-// the id — without this, grant/discount edges from advantages, plus their
-// descriptions and the inspector, resolve to nothing.
-for (const lin of lineagesJson) for (const a of (lin.advantages || [])) {
-  const id = `advantages:${lin.name} - ${a.name}`;
-  ENTITY_INDEX.set(id, { ...a, id, type: 'advantages', name: a.name, lineage: lin.name });
+// Lineage advantages AND challenges. Keyed "<type>:<Lineage> - <name>" to match how
+// the rules relations reference them (REFS.grants/discounts) and how ownedGrantSources
+// builds the id — without this, grant/discount edges, descriptions, and the inspector
+// resolve to nothing. `...item` carries the lineage facets (sublineage, repped,
+// required, lbp, statMods, desc) straight onto the entity so they're browsable/
+// filterable; `lineage` is added so it's a first-class facet too. Challenges were
+// previously absent from the entity index entirely (so 105 of them were invisible to
+// the Rules Explorer); registering them here makes them browsable like advantages.
+for (const lin of lineagesJson) {
+  for (const a of (lin.advantages || [])) {
+    const id = `advantages:${lin.name} - ${a.name}`;
+    ENTITY_INDEX.set(id, { ...a, id, type: 'advantages', name: a.name, lineage: lin.name });
+  }
+  for (const c of (lin.challenges || [])) {
+    const id = `challenges:${lin.name} - ${c.name}`;
+    ENTITY_INDEX.set(id, { ...c, id, type: 'challenges', name: c.name, lineage: lin.name });
+  }
 }
 
 // ─── CONCEPT / GLOSSARY INDEX ──────────────────────────────────────────────────
