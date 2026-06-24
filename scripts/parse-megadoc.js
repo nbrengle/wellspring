@@ -1448,6 +1448,8 @@ function extractTiers(results) {
       r.tiers = tiers;
       // The base `cost` is tier 1's cost (the flat field still reflects entry price).
       r.cost = tiers[0].cost;
+      // Multi-tier perks implicitly support ranking up to the number of tiers available.
+      r.ranks = tiers.length;
     }
   }
   return results;
