@@ -29,9 +29,6 @@ export function statMods(graph) {
     }
     if (node.entity?.statModNotes) {
       for (const note of node.entity.statModNotes) {
-        if (note.text === 'variable' && node.effects.some(e => e.type === 'STAT' && e.stat === note.stat)) {
-          continue;
-        }
         notes.push({ name: node.name, ...note });
       }
     }

@@ -1433,10 +1433,14 @@ function extractTiers(results) {
           const numColumns = firstDigitIdx - costIdx;
           if (numColumns >= 2 && numColumns <= 4) {
             const headers = lines.slice(costIdx, firstDigitIdx);
-            const keys = headers.map(h => {
-              const k = h.replace(/(?:^\w|[A-Z]|\b\w)/g, (w, i) => i === 0 ? w.toLowerCase() : w.toUpperCase()).replace(/[^a-zA-Z0-9]/g, '');
-              return k === 'byMyVoiceDmg' ? 'byMyVoiceDmg' : k;
-            });
+            
+            // Standard tiered tables (Cost, Character Level, Ability) are NOT cumulative 
+            // and should be handled by the legacy dedicated parser below.
+            if (!headers.some(h => /Character\s+Level/i.test(h))) {
+              const keys = headers.map(h => {
+                const k = h.replace(/(?:^\w|[A-Z]|\b\w)/g, (w, i) => i === 0 ? w.toLowerCase() : w.toUpperCase()).replace(/[^a-zA-Z0-9]/g, '');
+                return k === 'byMyVoiceDmg' ? 'byMyVoiceDmg' : k;
+              });
             const tiers = [];
             let prevCost = 0;
             let i = firstDigitIdx;
@@ -1461,6 +1465,7 @@ function extractTiers(results) {
               r.ranks = tiers.length;
               continue;
             }
+            } // Close if (!headers.some(...))
           }
         }
       }

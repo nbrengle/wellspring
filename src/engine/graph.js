@@ -1,3 +1,4 @@
+import { EFFECT_EXTRACTORS } from './extractors.js';
 import { lookupEntity, LINEAGES, CLASS_PROGRESSION, REFS, lineageChoiceSpec } from '../engine/data.js';
 import { startingSkillGrants } from '../engine/starting-choices.js';
 import { cleanItemName, bareSkill, resolveId, entityType, getClasses, idName } from './resolver.js';
@@ -18,18 +19,7 @@ export function resolveCharacterGraph(character) {
   // to starting-skill nodes so consumers (classifyOwnedItems) read it off the graph.
   const ssGrants = startingSkillGrants(character);
 
-  const attachGlobalEffects = (id, effects, ent) => {
-    if (REFS.discounts?.[id]) {
-      effects.push({ type: 'DISCOUNT_SOURCE', discount: REFS.discounts[id] });
-    }
-    const isChoice = ent?.chooseOne?.kind === 'build' ||
-      /\b(?:choose\s+one|gains?\s+one\s+of|one\s+of\s+the\s+following|gains?\s+one\s+skill)\b/i.test(ent?.requirement || '') ||
-      /\b(?:choose\s+one|gains?\s+one\s+of|one\s+of\s+the\s+following|gains?\s+one\s+skill)\b/i.test(ent?.description || '') ||
-      /\b(?:choose\s+one|gains?\s+one\s+of|one\s+of\s+the\s+following|gains?\s+one\s+skill)\b/i.test(ent?.skillsAndOptions || '');
-    if (REFS.grants?.[id] && !isChoice) {
-      effects.push({ type: 'GRANT_SOURCE', grants: REFS.grants[id] });
-    }
-  };
+
 
   const addItem = (field, rawString, sourceType, index) => {
     const cleanName = cleanItemName(rawString);
@@ -53,39 +43,9 @@ export function resolveCharacterGraph(character) {
     const authoredCost = character.effectiveBP?.[field]?.[index];
     const grantSidecar = character.grants?.[field]?.[index];
 
-    attachGlobalEffects(ent?.id || id, effects, ent);
-    
-    if (ent?.wealthIncome) {
-      effects.push({
-        type: 'WEALTH', amount: ent.wealthIncome.n,
-        note: ent.wealthIncome.kind === 'manse' ? 'or resources' : 
-              ent.wealthIncome.kind === 'firstEvent' ? 'one-time, first event' : undefined
-      });
-    }
-
-    if (ent?.statMods) {
-      for (const mod of ent.statMods) {
-        effects.push({ type: 'STAT', stat: mod.stat, amount: mod.n });
-      }
-    }
-    
-    if (Array.isArray(ent?.tiers) && ent.tiers.length > 0 && rank > 0) {
-      const currentTier = ent.tiers[Math.min(rank - 1, ent.tiers.length - 1)];
-      if (currentTier?.armorPoints) {
-        effects.push({ type: 'STAT', stat: 'naturalArmor', amount: currentTier.armorPoints });
-      }
-    }
-    
-    // Choose-one powers (Expert Craft) grant the selected skill(s)
-    if (ent?.chooseOne?.kind === 'build') {
-      const chosen = character.choices?.[`powers:${ent.name}`];
-      if (chosen) {
-        // Find the option by direct text match, or by seeing if one of its granted skills matches the chosen string.
-        const opt = ent.chooseOne.options.find((o) => o.text === chosen || o.grants?.includes(chosen));
-        if (opt?.grants && opt.grants.length > 0) {
-          effects.push({ type: 'GRANT_SOURCE', grants: opt.grants.map(s => `skills:${s}`) });
-        }
-      }
+    const entityId = ent?.id || id;
+    for (const extractor of EFFECT_EXTRACTORS) {
+      effects.push(...extractor(ent, character, entityId));
     }
 
 
@@ -154,16 +114,12 @@ export function resolveCharacterGraph(character) {
       const ent = lookupEntity(`powers:${ip.name}`) || ip.entity;
       const effects = [];
       const id = ent?.id || `powers:${ip.name}`;
-      attachGlobalEffects(id, effects, ent);
+      const entityId = ent?.id || id;
+      for (const extractor of EFFECT_EXTRACTORS) {
+        effects.push(...extractor(ent, character, entityId));
+      }
 
-      if (ent?.wealthIncome) {
-        effects.push({ type: 'WEALTH', amount: ent.wealthIncome.n });
-      }
-      if (ent?.statMods) {
-        for (const mod of ent.statMods) {
-          effects.push({ type: 'STAT', stat: mod.stat, amount: mod.n });
-        }
-      }
+
       
       // Level-gated discounts (e.g. Ritual Affinity)
       if (ip.cls && ent?.levelDiscounts) {
@@ -200,19 +156,18 @@ export function resolveCharacterGraph(character) {
       const ent = (lin?.advantages || []).find((x) => x.name === adv || x.baseName === adv);
       const effects = [];
       const id = `advantages:${character.lineage} - ${ent?.baseName || adv}`;
-      attachGlobalEffects(id, effects, ent);
-      
-      if (ent?.statMods) {
-        for (const mod of ent.statMods) {
-          effects.push({ type: 'STAT', stat: mod.stat, amount: mod.n });
-        }
+      const entityId = ent?.id || id;
+      for (const extractor of EFFECT_EXTRACTORS) {
+        effects.push(...extractor(ent, character, entityId));
       }
+      
       // A cantrip-choice advantage (Divine Magic, Psionic Cantrip, …) grants the
       // chosen cantrip. Data-driven via lineageChoiceSpec — no per-name special case.
       if (lineageChoiceSpec(ent)?.kind === 'cantrip') {
         const picked = character.advantageChoices?.[ent?.baseName || ent?.name];
         if (picked) effects.push({ type: 'GRANT_SOURCE', grants: [`powers:${picked}`] });
       }
+
       items.push({
         id,
         name: adv,
@@ -240,12 +195,11 @@ export function resolveCharacterGraph(character) {
       if (!ent) continue;
       const effects = [];
       const id = `challenges:${character.lineage} - ${ent.baseName || cleanCh}`;
-      attachGlobalEffects(id, effects, ent);
-      if (ent.statMods) {
-        for (const mod of ent.statMods) {
-          effects.push({ type: 'STAT', stat: mod.stat, amount: mod.n });
-        }
+      const entityId = ent?.id || id;
+      for (const extractor of EFFECT_EXTRACTORS) {
+        effects.push(...extractor(ent, character, entityId));
       }
+
       items.push({
         id,
         name: ch,

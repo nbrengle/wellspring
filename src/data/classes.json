@@ -177,9 +177,9 @@
         "refresh": null,
         "accent": null,
         "effect": null,
-        "requirement": "Artisan Level 4",
+        "requirement": "Artisan Level 4Skills and Options: The Artisan gains one of the following skills for free based on their Specialization when they attain level 4 Artisan (this one time skill bonus does not change if their Specialization later changes). The Artisan must have the prerequisites for this skill and if they do not then they may instead take the Apprentice or Basic level of the skill.",
         "prerequisites": null,
-        "skillsAndOptions": "The Artisan gains one of the following skills for free based on their Specialization when they attain level 4 Artisan (this one time skill bonus does not change if their Specialization later changes). The Artisan must have the prerequisites for this skill and if they do not then they may instead take the Apprentice or Basic level of the skill.",
+        "skillsAndOptions": null,
         "description": "• Artificer- Basic Shields (4), Basic Traps (5), Medium Armor (4) • Crafter- Journeyman Alchemy (4), Journeyman Enchanting (4), Journeyman Tinkering (4) • Mystic- Advanced Medicine (4), [Journeyman Ritual Magic (2) AND Ritual Lore (2)]",
         "requiredLevel": 4,
         "requiredClass": "Artisan"
@@ -6491,7 +6491,13 @@
               "text": "gesturing to another individual with one hand"
             },
             {
-              "text": "tapping a character on the shoulder (if the character has prior explicit consent only)"
+              "text": "tapping a character on the shoulder (if the character has prior explicit consent only). If this movement triggers a trap"
+            },
+            {
+              "text": "the Mage will be considered to have tripped the trap while momentarily physical"
+            },
+            {
+              "text": "and therefore take the effects of the trap per the normal Insubstantial rules. This cantrip can only be cast out of combat. Note: This spell offers interaction normally unavailable to Insubstantial creatures"
             }
           ]
         },
@@ -9713,7 +9719,7 @@
               "text": "Fear"
             },
             {
-              "text": "Mind"
+              "text": "Mind. The Socialite may then Focus for a Quick 100 to Grant themselves a Protect vs the chosen Accent. They may re-apply this Protect by Focusing for another Quick 100 until they complete a Short Rest"
             }
           ]
         },
@@ -10002,23 +10008,18 @@
         "tags": [],
         "maxRanks": 1,
         "cost": 3,
-        "incantation": "RP",
-        "call": "None",
-        "target": "Self",
-        "duration": "Instantaneous",
-        "delivery": "None",
-        "refresh": "Immediate",
+        "incantation": null,
+        "call": null,
+        "target": null,
+        "duration": null,
+        "delivery": null,
+        "refresh": null,
         "accent": null,
         "effect": null,
-        "requirement": "The Right Hand, Socialite Level 4",
+        "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Socialite has mastered the arts of social manipulation such that they may have an additional Bodyguard. The Socialite may use The Right Hand power to designate one other individual as their Bodyguard. Purchasing this Power also grants the Socialite the privilege of purchasing another Right Hand Power.",
-        "requiredLevel": 4,
-        "requiredClass": "Socialite",
-        "requiresEntity": [
-          "The Right Hand"
-        ]
+        "description": "Requirements: The Right Hand, Socialite Level 4 Incantation: RPCall: None Target: Self                                        Duration: Instantaneous Delivery: None                                        Refresh: Immediate The Socialite has mastered the arts of social manipulation such that they may have an additional Bodyguard. The Socialite may use The Right Hand power to designate one other individual as their Bodyguard. Purchasing this Power also grants the Socialite the privilege of purchasing another Right Hand Power."
       },
       {
         "name": "Inspirational Leader",
@@ -10554,18 +10555,18 @@
         "tags": [],
         "maxRanks": 1,
         "cost": null,
-        "incantation": "None",
-        "call": "None",
-        "target": "Self",
-        "duration": "Instantaneous",
-        "delivery": "None",
-        "refresh": "Immediate",
+        "incantation": null,
+        "call": null,
+        "target": null,
+        "duration": null,
+        "delivery": null,
+        "refresh": null,
         "accent": null,
         "effect": null,
-        "requirement": "Sourcerer Level 1",
+        "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Sourcerer has an item (See Arcane Source, above) that is special to them. The character may begin with an object of their choice empowered as a Source. Arcane Sources must be a solid durable object at least 5” in one dimension and 1” in the others. After completing a Long Rest, a Sourcerer may empower a new object as their Source (the other one loses its Source properties). This Source must follow all rules defining an appropriate object. If that object is not an Empowered Source, it is attuned to one of the following Accents: Acid, Ice, Flame, or Lightning, chosen at the time of designation as a Source. This Chosen Accent is called their Arcane Accent. The Sorcerer may only have one Source at any one time, and this Source will only work for the Sourcerer who designated it. However, the Source comes with some risk: should the Sourcerer find themself without an Arcane Source, they will lose access to all Sourcerer Spell-Slots and Known Spells until the Arcane Source is back in hand or a new object is designated (at a Long Rest, see above). Once per Short Rest, the Sourcerer may re-Empower a broken or shattered Arcane Source by performing a personal rite over the Source. If it was Shattered, the Source must first be Rebuilt. Once the Sourcerer has reached 10th Sourcerer level, when empowering an Arcane Source, the Sourcerer may choose an additional Arcane Accent for the Source. While wielding the enhanced Source, the caster may use either Accent when the [Arcane Accent] is noted. When choosing this Arcane Accent for a given Power, all instances of the [Arcane Accent] must be the same Accent. Note: The Sourcerer’s Arcane Source takes the place of the Basic Arcane Spellbook. The Sourcerer cannot use Powers or Skills that rely on a Spellbook for their Sourcerer Spells.",
+        "description": "Requirements: Sourcerer Level 1 Incantation: None Call: None Target: Self                                        Duration: Instantaneous Delivery: None                                        Refresh: Immediate The Sourcerer has an item (See Arcane Source, above) that is special to them. The character may begin with an object of their choice empowered as a Source. Arcane Sources must be a solid durable object at least 5” in one dimension and 1” in the others. After completing a Long Rest, a Sourcerer may empower a new object as their Source (the other one loses its Source properties). This Source must follow all rules defining an appropriate object. If that object is not an Empowered Source, it is attuned to one of the following Accents: Acid, Ice, Flame, or Lightning, chosen at the time of designation as a Source. This Chosen Accent is called their Arcane Accent. The Sorcerer may only have one Source at any one time, and this Source will only work for the Sourcerer who designated it. However, the Source comes with some risk: should the Sourcerer find themself without an Arcane Source, they will lose access to all Sourcerer Spell-Slots and Known Spells until the Arcane Source is back in hand or a new object is designated (at a Long Rest, see above). Once per Short Rest, the Sourcerer may re-Empower a broken or shattered Arcane Source by performing a personal rite over the Source. If it was Shattered, the Source must first be Rebuilt. Once the Sourcerer has reached 10th Sourcerer level, when empowering an Arcane Source, the Sourcerer may choose an additional Arcane Accent for the Source. While wielding the enhanced Source, the caster may use either Accent when the [Arcane Accent] is noted. When choosing this Arcane Accent for a given Power, all instances of the [Arcane Accent] must be the same Accent. Note: The Sourcerer’s Arcane Source takes the place of the Basic Arcane Spellbook. The Sourcerer cannot use Powers or Skills that rely on a Spellbook for their Sourcerer Spells.",
         "chooseOne": {
           "kind": "play",
           "options": [
@@ -10582,12 +10583,49 @@
               "text": "Lightning"
             },
             {
-              "text": "chosen at the time of designation as a Source"
+              "text": "chosen at the time of designation as a Source. This Chosen Accent is called their Arcane Accent. The Sorcerer may only have one Source at any one time"
+            },
+            {
+              "text": "and this Source will only work for the Sourcerer who designated it. However"
+            },
+            {
+              "text": "the Source comes with some risk: should the Sourcerer find themself without an Arcane Source"
+            },
+            {
+              "text": "they will lose access to all Sourcerer Spell-Slots and Known Spells until the Arcane Source is back in hand"
+            },
+            {
+              "text": "a new object is designated (at a Long Rest"
+            },
+            {
+              "text": "see above). Once per Short Rest"
+            },
+            {
+              "text": "the Sourcerer may re-Empower a broken"
+            },
+            {
+              "text": "shattered Arcane Source by performing a personal rite over the Source. If it was Shattered"
+            },
+            {
+              "text": "the Source must first be Rebuilt. Once the Sourcerer has reached 10th Sourcerer level"
+            },
+            {
+              "text": "when empowering an Arcane Source"
+            },
+            {
+              "text": "the Sourcerer may choose an additional Arcane Accent for the Source. While wielding the enhanced Source"
+            },
+            {
+              "text": "the caster may use either Accent when the [Arcane Accent] is noted. When choosing this Arcane Accent for a given Power"
+            },
+            {
+              "text": "all instances of the [Arcane Accent] must be the same Accent. Note: The Sourcerer’s Arcane Source takes the place of the Basic Arcane Spellbook. The Sourcerer cannot use Powers"
+            },
+            {
+              "text": "Skills that rely on a Spellbook for their Sourcerer Spells"
             }
           ]
-        },
-        "requiredLevel": 1,
-        "requiredClass": "Sourcerer"
+        }
       },
       {
         "name": "Astride the Weave",
@@ -10595,20 +10633,18 @@
         "tags": [],
         "maxRanks": 1,
         "cost": null,
-        "incantation": "None",
-        "call": "None",
-        "target": "Self",
-        "duration": "Passive",
-        "delivery": "None",
-        "refresh": "Immediate",
+        "incantation": null,
+        "call": null,
+        "target": null,
+        "duration": null,
+        "delivery": null,
+        "refresh": null,
         "accent": null,
         "effect": null,
-        "requirement": "Sourcerer Level 2",
+        "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Sourcerer’s channeling of magic through the Arcane Source unbinds them from the traditional need to remain still while gathering power, allowing the arcane theurgist to move while incanting their Base Class: Sourcerer Cantrips and Spells. This delicate balance is lost if the character is wearing any non-Barrier Armor and only applies to Base Class Sourcerer Cantrips and Spells. This ability does not override the specific requirements of the spell being cast, thus, if the specific spell itself calls for the caster to remain in place, or pivot on one foot, or any other requirement, the caster must abide by those restrictions.",
-        "requiredLevel": 2,
-        "requiredClass": "Sourcerer"
+        "description": "Requirements: Sourcerer Level 2 Incantation: None Call: None Target: Self                                        Duration: Passive Delivery: None                                        Refresh: Immediate The Sourcerer’s channeling of magic through the Arcane Source unbinds them from the traditional need to remain still while gathering power, allowing the arcane theurgist to move while incanting their Base Class: Sourcerer Cantrips and Spells. This delicate balance is lost if the character is wearing any non-Barrier Armor and only applies to Base Class Sourcerer Cantrips and Spells. This ability does not override the specific requirements of the spell being cast, thus, if the specific spell itself calls for the caster to remain in place, or pivot on one foot, or any other requirement, the caster must abide by those restrictions."
       },
       {
         "name": "Enduring Source",
@@ -10616,20 +10652,18 @@
         "tags": [],
         "maxRanks": 1,
         "cost": null,
-        "incantation": "RP: Focus Quick 100 miming rebuilding the source.",
-        "call": "“Rebuild Source”",
-        "target": "Self",
-        "duration": "Instantaneous",
-        "delivery": "None",
-        "refresh": "Short Rest",
-        "accent": "None",
-        "effect": "Rebuild",
-        "requirement": "Sourcerer Level 3",
+        "incantation": null,
+        "call": null,
+        "target": null,
+        "duration": null,
+        "delivery": null,
+        "refresh": null,
+        "accent": null,
+        "effect": null,
+        "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "Once per Short Rest, the Sourcerer may Rebuild a broken or shattered Arcane Source.",
-        "requiredLevel": 3,
-        "requiredClass": "Sourcerer"
+        "description": "Requirements: Sourcerer Level 3 Incantation: RP: Focus Quick 100 miming rebuilding the source. Call: “Rebuild Source” Target: Self                                         Duration: Instantaneous Delivery: None                                          Refresh: Short Rest Accent: None                                        Effect: Rebuild Once per Short Rest, the Sourcerer may Rebuild a broken or shattered Arcane Source."
       },
       {
         "name": "Dissipate Curse",
@@ -10637,20 +10671,18 @@
         "tags": [],
         "maxRanks": 1,
         "cost": null,
-        "incantation": "Focus Quick 30",
-        "call": "“Cure [Disarm, Disable, Root, Bind]”",
-        "target": "Self",
-        "duration": "Instantaneous",
-        "delivery": "None",
-        "refresh": "Short Rest",
-        "accent": "None",
-        "effect": "Cure",
-        "requirement": "Sourcerer Level 5",
+        "incantation": null,
+        "call": null,
+        "target": null,
+        "duration": null,
+        "delivery": null,
+        "refresh": null,
+        "accent": null,
+        "effect": null,
+        "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "Once per Short Rest, the Sourcerer may Cure Condition [Disarm, Disable, Root, Bind] on themselves by Focusing for a Quick 30.",
-        "requiredLevel": 5,
-        "requiredClass": "Sourcerer"
+        "description": "Requirements: Sourcerer Level 5 Incantation: Focus Quick 30 Call: “Cure [Disarm, Disable, Root, Bind]” Target: Self                                         Duration: Instantaneous Delivery: None                                         Refresh: Short Rest Accent: None                                        Effect: Cure Once per Short Rest, the Sourcerer may Cure Condition [Disarm, Disable, Root, Bind] on themselves by Focusing for a Quick 30."
       },
       {
         "name": "Power of Magic",
@@ -10658,20 +10690,18 @@
         "tags": [],
         "maxRanks": 1,
         "cost": null,
-        "incantation": "None",
-        "call": "None",
-        "target": "Self",
-        "duration": "Long Rest",
-        "delivery": "None",
-        "refresh": "Long Rest",
+        "incantation": null,
+        "call": null,
+        "target": null,
+        "duration": null,
+        "delivery": null,
+        "refresh": null,
         "accent": null,
         "effect": null,
-        "requirement": "Sourcerer Level 7",
+        "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Sourcerer’s channeling of magic through the Arcane Source allows them to make sacrifices other more traditional arcane casters cannot. Upon completion of a Long Rest, the Sourcerer may Sacrifice a Cantrip that they know, other than Cancel, losing the ability to cast it until their next Long Rest. In exchange, the Sourcerer may select an Accent they have a Source for and add +1 damage to any spell (not Cantrip) cast with that accent, for a Long Rest. Note: In all cases, the normal stacking rules apply to these damage bonuses.",
-        "requiredLevel": 7,
-        "requiredClass": "Sourcerer"
+        "description": "Requirements: Sourcerer Level 7 Incantation: None Call: None Target: Self                                        Duration: Long Rest Delivery: None                                        Refresh: Long Rest The Sourcerer’s channeling of magic through the Arcane Source allows them to make sacrifices other more traditional arcane casters cannot. Upon completion of a Long Rest, the Sourcerer may Sacrifice a Cantrip that they know, other than Cancel, losing the ability to cast it until their next Long Rest. In exchange, the Sourcerer may select an Accent they have a Source for and add +1 damage to any spell (not Cantrip) cast with that accent, for a Long Rest. Note: In all cases, the normal stacking rules apply to these damage bonuses."
       },
       {
         "name": "Rote Invocation",
@@ -10679,20 +10709,18 @@
         "tags": [],
         "maxRanks": 1,
         "cost": null,
-        "incantation": "None",
-        "call": "None",
-        "target": "Self",
-        "duration": "Long Rest",
-        "delivery": "None",
-        "refresh": "Long Rest",
-        "accent": "None",
-        "effect": "Grant Signature Spell",
-        "requirement": "Sourcerer Level 10",
+        "incantation": null,
+        "call": null,
+        "target": null,
+        "duration": null,
+        "delivery": null,
+        "refresh": null,
+        "accent": null,
+        "effect": null,
+        "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Sourcerer’s time harnessing the arcane has led to their ability to gradually intake mana from their environment, fuelling the spellwork with which they are most familiar. Once per Long Rest, you may designate a Sourcerer spell you know as a Signature Spell by expending a spell slot that could be used to cast that spell. Until your next Long Rest, you may cast your Signature Spell once per Short Rest as if you had spent the spell slot used to designate the spell. The spell may not have the Duration of Long Rest.",
-        "requiredLevel": 10,
-        "requiredClass": "Sourcerer"
+        "description": "Requirements: Sourcerer Level 10 Incantation: None Call: None Target: Self                                        Duration: Long Rest Delivery: None                                        Refresh: Long Rest Accent: None                                                            Effect: Grant Signature Spell The Sourcerer’s time harnessing the arcane has led to their ability to gradually intake mana from their environment, fuelling the spellwork with which they are most familiar. Once per Long Rest, you may designate a Sourcerer spell you know as a Signature Spell by expending a spell slot that could be used to cast that spell. Until your next Long Rest, you may cast your Signature Spell once per Short Rest as if you had spent the spell slot used to designate the spell. The spell may not have the Duration of Long Rest."
       }
     ],
     "utility": [],
@@ -10706,20 +10734,18 @@
         "tags": [],
         "maxRanks": 1,
         "cost": 4,
-        "incantation": "RP Short Rest to Create; Focus Quick 100 while altering your binding to a different Arcane Source.",
-        "call": "None",
-        "target": "Self",
-        "duration": "Permanent",
-        "delivery": "None",
-        "refresh": "Short Rest, Immediate",
+        "incantation": null,
+        "call": null,
+        "target": null,
+        "duration": null,
+        "delivery": null,
+        "refresh": null,
         "accent": null,
         "effect": null,
-        "requirement": "Sourcerer Level 4",
+        "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Sourcerer has mastered the arts of Source manipulation such that they may have an additional Arcane Source bound. After finishing a Short Rest linked to an object, the Sourcerer may designate a new item to become their Source in addition to their first. The Source must be aligned with one of the normal Accents that the Sourcerer can choose for Sources. While a character must hold an Arcane Source in their hand to use its Accent, the character may switch between two different Arcane Sources that they are bound to with a Focus Quick 100.",
-        "requiredLevel": 4,
-        "requiredClass": "Sourcerer"
+        "description": "Requirements: Sourcerer Level 4 Incantation: RP Short Rest to Create; Focus Quick 100 while altering your binding to a different Arcane Source. Call: None Target: Self                                        Duration: Permanent Delivery: None                                        Refresh: Short Rest, Immediate The Sourcerer has mastered the arts of Source manipulation such that they may have an additional Arcane Source bound. After finishing a Short Rest linked to an object, the Sourcerer may designate a new item to become their Source in addition to their first. The Source must be aligned with one of the normal Accents that the Sourcerer can choose for Sources. While a character must hold an Arcane Source in their hand to use its Accent, the character may switch between two different Arcane Sources that they are bound to with a Focus Quick 100."
       },
       {
         "name": "Accent Substantiation",
@@ -10727,20 +10753,18 @@
         "tags": [],
         "maxRanks": 8,
         "cost": 1,
-        "incantation": "None",
-        "call": "None",
-        "target": "Self",
-        "duration": "Passive",
-        "delivery": "None",
-        "refresh": "None",
+        "incantation": null,
+        "call": null,
+        "target": null,
+        "duration": null,
+        "delivery": null,
+        "refresh": null,
         "accent": null,
         "effect": null,
-        "requirement": "Sourcerer Level 4",
+        "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Sourcerer can bend the elemental forces of reality itself to mold to their purpose. Many cantrips and spells have optional modes or bonuses that only apply when the accent matches a specific requirement. This skill allows the Sourcerer to gain the benefits of these options with another Accent. This skill may be purchased multiple times, each time allowing the Sourcerer to choose from the substitution list below. For Example: Trivian the Sourcerer is wielding his Arcane Source with the Agony accent. When casting a spell that has a special effect that benefits from the Acid Accent, the Agony Accent counts as the Acid Accent for purposes of that spell. Note that this does not change the accent of that spell.",
-        "requiredLevel": 4,
-        "requiredClass": "Sourcerer"
+        "description": "Requirements: Sourcerer Level 4 Incantation: None Call: None Target: Self                                        Duration: Passive Delivery: None                                        Refresh: None The Sourcerer can bend the elemental forces of reality itself to mold to their purpose. Many cantrips and spells have optional modes or bonuses that only apply when the accent matches a specific requirement. This skill allows the Sourcerer to gain the benefits of these options with another Accent. This skill may be purchased multiple times, each time allowing the Sourcerer to choose from the substitution list below. For Example: Trivian the Sourcerer is wielding his Arcane Source with the Agony accent. When casting a spell that has a special effect that benefits from the Acid Accent, the Agony Accent counts as the Acid Accent for purposes of that spell. Note that this does not change the accent of that spell."
       },
       {
         "name": "Unsuppressable",
@@ -10748,20 +10772,18 @@
         "tags": [],
         "maxRanks": 1,
         "cost": 4,
-        "incantation": "None",
-        "call": "“Concentration”",
-        "target": "Self",
-        "duration": "Passive",
-        "delivery": "None",
-        "refresh": "None",
+        "incantation": null,
+        "call": null,
+        "target": null,
+        "duration": null,
+        "delivery": null,
+        "refresh": null,
         "accent": null,
         "effect": null,
-        "requirement": "Sourcerer Level 5",
+        "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Sourceror can not be interrupted while incanting by strikes or Effects, or defending from strikes or Effects. The Sourceror can still be interrupted by conditions that would prevent being able to incant, such as being Silenced, being rendered Helpless by damage taken, being Imprisoned, etc. Additionally, the Sourceror may call defenses retroactively after completion of the incantation, by calling “Concentration” followed by any relevant defenses. Note that while this Power affects Incantations, it does not stop non-Incantation Focus requirements such as for Refresh or the cooldown time on various Spells.",
-        "requiredLevel": 5,
-        "requiredClass": "Sourcerer"
+        "description": "Requirements: Sourcerer Level 5 Incantation: None Call: “Concentration” Target: Self                                        Duration: Passive Delivery: None                                        Refresh: None The Sourceror can not be interrupted while incanting by strikes or Effects, or defending from strikes or Effects. The Sourceror can still be interrupted by conditions that would prevent being able to incant, such as being Silenced, being rendered Helpless by damage taken, being Imprisoned, etc. Additionally, the Sourceror may call defenses retroactively after completion of the incantation, by calling “Concentration” followed by any relevant defenses. Note that while this Power affects Incantations, it does not stop non-Incantation Focus requirements such as for Refresh or the cooldown time on various Spells."
       },
       {
         "name": "Interlaced Shell",
@@ -10769,20 +10791,18 @@
         "tags": [],
         "maxRanks": 1,
         "cost": 3,
-        "incantation": "None",
-        "call": "“Grant 2 Barrier to Self”",
-        "target": "Self",
-        "duration": "Instantaneous",
-        "delivery": "None",
-        "refresh": "Immediate",
-        "accent": "None",
-        "effect": "Grant Barrier",
-        "requirement": "Sourcerer Level 6",
+        "incantation": null,
+        "call": null,
+        "target": null,
+        "duration": null,
+        "delivery": null,
+        "refresh": null,
+        "accent": null,
+        "effect": null,
+        "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "On the completion of a Short Rest the Sourcerer may grant themselves 2 Barrier by calling “Grant 2 Barrier to Self.”",
-        "requiredLevel": 6,
-        "requiredClass": "Sourcerer"
+        "description": "Requirements: Sourcerer Level 6 Incantation: None Call: “Grant 2 Barrier to Self” Target: Self                                        Duration: Instantaneous Delivery: None                                        Refresh: Immediate Accent: None                                        Effect: Grant Barrier On the completion of a Short Rest the Sourcerer may grant themselves 2 Barrier by calling “Grant 2 Barrier to Self.”"
       },
       {
         "name": "Cantrip Scholar",
