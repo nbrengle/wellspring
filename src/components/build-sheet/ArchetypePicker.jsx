@@ -19,9 +19,15 @@ export default function ArchetypePicker({ onPick, onStartBlank }) {
         <h1 className="b-sheet-title">Pick a starting character</h1>
         <p className="b-sheet-tagline">
           New to Wellspring? Any of these gives you a complete, legal level-4 character.
-          You can tweak anything afterward — or hit "Start blank" to build from scratch.
+          You can tweak anything afterward — or start blank to build from scratch.
         </p>
       </header>
+
+      <section className="b-section">
+        <button className="b-blank-button" onClick={onStartBlank}>
+          Start blank — I want full control
+        </button>
+      </section>
 
       {byClass.map(([cls, archetypes]) => (
         <section key={cls} className="b-section">
@@ -39,12 +45,6 @@ export default function ArchetypePicker({ onPick, onStartBlank }) {
           </div>
         </section>
       ))}
-
-      <section className="b-section">
-        <button className="b-blank-button" onClick={onStartBlank}>
-          Start blank — I want full control
-        </button>
-      </section>
     </main>
   );
 }
