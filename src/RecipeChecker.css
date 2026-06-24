@@ -233,40 +233,6 @@
   border-radius: 3px;
 }
 
-/* FILTERS */
-.b-recipe-filters {
-  display: flex;
-  align-items: flex-end;
-  gap: 1.2rem;
-  flex-wrap: wrap;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid var(--b-border, #3a332a);
-}
-
-.b-filter-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-}
-
-.b-filter-group label {
-  font-family: Cinzel, serif;
-  font-size: 0.68rem;
-  text-transform: uppercase;
-  color: var(--b-muted, #9c9183);
-  letter-spacing: 0.05em;
-}
-
-.b-filter-checkbox {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  font-size: 0.88rem;
-  cursor: pointer;
-  color: var(--b-muted, #9c9183);
-  padding-bottom: 0.35rem;
-}
-
 /* RECIPE CARDS GRID */
 .b-recipe-section {
   display: flex;
