@@ -1,7 +1,8 @@
-import React, { useState, useMemo, useEffect, useCallback } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import { getAllEntities, lookupEntity } from './engine/data.js';
-import { bareSkill, cleanItemName } from "./engine/resolver.js";
+import { cleanItemName } from "./engine/resolver.js";
 import { EntityBody } from "./components/DetailPane.jsx";
+import { browse, gameEffectAxes, axisApplies } from "./components/browse/browse.js";
 import "./RulesExplorer.css";
 
 const HIGH_LEVEL_GROUPS = [
@@ -44,6 +45,16 @@ const TYPE_LABELS = {
   "ritual-concepts": "Ritual Concepts",
   "creature-types": "Creature Types",
 };
+
+// The explorer's own group axes (by type / A–Z / ungrouped), plus the shared
+// game-effect axes — so browsing the rules can group powers/effects by what they DO
+// in play (Effect / Damage type / Condition), exactly like the power picker.
+const EXPLORER_AXES = [
+  { id: "type", label: "By Type", key: (e) => TYPE_LABELS[e.type] || e.type, order: (l) => l, },
+  { id: "alphabetical", label: "A–Z", key: (e) => (e.name[0] || "#").toUpperCase() },
+  { id: "none", label: "Ungrouped", key: () => "Results" },
+  ...gameEffectAxes((e) => e.type),
+];
 
 export default function RulesExplorer({ onClose }) {
   const [query, setQuery] = useState("");
@@ -113,72 +124,45 @@ export default function RulesExplorer({ onClose }) {
     setSelectedId(id);
   };
 
-  // Filter and sort entities list
-  const filteredEntities = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    
-    // 1. Filter by high-level group / types
+  // The candidates after the sidebar's group/type filters (search + grouping/sorting
+  // is then handled by the shared browse() engine).
+  const candidates = useMemo(() => {
     let list = allEntities;
     if (activeGroup !== "all") {
       const allowedTypes = GROUP_TYPES[activeGroup] || [];
       list = list.filter((e) => allowedTypes.includes(e.type));
     }
-    
-    // 2. Filter by specific checked types
     if (selectedTypes.length > 0) {
       list = list.filter((e) => selectedTypes.includes(e.type));
     }
-    
-    // 3. Filter by search query
-    if (q) {
-      list = list.filter(
-        (e) =>
-          e.name.toLowerCase().includes(q) ||
-          (e.description || "").toLowerCase().includes(q) ||
-          (e.summary || "").toLowerCase().includes(q)
-      );
-    }
-    
-    // 4. Sort
-    list = [...list];
-    if (sortMode === "type") {
-      list.sort((a, b) =>
-        (TYPE_LABELS[a.type] || a.type).localeCompare(TYPE_LABELS[b.type] || b.type) ||
-        a.name.localeCompare(b.name)
-      );
-    } else {
-      list.sort((a, b) => a.name.localeCompare(b.name));
-    }
-    
     return list;
-  }, [allEntities, query, activeGroup, selectedTypes, sortMode]);
+  }, [allEntities, activeGroup, selectedTypes]);
 
-  // Group matching list
-  const groupedEntities = useMemo(() => {
-    if (groupMode === "none") {
-      return [["Results", filteredEntities]];
-    }
-    
-    const buckets = new Map();
-    const keyFn = groupMode === "type"
-      ? (e) => TYPE_LABELS[e.type] || e.type
-      : (e) => (e.name[0] || "#").toUpperCase();
-      
-    for (const e of filteredEntities) {
-      const k = keyFn(e);
-      if (!buckets.has(k)) buckets.set(k, []);
-      buckets.get(k).push(e);
-    }
-    
-    const sortedEntries = [...buckets.entries()];
-    if (groupMode === "alphabetical") {
-      sortedEntries.sort((a, b) => a[0].localeCompare(b[0]));
-    } else if (groupMode === "type") {
-      // Keep type buckets sorted by frequency or name
-      sortedEntries.sort((a, b) => a[0].localeCompare(b[0]));
-    }
-    return sortedEntries;
-  }, [filteredEntities, groupMode]);
+  // Only offer a game-effect group axis when some visible entity carries that facet.
+  const availableAxes = useMemo(
+    () => EXPLORER_AXES.filter((a) => axisApplies(a, candidates)),
+    [candidates],
+  );
+
+  const { groups: groupedEntities } = useMemo(
+    () => browse({
+      items: candidates,
+      axes: availableAxes,
+      groupBy: groupMode,
+      query,
+      matches: (e, q) =>
+        e.name.toLowerCase().includes(q) ||
+        (e.description || "").toLowerCase().includes(q) ||
+        (e.summary || "").toLowerCase().includes(q),
+      sort: sortMode,
+      compare: (a, b, s) =>
+        s === "type"
+          ? (TYPE_LABELS[a.type] || a.type).localeCompare(TYPE_LABELS[b.type] || b.type) ||
+            a.name.localeCompare(b.name)
+          : a.name.localeCompare(b.name),
+    }),
+    [candidates, availableAxes, groupMode, query, sortMode],
+  );
 
   // Resolved entity to display on the right
   const currentEntity = useMemo(() => {
@@ -232,9 +216,9 @@ export default function RulesExplorer({ onClose }) {
                   value={groupMode}
                   onChange={(e) => setGroupMode(e.target.value)}
                 >
-                  <option value="type">By Type</option>
-                  <option value="alphabetical">A–Z</option>
-                  <option value="none">Ungrouped</option>
+                  {availableAxes.map((a) => (
+                    <option key={a.id} value={a.id}>{a.label}</option>
+                  ))}
                 </select>
               </label>
               <label className="b-explorer-sortlabel">Sort
@@ -271,7 +255,7 @@ export default function RulesExplorer({ onClose }) {
             {groupedEntities.length === 0 && (
               <p className="b-explorer-empty">No rules found matching that search or filter.</p>
             )}
-            {groupedEntities.map(([groupName, items]) => (
+            {groupedEntities.map(({ key: groupName, items }) => (
               <div key={groupName} className="b-explorer-group">
                 <h4 className="b-explorer-group-label">{groupName}</h4>
                 <ul className="b-explorer-items">
