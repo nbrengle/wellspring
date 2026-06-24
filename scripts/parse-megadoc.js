@@ -330,10 +330,10 @@ function subPowerNames() {
   return _subPowerNames;
 }
 
-const STAT_FIELD = /^(Incantation|Incant|Call|Target|Duration|Delivery|Refresh|Accent|Effect|Requirement|Requirements|Prerequisite|Prerequisites|Skills and Options):\s*(.*)$/;
+const STAT_FIELD = /^(Incantation|Incant|Call|Target|Duration|Delivery|Refresh|Accent|Effect|Requirement|Prerequisites?|Skills and Options):\s*(.*)$/;
 // Same field labels, unanchored — used to find where a stat block starts within a
 // run-on string (sub-power cells glue the power NAME onto the first field label).
-const STAT_LABEL = /(Incantation|Incant|Call|Target|Duration|Delivery|Refresh|Accent|Effect|Requirement|Requirements|Prerequisite|Prerequisites|Skills and Options):/;
+const STAT_LABEL = /(Incantation|Incant|Call|Target|Duration|Delivery|Refresh|Accent|Effect|Requirement|Prerequisites?|Skills and Options):/;
 const STAT_TWO = /^(Target|Delivery|Accent):\s*(.+?)\s{2,}(Duration|Refresh|Effect):\s*(.+)$/;
 const statKey = l => l.toLowerCase().replace(/^incant$/, 'incantation').replace(/\s+/g, '_').replace(/s$/, '');
 
@@ -341,31 +341,9 @@ function parsePowerNodes(powerNodes) {
   // powerNodes: text + list nodes belonging to one power (after its heading node).
   // A `list` node's items are flattened to bullet lines ("• …") so a power's
   // level/benefit list survives into the description instead of being dropped.
-  const rawLines = powerNodes
+  const lines = powerNodes
     .flatMap(n => n.type === 'list' ? n.items.map(it => `• ${it}`) : [n.text])
     .filter(Boolean);
-
-  const lines = [];
-  for (const line of rawLines) {
-    if (line.startsWith('•')) {
-      lines.push(line);
-      continue;
-    }
-    let current = line;
-    while (true) {
-      // Find a stat label that isn't at the very start of the string
-      const match = current.slice(1).match(STAT_LABEL);
-      if (match) {
-        const splitAt = match.index + 1;
-        lines.push(current.slice(0, splitAt).trim());
-        current = current.slice(splitAt).trim();
-      } else {
-        lines.push(current.trim());
-        break;
-      }
-    }
-  }
-
   const fields = {};
   let descStart = 0;
 
@@ -1057,9 +1035,7 @@ function extractChooseOne(power) {
   
   // If no bullets, try inline comma-separated list (e.g. "Swords, Thrown Weapons, or Daggers.")
   if (opts.length === 0) {
-    let inline = m[2];
-    const firstPeriod = inline.indexOf('.');
-    if (firstPeriod >= 0) inline = inline.slice(0, firstPeriod);
+    const inline = m[2].replace(/\.$/, ''); // strip trailing period
     opts = inline.split(/,(?:\s*or\s+)?|\s+or\s+/i).map((x) => x.trim()).filter(Boolean);
   }
   if (opts.length < 2) return;
@@ -1444,25 +1420,50 @@ function extractTiers(results) {
   const HEADER = /Cost\s+Character\s+Level\s+Ability\s+/i;
   const ROW = /(\d+)\s+(\d+)\s+(.+?)(?=\s+\d+\s+\d+\s|$)/gs;
   for (const r of results) {
-    if (r.name === 'Gift of Hateful Retribution') {
-      r.tiers = [
-        { cost: 2, damage: 10 },
-        { cost: 1, damage: 15 },
-        { cost: 1, damage: 25 },
-        { cost: 1, damage: 50, byMyVoiceDmg: 5 }
-      ];
-      r.cost = 2;
-      continue;
-    }
-    if (r.name === 'Gift of Unbreakable Flesh') {
-      r.tiers = [
-        { cost: 2, armorPoints: 1 },
-        { cost: 3, armorPoints: 2 },
-        { cost: 5, armorPoints: 3 },
-        { cost: 5, armorPoints: 4 }
-      ];
-      r.cost = 2;
-      continue;
+    // Try generic table idiom first: "Cost" followed by headers, then rows of values
+    if (r.description) {
+      const lines = r.description.split(/\n+/).map(l => l.trim()).filter(Boolean);
+      const costIdx = lines.indexOf('Cost');
+      if (costIdx !== -1) {
+        let firstDigitIdx = -1;
+        for (let i = costIdx + 1; i < lines.length; i++) {
+          if (/^\d+$/.test(lines[i])) { firstDigitIdx = i; break; }
+        }
+        if (firstDigitIdx !== -1) {
+          const numColumns = firstDigitIdx - costIdx;
+          if (numColumns >= 2 && numColumns <= 4) {
+            const headers = lines.slice(costIdx, firstDigitIdx);
+            const keys = headers.map(h => {
+              const k = h.replace(/(?:^\w|[A-Z]|\b\w)/g, (w, i) => i === 0 ? w.toLowerCase() : w.toUpperCase()).replace(/[^a-zA-Z0-9]/g, '');
+              return k === 'byMyVoiceDmg' ? 'byMyVoiceDmg' : k;
+            });
+            const tiers = [];
+            let prevCost = 0;
+            let i = firstDigitIdx;
+            for (; i < lines.length; i += numColumns) {
+              if (!/^\d+$/.test(lines[i])) break; // end of table
+              const tier = {};
+              const cumulativeCost = parseInt(lines[i], 10);
+              tier[keys[0]] = cumulativeCost - prevCost;
+              prevCost = cumulativeCost;
+              for (let j = 1; j < numColumns; j++) {
+                let val = lines[i + j];
+                if (val === '-' || val === undefined) continue;
+                if (/^\d+$/.test(val)) val = parseInt(val, 10);
+                tier[keys[j]] = val;
+              }
+              tiers.push(tier);
+            }
+            if (tiers.length > 0) {
+              // Only override if we actually got rows
+              r.tiers = tiers;
+              r.cost = tiers[0].cost;
+              r.ranks = tiers.length;
+              continue;
+            }
+          }
+        }
+      }
     }
 
     const m = r.description && r.description.match(HEADER);
