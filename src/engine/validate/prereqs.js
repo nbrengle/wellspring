@@ -355,7 +355,7 @@ export function checkPrereqs(character) {
       for (const list of Object.values(tiers)) {
         if (!Array.isArray(list)) continue;
         const hit = list.find((p) => p.name === name);
-        if (hit) return hit;
+        if (hit) return { ...hit, __contextClass: cls };
       }
     }
     return lookupEntity(`powers:${name}`);
@@ -376,10 +376,11 @@ export function checkPrereqs(character) {
       // Level requirement: against the owning class's level (or character level
       // when the requirement names no class).
       if (ent.requiredLevel > 0) {
-        const have = ent.requiredClass ? (charClassLevels.get(ent.requiredClass) || 0) : charLevel;
+        const reqClass = ent.requiredClass || ent.__contextClass;
+        const have = reqClass ? (charClassLevels.get(reqClass) || 0) : charLevel;
         if (have < ent.requiredLevel) {
           issues.push({ id: `powers:${name}`, item: name, field,
-            text: `Requires ${ent.requiredClass ? `${ent.requiredClass} ` : ''}Level ${ent.requiredLevel}` });
+            text: `Requires ${reqClass ? `${reqClass} ` : ''}Level ${ent.requiredLevel}` });
         }
       }
       // Entity requirement: each named prerequisite power/skill must be owned.
