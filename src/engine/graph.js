@@ -278,6 +278,35 @@ export function resolveCharacterGraph(character) {
     });
   }
 
+  // 4.6 Granted Selections — dynamic picks that belong in the graph so they count as owned items.
+  for (const [selId, val] of Object.entries(character.grantedSelections || {})) {
+    if (!val || val === "temp") continue;
+    // Extract the raw name from the value (which is "PowerName (ClassName)")
+    const nameMatch = val.match(/^(.*?)(?:\s+\([^)]+\))?$/);
+    const rawName = nameMatch ? nameMatch[1].trim() : val;
+    const cleanName = cleanItemName(rawName);
+    const bareName = bareSkill(cleanName);
+    const ent = lookupEntity(`powers:${cleanName}`) ||
+                lookupEntity(`skills:${bareName}`) ||
+                lookupEntity(`perks:${cleanName}`);
+    const field = ent ? entityType(ent.id) : 'synthetic';
+    
+    items.push({
+      id: ent?.id || `synthetic:${cleanName}`,
+      name: rawName,
+      rawString: val,
+      field,
+      sourceType: 'grantedSelection',
+      index: -1,
+      rank: 1,
+      baseCost: 0,
+      entity: ent,
+      effects: [],
+      specialty: null,
+      floor: 0,
+    });
+  }
+
   // 5. Add Synthetic Item for Tax Evasion
   const hasTaxEvasion = items.some(i => i.name === 'Tax Evasion');
   if (hasTaxEvasion) {

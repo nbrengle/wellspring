@@ -168,7 +168,7 @@ export function classifyOwnedItems(character) {
   // every owned field (incl. innates and multiclass-granted skills) and carries
   // each item's field/index/specialty/floor, so this no longer re-walks the
   // character. `source` is derived from the node's sourceType.
-  const SOURCE_OF = { starting: 'class', purchased: 'purchased', power: 'purchased', innate: 'class', multiclass: 'class' };
+  const SOURCE_OF = { starting: 'class', purchased: 'purchased', power: 'purchased', innate: 'class', multiclass: 'class', grantedSelection: 'class' };
   const graph = resolveCharacterGraph(character);
   for (const node of graph.items) {
     if (node.field === 'flaws' || node.field === 'synthetic' || node.field === 'lineageAdvantages') continue;
@@ -204,7 +204,7 @@ export function classifyOwnedItems(character) {
     // A class power (classSkills/Class tier) misfiled into a skill field → route to
     // classPowers and suppress from the skills list.
     if (t === 'powers' && CLASS_POWER_TIERS.has(ent.tier)
-        && (!ent.parentClass || classNames.has(ent.parentClass))) {
+        && (!ent.parentClass || classNames.has(ent.parentClass) || node.sourceType === 'grantedSelection')) {
       classPowers.push({ name: item, field, index, source, cls: ent.parentClass || null, specialty, floor });
       flag(field, index);
       continue;
@@ -353,6 +353,27 @@ export function bonusBudgetFor(level) {
 }
 
 
+export function computeActiveSelections(graph, lbp) {
+  const active = [];
+  const check = (name) => {
+    const ent = lookupEntity(name);
+    if (ent?.grantedSelections) {
+      for (const gs of ent.grantedSelections) {
+        active.push({ ...gs, sourceName: name });
+      }
+    }
+  };
+  for (const item of graph.items) {
+    if (item.field !== 'synthetic') {
+      check(item.name || item.rawString);
+    }
+  }
+  for (const a of lbp?.advantages || []) {
+    check(a.name || a.baseName);
+  }
+  return active;
+}
+
 export function validate(character) {
   const level = characterLevel(character);
   const legalMinLevel = getLegalMinLevel(character);
@@ -392,6 +413,7 @@ export function validate(character) {
       row.cost = lookupCost(spend.byItem, row.field, row.name, row.index);
     }
   }
+  const activeSelections = computeActiveSelections(graph, lbp);
   const powerBenefits = activePowerBenefits(character);
   const prereqs = checkPrereqs(character);
   const slotsOver = slots.some((s) => s.over);
@@ -437,6 +459,7 @@ export function validate(character) {
     grantedAbilities: granted,
     crafting,
     owned,
+    activeSelections,
     powerBenefits,
     prereqs,
     belowFloor,

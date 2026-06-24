@@ -825,12 +825,42 @@ function slotGrantsFromText(name, text) {
   const known = text.match(/\badds?\s+(\d+)\s+to\s+the\s+number\s+of\s+Known\s+Spells/i);
   if (known) grants.push({ cat: 'spellsKnown', n: parseInt(known[1], 10) });
   if (/additional\s+spell-?slot\s+of\s+their\s+highest[- ]level/i.test(text)) highest = true;
+
+  const chooseTier = text.match(/\bchoose\s+(two|three|one|four|\d+)\s+(Novice|Adept|Greater|Utility|Basic|Advanced|Veteran)(?:-tier)?\s+Powers?/i);
+  if (chooseTier) {
+    const numWords = { one: 1, two: 2, three: 3, four: 4 };
+    const n = numWords[chooseTier[1].toLowerCase()] || parseInt(chooseTier[1], 10) || 1;
+    const cat = SLOT_TIER_TO_CAT[chooseTier[2].toLowerCase()];
+    if (cat) grants.push({ cat, n });
+  }
+
   return { grants, highest };
 }
+
+function extractOptionsList(entity) {
+  const text = entity.description || entity.desc || '';
+  if (!text) return;
+  // Look for "Choose one Craft: X, Y, or Z."
+  let m = text.match(/Choose one Craft:\s*([^.]+)\./i);
+  if (m) {
+    const opts = m[1].split(/,(?:\s*or\s+)?|\s+or\s+/i).map(x => x.trim()).filter(Boolean);
+    entity.options = opts;
+    return;
+  }
+  // Look for Specialty Tag options e.g. "Specialty Tag (ie: Artificer, Crafter, Mystic)"
+  m = text.match(/Specialty Tag\s*\(i\.?e\.?:\s*([^)]+)\)/i);
+  if (m) {
+    const opts = m[1].split(/,\s*/i).map(x => x.trim()).filter(Boolean);
+    entity.options = opts;
+    return;
+  }
+}
+
 function extractSlotGrants(entity) {
   const { grants, highest } = slotGrantsFromText(entity.name, entity.description || entity.desc || '');
   if (grants.length) entity.slotGrants = grants;
   if (highest) entity.highestSlot = true;
+  extractOptionsList(entity);
 }
 
 // ─── LEVEL-GATED BUILD-POINT DISCOUNTS (prose → structured) ────────────────────
@@ -861,6 +891,75 @@ function enrichMechanics(entity) {
   extractSlotGrants(entity);
   extractLevelDiscounts(entity);
   extractRequirement(entity);
+  extractGrantedSelections(entity);
+  extractManualParameterizations(entity);
+}
+
+// ─── MANUAL PARAMETERIZATIONS (For powers that need `options` arrays) ──────────
+function extractManualParameterizations(entity) {
+  if (entity.name === "Efficient Crafting") {
+    entity.options = ["Alchemy", "Enchanting", "Tinkering"];
+  } else if (entity.name === "Batch Process") {
+    entity.options = ["Alchemy", "Ritual Magic", "Enchanting", "Tinkering"];
+  } else if (entity.name === "Studied Focus") {
+    entity.options = ["Artificer", "Crafter", "Mystic"];
+  }
+}
+
+// ─── GRANTED SELECTIONS (Dynamic picks) ────────────────────────────────────────
+function extractGrantedSelections(entity) {
+  const text = entity.description || entity.desc;
+  if (!text) return;
+  const selections = [];
+
+  // 1. Broad Study: "choose one Basic-Tier Power from any other non-Artisan Base Class"
+  let m = text.match(/choose one (Basic|Advanced|Veteran)(?:-Tier)? Power from any other non-(\w+) Base Class/i);
+  if (m) {
+    selections.push({
+      id: "broad_study_power",
+      type: "power",
+      tier: m[1].charAt(0).toUpperCase() + m[1].slice(1).toLowerCase(),
+      source: "BaseClasses",
+      excludeClass: m[2],
+      bypassPrereqs: ["class", "level"]
+    });
+  }
+
+  // 2. Arcane Secret: "choose one arcane spell at a rank they are capable of casting"
+  m = text.match(/choose one (arcane|divine) spell at a rank they are capable of casting/i);
+  if (m) {
+    selections.push({
+      id: "arcane_secret_spell",
+      type: "spell",
+      sphere: m[1].charAt(0).toUpperCase() + m[1].slice(1).toLowerCase(),
+      maxTier: "HighestAccessible",
+      bypassPrereqs: ["class"]
+    });
+  }
+
+  // 3. Intervened: "learns one Cantrip from any basic Divine spellcasting class"
+  m = text.match(/learns one Cantrip from any basic (Divine|Arcane) spellcasting class/i);
+  if (m) {
+    selections.push({
+      id: "intervened_cantrip",
+      type: "spell",
+      tier: "Cantrip",
+      sphere: m[1].charAt(0).toUpperCase() + m[1].slice(1).toLowerCase(),
+      bypassPrereqs: ["class"]
+    });
+  }
+
+  // 4. Intervened Accent: "choose one Devotion Accent"
+  if (text.match(/choose one Devotion Accent/i)) {
+    selections.push({
+      id: "intervened_accent",
+      type: "devotionAccent"
+    });
+  }
+
+  if (selections.length > 0) {
+    entity.grantedSelections = selections;
+  }
 }
 
 // ─── POWER REQUIREMENT (prose → structured) ────────────────────────────────────
@@ -875,24 +974,34 @@ function enrichMechanics(entity) {
 const REQ_CLASS_LEVEL = /^(Artisan|Cleric|Druid|Fighter|Mage|Rogue|Socialite|Sourcerer)\s+Level\s+(\d+)/i;
 function extractRequirement(entity) {
   const raw = entity.requirement;
-  if (!raw) return;
   let requiredLevel = 0, requiredClass = null;
   const requiresEntity = [];
-  for (let part of String(raw).split(',')) {
-    part = part.trim();
-    if (!part) continue;
-    const m = part.match(REQ_CLASS_LEVEL);
-    if (m) {
-      // Take only the "<Class> Level N" head — guards against run-on capture like
-      // "Artisan Level 4Skills and Options: …" where the field fused with prose.
-      requiredLevel = parseInt(m[2], 10);
-      requiredClass = m[1];
-    } else {
-      // A named prerequisite entity. Strip a trailing " skill" noise word.
-      const nm = part.replace(/\s+skill$/i, '').trim();
-      if (nm && !/^level\b/i.test(nm)) requiresEntity.push(nm);
+  if (raw) {
+    for (let part of String(raw).split(',')) {
+      part = part.trim();
+      if (!part) continue;
+      const m = part.match(REQ_CLASS_LEVEL);
+      if (m) {
+        // Take only the "<Class> Level N" head — guards against run-on capture like
+        // "Artisan Level 4Skills and Options: …" where the field fused with prose.
+        requiredLevel = parseInt(m[2], 10);
+        requiredClass = m[1];
+      } else {
+        // A named prerequisite entity. Strip a trailing " skill" noise word.
+        const nm = part.replace(/\s+skill$/i, '').trim();
+        if (nm && !/^level\b/i.test(nm)) requiresEntity.push(nm);
+      }
     }
   }
+
+  // Implicit tier-based level requirements for class powers.
+  if (!requiredLevel && entity.tier) {
+    const t = entity.tier.toLowerCase();
+    if (t === 'adept' || t === 'advanced') requiredLevel = 5;
+    else if (t === 'greater' || t === 'veteran') requiredLevel = 7;
+    else if (t === 'novice' || t === 'basic' || t === 'utility' || t === 'cantrip') requiredLevel = 1;
+  }
+
   if (requiredLevel) { entity.requiredLevel = requiredLevel; entity.requiredClass = requiredClass; }
   if (requiresEntity.length) entity.requiresEntity = requiresEntity;
 }

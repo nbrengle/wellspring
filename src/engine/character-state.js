@@ -22,11 +22,13 @@ export const EMPTY_CHARACTER = {
   purchasedPerks: [],
   flaws: [],
   advantageChoices: {},
+  grantedSelections: {},
   innatePowers: [], utilityPowers: [], basicPowers: [],
   advancedPowers: [], veteranPowers: [], classPowers: [],
   rightHandPowers: [], cantrips: [],
   noviceSpells: [], adeptSpells: [], greaterSpells: [], bookSpells: [],
   domainPowers: [], formPowers: [],
+  agileLearnerTrades: {},
 };
 
 // ─── PURE STATE MODIFIERS ───────────────────────────────────────────────────
