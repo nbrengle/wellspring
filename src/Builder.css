@@ -3360,6 +3360,37 @@
   border-color: var(--b-amber);
 }
 
+/* The Lost Life rep trigger — a readable button (opens the searchable RepPicker)
+   in place of the old washed-out <select>. Shows the current rep, or a prompt. */
+.b-lin-subchoice-btn {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.4rem;
+  background: var(--b-panel);
+  color: var(--b-text, #e8dcc8);
+  border: 1px solid var(--b-border);
+  border-radius: 0.3rem;
+  padding: 0.3rem 0.5rem;
+  font-size: 0.78rem;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.12s ease, background 0.12s ease;
+}
+
+.b-lin-subchoice-btn:hover {
+  border-color: var(--b-amber);
+  background: var(--b-panel-2, var(--b-panel));
+}
+
+.b-lin-subchoice-btn-caret {
+  color: var(--b-muted);
+  font-size: 0.7rem;
+  flex: none;
+}
+
 /* Sublineage tag on a row + dimming for off-sublineage items */
 .b-lin-subtag {
   color: var(--b-purple);
