@@ -69,6 +69,13 @@ export function resolveCharacterGraph(character) {
       }
     }
     
+    if (Array.isArray(ent?.tiers) && ent.tiers.length > 0 && rank > 0) {
+      const currentTier = ent.tiers[Math.min(rank - 1, ent.tiers.length - 1)];
+      if (currentTier?.armorPoints) {
+        effects.push({ type: 'STAT', stat: 'naturalArmor', amount: currentTier.armorPoints });
+      }
+    }
+    
     // Choose-one powers (Expert Craft) grant the selected skill(s)
     if (ent?.chooseOne?.kind === 'build') {
       const chosen = character.choices?.[`powers:${ent.name}`];

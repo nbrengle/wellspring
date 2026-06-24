@@ -519,7 +519,7 @@ function BackLinks({ entity, onInspect }) {
   );
 }
 
-function useResolvedEntity(item, field, resolveType) {
+export function useResolvedEntity(item, field, resolveType) {
   return useMemo(() => {
     if (!item) return null;
     let type = resolveType;

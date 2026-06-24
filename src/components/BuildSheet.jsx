@@ -108,7 +108,7 @@ function grantSourceRole(grant) {
 
 export default function BuildSheet() {
   const { character, report } = useBuilderState();
-  const { onPickArchetype, onStartBlank, onInspect, onOpenAdd, onSetName, onChangeArchetype } = useBuilderActions();
+  const { onPickArchetype, onStartBlank, onOpenAdd, onSetName, onChangeArchetype } = useBuilderActions();
   if (!character.archetypeName) {
     return <ArchetypePicker onPick={onPickArchetype} onStartBlank={onStartBlank} />;
   }
@@ -188,7 +188,7 @@ export default function BuildSheet() {
       </Section>
 
       {report.crafting?.any && (
-        <CraftingSection crafting={report.crafting} onInspect={onInspect} />
+        <CraftingSection crafting={report.crafting} />
       )}
     </main>
   );
