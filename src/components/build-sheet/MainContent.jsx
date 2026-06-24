@@ -221,7 +221,8 @@ export function GrantedSelectionsSection() {
 }
 
 export function AgileLearnerSection() {
-  const { character, setCharacter } = useBuilderState();
+  const { character } = useBuilderState();
+  const { onSetAgileLearnerTrade } = useBuilderActions();
 
   let rank = 0;
   for (const field of ['startingSkills', 'purchasedSkills', 'classSkills']) {
@@ -239,12 +240,8 @@ export function AgileLearnerSection() {
   const available = rank - used;
   const classes = getClasses(character);
 
-  const addTrade = (cls) => setCharacter(c => ({
-    ...c, agileLearnerTrades: { ...(c.agileLearnerTrades || {}), [cls]: (c.agileLearnerTrades?.[cls] || 0) + 1 }
-  }));
-  const removeTrade = (cls) => setCharacter(c => ({
-    ...c, agileLearnerTrades: { ...(c.agileLearnerTrades || {}), [cls]: Math.max(0, (c.agileLearnerTrades?.[cls] || 0) - 1) }
-  }));
+  const addTrade = (cls) => onSetAgileLearnerTrade(cls, 1);
+  const removeTrade = (cls) => onSetAgileLearnerTrade(cls, -1);
 
   return (
     <div className="b-slot-block">

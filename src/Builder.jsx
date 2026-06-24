@@ -120,6 +120,7 @@ export default function Builder() {
       onSetLineageRep: handlers.handleSetLineageRep,
       onSetAdvantageChoice: handlers.handleSetAdvantageChoice,
       onSetGrantedSelection: handlers.handleSetGrantedSelection,
+      onSetAgileLearnerTrade: handlers.handleSetAgileLearnerTrade,
       onOpenLineage: () => setLineageOpen(true),
     }),
     [handlers],

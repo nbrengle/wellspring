@@ -184,6 +184,17 @@ export function useCoreHandlers({ character, setCharacter, setPicking, setView }
     }));
   }, [setCharacter]);
 
+  const handleSetAgileLearnerTrade = useCallback((cls, delta) => {
+    setCharacter((c) => {
+      const current = c.agileLearnerTrades?.[cls] || 0;
+      const next = Math.max(0, current + delta);
+      return {
+        ...c,
+        agileLearnerTrades: { ...(c.agileLearnerTrades || {}), [cls]: next }
+      };
+    });
+  }, [setCharacter]);
+
   return {
     handleSetChoice,
     handleUpdateParameter,
@@ -193,5 +204,6 @@ export function useCoreHandlers({ character, setCharacter, setPicking, setView }
     handleSetRank,
     handleSetSpecialty,
     handleSetGrantedSelection,
+    handleSetAgileLearnerTrade,
   };
 }
