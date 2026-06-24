@@ -1600,6 +1600,18 @@
   border-color: rgb(111, 191, 115, 40%);
 }
 
+/* "also Flame, Root" — the item's OTHER game-effect facets when grouped by one,
+   so a multi-effect power explains why it appears under more than one heading. */
+.b-picker-row-also {
+  font-size: 0.6rem;
+  color: var(--b-muted);
+  font-style: italic;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 11rem;
+}
+
 /* Right: read */
 .b-picker-read {
   display: flex;
