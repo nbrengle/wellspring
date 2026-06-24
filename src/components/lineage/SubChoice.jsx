@@ -10,8 +10,9 @@
 //               as a parameterized name "<item> (<rep>)" via onSetRep.
 //   'flavor'  — free pick with no mechanical effect (Elemental Expression accent,
 //               Favored Gem). Stored in advantageChoices[item]; display only.
-import React from "react";
-import { cantripOptions, lineageRepOptions } from "../../engine/data.js";
+import React, { useState } from "react";
+import { cantripOptions } from "../../engine/data.js";
+import RepPicker from "./RepPicker.jsx";
 
 const FLAVOR_OPTIONS = {
   Accent: ["Flame", "Ice", "Lightning", "Acid", "Force", "Mind", "Fear", "Shadow"],
@@ -43,30 +44,36 @@ export default function SubChoice({ spec, item, field, value, onSetChoice, onSet
   }
 
   if (spec.kind === "rep") {
-    return (
-      <label className="b-lin-subchoice">
-        <span className="b-lin-subchoice-label">Repping</span>
-        <select
-          className="b-lin-subchoice-select"
-          value={value || ""}
-          onChange={(e) => onSetRep(field, item, e.target.value)}
-        >
-          <option value="">Choose a challenge to rep…</option>
-          {lineageRepOptions().map(([linName, challenges]) => (
-            <optgroup key={linName} label={linName}>
-              {challenges.map((c) => (
-                <option key={`${linName}:${c.baseName || c.name}`} value={c.baseName || c.name}>
-                  {c.baseName || c.name} (+{c.lbp})
-                </option>
-              ))}
-            </optgroup>
-          ))}
-        </select>
-      </label>
-    );
+    return <RepChoice item={item} field={field} value={value} onSetRep={onSetRep} />;
   }
 
   // flavor
+  return <FlavorChoice spec={spec} item={item} value={value} onSetChoice={onSetChoice} />;
+}
+
+// Lost Life: the recorded rep is shown as a button (not a bare <select>) that opens
+// the searchable RepPicker overlay, where each option carries its description and LBP.
+function RepChoice({ item, field, value, onSetRep }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="b-lin-subchoice">
+      <span className="b-lin-subchoice-label">Repping</span>
+      <button type="button" className="b-lin-subchoice-btn" onClick={() => setOpen(true)}>
+        {value ? value : "Choose a challenge to rep…"}
+        <span className="b-lin-subchoice-btn-caret">⌄</span>
+      </button>
+      {open && (
+        <RepPicker
+          value={value || null}
+          onChoose={(rep) => { onSetRep(field, item, rep); setOpen(false); }}
+          onClose={() => setOpen(false)}
+        />
+      )}
+    </div>
+  );
+}
+
+function FlavorChoice({ spec, item, value, onSetChoice }) {
   const opts = FLAVOR_OPTIONS[spec.label];
   return (
     <label className="b-lin-subchoice">
