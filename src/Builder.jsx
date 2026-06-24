@@ -69,12 +69,7 @@ const LEVEL_CAP = 10;
 export default function Builder() {
   const [mode, setMode] = useState("builder"); // "builder" | "explorer" | "recipes"
   const { character, setCharacter, report } = useCharacterState();
-  // `view` = the INLINE detail expanded under a build-sheet row (the primary glance).
-  // `chase` = the right DRAWER's current entity when following concept links. They're
-  // independent so chasing a link never collapses the inline expand. `history` is the
-  // chase back-stack.
   const [view, setView] = useState(null);
-  const [chase, setChase] = useState(null);
   const [picking, setPicking] = useState(null); // null | picker spec
   const [exportOpen, setExportOpen] = useState(false);
   const [history, setHistory] = useState([]);
@@ -85,21 +80,10 @@ export default function Builder() {
     report,
     setCharacter,
     setView,
-    setChase,
     setPicking,
     setHistory,
     setLineageOpen,
   });
-
-  // Close the chase drawer on Escape — a reliable "I'm done" gesture. Click-away is
-  // deliberately NOT a global mousedown so that following another chase link never
-  // closes-then-reopens the drawer.
-  useEffect(() => {
-    if (!chase) return;
-    const onKey = (e) => e.key === "Escape" && handlers.handleClose();
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [chase, handlers]);
 
   // ─── CONTEXT BUNDLES ──────────────────────────────────────────────────────
   // State changes per keystroke; actions are (mostly) stable. Split into two
@@ -111,7 +95,6 @@ export default function Builder() {
       onStartBlank: handlers.handleStartBlank,
       onSetName: handlers.handleSetName,
       onInspect: handlers.handleInspect,
-      onChase: handlers.handleChase,
       onClickField: handlers.handleClickIdentityField,
       onRestart: handlers.handleRestart,
       onChangeArchetype: handlers.handleChangeArchetype,
@@ -159,24 +142,19 @@ export default function Builder() {
         <RecipeChecker onClose={() => setMode("builder")} />
       ) : (
         <BuilderProvider state={builderState} actions={builderActions}>
-          <div className={`b-cols ${chase ? "is-chasing" : ""}`}>
+          <div className="b-cols">
             <IdentityRail />
             <BuildSheet />
-            {/* The right detail pane is the CHASE drawer: it appears only when you
-                follow a concept link from a detail body. Item detail itself renders
-                inline in the build sheet (the inline expand stays open underneath). */}
-            {chase && (
-              <DetailPane
-                view={chase}
-                report={report}
-                choices={character.choices}
-                onSetChoice={handlers.handleSetChoice}
-                onUpdateParameter={handlers.handleUpdateParameter}
-                onInspect={handlers.handleChase}
-                onBack={history.length ? handlers.handleBack : null}
-                onClose={handlers.handleClose}
-              />
-            )}
+            <DetailPane
+              view={view}
+              report={report}
+              choices={character.choices}
+              onSetChoice={handlers.handleSetChoice}
+              onUpdateParameter={handlers.handleUpdateParameter}
+              onInspect={handlers.handleInspect}
+              onBack={history.length ? handlers.handleBack : null}
+              onClose={handlers.handleClose}
+            />
           </div>
         </BuilderProvider>
       )}

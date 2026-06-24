@@ -114,16 +114,12 @@ export function resolveCharacterGraph(character) {
       const ent = lookupEntity(`powers:${ip.name}`) || ip.entity;
       const effects = [];
       const id = ent?.id || `powers:${ip.name}`;
-      attachGlobalEffects(id, effects, ent);
+      const entityId = ent?.id || id;
+      for (const extractor of EFFECT_EXTRACTORS) {
+        effects.push(...extractor(ent, character, entityId));
+      }
 
-      if (ent?.wealthIncome) {
-        effects.push({ type: 'WEALTH', amount: ent.wealthIncome.n });
-      }
-      if (ent?.statMods) {
-        for (const mod of ent.statMods) {
-          effects.push({ type: 'STAT', stat: mod.stat, amount: mod.n });
-        }
-      }
+
       
       // Level-gated discounts (e.g. Ritual Affinity)
       if (ip.cls && ent?.levelDiscounts) {
@@ -160,19 +156,18 @@ export function resolveCharacterGraph(character) {
       const ent = (lin?.advantages || []).find((x) => x.name === adv || x.baseName === adv);
       const effects = [];
       const id = `advantages:${character.lineage} - ${ent?.baseName || adv}`;
-      attachGlobalEffects(id, effects, ent);
-      
-      if (ent?.statMods) {
-        for (const mod of ent.statMods) {
-          effects.push({ type: 'STAT', stat: mod.stat, amount: mod.n });
-        }
+      const entityId = ent?.id || id;
+      for (const extractor of EFFECT_EXTRACTORS) {
+        effects.push(...extractor(ent, character, entityId));
       }
+      
       // A cantrip-choice advantage (Divine Magic, Psionic Cantrip, …) grants the
       // chosen cantrip. Data-driven via lineageChoiceSpec — no per-name special case.
       if (lineageChoiceSpec(ent)?.kind === 'cantrip') {
         const picked = character.advantageChoices?.[ent?.baseName || ent?.name];
         if (picked) effects.push({ type: 'GRANT_SOURCE', grants: [`powers:${picked}`] });
       }
+
       items.push({
         id,
         name: adv,
@@ -200,12 +195,11 @@ export function resolveCharacterGraph(character) {
       if (!ent) continue;
       const effects = [];
       const id = `challenges:${character.lineage} - ${ent.baseName || cleanCh}`;
-      attachGlobalEffects(id, effects, ent);
-      if (ent.statMods) {
-        for (const mod of ent.statMods) {
-          effects.push({ type: 'STAT', stat: mod.stat, amount: mod.n });
-        }
+      const entityId = ent?.id || id;
+      for (const extractor of EFFECT_EXTRACTORS) {
+        effects.push(...extractor(ent, character, entityId));
       }
+
       items.push({
         id,
         name: ch,
