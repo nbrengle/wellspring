@@ -966,24 +966,34 @@ function extractGrantedSelections(entity) {
 const REQ_CLASS_LEVEL = /^(Artisan|Cleric|Druid|Fighter|Mage|Rogue|Socialite|Sourcerer)\s+Level\s+(\d+)/i;
 function extractRequirement(entity) {
   const raw = entity.requirement;
-  if (!raw) return;
   let requiredLevel = 0, requiredClass = null;
   const requiresEntity = [];
-  for (let part of String(raw).split(',')) {
-    part = part.trim();
-    if (!part) continue;
-    const m = part.match(REQ_CLASS_LEVEL);
-    if (m) {
-      // Take only the "<Class> Level N" head — guards against run-on capture like
-      // "Artisan Level 4Skills and Options: …" where the field fused with prose.
-      requiredLevel = parseInt(m[2], 10);
-      requiredClass = m[1];
-    } else {
-      // A named prerequisite entity. Strip a trailing " skill" noise word.
-      const nm = part.replace(/\s+skill$/i, '').trim();
-      if (nm && !/^level\b/i.test(nm)) requiresEntity.push(nm);
+  if (raw) {
+    for (let part of String(raw).split(',')) {
+      part = part.trim();
+      if (!part) continue;
+      const m = part.match(REQ_CLASS_LEVEL);
+      if (m) {
+        // Take only the "<Class> Level N" head — guards against run-on capture like
+        // "Artisan Level 4Skills and Options: …" where the field fused with prose.
+        requiredLevel = parseInt(m[2], 10);
+        requiredClass = m[1];
+      } else {
+        // A named prerequisite entity. Strip a trailing " skill" noise word.
+        const nm = part.replace(/\s+skill$/i, '').trim();
+        if (nm && !/^level\b/i.test(nm)) requiresEntity.push(nm);
+      }
     }
   }
+
+  // Implicit tier-based level requirements for class powers.
+  if (!requiredLevel && entity.tier) {
+    const t = entity.tier.toLowerCase();
+    if (t === 'adept' || t === 'advanced') requiredLevel = 5;
+    else if (t === 'greater' || t === 'veteran') requiredLevel = 7;
+    else if (t === 'novice' || t === 'basic' || t === 'utility' || t === 'cantrip') requiredLevel = 1;
+  }
+
   if (requiredLevel) { entity.requiredLevel = requiredLevel; entity.requiredClass = requiredClass; }
   if (requiresEntity.length) entity.requiresEntity = requiresEntity;
 }
