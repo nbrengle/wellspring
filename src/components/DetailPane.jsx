@@ -5,6 +5,7 @@ import {
   UNLIMITED_SKILLS, ALL_SKILLS, LINEAGES
 } from '../engine/data.js';
 import { getClasses } from "../engine/resolver.js";
+import { useBuilderState } from "./builder-context.jsx";
 
 // Devotion names + Lore areas + Profession suggestions are derived from parsed data
 const DEVOTION_NAMES = DEVOTIONS.map((d) => d.name);
@@ -295,6 +296,7 @@ function ParameterEditor({ baseName, entity, view, suggestions: suggestionsProp,
 }
 
 export function EntityBody({ entity, view, report, choices, onSetChoice, onUpdateParameter, onInspect }) {
+  const { character } = useBuilderState();
   if (!entity) {
     return <p className="b-detail-missing">No detail available — this item may be unresolved.</p>;
   }
