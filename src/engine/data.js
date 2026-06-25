@@ -662,6 +662,16 @@ export const lookupEntity = (id) => {
   // parameter visible (name + a `parameter` field) so the detail pane shows the
   // base skill's full description with the picked area called out.
   let paramMatch = name.match(/^(.*?)\s*\(([^()]*)\)\s*$/);
+  // Purely-numeric parens are a COST annotation, not a parameter ("Two Weapon Style
+  // (2)" / "Weapon Specialization (4)" / "Short Weapons (3)" all just note the skill's
+  // BP cost — there's no skill named "2"/"3"/"4"). Resolve to the bare base skill so
+  // these names don't become spurious parameterized entities.
+  if (paramMatch && /^\d+$/.test(paramMatch[2].trim())) {
+    const base = ENTITY_INDEX.get(`${type}:${paramMatch[1].trim()}`)
+      || (NAME_INDEX.get(canon(paramMatch[1])) && ENTITY_INDEX.get(NAME_INDEX.get(canon(paramMatch[1]))));
+    if (base) return { ...base, name, baseName: base.name };
+    paramMatch = null; // fall through to other resolution if the base isn't known
+  }
   if (!paramMatch) {
     const dashIdx = name.indexOf(' - ');
     if (dashIdx > 0) {
