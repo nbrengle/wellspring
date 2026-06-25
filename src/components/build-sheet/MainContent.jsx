@@ -220,7 +220,7 @@ export function GrantedSelectionsSection() {
   );
 }
 
-const MULTICLASS_ALLOCATABLE_SKILLS = {
+export const MULTICLASS_ALLOCATABLE_SKILLS = {
   "Agile Learner": "(trade 1st-tier for 2nd-tier)",
   "Extensive Combat Training - Basic": "(assign basic slot)",
   "Extensive Combat Training - Advanced": "(assign advanced slot)",
@@ -231,69 +231,74 @@ const MULTICLASS_ALLOCATABLE_SKILLS = {
   "Advanced Great Weapon Style": "(assign class ability)",
 };
 
-export function MulticlassSkillAllocators() {
+export function SingleSkillAllocator({ skillName, hint }) {
   const { character } = useBuilderState();
   const { onSetMulticlassAllocation, onSetAgileLearnerTrade } = useBuilderActions();
 
   const classList = getClasses(character);
+
+  let rank = 0;
+  for (const field of ['startingSkills', 'purchasedSkills', 'classSkills']) {
+    (character[field] || []).forEach((item, idx) => {
+      if (cleanItemName(item) === skillName) {
+        rank += character.ranks?.[field]?.[idx] || 1;
+      }
+    });
+  }
+
+  if (rank <= 0) return null;
+
+  const trades = skillName === "Agile Learner" 
+    ? (character.multiclassAllocations?.["Agile Learner"] || character.agileLearnerTrades || {})
+    : (character.multiclassAllocations?.[skillName] || {});
+
+  const used = Object.values(trades).reduce((a, b) => a + b, 0);
+  const available = rank - used;
+
+  const addTrade = (cls) => {
+    if (skillName === "Agile Learner") onSetAgileLearnerTrade(cls, 1);
+    onSetMulticlassAllocation(skillName, cls, 1);
+  };
+  const removeTrade = (cls) => {
+    if (skillName === "Agile Learner") onSetAgileLearnerTrade(cls, -1);
+    onSetMulticlassAllocation(skillName, cls, -1);
+  };
+
+  return (
+    <div className="b-slot-block">
+      <div className="b-slot-head">
+        <h3 className="b-slot-label">{skillName} Allocations</h3>
+        <span className="b-slot-count">{used} / {rank}</span>
+      </div>
+      <ul className="b-rows" style={{ marginTop: '0.5rem' }}>
+        {classList.map(c => {
+           const classTrades = trades[c.name] || 0;
+           return (
+             <li key={c.name} className="b-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+               <span>{c.name} <em style={{opacity:0.7, paddingLeft: '0.5rem'}}>{hint}</em></span>
+               <div className="b-row-rank-adjust">
+                 <button className="b-rank-btn" type="button" onClick={() => removeTrade(c.name)} disabled={classTrades <= 0}>-</button>
+                 <span className="b-rank-val" style={{ margin: '0 0.5rem' }}>{classTrades}</span>
+                 <button className="b-rank-btn" type="button" onClick={() => addTrade(c.name)} disabled={available <= 0}>+</button>
+               </div>
+             </li>
+           );
+        })}
+      </ul>
+    </div>
+  );
+}
+
+export function MulticlassSkillAllocators() {
   const blocks = [];
 
   for (const [skillName, hint] of Object.entries(MULTICLASS_ALLOCATABLE_SKILLS)) {
-    let rank = 0;
-    for (const field of ['startingSkills', 'purchasedSkills', 'classSkills']) {
-      (character[field] || []).forEach((item, idx) => {
-        if (cleanItemName(item) === skillName) {
-          rank += character.ranks?.[field]?.[idx] || 1;
-        }
-      });
-    }
-
-    if (rank > 0) {
-      // Backwards compatibility for Agile Learner
-      const trades = skillName === "Agile Learner" 
-        ? (character.multiclassAllocations?.["Agile Learner"] || character.agileLearnerTrades || {})
-        : (character.multiclassAllocations?.[skillName] || {});
-
-      const used = Object.values(trades).reduce((a, b) => a + b, 0);
-      const available = rank - used;
-
-      const addTrade = (cls) => {
-        if (skillName === "Agile Learner") onSetAgileLearnerTrade(cls, 1);
-        onSetMulticlassAllocation(skillName, cls, 1);
-      };
-      const removeTrade = (cls) => {
-        if (skillName === "Agile Learner") onSetAgileLearnerTrade(cls, -1);
-        onSetMulticlassAllocation(skillName, cls, -1);
-      };
-
-      blocks.push(
-        <div key={skillName} className="b-slot-block">
-          <div className="b-slot-head">
-            <h3 className="b-slot-label">{skillName} Allocations</h3>
-            <span className="b-slot-count">{used} / {rank}</span>
-          </div>
-          <ul className="b-rows" style={{ marginTop: '0.5rem' }}>
-            {classList.map(c => {
-               const classTrades = trades[c.name] || 0;
-               return (
-                 <li key={c.name} className="b-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                   <span>{c.name} <em style={{opacity:0.7, paddingLeft: '0.5rem'}}>{hint}</em></span>
-                   <div className="b-row-rank-adjust">
-                     <button className="b-rank-btn" type="button" onClick={() => removeTrade(c.name)} disabled={classTrades <= 0}>-</button>
-                     <span className="b-rank-val" style={{ margin: '0 0.5rem' }}>{classTrades}</span>
-                     <button className="b-rank-btn" type="button" onClick={() => addTrade(c.name)} disabled={available <= 0}>+</button>
-                   </div>
-                 </li>
-               );
-            })}
-          </ul>
-        </div>
-      );
-    }
+    blocks.push(
+      <SingleSkillAllocator key={skillName} skillName={skillName} hint={hint} />
+    );
   }
 
-  if (blocks.length === 0) return null;
-  return <>{blocks}</>;
+  return <div className="b-multiclass-allocators">{blocks}</div>;
 }
 
 export function SlotBlock({ slot, pickClassOf }) {

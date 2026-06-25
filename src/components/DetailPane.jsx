@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef, Fragment } from "react";
+import { MULTICLASS_ALLOCATABLE_SKILLS, SingleSkillAllocator } from "./build-sheet/MainContent.jsx";
 import {
   lookupEntity, REFS, DEVOTIONS, DOMAINS,
   UNLIMITED_SKILLS, ALL_SKILLS, LINEAGES
@@ -336,6 +337,11 @@ export function EntityBody({ entity, view, report, choices, onSetChoice, onUpdat
           groups={paramGroups}
           onUpdateParameter={onUpdateParameter}
         />
+      )}
+      {MULTICLASS_ALLOCATABLE_SKILLS[baseName] && (
+        <div style={{ marginTop: '1rem' }}>
+          <SingleSkillAllocator skillName={baseName} hint={MULTICLASS_ALLOCATABLE_SKILLS[baseName]} />
+        </div>
       )}
       {activeBenefits && (
         <div className="b-detail-section">
