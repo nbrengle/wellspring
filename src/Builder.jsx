@@ -313,6 +313,12 @@ function BTopBar({ mode, setMode, character, report, onLevelChange, onExport }) 
         )}
       </div>
       <div className="b-topbar-actions">
+        <a href="https://www.wellspringlarp.org/" target="_blank" rel="noreferrer" className="b-topbar-btn" style={{ textDecoration: "none" }}>
+          Wellspring Website
+        </a>
+        <a href="https://docs.google.com/document/d/1lh8WAAWPk2ELo4_djuQg0fBTdt6Y5Oqp3a124qvtUrM/" target="_blank" rel="noreferrer" className="b-topbar-btn" style={{ textDecoration: "none" }}>
+          Rules Megadoc
+        </a>
         {mode === "builder" ? (
           <>
             <button className="b-topbar-btn" onClick={onExport}>
