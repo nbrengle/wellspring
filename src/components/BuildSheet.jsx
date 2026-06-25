@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from "react";
 export { IdentityRail } from "./build-sheet/IdentityRail.jsx";
 import { Stat, StatWithSources, Section, CostBadge } from "./build-sheet/SharedUI.jsx";
-import { LineageSummary, StartingChoicesSection, GrantedSelectionsSection, CraftingSection, SlotBlock, ClassifiedRows, EditableRows } from "./build-sheet/MainContent.jsx";
+import { LineageSummary, StartingChoicesSection, GrantedSelectionsSection, AgileLearnerSection, CraftingSection, SlotBlock, ClassifiedRows, EditableRows } from "./build-sheet/MainContent.jsx";
 import {
   ARCHETYPES, lookupEntity, ALL_SKILLS, ALL_PERKS, ALL_FLAWS,
   CLASS_POWER_SLOTS, CLASSES, DEVOTIONS, DOMAINS, LINEAGES,
@@ -181,6 +181,8 @@ export default function BuildSheet() {
           ))}
         </Section>
       )}
+
+      <AgileLearnerSection />
 
       <Section title="Flaws" tone="red" onAdd={() => onOpenAdd("flaw")}>
         <EditableRows items={character.flaws} field="flaws" resolveType="flaws" removable={() => true} />

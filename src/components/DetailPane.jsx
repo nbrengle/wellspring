@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef, Fragment } from "react";
-import { MULTICLASS_ALLOCATABLE_SKILLS, SingleSkillAllocator } from "./build-sheet/MainContent.jsx";
+import { CostBadge } from "./build-sheet/SharedUI.jsx";
 import {
   lookupEntity, REFS, DEVOTIONS, DOMAINS,
   UNLIMITED_SKILLS, ALL_SKILLS, LINEAGES
@@ -58,7 +58,11 @@ const PARAMETER_SUGGESTIONS = {
   "Mild Allergy": ["Cloth", "Copper", "Gold", "Harvest", "Hide", "Ingot", "Iron", "Leather", "Materia", "Night Prize", "Other Common Allergen", "Other Uncommon Allergen", "Rare Minerals", "Scale", "Silver"],
   "Severe Allergy": ["Cloth", "Copper", "Gold", "Harvest", "Hide", "Ingot", "Iron", "Leather", "Materia", "Night Prize", "Other Common Allergen", "Other Uncommon Allergen", "Rare Minerals", "Scale", "Silver"],
   "Lost Life": LOST_LIFE_SUGGESTIONS,
-  "Additional Lost Life": LOST_LIFE_SUGGESTIONS
+  "Additional Lost Life": LOST_LIFE_SUGGESTIONS,
+  "Extensive Combat Training - Basic": [],
+  "Extensive Combat Training - Advanced": [],
+  "Extensive Combat Training - Veteran": [],
+  "Extensive Training": []
 };
 
 export function formatParameterizedName(baseName, parameter, originalName) {
@@ -338,11 +342,6 @@ export function EntityBody({ entity, view, report, choices, onSetChoice, onUpdat
           onUpdateParameter={onUpdateParameter}
         />
       )}
-      {MULTICLASS_ALLOCATABLE_SKILLS[baseName] && (
-        <div style={{ marginTop: '1rem' }}>
-          <SingleSkillAllocator skillName={baseName} hint={MULTICLASS_ALLOCATABLE_SKILLS[baseName]} />
-        </div>
-      )}
       {activeBenefits && (
         <div className="b-detail-section">
           <h3 className="b-detail-section-title">Benefits by {entity.levelBenefitClass || "class"} level</h3>
@@ -490,6 +489,24 @@ function ForwardLinks({ entity, onInspect }) {
       <LinkList title="Unlocks" ids={unlockIds} tone="green" onInspect={onInspect} />
       <LinkList title="References" ids={mentionIds} tone="blue" onInspect={onInspect} />
     </>
+  );
+}
+
+export function ConceptRefs({ entityId, entity }) {
+  const baseId = entity?.baseName ? `${entityId.split(':')[0]}:${entity.baseName}` : entityId;
+  const refs = REFS.references?.[baseId] || [];
+  if (refs.length === 0) return null;
+  return (
+    <div className="b-detail-section">
+      <h3 className="b-detail-section-title">References</h3>
+      <ul className="b-choose-list">
+        {refs.map((r, i) => (
+          <li key={i} className="b-choose-opt">
+            <span className="b-choose-text">• {r}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
 
