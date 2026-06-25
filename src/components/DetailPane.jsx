@@ -5,7 +5,6 @@ import {
   UNLIMITED_SKILLS, ALL_SKILLS, LINEAGES
 } from '../engine/data.js';
 import { getClasses } from "../engine/resolver.js";
-import { useBuilderState } from "./builder-context.jsx";
 
 // Devotion names + Lore areas + Profession suggestions are derived from parsed data
 const DEVOTION_NAMES = DEVOTIONS.map((d) => d.name);
@@ -89,7 +88,7 @@ function sourceType(name) {
   return null;
 }
 
-export default function DetailPane({ view, report, choices, onSetChoice, onUpdateParameter, onInspect, onBack, onClose }) {
+export default function DetailPane({ character, view, report, choices, onSetChoice, onUpdateParameter, onInspect, onBack, onClose }) {
   if (!view) {
     return (
       <aside className="b-rail b-rail-right is-empty">
@@ -99,10 +98,10 @@ export default function DetailPane({ view, report, choices, onSetChoice, onUpdat
       </aside>
     );
   }
-  return <EntityDetail view={view} report={report} choices={choices} onSetChoice={onSetChoice} onUpdateParameter={onUpdateParameter} onInspect={onInspect} onBack={onBack} onClose={onClose} />;
+  return <EntityDetail character={character} view={view} report={report} choices={choices} onSetChoice={onSetChoice} onUpdateParameter={onUpdateParameter} onInspect={onInspect} onBack={onBack} onClose={onClose} />;
 }
 
-function EntityDetail({ view, report, choices, onSetChoice, onUpdateParameter, onInspect, onBack, onClose }) {
+function EntityDetail({ character, view, report, choices, onSetChoice, onUpdateParameter, onInspect, onBack, onClose }) {
   const entity = useResolvedEntity(view.item, view.field, view.resolveType);
   const { item, resolveType } = view;
 
@@ -119,7 +118,7 @@ function EntityDetail({ view, report, choices, onSetChoice, onUpdateParameter, o
         <p className="b-detail-type">{entity?.type || resolveType}</p>
       </header>
       <div className="b-detail-body">
-        <EntityBody entity={entity} view={view} report={report} choices={choices} onSetChoice={onSetChoice} onUpdateParameter={onUpdateParameter} onInspect={onInspect} />
+        <EntityBody character={character} entity={entity} view={view} report={report} choices={choices} onSetChoice={onSetChoice} onUpdateParameter={onUpdateParameter} onInspect={onInspect} />
       </div>
     </aside>
   );
@@ -295,8 +294,7 @@ function ParameterEditor({ baseName, entity, view, suggestions: suggestionsProp,
   );
 }
 
-export function EntityBody({ entity, view, report, choices, onSetChoice, onUpdateParameter, onInspect }) {
-  const { character } = useBuilderState();
+export function EntityBody({ character, entity, view, report, choices, onSetChoice, onUpdateParameter, onInspect }) {
   if (!entity) {
     return <p className="b-detail-missing">No detail available — this item may be unresolved.</p>;
   }

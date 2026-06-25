@@ -147,6 +147,7 @@ export default function Builder() {
             <IdentityRail />
             <BuildSheet />
             <DetailPane
+              character={character}
               view={view}
               report={report}
               choices={character.choices}
