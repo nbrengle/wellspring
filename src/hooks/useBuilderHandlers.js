@@ -23,6 +23,7 @@ export function useBuilderHandlers({
   report,
   setCharacter,
   setView,
+  setChase,
   setPicking,
   setHistory,
   setLineageOpen,
@@ -32,8 +33,9 @@ export function useBuilderHandlers({
   const handlePickArchetype = useCallback((archetype) => {
     setCharacter(loadArchetype(archetype));
     setView(null);
+    setChase(null);
     setHistory([]);
-  }, [setCharacter, setView, setHistory]);
+  }, [setCharacter, setView, setChase, setHistory]);
 
   const identityHandlers = useIdentityHandlers({ character, setCharacter, setPicking });
 
@@ -101,9 +103,40 @@ export function useBuilderHandlers({
     );
   }, [setCharacter, setView, setHistory, setPicking]);
 
+  // Primary gesture: clicking an owned item → expand its detail INLINE under the row.
+  // Re-clicking the same item closes it. Moving to a DIFFERENT row (or closing) means
+  // you've moved on, so it also dismisses any open chase drawer.
   const handleInspect = useCallback(
     (item, field, resolveType, slot = null, index = null) => {
+      setChase(null);
+      setHistory([]);
       setView((cur) => {
+        if (cur && cur.item === item && cur.field === field) return null; // toggle closed
+        return {
+          mode: "inspect",
+          item,
+          field,
+          resolveType,
+          archetypeName: character.archetypeName,
+          category: slot?.category,
+          index: index !== null ? index : slot?.index,
+          choosable: !!slot,
+        };
+      });
+    },
+    [character.archetypeName, setChase, setHistory, setView],
+  );
+
+  // Chasing: following a concept link inside a detail body opens/continues the right
+  // DRAWER with a back-stack. Never touches `view`, so the inline expand stays put.
+  // Re-clicking the entity that's already at the drawer head closes it.
+  const handleChase = useCallback(
+    (item, field, resolveType, slot = null, index = null) => {
+      setChase((cur) => {
+        if (cur && cur.item === item && cur.field === field) {
+          setHistory([]);
+          return null;
+        }
         if (cur) setHistory((h) => [...h, cur]);
         return {
           mode: "inspect",
@@ -117,7 +150,7 @@ export function useBuilderHandlers({
         };
       });
     },
-    [character.archetypeName],
+    [character.archetypeName, setChase, setHistory],
   );
 
   const coreHandlers = useCoreHandlers({ character, setCharacter, setPicking, setView });
@@ -158,38 +191,41 @@ export function useBuilderHandlers({
     handleAddEntity,
   });
 
+  // Back/close operate on the CHASE drawer (the inline expand is closed by re-click).
   const handleBack = useCallback(() => {
     setHistory((h) => {
       if (h.length === 0) {
-        setView(null);
+        setChase(null);
         return h;
       }
       const prev = h[h.length - 1];
-      setView(prev);
+      setChase(prev);
       return h.slice(0, -1);
     });
-  }, [setHistory, setView]);
+  }, [setHistory, setChase]);
 
   const handleClose = useCallback(() => {
-    setView(null);
+    setChase(null);
     setHistory([]);
-  }, [setView, setHistory]);
+  }, [setChase, setHistory]);
 
   const handleRestart = useCallback(() => {
     if (window.confirm("Discard this character and start over?")) {
       setCharacter(EMPTY_CHARACTER);
       setView(null);
+      setChase(null);
       setHistory([]);
     }
-  }, [setCharacter, setView, setHistory]);
+  }, [setCharacter, setView, setChase, setHistory]);
 
   const handleChangeArchetype = useCallback(() => {
     if (window.confirm("Select a different archetype? Any changes you've made to this character will be lost.")) {
       setCharacter(EMPTY_CHARACTER);
       setView(null);
+      setChase(null);
       setHistory([]);
     }
-  }, [setCharacter, setView, setHistory]);
+  }, [setCharacter, setView, setChase, setHistory]);
 
   const handleClickIdentityField = useCallback(
     (field) => {
@@ -224,6 +260,7 @@ export function useBuilderHandlers({
     handleSetAgileLearnerTrade,
     handleStartBlank,
     handleInspect,
+    handleChase,
     handleUpdateParameter,
     handleOpenSlot,
     handleAddEntity,
