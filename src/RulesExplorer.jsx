@@ -3,7 +3,11 @@ import { getAllEntities, lookupEntity } from './engine/data.js';
 import { cleanItemName } from "./engine/resolver.js";
 import { EntityBody } from "./components/DetailPane.jsx";
 import { browse, gameEffectAxes, axisApplies } from "./components/browse/browse.js";
+import { availableFacets, passesFacets, FACETS } from "./components/browse/facets.js";
+import FacetSidebar, { ActiveFilterBar } from "./components/browse/FacetSidebar.jsx";
 import "./RulesExplorer.css";
+
+const FACET_LABELS = Object.fromEntries(FACETS.map((f) => [f.id, f.label]));
 
 const HIGH_LEVEL_GROUPS = [
   { id: "all", label: "All Rules" },
@@ -59,7 +63,7 @@ const EXPLORER_AXES = [
 export default function RulesExplorer({ onClose }) {
   const [query, setQuery] = useState("");
   const [activeGroup, setActiveGroup] = useState("all");
-  const [selectedTypes, setSelectedTypes] = useState([]);
+  const [facetSel, setFacetSel] = useState({}); // facet id -> Set of selected values
   
   // Navigation stack for back button support
   const [history, setHistory] = useState([]);
@@ -71,28 +75,16 @@ export default function RulesExplorer({ onClose }) {
   const [sortMode, setSortMode] = useState("name"); // "name" | "type"
   const [groupMode, setGroupMode] = useState("type"); // "none" | "type" | "alphabetical"
 
-  // Fetch all entities
-  const allEntities = useMemo(() => getAllEntities(), []);
+  // Fetch all entities, tagged with their display label so the Type facet reads nicely.
+  const allEntities = useMemo(
+    () => getAllEntities().map((e) => ({ ...e, typeLabel: TYPE_LABELS[e.type] || e.type })),
+    [],
+  );
 
-  // Drill-down types based on the selected high-level group
-  const availableTypes = useMemo(() => {
-    if (activeGroup === "all") {
-      return Object.keys(TYPE_LABELS);
-    }
-    return GROUP_TYPES[activeGroup] || [];
-  }, [activeGroup]);
-
-  // Handle high-level group change
+  // The coarse Category tab clears any facet selection (it's a different scoping).
   const handleGroupChange = (groupId) => {
     setActiveGroup(groupId);
-    setSelectedTypes([]);
-  };
-
-  // Toggle type filter checkbox
-  const handleTypeToggle = (type) => {
-    setSelectedTypes((prev) =>
-      prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type]
-    );
+    setFacetSel({});
   };
 
   // Navigation handlers
@@ -124,19 +116,22 @@ export default function RulesExplorer({ onClose }) {
     setSelectedId(id);
   };
 
-  // The candidates after the sidebar's group/type filters (search + grouping/sorting
-  // is then handled by the shared browse() engine).
-  const candidates = useMemo(() => {
-    let list = allEntities;
-    if (activeGroup !== "all") {
-      const allowedTypes = GROUP_TYPES[activeGroup] || [];
-      list = list.filter((e) => allowedTypes.includes(e.type));
-    }
-    if (selectedTypes.length > 0) {
-      list = list.filter((e) => selectedTypes.includes(e.type));
-    }
-    return list;
-  }, [allEntities, activeGroup, selectedTypes]);
+  // `pool` = the Category-scoped set BEFORE facet filters (what the sidebar counts
+  // against). `candidates` = pool after the facet selection (what the list shows).
+  const pool = useMemo(() => {
+    if (activeGroup === "all") return allEntities;
+    const allowedTypes = GROUP_TYPES[activeGroup] || [];
+    return allEntities.filter((e) => allowedTypes.includes(e.type));
+  }, [allEntities, activeGroup]);
+
+  const candidates = useMemo(() => pool.filter((e) => passesFacets(e, facetSel)), [pool, facetSel]);
+
+  // Facets offered for the current pool (2+ distinct values), in registry order.
+  const sidebarFacets = useMemo(() => availableFacets(pool), [pool]);
+  const matchesSearch = (e, q) =>
+    e.name.toLowerCase().includes(q) ||
+    (e.description || "").toLowerCase().includes(q) ||
+    (e.summary || "").toLowerCase().includes(q);
 
   // Only offer a game-effect group axis when some visible entity carries that facet.
   const availableAxes = useMemo(
@@ -192,19 +187,15 @@ export default function RulesExplorer({ onClose }) {
           </div>
 
           <div className="b-sidebar-section">
-            <h3 className="b-sidebar-title">Filter by Type</h3>
-            <div className="b-type-filters">
-              {availableTypes.map((type) => (
-                <label key={type} className="b-type-checkbox-label">
-                  <input
-                    type="checkbox"
-                    checked={selectedTypes.includes(type)}
-                    onChange={() => handleTypeToggle(type)}
-                  />
-                  <span>{TYPE_LABELS[type]}</span>
-                </label>
-              ))}
-            </div>
+            <h3 className="b-sidebar-title">Filter</h3>
+            <FacetSidebar
+              pool={pool}
+              facets={sidebarFacets}
+              sel={facetSel}
+              onChange={setFacetSel}
+              query={query}
+              matches={matchesSearch}
+            />
           </div>
 
           <div className="b-sidebar-section">
@@ -250,6 +241,9 @@ export default function RulesExplorer({ onClose }) {
               <button className="b-search-clear" onClick={() => setQuery("")}>×</button>
             )}
           </div>
+
+          <ActiveFilterBar sel={facetSel} onChange={setFacetSel}
+                           facetLabel={(id) => FACET_LABELS[id] || id} />
 
           <div className="b-explorer-list-container">
             {groupedEntities.length === 0 && (

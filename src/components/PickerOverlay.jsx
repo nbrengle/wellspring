@@ -2,6 +2,9 @@ import React, { useState, useMemo, useRef, useLayoutEffect } from "react";
 import { lookupEntity, UNLIMITED_SKILLS } from '../engine/data.js';
 import { prereqStatus } from "../engine/validate.js";
 import { browse, gameEffectAxes, axisApplies, otherBuckets } from "./browse/browse.js";
+import { availableFacets as computeAvailableFacets, passesFacets as facetsPass,
+         passesFacetsExcept as facetsPassExcept, activeFacetCount as countActiveFacets,
+         toggleFacetValue } from "./browse/facets.js";
 import { EntityBody } from "./DetailPane.jsx";
 import Overlay from "./ui/Overlay.jsx";
 
@@ -55,25 +58,6 @@ const SURFACE_AXES = [
   { id: "cost",         label: "Cost",     key: (c) => (typeof c.cost === "number" ? `${c.cost} BP` : "—") },
 ];
 
-// Facet FILTERS (narrow the list), distinct from the Group axis (reorders it). Each
-// `values(c)` returns the buckets a candidate belongs to; a facet only shows up in
-// the popover when the current candidate pool has 2+ distinct values for it, so a
-// tightly-scoped slot ("Add a Mage power") shows few/no filters. Game-effect facets
-// (Effect/Damage/Condition) come from the shared gameEffectAxes (per entity type).
-const SINGLE_FACETS = [
-  { id: "tier",    label: "Tier",     values: (c) => (SPELL_TIER_BUCKET[c.tierList] || c.tier ? [SPELL_TIER_BUCKET[c.tierList] || c.tier] : []) },
-  { id: "refresh", label: "Refresh",  values: (c) => (c.refresh && c.refresh !== "None" ? [refreshBucket(c)] : []) },
-];
-
-function facetFilters(entityType) {
-  return [...SINGLE_FACETS, ...gameEffectAxes(() => entityType).map((a) => ({ id: a.id, label: a.label, values: a.keys }))];
-}
-function distinctValues(candidates, facet) {
-  const s = new Set();
-  for (const c of candidates) for (const v of facet.values(c)) s.add(v);
-  return [...s].sort((a, b) => String(a).localeCompare(String(b)));
-}
-
 export default function PickerOverlay({ spec, character, onClose }) {
   const { entityType, title, subtitle, candidates, taken, onChoose } = spec;
 
@@ -103,37 +87,23 @@ export default function PickerOverlay({ spec, character, onClose }) {
     [allAxes, candidates],
   );
 
-  // Facet filters offered for THIS pool: only those with 2+ distinct values, each
-  // with its value list (counts shown in the popover). A narrow slot offers few/none.
-  const availableFacets = useMemo(() => {
-    return facetFilters(entityType)
-      .map((f) => ({ ...f, options: distinctValues(candidates, f) }))
-      .filter((f) => f.options.length >= 2);
+  // Resolve each thin candidate ({name, cat, …}) to its FULL entity so the shared
+  // facet registry (which reads entity fields: type/tier/lineage/…) can slice them.
+  // Keyed by candidate name; falls back to the candidate itself if not indexed.
+  const entityOf = useMemo(() => {
+    const m = new Map();
+    for (const c of candidates) m.set(c.name, lookupEntity(`${entityType}:${c.name}`) || c);
+    return m;
   }, [candidates, entityType]);
+  const entities = useMemo(() => candidates.map((c) => entityOf.get(c.name)), [candidates, entityOf]);
 
-  const activeFacetCount = Object.values(facetSel).reduce((n, s) => n + (s?.size || 0), 0);
-  const passesFacets = (c) =>
-    Object.entries(facetSel).every(([id, set]) => {
-      if (!set || !set.size) return true;
-      const f = availableFacets.find((x) => x.id === id);
-      return f && f.values(c).some((v) => set.has(v));
-    });
-  const toggleFacet = (id, v) =>
-    setFacetSel((cur) => {
-      const set = new Set(cur[id] || []);
-      set.has(v) ? set.delete(v) : set.add(v);
-      const next = { ...cur, [id]: set };
-      if (!set.size) delete next[id];
-      return next;
-    });
-  // Count of candidates matching every ACTIVE facet except `exceptId` — so the
-  // popover can show each value's resulting count without self-cancelling.
-  const passesFacetsExcept = (c, exceptId) =>
-    Object.entries(facetSel).every(([id, set]) => {
-      if (id === exceptId || !set || !set.size) return true;
-      const f = availableFacets.find((x) => x.id === id);
-      return f && f.values(c).some((v) => set.has(v));
-    });
+  // Facets offered for THIS pool: shared registry, only those with 2+ values. A
+  // narrow slot ("Add a Mage power" — all Mage) offers few/none.
+  const availableFacets = useMemo(() => computeAvailableFacets(entities), [entities]);
+  const activeFacetCount = countActiveFacets(facetSel);
+  const passesFacets = (c) => facetsPass(entityOf.get(c.name), facetSel);
+  const passesFacetsExcept = (c, exceptId) => facetsPassExcept(entityOf.get(c.name), facetSel, exceptId);
+  const toggleFacet = (id, v) => setFacetSel((cur) => toggleFacetValue(cur, id, v));
 
   const facetCount = (c, axis) => (axis?.multi ? (axis.keys(c)?.length || 0) : 0);
   const { axis: groupAxis, groups } = useMemo(
@@ -212,7 +182,7 @@ export default function PickerOverlay({ spec, character, onClose }) {
             </div>
             {filtersOpen && (
               <FacetPopover anchorRef={filtersBtnRef} facets={availableFacets} sel={facetSel}
-                            candidates={candidates} passesExcept={passesFacetsExcept}
+                            candidates={candidates} entityOf={entityOf} passesExcept={passesFacetsExcept}
                             onToggle={toggleFacet} onClear={() => setFacetSel({})}
                             onClose={() => setFiltersOpen(false)} />
             )}
@@ -290,7 +260,7 @@ export default function PickerOverlay({ spec, character, onClose }) {
 // Filters button) so opening it NEVER reflows the list or the read pane — closed,
 // the picker is byte-identical to before. Multi-select checkboxes per facet, each
 // value showing how many results it would yield given the other active facets.
-function FacetPopover({ anchorRef, facets, sel, candidates, passesExcept, onToggle, onClear, onClose }) {
+function FacetPopover({ anchorRef, facets, sel, candidates, entityOf, passesExcept, onToggle, onClear, onClose }) {
   const ref = useRef(null);
   const [pos, setPos] = useState(null);
   useLayoutEffect(() => {
@@ -316,7 +286,7 @@ function FacetPopover({ anchorRef, facets, sel, candidates, passesExcept, onTogg
   }, [anchorRef, onClose]);
 
   const countFor = (facet, v) =>
-    candidates.filter((c) => passesExcept(c, facet.id) && facet.values(c).includes(v)).length;
+    candidates.filter((c) => passesExcept(c, facet.id) && facet.values(entityOf.get(c.name)).includes(v)).length;
   const anyActive = Object.values(sel).some((s) => s?.size);
 
   return (
@@ -332,7 +302,7 @@ function FacetPopover({ anchorRef, facets, sel, candidates, passesExcept, onTogg
           return (
             <div key={f.id} className="b-facet-group">
               <h4 className="b-facet-group-label">{f.label}</h4>
-              {f.options.map((v) => {
+              {f.options.map(([v]) => {
                 const n = countFor(f, v);
                 const on = set.has(v);
                 return (
