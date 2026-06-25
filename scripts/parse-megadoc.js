@@ -1098,9 +1098,9 @@ for (const cls of CLASSES_OUT) {
       wotb.chooseOne = {
         kind: "build",
         options: [
-          { text: "Swords", grantsSkills: ["Weapon Specialization - Swords", "Two Weapon Style"] },
-          { text: "Thrown Weapons", grantsSkills: ["Weapon Specialization - Thrown Weapons", "Two Weapon Style"] },
-          { text: "Daggers", grantsSkills: ["Weapon Specialization - Daggers", "Two Weapon Style"] }
+          { text: "Swords", grants: ["Weapon Specialization - Swords", "Two Weapon Style"] },
+          { text: "Thrown Weapons", grants: ["Weapon Specialization - Thrown Weapons", "Two Weapon Style"] },
+          { text: "Daggers", grants: ["Weapon Specialization - Daggers", "Two Weapon Style"] }
         ]
       };
     }
