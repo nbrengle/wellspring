@@ -130,6 +130,7 @@ export function useBuilderHandlers({
   const handleSetSpecialty = coreHandlers.handleSetSpecialty;
   const handleSetGrantedSelection = coreHandlers.handleSetGrantedSelection;
   const handleSetAgileLearnerTrade = coreHandlers.handleSetAgileLearnerTrade;
+  const handleSetMulticlassAllocation = coreHandlers.handleSetMulticlassAllocation;
 
   const classHandlers = useClassHandlers({ setCharacter });
   const handleLevelChange = classHandlers.handleLevelChange;
@@ -222,6 +223,7 @@ export function useBuilderHandlers({
     handleSetAdvantageChoice,
     handleSetGrantedSelection,
     handleSetAgileLearnerTrade,
+    handleSetMulticlassAllocation,
     handleStartBlank,
     handleInspect,
     handleUpdateParameter,

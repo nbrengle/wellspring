@@ -121,6 +121,7 @@ export default function Builder() {
       onSetAdvantageChoice: handlers.handleSetAdvantageChoice,
       onSetGrantedSelection: handlers.handleSetGrantedSelection,
       onSetAgileLearnerTrade: handlers.handleSetAgileLearnerTrade,
+      onSetMulticlassAllocation: handlers.handleSetMulticlassAllocation,
       onOpenLineage: () => setLineageOpen(true),
     }),
     [handlers],
