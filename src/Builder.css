@@ -1124,12 +1124,19 @@
   letter-spacing: 0.03em;
 }
 
+.b-slot-bonus {
+  font-size: 0.62rem;
+  color: var(--b-teal);
+  font-style: italic;
+}
+
 .b-slot-count {
   font-size: 0.68rem;
   color: var(--b-dim);
   border: 1px solid var(--b-border);
   border-radius: 1rem;
   padding: 0.05rem 0.45rem;
+  margin-left: auto;
 }
 
 .b-slot-block.is-full .b-slot-count {

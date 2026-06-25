@@ -4,7 +4,7 @@ import { Section, CostBadge } from "./SharedUI.jsx";
 import SubSelect from "../SubSelect.jsx";
 import { spellTierKey, spellTierLabel } from "./utils.js";
 import { ALL_SKILLS, LINEAGES, CRAFTING, RITUALS, CLASSES, DOMAINS } from "../../engine/data.js";
-import { getMaxRanks, pickClass } from "../../engine/validate.js";
+import { getMaxRanks, pickClass, agileLearnerCapacity } from "../../engine/validate.js";
 import { bareSkill, getClasses, cleanItemName } from "../../engine/resolver.js";
 import { lookupCost } from "../../engine/validate/cost-key.js";
 import { STARTING_CHOICES_CONFIG, reconcileStartingChoices } from "../../engine/starting-choices.js";
@@ -222,14 +222,9 @@ export function AgileLearnerSection() {
   const { character } = useBuilderState();
   const { onSetAgileLearnerTrade } = useBuilderActions();
 
-  let rank = 0;
-  for (const field of ['startingSkills', 'purchasedSkills', 'classSkills']) {
-    (character[field] || []).forEach((item, idx) => {
-      if (cleanItemName(item) === "Agile Learner") {
-        rank += character.ranks?.[field]?.[idx] || 1;
-      }
-    });
-  }
+  // Owned Agile Learner ranks = the number of trades available (engine is the
+  // single source of truth, so the UI cap matches what computeSlots enforces).
+  const rank = agileLearnerCapacity(character);
 
   if (!rank) return null;
 
@@ -290,6 +285,11 @@ export function SlotBlock({ slot, pickClassOf }) {
     <div className={`b-slot-block ${state}`}>
       <div className="b-slot-head">
         <h3 className="b-slot-label">{slot.label}</h3>
+        {slot.bonusFrom?.length > 0 && (
+          <span className="b-slot-bonus" title={`+${slot.bonus} bonus slot${slot.bonus === 1 ? "" : "s"} from ${slot.bonusFrom.join(", ")}`}>
+            +{slot.bonus} from {slot.bonusFrom.join(", ")}
+          </span>
+        )}
         <span className="b-slot-count">{slot.used} / {slot.allowed}</span>
       </div>
       <ol className="b-slot-rows">

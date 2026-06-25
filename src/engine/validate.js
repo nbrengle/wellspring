@@ -38,8 +38,8 @@ export { lbpState };
 // Slot/spell-slot accounting (validate/slots.js) and prerequisite checking
 // (validate/prereqs.js) — extracted leaves. Import the ones the orchestrator calls
 // internally; re-export the public surface so the barrel keeps its API.
-import { computeSlots, spellSlots, bookcasterSpellOptions } from './validate/slots.js';
-export { innateBonusCantrips } from './validate/slots.js';
+import { computeSlots, spellSlots, bookcasterSpellOptions, eligibleClassChoices, CLASS_CHOICE_SKILLS } from './validate/slots.js';
+export { innateBonusCantrips, eligibleClassChoices, CLASS_CHOICE_SKILLS, agileLearnerCapacity } from './validate/slots.js';
 import { resolveCharacterGraph, grantedAbilities } from './graph.js';
 export { grantedAbilities };
 import { computeBP } from './validate/bp-accounting.js';
@@ -406,6 +406,13 @@ export function validate(character) {
   const granted = grantedAbilities(character);
   const crafting = craftingCapability(character);
   const owned = classifyOwnedItems(character);
+  // Class-choice grants (Extensive Combat Training / Extensive Training /
+  // Spell-Scholar): the classes the player may pick for each, gated by the classes
+  // they actually have. The UI reads this to offer ONLY eligible classes (not the
+  // hardcoded full list) as the skill's parameter.
+  const classChoices = Object.fromEntries(
+    Object.keys(CLASS_CHOICE_SKILLS).map((baseName) => [baseName, eligibleClassChoices(character, baseName)]),
+  );
   // Attach each classified row's computed cost record (from the BP ledger) so the
   // UI reads `row.cost` directly instead of reconstructing a ledger key per row.
   for (const bucket of ['skills', 'perks', 'classPowers']) {
@@ -459,6 +466,7 @@ export function validate(character) {
     grantedAbilities: granted,
     crafting,
     owned,
+    classChoices,
     activeSelections,
     powerBenefits,
     prereqs,

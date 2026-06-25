@@ -15,7 +15,7 @@ import {
 import {
   budgetFor, computeSlots, spellSlots, devotionState, prereqStatus,
   LEVEL_CAP, LEGAL_MIN_LEVEL, grantedAbilities, computeSpend,
-  getMaxRanks, bookcasterSpellOptions
+  getMaxRanks, bookcasterSpellOptions, eligibleClassChoices, agileLearnerCapacity
 } from "../src/engine/testing.js";
 import { bareSkill, cleanItemName, getClasses, formatParameterizedName } from "../src/engine/resolver.js";
 import { formatCharacterSheet, parseCharacterSheet } from '../src/engine/sheet.js';
@@ -230,6 +230,43 @@ test('Fighter 2 / Rogue 2 yields separate per-class slot rows at L2 caps', () =>
   const ru = rows.find((s) => s.cls === 'Rogue' && s.category === 'utility');
   ok(fu && ru, 'both Fighter and Rogue utility rows exist');
   eq(fu.allowed, 1, 'Fighter L2 utility'); eq(ru.allowed, 1, 'Rogue L2 utility');
+});
+
+// ─── cross-class / pick-a-class grants ────────────────────────────────────────
+test('Extensive Training routes its bonus slot to the CHOSEN class, attributed', () => {
+  const c = { archetypeName: 'x', classes: [{ name: 'Fighter', level: 3 }, { name: 'Rogue', level: 3 }],
+    purchasedSkills: ['Extensive Training (Rogue)'], ranks: { purchasedSkills: [1] } };
+  const rows = computeSlots(c);
+  const fu = rows.find((s) => s.cls === 'Fighter' && s.category === 'utility');
+  const ru = rows.find((s) => s.cls === 'Rogue' && s.category === 'utility');
+  eq(fu.allowed, 1, 'Fighter utility unchanged');
+  eq(ru.allowed, 2, 'Rogue utility +1 from Extensive Training');
+  ok(ru.bonusFrom.includes('Extensive Training'), 'the bonus slot is attributed to the skill');
+});
+
+test('class-choice skills offer only the eligible classes you have', () => {
+  const c = { classes: [{ name: 'Fighter', level: 3 }, { name: 'Rogue', level: 2 }, { name: 'Cleric', level: 2 }] };
+  eq(eligibleClassChoices(c, 'Extensive Training').sort().join(','), 'Fighter,Rogue', 'non-casting classes only');
+  eq(eligibleClassChoices(c, 'Spell-Scholar').join(','), 'Cleric', 'spell-casting classes only');
+  const f = { classes: [{ name: 'Fighter', level: 4 }] };
+  eq(eligibleClassChoices(f, 'Spell-Scholar').length, 0, 'no caster class → no Spell-Scholar options');
+});
+
+test('Agile Learner trades require owning the skill and are capped by its rank', () => {
+  const base = (skills, ranks, trades) => computeSlots({ classes: [{ name: 'Fighter', level: 4 }],
+    purchasedSkills: skills, ranks: { purchasedSkills: ranks }, agileLearnerTrades: trades });
+  const basic = (rows) => rows.find((s) => s.category === 'basic').allowed;
+  const advanced = (rows) => rows.find((s) => s.category === 'advanced').allowed;
+  // Owns it: trade applies (basic 2→1, advanced 0→1).
+  let r = base(['Agile Learner'], [1], { Fighter: 1 });
+  eq(basic(r), 1, 'owned: basic -1'); eq(advanced(r), 1, 'owned: advanced +1');
+  // Doesn't own it: no trade.
+  r = base([], [], { Fighter: 1 });
+  eq(basic(r), 2, 'unowned: basic unchanged'); eq(advanced(r), 0, 'unowned: advanced unchanged');
+  // Owns 1, requests 3: clamped to capacity 1.
+  eq(agileLearnerCapacity({ purchasedSkills: ['Agile Learner'], ranks: { purchasedSkills: [1] } }), 1, 'capacity = owned ranks');
+  r = base(['Agile Learner'], [1], { Fighter: 3 });
+  eq(basic(r), 1, 'over-request clamped: basic -1 only');
 });
 
 // ─── multiclass skills ────────────────────────────────────────────────────────
