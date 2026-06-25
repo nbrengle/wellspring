@@ -278,6 +278,7 @@ export function SlotBlock({ slot, pickClassOf }) {
       .filter((p) => pickClassOf(field, p.flatIndex, p.name) === slot.cls && !grantedSet.has(p.name)));
 
   const rowCount = Math.max(slot.allowed, myPicks.length);
+  if (rowCount === 0 && granted.length === 0) return null;
   const rows = Array.from({ length: rowCount }, (_, i) => myPicks[i] ?? null);
   const state = slot.over ? "is-over" : slot.used === slot.allowed && slot.allowed > 0 ? "is-full" : "";
 
