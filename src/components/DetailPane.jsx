@@ -4,6 +4,10 @@ import {
   UNLIMITED_SKILLS, ALL_SKILLS, LINEAGES
 } from '../engine/data.js';
 import SubSelect from "./SubSelect.jsx";
+import { formatParameterizedName } from "../engine/resolver.js";
+// Re-export so existing importers (Builder.jsx) keep their path; the impl now lives
+// in the engine where it's unit-tested.
+export { formatParameterizedName };
 
 // Devotion names + Lore areas + Profession suggestions are derived from parsed data
 const DEVOTION_NAMES = DEVOTIONS.map((d) => d.name);
@@ -68,18 +72,6 @@ const PARAMETER_SUGGESTIONS = {
   "Additional Lost Life": LOST_LIFE_SUGGESTIONS
 };
 
-export function formatParameterizedName(baseName, parameter, originalName) {
-  if (!parameter) return baseName;
-  if (originalName) {
-    if (originalName.includes(" - ")) {
-      return `${baseName} - ${parameter}`;
-    }
-    if (originalName.includes("(")) {
-      return `${baseName} (${parameter})`;
-    }
-  }
-  return `${baseName} (${parameter})`;
-}
 
 // Resolve the entity type of a stat/wealth source name
 function sourceType(name) {

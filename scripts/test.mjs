@@ -17,7 +17,7 @@ import {
   LEVEL_CAP, LEGAL_MIN_LEVEL, grantedAbilities, computeSpend,
   getMaxRanks, bookcasterSpellOptions
 } from "../src/engine/testing.js";
-import { bareSkill, cleanItemName, getClasses } from "../src/engine/resolver.js";
+import { bareSkill, cleanItemName, getClasses, formatParameterizedName } from "../src/engine/resolver.js";
 import { formatCharacterSheet, parseCharacterSheet } from '../src/engine/sheet.js';
 import { solveCrafting, RECIPES, resolveRecipe, classifyIngredient, buildCraftTree } from '../src/engine/recipe-solver.js';
 import { readFileSync } from 'node:fs';
@@ -964,6 +964,21 @@ test('switching a parameterized choice updates the subject; player picks survive
   d.startingSkills[pi] = 'Profession - Apprentice (Smith)';
   d = rebuildStartingSkills(d, 'Druid', { ...d.startingChoices, [survBlock]: 'Scavenge I' });
   ok(d.startingSkills.includes('Profession - Apprentice (Smith)'), 'player profession pick preserved');
+});
+
+test('formatParameterizedName: dash form only when the base has no " - "', () => {
+  // Regression: a base that already contains " - " (Profession - Apprentice) must
+  // take the PARENS form, not "Profession - Apprentice - Blacksmith" (which no longer
+  // resolves back to its base, breaking re-edit + cleanup).
+  eq(formatParameterizedName('Profession - Apprentice', 'Blacksmith', 'Profession - Apprentice'),
+    'Profession - Apprentice (Blacksmith)', 'dash-in-base → parens');
+  eq(formatParameterizedName('Profession - Apprentice', 'Tailor', 'Profession - Apprentice (Specific Profession)'),
+    'Profession - Apprentice (Tailor)', 'reparameterize keeps parens');
+  // A clean base with a dash original keeps the dash form (Weapon Specialization).
+  eq(formatParameterizedName('Weapon Specialization', 'Swords', 'Weapon Specialization - Swords'),
+    'Weapon Specialization - Swords', 'clean base → dash preserved');
+  eq(formatParameterizedName('Lore', 'Shadow', 'Lore'), 'Lore (Shadow)', 'parens default');
+  eq(formatParameterizedName('Lore', '', 'Lore (Shadow)'), 'Lore', 'empty param → base only');
 });
 
 // Reconcile resolves the implicit choice for every block of every archetype (no
