@@ -15,7 +15,7 @@ import {
 import {
   budgetFor, computeSlots, spellSlots, devotionState, prereqStatus,
   LEVEL_CAP, LEGAL_MIN_LEVEL, grantedAbilities, computeSpend,
-  getMaxRanks, bookcasterSpellOptions, eligibleClassChoices, agileLearnerCapacity
+  getMaxRanks, bookcasterSpellOptions, eligibleClassChoices, agileLearnerCapacity, basicSpellOptions
 } from "../src/engine/testing.js";
 import { bareSkill, cleanItemName, getClasses, formatParameterizedName } from "../src/engine/resolver.js";
 import { formatCharacterSheet, parseCharacterSheet } from '../src/engine/sheet.js';
@@ -131,6 +131,23 @@ test('Bookcaster spell options: known vs other accessible spells', () => {
   eq(fighter.known.length + fighter.other.length, 0, 'non-caster has no options');
   // Each group sorted.
   eq(JSON.stringify(l4.other), JSON.stringify([...l4.other].sort((a, b) => a.localeCompare(b))), 'other sorted');
+});
+
+test('Basic Arcane / Basic Faith spell pools: sphere-gated, non-casters get any base class', () => {
+  const mk = (cls) => ({ classes: [{ name: cls, level: 4 }] });
+  // Non-caster: any base class of the matching sphere.
+  const fAr = basicSpellOptions(mk('Fighter'), 'Arcane');
+  const fDi = basicSpellOptions(mk('Fighter'), 'Divine');
+  ok(fAr.length > 0 && fDi.length > 0, 'non-caster gets a pool for each sphere');
+  ok(fAr.includes('Arcane Barrage'), 'Arcane pool has a Mage spell');
+  ok(fDi.includes('Cure'), 'Divine pool has a Cleric spell');
+  ok(!fAr.includes('Cure'), 'Divine spell not in the Arcane pool'); // spheres don't bleed
+  // Caster: restricted to their own class's list (a strict subset of the all-sphere pool).
+  const mage = basicSpellOptions(mk('Mage'), 'Arcane');
+  ok(mage.length > 0 && mage.length < fAr.length, 'Mage pool is smaller than all-Arcane');
+  ok(mage.every((s) => fAr.includes(s)), 'Mage pool ⊆ all-Arcane pool');
+  // sorted + de-duped
+  eq(JSON.stringify(fAr), JSON.stringify([...new Set(fAr)].sort((a, b) => a.localeCompare(b))), 'sorted + unique');
 });
 test('innate bonus cantrip (Cancel) is granted+locked, not a choosable slot', () => {
   const cant = (cls, lvl) => computeSlots({ archetypeName: 'x', classes: [{ name: cls, level: lvl }] })
