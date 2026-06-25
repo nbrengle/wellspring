@@ -225,7 +225,7 @@ function SiteFooter() {
       <span className="b-footer-ver">v{META.appVersion}</span>
       <span className="b-footer-sep">·</span>
       <span className="b-footer-sync">
-        Rules data synced from the {META.sourceDoc} ({META.sourceVersion}) on {META.sourceSyncedLabel}
+        Rules data synced from the <a href="https://docs.google.com/document/d/1lh8WAAWPk2ELo4_djuQg0fBTdt6Y5Oqp3a124qvtUrM/" target="_blank" rel="noreferrer" style={{ color: "inherit" }}>{META.sourceDoc}</a> ({META.sourceVersion}) on {META.sourceSyncedLabel}
       </span>
       <span className="b-footer-sep">·</span>
       <span className="b-footer-note">Unofficial fan tool — verify against the current rules.</span>
@@ -244,7 +244,7 @@ function BTopBar({ mode, setMode, character, report, onLevelChange, onExport }) 
   return (
     <header className="b-topbar">
       <div className="b-topbar-brand">
-        <span className="b-topbar-title">Wellspring</span>
+        <a href="https://www.wellspringlarp.org/" target="_blank" rel="noreferrer" className="b-topbar-title" style={{ textDecoration: "none" }}>Wellspring</a>
         <span className="b-topbar-sub">
           {mode === "explorer" ? "Rules Explorer" : mode === "recipes" ? "Recipe Explorer" : "Character Builder"}
         </span>
@@ -313,12 +313,6 @@ function BTopBar({ mode, setMode, character, report, onLevelChange, onExport }) 
         )}
       </div>
       <div className="b-topbar-actions">
-        <a href="https://www.wellspringlarp.org/" target="_blank" rel="noreferrer" className="b-topbar-btn" style={{ textDecoration: "none" }}>
-          Wellspring Website
-        </a>
-        <a href="https://docs.google.com/document/d/1lh8WAAWPk2ELo4_djuQg0fBTdt6Y5Oqp3a124qvtUrM/" target="_blank" rel="noreferrer" className="b-topbar-btn" style={{ textDecoration: "none" }}>
-          Rules Megadoc
-        </a>
         {mode === "builder" ? (
           <>
             <button className="b-topbar-btn" onClick={onExport}>
