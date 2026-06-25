@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef, Fragment } from "react";
+import React, { useMemo } from "react";
 import {
   lookupEntity, REFS, DEVOTIONS, DOMAINS,
   UNLIMITED_SKILLS, ALL_SKILLS, LINEAGES
@@ -185,101 +185,51 @@ function DescriptionBlock({ text, terms = [], onInspect }) {
   );
 }
 
+// Params whose value is open-ended — the player types their own (a Lore area, a
+// profession, a relic's name). These get the "type your own" custom chip; everything
+// else is a fixed pick from its options.
+const TYPEABLE_PARAMS = new Set([
+  "Lore", "Chronic Hobbyist",
+  "Profession - Apprentice", "Profession - Journeyman", "Profession - Master",
+  "Honor Debt", "Contact", "Ancestral Relic", "Ancestral Weapon", "Boon Bonds",
+  "Heartbond", "Famous", "Minor Fame", "Manse",
+]);
+
 function ParameterEditor({ baseName, entity, view, suggestions: suggestionsProp, groups, onUpdateParameter }) {
-  const [isOpen, setIsOpen] = useState(false);
   const chosenParam = entity.baseName ? (entity.parameter || "") : "";
-  const [filter, setFilter] = useState(chosenParam);
-  const containerRef = useRef(null);
-
-  useEffect(() => {
-    setFilter(chosenParam);
-  }, [chosenParam]);
-
-  useEffect(() => {
-    const handleOutsideClick = (e) => {
-      if (containerRef.current && !containerRef.current.contains(e.target)) {
-        setIsOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleOutsideClick);
-    return () => document.removeEventListener("mousedown", handleOutsideClick);
-  }, []);
 
   const isSpellChoice = baseName === "Bookcaster";
   const flat = suggestionsProp || PARAMETER_SUGGESTIONS[baseName] || [];
-  const allGroups = groups && groups.length ? groups : (flat.length ? [{ label: null, options: flat }] : []);
-  const isSearching = isOpen && filter !== chosenParam;
-  const match = (opt) => opt.toLowerCase().includes(filter.toLowerCase());
-  const visibleGroups = allGroups
-    .map((g) => ({ ...g, options: isSearching ? g.options.filter(match) : g.options }))
-    .filter((g) => g.options.length);
-  const hasOptions = allGroups.some((g) => g.options.length);
+  // SubSelect takes flat options OR grouped [{label, options}].
+  const options = (groups && groups.length) ? groups : flat;
+  const hasOptions = options.length > 0;
+  const allowCustom = TYPEABLE_PARAMS.has(baseName);
 
   const sectionLabel = baseName === "Lore" ? "Customize Area"
-    : isSpellChoice ? "Choose a Spell" : "Customize Choice";
-  const placeholder = baseName === "Lore" ? "Enter area..."
-    : isSpellChoice ? "Choose or type a spell..." : "Enter choice...";
+    : isSpellChoice ? "Choose a Spell" : "Choose";
 
   const choose = (opt) => {
-    setFilter(opt);
-    const newName = formatParameterizedName(baseName, opt, entity.name);
+    const newName = opt ? formatParameterizedName(baseName, opt, entity.name) : (entity.baseName || baseName);
     onUpdateParameter(view.field, entity.name, newName, view.index);
-    setIsOpen(false);
   };
 
   return (
-    <div className="b-detail-section b-parameter-editor" ref={containerRef}>
-      <h3 className="b-detail-section-title">
-        {sectionLabel}
-      </h3>
-      {isSpellChoice && !hasOptions && (
-        <p className="b-detail-hint">No accessible spell lists yet — gain spell-slots (or a caster class) to bookcast.</p>
+    <div className="b-detail-section b-parameter-editor">
+      {isSpellChoice && !hasOptions ? (
+        <>
+          <h3 className="b-detail-section-title">{sectionLabel}</h3>
+          <p className="b-detail-hint">No accessible spell lists yet — gain spell-slots (or a caster class) to bookcast.</p>
+        </>
+      ) : (
+        <SubSelect
+          prompt={sectionLabel}
+          value={chosenParam || null}
+          onChange={choose}
+          options={options}
+          allowCustom={allowCustom}
+          customLabel={baseName === "Lore" ? "Type an area…" : "Type your own…"}
+        />
       )}
-      <div className="b-combobox">
-        <div className="b-combobox-input-wrapper">
-          <input
-            type="text"
-            className="b-parameter-input"
-            placeholder={placeholder}
-            value={filter}
-            onFocus={() => setIsOpen(true)}
-            onChange={(e) => {
-              const val = e.target.value;
-              setFilter(val);
-              const newName = formatParameterizedName(baseName, val, entity.name);
-              onUpdateParameter(view.field, entity.name, newName, view.index);
-            }}
-          />
-          <button
-            type="button"
-            className="b-combobox-toggle"
-            aria-label="Toggle suggestions"
-            onClick={() => setIsOpen(!isOpen)}
-          >
-            {isOpen ? "▲" : "▼"}
-          </button>
-        </div>
-        {isOpen && visibleGroups.length > 0 && (
-          <ul className="b-combobox-list">
-            {visibleGroups.map((g) => (
-              <Fragment key={g.label || "_"}>
-                {g.label && <li className="b-combobox-group-label" aria-hidden="true">{g.label}</li>}
-                {g.options.map((opt) => (
-                  <li key={`${g.label || ""}:${opt}`}>
-                    <button
-                      type="button"
-                      className="b-combobox-option"
-                      onClick={() => choose(opt)}
-                    >
-                      {opt}
-                    </button>
-                  </li>
-                ))}
-              </Fragment>
-            ))}
-          </ul>
-        )}
-      </div>
     </div>
   );
 }
@@ -312,7 +262,8 @@ export function EntityBody({ entity, view, report, choices, onSetChoice, onUpdat
     paramSuggestions = PARAMETER_SUGGESTIONS[baseName] || null;
   }
   const isParamEditable = !!(onUpdateParameter && view?.field && view.field !== "multiclassGrant"
-    && (paramSuggestions?.length || paramGroups?.length || baseName === "Bookcaster"));
+    && (paramSuggestions?.length || paramGroups?.length || baseName === "Bookcaster"
+        || TYPEABLE_PARAMS.has(baseName)));  // typeable params are editable even with no suggestions
   const grantedSubPowers = useMemo(() => {
     if (!entity?.id) return [];
     const targets = REFS.grants?.[entity.id] || [];

@@ -4100,9 +4100,11 @@
   color: var(--b-amber);
 }
 
+/* Roomy enough that a sub-pick (chips / parameter editor) under the description
+   isn't cut off and forced into a scroll-within-scroll. */
 .b-inline-detail-body {
   padding: 0 0.85rem 0.7rem;
-  max-height: 14rem;
+  max-height: 28rem;
   overflow-y: auto;
 }
 
@@ -4153,6 +4155,35 @@
 }
 
 .b-subselect-chip:hover { border-color: var(--b-amber); }
+
+/* "Type your own" chip — dashed to read as an action, not a fixed option. */
+.b-subselect-chip.is-custom {
+  border-style: dashed;
+  color: var(--b-muted);
+}
+
+.b-subselect-chip.is-custom:hover { color: var(--b-amber); }
+
+/* Inline input the custom chip opens into. */
+.b-subselect-custom-input {
+  background: var(--b-panel-2, var(--b-panel));
+  border: 1px solid var(--b-amber);
+  color: var(--b-text);
+  border-radius: 0.4rem;
+  padding: 0.25rem 0.6rem;
+  font-size: 0.82rem;
+  min-width: 10rem;
+}
+
+/* A group heading inside a chip set (Bookcaster known / other). */
+.b-subselect-grouplabel {
+  width: 100%;
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--b-muted);
+  margin-top: 0.25rem;
+}
 
 .b-subselect-chip.is-on {
   border-color: var(--b-amber);
