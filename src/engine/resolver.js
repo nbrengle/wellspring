@@ -56,3 +56,18 @@ export function primaryClass(character) {
   return getClasses(character)[0]?.name || null;
 }
 
+
+// Build a parameterized skill name from its base + chosen parameter, in the right
+// separator form. The dash form ("Weapon Specialization - Swords") is only safe when
+// the BASE doesn't already contain " - " — otherwise it's ambiguous and yields a
+// malformed "Profession - Apprentice - Blacksmith" that no longer resolves back to
+// its base (breaking re-editing + cleanup). A base with its own " - " (or an original
+// that already used parens) takes the parenthesized form.
+export function formatParameterizedName(baseName, parameter, originalName) {
+  if (!parameter) return baseName;
+  const baseHasDash = baseName.includes(" - ");
+  if (!baseHasDash && originalName && originalName.includes(" - ") && !originalName.includes("(")) {
+    return `${baseName} - ${parameter}`;
+  }
+  return `${baseName} (${parameter})`;
+}

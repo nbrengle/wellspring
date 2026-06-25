@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import { DEVOTIONS, DOMAINS } from "../../engine/data.js";
-import { formatParameterizedName } from "../../components/DetailPane.jsx";
+import { formatParameterizedName } from "../../engine/resolver.js";
 import { MAX_DOMAINS } from "../../engine/validate.js";
 
 export function useIdentityHandlers({ character, setCharacter, setPicking }) {
