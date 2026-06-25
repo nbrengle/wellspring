@@ -415,3 +415,125 @@
 .b-explorer-sidebar::-webkit-scrollbar-thumb:hover {
   background: rgb(255, 255, 255, 15%);
 }
+
+/* ─── FACETED SIDEBAR (V4) ────────────────────────────────────────────────
+   Dim-don't-hide checkbox facets: impossible values gray to 0 + disable rather
+   than vanish, so the option list never shifts. Multi-select within a facet. */
+.b-facetbar {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.b-facetbar-group { margin-bottom: 0.6rem; }
+
+.b-facetbar-head {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  cursor: pointer;
+  margin-bottom: 0.15rem;
+}
+
+.b-facetbar-label {
+  font-family: Cinzel, serif;
+  font-size: 0.66rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--b-muted, #9c9183);
+}
+
+.b-facetbar-clear {
+  background: none;
+  border: none;
+  color: var(--b-amber, #d6a956);
+  font-size: 0.62rem;
+  cursor: pointer;
+  padding: 0;
+}
+
+.b-facetbar-chev {
+  margin-left: auto;
+  color: var(--b-dim, #5e564b);
+  font-size: 0.7rem;
+}
+
+.b-facetbar-opt {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  padding: 0.08rem 0;
+  cursor: pointer;
+  color: var(--b-text, #e8dcc8);
+}
+
+.b-facetbar-opt.is-on { color: var(--b-amber, #d6a956); }
+
+.b-facetbar-opt.is-zero {
+  color: var(--b-dim, #5e564b);
+  cursor: default;
+}
+
+.b-facetbar-v {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.b-facetbar-c {
+  margin-left: auto;
+  font-size: 0.72rem;
+  color: var(--b-muted, #9c9183);
+  font-variant-numeric: tabular-nums;
+}
+
+.b-facetbar-opt.is-zero .b-facetbar-c { color: var(--b-dim, #5e564b); }
+
+.b-facetbar-more {
+  background: none;
+  border: none;
+  color: var(--b-teal, #6fb0a8);
+  font-size: 0.72rem;
+  cursor: pointer;
+  padding: 0.1rem 0;
+}
+
+/* Active filter chip bar above the results */
+.b-facetbar-active {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.b-facetbar-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: var(--b-panel-2, var(--b-panel, #232019));
+  border: 1px solid var(--b-amber, #d6a956);
+  color: var(--b-amber, #d6a956);
+  border-radius: 1rem;
+  padding: 0.1rem 0.5rem;
+  font-size: 0.73rem;
+}
+
+.b-facetbar-chip button {
+  background: none;
+  border: none;
+  color: var(--b-amber, #d6a956);
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+
+.b-facetbar-clearall {
+  background: none;
+  border: none;
+  color: var(--b-muted, #9c9183);
+  font-size: 0.72rem;
+  cursor: pointer;
+  text-decoration: underline;
+}
