@@ -44,14 +44,21 @@ function extractStatMods(ent, character, id) {
   return [];
 }
 
+// A build chooseOne option's granted skills. The parser emits this under `grants`
+// for most powers but `grantsSkills` for a few (Way of the Blade) — read either so a
+// field-name drift never silently drops the grant (which left the chosen spec NOT
+// free). Normalizing the parser too, but stay tolerant here.
+const optGrants = (o) => o?.grants || o?.grantsSkills || [];
+
 function extractChooseOne(ent, character, id) {
   if (ent?.chooseOne?.kind === 'build') {
     const chosen = character.choices?.[`powers:${ent.name}`];
     if (chosen) {
       // Find the option by direct text match, or by seeing if one of its granted skills matches the chosen string.
-      const opt = ent.chooseOne.options.find((o) => o.text === chosen || o.grants?.includes(chosen));
-      if (opt?.grants && opt.grants.length > 0) {
-        return [{ type: 'GRANT_SOURCE', grants: opt.grants.map(s => `skills:${s}`) }];
+      const opt = ent.chooseOne.options.find((o) => o.text === chosen || optGrants(o).includes(chosen));
+      const grants = optGrants(opt);
+      if (grants.length > 0) {
+        return [{ type: 'GRANT_SOURCE', grants: grants.map(s => `skills:${s}`) }];
       }
     }
   }

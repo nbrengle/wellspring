@@ -7905,21 +7905,21 @@
           "options": [
             {
               "text": "Swords",
-              "grantsSkills": [
+              "grants": [
                 "Weapon Specialization - Swords",
                 "Two Weapon Style"
               ]
             },
             {
               "text": "Thrown Weapons",
-              "grantsSkills": [
+              "grants": [
                 "Weapon Specialization - Thrown Weapons",
                 "Two Weapon Style"
               ]
             },
             {
               "text": "Daggers",
-              "grantsSkills": [
+              "grants": [
                 "Weapon Specialization - Daggers",
                 "Two Weapon Style"
               ]
