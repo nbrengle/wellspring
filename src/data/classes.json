@@ -10625,7 +10625,8 @@
               "text": "Skills that rely on a Spellbook for their Sourcerer Spells"
             }
           ]
-        }
+        },
+        "requiredLevel": 1
       },
       {
         "name": "Astride the Weave",
@@ -10644,7 +10645,8 @@
         "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "Requirements: Sourcerer Level 2 Incantation: None Call: None Target: Self                                        Duration: Passive Delivery: None                                        Refresh: Immediate The Sourcerer’s channeling of magic through the Arcane Source unbinds them from the traditional need to remain still while gathering power, allowing the arcane theurgist to move while incanting their Base Class: Sourcerer Cantrips and Spells. This delicate balance is lost if the character is wearing any non-Barrier Armor and only applies to Base Class Sourcerer Cantrips and Spells. This ability does not override the specific requirements of the spell being cast, thus, if the specific spell itself calls for the caster to remain in place, or pivot on one foot, or any other requirement, the caster must abide by those restrictions."
+        "description": "Requirements: Sourcerer Level 2 Incantation: None Call: None Target: Self                                        Duration: Passive Delivery: None                                        Refresh: Immediate The Sourcerer’s channeling of magic through the Arcane Source unbinds them from the traditional need to remain still while gathering power, allowing the arcane theurgist to move while incanting their Base Class: Sourcerer Cantrips and Spells. This delicate balance is lost if the character is wearing any non-Barrier Armor and only applies to Base Class Sourcerer Cantrips and Spells. This ability does not override the specific requirements of the spell being cast, thus, if the specific spell itself calls for the caster to remain in place, or pivot on one foot, or any other requirement, the caster must abide by those restrictions.",
+        "requiredLevel": 2
       },
       {
         "name": "Enduring Source",
@@ -10663,7 +10665,8 @@
         "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "Requirements: Sourcerer Level 3 Incantation: RP: Focus Quick 100 miming rebuilding the source. Call: “Rebuild Source” Target: Self                                         Duration: Instantaneous Delivery: None                                          Refresh: Short Rest Accent: None                                        Effect: Rebuild Once per Short Rest, the Sourcerer may Rebuild a broken or shattered Arcane Source."
+        "description": "Requirements: Sourcerer Level 3 Incantation: RP: Focus Quick 100 miming rebuilding the source. Call: “Rebuild Source” Target: Self                                         Duration: Instantaneous Delivery: None                                          Refresh: Short Rest Accent: None                                        Effect: Rebuild Once per Short Rest, the Sourcerer may Rebuild a broken or shattered Arcane Source.",
+        "requiredLevel": 3
       },
       {
         "name": "Dissipate Curse",
@@ -10682,7 +10685,8 @@
         "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "Requirements: Sourcerer Level 5 Incantation: Focus Quick 30 Call: “Cure [Disarm, Disable, Root, Bind]” Target: Self                                         Duration: Instantaneous Delivery: None                                         Refresh: Short Rest Accent: None                                        Effect: Cure Once per Short Rest, the Sourcerer may Cure Condition [Disarm, Disable, Root, Bind] on themselves by Focusing for a Quick 30."
+        "description": "Requirements: Sourcerer Level 5 Incantation: Focus Quick 30 Call: “Cure [Disarm, Disable, Root, Bind]” Target: Self                                         Duration: Instantaneous Delivery: None                                         Refresh: Short Rest Accent: None                                        Effect: Cure Once per Short Rest, the Sourcerer may Cure Condition [Disarm, Disable, Root, Bind] on themselves by Focusing for a Quick 30.",
+        "requiredLevel": 5
       },
       {
         "name": "Power of Magic",
@@ -10701,7 +10705,8 @@
         "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "Requirements: Sourcerer Level 7 Incantation: None Call: None Target: Self                                        Duration: Long Rest Delivery: None                                        Refresh: Long Rest The Sourcerer’s channeling of magic through the Arcane Source allows them to make sacrifices other more traditional arcane casters cannot. Upon completion of a Long Rest, the Sourcerer may Sacrifice a Cantrip that they know, other than Cancel, losing the ability to cast it until their next Long Rest. In exchange, the Sourcerer may select an Accent they have a Source for and add +1 damage to any spell (not Cantrip) cast with that accent, for a Long Rest. Note: In all cases, the normal stacking rules apply to these damage bonuses."
+        "description": "Requirements: Sourcerer Level 7 Incantation: None Call: None Target: Self                                        Duration: Long Rest Delivery: None                                        Refresh: Long Rest The Sourcerer’s channeling of magic through the Arcane Source allows them to make sacrifices other more traditional arcane casters cannot. Upon completion of a Long Rest, the Sourcerer may Sacrifice a Cantrip that they know, other than Cancel, losing the ability to cast it until their next Long Rest. In exchange, the Sourcerer may select an Accent they have a Source for and add +1 damage to any spell (not Cantrip) cast with that accent, for a Long Rest. Note: In all cases, the normal stacking rules apply to these damage bonuses.",
+        "requiredLevel": 7
       },
       {
         "name": "Rote Invocation",
@@ -10720,7 +10725,8 @@
         "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "Requirements: Sourcerer Level 10 Incantation: None Call: None Target: Self                                        Duration: Long Rest Delivery: None                                        Refresh: Long Rest Accent: None                                                            Effect: Grant Signature Spell The Sourcerer’s time harnessing the arcane has led to their ability to gradually intake mana from their environment, fuelling the spellwork with which they are most familiar. Once per Long Rest, you may designate a Sourcerer spell you know as a Signature Spell by expending a spell slot that could be used to cast that spell. Until your next Long Rest, you may cast your Signature Spell once per Short Rest as if you had spent the spell slot used to designate the spell. The spell may not have the Duration of Long Rest."
+        "description": "Requirements: Sourcerer Level 10 Incantation: None Call: None Target: Self                                        Duration: Long Rest Delivery: None                                        Refresh: Long Rest Accent: None                                                            Effect: Grant Signature Spell The Sourcerer’s time harnessing the arcane has led to their ability to gradually intake mana from their environment, fuelling the spellwork with which they are most familiar. Once per Long Rest, you may designate a Sourcerer spell you know as a Signature Spell by expending a spell slot that could be used to cast that spell. Until your next Long Rest, you may cast your Signature Spell once per Short Rest as if you had spent the spell slot used to designate the spell. The spell may not have the Duration of Long Rest.",
+        "requiredLevel": 10
       }
     ],
     "utility": [],
