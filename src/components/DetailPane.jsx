@@ -205,7 +205,7 @@ function ParameterEditor({ baseName, entity, view, suggestions: suggestionsProp,
     return () => document.removeEventListener("mousedown", handleOutsideClick);
   }, []);
 
-  const isSpellChoice = baseName === "Bookcaster";
+  const isSpellChoice = baseName === "Bookcaster" || baseName === "Basic Arcane" || baseName === "Basic Faith";
   const flat = suggestionsProp || PARAMETER_SUGGESTIONS[baseName] || [];
   const allGroups = groups && groups.length ? groups : (flat.length ? [{ label: null, options: flat }] : []);
   const isSearching = isOpen && filter !== chosenParam;
@@ -308,6 +308,10 @@ export function EntityBody({ entity, view, report, choices, onSetChoice, onUpdat
     // offer ONLY the classes this character is eligible to pick (their own classes
     // of the right kind), not the hardcoded full list.
     paramSuggestions = report.classChoices[baseName] || [];
+  } else if (report?.basicSpellChoices && baseName in report.basicSpellChoices) {
+    // Basic Arcane / Basic Faith: pick the one spell you learn, from the
+    // sphere-appropriate pool (your caster class's list, or any base class's).
+    paramSuggestions = report.basicSpellChoices[baseName] || [];
   } else {
     paramSuggestions = PARAMETER_SUGGESTIONS[baseName] || null;
   }
