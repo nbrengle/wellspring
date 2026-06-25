@@ -45,11 +45,11 @@ const PARAMETER_SUGGESTIONS = {
   "Extended Capacity - Novice": ["Arcane", "Divine"],
   "Extended Capacity - Adept": ["Arcane", "Divine"],
   "Extended Capacity - Greater": ["Arcane", "Divine"],
-  "Extensive Combat Training - Basic": ["Artisan", "Fighter", "Rogue", "Socialite"],
-  "Extensive Combat Training - Advanced": ["Artisan", "Fighter", "Rogue", "Socialite"],
-  "Extensive Combat Training - Veteran": ["Artisan", "Fighter", "Rogue", "Socialite"],
-  "Extensive Training": ["Artisan", "Fighter", "Rogue", "Socialite"],
-  "Spell-Scholar": ["Cleric", "Druid", "Mage", "Sourcerer"],
+  // Extensive Combat Training / Extensive Training / Spell-Scholar are class-choice
+  // grants — their options are computed dynamically (report.classChoices) from the
+  // classes the character actually has, so they're NOT listed statically here.
+  // (Two Weapon Style / Advanced styles / Advanced Recharge were removed in #106 —
+  // their rules have no sub-selection.)
   "Additional Cantrip": ["Arcane", "Divine"],
   "Elemental Affinity": ["Flame", "Ice", "Lightning", "Acid"],
   "Draconic Heritage": ["Acid", "Flame", "Ice", "Lightning"],
@@ -303,11 +303,16 @@ export function EntityBody({ entity, view, report, choices, onSetChoice, onUpdat
       { label: "Known Spells", options: bc.known || [] },
       { label: "Other Accessible Spells", options: bc.other || [] },
     ].filter((g) => g.options.length);
+  } else if (report?.classChoices && baseName in report.classChoices) {
+    // Cross-class grants (Extensive Combat Training / Training / Spell-Scholar):
+    // offer ONLY the classes this character is eligible to pick (their own classes
+    // of the right kind), not the hardcoded full list.
+    paramSuggestions = report.classChoices[baseName] || [];
   } else {
     paramSuggestions = PARAMETER_SUGGESTIONS[baseName] || null;
   }
   const isParamEditable = !!(onUpdateParameter && view?.field && view.field !== "multiclassGrant"
-    && (paramSuggestions || paramGroups || baseName === "Bookcaster"));
+    && (paramSuggestions?.length || paramGroups?.length || baseName === "Bookcaster"));
   const grantedSubPowers = useMemo(() => {
     if (!entity?.id) return [];
     const targets = REFS.grants?.[entity.id] || [];

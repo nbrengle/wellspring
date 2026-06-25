@@ -14,19 +14,54 @@ import {
   activeInnatePowers, CASTER_SLOT_FIELDS, MARTIAL_SLOT_FIELDS, POWER_SOURCE_FIELDS
 } from './core.js';
 
+// Skills whose grant is scoped to a CLASS the player must choose — and the choice
+// is gated by the classes they actually have levels in (the rules: "from a
+// non-casting class that they have levels in", "a spell-casting class in which they
+// have a Known Spell"). The chosen class is stored as the skill's parameter
+// ("Extensive Training (Fighter)"), which slotGrants() already routes the bonus slot
+// to. `kind` filters which of the character's classes are eligible.
+//   nonCasting  — Extensive Combat Training / Extensive Training: pick a non-casting
+//                 class you have levels in → +1 power slot of that tier there.
+//   spellCasting — Spell-Scholar: pick a spell-casting class you have a Known Spell
+//                 in → +1 spells-known there.
+export const CLASS_CHOICE_SKILLS = {
+  'Extensive Combat Training - Basic':    { kind: 'nonCasting' },
+  'Extensive Combat Training - Advanced': { kind: 'nonCasting' },
+  'Extensive Combat Training - Veteran':  { kind: 'nonCasting' },
+  'Extensive Training':                   { kind: 'nonCasting' },
+  'Spell-Scholar':                        { kind: 'spellCasting' },
+};
+
+// The classes a character may choose for a given class-choice skill: their own
+// classes, filtered to the skill's required kind (and for Spell-Scholar, only ones
+// they actually have a Known Spell in — i.e. a caster class they've leveled).
+export function eligibleClassChoices(character, baseName) {
+  const spec = CLASS_CHOICE_SKILLS[baseName];
+  if (!spec) return null;
+  return getClasses(character)
+    .map((c) => c.name)
+    .filter((name) => {
+      const isCaster = !!CLASSES[name]?.spellcaster;
+      return spec.kind === 'spellCasting' ? isCaster : !isCaster;
+    });
+}
+
 // Bonus slots, keyed PER CLASS as "class:category" → count. Class features
 // attribute to their own class; skill grants attribute to a relevant class (the
 // caster class for cantrip/spell grants, the martial class for power grants), so
 // the bonus lands on the correct per-class slot row.
-export function slotGrants(character) {
+// `sources` (optional) is filled with { "cls:cat": [grantingItemName, …] } so the
+// slot UI can show WHICH skill granted a bonus slot (the "auditable" attribution).
+export function slotGrants(character, sources = null) {
   const grants = {};
   // computeSlots categories only. Raw spell-tier grants (novice/adept/greater) are
   // the province of spellSlots(), not the slot-cap budget here — skip them.
   const cats = new Set(SLOT_CATS);
-  const addTo = (cls, cat, n) => {
+  const addTo = (cls, cat, n, source) => {
     if (!cls || !cats.has(cat)) return;
     const k = `${cls}:${cat}`;
     grants[k] = (grants[k] || 0) + n;
+    if (sources && source) (sources[k] = sources[k] || []).push(source);
   };
   const classes = getClasses(character);
   const casterClass = classes.find((c) => CLASSES[c.name]?.spellcaster)?.name;
@@ -73,7 +108,7 @@ export function slotGrants(character) {
       }
 
       for (const { cat, n } of (ent?.slotGrants || [])) {
-         addTo(targetCls || classFor(cat), cat, n * rank);
+         addTo(targetCls || classFor(cat), cat, n * rank, ent?.baseName || ent?.name || cleanItemName(item));
       }
     });
   }
@@ -84,7 +119,7 @@ export function slotGrants(character) {
   // locked cantrip, handled by innateBonusCantrips(), so it never bumps the cap.
   for (const ip of activeInnatePowers(character)) {
     if (ip.cls && ip.entity?.slotGrants) {
-      for (const { cat, n } of (ip.entity.slotGrants || [])) addTo(ip.cls, cat, n);
+      for (const { cat, n } of (ip.entity.slotGrants || [])) addTo(ip.cls, cat, n, ip.entity.name || ip.name);
     }
   }
 
@@ -126,15 +161,52 @@ export function innateBonusCantrips(character) {
 // one row per class × category, each counting only that class's attributed picks
 // and capped by that class's progression at its level. Each row carries `cls` so
 // the picker can filter candidates to that class.
+// How many Agile Learner trades the character is entitled to — the total rank of
+// every Agile Learner skill they own (it has no maxRanks, so each purchase = one
+// more trade). 0 when the skill isn't owned.
+export function agileLearnerCapacity(character) {
+  let n = 0;
+  for (const field of ['startingSkills', 'purchasedSkills', 'classSkills']) {
+    (character[field] || []).forEach((item, idx) => {
+      if (cleanItemName(item) === 'Agile Learner') n += rankOf(character, field, idx);
+    });
+  }
+  return n;
+}
+
+// The per-class trades actually allowed: the recorded trades, clamped so the total
+// never exceeds capacity (owned Agile Learner ranks) and a class never trades away
+// a basic slot it doesn't have. Drops trades on classes not owned.
+function clampAgileTrades(character, classes) {
+  const recorded = character.agileLearnerTrades || {};
+  const capacity = agileLearnerCapacity(character);
+  const out = {};
+  let used = 0;
+  for (const { name: cls, level } of classes) {
+    if (CLASSES[cls]?.spellcaster) continue; // power trades are non-caster only
+    const want = recorded[cls] || 0;
+    if (want <= 0) continue;
+    const basics = progressionRow(cls, level).basic ?? 0;
+    const allowed = Math.min(want, basics, capacity - used);
+    if (allowed > 0) { out[cls] = allowed; used += allowed; }
+  }
+  return out;
+}
+
 export function computeSlots(character) {
   const classes = getClasses(character).filter((c) => CLASS_POWER_SLOTS[c.name]);
   if (!classes.length) return [];
   const multi = classes.length > 1;
-  const bonus = slotGrants(character);
+  const bonusSources = {};
+  const bonus = slotGrants(character, bonusSources);
   // Free, locked cantrips granted by progression ("Innate Bonus Cantrip: Cancel").
   const grantedCantrips = innateBonusCantrips(character);
 
-  const agileTrades = character.agileLearnerTrades || {};
+  // Agile Learner trades a tier-1 slot for a tier-2 (same class). You can only make
+  // as many trades as you own Agile Learner ranks — so clamp the recorded trades to
+  // that capacity. Without this, a stale `agileLearnerTrades` (or one set on a
+  // character that doesn't own the skill) would silently shift slots for free.
+  const agileTrades = clampAgileTrades(character, classes);
 
   const rows = [];
   for (const { name: cls, level } of classes) {
@@ -150,6 +222,9 @@ export function computeSlots(character) {
       return {
         cls, category, label: multi ? `${cls} ${label}` : label,
         used, base: baseVal, bonus: b, allowed: baseVal + b,
+        // Which skill(s) granted the bonus slot(s) on this row — for the UI to show
+        // "+1 from Extensive Training" so a granted slot is auditable.
+        bonusFrom: bonusSources[`${cls}:${category}`] || [],
       };
     };
     if (isCaster) {
