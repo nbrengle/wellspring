@@ -4098,3 +4098,94 @@
   max-height: 14rem;
   overflow-y: auto;
 }
+
+/* ─── SUBSELECT (the one sub-selection chip control) ──────────────────────
+   Standardizes every "pick one" sub-selection (build chooseOne, starting
+   specialty, granted selection, lineage sub-choice) onto visible chips with a
+   "Choose" badge for unmade picks. */
+.b-subselect-prompt {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.78rem;
+  color: var(--b-muted);
+  margin-bottom: 0.35rem;
+}
+
+.b-subselect-badge {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+  color: var(--b-bg, #1a1714);
+  background: var(--b-amber);
+  border-radius: 1rem;
+  padding: 0.08rem 0.45rem;
+}
+
+.b-subselect-made {
+  font-size: 0.72rem;
+  color: var(--b-teal);
+}
+
+.b-subselect-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.b-subselect-chip {
+  background: var(--b-panel-2, var(--b-panel));
+  border: 1px solid var(--b-border);
+  color: var(--b-text);
+  border-radius: 0.4rem;
+  padding: 0.25rem 0.6rem;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: border-color 0.12s ease, color 0.12s ease;
+}
+
+.b-subselect-chip:hover { border-color: var(--b-amber); }
+
+.b-subselect-chip.is-on {
+  border-color: var(--b-amber);
+  color: var(--b-amber);
+  background: rgb(214 169 86 / 8%);
+}
+
+.b-subselect-free {
+  color: var(--b-teal);
+  font-size: 0.68rem;
+  margin-left: 0.3rem;
+}
+
+.b-subselect-hint {
+  color: var(--b-muted);
+  font-size: 0.68rem;
+  margin-left: 0.3rem;
+}
+
+/* An unmade subselect gets a subtle amber edge so it's noticeable in a long sheet. */
+.b-subselect.is-unmade {
+  border-left: 2px solid var(--b-amber);
+  padding-left: 0.5rem;
+  margin-left: -0.5rem;
+}
+
+/* SubSelect search fallback (only for large pools like cantrips, 18–33 options) */
+.b-subselect-search {
+  width: 100%;
+  max-width: 22rem;
+  background: var(--b-panel-2, var(--b-panel));
+  color: var(--b-text);
+  border: 1px solid var(--b-border);
+  border-radius: 0.4rem;
+  padding: 0.3rem 0.5rem;
+  font-size: 0.82rem;
+  margin-bottom: 0.4rem;
+}
+
+.b-subselect-chips.is-scroll {
+  max-height: 9rem;
+  overflow-y: auto;
+}
