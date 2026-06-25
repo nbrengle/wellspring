@@ -180,7 +180,7 @@ for (let i = 0; i < nodes.length; i++) {
   if (looksLikeProse) nodes[i] = { type: 'text', text: n.text };
 }
 
-const POWER_STAT_FIELD = /^(Incantation|Incant|Call|Target|Refresh|Cost|Requirement|Prerequisites?):\s/;
+const POWER_STAT_FIELD = /^(Incantation|Incant|Call|Target|Refresh|Cost|Requirements?|Prerequisites?):\s/;
 // A power heading has either a tier tag in brackets OR a "- N BP" cost suffix.
 // Class powers live at H4 in the doc; domain powers at H3. Tier-tag presence
 // alone isn't enough to decide (domain powers may carry [Adept], [Greater],
@@ -330,10 +330,10 @@ function subPowerNames() {
   return _subPowerNames;
 }
 
-const STAT_FIELD = /^(Incantation|Incant|Call|Target|Duration|Delivery|Refresh|Accent|Effect|Requirement|Prerequisites?|Skills and Options):\s*(.*)$/;
+const STAT_FIELD = /^(Incantation|Incant|Call|Target|Duration|Delivery|Refresh|Accent|Effect|Requirements?|Prerequisites?|Skills and Options):\s*(.*)$/;
 // Same field labels, unanchored — used to find where a stat block starts within a
 // run-on string (sub-power cells glue the power NAME onto the first field label).
-const STAT_LABEL = /(Incantation|Incant|Call|Target|Duration|Delivery|Refresh|Accent|Effect|Requirement|Prerequisites?|Skills and Options):/;
+const STAT_LABEL = /(Incantation|Incant|Call|Target|Duration|Delivery|Refresh|Accent|Effect|Requirements?|Prerequisites?|Skills and Options):/;
 const STAT_TWO = /^(Target|Delivery|Accent):\s*(.+?)\s{2,}(Duration|Refresh|Effect):\s*(.+)$/;
 const statKey = l => l.toLowerCase().replace(/^incant$/, 'incantation').replace(/\s+/g, '_').replace(/s$/, '');
 

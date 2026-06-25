@@ -122,12 +122,7 @@ export function getMaxRanks(name, field, character) {
 }
 
 export function requiredLevel(power) {
-  if (power?.requiredLevel != null) return power.requiredLevel;
-  if (power?.description) {
-    const m = power.description.match(/Requirements?:.*?(?:\b(?!Character\b)[A-Za-z]+\s+)?Level\s+(\d+)/i);
-    if (m) return parseInt(m[1], 10);
-  }
-  return 0;
+  return power?.requiredLevel ?? 0;
 }
 
 // Which class a power pick belongs to (explicit tag, else the sole class, else the
