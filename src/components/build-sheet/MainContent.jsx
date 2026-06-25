@@ -240,7 +240,7 @@ export function SingleSkillAllocator({ skillName, hint }) {
   let rank = 0;
   for (const field of ['startingSkills', 'purchasedSkills', 'classSkills']) {
     (character[field] || []).forEach((item, idx) => {
-      if (cleanItemName(item) === skillName) {
+      if (bareSkill(cleanItemName(item)) === skillName) {
         rank += character.ranks?.[field]?.[idx] || 1;
       }
     });
