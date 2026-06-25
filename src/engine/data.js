@@ -92,9 +92,17 @@ export const ALL_SKILLS = skillsJson.map(s => ({
 // Skills with unlimited ranks are instance-based: "Skill xN" means N separate
 // skills (each a distinct subject), not rank N. Single source of truth for the
 // rule, shared by the importer's xN expansion.
-export const UNLIMITED_SKILLS = new Set(
-  skillsJson.filter(s => String(s.ranks).toLowerCase() === 'unlimited').map(s => s.name)
-);
+export const UNLIMITED_SKILLS = new Set([
+  ...skillsJson.filter(s => String(s.ranks).toLowerCase() === 'unlimited').map(s => s.name),
+  // Parameterized multiclass skills that need to be purchasable per-class
+  'Extensive Combat Training - Basic',
+  'Extensive Combat Training - Advanced',
+  'Extensive Combat Training - Veteran',
+  'Extensive Training',
+  'Two Weapon Style',
+  'Advanced Two Weapon Style',
+  'Advanced Great Weapon Style'
+]);
 
 // Perk categories in the source use "Social/Background"; the UI groups under
 // "Social". Normalize here so the UI's category list matches.

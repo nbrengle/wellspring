@@ -195,6 +195,18 @@ export function useCoreHandlers({ character, setCharacter, setPicking, setView }
     });
   }, [setCharacter]);
 
+  const handleSetMulticlassAllocation = useCallback((skill, cls, delta) => {
+    setCharacter((c) => {
+      const allocs = c.multiclassAllocations?.[skill] || {};
+      const current = allocs[cls] || 0;
+      const next = Math.max(0, current + delta);
+      return {
+        ...c,
+        multiclassAllocations: { ...(c.multiclassAllocations || {}), [skill]: { ...allocs, [cls]: next } }
+      };
+    });
+  }, [setCharacter]);
+
   return {
     handleSetChoice,
     handleUpdateParameter,
@@ -205,5 +217,6 @@ export function useCoreHandlers({ character, setCharacter, setPicking, setView }
     handleSetSpecialty,
     handleSetGrantedSelection,
     handleSetAgileLearnerTrade,
+    handleSetMulticlassAllocation,
   };
 }

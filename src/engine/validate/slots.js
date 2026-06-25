@@ -72,8 +72,21 @@ export function slotGrants(character) {
          }
       }
 
-      for (const { cat, n } of (ent?.slotGrants || [])) {
-         addTo(targetCls || classFor(cat), cat, n * rank);
+      if (ent && ent.slotGrants) {
+        const allocs = character.multiclassAllocations?.[ent.name] || {};
+        const allocatedRanks = Object.values(allocs).reduce((a, b) => a + b, 0);
+        const unallocated = Math.max(0, rank - allocatedRanks);
+
+        for (const { cat, n } of ent.slotGrants) {
+          // Grant allocated slots specifically to their allocated class
+          for (const [clsName, r] of Object.entries(allocs)) {
+             if (r > 0) addTo(clsName, cat, n * r);
+          }
+          // Grant unallocated slots to the default target
+          if (unallocated > 0) {
+             addTo(targetCls || classFor(cat), cat, n * unallocated);
+          }
+        }
       }
     });
   }
@@ -134,7 +147,7 @@ export function computeSlots(character) {
   // Free, locked cantrips granted by progression ("Innate Bonus Cantrip: Cancel").
   const grantedCantrips = innateBonusCantrips(character);
 
-  const agileTrades = character.agileLearnerTrades || {};
+  const agileTrades = character.multiclassAllocations?.["Agile Learner"] || character.agileLearnerTrades || {};
 
   const rows = [];
   for (const { name: cls, level } of classes) {
@@ -181,7 +194,7 @@ export function spellSlots(character) {
   if (!casters.length) return null; // not a caster
 
   const pools = {};
-  const agileTrades = character.agileLearnerTrades || {};
+  const agileTrades = character.multiclassAllocations?.["Agile Learner"] || character.agileLearnerTrades || {};
 
   // Sum each caster class's progression "N/N/N" slots at its own level.
   for (const { name, level } of casters) {

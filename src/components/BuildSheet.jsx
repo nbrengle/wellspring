@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from "react";
 export { IdentityRail } from "./build-sheet/IdentityRail.jsx";
 import { Stat, StatWithSources, Section, CostBadge } from "./build-sheet/SharedUI.jsx";
-import { LineageSummary, StartingChoicesSection, GrantedSelectionsSection, AgileLearnerSection, CraftingSection, SlotBlock, ClassifiedRows, EditableRows } from "./build-sheet/MainContent.jsx";
+import { LineageSummary, StartingChoicesSection, GrantedSelectionsSection, MulticlassSkillAllocators, CraftingSection, SlotBlock, ClassifiedRows, EditableRows } from "./build-sheet/MainContent.jsx";
 import {
   ARCHETYPES, lookupEntity, ALL_SKILLS, ALL_PERKS, ALL_FLAWS,
   CLASS_POWER_SLOTS, CLASSES, DEVOTIONS, DOMAINS, LINEAGES,
@@ -175,7 +175,7 @@ export default function BuildSheet() {
 
       {report.slots.length > 0 && (
         <Section title="Powers" tone="purple">
-          <AgileLearnerSection />
+          <MulticlassSkillAllocators />
           {report.slots.map((slot) => (
             <SlotBlock key={`${slot.cls}-${slot.category}`} slot={slot}
                        pickClassOf={(field, i, name) => pickClass(character, field, i, name)} />
