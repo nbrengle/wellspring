@@ -21,7 +21,8 @@ import { bareSkill, cleanItemName, getClasses, formatParameterizedName } from ".
 import { formatCharacterSheet, parseCharacterSheet } from '../src/engine/sheet.js';
 import { solveCrafting, RECIPES, resolveRecipe, classifyIngredient, buildCraftTree } from '../src/engine/recipe-solver.js';
 import { readFileSync } from 'node:fs';
-import { lookupEntity, eligiblePowers, DEVOTIONS, DOMAINS, REFS, CLASSES, LINEAGES, lineageChoiceSpec, lineageItemImpact, ALLERGEN_AWARDS, allergenOptions, allergenAward } from '../src/engine/data.js';
+import { lookupEntity, eligiblePowers, DEVOTIONS, DOMAINS, REFS, CLASSES, LINEAGES, lineageChoiceSpec, lineageItemImpact, ALLERGEN_AWARDS, allergenOptions, allergenAward, powerSpellChoiceSpec } from '../src/engine/data.js';
+import { resolveCharacterGraph } from '../src/engine/graph.js';
 import {
   hasStartingChoices, reconcileStartingChoices, rebuildStartingSkills,
   STARTING_CHOICES_CONFIG, optionSkills, resolveSkill,
@@ -398,6 +399,19 @@ test('lineageChoiceSpec classifies sub-choice items by kind', () => {
   eq(lineageChoiceSpec(findLin('Lost', 'Lost Life')).kind, 'rep', 'Lost Life = rep');
   eq(lineageChoiceSpec(findLin('Aewen', 'Elemental Expression')).kind, 'flavor', 'Elemental Expression = flavor');
   eq(lineageChoiceSpec(findLin('Aewen', 'Deep Reserves')), null, 'an ordinary advantage has no choice spec');
+  // Arcane Aptitude: a 'spell' pick (cantrip/novice from any base Arcane class).
+  const aa = lineageChoiceSpec(findLin('Aewen', 'Arcane Aptitude'));
+  eq(aa.kind, 'spell', 'Arcane Aptitude = spell');
+  ok(aa.pool.includes('Arcane') && aa.tiers.includes('novice'), 'Arcane Aptitude pool=Arcane, includes novice');
+});
+
+test('Arcane Aptitude grants the chosen spell as a Known Spell', () => {
+  const char = { lineage: 'Aewen', lineageAdvantages: ['Arcane Aptitude'],
+    advantageChoices: { 'Arcane Aptitude': 'Flameburst' }, ranks: {} };
+  const items = resolveCharacterGraph(char).items;
+  const aa = items.find((i) => /Arcane Aptitude/.test(i.name));
+  ok(aa.effects.some((e) => e.type === 'GRANT_SOURCE' && e.grants.includes('powers:Flameburst')),
+    'the picked spell is granted');
 });
 
 test('cantrip-choice lineage items grant + slot the chosen cantrip (Divine Magic + the previously-broken Psionic Cantrip)', () => {

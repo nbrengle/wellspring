@@ -164,9 +164,11 @@ export function resolveCharacterGraph(character) {
         effects.push(...extractor(ent, character, entityId));
       }
       
-      // A cantrip-choice advantage (Divine Magic, Psionic Cantrip, …) grants the
-      // chosen cantrip. Data-driven via lineageChoiceSpec — no per-name special case.
-      if (lineageChoiceSpec(ent)?.kind === 'cantrip') {
+      // A cantrip- or spell-choice advantage (Divine Magic, Psionic Cantrip, Arcane
+      // Aptitude) grants the chosen spell as a Known Spell. Data-driven via
+      // lineageChoiceSpec — no per-name special case.
+      const choiceKind = lineageChoiceSpec(ent)?.kind;
+      if (choiceKind === 'cantrip' || choiceKind === 'spell') {
         const picked = character.advantageChoices?.[ent?.baseName || ent?.name];
         if (picked) effects.push({ type: 'GRANT_SOURCE', grants: [`powers:${picked}`] });
       }
