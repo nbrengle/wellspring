@@ -38,8 +38,8 @@ export { lbpState };
 // Slot/spell-slot accounting (validate/slots.js) and prerequisite checking
 // (validate/prereqs.js) — extracted leaves. Import the ones the orchestrator calls
 // internally; re-export the public surface so the barrel keeps its API.
-import { computeSlots, spellSlots, bookcasterSpellOptions, eligibleClassChoices, CLASS_CHOICE_SKILLS } from './validate/slots.js';
-export { innateBonusCantrips, eligibleClassChoices, CLASS_CHOICE_SKILLS, agileLearnerCapacity } from './validate/slots.js';
+import { computeSlots, spellSlots, bookcasterSpellOptions, eligibleClassChoices, CLASS_CHOICE_SKILLS, basicSpellOptions, BASIC_SPELL_SKILLS } from './validate/slots.js';
+export { innateBonusCantrips, eligibleClassChoices, CLASS_CHOICE_SKILLS, agileLearnerCapacity, basicSpellOptions, BASIC_SPELL_SKILLS } from './validate/slots.js';
 import { resolveCharacterGraph, grantedAbilities } from './graph.js';
 export { grantedAbilities };
 import { computeBP } from './validate/bp-accounting.js';
@@ -399,6 +399,11 @@ export function validate(character) {
   const slots = computeSlots(character);
   const spellSlotCounts = spellSlots(character);
   const bookcasterOptions = bookcasterSpellOptions(character);
+  // Basic Arcane / Basic Faith pickable spell pools (sphere-gated; non-casters get
+  // any base class of that sphere). Keyed by skill base name for the UI picker.
+  const basicSpellChoices = Object.fromEntries(
+    Object.entries(BASIC_SPELL_SKILLS).map(([skill, mt]) => [skill, basicSpellOptions(character, mt)]),
+  );
   const stats = computeLevelStats(graph);
   const wealth = computeWealthState(graph, character.wealth);
   const devotion = devotionState(character);
@@ -459,6 +464,7 @@ export function validate(character) {
     slotsOver,
     spellSlots: spellSlotCounts,
     bookcasterOptions,
+    basicSpellChoices,
     stats,
     wealth,
     devotion,

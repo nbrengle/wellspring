@@ -341,6 +341,40 @@ export function spellSlots(character) {
   return pools;
 }
 
+// Basic Arcane / Basic Faith let ANY character (including a non-caster) learn a
+// spell. The spell SOURCE is conditional (per the rules):
+//   • if you have a caster class of the matching magic type → only that class's list
+//   • if you have no caster class → any Base Class's spell list of that type
+// The skill confers no spell-slots — only the Known Spell — so this just supplies the
+// pickable pool; the chosen spell is recorded as the skill's parameter (like
+// Bookcaster). Returns a sorted, de-duped list of spell names. `magicType` is
+// 'Arcane' (Basic Arcane) or 'Divine' (Basic Faith).
+export function basicSpellOptions(character, magicType) {
+  const myCasterClasses = getClasses(character)
+    .filter((c) => CLASSES[c.name]?.spellcaster && CLASSES[c.name]?.magicType === magicType)
+    .map((c) => c.name);
+  // Source classes: your matching caster class(es) if any, else every base class of
+  // this magic type.
+  const sourceClasses = myCasterClasses.length
+    ? myCasterClasses
+    : Object.keys(CLASSES).filter((n) => CLASSES[n]?.spellcaster && CLASSES[n]?.magicType === magicType);
+
+  const spells = new Set();
+  for (const cls of sourceClasses) {
+    const byTier = CLASS_POWERS[cls];
+    if (!byTier) continue;
+    for (const field of KNOWN_SPELL_FIELDS) {
+      for (const sp of (byTier[field] || [])) {
+        if (sp?.name && !/^(Adept|Greater)\s+\w+\s+Power$/i.test(sp.name)) spells.add(sp.name);
+      }
+    }
+  }
+  return [...spells].sort((a, b) => a.localeCompare(b));
+}
+
+// The magic type each Basic-spell skill draws from.
+export const BASIC_SPELL_SKILLS = { 'Basic Arcane': 'Arcane', 'Basic Faith': 'Divine' };
+
 // Spells a Bookcaster can select, split into { known, other } for the picker.
 
 export function bookcasterSpellOptions(character) {
