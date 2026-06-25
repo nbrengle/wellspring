@@ -3947,3 +3947,95 @@
     flex-direction: column;
   }
 }
+
+/* ─── PICKER FILTERS POPOVER (facet filtering) ────────────────────────────
+   The Filters button sits in the picker control row; the popover floats over
+   the list (position:fixed via JS anchor) so opening it never reflows the
+   list or read pane. Closed = the picker is exactly as before. */
+.b-picker-filters-btn {
+  background: var(--b-panel-2, var(--b-panel));
+  color: var(--b-muted);
+  border: 1px solid var(--b-border);
+  border-radius: 0.3rem;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.b-picker-filters-btn:hover {
+  border-color: var(--b-amber);
+  color: var(--b-amber);
+}
+
+.b-picker-filters-btn.is-active {
+  border-color: var(--b-amber);
+  color: var(--b-amber);
+}
+
+.b-facet-pop {
+  position: fixed;
+  z-index: 300;
+  width: 19rem;
+  max-height: 24rem;
+  overflow-y: auto;
+  background: var(--b-panel);
+  border: 1px solid var(--b-border-2, var(--b-border));
+  border-radius: 0.5rem;
+  box-shadow: 0 8px 28px rgb(0 0 0 / 45%);
+}
+
+.b-facet-pop-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.7rem;
+  border-bottom: 1px solid var(--b-border);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--b-muted);
+}
+
+.b-facet-clear {
+  background: none;
+  border: none;
+  color: var(--b-amber);
+  font-size: 0.72rem;
+  cursor: pointer;
+}
+
+.b-facet-pop-body { padding: 0.3rem 0.7rem 0.6rem; }
+
+.b-facet-group { margin-top: 0.5rem; }
+
+.b-facet-group-label {
+  margin: 0 0 0.2rem;
+  font-size: 0.64rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--b-muted);
+}
+
+.b-facet-opt {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.82rem;
+  padding: 0.1rem 0;
+  cursor: pointer;
+  color: var(--b-text);
+}
+
+.b-facet-opt.is-on { color: var(--b-amber); }
+
+.b-facet-opt.is-zero {
+  color: var(--b-dim, #5e564b);
+  cursor: default;
+}
+
+.b-facet-c {
+  margin-left: auto;
+  font-size: 0.72rem;
+  color: var(--b-muted);
+  font-variant-numeric: tabular-nums;
+}
