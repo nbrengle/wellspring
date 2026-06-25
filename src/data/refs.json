@@ -21880,6 +21880,2800 @@
       "anyOf": [],
       "levels": [],
       "other": []
+    },
+    "powers:Living Iron": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Brilliant Thinker": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:The Learned One": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Pragmatist": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Grand Ritualist": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Technical Expertise": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Expert Craft": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Opus": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:A Spoonful of Sugar": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Adept Ritualist": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Apt Assistant": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Custom Creation": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Forged From Steel": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Forgesource Specialist": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Good Timing": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Hunter Gatherer": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Mechanical Augmentation": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Otherworldly Sight": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Perspicacity": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Protected Casting": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Smithy’s Blessing": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Shield Bearer": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Spirit Guide": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Tanner": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Triage": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Acid Soak": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Aegis of the Unknown / Sundering of the Unknown": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Analysis": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Antidote": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Armor Upkeep Specialist": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Borrow Knowledge": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Blood Scroll": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Combat Analysis": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Reconstitute Summon": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Create Infusion": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Critique Construction": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Custom Brew": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Dig Deep": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Forcefield": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Intimidating Spines": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Jury Rig": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Kick": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Mesmerize": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Overcharge": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Share": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Spiritual Anchor": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Trap Recovery": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Treat": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Warming Elixir / Cooling Draught": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Weapon Upkeep Specialist": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Weird Wanderings": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Advanced Treatment": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Detonate": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Explosive Impact": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Efficiencies of Scale": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Empower Friends": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Exploding Arrows": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Grounded": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Hiatus": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Infuse": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Perfect Practice": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Reinforce Shield": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Soulhold Survival": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Spark of Doom": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Spiritual Defense": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Strange Token": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Curious Balm": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Studied Focus": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Uninterrupted Creativity": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Zenith of Knowledge": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Studied Process": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Utilitarian": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Batch Process": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Quality Control": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:It’s Alive!": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Refreshing Prayer": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Healing Touch": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Ritual Affinity": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Shield of Faith": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Holy Armor": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Shepherd the Faithful": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Path of Panic": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Mantle of Faith": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Cantrip Scholar": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Expand Focus": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Expansive Worship": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Greater Healing Touch": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Divine Substitution": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Blade Blessing": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Cancel": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Curing Prayer": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Detect Devotion": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Devotion’s Strike": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Divine Bolt": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Revivify": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Sense Supernatural": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Shield of Devotion": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Armor of Faith": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Augury": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Benediction": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Burn": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Cure": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Disable Undead": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Faith’s Lash": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Fortress of Faith": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Heal": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Heretics’ Brand": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Intercession": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Blade Guard": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Prayer of Rest": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Holy Rest": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Rekindle": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Spirit Speak": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Bless Shield": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Blessing": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Cleanse": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Disrupt": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Divine Armor": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Flame of Faith": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Gift of Life": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Judgment": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Minor Circle": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Punish": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Retributive Protection": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Safe Return": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Salvation": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Speak With The Dead": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Spell-Warding": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Commune with Nature": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Nature’s Understanding": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Message of the Flowers": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Earth’s Vitality": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Natural Cycle": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Grove": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Red in Tooth and Claw": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Favored Form": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Find the Path": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Hunter": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Wyvern’s Tooth and Claw": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Flexible Form": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Antitoxin": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Care for the Fallen": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Enchanted Thorn": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Festering Lash": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Hide": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Life Tap": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Nature’s Rebuke": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Nettles and Barbs": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Natural Remedies": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Lesser Form of the Hulking Bear": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Lesser Form of the Striking Serpent": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Lesser Form of the Hunting Panther": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Arboreal Transformation": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Balm": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Barkskin": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Blessing of the Oak": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Bounty of the Land": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Corrosive Bolt": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Ensnare": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Entangling Vines": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Eyes of the Crow": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Frostbite": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Nature’s Embrace": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Purifying Flame": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Quell Beast": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Sap of Life": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Shape Metal": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Submerge": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Form of the Hulking Bear": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Form of the Striking Serpent": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Form of the Hunting Panther": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Curse the Despoiler": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Dart Frog’s Skin": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Feral Strength": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Health of the World": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Putrid Blade": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Phoenix Reborn": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Hide of the Rhino": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Lifethrive": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Nature’s Blessing": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Spitting Venom": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Spirit Strike": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Thorns of Ruin": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Sprout Wings": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Weasel’s Agility": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Deadly Remnants": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Parry Blow": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Fighting Instructor": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Mountain of Steel": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Warrior Spirit": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Armored Shell": {
+      "skills": [
+        "skills:Light Armor"
+      ],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Armored Shell II": {
+      "skills": [
+        "powers:Armored Shell"
+      ],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Bowyer": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Execute": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Fortitude": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Knight’s Strength": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Lessons from Scars": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Linked Armor": {
+      "skills": [
+        "skills:Light Armor"
+      ],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Reload": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Renowned Soldier": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Scales of the Serpent": {
+      "skills": [
+        "skills:Medium Armor"
+      ],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Shoulder": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Wall of Steel": {
+      "skills": [
+        "skills:Heavy Armor"
+      ],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Battlemind": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Disarming Strike": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Disengage": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Flaming Arrow": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Grit": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Harry": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Heroic Save": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Patchwork Defense": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Raging Blows": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Resolve": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Shake It Off I": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Shot Placement": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Smite": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Snap Shot": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Stifle": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Twin Shot": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Archer’s Eye": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Challenging Shout": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Expert Parry": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Hammer Down": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Heartseeker Shot": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Improved Blows": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Lock Down": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Rally the Troops": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Rapid Shot": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Refocus": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Rest": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Riposte": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Shake It Off II": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Skewer": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Stand Ground": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Throat Shot": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Thick Skin": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Reinforce": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Accuracy": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Field Maintenance": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Healthy": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Flesh of the Titan": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Arcane Study": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Replicate Enhancement": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Arcane Barrier": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Cantrip Mastery": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Practiced Sight": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Channel the Arcane": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Empowered Mage Bolt": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Arcane Charge": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Force Shield": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Fumble": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Ghost Hand": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Identify": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Mage Bolt": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:See Magic": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Stop": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Arcane Barrage": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Bolster Shield": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Carnate": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Cripple": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Flameburst": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Forcebolt": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Freeze": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Mage Armor": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Mage Mend": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Mage Power": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Mageskin": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Mask Aura": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Revulsion": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Magekey": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Ruinous Curse": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Shred": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Town Portal": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Adept Mage Power": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Arcane Bridge": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Betrayal": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Disintegrate Item": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Dispel Magic": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Dominate Creature": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Elemental Node": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Elemental Survival": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Gift of Solitude": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Alone But Not Lonely": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Harden Gear": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Hush": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Improved Identification": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Mageblast": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Rebuild": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Spell Absorption": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Succumb": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Wrest Control": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Deflect Projectile": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Backstab": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Loot": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Dodge": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Escape Plan": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Sinister Strike": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Acquired Tolerance": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Back Alley Deals": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Catfall": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Contract Killing": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Keen Hearing": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Mine": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Rogue’s Touch": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Studded Leather Armor": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Size Up": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Throat Slit": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:What We Do": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Way of the Blade": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Blunt End": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Concealed Dart": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Expert Deflect": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Evasion": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Flash Attack": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Hamstring": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Improvised Weapon": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Keen Eye": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Precision Strike": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Quick Nap": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Reflexive Strike": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Rogue’s Aim": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Scarper": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Scavenge Armor": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Unburdened Speed": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Uncanny Perception": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Waylay": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Ambush": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Bloodthirst": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Breach": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Elude": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Fan of Blades": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Flat Catch": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Gut Shot": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Hidden Soul": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Incapacitate": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Piercing Strike": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Precision Throws": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Reversal": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Slice": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Toxic Blade": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Serious Knots": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Mask of Deception": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Trap Sense": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Retreat": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Practiced Manner": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Heart of the Group": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Stern Willed": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Smuggler’s Powdercase": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Of Sound Mind": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Sharp Dagger, Sharper Tongue": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:The Last Toast": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Enduring Inspiration": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Aesthetic Suggestion": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Headliner": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Implicit Truths": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:It’s Who You Know": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Never Stop Learning": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Pit Master": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Safebox": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Sources": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Tax Evasion": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Traveling Merchant": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Calming Tone": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Curiosity Killed the Cat": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Deducing the Apparent": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Diplomatic Immunity": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Don’t You Know Who I Am?": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Enthrall": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Inspiration": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Intoxicating Aura": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Mithridatization": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Plausible Deniability": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Pocket Sand": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Poison Dart": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Rotten Tomato": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Soothe": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Sizing Up the Opposition": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Time to Go": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:To Dance with Death": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Battlefield Commander": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Enticing Opulence": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Fortress of the Mind": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Gathering of the Moot": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Grace Under Duress": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Hard to Read": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Inspiring Performance": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Liquid Courage": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Let’s You and Them Fight": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Mark for Death": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Method Acting": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Mostly Harmless": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Party Planner": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Peacebind": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Sense Duplicity": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Squirreled Away": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Gambler’s Visage": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:The Right Hand": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Additional Bodyguard": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Inspirational Leader": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Commission of Protection": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Holding Out For a Hero": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Save the Day": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:It's Not Safe to Go Alone": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Magical Empowerment": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Rise Above This": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Steel Yourself": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Training Regiment": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Hidden Weapon": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Concealed Weapon": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Rousing Inspiration": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Third Hand": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Guard and Savior": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:This Is My Bodyguard": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Internal Battery": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Arcane Source": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Astride the Weave": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Enduring Source": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Dissipate Curse": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Power of Magic": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Rote Invocation": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Additional Source": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Accent Substantiation": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Unsuppressable": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Interlaced Shell": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Faded Slumber": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Charge": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Circle of Four": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Wild Bolt": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Energy Shield": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Infuriate": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Mass Flux": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Synergistic Transfer": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Whispers of the Unseen": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Aether Lance": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Coalesce Scales": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Destructive Resonance": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Deteriorate": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Galvanic Shield": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Flee": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Icy Veins": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Iron Maiden": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Melt": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Primal Ray": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Soulknife": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Spirit Link": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Startle": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Aethereal Fade": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Warpfire": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Bonesplinter": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Breach Teleport": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Crimson Bargain": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Devastating Eruption": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Enduring Corrosion": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Everflowing Shield": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Immortal Focus": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Incandescent Spire": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Arcane Backlash": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Mystic Mirror": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Restful Prison": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Smothering Ash": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Spirit Chalice": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Splinter Shield": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Vaporize": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
+    },
+    "powers:Wrack": {
+      "skills": [],
+      "anyOf": [],
+      "levels": [],
+      "other": []
     }
   },
   "unlocks": {
@@ -21907,13 +24701,17 @@
       "skills:Light Armor"
     ],
     "skills:Light Armor": [
-      "skills:Medium Armor"
+      "skills:Medium Armor",
+      "powers:Armored Shell",
+      "powers:Linked Armor"
     ],
     "skills:Medium Armor": [
-      "skills:Heavy Armor"
+      "skills:Heavy Armor",
+      "powers:Scales of the Serpent"
     ],
     "skills:Heavy Armor": [
-      "skills:Ironclad Armor"
+      "skills:Ironclad Armor",
+      "powers:Wall of Steel"
     ],
     "skills:Two Weapon Style": [
       "skills:Advanced Two Weapon Style"
@@ -22108,6 +24906,9 @@
     ],
     "perks:Arcane Hearth": [
       "perks:Experimental Hearth"
+    ],
+    "powers:Armored Shell": [
+      "powers:Armored Shell II"
     ]
   },
   "grants": {
