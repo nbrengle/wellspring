@@ -3,6 +3,7 @@ import {
   lookupEntity, REFS, DEVOTIONS, DOMAINS,
   UNLIMITED_SKILLS, ALL_SKILLS, LINEAGES
 } from '../engine/data.js';
+import SubSelect from "./SubSelect.jsx";
 
 // Devotion names + Lore areas + Profession suggestions are derived from parsed data
 const DEVOTION_NAMES = DEVOTIONS.map((d) => d.name);
@@ -363,28 +364,36 @@ export function EntityBody({ entity, view, report, choices, onSetChoice, onUpdat
         const powerId = `powers:${entity.name}`;
         const chosen = choices?.[powerId];
         const build = co.kind === "build";
+        // A build choose-one (Way of the Blade, Expert Craft) is a real selection —
+        // render the shared chip control with its "Choose"/free affordances. An
+        // in-play "choose one when used" is informational, so it stays a plain list.
+        if (build && onSetChoice) {
+          // Match the stored value whether it's the option text or a granted skill name.
+          const value = co.options.find((o) =>
+            o.text === chosen || (o.grants || o.grantsSkills || []).includes(chosen))?.text || null;
+          return (
+            <div className="b-detail-section">
+              <SubSelect
+                prompt="Choose one (free)"
+                value={value}
+                onChange={(v) => onSetChoice(powerId, v)}
+                options={co.options.map((o) => ({
+                  value: o.text,
+                  free: (o.grants || o.grantsSkills || []).length > 0,
+                }))}
+              />
+            </div>
+          );
+        }
         return (
           <div className="b-detail-section">
-            <h3 className="b-detail-section-title">
-              {build ? "Choose one (free)" : "Choose one when used"}
-            </h3>
+            <h3 className="b-detail-section-title">Choose one when used</h3>
             <ul className="b-choose-list">
-              {co.options.map((o, i) => {
-                const key = o.text;
-                // Options grant skills under `grants` or (a few) `grantsSkills`.
-                const grants = o.grants || o.grantsSkills || [];
-                const sel = build && (chosen === key || grants.includes(chosen));
-                return (
-                  <li key={i} className={`b-choose-opt ${build ? "is-selectable" : ""} ${sel ? "is-chosen" : ""}`}>
-                    {build && onSetChoice
-                      ? <button className="b-choose-btn" onClick={() => onSetChoice(powerId, key)}>
-                          <span className="b-choose-mark">{sel ? "●" : "○"}</span> {o.text}
-                          {grants.length > 0 && <span className="b-choose-free"> · free</span>}
-                        </button>
-                      : <span className="b-choose-text">• {o.text}</span>}
-                  </li>
-                );
-              })}
+              {co.options.map((o, i) => (
+                <li key={i} className="b-choose-opt">
+                  <span className="b-choose-text">• {o.text}</span>
+                </li>
+              ))}
             </ul>
           </div>
         );

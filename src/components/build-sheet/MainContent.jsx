@@ -1,6 +1,7 @@
 import React, { useMemo } from "react";
 import { useBuilderState, useBuilderActions } from "../builder-context.jsx";
 import { Section, CostBadge } from "./SharedUI.jsx";
+import SubSelect from "../SubSelect.jsx";
 import { spellTierKey, spellTierLabel } from "./utils.js";
 import { ALL_SKILLS, LINEAGES, CRAFTING, RITUALS, CLASSES, DOMAINS } from "../../engine/data.js";
 import { getMaxRanks, pickClass } from "../../engine/validate.js";
@@ -107,17 +108,17 @@ export function StartingChoicesSection() {
       <ul className="b-spec-list">
         {configs.map((conf) => (
           <li key={conf.id} className="b-spec-row">
-            <label className="b-spec-label" htmlFor={`spec-${conf.id}`}>{conf.label}</label>
-            <select
-              id={`spec-${conf.id}`}
-              className="b-spec-select"
+            {/* Starting choices always have a value (they default to the first
+                option), so no "Choose" badge — but the shared chip control keeps
+                them visually consistent with every other sub-selection. */}
+            <SubSelect
+              prompt={conf.label}
+              showBadge={false}
+              allowClear={false}
               value={selected[conf.id] ?? conf.options[0]?.label ?? ""}
-              onChange={(e) => onSetSpecialty(conf.id, e.target.value)}
-            >
-              {conf.options.map((opt) => (
-                <option key={opt.label} value={opt.label}>{opt.label}</option>
-              ))}
-            </select>
+              onChange={(v) => v && onSetSpecialty(conf.id, v)}
+              options={conf.options.map((opt) => ({ value: opt.label }))}
+            />
           </li>
         ))}
       </ul>
@@ -198,17 +199,17 @@ export function GrantedSelectionsSection() {
         {active.map((sel, i) => {
           const value = character.grantedSelections?.[sel.id] || "";
           const options = getSelectionOptions(sel);
+          const typeLabel = sel.type === "devotionAccent" ? "Devotion Accent" : sel.type;
           return (
             <li key={i} className="b-choice-row">
-              <label className="b-choice-label">
-                {sel.sourceName} <span className="b-choice-desc">({sel.type === "devotionAccent" ? "Devotion Accent" : sel.type})</span>
-              </label>
-              <select className="b-select b-choice-select" value={value} onChange={(e) => onSetGrantedSelection(sel.id, e.target.value)}>
-                <option value="">-- Choose --</option>
-                {options.map((opt) => (
-                  <option key={opt} value={opt}>{opt}</option>
-                ))}
-              </select>
+              {/* A granted selection can be unmade (value ""), so the chip control's
+                  "Choose" badge surfaces it — the easy-to-miss case the user flagged. */}
+              <SubSelect
+                prompt={<>{sel.sourceName} <span className="b-choice-desc">({typeLabel})</span></>}
+                value={value || null}
+                onChange={(v) => onSetGrantedSelection(sel.id, v || "")}
+                options={options.map((opt) => ({ value: opt }))}
+              />
             </li>
           );
         })}

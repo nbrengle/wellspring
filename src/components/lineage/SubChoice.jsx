@@ -13,6 +13,7 @@
 import React, { useState } from "react";
 import { cantripOptions } from "../../engine/data.js";
 import RepPicker from "./RepPicker.jsx";
+import SubSelect from "../SubSelect.jsx";
 
 const FLAVOR_OPTIONS = {
   Accent: ["Flame", "Ice", "Lightning", "Acid", "Force", "Mind", "Fear", "Shadow"],
@@ -22,24 +23,16 @@ export default function SubChoice({ spec, item, field, value, onSetChoice, onSet
   if (!spec) return null;
 
   if (spec.kind === "cantrip") {
+    // 18–33 cantrips → the shared control falls back to its searchable list.
     return (
-      <label className="b-lin-subchoice">
-        <span className="b-lin-subchoice-label">Cantrip</span>
-        <select
-          className="b-lin-subchoice-select"
-          value={value || ""}
-          onChange={(e) => onSetChoice(item, e.target.value)}
-        >
-          <option value="" disabled>
-            Choose a cantrip…
-          </option>
-          {cantripOptions(spec.pool).map((c) => (
-            <option key={c} value={c}>
-              {c}
-            </option>
-          ))}
-        </select>
-      </label>
+      <div className="b-lin-subchoice">
+        <SubSelect
+          prompt="Cantrip"
+          value={value || null}
+          onChange={(v) => onSetChoice(item, v || "")}
+          options={cantripOptions(spec.pool).map((c) => ({ value: c }))}
+        />
+      </div>
     );
   }
 
@@ -75,33 +68,30 @@ function RepChoice({ item, field, value, onSetRep }) {
 
 function FlavorChoice({ spec, item, value, onSetChoice }) {
   const opts = FLAVOR_OPTIONS[spec.label];
+  // A fixed flavor list (Accent, 8 options) → chips. A free-text flavor (no preset
+  // list) stays a text input.
+  if (opts) {
+    return (
+      <div className="b-lin-subchoice">
+        <SubSelect
+          prompt={spec.label || "Choice"}
+          value={value || null}
+          onChange={(v) => onSetChoice(item, v || "")}
+          options={opts.map((o) => ({ value: o }))}
+        />
+      </div>
+    );
+  }
   return (
     <label className="b-lin-subchoice">
       <span className="b-lin-subchoice-label">{spec.label || "Choice"}</span>
-      {opts ? (
-        <select
-          className="b-lin-subchoice-select"
-          value={value || ""}
-          onChange={(e) => onSetChoice(item, e.target.value)}
-        >
-          <option value="" disabled>
-            Choose…
-          </option>
-          {opts.map((o) => (
-            <option key={o} value={o}>
-              {o}
-            </option>
-          ))}
-        </select>
-      ) : (
-        <input
-          className="b-lin-subchoice-select"
-          type="text"
-          value={value || ""}
-          placeholder={`Your ${(spec.label || "choice").toLowerCase()}…`}
-          onChange={(e) => onSetChoice(item, e.target.value)}
-        />
-      )}
+      <input
+        className="b-lin-subchoice-select"
+        type="text"
+        value={value || ""}
+        placeholder={`Your ${(spec.label || "choice").toLowerCase()}…`}
+        onChange={(e) => onSetChoice(item, e.target.value)}
+      />
     </label>
   );
 }
