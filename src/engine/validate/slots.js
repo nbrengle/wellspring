@@ -45,6 +45,7 @@ export function slotGrants(character) {
       const ent = lookupEntity(resolveId(item, field, character))
         || lookupEntity(`skills:${clean}`)
         || lookupEntity(`powers:${clean}`)
+        || lookupEntity(`skills:${bare}`)
         || lookupEntity(`powers:${bare}`);
       const rank = rankOf(character, field, idx);
 

@@ -4,6 +4,7 @@ import {
   lookupEntity, REFS, DEVOTIONS, DOMAINS,
   UNLIMITED_SKILLS, ALL_SKILLS, LINEAGES
 } from '../engine/data.js';
+import { getClasses } from "../engine/resolver.js";
 
 // Devotion names + Lore areas + Profession suggestions are derived from parsed data
 const DEVOTION_NAMES = DEVOTIONS.map((d) => d.name);
@@ -312,6 +313,9 @@ export function EntityBody({ entity, view, report, choices, onSetChoice, onUpdat
       { label: "Known Spells", options: bc.known || [] },
       { label: "Other Accessible Spells", options: bc.other || [] },
     ].filter((g) => g.options.length);
+  } else if (baseName.startsWith("Extensive Combat Training") || baseName === "Extensive Training") {
+    const classes = character ? getClasses(character) : [];
+    paramSuggestions = classes.map((c) => c.name);
   } else {
     paramSuggestions = PARAMETER_SUGGESTIONS[baseName] || null;
   }
