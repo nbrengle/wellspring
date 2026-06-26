@@ -484,10 +484,6 @@
       {
         "cat": "novice",
         "n": 1
-      },
-      {
-        "cat": "spellsKnown",
-        "n": 1
       }
     ],
     "parameter": "Sphere"
@@ -503,10 +499,6 @@
       {
         "cat": "adept",
         "n": 1
-      },
-      {
-        "cat": "spellsKnown",
-        "n": 1
       }
     ],
     "parameter": "Sphere"
@@ -521,10 +513,6 @@
     "slotGrants": [
       {
         "cat": "greater",
-        "n": 1
-      },
-      {
-        "cat": "spellsKnown",
         "n": 1
       }
     ],
