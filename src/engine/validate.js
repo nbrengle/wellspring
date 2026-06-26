@@ -108,7 +108,8 @@ export function devotionState(character) {
   const chosen = (character.divineDomains || []).filter((d) => available.includes(d)).slice(0, MAX_DOMAINS);
   // Domain powers purchasable from the chosen domains.
   const powers = chosen.flatMap((dn) => {
-    const dom = DOMAINS.find((x) => x.name === dn);
+    const baseName = dn.split(':')[0].trim();
+    const dom = DOMAINS.find((x) => x.name === baseName);
     return (dom?.powers || []).map((p) => ({ ...p, domain: dn }));
   });
   return {
