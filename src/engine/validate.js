@@ -9,20 +9,17 @@
 // Pure functions, no React, so the UI calls them in a useMemo and they stay
 // unit-testable. The character shape is the flat object from Builder.jsx.
 
-import { LEVEL_TABLE, lookupEntity, REFS, CLASS_POWER_SLOTS, CLASS_POWERS, CLASS_PROGRESSION, DEVOTIONS, DOMAINS, LINEAGES, CRAFTING, RITUALS, EVENTS_TABLE, UNLIMITED_SKILLS, BASE_CLASSES } from '../engine/data.js';
-import { cleanItemName, bareSkill, resolveId, idName, entityType, getClasses, primaryClass } from './resolver.js';
+import { LEVEL_TABLE, lookupEntity, CLASS_POWER_SLOTS, DEVOTIONS, DOMAINS, CRAFTING, RITUALS, UNLIMITED_SKILLS } from '../engine/data.js';
+import { cleanItemName, bareSkill, resolveId, entityType, getClasses, primaryClass } from './resolver.js';
 
 // Shared primitives now live in validate/core.js (hotspot split). Import the ones
 // this module still uses internally, and re-export the public surface from the
 // barrel so existing imports (`from './data/validate.js'`) keep working unchanged.
 import {
   MAX_LBP, MAX_FLAW_BP, BACKSTORY_BP, MAX_DOMAINS, DEFAULT_WEALTH,
-  LEGAL_MIN_LEVEL, LEVEL_CAP, subKey,
-  BP_FIELDS, BP_POWER_FIELDS, MARTIAL_SLOT_FIELDS, CASTER_SLOT_FIELDS,
-  ENTITY_FIELDS, CLASS_POWER_TIERS, POWER_SOURCE_FIELDS,
-  characterLevel, getLegalMinLevel,
-  parseTrailingRank, rankOf, getMaxRanks, requiredLevel,
-  pickClass, countPicksForClass, maxProgressionLevel, progressionRow,
+  LEGAL_MIN_LEVEL, LEVEL_CAP, subKey, CLASS_POWER_TIERS, POWER_SOURCE_FIELDS,
+  characterLevel, getLegalMinLevel, getMaxRanks,
+  pickClass, maxProgressionLevel,
 } from './validate/core.js';
 export {
   MAX_LBP, MAX_FLAW_BP, BACKSTORY_BP, MAX_DOMAINS, DEFAULT_WEALTH,
@@ -44,7 +41,7 @@ import { resolveCharacterGraph, grantedAbilities } from './graph.js';
 export { grantedAbilities };
 import { computeBP } from './validate/bp-accounting.js';
 import { lookupCost } from './validate/cost-key.js';
-import { statMods as computeStatMods, levelStats as computeLevelStats } from './validate/derived-stats.js';
+import { levelStats as computeLevelStats } from './validate/derived-stats.js';
 import { wealthState as computeWealthState } from './validate/wealth-income.js';
 
 import { checkPrereqs } from './validate/prereqs.js';

@@ -2,14 +2,13 @@ import React, { useMemo } from "react";
 import { useBuilderState, useBuilderActions } from "../builder-context.jsx";
 import { Section, CostBadge } from "./SharedUI.jsx";
 import SubSelect from "../SubSelect.jsx";
-import { spellTierKey, spellTierLabel } from "./utils.js";
-import { ALL_SKILLS, LINEAGES, CRAFTING, RITUALS, CLASSES, DOMAINS, lookupEntity } from "../../engine/data.js";
-import { getMaxRanks, pickClass, agileLearnerCapacity } from "../../engine/validate.js";
+import { spellTierKey } from "./utils.js";
+import { CLASSES, DOMAINS, lookupEntity } from "../../engine/data.js";
+import { getMaxRanks, agileLearnerCapacity } from "../../engine/validate.js";
 import { bareSkill, getClasses, cleanItemName } from "../../engine/resolver.js";
 import { lookupCost } from "../../engine/validate/cost-key.js";
 import { STARTING_CHOICES_CONFIG, reconcileStartingChoices } from "../../engine/starting-choices.js";
 import { UNLIMITED_SKILLS } from "../../engine/data.js";
-import Tag from "./Tag.jsx";
 import InspectableRow from "./InspectableRow.jsx";
 import InlineDetail from "./InlineDetail.jsx";
 
@@ -95,7 +94,9 @@ export function StartingChoicesSection() {
     if (!primary || !configs.length) return {};
     const have = character.startingChoices && Object.keys(character.startingChoices).length;
     return have ? character.startingChoices : reconcileStartingChoices(character, primary);
-  }, [character.startingChoices, character.startingSkills, character.ranks?.startingSkills, primary, configs.length]);
+    // reconcileStartingChoices reads the whole character, so depend on it directly
+    // rather than a hand-picked subset (which could go stale on other field changes).
+  }, [character, primary, configs.length]);
 
   if (!primary || !configs.length) return null;
 

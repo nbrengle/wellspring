@@ -8,7 +8,7 @@
 // selection map) and the candidate pool; this renders the controls and reports
 // toggles back. Counts for each value reflect the OTHER active facets, so you can
 // see what checking it would yield.
-import React, { useState } from "react";
+import { useState } from "react";
 import { facetValues, passesFacetsExcept, activeFacetCount, toggleFacetValue } from "./facets.js";
 
 const DEFAULT_LIMIT = 8;

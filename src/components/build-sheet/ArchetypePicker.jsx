@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import { ARCHETYPES } from "../../engine/data.js";
 import Tag from "./Tag.jsx";
 

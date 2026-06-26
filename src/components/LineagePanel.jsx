@@ -1,4 +1,3 @@
-import React from "react";
 import { LINEAGES } from "../engine/data.js";
 import Overlay from "./ui/Overlay.jsx";
 import LineageGallery from "./lineage/LineageGallery.jsx";

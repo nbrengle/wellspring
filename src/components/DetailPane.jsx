@@ -1,7 +1,6 @@
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import {
-  lookupEntity, REFS, DOMAINS,
-  UNLIMITED_SKILLS, allergenAward, powerSpellChoiceSpec
+  lookupEntity, REFS, allergenAward, powerSpellChoiceSpec
 } from '../engine/data.js';
 import { PARAMETER_SUGGESTIONS, TYPEABLE_PARAMS } from "./parameter-suggestions.js";
 import SubSelect from "./SubSelect.jsx";
@@ -10,15 +9,6 @@ import { formatParameterizedName } from "../engine/resolver.js";
 // in the engine where it's unit-tested.
 export { formatParameterizedName };
 
-
-// Resolve the entity type of a stat/wealth source name
-function sourceType(name) {
-  const clean = String(name).replace(/\s*\([^)]*\)\s*$/, "").trim();
-  for (const t of ["powers", "perks", "skills"]) {
-    if (lookupEntity(`${t}:${clean}`)) return t;
-  }
-  return null;
-}
 
 export default function DetailPane({ view, report, choices, onSetChoice, onUpdateParameter, onInspect, onBack, onClose }) {
   if (!view) {
@@ -168,6 +158,16 @@ function ParameterEditor({ baseName, entity, view, suggestions: suggestionsProp,
 }
 
 export function EntityBody({ entity, view, report, choices, onSetChoice, onUpdateParameter, onInspect }) {
+  // Hooks must run unconditionally and in the same order every render — so this
+  // useMemo is hoisted ABOVE the early `!entity` return (it already guards on
+  // entity?.id internally). Calling it after the return tripped rules-of-hooks.
+  const grantedSubPowers = useMemo(() => {
+    if (!entity?.id) return [];
+    const targets = REFS.grants?.[entity.id] || [];
+    return targets
+      .map((id) => lookupEntity(id))
+      .filter((sub) => sub && sub.tier === "SubPower");
+  }, [entity]);
   if (!entity) {
     return <p className="b-detail-missing">No detail available — this item may be unresolved.</p>;
   }
@@ -201,13 +201,6 @@ export function EntityBody({ entity, view, report, choices, onSetChoice, onUpdat
   const isParamEditable = !!(onUpdateParameter && view?.field && view.field !== "multiclassGrant"
     && (paramSuggestions?.length || paramGroups?.length || baseName === "Bookcaster"
         || TYPEABLE_PARAMS.has(baseName)));  // typeable params are editable even with no suggestions
-  const grantedSubPowers = useMemo(() => {
-    if (!entity?.id) return [];
-    const targets = REFS.grants?.[entity.id] || [];
-    return targets
-      .map((id) => lookupEntity(id))
-      .filter((sub) => sub && sub.tier === "SubPower");
-  }, [entity]);
   return (
     <>
       {entity.description

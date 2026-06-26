@@ -2,7 +2,6 @@
 // the recursive craft-tree node, and the resource/discipline constants. Extracted
 // from RecipeChecker.jsx so the inventory panel, the three tabs, and the detail
 // drawer can each be their own component.
-import React from "react";
 import resourcesJson from "../../data/resources.json";
 import { classifyIngredient, normalizeResourceName } from "../../engine/recipe-solver.js";
 

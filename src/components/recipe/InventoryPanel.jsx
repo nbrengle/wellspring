@@ -1,6 +1,5 @@
 // Left panel: the resource inventory — raw materials and crafted intermediates,
 // each with qty steppers, plus a free-text "add custom item" form.
-import React from "react";
 import { STANDARD_RESOURCES } from "./shared.jsx";
 
 export default function InventoryPanel({

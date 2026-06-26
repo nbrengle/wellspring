@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { getAllEntities, lookupEntity } from './engine/data.js';
 import { cleanItemName } from "./engine/resolver.js";
 import { EntityBody } from "./components/DetailPane.jsx";
@@ -60,7 +60,7 @@ const EXPLORER_AXES = [
   ...gameEffectAxes((e) => e.type),
 ];
 
-export default function RulesExplorer({ onClose }) {
+export default function RulesExplorer({ onClose: _onClose }) {
   const [query, setQuery] = useState("");
   const [activeGroup, setActiveGroup] = useState("all");
   const [facetSel, setFacetSel] = useState({}); // facet id -> Set of selected values

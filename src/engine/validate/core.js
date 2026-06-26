@@ -13,8 +13,8 @@
 //
 // Pure functions, no React. Re-exported by the validate.js barrel.
 
-import { LEVEL_TABLE, lookupEntity, REFS, CLASS_POWERS, CLASS_PROGRESSION, CLASS_POWER_SLOTS, EVENTS_TABLE, CLASSES } from '../data.js';
-import { cleanItemName, bareSkill, resolveId, entityType, getClasses, primaryClass } from '../resolver.js';
+import { LEVEL_TABLE, lookupEntity, CLASS_POWERS, CLASS_PROGRESSION, CLASS_POWER_SLOTS, EVENTS_TABLE, CLASSES } from '../data.js';
+import { cleanItemName, bareSkill, resolveId, entityType, getClasses } from '../resolver.js';
 
 import {
   MAX_LBP, MAX_FLAW_BP, BACKSTORY_BP, MAX_DOMAINS, DEFAULT_WEALTH, LEVEL_CAP

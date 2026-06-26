@@ -13,7 +13,7 @@ const SLOT_FIELD = {
 };
 
 export function powerPickerSpec(slot, character) {
-  const { category, index, label, cls } = slot;
+  const { category, label, cls } = slot;
   const field = SLOT_FIELD[category];
   const candidates = eligiblePowers(cls, category);
   const fieldFor = (name) => {

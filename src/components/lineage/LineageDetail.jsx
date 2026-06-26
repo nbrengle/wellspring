@@ -3,7 +3,6 @@
 // meter; the OPTIONAL sublineage step (its own band, not a column); then the two
 // FACING columns (challenges earn ⇄ advantages spend) so the two-sided budget is
 // always visible. All rules logic stays in the engine selectors + lbp report.
-import React from "react";
 import { subKey } from "../../engine/validate.js";
 import { cleanChallengeName } from "../LineagePanel.jsx";
 import { costumeStatus } from "./lineage-helpers.js";

@@ -1,6 +1,5 @@
 // "Target Calculator" tab: pick a target recipe, see craftable/missing status, the
 // full nested crafting tree, and a deficit table for the closest alternative.
-import React from "react";
 import { CraftTreeNode, IngredientKind } from "./shared.jsx";
 
 export default function CalculatorTab({

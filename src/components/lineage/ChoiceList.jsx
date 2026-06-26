@@ -3,7 +3,7 @@
 // Within each column, items are grouped into LBP-value bands (a price list you scan
 // by cost). One shared search/filter spans both. Sublineage-scoped items are shown
 // dimmed/locked until their sublineage is picked. Each item is a ChoiceRow.
-import React, { useState, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { subKey } from "../../engine/validate.js";
 import { lineageItemImpact } from "../../engine/data.js";
 import { cleanChallengeName } from "../LineagePanel.jsx";
@@ -33,12 +33,6 @@ const itemLbp = (it) => (typeof it.lbp === "number" ? it.lbp : -1);
 
 // The primary BUILD-effect label of an item (its first parsed impact, e.g. "+3
 // Natural Armor"). lineageItemImpact only knows build-time / derived effects, so
-// items with none still have real IN-PLAY effects — bucket them honestly, never as
-// "no effect".
-const effectKey = (it, lineage) => {
-  const imp = lineageItemImpact(it, lineage);
-  return imp.length ? imp[0] : OTHER_EFFECT_LABEL;
-};
 
 export default function ChoiceList({
   lin,
