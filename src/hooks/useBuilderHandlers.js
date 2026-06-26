@@ -223,15 +223,17 @@ export function useBuilderHandlers({
 
   const handleClickIdentityField = useCallback(
     (field) => {
-      if (field === "class") {
-        const primary = getClasses(character)[0]?.name;
-        if (primary) handleInspect(primary, null, "classes");
-        return;
-      }
-      const item = character[field];
-      if (item) handleInspect(item, null, field);
+      // Identity-rail items (class, devotion) have no inline-detail anchor in the
+      // rail, so handleInspect's inline `view` would never render. Promote to the
+      // chase DRAWER (the right DetailPane) instead — that's where these resolve and
+      // display. Map the field name to the registry's entity type (plural) so the
+      // lookup hits: "devotion" → "devotions", "class" → "classes".
+      const RESOLVE_TYPE = { devotion: "devotions", class: "classes" };
+      const resolveType = RESOLVE_TYPE[field] || field;
+      const item = field === "class" ? getClasses(character)[0]?.name : character[field];
+      if (item) handleChase(item, null, resolveType);
     },
-    [character, handleInspect],
+    [character, handleChase],
   );
 
 
