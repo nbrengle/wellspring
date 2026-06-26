@@ -3255,7 +3255,7 @@
       "Natural Survival: Basic Martial Weapons (1), Profession - Apprentice (1), and either Forage I (3) or Scavenge I (3)",
       "The Song of the Land: Basic Faith (4)",
       "Budding Wisdom - Choose one of the following:",
-      "Extended Capacity - Novice [Primal] (3), Lore [Nature] (2)",
+      "Extended Capacity - Novice [Divine] (3), Lore [Nature] (2)",
       "Short Weapons (3), Two-Weapon Style (2)",
       "Peacecaster (3), Basic Medicine (2)"
     ],
@@ -10441,7 +10441,7 @@
     "startingSkills": [
       "The Ritual of Beginnings: Basic Arcane (4), Warcaster (5)",
       "The Contract With the Other - Choose one of the following:",
-      "Extended Capacity - Novice [Occult] x2 (6)",
+      "Extended Capacity - Novice [Arcane] x2 (6)",
       "Additional Cantrip (6)",
       "Patron [Character’s Choice] (4), Gift of Hateful Retribution I (2)"
     ],
