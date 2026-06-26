@@ -16,6 +16,8 @@ import craftingJson from '../data/crafting-recipes.json';
 import ritualsJson from '../data/ritual-recipes.json';
 import archetypesJson from '../data/archetypes.json';
 import refsJson from '../data/refs.json';
+// Choice/parameter spec registries — kept in their own module (see re-export below).
+import { LINEAGE_CHOICE_SPECS, lineageChoiceSpec } from './choice-specs.js';
 
 // Concept content files — the glossary and rules-reference data the linker emits
 // references to (terms:, rules-concepts:, effects:, accents:, …). Indexed below
@@ -122,6 +124,43 @@ export const ALL_FLAWS = flawsJson.map(f => ({
   desc: descBody(f.description),
   summary: splitDescription(f.description).summary,
 }));
+
+// ─── ALLERGENS ────────────────────────────────────────────────────────────────
+// Mild/Severe Allergy award a variable BP amount depending on the chosen substance
+// ("Award: 1 or 2" / "2 or 3"). The per-substance award comes from the parser:
+// scripts/parse-megadoc.js reads the rulebook's "Standard Allergens and Awards"
+// table out of each flaw's detail prose into a structured `allergens` field. The
+// engine just READS that field — no runtime prose scraping, no hardcoded substance
+// lists. A MegaDoc edit to the table flows through on the next parse.
+//
+//   ALLERGEN_AWARDS = { 'Mild Allergy': { cloth: 2, gold: 1, … }, 'Severe Allergy': {…} }
+//
+// keyed by lowercased substance, value = BP awarded (a positive magnitude).
+export const ALLERGEN_AWARDS = Object.fromEntries(
+  flawsJson
+    .filter((f) => f.allergens && Object.keys(f.allergens).length)
+    .map((f) => [
+      f.name,
+      Object.fromEntries(Object.entries(f.allergens).map(([s, bp]) => [s.toLowerCase(), bp])),
+    ]),
+);
+
+// The substances a given allergy flaw can take, in rulebook order — drives the
+// picker. From the same parsed field, so picker options and awards never drift.
+export function allergenOptions(flawName) {
+  const f = flawsJson.find((x) => x.name === flawName);
+  return Object.keys(f?.allergens || {});
+}
+
+// BP a given allergy flaw awards for a chosen substance. Returns null when the flaw
+// isn't an allergy or no (recognized) substance is chosen yet — callers decide how
+// to present an as-yet-undetermined award (the rulebook leaves it to Staff).
+export function allergenAward(flawName, substance) {
+  const table = ALLERGEN_AWARDS[flawName];
+  if (!table) return null;
+  const key = String(substance || '').toLowerCase().trim();
+  return key && key in table ? table[key] : null;
+}
 
 // ─── CLASSES ──────────────────────────────────────────────────────────────────
 // UI expects CLASSES keyed by name with { type, spellcaster, magicType,
@@ -261,6 +300,28 @@ export function divineCantripOptions() {
   return cantripOptions(['Divine']);
 }
 
+// Spells choosable from any base spellcasting class of the given magic type(s), at
+// the given spell tiers (cantrips/novice/…). Drives lineage picks like Arcane
+// Aptitude ("a Cantrip or Novice spell from any Base arcane class"). `tiers` maps to
+// the CLASS_POWERS fields.
+const SPELL_TIER_FIELD = { cantrip: 'cantrips', novice: 'noviceSpells', adept: 'adeptSpells', greater: 'greaterSpells' };
+export function lineageSpellOptions(magicTypes, tiers = ['cantrip', 'novice']) {
+  const want = new Set(magicTypes);
+  const classes = Object.entries(CLASSES)
+    .filter(([, c]) => c.type === 'Spellcaster' && want.has(c.magicType))
+    .map(([name]) => name);
+  const spells = new Set();
+  for (const cls of classes) {
+    for (const tier of tiers) {
+      const field = SPELL_TIER_FIELD[tier];
+      for (const p of (CLASS_POWERS[cls]?.[field] || [])) {
+        if (p?.name && !/^(Adept|Greater)\s+\w+\s+Power$/i.test(p.name)) spells.add(p.name);
+      }
+    }
+  }
+  return [...spells].sort();
+}
+
 // The [Repped] challenges a Lost character may rep, grouped by source lineage
 // (every lineage other than Lost). Returns [[lineageName, challenges[]], …] for
 // lineages that have at least one repped challenge. Rules knowledge — see Lost
@@ -283,18 +344,14 @@ export function lineageRepOptions() {
 //               Elemental Expression (an Accent), Favored Gem (a gem).
 // Keyed by baseName so the same mechanic is one code path, not a per-name special
 // case. New choice items only need an entry here (no new component / wiring).
-const LINEAGE_CHOICE_SPECS = {
-  'Divine Magic':        { kind: 'cantrip', pool: ['Divine'] },
-  'Psionic Cantrip':     { kind: 'cantrip', pool: ['Arcane', 'Divine'] },
-  'Lost Life':           { kind: 'rep' },
-  'Additional Lost Life':{ kind: 'rep' },
-  'Elemental Expression':{ kind: 'flavor', label: 'Accent' },
-  'Favored Gem':         { kind: 'flavor', label: 'Gemstone' },
-};
-export function lineageChoiceSpec(item) {
-  const base = item?.baseName || item?.name;
-  return base ? (LINEAGE_CHOICE_SPECS[base] || null) : null;
-}
+// Choice/parameter spec registries now live in ./choice-specs.js so adding a new
+// pickable mechanic doesn't churn this file. Re-exported here so existing import
+// paths (`from '../engine/data.js'`) keep working; also imported for the internal
+// uses below (lineageItemImpact, lineageCantripChoices).
+export {
+  LINEAGE_CHOICE_SPECS, lineageChoiceSpec,
+  POWER_SPELL_CHOICE_SPECS, powerSpellChoiceSpec,
+} from './choice-specs.js';
 
 // Lineage cantrip CHOICES the character has actually recorded — the chosen cantrip
 // for each owned cantrip-kind item (Divine Magic, Psionic Cantrip, …). Drives both

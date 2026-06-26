@@ -1,8 +1,7 @@
 import { EFFECT_EXTRACTORS } from './extractors.js';
-import { lookupEntity, LINEAGES, CLASS_PROGRESSION, REFS, lineageChoiceSpec } from '../engine/data.js';
+import { lookupEntity, LINEAGES, CLASS_PROGRESSION, REFS, lineageChoiceSpec, powerSpellChoiceSpec, allergenAward, ALLERGEN_AWARDS } from '../engine/data.js';
 import { startingSkillGrants } from '../engine/starting-choices.js';
 import { cleanItemName, bareSkill, resolveId, entityType, getClasses, idName } from './resolver.js';
-import { COMMON_ALLERGENS } from './config.js';
 import {
   characterLevel, parseTrailingRank, rankOf,
   BP_FIELDS, BP_POWER_FIELDS, POWER_SOURCE_FIELDS,
@@ -48,6 +47,14 @@ export function resolveCharacterGraph(character) {
       effects.push(...extractor(ent, character, entityId));
     }
 
+    // A power that lets you choose a spell to add to Known Spells (e.g. the Knowledge
+    // domain's Arcane Secrets) grants the chosen spell. Data-driven via
+    // powerSpellChoiceSpec — same shape as the lineage `spell` kind, no per-name case.
+    if (powerSpellChoiceSpec(ent)) {
+      const picked = character.choices?.[`powers:${ent?.baseName || ent?.name}`]
+        || character.choices?.[ent?.id];
+      if (picked) effects.push({ type: 'GRANT_SOURCE', grants: [`powers:${picked}`] });
+    }
 
     items.push({
       id: ent?.id || id,
@@ -81,9 +88,13 @@ export function resolveCharacterGraph(character) {
     const ent = lookupEntity(`flaws:${cleanName}`);
     let bp = 0;
     if (ent) {
-      if (ent.baseName === "Mild Allergy" || ent.baseName === "Severe Allergy") {
-        const isCommon = COMMON_ALLERGENS.includes(String(ent.parameter || "").toLowerCase().trim());
-        bp = ent.baseName === "Mild Allergy" ? (isCommon ? 2 : 1) : (isCommon ? 3 : 2);
+      const allergenTable = ALLERGEN_AWARDS[ent.baseName];
+      if (allergenTable) {
+        // Award is per-substance, DERIVED from the rulebook's allergen table. With
+        // no (recognized) substance chosen yet, the award is undetermined (Staff-
+        // approved) — fall back to the table's minimum so BP stays conservative.
+        const chosen = allergenAward(ent.baseName, ent.parameter);
+        bp = chosen != null ? chosen : Math.min(...Object.values(allergenTable));
       } else {
         bp = typeof ent.bp === 'number' ? ent.bp : parseInt(String(ent.bp), 10) || 0;
       }
@@ -162,9 +173,11 @@ export function resolveCharacterGraph(character) {
         effects.push(...extractor(ent, character, entityId));
       }
       
-      // A cantrip-choice advantage (Divine Magic, Psionic Cantrip, …) grants the
-      // chosen cantrip. Data-driven via lineageChoiceSpec — no per-name special case.
-      if (lineageChoiceSpec(ent)?.kind === 'cantrip') {
+      // A cantrip- or spell-choice advantage (Divine Magic, Psionic Cantrip, Arcane
+      // Aptitude) grants the chosen spell as a Known Spell. Data-driven via
+      // lineageChoiceSpec — no per-name special case.
+      const choiceKind = lineageChoiceSpec(ent)?.kind;
+      if (choiceKind === 'cantrip' || choiceKind === 'spell') {
         const picked = character.advantageChoices?.[ent?.baseName || ent?.name];
         if (picked) effects.push({ type: 'GRANT_SOURCE', grants: [`powers:${picked}`] });
       }

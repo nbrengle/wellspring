@@ -413,3 +413,42 @@ export function bookcasterSpellOptions(character) {
   const other = sort([...accessible].filter((n) => !knownSet.has(n)));
   return { known, other };
 }
+
+// Spells choosable for Arcane Secrets (Knowledge domain power). The rules have TWO
+// branches, both drawing from ANY base arcane class ("does not need to be from an
+// arcane spellcasting class they already have access to"):
+//   • Caster with Known Spells → "one arcane spell at a rank they are capable of
+//     casting": cantrips + every tier they hold an Arcane spell-slot for.
+//   • No Known Spells (e.g. a non-caster Cleric) → "a spell an equivalent level
+//     caster could cast based on total level, UP TO ADEPT": cantrip/novice/adept.
+// (The "cast once per long rest without a slot" part is in-play, not a build pick.)
+// Returns a sorted, de-duped list of arcane spell names — the pickable pool.
+const ARCANE_TIER_FIELD = { cantrip: 'cantrips', novice: 'noviceSpells', adept: 'adeptSpells', greater: 'greaterSpells' };
+export function arcaneSecretsSpellOptions(character) {
+  const arcaneClasses = Object.keys(CLASSES).filter(
+    (n) => CLASSES[n]?.spellcaster && CLASSES[n]?.magicType === 'Arcane',
+  );
+  const hasKnownSpells = KNOWN_SPELL_FIELDS.some((f) => (character[f] || []).length > 0);
+
+  let tiers;
+  if (hasKnownSpells) {
+    // Cantrips are always castable; higher tiers gated by Arcane spell-slots held.
+    const arcaneSlots = (spellSlots(character) || {}).Arcane || { novice: 0, adept: 0, greater: 0 };
+    tiers = ['cantrip', ...['novice', 'adept', 'greater'].filter((t) => (arcaneSlots[t] || 0) > 0)];
+  } else {
+    // No Known Spells → capped at Adept regardless of slots.
+    tiers = ['cantrip', 'novice', 'adept'];
+  }
+
+  const spells = new Set();
+  for (const cls of arcaneClasses) {
+    const byTier = CLASS_POWERS[cls];
+    if (!byTier) continue;
+    for (const tier of tiers) {
+      for (const sp of (byTier[ARCANE_TIER_FIELD[tier]] || [])) {
+        if (sp?.name && !/^(Adept|Greater)\s+\w+\s+Power$/i.test(sp.name)) spells.add(sp.name);
+      }
+    }
+  }
+  return [...spells].sort((a, b) => a.localeCompare(b));
+}

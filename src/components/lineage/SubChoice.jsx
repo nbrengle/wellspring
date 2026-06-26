@@ -8,10 +8,13 @@
 //               grants it + gives a casting slot.
 //   'rep'     — pick a [Repped] challenge from another lineage (Lost Life). Stored
 //               as a parameterized name "<item> (<rep>)" via onSetRep.
+//   'spell'   — pick a cantrip/novice spell from any base class of the magic type
+//               (Arcane Aptitude). Stored in advantageChoices[item]; the engine
+//               grants the chosen spell as a Known Spell.
 //   'flavor'  — free pick with no mechanical effect (Elemental Expression accent,
 //               Favored Gem). Stored in advantageChoices[item]; display only.
 import React, { useState } from "react";
-import { cantripOptions } from "../../engine/data.js";
+import { cantripOptions, lineageSpellOptions } from "../../engine/data.js";
 import RepPicker from "./RepPicker.jsx";
 import SubSelect from "../SubSelect.jsx";
 
@@ -31,6 +34,21 @@ export default function SubChoice({ spec, item, field, value, onSetChoice, onSet
           value={value || null}
           onChange={(v) => onSetChoice(item, v || "")}
           options={cantripOptions(spec.pool).map((c) => ({ value: c }))}
+        />
+      </div>
+    );
+  }
+
+  if (spec.kind === "spell") {
+    // Arcane Aptitude: cantrip/novice spell from any base arcane class — large pool,
+    // so the shared control's search fallback kicks in.
+    return (
+      <div className="b-lin-subchoice">
+        <SubSelect
+          prompt="Spell"
+          value={value || null}
+          onChange={(v) => onSetChoice(item, v || "")}
+          options={lineageSpellOptions(spec.pool, spec.tiers).map((s) => ({ value: s }))}
         />
       </div>
     );

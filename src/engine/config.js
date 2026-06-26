@@ -34,9 +34,9 @@ export const ARMOR_SKILLS = [
   'Basic Armor', 'Light Armor', 'Medium Armor', 'Heavy Armor', 'Ironclad Armor'
 ];
 
-export const COMMON_ALLERGENS = [
-  "cloth", "iron", "leather", "materia", "other common allergen"
-];
+// (Allergen common/uncommon split is no longer hardcoded — the per-substance
+// award is derived from each allergy flaw's rulebook table; see ALLERGEN_AWARDS
+// in data.js.)
 
 // ─── Character State Field Mappings ─────────────────────────────────────────
 export const BP_FIELDS = ['purchasedSkills', 'purchasedPerks'];

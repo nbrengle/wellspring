@@ -1,0 +1,240 @@
+// lineages-devotions.test.mjs — split from scripts/test.mjs (hotspot split). Owns its own
+// imports so concurrent features don't collide on one shared import block.
+import { test, eq, ok } from './harness.mjs';
+import {
+  validate, characterLevel
+} from "../../src/engine/validate.js";
+import {
+  budgetFor, computeSlots, spellSlots, devotionState, prereqStatus,
+  LEVEL_CAP, LEGAL_MIN_LEVEL, grantedAbilities, computeSpend,
+  getMaxRanks, bookcasterSpellOptions, arcaneSecretsSpellOptions, eligibleClassChoices, agileLearnerCapacity, basicSpellOptions
+} from "../../src/engine/testing.js";
+import { bareSkill, cleanItemName, getClasses, formatParameterizedName } from "../../src/engine/resolver.js";
+import { formatCharacterSheet, parseCharacterSheet } from '../../src/engine/sheet.js';
+import { solveCrafting, RECIPES, resolveRecipe, classifyIngredient, buildCraftTree } from '../../src/engine/recipe-solver.js';
+import { readFileSync } from 'node:fs';
+import { lookupEntity, eligiblePowers, DEVOTIONS, DOMAINS, REFS, CLASSES, LINEAGES, lineageChoiceSpec, lineageItemImpact, ALLERGEN_AWARDS, allergenOptions, allergenAward, powerSpellChoiceSpec } from '../../src/engine/data.js';
+import { resolveCharacterGraph } from '../../src/engine/graph.js';
+import {
+  hasStartingChoices, reconcileStartingChoices, rebuildStartingSkills,
+  STARTING_CHOICES_CONFIG, optionSkills, resolveSkill,
+  configSkillKeys, sourceStartingSkillKeys,
+} from '../../src/engine/starting-choices.js';
+import ARCHETYPES from '../../src/data/archetypes.json' with { type: 'json' };
+import CLASSES_JSON from '../../src/data/classes.json' with { type: 'json' };
+
+
+// A character built straight from an archetype mirrors what loadArchetype keeps.
+const fromArchetype = (a) => ({ ...a, archetypeName: a.name });
+
+// ─── lineages / LBP ───────────────────────────────────────────────────────────
+test('LBP: challenges award, advantages spend, cap at 10', () => {
+  const a = LINEAGES.Aewen;
+  const req = a.challenges.find((c) => c.required);
+  const c = {
+    lineage: 'Aewen',
+    lineageChallenges: [req.name, 'Mana Lines [Repped]', 'Pointed Ears [Repped]'],
+    lineageAdvantages: ['Deep Reserves'],
+  };
+  const s = validate(c).lbp;
+  eq(s.awarded, 5, 'awarded'); eq(s.spent, 4, 'spent'); eq(s.remaining, 1, 'remaining');
+  ok(s.valid, 'complete build is valid');
+});
+test('LBP: overspend is invalid', () => {
+  const s = validate({ lineage: 'Aewen', lineageChallenges: ['Pointed Ears [Repped]'], lineageAdvantages: ['Deep Reserves'] }).lbp;
+  ok(s.overspent, 'overspent (1 awarded, 4 spent)');
+});
+test('LBP: missing required challenge is invalid', () => {
+  const s = validate({ lineage: 'Lost', lineageChallenges: ['Lost Life [Repped]'], lineageAdvantages: [] }).lbp;
+  ok(s.missingRequired.length > 0, 'required challenge flagged');
+});
+test('LBP: Lost Life / Additional Lost Life dynamic LBP calculation', () => {
+  // Lost Life (Pointed Ears (1 LBP)) should award 1 LBP
+  let s = validate({
+    lineage: 'Lost',
+    lineageChallenges: ['Born of the Void [Required]', 'Scarred by the Void [Repped] [Required]', 'Lost Life [Repped] (Pointed Ears (1 LBP))'],
+    lineageAdvantages: []
+  }).lbp;
+  // Born of the Void = 0, Scarred by the Void = 3, Lost Life = 1. Total = 4.
+  eq(s.rawAwarded, 4, 'Lost Life parsed from LBP suffix');
+
+  // Lost Life (Horns) should lookup Horns in Chimera lineage (3 LBP) and award 3 LBP
+  s = validate({
+    lineage: 'Lost',
+    lineageChallenges: ['Born of the Void [Required]', 'Scarred by the Void [Repped] [Required]', 'Lost Life [Repped] (Horns)'],
+    lineageAdvantages: []
+  }).lbp;
+  // Born of the Void = 0, Scarred by the Void = 3, Horns = 3. Total = 6.
+  eq(s.rawAwarded, 6, 'Lost Life looked up by challenge name');
+});
+test('LBP: Lost Life picker storage format (base name + rep param) resolves', () => {
+  // The Lost Life rep PICKER stores "Lost Life (<rep>)" using the bare baseName
+  // (no [Repped] tag). Confirm that exact shape resolves the rep's LBP, and that
+  // an un-repped Lost Life awards 0 (the bug the picker fixes).
+  const req = ['Born of the Void [Required]', 'Scarred by the Void [Repped] [Required]'];
+  const repped = validate({ lineage: 'Lost', lineageChallenges: [...req, 'Lost Life (Horns)'], lineageAdvantages: [] }).lbp;
+  eq(repped.rawAwarded, 6, 'picker-stored "Lost Life (Horns)" awards Horns\' LBP (0+3+3)');
+
+  const bare = validate({ lineage: 'Lost', lineageChallenges: [...req, 'Lost Life'], lineageAdvantages: [] }).lbp;
+  eq(bare.rawAwarded, 3, 'un-repped "Lost Life" awards 0 (just the required Scarred=3)');
+});
+
+const findLin = (ln, nm) => {
+  const l = LINEAGES[ln];
+  for (const k of ['challenges', 'advantages']) for (const it of (l[k] || [])) if ((it.baseName || it.name) === nm) return it;
+};
+
+test('lineageChoiceSpec classifies sub-choice items by kind', () => {
+  eq(lineageChoiceSpec(findLin('Lost', 'Divine Magic')).kind, 'cantrip', 'Divine Magic = cantrip');
+  eq(lineageChoiceSpec(findLin('Human', 'Psionic Cantrip')).kind, 'cantrip', 'Psionic Cantrip = cantrip');
+  ok(lineageChoiceSpec(findLin('Human', 'Psionic Cantrip')).pool.includes('Arcane'), 'Psionic pool includes Arcane');
+  ok(!lineageChoiceSpec(findLin('Lost', 'Divine Magic')).pool.includes('Arcane'), 'Divine Magic pool is Divine-only');
+  eq(lineageChoiceSpec(findLin('Lost', 'Lost Life')).kind, 'rep', 'Lost Life = rep');
+  eq(lineageChoiceSpec(findLin('Aewen', 'Elemental Expression')).kind, 'flavor', 'Elemental Expression = flavor');
+  eq(lineageChoiceSpec(findLin('Aewen', 'Deep Reserves')), null, 'an ordinary advantage has no choice spec');
+  // Arcane Aptitude: a 'spell' pick (cantrip/novice from any base Arcane class).
+  const aa = lineageChoiceSpec(findLin('Aewen', 'Arcane Aptitude'));
+  eq(aa.kind, 'spell', 'Arcane Aptitude = spell');
+  ok(aa.pool.includes('Arcane') && aa.tiers.includes('novice'), 'Arcane Aptitude pool=Arcane, includes novice');
+});
+
+test('Arcane Aptitude grants the chosen spell as a Known Spell', () => {
+  const char = { lineage: 'Aewen', lineageAdvantages: ['Arcane Aptitude'],
+    advantageChoices: { 'Arcane Aptitude': 'Flameburst' }, ranks: {} };
+  const items = resolveCharacterGraph(char).items;
+  const aa = items.find((i) => /Arcane Aptitude/.test(i.name));
+  ok(aa.effects.some((e) => e.type === 'GRANT_SOURCE' && e.grants.includes('powers:Flameburst')),
+    'the picked spell is granted');
+});
+
+test('Arcane Secrets (domain power) grants the chosen arcane spell as a Known Spell', () => {
+  // powerSpellChoiceSpec drives an owned-power spell pick, keyed by choices['powers:..'].
+  const spec = powerSpellChoiceSpec({ name: 'Arcane Secrets' });
+  ok(spec?.kind === 'spell' && spec.pool.includes('Arcane'), 'Arcane Secrets = arcane spell pick');
+  const char = { classLevels: 'Cleric 6', devotion: 'The Librarian',
+    domainPowers: ['Arcane Secrets'], choices: { 'powers:Arcane Secrets': 'Arcane Barrage' } };
+  const sec = resolveCharacterGraph(char).items.find((i) => /Arcane Secrets/.test(i.name));
+  ok(sec.effects.some((e) => e.type === 'GRANT_SOURCE' && e.grants.includes('powers:Arcane Barrage')),
+    'the picked spell is granted');
+  // With no pick, no grant.
+  const none = resolveCharacterGraph({ classLevels: 'Cleric 6', devotion: 'The Librarian', domainPowers: ['Arcane Secrets'] })
+    .items.find((i) => /Arcane Secrets/.test(i.name));
+  ok(!none.effects.some((e) => e.type === 'GRANT_SOURCE'), 'no pick → no spell granted');
+});
+
+test('Arcane Secrets pool is rank-gated, not a flat list (the rules gate by castable rank)', () => {
+  // Caster with a Known Spell: the pool is gated by Arcane spell-slots held — a low
+  // caster (novice slots only) sees fewer spells than a high caster (adept unlocked).
+  const lo = arcaneSecretsSpellOptions({ classLevels: 'Mage 2', noviceSpells: ['Flameburst'] });
+  const hi = arcaneSecretsSpellOptions({ classLevels: 'Mage 10', noviceSpells: ['Flameburst'] });
+  ok(lo.length > 0 && hi.length > lo.length, 'higher caster level → strictly larger gated pool');
+  // The pool draws from ANY base arcane class, not just the character's own.
+  ok(hi.length >= 80, 'pool spans all base arcane classes (not just the owned class)');
+  // No Known Spells → the "up to Adept" branch (excludes any Greater-tier spell).
+  const noncaster = arcaneSecretsSpellOptions({ classLevels: 'Cleric 6' });
+  ok(noncaster.length > 0, 'non-caster still gets an arcane pool, capped at Adept');
+});
+
+test('cantrip-choice lineage items grant + slot the chosen cantrip (Divine Magic + the previously-broken Psionic Cantrip)', () => {
+  const dm = validate({ classLevels: 'Cleric 4', lineage: 'Lost', lineageAdvantages: ['Divine Magic'], advantageChoices: { 'Divine Magic': 'Cancel' } });
+  ok(dm.grantedAbilities.list.some(g => g.ability === 'powers:Cancel'), 'Divine Magic grants the chosen cantrip (unchanged)');
+  // Psionic Cantrip was hardcoded-out before; the generalized path fixes it.
+  const pc = validate({ classLevels: 'Mage 4', lineage: 'Human', sublineage: 'Psionic', lineageAdvantages: ['Psionic Cantrip'], advantageChoices: { 'Psionic Cantrip': 'Cancel' } });
+  ok(pc.grantedAbilities.list.some(g => g.ability === 'powers:Cancel'), 'Psionic Cantrip now grants the chosen cantrip');
+});
+
+test('lineageItemImpact summarizes mechanical effect', () => {
+  eq(lineageItemImpact(findLin('Aewen', 'Deep Reserves'), 'Aewen')[0], '+1 highest spell-slot', 'slot impact');
+  ok(lineageItemImpact(findLin('Aewen', 'Mystic Resilience'), 'Aewen').some(s => /grants Magical Resilience/.test(s)), 'grant impact');
+  ok(lineageItemImpact(findLin('Lost', 'Divine Magic'), 'Lost')[0].includes('cantrip'), 'cantrip-choice impact');
+});
+test('sublineage: same sublineage (inconsistent strings) is NOT mixed', () => {
+  const a = LINEAGES.Aewen;
+  const accC = a.challenges.find((c) => /^Accented/.test(c.sublineage));
+  const accA = a.advantages.find((c) => c.sublineage === 'Accented');
+  const s = validate({ lineage: 'Aewen', lineageChallenges: [accC.name], lineageAdvantages: [accA.name] }).lbp;
+  ok(!s.mixedSublineage, 'Accented long/short forms treated as one sublineage');
+});
+test('sublineage: mixing two sublineages is flagged', () => {
+  const a = LINEAGES.Aewen;
+  const accC = a.challenges.find((c) => /^Accented/.test(c.sublineage));
+  const shornC = a.challenges.find((c) => /Shorn Urbanite/.test(c.sublineage));
+  const s = validate({ lineage: 'Aewen', lineageChallenges: [accC.name, shornC.name], lineageAdvantages: [] }).lbp;
+  ok(s.mixedSublineage, 'two sublineages flagged as mixed');
+});
+test('sublineage: an optional sublineage item requires selecting that sublineage (#2)', () => {
+  // A Human taking a Psionic challenge (its downside) without committing to the
+  // Psionic sublineage is illegal — being psionic is a sublineage commitment.
+  const psiCh = LINEAGES.Human.challenges.find((c) => /psionic/i.test(c.sublineage || ''));
+  const without = validate({ lineage: 'Human', lineageChallenges: [psiCh.name], lineageAdvantages: [] }).lbp;
+  ok(without.needsSublineage, 'flags missing sublineage selection');
+  ok(!without.valid, 'invalid without the sublineage selected');
+  const withSub = validate({ lineage: 'Human', sublineage: 'Psionic', lineageChallenges: [psiCh.name], lineageAdvantages: [] }).lbp;
+  ok(!withSub.needsSublineage && withSub.valid, 'valid once Psionic is selected');
+});
+test('sublineage: a REQUIRED sublineage-tagged challenge does NOT force a selection', () => {
+  // Aewen's required challenge is tagged to a default presentation; taking it
+  // shouldn't demand a sublineage pick.
+  const a = LINEAGES.Aewen;
+  const req = a.challenges.find((c) => c.required);
+  const s = validate({ lineage: 'Aewen', lineageChallenges: [req.name], lineageAdvantages: [] }).lbp;
+  ok(!s.needsSublineage, 'required challenge does not trigger needsSublineage');
+});
+
+// ─── devotions ────────────────────────────────────────────────────────────────
+test('all 18 devotions carry domains', () => {
+  eq(DEVOTIONS.length, 18, 'devotion count');
+  for (const d of DEVOTIONS) ok(d.domains.length >= 2, `${d.name} has domains`);
+});
+test('devotionState resolves The Mother → Life/Creation/Protection', () => {
+  const ds = devotionState({ devotion: 'The Mother', divineDomains: ['Life', 'Protection'] });
+  ok(ds, 'devotionState non-null');
+  eq(ds.available.join(','), 'Life,Creation,Protection', 'available domains');
+  eq(ds.chosen.join(','), 'Life,Protection', 'chosen domains');
+});
+test('domain → powers → detail chain resolves', () => {
+  const life = DOMAINS.find((d) => d.name === 'Life');
+  ok(life.powers.length, 'Life has powers');
+  const p = lookupEntity(`powers:${life.powers[0].name}`);
+  ok(p && p.description, 'domain power resolves with description');
+});
+
+// ─── prereqs (disjunction) ────────────────────────────────────────────────────
+test('prereq disjunction: Basic Faith satisfies "Basic Arcane or Basic Faith"', () => {
+  const c = { archetypeName: 'x', classes: [{ name: 'Cleric', level: 4 }], startingSkills: ['Basic Faith', 'Extended Capacity - Novice'] };
+  const ps = prereqStatus(c, 'skills:Extended Capacity - Novice');
+  ok(ps.met, 'met with Basic Faith');
+});
+
+// ─── reference resolution coverage ────────────────────────────────────────────
+test('≥99% of reference links resolve', () => {
+  let total = 0, resolved = 0;
+  for (const id in REFS.mentions) for (const ref of REFS.mentions[id]) { total++; if (lookupEntity(ref)) resolved++; }
+  ok(resolved / total >= 0.99, `resolved ${resolved}/${total}`);
+});
+
+// ─── devotion: Worship skill is canonical, inline is the fallback ─────────────
+test('import derives devotion from Worship skill when no inline line', () => {
+  const c = parseCharacterSheet([
+    'Cleric Test', 'Class Levels: Cleric 4',
+    'Purchased Skills:', 'Worship - The Mother',
+  ].join('\n'));
+  eq(c.devotion, 'The Mother', 'devotion from Worship');
+  ok(!c.devotionWarning, 'no warning when only Worship');
+});
+test('import: Worship wins over a mismatched inline Devotion, with a warning', () => {
+  const c = parseCharacterSheet([
+    'Cleric Test', 'Class Levels: Cleric 4', 'Devotion: The Father',
+    'Purchased Skills:', 'Worship - The Mother',
+  ].join('\n'));
+  eq(c.devotion, 'The Mother', 'Worship is canonical');
+  ok(c.devotionWarning, 'mismatch warns');
+});
+test('import: inline Devotion alone is honored when no Worship skill', () => {
+  const c = parseCharacterSheet([
+    'Cleric Test', 'Class Levels: Cleric 4', 'Devotion: The Mother',
+  ].join('\n'));
+  eq(c.devotion, 'The Mother', 'inline fallback');
+  ok(!c.devotionWarning, 'no warning when only inline');
+});
+
