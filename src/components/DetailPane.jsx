@@ -118,6 +118,51 @@ function DescriptionBlock({ text, terms = [], onInspect }) {
 }
 
 
+// A devotion's detail: its lore (the narrative "description"), tenets/guiding
+// principles, structured facts, and clickable domains. The data lives in the
+// devotion entity's lore/tenets/etc. fields — there is no `description` field —
+// which is why the generic body rendered blank for devotions before.
+function DevotionBody({ entity, terms, onInspect }) {
+  // The parser leaves a trailing "Example Sigil:" label where the (now-dropped)
+  // sigil image was — strip it so it doesn't show as stray text.
+  const lore = String(entity.lore || "").replace(/\s*Example Sigil:\s*$/i, "").trim();
+  const tenets = entity.tenets || [];
+  const facts = [
+    ["Locality", entity.locality],
+    ["Color scheme", entity.colorScheme || entity.color],
+    ["Iconography", entity.iconography],
+  ].filter(([, v]) => v && String(v).trim());
+  const domainIds = (entity.domains || []).map((d) => `domains:${d}`);
+  return (
+    <>
+      {lore
+        ? <DescriptionBlock text={lore} terms={terms} onInspect={onInspect} />
+        : <p className="b-detail-missing">No lore on record.</p>}
+      {tenets.length > 0 && (
+        <div className="b-detail-section">
+          <h3 className="b-detail-section-title">Tenets</h3>
+          <ul className="b-detail-bullets">
+            {tenets.map((t, i) => <li key={i}>{t}</li>)}
+          </ul>
+        </div>
+      )}
+      {facts.length > 0 && (
+        <dl className="b-facts">
+          {facts.map(([label, value]) => (
+            <div key={label} className="b-fact">
+              <dt className="b-fact-label">{label}</dt>
+              <dd className="b-fact-val">{value}</dd>
+            </div>
+          ))}
+        </dl>
+      )}
+      {domainIds.length > 0 && (
+        <LinkList title="Domains" tone="purple" ids={domainIds} onInspect={onInspect} />
+      )}
+    </>
+  );
+}
+
 function ParameterEditor({ baseName, entity, view, suggestions: suggestionsProp, groups, onUpdateParameter }) {
   const chosenParam = entity.baseName ? (entity.parameter || "") : "";
 
@@ -201,6 +246,13 @@ export function EntityBody({ entity, view, report, choices, onSetChoice, onUpdat
   const isParamEditable = !!(onUpdateParameter && view?.field && view.field !== "multiclassGrant"
     && (paramSuggestions?.length || paramGroups?.length || baseName === "Bookcaster"
         || TYPEABLE_PARAMS.has(baseName)));  // typeable params are editable even with no suggestions
+  // A devotion's "description" lives in lore + tenets (not a `description` field),
+  // plus structured facts (color, iconography, locality, domains). Render those
+  // instead of falling through to the blank "No description on record".
+  if (entity.type === "devotions") {
+    return <DevotionBody entity={entity} terms={terms} onInspect={onInspect} />;
+  }
+
   return (
     <>
       {entity.description
