@@ -13,7 +13,7 @@ import { bareSkill, cleanItemName, getClasses, formatParameterizedName } from ".
 import { formatCharacterSheet, parseCharacterSheet } from '../../src/engine/sheet.js';
 import { solveCrafting, RECIPES, resolveRecipe, classifyIngredient, buildCraftTree } from '../../src/engine/recipe-solver.js';
 import { readFileSync } from 'node:fs';
-import { lookupEntity, eligiblePowers, DEVOTIONS, DOMAINS, REFS, CLASSES, LINEAGES, lineageChoiceSpec, lineageItemImpact, ALLERGEN_AWARDS, allergenOptions, allergenAward, powerSpellChoiceSpec } from '../../src/engine/data.js';
+import { lookupEntity, eligiblePowers, DEVOTIONS, DOMAINS, REFS, CLASSES, LINEAGES, lineageChoiceSpec, lineageItemImpact, ALLERGEN_AWARDS, allergenOptions, allergenAward, powerSpellChoiceSpec, divineSubstitutionOptions } from '../../src/engine/data.js';
 import { resolveCharacterGraph } from '../../src/engine/graph.js';
 import {
   hasStartingChoices, reconcileStartingChoices, rebuildStartingSkills,
@@ -197,6 +197,38 @@ test('domain → powers → detail chain resolves', () => {
   ok(life.powers.length, 'Life has powers');
   const p = lookupEntity(`powers:${life.powers[0].name}`);
   ok(p && p.description, 'domain power resolves with description');
+});
+test('opposed-domain pairs are parsed (symmetric) from the MegaDoc table', () => {
+  const opp = Object.fromEntries(DOMAINS.map((d) => [d.name, d.opposedBy]));
+  eq(opp['Chaos'], 'Order', 'Chaos ↔ Order'); eq(opp['Order'], 'Chaos', 'symmetric');
+  eq(opp['Life'], 'Death', 'Life ↔ Death');
+  eq(opp['Light'], 'Shadow', 'Light ↔ Shadow');
+  eq(opp['Peace'], 'War', 'Peace ↔ War');
+  eq(opp['Knowledge'], null, 'unopposed domain has no pair');
+});
+test('Divine Substitution offers domains that are neither standard nor opposed', () => {
+  // The Mother = Life/Creation/Protection → excludes those AND their opposites
+  // (Death opposes Life, Destruction opposes Creation).
+  const opts = divineSubstitutionOptions(['Life', 'Creation', 'Protection']);
+  ok(!opts.some((d) => ['Life', 'Creation', 'Protection'].includes(d)), 'excludes standard');
+  ok(!opts.includes('Death') && !opts.includes('Destruction'), 'excludes opposed');
+  ok(opts.includes('Shadow') && opts.includes('War'), 'offers eligible domains');
+});
+test('Divine Substitution grants the chosen domain (opposition enforced end-to-end)', () => {
+  const ds = devotionState({
+    classLevels: 'Cleric 10', devotion: 'The Mother', classPowers: ['Divine Substitution'],
+    choices: { 'powers:Divine Substitution': 'Shadow' }, divineDomains: ['Shadow'],
+  });
+  ok(ds.substitution, 'substitution surfaced when the power is owned');
+  eq(ds.substitution.chosen, 'Shadow', 'records the pick');
+  ok(ds.available.includes('Shadow'), 'chosen domain becomes available');
+  ok(ds.eligiblePowers.length > 0, 'its domain powers become purchasable');
+  // A forbidden (opposed) pick is rejected: Death opposes Life → not added.
+  const bad = devotionState({
+    classLevels: 'Cleric 10', devotion: 'The Mother', classPowers: ['Divine Substitution'],
+    choices: { 'powers:Divine Substitution': 'Death' },
+  });
+  ok(!bad.available.includes('Death'), 'an opposed pick is refused');
 });
 
 // ─── prereqs (disjunction) ────────────────────────────────────────────────────

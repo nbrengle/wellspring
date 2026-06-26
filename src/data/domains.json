@@ -3,6 +3,7 @@
     "name": "Chaos",
     "label": "Chaos",
     "accent": "Lightning",
+    "opposedBy": "Order",
     "powers": [
       {
         "name": "The Path Less Travelled",
@@ -55,6 +56,7 @@
     "name": "Creation",
     "label": "Creation",
     "accent": "Flame",
+    "opposedBy": "Destruction",
     "powers": [
       {
         "name": "Inspired Hands",
@@ -107,6 +109,7 @@
     "name": "Death",
     "label": "Death",
     "accent": "Shadow",
+    "opposedBy": "Life",
     "powers": [
       {
         "name": "Death Pact",
@@ -159,6 +162,7 @@
     "name": "Destruction",
     "label": "Destruction",
     "accent": "Acid",
+    "opposedBy": "Creation",
     "powers": [
       {
         "name": "Dissolve",
@@ -196,6 +200,7 @@
     "name": "Energy",
     "label": "Energy: [Acid, Flame, Ice, or Lightning]",
     "accent": null,
+    "opposedBy": null,
     "powers": [
       {
         "name": "Energistic Specialization",
@@ -248,6 +253,7 @@
     "name": "Expression",
     "label": "Expression",
     "accent": "Mind",
+    "opposedBy": "Manipulation",
     "powers": [
       {
         "name": "Emotional Attunement",
@@ -300,6 +306,7 @@
     "name": "Life",
     "label": "Life",
     "accent": "Life",
+    "opposedBy": "Death",
     "powers": [
       {
         "name": "Expanded Healing",
@@ -352,6 +359,7 @@
     "name": "Light",
     "label": "Light",
     "accent": "Radiant",
+    "opposedBy": "Shadow",
     "powers": [
       {
         "name": "No Stone Unturned",
@@ -404,6 +412,7 @@
     "name": "Knowledge",
     "label": "Knowledge",
     "accent": "Mind",
+    "opposedBy": null,
     "powers": [
       {
         "name": "Well Read",
@@ -456,6 +465,7 @@
     "name": "Manipulation",
     "label": "Manipulation",
     "accent": "Mind",
+    "opposedBy": "Expression",
     "powers": [
       {
         "name": "Mind Wipe",
@@ -508,6 +518,7 @@
     "name": "Nature",
     "label": "Nature",
     "accent": "Poison",
+    "opposedBy": null,
     "powers": [
       {
         "name": "Nature’s Form",
@@ -560,6 +571,7 @@
     "name": "Order",
     "label": "Order",
     "accent": "Ice",
+    "opposedBy": "Chaos",
     "powers": [
       {
         "name": "Orderly Conduct",
@@ -597,6 +609,7 @@
     "name": "Peace",
     "label": "Peace",
     "accent": "Life",
+    "opposedBy": "War",
     "powers": [
       {
         "name": "Non-Aggression Pact",
@@ -649,6 +662,7 @@
     "name": "Protection",
     "label": "Protection",
     "accent": "Divine",
+    "opposedBy": null,
     "powers": [
       {
         "name": "Protection Mastery",
@@ -701,6 +715,7 @@
     "name": "Shadow",
     "label": "Shadow",
     "accent": "Shadow",
+    "opposedBy": "Light",
     "powers": [
       {
         "name": "Slippery Tongue",
@@ -753,6 +768,7 @@
     "name": "War",
     "label": "War",
     "accent": "Force",
+    "opposedBy": "Peace",
     "powers": [
       {
         "name": "Severing Strikes",

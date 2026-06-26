@@ -9,7 +9,7 @@
 // Pure functions, no React, so the UI calls them in a useMemo and they stay
 // unit-testable. The character shape is the flat object from Builder.jsx.
 
-import { LEVEL_TABLE, lookupEntity, CLASS_POWER_SLOTS, DEVOTIONS, DOMAINS, CRAFTING, RITUALS, UNLIMITED_SKILLS } from '../engine/data.js';
+import { LEVEL_TABLE, lookupEntity, CLASS_POWER_SLOTS, DEVOTIONS, DOMAINS, CRAFTING, RITUALS, UNLIMITED_SKILLS, divineSubstitutionOptions } from '../engine/data.js';
 import { cleanItemName, bareSkill, resolveId, entityType, getClasses, primaryClass } from './resolver.js';
 
 // Shared primitives now live in validate/core.js (hotspot split). Import the ones
@@ -101,7 +101,19 @@ export function devotionState(character) {
   const devName = character?.devotion;
   if (!devName) return null;
   const dev = DEVOTIONS.find((d) => d.name === devName || d.baseName === devName);
-  const available = dev?.domains || [];
+  const standard = dev?.domains || [];
+
+  // Divine Substitution (Cleric Class power): grants access to ONE extra domain that
+  // is neither standard nor in direct opposition to a standard domain. Eligible
+  // options are computed from the parsed opposed-domains data; the chosen one (stored
+  // in choices['powers:Divine Substitution']) joins `available` so its powers can be
+  // bought. ownsSubstitution gates the UI picker.
+  const ownsSubstitution = ownsDivineSubstitution(character);
+  const substitutionOptions = ownsSubstitution ? divineSubstitutionOptions(standard) : [];
+  const subPick = character.choices?.['powers:Divine Substitution'];
+  const substituted = ownsSubstitution && subPick && substitutionOptions.includes(subPick) ? subPick : null;
+
+  const available = substituted ? [...standard, substituted] : standard;
   const chosen = (character.divineDomains || []).filter((d) => available.includes(d)).slice(0, MAX_DOMAINS);
   // Domain powers purchasable from the chosen domains.
   const powers = chosen.flatMap((dn) => {
@@ -111,10 +123,18 @@ export function devotionState(character) {
   });
   return {
     devotion: dev || { name: devName, domains: [] },
-    available, chosen,
+    available, standard, chosen,
     worship: hasWorship(character),
     eligiblePowers: powers,
+    substitution: ownsSubstitution ? { options: substitutionOptions, chosen: substituted } : null,
   };
+}
+
+// Whether the character owns the Divine Substitution Class power (in any of the
+// power fields it can be bought into).
+function ownsDivineSubstitution(character) {
+  const fields = ['classPowers', 'domainPowers'];
+  return fields.some((f) => (character[f] || []).some((p) => /^Divine Substitution\b/.test(cleanItemName(p))));
 }
 
 

@@ -1649,9 +1649,37 @@ write('devotions.json', parseDevotions());
 
 console.log('\nParsing divine domains...');
 
+// Opposed-domain pairs, from the "Opposed Domains:" table the Jun 26 MegaDoc added
+// under the Divine Substitution power (Chaos↔Order, Death↔Life, …). Symmetric:
+// returns { Chaos: 'Order', Order: 'Chaos', … }. Used to enforce Divine
+// Substitution's "may not take a domain in direct opposition" rule — this data was
+// previously absent (it pointed to an external doc), blocking that mechanic.
+function parseOpposedDomains() {
+  const opp = {};
+  // The label sits in a text/cell node; the pairs follow as two-cell rows. Find it.
+  const labelIdx = nodes.findIndex((n) => (n.type === 'text' || n.type === 'cell') && /Opposed Domains:/i.test(n.text || ''));
+  if (labelIdx === -1) return opp;
+  // Collect cell nodes after the label until a clear break (a heading); pair them up.
+  const cells = [];
+  for (let i = labelIdx; i < nodes.length && cells.length < 16; i++) {
+    const n = nodes[i];
+    if (n.type === 'heading' && i > labelIdx) break;
+    if (n.type === 'cell') cells.push(n.text.replace(/Opposed Domains:\s*/i, '').trim());
+  }
+  const known = new Set(['Chaos', 'Order', 'Creation', 'Destruction', 'Expression', 'Manipulation',
+    'Life', 'Death', 'Light', 'Shadow', 'Peace', 'War', 'Energy', 'Knowledge', 'Nature', 'Protection']);
+  const clean = cells.filter((c) => known.has(c));
+  for (let i = 0; i + 1 < clean.length; i += 2) {
+    opp[clean[i]] = clean[i + 1];
+    opp[clean[i + 1]] = clean[i]; // symmetric
+  }
+  return opp;
+}
+
 function parseDivineDomains() {
   const start = findHeading('Divine Domains', 1);
   const end = findHeading('Wellspring Economy Overview', 1, start);
+  const opposed = parseOpposedDomains();
 
   // Devotion accents table: H2 "Devotion Accents" → cell pairs
   const accents = {};
@@ -1716,7 +1744,8 @@ function parseDivineDomains() {
       }
     }
 
-    domains.push({ name, label: rawName, accent: accents[name] ?? accents[rawName] ?? null, powers });
+    domains.push({ name, label: rawName, accent: accents[name] ?? accents[rawName] ?? null,
+      opposedBy: opposed[name] ?? null, powers });
     i = dEnd;
   }
   return domains;
