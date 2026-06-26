@@ -171,7 +171,7 @@ export function classifyOwnedItems(character) {
   const SOURCE_OF = { starting: 'class', purchased: 'purchased', power: 'purchased', innate: 'class', multiclass: 'class', grantedSelection: 'class' };
   const graph = resolveCharacterGraph(character);
   for (const node of graph.items) {
-    if (node.field === 'flaws' || node.field === 'synthetic' || node.field === 'lineageAdvantages') continue;
+    if (node.field === 'flaws' || node.field === 'synthetic' || node.field === 'lineageAdvantages' || node.field === 'lineageChallenges') continue;
     const { field, index } = node;
     const source = SOURCE_OF[node.sourceType] || 'purchased';
     const specialty = node.specialty || null;
