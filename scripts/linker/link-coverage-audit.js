@@ -3,15 +3,15 @@
 // NOT get linked by the matcher. Surfaces candidate game-terms we may be
 // missing in the registry, in CURATED aliases, or via doc inconsistencies.
 //
-// Run: node scripts/link-coverage-audit.js
+// Run: node scripts/linker/link-coverage-audit.js
 
 import { readFileSync, readdirSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
-import { inflect, CURATED, MATCH_POLICY } from "./aliases.js";
+import { inflect, CURATED, MATCH_POLICY } from "../aliases.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const DATA = join(__dirname, "..", "src", "data");
+const DATA = join(__dirname, "..", "..", "src", "data");
 const read = (f) => JSON.parse(readFileSync(join(DATA, f), "utf8"));
 
 // ─── REPLICATE the linker's entity building so we know what IS linkable ───────

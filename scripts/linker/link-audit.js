@@ -5,15 +5,15 @@
 // - capitalized title-case phrases in bodies that go unlinked (potential aliases)
 // - stop-word suppression report (so we know what we're intentionally not linking)
 //
-// Run: node scripts/link-audit.js   (npm run link:audit)
+// Run: node scripts/linker/link-audit.js   (npm run link:audit)
 
 import { readFileSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
-import { STOP_WORDS, CURATED, inflect } from "./aliases.js";
+import { STOP_WORDS, CURATED, inflect } from "../aliases.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const DATA = join(__dirname, "..", "src", "data");
+const DATA = join(__dirname, "..", "..", "src", "data");
 const read = (f) => JSON.parse(readFileSync(join(DATA, f), "utf8"));
 
 const refs = read("refs.json");

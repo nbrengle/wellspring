@@ -4,15 +4,15 @@
 // report is for the people who write the MegaDoc: things they could clean up
 // in the source to make the rules more navigable and self-consistent.
 //
-// Run: node scripts/doc-feedback.js   (npm run doc:feedback)
+// Run: node scripts/linker/doc-feedback.js   (npm run doc:feedback)
 
 import { readFileSync, writeFileSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
-import { MATCH_POLICY, inflect } from "./aliases.js";
+import { MATCH_POLICY, inflect } from "../aliases.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const ROOT = join(__dirname, "..");
+const ROOT = join(__dirname, "..", "..");
 const DATA = join(ROOT, "src", "data");
 const read = (f) => JSON.parse(readFileSync(join(DATA, f), "utf8"));
 

@@ -13,7 +13,7 @@
 // records { type, name, category, snippet } so the whole mechanical surface is
 // visible and a reviewer can see exactly what phrasing matched.
 //
-// USE: `node --import ./scripts/register-json.mjs scripts/extract-mechanics.mjs`
+// USE: `node --import ./scripts/register-json.mjs scripts/linker/extract-mechanics.mjs`
 //   --json   emit the full structured records as JSON (for diffing / a consumer)
 //   --cat=X  only show category X
 //
@@ -26,7 +26,7 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const read = (f) => JSON.parse(readFileSync(join(__dirname, '..', 'src', 'data', f), 'utf8'));
+const read = (f) => JSON.parse(readFileSync(join(__dirname, '..', '..', 'src', 'data', f), 'utf8'));
 
 const argv = process.argv.slice(2);
 const asJson = argv.includes('--json');
@@ -112,7 +112,7 @@ function charForEntity(type, name) {
 // owns it and assert the bump registers. Reports the ones the builder IGNORES —
 // real candidate bugs (a rule the doc states but the rail doesn't apply). ───────
 if (auditStats) {
-  const { validate } = await import('../src/engine/validate.js');
+  const { validate } = await import('../../src/engine/validate.js');
   // Phrasings that denote a PERMANENT max-stat bump. Three shapes the doc uses:
   //   "+N (Base) Maximum <stat>" / "N additional ... Maximum <stat>"
   //   "(Base) Maximum <stat> is/are increased"
