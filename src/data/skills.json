@@ -484,12 +484,9 @@
       {
         "cat": "novice",
         "n": 1
-      },
-      {
-        "cat": "spellsKnown",
-        "n": 1
       }
-    ]
+    ],
+    "parameter": "Sphere"
   },
   {
     "name": "Extended Capacity - Adept",
@@ -502,12 +499,9 @@
       {
         "cat": "adept",
         "n": 1
-      },
-      {
-        "cat": "spellsKnown",
-        "n": 1
       }
-    ]
+    ],
+    "parameter": "Sphere"
   },
   {
     "name": "Extended Capacity - Greater",
@@ -520,12 +514,9 @@
       {
         "cat": "greater",
         "n": 1
-      },
-      {
-        "cat": "spellsKnown",
-        "n": 1
       }
-    ]
+    ],
+    "parameter": "Sphere"
   },
   {
     "name": "Additional Cantrip",

@@ -303,7 +303,7 @@
       "Worship - The Mother",
       "Basic Martial Weapons",
       "Basic Armor",
-      "Extended Capacity - Novice",
+      "Extended Capacity - Novice (Divine)",
       "Additional Cantrip"
     ],
     "divineDomains": [
@@ -392,7 +392,7 @@
       "Profession - Apprentice (Smith)",
       "Basic Faith",
       "Scavenge I",
-      "Extended Capacity - Novice",
+      "Extended Capacity - Novice (Divine)",
       "Lore (Nature)"
     ],
     "purchasedSkills": [
@@ -648,7 +648,7 @@
       "Library Use",
       "Bookcaster (Magekey)",
       "Bookcaster (Mask Aura)",
-      "Extended Capacity - Novice"
+      "Extended Capacity - Novice (Arcane)"
     ],
     "purchasedSkills": [
       "Apprentice Ritual Magic",

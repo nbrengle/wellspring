@@ -330,8 +330,7 @@ test('spells-known picker offers novice + adept (all learnable tiers)', () => {
 test('xN rank multiplies a slot-granting skill (Utility Mage Extended Capacity x2)', () => {
   const mage = ARCHETYPES.find((a) => a.name === 'Utility Mage');
   const r = validate(fromArchetype(mage));
-  const sk = r.slots.find((s) => s.category === 'spellsKnown');
-  ok(sk.bonus >= 2, `spellsKnown bonus from x2 grants (got ${sk.bonus})`);
+  ok(r.spellSlots.Arcane.novice >= 5, `novice bonus from x2 grants (got ${r.spellSlots.Arcane.novice})`);
 });
 
 // ─── lineages / LBP ───────────────────────────────────────────────────────────
@@ -1122,8 +1121,8 @@ test('granted "x2" specialty skill records rank 2 on a single row', () => {
     .filter((x) => x.base === 'Extended Capacity - Novice');
   eq(idxs.length, 1, 'stored as a single row, not two');
   eq(c.ranks.startingSkills[idxs[0].i], 2, 'rank 2 recorded');
-  // …and it still drives the +2 spellsKnown slot bonus mechanically.
-  eq(validate(c).slots.find((s) => s.category === 'spellsKnown').bonus, 2, 'x2 grants +2 spellsKnown');
+  // …and it still drives the +2 novice slot bonus mechanically.
+  eq(validate(c).spellSlots.Arcane.novice, 6, 'x2 grants +2 novice slots (total 6)');
 });
 
 // A finite multi-rank starting skill can be bought ABOVE its free granted floor:
@@ -1148,8 +1147,8 @@ test('buying a granted skill above its free floor bills only the excess', () => 
 
   // Rank 3: one paid rank @ 3 BP; bonus rises to 3.
   let r = validate(setRank(c, 'startingSkills', i, 3));
-  eq(r.spend.byItem[`startingSkills:${i}:Extended Capacity - Novice`].cost, 3, 'rank 3 bills 1 extra rank');
-  eq(r.slots.find((s) => s.category === 'spellsKnown').bonus, 3, 'rank 3 grants +3 spellsKnown');
+  eq(r.spend.byItem[`startingSkills:${i}:${c.startingSkills[i]}`].cost, 3, 'rank 3 bills 1 extra rank');
+  eq(r.spellSlots.Arcane.novice, 7, 'rank 3 grants +3 novice slots (total 7)');
 
   // Rank 4 (max): two paid ranks @ 3 BP.
   eq(validate(setRank(c, 'startingSkills', i, 4)).spend.net, 6, 'rank 4 bills 2 extra ranks');
