@@ -43,6 +43,7 @@ export const FACETS = [
   { id: "required",   label: "Required",   values: (e) => (e.required ? ["Required"] : []) },
   { id: "tier",       label: "Tier",       values: (e) => one(e.tier) },
   { id: "refresh",    label: "Refresh",    values: (e) => (e.refresh && e.refresh !== "None" ? [e.refresh] : []) },
+  { id: "tags",       label: "Tags",       values: (e) => e.tags || [] },
   { id: "damage",     label: "Damage",     values: (e) => gameEffectFacets(e.type, facetName(e)).damage },
   { id: "effect",     label: "Effect",     values: (e) => gameEffectFacets(e.type, facetName(e)).effect },
   { id: "condition",  label: "Condition",  values: (e) => gameEffectFacets(e.type, facetName(e)).condition },

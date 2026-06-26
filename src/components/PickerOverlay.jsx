@@ -75,18 +75,6 @@ export default function PickerOverlay({ spec, character, onClose }) {
 
   const lockedOf = (name) => !prereqStatus(character, `${entityType}:${name}`).met;
 
-  // Surface axes + shared game-effect axes (resolved against this picker's entity
-  // type). Drop the Damage/Condition axes when no candidate carries that facet so
-  // they don't clutter a skill/perk picker.
-  const allAxes = useMemo(
-    () => [...SURFACE_AXES, ...gameEffectAxes(() => entityType)],
-    [entityType],
-  );
-  const availableAxes = useMemo(
-    () => allAxes.filter((a) => axisApplies(a, candidates)),
-    [allAxes, candidates],
-  );
-
   // Resolve each thin candidate ({name, cat, …}) to its FULL entity so the shared
   // facet registry (which reads entity fields: type/tier/lineage/…) can slice them.
   // Keyed by candidate name; falls back to the candidate itself if not indexed.
@@ -96,6 +84,22 @@ export default function PickerOverlay({ spec, character, onClose }) {
     return m;
   }, [candidates, entityType]);
   const entities = useMemo(() => candidates.map((c) => entityOf.get(c.name)), [candidates, entityOf]);
+
+  // Surface axes + shared game-effect axes (resolved against this picker's entity
+  // type). Drop the Damage/Condition axes when no candidate carries that facet so
+  // they don't clutter a skill/perk picker.
+  const allAxes = useMemo(
+    () => [
+      ...SURFACE_AXES,
+      { id: "tags", label: "Tags", multi: true, keys: (c) => entityOf.get(c.name)?.tags || [], placeholder: "Untagged" },
+      ...gameEffectAxes(() => entityType)
+    ],
+    [entityType, entityOf],
+  );
+  const availableAxes = useMemo(
+    () => allAxes.filter((a) => axisApplies(a, candidates)),
+    [allAxes, candidates],
+  );
 
   // Facets offered for THIS pool: shared registry, only those with 2+ values. A
   // narrow slot ("Add a Mage power" — all Mage) offers few/none.
