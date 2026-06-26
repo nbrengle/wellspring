@@ -103,7 +103,7 @@ export function browse({
     if (a.key === ph) return 1;
     if (b.key === ph) return -1;
     if (axis.order) return cmpOrder(axis.order(a.key), axis.order(b.key)) || a.label.localeCompare(b.label);
-    return axis.multi ? a.label.localeCompare(b.label) : 0;
+    return a.label.localeCompare(b.label);
   });
 
   return { axis, groups: entries };
