@@ -42,13 +42,35 @@ function discountApplies(src, itemNode, pos) {
 export function computeBP(graph, character) {
   const startFloors = startingSkillGrants(character).floor;
   
-  // Build index of things granted by the character's owned items
+  // Build index of things granted by the character's owned items. A grant matches
+  // an owned node so that node renders free + attributed. Two keys are needed:
+  //   - exact id (`skills:Two Weapon Style`), and
+  //   - a PARAMETERIZED key (`skills:Weapon Specialization|daggers`), because a
+  //     parameterized grant ("Weapon Specialization - Daggers", dash form) must
+  //     match a parameterized PURCHASE ("Weapon Specialization (Daggers)", parens
+  //     form) of the same weapon — but NOT a different weapon. The node's bare
+  //     `id` drops the parameter (both forms resolve to the base skill entity), so
+  //     bare-id matching alone would refund the wrong purchase (or none).
+  const paramKey = (typedName) => {
+    const c = typeof typedName === 'string' && typedName.includes(':')
+      ? typedName : `:${typedName}`;
+    const [type, rest = ''] = [c.slice(0, c.indexOf(':')), c.slice(c.indexOf(':') + 1)];
+    // Normalize both "Base - Param" and "Base (Param)" to base + lowercased param.
+    const paren = rest.match(/^(.*?)\s*\(([^)]*)\)\s*$/);
+    const dash = rest.match(/^(.*?)\s+-\s+(.*)$/);
+    const m = paren || dash;
+    if (!m) return null; // no parameter → nothing to disambiguate
+    return `${type}:${m[1].trim()}|${m[2].trim().toLowerCase()}`;
+  };
   const grantIndex = {};
+  const grantParamIndex = {};
   for (const node of graph.items) {
     for (const eff of node.effects) {
       if (eff.type === 'GRANT_SOURCE') {
         eff.grants.forEach(g => {
           if (!grantIndex[g]) grantIndex[g] = node.name;
+          const pk = paramKey(g);
+          if (pk && !grantParamIndex[pk]) grantParamIndex[pk] = node.name;
         });
       }
     }
@@ -76,10 +98,18 @@ export function computeBP(graph, character) {
     let isGranted = false;
     let grantSrc = null;
     let isDerived = false;
+    // The node's parameterized key: its base id (type:base) + the param from its
+    // raw string, so a granted "Weapon Specialization - Daggers" matches a bought
+    // "Weapon Specialization (Daggers)" but not "(Swords)".
+    const nodeParamKey = node.id && /\(|\s-\s/.test(node.rawString || '')
+      ? paramKey(`${node.id.slice(0, node.id.indexOf(':') + 1)}${node.rawString}`)
+      : null;
     if (node.grantSidecar?.kind === 'grant') {
       isGranted = true; grantSrc = node.grantSidecar.source;
     } else if (grantIndex[node.id]) {
       isGranted = true; grantSrc = grantIndex[node.id]; isDerived = true;
+    } else if (nodeParamKey && grantParamIndex[nodeParamKey]) {
+      isGranted = true; grantSrc = grantParamIndex[nodeParamKey]; isDerived = true;
     } else if (node.sourceType === 'innate' || node.field === 'multiclassGrant') {
       isGranted = true; grantSrc = 'class'; isDerived = true;
     }

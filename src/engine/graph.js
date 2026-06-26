@@ -268,6 +268,62 @@ export function resolveCharacterGraph(character) {
     });
   }
 
+  // 4.7 GRANT_SOURCE grants — abilities a source GIVES YOU FOR FREE (REFS.grants and
+  // build choose-one picks). The graph collects these as effects on the granting
+  // node; materialize each as its OWN owned item (cost 0, with grantedBy provenance)
+  // so it renders uniformly in its natural section (a granted skill in Skills, a
+  // granted perk in Perks) and is clickable/parameterizable — instead of only
+  // showing for lineage advantages. Skip ones already owned as a real purchase (the
+  // duplicate is a free-BP refund, handled in BP accounting, not a second row).
+  // Dedup on the BARE skill name (param- and type-agnostic): a granted "Weapon
+  // Specialization - Swords" is the same skill as an owned "Weapon Specialization
+  // (Daggers)" for the purpose of not rendering two rows. The grant's own parameter
+  // wins via the choice, so the owned-purchase copy is what we keep when both exist.
+  // Resolve to the canonical BASE name (strips both "(param)" and " - param" forms),
+  // so a granted "Weapon Specialization - Swords" and an owned "Weapon Specialization
+  // (Daggers)" collapse to the same key.
+  const bareKey = (name, ent) => {
+    const e = ent || lookupEntity(`skills:${cleanItemName(name)}`) || lookupEntity(`powers:${cleanItemName(name)}`);
+    const base = e?.baseName || e?.name || bareSkill(cleanItemName(name));
+    return base.toLowerCase();
+  };
+  const ownedKeys = new Set(items
+    .filter((it) => it.sourceType !== 'lineage')
+    .map((it) => bareKey(it.name, it.entity)));
+  const grantedKeys = new Set();
+  for (const node of [...items]) {
+    const isChoiceGrant = node.entity?.chooseOne?.kind === 'build';
+    for (const eff of node.effects) {
+      if (eff.type !== 'GRANT_SOURCE') continue;
+      for (const gid of eff.grants) {
+        const ent = lookupEntity(gid);
+        const gType = gid.slice(0, gid.indexOf(':'));
+        const gName = ent?.name || gid.slice(gid.indexOf(':') + 1);
+        const key = bareKey(gName, ent);
+        // Don't double-render: skip if the player already owns this, or another grant
+        // already materialized it.
+        if (ownedKeys.has(key) || grantedKeys.has(key)) continue;
+        grantedKeys.add(key);
+        items.push({
+          id: ent?.id || gid,
+          name: gName,
+          rawString: gName,
+          field: `${gType}Grant`,        // distinct field so it's recognizably a grant
+          sourceType: 'grant',
+          grantedBy: node.name,
+          grantKind: isChoiceGrant ? 'choice' : nodeGrantKind(node),
+          index: -1,
+          rank: 1,
+          baseCost: 0,
+          entity: ent,
+          effects: [],
+          specialty: null,
+          floor: 0,
+        });
+      }
+    }
+  }
+
   // 5. Add Synthetic Item for Tax Evasion
   const hasTaxEvasion = items.some(i => i.name === 'Tax Evasion');
   if (hasTaxEvasion) {

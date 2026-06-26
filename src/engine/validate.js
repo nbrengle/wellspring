@@ -188,6 +188,18 @@ export function classifyOwnedItems(character) {
       skills.push({ name: node.name, field, index, source: 'class', grantedBy: node.grantedBy });
       continue;
     }
+    // GRANT_SOURCE grants (a power/perk/advantage that gives a free ability): route to
+    // the bucket matching the granted entity's type, carrying the granting source so
+    // the row renders "free · <source>" and stays parameterizable. One uniform path
+    // for every grant, not just lineage ones.
+    if (node.sourceType === 'grant') {
+      const row = { name: node.name, field: node.field, index, source: 'class', grantedBy: node.grantedBy };
+      const gt = node.entity?.type;
+      if (gt === 'perks') perks.push(row);
+      else if (gt === 'powers') classPowers.push({ ...row, cls: node.entity?.parentClass || null });
+      else skills.push(row);
+      continue;
+    }
     // Class powers stored in their own field are class powers by definition.
     if (field === 'classPowers') {
       classPowers.push({ name: node.rawString, field, index, source: 'purchased', cls: node.entity?.parentClass || null });
@@ -225,18 +237,12 @@ export function classifyOwnedItems(character) {
     skills.push({ name: g.skill, field: 'multiclassGrant', index: -1, source: 'class', grantedBy: g.source, refundedBP: g.bp });
   }
 
-  // Granted abilities (e.g. from Linked Armor, Lineages) are derived effects,
-  // not independent graph items — surface them as display rows so they render.
-  for (const g of grantedAbilities(character).list) {
-    const row = { name: g.abilityName, field: 'synthetic', index: -1, source: g.sourceKind, grantedBy: g.source };
-    if (g.abilityType === 'skills') skills.push(row);
-    else if (g.abilityType === 'perks' || g.abilityType === 'flaws') perks.push(row);
-    else if (g.abilityType === 'powers') {
-      const ent = lookupEntity(g.ability);
-      if (ent && CLASS_POWER_TIERS.has(ent.tier)) classPowers.push(row);
-      else innatePowers.push(row);
-    }
-  }
+  // (Granted abilities are no longer surfaced here as `synthetic` display rows.
+  // They're materialized upstream as real owned graph items — `${type}Grant`
+  // fields, sourceType 'grant' — by resolveCharacterGraph, then routed above by
+  // the node.sourceType === 'grant' branch. One engine-driven path: the grants
+  // carry a real cost (free), parameterize like any owned item, and de-dupe
+  // against an equivalent purchase, instead of living as a parallel projection.)
 
   // De-dupe by canonical name within each bucket: the same item can be listed in
   // more than one storage field (Socialite's Contact lands in both startingSkills
