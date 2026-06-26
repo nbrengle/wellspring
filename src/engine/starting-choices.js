@@ -78,7 +78,10 @@ function parseSkillTokens(text) {
   const parts = body
     .replace(/\band either\b/gi, ',').replace(/\beither\b/gi, ' ')
     .replace(/\bone of\b/gi, ',')
-    .split(/\s*,\s*|\s*&\s*|\s+\band\b\s+|\s+\bor\b\s+/i);
+    // NB: do NOT split on bare "&" — tier-distribution ("Apprentice & Journeyman")
+    // was already expanded to commas above, so a remaining "&" is part of a skill/
+    // perk NAME ("Bits & Pieces"). Splitting it would shatter the name into nonsense.
+    .split(/\s*,\s*|\s+\band\b\s+|\s+\bor\b\s+/i);
   for (const raw of parts) {
     const tok = canonicalSkill(raw);
     if (tok) out.push(tok);
@@ -248,29 +251,91 @@ function deriveStartingSkills(className) {
   const fixed = [];
   const choices = [];
   if (!cls?.startingSkills) return { fixed, choices };
-  let current = null; // an open choice block awaiting option lines
-  for (const line of cls.startingSkills) {
-    if (/^Note:/i.test(line.trim())) continue;
+  // The Jun 26 MegaDoc reformatted choices to "X - Choose one of the following:"
+  // headers followed by flat option lines (instead of inline "[a, b, c]"). But the
+  // options carry NO structural indentation (every <li> is bullet level 0), so a
+  // nested sub-choice — an OPTION that is itself a "…Choose one of the following:"
+  // line — is indistinguishable from a new top-level block by structure alone. We
+  // recover nesting by the ":" convention + the redundant flat lines the sub-header
+  // re-lists: when a choice-header appears while a block is already open, treat it
+  // as a nested sub-choice OPTION of the current block (expanded dynamically), and
+  // SKIP the flat option lines that follow until the sub-choice's own skills are
+  // exhausted or a delimiter (Note:, or a new same-block option) appears. See
+  // PARSER_SOURCE_FEEDBACK.md #1/#2: real list indentation would delete this.
+  let current = null;        // open choice block awaiting option lines
+  let subChoice = false;     // inside a NESTED sub-choice's literal option lines
+  let subChoiceFixed = [];   // fixed skills shared by every option of that sub-choice
+
+  const lines = cls.startingSkills;
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    if (/^Note:/i.test(line.trim())) { subChoice = false; continue; }
+
+    // A choice header. Two shapes in the Jun 26 doc, told apart by the separator:
+    //   TOP-LEVEL: "<Flavor> - Choose one of the following:"  (a " - " before Choose)
+    //   NESTED:    "<Skill>: Choose…" / "<Skill>, Choose…"    (an option that is
+    //              itself a sub-choice, e.g. Artisan "Apprentice Crafting: Choose…")
+    // The dash is the only signal the flat (un-indented) list gives us. For a nested
+    // sub-choice we consume the LITERAL following option lines as its options (each
+    // becomes a top-level option of the current block, matching how the UI flattens
+    // the tree). See PARSER_SOURCE_FEEDBACK.md #1/#2: real indentation would replace
+    // this convention-based grouping with structural parsing.
     if (isChoiceHeader(line)) {
+      const isTopLevel = /\s[-–]\s*Choose/i.test(line) || !current;
+      if (!isTopLevel) {
+        // Header line may carry its own fixed skill(s) before "Choose…" (e.g.
+        // "Basic Medicine (2), Choose one of the following:"). Add those to EVERY
+        // following option as shared skills.
+        subChoice = true;
+        subChoiceFixed = parseSkillTokens(line.replace(/,?\s*choose[^:]*:\s*$/i, ''));
+        continue;
+      }
+      // A top-level header may carry FIXED skills before the "Choose…" clause, e.g.
+      // Druid "Natural Survival: Basic Martial Weapons (1), Profession - Apprentice
+      // (1), Choose one of the following:". Those are granted regardless of the pick.
+      const headFixed = parseSkillTokens(line.replace(/,?\s*choose[^:]*:\s*$/i, ''));
+      fixed.push(...headFixed);
       current = { id: slugId(choiceLabel(line)), label: choiceLabel(line), options: [] };
       choices.push(current);
+      subChoice = false; subChoiceFixed = [];
       continue;
     }
+
     if (hasInlineChoose(line)) {
       const { options, fixed: tail } = expandInlineChoice(line);
       if (options.length) choices.push({ id: slugId(choiceLabel(line)), label: choiceLabel(line), options });
       fixed.push(...tail);
-      current = null;
+      current = null; subChoice = false;
       continue;
     }
+
     const { fixedText, options: embedded } = extractEmbeddedChoice(line);
     const toks = parseSkillTokens(fixedText);
+
+    // A "Title: …" prefixed line is a NEW fixed/header entry, never an option of an
+    // open choice — it terminates the current option run. The prefix is flavor PROSE
+    // that does NOT resolve to a skill ("The Song of the Land:", "Materials,
+    // Everywhere:"). An option whose text merely contains a skill-parameter colon
+    // ("Apprentice & Journeyman Profession: [Your Choice]", "…, Lore: Nature (2)")
+    // has a prefix that DOES resolve (or carries a "(cost)"), so it's not a title.
+    const firstColon = line.indexOf(':');
+    const prefix = firstColon > 0 ? line.slice(0, firstColon) : '';
+    const isTitledLine = !!prefix && !isChoiceHeader(line)
+      && !/\(\d+\)/.test(prefix)
+      && parseSkillTokens(prefix).length === 0;  // prose prefix → a fresh fixed line
+    if (isTitledLine) { current = null; subChoice = false; }
+
+    // A literal option line of an open nested sub-choice → one option of the current
+    // block, carrying the sub-choice's shared fixed skills (if any).
+    if (subChoice && current && toks.length && !isTitledLine) {
+      const all = [...subChoiceFixed, ...toks];
+      current.options.push({ label: all.map((t) => t.name).join(', '), skills: all });
+      continue;
+    }
+
     if (current) {
-      // An option line may itself carry a nested sub-choice — a bracketed list
-      // ("Apprentice Crafting: [Alchemy, …]") or "one of [perks]". Flatten each
-      // alternative into its own top-level option (matching how the UI presents
-      // the block), so e.g. Artisan's "A Path Unfolds" offers each crafting and
-      // each medicine-perk pairing directly.
+      // An option line may itself carry a nested sub-choice — a bracketed list or
+      // "one of [perks]". Flatten each alternative into its own option.
       for (const opt of expandOptionLine(line, toks)) current.options.push(opt);
     } else {
       fixed.push(...toks);

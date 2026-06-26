@@ -255,40 +255,50 @@ function bodyBetween(start, end) {
     .join(' ');
 }
 
-// Parse the prose multiclass-skill blobs into a clean granted-skill list.
-// Each entry looks like: "<Header>: Skill A (1), Choose a X: [Opt1, Opt2] (3)".
-// We drop the leading header, split on commas (keeping "[...]" groups intact),
-// and for each part extract { name, cost }. A "Choose a …: [a, b, c]" part picks
-// the FIRST option as a sensible default (the builder can change it later).
+// Parse the multiclass-skill bullet lines into a clean default granted-skill list.
+// The Jun 26 MegaDoc reformatted these to a header line carrying the fixed skills +
+// a "Choose one of the following:" marker, with the options as their own following
+// bullet lines:
+//   "Materials, Everywhere: Basic Martial Weapons (1), Choose one of the following:"
+//   "Forage I (3)" / "Prospect I (3)" / "Scavenge I (3)"
+// We emit the fixed skills, then default each choice to its FIRST listed option (the
+// builder can change it later). This replaced the old inline "[a, b, c]" parsing —
+// the bracket-splitting regex and hardcoded default map are no longer needed.
+//
+// `blobs` is the flat <li> list for the section; a line ending in "the following:"
+// opens a choice whose options are the subsequent lines until the next header line
+// (a line that introduces its own fixed skills / choice). See PARSER_SOURCE_FEEDBACK
+// #1: real list indentation would make this structural instead of convention-based.
 function parseMulticlassSkills(blobs) {
   const out = [];
-  for (const blob of blobs || []) {
-    // Strip the leading "<Header>: " (the flavor name before the first colon that
-    // is NOT part of a "Choose a …:" clause).
-    const body = blob.replace(/^[^:[]+:\s*/, '');
-    // Split on commas not inside brackets.
-    const parts = body.split(/,(?![^[]*\])/).map(s => s.trim()).filter(Boolean);
-    for (const part of parts) {
+  const tokensOf = (text) => {
+    // "<Header>: " flavor prefix → drop it; then split the rest into "Name (cost)".
+    const body = text.replace(/^[^:]+:\s*/, '').replace(/Choose one of the following:\s*$/i, '').trim();
+    return body.split(',').map((s) => s.trim()).filter(Boolean).map((part) => {
       const costM = part.match(/\((\d+)\)\s*$/);
-      const cost = costM ? parseInt(costM[1], 10) : null;
-      const noCost = part.replace(/\s*\(\d+\)\s*$/, '').trim();
-      const bracketM = noCost.match(/choose[^[]*\[([^\]]+)\]/i);
-      if (bracketM) {
-        const first = bracketM[1].split(',')[0].trim();   // default to first listed option
-        if (first) out.push({ name: first, cost });
-        continue;
-      }
-      // Unbracketed "Choose a <Skill> Skill" → resolve to a concrete default.
-      const chooseM = noCost.match(/choose\s+a\s+(.+?)\s+skill/i);
-      if (chooseM) {
-        const fam = chooseM[1].trim();
-        // e.g. "Lore" → "Lore (Historical)"; fall back to the bare family name.
-        const dflt = { Lore: 'Lore (Historical)', Gathering: 'Forage I' }[fam] || fam;
-        out.push({ name: dflt, cost });
-        continue;
-      }
-      if (noCost) out.push({ name: noCost, cost });
+      return { name: part.replace(/\s*\(\d+\)\s*$/, '').trim(), cost: costM ? parseInt(costM[1], 10) : null };
+    }).filter((t) => t.name);
+  };
+
+  // When a line opens a choice ("…the following:"), the subsequent bare-skill lines
+  // are its OPTIONS: take the FIRST as the default and skip the rest, until a header
+  // / fixed line (one with a "Header:" prefix, or that opens its own choice) ends the
+  // option run.
+  let inOptions = false; // inside an open choice's option list
+  let tookDefault = false;
+  for (const blob of blobs || []) {
+    const line = blob.trim();
+    const opensChoice = /the following:\s*$/i.test(line);
+    const isBareOption = !opensChoice && !/^[^:]+:/.test(line);
+
+    if (inOptions && isBareOption) {
+      if (!tookDefault) { const t = tokensOf(blob); if (t.length) { out.push(t[0]); tookDefault = true; } }
+      continue; // skip non-default options
     }
+    // Header / fixed line: emit its fixed skills; (re)open or close the option run.
+    for (const t of tokensOf(blob)) out.push(t);
+    inOptions = opensChoice;
+    tookDefault = false;
   }
   return out;
 }

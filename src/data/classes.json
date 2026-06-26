@@ -7,16 +7,33 @@
     "startingSkills": [
       "A Good Defense - Basic Martial Weapons (1), Short Weapons (3)",
       "Protective Equipment - Basic Armor (2)",
-      "Productive Equipment - Choose one Apprentice Crafting: [Alchemy, (Ritual Magic AND Ritual Lore), Enchanting, or Tinkering] (3)",
-      "The Land Provides - Choose a Gathering Skill: Forage I, Prospect I, or Scavenge I (3)",
-      "A Path Unfolds - Choose one of the below:",
+      "Productive Equipment - Choose one of the following:",
+      "Apprentice Alchemy (3)",
+      "Apprentice Ritual Magic (1), Ritual Lore (2)",
+      "Apprentice Enchanting (3)",
+      "Apprentice Tinkering (3)",
+      "The Land Provides - Choose one of the following:",
+      "Forage I (3)",
+      "Prospect I (3)",
+      "Scavenge I (3)",
+      "A Path Unfolds - Choose one of the following:",
       "Apprentice & Journeyman Profession: [Your Choice] (3)",
-      "Apprentice Crafting: [Alchemy, (Ritual Magic AND Ritual Lore), Enchanting, or Tinkering] (3)",
+      "Apprentice Crafting: Choose one of the following:",
+      "Apprentice Alchemy (3)",
+      "Apprentice Ritual Magic (1), Ritual Lore (2)",
+      "Apprentice Enchanting (3)",
+      "Apprentice Tinkering (3)",
       "Note: This must be different from the choice made in Productive Equipment.",
-      "Basic Medicine (2) and one of [Bits & Pieces (1), Hearth (1), or Soothing Touch (1)]"
+      "Basic Medicine (2), Choose one of the following:",
+      "Bits & Pieces (1)",
+      "Hearth (1)",
+      "Soothing Touch (1)"
     ],
     "multiclassSkills": [
-      "Materials, Everywhere: Basic Martial Weapons (1), Choose a Gathering Skill: [Forage I, Prospect I, Scavenge] (3)"
+      "Materials, Everywhere: Basic Martial Weapons (1), Choose one of the following:",
+      "Forage I (3)",
+      "Prospect I (3)",
+      "Scavenge I (3)"
     ],
     "multiclassGrants": [
       {
@@ -177,10 +194,45 @@
         "refresh": null,
         "accent": null,
         "effect": null,
-        "requirement": "Artisan Level 4Skills and Options: The Artisan gains one of the following skills for free based on their Specialization when they attain level 4 Artisan (this one time skill bonus does not change if their Specialization later changes). The Artisan must have the prerequisites for this skill and if they do not then they may instead take the Apprentice or Basic level of the skill.",
+        "requirement": "Artisan Level 4Skills and Options: The Artisan gains one of the following options for free based on their Specialization when they attain level 4 Artisan (this one time skill bonus does not change if their Specialization later changes). The Artisan must have the prerequisites for this skill and if they do not then they may instead take the Apprentice or Basic level of the skill.",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "• Artificer- Basic Shields (4), Basic Traps (5), Medium Armor (4) • Crafter- Journeyman Alchemy (4), Journeyman Enchanting (4), Journeyman Tinkering (4) • Mystic- Advanced Medicine (4), [Journeyman Ritual Magic (2) AND Ritual Lore (2)]",
+        "description": "• Artificer - Choose one of the following: • Basic Shields (4) • Basic Traps (5) • Medium Armor (4) • Crafter - Choose one of the following: • Journeyman Alchemy (4) • Journeyman Enchanting (4) • Journeyman Tinkering (4) • Mystic - Choose one of the following: • Advanced Medicine (4) • Journeyman Ritual Magic (2), Ritual Lore (2)",
+        "chooseOne": {
+          "kind": "play",
+          "options": [
+            {
+              "text": "Basic Shields (4)"
+            },
+            {
+              "text": "Basic Traps (5)"
+            },
+            {
+              "text": "Medium Armor (4)"
+            },
+            {
+              "text": "Crafter - Choose one of the following:"
+            },
+            {
+              "text": "Journeyman Alchemy (4)"
+            },
+            {
+              "text": "Journeyman Enchanting (4)"
+            },
+            {
+              "text": "Journeyman Tinkering (4)"
+            },
+            {
+              "text": "Mystic - Choose one of the following:"
+            },
+            {
+              "text": "Advanced Medicine (4)"
+            },
+            {
+              "text": "Journeyman Ritual Magic (2), Ritual Lore (2)"
+            }
+          ]
+        },
         "requiredLevel": 4,
         "requiredClass": "Artisan"
       },
@@ -406,7 +458,7 @@
         "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Artisan can streamline another crafter’s process by helping at a Crafting Station of any kind. RP handing tools, helping follow the Recipe, etc. Halve all repeated task repetitions and the number of turns on the timer (round up). Additionally, in specific cases, this power can reduce the time to accomplish Counted tasks. Note: This Power stacks with other time reduction skills for crafting, however, no repetitions / turns can be reduced below 1 each by this Power.",
+        "description": "Additionally, in specific cases, this power can reduce the time to accomplish Counted tasks. Note: This Power stacks with other time reduction skills for crafting, however, no repetitions / turns can be reduced below 1 each by this Power.",
         "requiredLevel": 1,
         "requiredClass": null
       },
@@ -558,7 +610,7 @@
         "maxRanks": 1,
         "cost": null,
         "incantation": "Focus Quick 100",
-        "call": "“[Name or Description] Subtle Discern by Mind: What is your Lineage?” OR “[Name or Description] Subtle Discern by Mind: Are you a/an [Exalted, Undead, Voidborn]?”",
+        "call": "“[Name or Description] Subtle Discern by Mind: What is your Lineage?” OR “[Name or Description] Subtle Discern by Mind: Are you a/an [Exalted/Undead/Voidborn]?”",
         "target": "Other Individual",
         "duration": "Instantaneous",
         "delivery": "Verbal",
@@ -1220,7 +1272,7 @@
         "maxRanks": 1,
         "cost": null,
         "incantation": "None",
-        "call": "“[Name or Description] Short Grant resistance to Insubstantial.”",
+        "call": "“[Name or Description] Short Grant Resistance to Insubstantial.”",
         "target": "Individual",
         "duration": "Instantaneous",
         "delivery": "Verbal",
@@ -1230,7 +1282,7 @@
         "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Artisan can force an individual to remain corporeal. The Artisan can call out “[Name or Description] Short Grant resistance to Insubstantial.” Reminder: Inherent conditions, such as ones passively granted from having a Type, cannot be removed or prevented.",
+        "description": "The Artisan can force an individual to remain corporeal. The Artisan can call out “[Name or Description] Short Grant Resistance to Insubstantial.” Reminder: Inherent conditions, such as ones passively granted from having a Type, cannot be removed or prevented.",
         "requiredLevel": 1,
         "requiredClass": null
       },
@@ -1711,7 +1763,7 @@
         "requirement": "Mystic Specialization",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "Through prayers to a Divine Being, energy manipulation, or binding of minor spirits, the Mystic energizes up to six objects with power that may be gifted to others. When bestowed to another, the Mystic explains the token’s healing properties, and how they are used. The bound powers are non-transferrable, and cannot be regifted. Such power comes with a price, and the life given will take something in return, causing the recipient to be drained until they complete a Short Rest. The recipients are granted the Curious Balm Power below:",
+        "description": "Through prayers to a Divine Being, energy manipulation, or binding of minor spirits, the Mystic energizes up to six objects with power that may be gifted to others. When bestowed to another, the Mystic explains the token’s healing properties, and how they are used. The bound powers are non-transfewrrable, and cannot be regifted. Such power comes with a price, and the life given will take something in return, causing the recipient to be drained until they complete a Short Rest. The recipients are granted the Curious Balm Power below:",
         "requiredLevel": 5,
         "requiredClass": null,
         "requiresEntity": [
@@ -1758,20 +1810,31 @@
         "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "Instead of taking an Advanced Power, the Artisan can choose two Basic-tier Powers from the Artisan Base Class with the same Specialty Tag (ie: Artificer, Crafter, Mystic).",
+        "description": "Instead of taking an Advanced Power, the Artisan can choose two Basic-tier Powers from the Artisan Base Class with the same Specialty Tag. Choose one of the following: (ie: • Artificer, • Crafter, Mystic).",
+        "chooseOne": {
+          "kind": "play",
+          "options": [
+            {
+              "text": "Artificer,"
+            },
+            {
+              "text": "Crafter, Mystic)."
+            }
+          ]
+        },
         "slotGrants": [
           {
             "cat": "basic",
             "n": 2
           }
         ],
+        "requiredLevel": 5,
+        "requiredClass": null,
         "options": [
           "Artificer",
           "Crafter",
           "Mystic"
-        ],
-        "requiredLevel": 5,
-        "requiredClass": null
+        ]
       },
       {
         "name": "Uninterrupted Creativity",
@@ -3252,11 +3315,13 @@
     "magicType": "Divine",
     "description": "Divine Spell-Casting Class",
     "startingSkills": [
-      "Natural Survival: Basic Martial Weapons (1), Profession - Apprentice (1), and either Forage I (3) or Scavenge I (3)",
+      "Natural Survival: Basic Martial Weapons (1), Profession - Apprentice (1), Choose one of the following:",
+      "Forage I (3)",
+      "Scavenge I (3)",
       "The Song of the Land: Basic Faith (4)",
       "Budding Wisdom - Choose one of the following:",
       "Extended Capacity - Novice [Divine] (3), Lore: Nature (2)",
-      "Short Weapons (3), Two-Weapon Style (2)",
+      "Short Weapons (3), Two Weapon Style (2)",
       "Peacecaster (3), Basic Medicine (2)"
     ],
     "multiclassSkills": [
@@ -4637,7 +4702,8 @@
       "The Second Skin: Basic Armor (2), Light Armor (3)",
       "The Path of Combat - Choose one of the following:",
       "Projectile Weapons (3), Lore: Historical (2)",
-      "Short Weapons (3), Advanced Shields (2) or Two Weapon Style (2)",
+      "Short Weapons (3), Advanced Shields (2)",
+      "Short Weapons (3), Two Weapon Style (2)",
       "Great Weapons (5)"
     ],
     "multiclassSkills": [
@@ -5252,7 +5318,7 @@
         "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "While wielding a projectile weapon, the fighter may set their ammunition aflame. For up to two shots with a projectile weapon, the archer may strike a foe and then call “Wounding 5 by Flame”. These shots need not be consecutive, but they expire when the archer takes a Short Rest.If the Fighter has at least 11 levels of Fighter they may instead fire 3 shots instead of 2.",
+        "description": "While wielding a projectile weapon, the fighter may set their ammunition aflame. For up to two shots with a projectile weapon, the archer may strike a foe and then call “Wounding 5 by Flame”. These shots need not be consecutive, but they expire when the archer takes a Short Rest.",
         "requiredLevel": 1,
         "requiredClass": null
       },
@@ -6055,7 +6121,7 @@
     "description": "Utility & Arcane Spell-Casting Class",
     "startingSkills": [
       "The Arcane Unveiled: Basic Arcane (4)",
-      "Dutiful Scholar: Choose a Lore Skill (2), Library Use (1), Bookcaster (1) x 2",
+      "Dutiful Scholar: Lore [Your Choice] (2), Library Use (1), Bookcaster (1) x 2",
       "A Magical Specialty - Choose one of the following:",
       "Extended Capacity - Novice [Arcane] (3) x 2",
       "Advanced Recharge (2), Lore: Arcane (2), Bookcaster (1) x 2",
@@ -7389,9 +7455,10 @@
       "Trust is Rare: Basic Armor (2), Light Armor (3)",
       "Up to No Good - Choose One of the Following:",
       "Short Weapons (3), Scavenge (3)",
-      "Fence (3), Lore [Shadow] (2), Profession - Apprentice [Specific Profession] (1)",
-      "Basic Lock Skill (5) or Basic Trap Skill (5), Poisoner (1)",
-      "Connections (2), Lore: Shadow (2), and Contact (2)"
+      "Fence (3), Lore [Shadow] (2), Profession - Apprentice [Your Choice] (1)",
+      "Basic Traps (5), Poisoner (1)",
+      "Basic Locks (5), Poisoner (1)",
+      "Connections (2), Lore [Shadow] (2), Contact (2)"
     ],
     "multiclassSkills": [
       "The Tools of the Trade: Basic Martial Weapons (1), Thrown Weapons (3)"
@@ -7784,13 +7851,7 @@
         "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "Whenever the Rogue is physically representing and using 4 or fewer Armor Points of physical armor, they gain one additional point to their Base Maximum Armor Points. This bonus becomes +2 when the character reaches 15th Level Rogue.",
-        "statMods": [
-          {
-            "stat": "armor",
-            "n": 1
-          }
-        ],
+        "description": "Whenever the Rogue is physically representing and using 4 or fewer Armor Points of physical armor, they gain one additional point to their Base Maximum Physical Armor Points. This bonus becomes +2 when the character reaches 15th Level Rogue.",
         "requiredLevel": 1,
         "requiredClass": null
       },
@@ -7899,7 +7960,7 @@
         "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Rogue gains the Two Weapon Style (2) and Weapon Specialization (4) in one of the following weapons: Swords, Thrown Weapons, or Daggers.",
+        "description": "The Rogue gains the Two Weapon Style (2) and Weapon Specialization (4) in one of the following weapons: • Swords • , Thrown Weapons , or Daggers.",
         "chooseOne": {
           "kind": "build",
           "options": [
@@ -8391,7 +8452,7 @@
         "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Rogue may throw several weapons in rapid succession with exceptional accuracy. The Rogue may make up to three consecutive attacks with Thrown Weapons with the call “Wounding 4”.",
+        "description": "The Rogue may throw several weapons in rapid succession with exceptional accuracy. The Rogue may make up to three consecutive attacks with Thrown Weapons with the calldeadly “Wounding 4”.",
         "requiredLevel": 5,
         "requiredClass": null
       },
@@ -8650,29 +8711,8 @@
         "requirement": "Rogue Level 5",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "If your form is hidden by appropriate clothing, you may circumvent attempts to expose your location. You must be masked and hooded to use this skill, and you cannot have any skin showing except for the eye holes or eye slit in your mask or cowl. While you are dressed this way, you may expend a Spike to gain Obfuscate vs Expose once. As with all Obfuscate Powers, you do not need to announce when you are using this Power.",
+        "description": "If your form is hidden by appropriate clothing, you may circumvent attempts to expose your location. You must be masked and hooded to use this skill, and you cannot have any skin showing except for the eye holes or eye slit in your mask or cowl. While you are dressed this way, you may expend a Spike to gain Obfuscate vs Expose once. As with all Obfuscate Powers, you do not need to announce when you are using this Power. Trap Sense - 2 BP [Class] Requirement: Rogue Level 6 Incantation: None Call: “Altered, Trap Sense” Target: Self                                        Duration: Instantaneous Delivery: None                                        Refresh: Immediate Accent: None                                        Effect: Alter Any time the Rogue is affected by a trap, they can use this Power to reduce the effects of the trap. If the trap does enough damage that the Rogue would drop to 0 or fewer Life Points, instead they are reduced to one Life Point. If the Rogue takes a Death Effect, they take a Drain Effect and drop to one Life Point instead. Any other Effects and damage are taken normally. A Final trap effect cannot be stopped by Trap Sense.",
         "requiredLevel": 5,
-        "requiredClass": "Rogue"
-      },
-      {
-        "name": "Trap Sense",
-        "tier": "Class",
-        "tags": [],
-        "maxRanks": 1,
-        "cost": 2,
-        "incantation": "None",
-        "call": "“Altered, Trap Sense”",
-        "target": "Self",
-        "duration": "Instantaneous",
-        "delivery": "None",
-        "refresh": "Immediate",
-        "accent": "None",
-        "effect": "Alter",
-        "requirement": "Rogue Level 6",
-        "prerequisites": null,
-        "skillsAndOptions": null,
-        "description": "Any time the Rogue is affected by a trap, they can use this Power to reduce the effects of the trap. If the trap does enough damage that the Rogue would drop to 0 or fewer Life Points, instead they are reduced to one Life Point. If the Rogue takes a Death Effect, they take a Drain Effect and drop to one Life Point instead. Any other Effects and damage are taken normally. A Final trap effect cannot be stopped by Trap Sense.",
-        "requiredLevel": 6,
         "requiredClass": "Rogue"
       },
       {
@@ -8744,19 +8784,19 @@
     "startingSkills": [
       "Forewarned is Forearmed: Basic Martial Weapons (1), Library Use (1), Poisoner (1)",
       "The Presentation: Basic Armor (2)",
-      "Old Secrets: Choose a Lore Skill (2)",
+      "Old Secrets: Lore [Your Choice] (2)",
       "A Means to an End: Profession: Apprentice & Journeyman [Your Choice] (3)",
       "Opportunities Abound: Choose one of the following:",
-      "Fence (3) & Contact (2)",
-      "Title (4) & Minor Fame (1)",
-      "Short Weapons (3) & Connections (2)"
+      "Fence (3), Contact (2)",
+      "Title (4), Minor Fame (1)",
+      "Short Weapons (3), Connections (2)"
     ],
     "multiclassSkills": [
-      "Finishing School: Choose a Lore Skill (2), Library Use (1), Poisoner (1)"
+      "Finishing School: Lore [Your Choice] (2), Library Use (1), Poisoner (1)"
     ],
     "multiclassGrants": [
       {
-        "name": "Lore (Historical)",
+        "name": "Lore [Your Choice]",
         "cost": 2
       },
       {
@@ -9627,7 +9667,7 @@
         "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "When pressed into combat, the Socialite is best able to serve while heavily guarded and calling the shots from the back. Their quick wit and observant nature are cornerstones of the Socialite’s battlefield prowess. Weaving inspiring words to benefit their allies is what they do best. The Socialite may use the following abilities to grant boons to their allies. The Socialite must Focus for a Quick Count of 100 to grant each one and the Socialite cannot grant themself boons. • “Imbue Weapon with 3” • “Mend 3 Armor” • “Heal 1” • “Grant Protect vs Packets” • “Grant Protect vs [Mind/Fear]” Once the first boon is granted, the Socialite may grant additional boons at-will (with a Focus Quick 100 Count) until they take a Rest or  become Helpless.",
+        "description": "When pressed into combat, the Socialite is best able to serve while heavily guarded and calling the shots from the back. Their quick wit and observant nature are cornerstones of the Socialite’s battlefield prowess. Weaving inspiring words to benefit their allies is what they do best. The Socialite may use the following abilities to grant boons to their allies. The Socialite must Focus for a Quick Count of 100 to grant each one and the Socialite cannot grant themself boons. • “Imbue Weapon with 3” • “Mend 3 Armor” • “Heal 1” • “Grant Protect vs Packets” • “Grant Protect vs [Mind/Fear]” Once the first boon is granted, the Socialite may grant additional boons at-will (with a Focus Quick 100 Count) until they take a Rest or become Helpless.",
         "requiredLevel": 5,
         "requiredClass": null
       },
@@ -10206,13 +10246,10 @@
         "requirement": "The Right Hand",
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "Bodyguards may be inspired and call upon their inner reserves to accomplish more than they thought possible. The Bodyguard may Refresh 1 Novice or Adept Spell Slot after a quick pep talk with the Socialite.",
-        "requiresEntity": [
-          "The Right Hand"
-        ]
+        "description": ""
       },
       {
-        "name": "Rise Above This",
+        "name": "Bodyguards may be inspired and call upon their inner reserves to accomplish more than they thought possible. The Bodyguard may Refresh 1 Novice or Adept Spell Slot after a quick pep talk with the Socialite. Rise Above This",
         "tier": "Class",
         "tags": [
           "Right Hand"
@@ -10446,9 +10483,9 @@
     "startingSkills": [
       "The Ritual of Beginnings: Basic Arcane (4), Warcaster (5)",
       "The Contract With the Other - Choose one of the following:",
-      "Extended Capacity - Novice [Arcane] x2 (6)",
+      "Extended Capacity - Novice [Arcane] (3) x2",
       "Additional Cantrip (6)",
-      "Patron [Character’s Choice] (4), Gift of Hateful Retribution I (2)"
+      "Patron [Your Choice] (4), Gift of Hateful Retribution I (2)"
     ],
     "multiclassSkills": [
       "The Fundamentals: Basic Arcane (4)"
@@ -10528,7 +10565,7 @@
         "cantrips": 4,
         "spellsKnown": 8,
         "slots": "6/5/0",
-        "bonus": "Arcane Source (Bonus Accent)"
+        "bonus": "Arcane Source (Bonus Accent), Rote Invocation"
       }
     },
     "specializations": [],
@@ -10993,12 +11030,10 @@
         "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The Sourcerer throws up a shield of energy to protect themself from the elements. This gives the caster one Protect from the Accent of their Arcane Source. If the Sourcerer has more than one Arcane Accent, they may have a Protect for each of those Accents.",
-        "requiredLevel": 1,
-        "requiredClass": null
+        "description": ""
       },
       {
-        "name": "Infuriate",
+        "name": "The Sourcerer throws up a shield of energy to protect themself from the elements. This gives the caster one Protect from the Accent of their Arcane Source. If the Sourcerer has more than one Arcane Accent, they may have a Protect for each of those Accents. Infuriate",
         "tier": "Cantrip",
         "tags": [],
         "maxRanks": 1,
@@ -11142,7 +11177,7 @@
         "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "For the duration of this Spell, the Sourcerer is able to set up deadly resonances within a Helpless, Imprisoned, or Insubstantial target by Touch, causing the victim to literally shake apart under the ever increasing vibrations. The caster may call “Piercing 1 to [Helpless/Imprisoned\\Insubstantial] by [Arcane Accent]” and can then repeat that after Focusing for a Quick Count of 30.",
+        "description": "For the duration of this Spell, the Sourcerer is able to set up deadly resonances within a Helpless, Imprisoned, or Insubstantial target by Touch, causing the victim to literally shake apart under the ever increasing vibrations. The caster may call “Piercing 1 to [Helpless/Imprisoned/Insubstantial] by [Arcane Accent]” and can then repeat that after Focusing for a Quick Count of 30.",
         "requiredLevel": 1,
         "requiredClass": null
       },
@@ -11423,7 +11458,7 @@
         "incantation": "Standard",
         "call": "“Wounding 6 by [Arcane Accent]”, “Weakness by Agony”",
         "target": "Individual",
-        "duration": "Short Rest",
+        "duration": "Instantaneous, Event",
         "delivery": "Spell-Packet, Verbal",
         "refresh": "Spell",
         "accent": "[Arcane Accent], Agony",
@@ -11452,7 +11487,7 @@
         "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "This spell must be cast upon a Spell-Packet that has been marked with a symbol that is special to the caster. The incantation charges the Spell-Packet which is then thrown. As soon as it comes to rest, the Sourcerer will become insubstantial and must either move as quickly and directly as possible to the spot where the Spell-Packet came to rest, or end the spell immediately. They may not walk part way and then end the spell. Once see the Sourcerer arrives at the appropriate spot, they should call loudly “Cure Insubstantial to Self”. The Sourcerer can do nothing besides move to the Spell-Packet’s location while Insubstantial. Note that if the Spell-Packet hits an individual, the caster should inform the struck person that the Spell-Packet has no effect on them.",
+        "description": "This spell must be cast upon a Spell-Packet that has been marked with a symbol that is special to the caster. The incantation charges the Spell-Packet which is then thrown. As soon as it comes to rest, the Sourcerer will become insubstantial and must either move as quickly and directly as possible to the spot where the Spell-Packet came to rest, or end the spell immediately. They may not walk part way and then end the spell. Once the Sourcerer arrives at the appropriate spot, they should call loudly “Cure Insubstantial to Self”. The Sourcerer can do nothing besides move to the Spell-Packet’s location while Insubstantial. Note that if the Spell-Packet hits an individual, the caster should inform the struck person that the Spell-Packet has no effect on them.",
         "requiredLevel": 5,
         "requiredClass": null
       },
@@ -11595,11 +11630,11 @@
         "delivery": "None, Verbal",
         "refresh": "Spell",
         "accent": "[Arcane Accent]",
-        "effect": "Wounding, Piercing",
+        "effect": "Wounding",
         "requirement": null,
         "prerequisites": null,
         "skillsAndOptions": null,
-        "description": "The caster charges their aura with violent points of concussive force. Whenever the Caster is hit by a melee attack that deals damage, they may immediately Call “[Name or Description] Wounding 3 by [Arcane Accent]” to the person who struck them once per strike, up to 3 times before the spell is expended. Enhancement: If the Sourcerer’s Arcane Accent is Lightning, they instead do Wounding 4. Enhancement: Greater Spell-Slot: Ten charges are gained instead of three.",
+        "description": "​​ The caster charges their aura with violent points of concussive force. Whenever the Caster is hit by a melee attack that deals damage, they may immediately Call “[Name or Description] Wounding 3 by [Arcane Accent]” to the person who struck them once per strike, up to 3 times before the spell is expended. Enhancement: If the Sourcerer’s Arcane Accent is Lightning, they instead do Wounding 4. Enhancement: Greater Spell-Slot: Ten charges are gained instead of three.",
         "requiredLevel": 5,
         "requiredClass": null
       },

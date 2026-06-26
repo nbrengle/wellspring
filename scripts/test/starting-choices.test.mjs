@@ -140,15 +140,18 @@ function validityFlags(r) {
 // "Lore (Arcane)") must update the granted skill's parameter — not keep the old
 // subject. But a player-chosen value on a PLACEHOLDER grant ("(your choice)")
 // must survive a rebuild triggered by an unrelated choice.
-test('switching a parameterized choice updates the subject; player picks survive', () => {
-  const loreBlock = blockId('Mage', 'Lore');
-  const mage = (lore) => rebuildStartingSkills({ classes: [{ name: 'Mage', level: 4 }] }, 'Mage',
-    { [loreBlock]: lore, ...choicesFor('Mage', 'Additional Cantrip') });
-  let c = mage('Historical');
-  ok(c.startingSkills.includes('Lore (Historical)'), 'starts Historical');
-  c = rebuildStartingSkills(c, 'Mage', { ...c.startingChoices, [loreBlock]: 'Arcane' });
-  ok(c.startingSkills.includes('Lore (Arcane)'), 'updates to Arcane');
-  ok(!c.startingSkills.includes('Lore (Historical)'), 'old subject dropped');
+test('a fixed parameterized starting skill is editable + survives an unrelated swap', () => {
+  // The Jun 26 MegaDoc made Mage's Lore a FIXED parameterized skill ("Dutiful
+  // Scholar: Lore [Your Choice] (2)") rather than a "Choose a Lore Skill" block.
+  // The player edits its parameter directly; that pick must survive an unrelated
+  // specialty-choice rebuild.
+  const specBlock = STARTING_CHOICES_CONFIG['Mage'][0];
+  let c = rebuildStartingSkills({ classes: [{ name: 'Mage', level: 4 }] }, 'Mage', {});
+  ok(c.startingSkills.some((s) => /^Lore \(/.test(s)), 'Mage gets a parameterized Lore');
+  const li = c.startingSkills.findIndex((s) => /^Lore/.test(s));
+  c.startingSkills[li] = 'Lore (Historical)';   // player picks the area
+  c = rebuildStartingSkills(c, 'Mage', { [specBlock.id]: specBlock.options[0].label });
+  ok(c.startingSkills.includes('Lore (Historical)'), 'player Lore pick survives the swap');
 
   // Druid's base "Profession - Apprentice (your choice)" is a placeholder; a
   // player setting it to (Smith) must survive an unrelated survival-choice swap.
@@ -196,10 +199,19 @@ test('reconcile picks a concrete option for each archetype choice block', () => 
     const a = ARCHETYPES.find((x) => x.name === name);
     const cls = getClasses(a)[0].name;
     const choices = reconcileStartingChoices(fromArchetype(a), cls);
+    // Assert the OUTCOME (the expected skill ends up granted) rather than WHICH
+    // block grants it: when a skill is offered by more than one block (e.g. the
+    // Jun 26 Artisan offers Apprentice Enchanting in both Productive Equipment AND
+    // A Path Unfolds), reconcile may legitimately assign it to either — both are
+    // valid. Rebuild and check the skill is present.
+    const rebuilt = rebuildStartingSkills(fromArchetype(a), cls, choices);
+    // Compare on the resolved BASE entity so surface-form differences don't matter
+    // ("Journeyman Profession" vs "Profession - Journeyman" are the same skill).
+    const key = (s) => (resolveSkill(s)?.baseName || resolveSkill(s)?.name || bareSkill(cleanItemName(s))).toLowerCase();
     for (const skill of skills) {
-      const id = blockId(cls, skill);
-      ok(id, `${name}: a block grants ${skill}`);
-      eq(choices[id], optLabel(cls, skill), `${name}: chose the option granting ${skill}`);
+      ok(blockId(cls, skill), `${name}: a block grants ${skill}`);
+      ok(rebuilt.startingSkills.some((s) => key(s) === key(skill)),
+        `${name}: reconcile + rebuild grants ${skill}`);
     }
   }
 });
