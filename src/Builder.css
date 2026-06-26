@@ -1608,8 +1608,8 @@
 }
 
 .b-picker-row-tag.b-data {
-  color: var(--b-indigo);
-  border-color: rgb(123, 137, 219, 40%);
+  color: var(--b-blue);
+  border-color: rgb(111, 168, 217, 40%);
 }
 
 /* "also Flame, Root" — the item's OTHER game-effect facets when grouped by one,
