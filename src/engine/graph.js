@@ -1,8 +1,7 @@
 import { EFFECT_EXTRACTORS } from './extractors.js';
-import { lookupEntity, LINEAGES, CLASS_PROGRESSION, REFS, lineageChoiceSpec } from '../engine/data.js';
+import { lookupEntity, LINEAGES, CLASS_PROGRESSION, REFS, lineageChoiceSpec, allergenAward, ALLERGEN_AWARDS } from '../engine/data.js';
 import { startingSkillGrants } from '../engine/starting-choices.js';
 import { cleanItemName, bareSkill, resolveId, entityType, getClasses, idName } from './resolver.js';
-import { COMMON_ALLERGENS } from './config.js';
 import {
   characterLevel, parseTrailingRank, rankOf,
   BP_FIELDS, BP_POWER_FIELDS, POWER_SOURCE_FIELDS,
@@ -81,9 +80,13 @@ export function resolveCharacterGraph(character) {
     const ent = lookupEntity(`flaws:${cleanName}`);
     let bp = 0;
     if (ent) {
-      if (ent.baseName === "Mild Allergy" || ent.baseName === "Severe Allergy") {
-        const isCommon = COMMON_ALLERGENS.includes(String(ent.parameter || "").toLowerCase().trim());
-        bp = ent.baseName === "Mild Allergy" ? (isCommon ? 2 : 1) : (isCommon ? 3 : 2);
+      const allergenTable = ALLERGEN_AWARDS[ent.baseName];
+      if (allergenTable) {
+        // Award is per-substance, DERIVED from the rulebook's allergen table. With
+        // no (recognized) substance chosen yet, the award is undetermined (Staff-
+        // approved) — fall back to the table's minimum so BP stays conservative.
+        const chosen = allergenAward(ent.baseName, ent.parameter);
+        bp = chosen != null ? chosen : Math.min(...Object.values(allergenTable));
       } else {
         bp = typeof ent.bp === 'number' ? ent.bp : parseInt(String(ent.bp), 10) || 0;
       }

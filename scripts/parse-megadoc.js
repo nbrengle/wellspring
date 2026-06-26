@@ -1491,8 +1491,27 @@ function extractTiers(results) {
   return results;
 }
 
+// Mild/Severe Allergy award a VARIABLE BP amount ("Award: 1 or 2" / "2 or 3")
+// that depends on the chosen substance. The rulebook embeds a "Standard Allergens
+// and Awards" table in the detail prose (one "• <substance> - <n> BP" row each).
+// Parse it into a structured `allergens: { <substance>: <bp> }` map so the engine
+// reads a typed field instead of re-scraping prose at runtime. A MegaDoc edit to
+// the table (new allergen / changed award) flows through on the next parse.
+function extractAllergens(results) {
+  for (const r of results) {
+    const m = (r.description || '').match(/Standard Allergens and Awards:\s*(.+)$/s);
+    if (!m) continue;
+    const allergens = {};
+    for (const row of m[1].matchAll(/•\s*([^-•\n]+?)\s*-\s*(\d+)\s*BP/g)) {
+      allergens[row[1].trim()] = parseInt(row[2], 10);
+    }
+    if (Object.keys(allergens).length) r.allergens = allergens;
+  }
+  return results;
+}
+
 write('perks.json', withMechanics(extractTiers(enrichWithDetailSections(parsePerkFlawList('Perks List', 'cost')))));
-write('flaws.json', withMechanics(enrichWithDetailSections(parsePerkFlawList('Flaws List', 'bp'))));
+write('flaws.json', withMechanics(extractAllergens(enrichWithDetailSections(parsePerkFlawList('Flaws List', 'bp')))));
 
 // ─── DEVOTIONS ────────────────────────────────────────────────────────────────
 // Each devotion is an H1. Content is text nodes with bullet lists for tenets.

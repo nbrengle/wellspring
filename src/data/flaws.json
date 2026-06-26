@@ -69,7 +69,24 @@
     "ranks": null,
     "prereq": null,
     "category": "Physical",
-    "description": "Minor allergy to gold, silver, iron, magic or other substances. Cannot rest or heal efficiently while in contact.\n\nAward: 1 or 2\n\nPrerequisites: None\n\nThe character has a supernatural allergy to gold, silver, iron, magic, or other substances which must be approved by Staff. While in contact with the substance, the character cannot benefit from a Short or Long Rest and all Healing sources will Heal only 1 point. The character will feel twitchy, nauseous, headachy, or paranoid (or any combination of these) while touching the material in question and should role play as such. Cloth will not stop these symptoms, but leather or thicker substances will. 2 points are awarded for materials that are likely to be very common such as leather, iron, and materia. 1 point is awarded for materials that are less likely to be common or a hindrance, such as gold, silver, or any of the Resources. No points will be awarded for materials that are unlikely to be encountered, or will rarely cause a hindrance.\n\nStandard Allergens and Awards:\n\n• Cloth - 2 BP\n\n• Copper - 1 BP\n\n• Gold - 1 BP\n\n• Harvest - 1 BP\n\n• Hide - 1 BP\n\n• Ingot - 1 BP\n\n• Iron - 2 BP\n\n• Leather - 2 BP\n\n• Materia  - 2 BP\n\n• Night Prize - 1 BP\n\n• Other Common Allergen  - 2 BP\n\n• Other Uncommon Allergen - 1 BP\n\n• Rare Minerals - 1 BP\n\n• Scale - 1 BP\n\n• Silver - 1 BP"
+    "description": "Minor allergy to gold, silver, iron, magic or other substances. Cannot rest or heal efficiently while in contact.\n\nAward: 1 or 2\n\nPrerequisites: None\n\nThe character has a supernatural allergy to gold, silver, iron, magic, or other substances which must be approved by Staff. While in contact with the substance, the character cannot benefit from a Short or Long Rest and all Healing sources will Heal only 1 point. The character will feel twitchy, nauseous, headachy, or paranoid (or any combination of these) while touching the material in question and should role play as such. Cloth will not stop these symptoms, but leather or thicker substances will. 2 points are awarded for materials that are likely to be very common such as leather, iron, and materia. 1 point is awarded for materials that are less likely to be common or a hindrance, such as gold, silver, or any of the Resources. No points will be awarded for materials that are unlikely to be encountered, or will rarely cause a hindrance.\n\nStandard Allergens and Awards:\n\n• Cloth - 2 BP\n\n• Copper - 1 BP\n\n• Gold - 1 BP\n\n• Harvest - 1 BP\n\n• Hide - 1 BP\n\n• Ingot - 1 BP\n\n• Iron - 2 BP\n\n• Leather - 2 BP\n\n• Materia  - 2 BP\n\n• Night Prize - 1 BP\n\n• Other Common Allergen  - 2 BP\n\n• Other Uncommon Allergen - 1 BP\n\n• Rare Minerals - 1 BP\n\n• Scale - 1 BP\n\n• Silver - 1 BP",
+    "allergens": {
+      "Cloth": 2,
+      "Copper": 1,
+      "Gold": 1,
+      "Harvest": 1,
+      "Hide": 1,
+      "Ingot": 1,
+      "Iron": 2,
+      "Leather": 2,
+      "Materia": 2,
+      "Night Prize": 1,
+      "Other Common Allergen": 2,
+      "Other Uncommon Allergen": 1,
+      "Rare Minerals": 1,
+      "Scale": 1,
+      "Silver": 1
+    }
   },
   {
     "name": "Severe Allergy",
@@ -77,7 +94,24 @@
     "ranks": null,
     "prereq": null,
     "category": "Physical",
-    "description": "Severe allergy to gold, silver, iron, magic or other substances. Suffers severe pain and Drained while in contact.\n\nAward: 2 or 3\n\nPrerequisites: None\n\nThe character has a supernatural allergy to gold, silver, iron, magic, or other substances which must be approved by Staff. Each time the character goes from not touching an object made of the material to touching it with skin, it will cause Piercing 1 by Agony (even cloth will prevent this damage). So a character with a gold ring would take the damage each time it was put on, as well as each time they touched a gold coin (even if the ring remained on).\n\nWhile in contact with the substance, even through cloth, the character cannot benefit from a Short or Long Rest or Healing and will have the Drained Condition. The character will feel severely ill, feel burning pain, or have severe migraines and difficulty thinking (or any combination of these) while touching the material in question and should role play it as such. Cloth will not stop these symptoms but leather or thicker substances will. Weapons that are not obviously made of some other material are considered to be iron, and attacks from are considered to be “hitting skin” if they damage Life Points.\n\n3 points are awarded for materials that are likely to be very common such as leather, iron, and materia. 2 points are awarded for materials that are less likely to be common or a hindrance, such as gold, silver, or any of the Resources. No points will be awarded for materials that are unlikely to be encountered, or will rarely cause a hindrance such as butter, horse hair, or werewolf skin.\n\nStandard Allergens and Awards:\n\n• Cloth - 3 BP\n\n• Copper - 2 BP\n\n• Gold - 2 BP\n\n• Harvest - 2 BP\n\n• Hide - 2 BP\n\n• Ingot - 2 BP\n\n• Iron - 3 BP\n\n• Leather - 3 BP\n\n• Materia  - 3 BP\n\n• Night Prize - 2 BP\n\n• Other Common Allergen  - 3 BP\n\n• Other Uncommon Allergen - 2 BP\n\n• Rare Minerals - 2 BP\n\n• Scale - 2 BP\n\n• Silver - 2 BP"
+    "description": "Severe allergy to gold, silver, iron, magic or other substances. Suffers severe pain and Drained while in contact.\n\nAward: 2 or 3\n\nPrerequisites: None\n\nThe character has a supernatural allergy to gold, silver, iron, magic, or other substances which must be approved by Staff. Each time the character goes from not touching an object made of the material to touching it with skin, it will cause Piercing 1 by Agony (even cloth will prevent this damage). So a character with a gold ring would take the damage each time it was put on, as well as each time they touched a gold coin (even if the ring remained on).\n\nWhile in contact with the substance, even through cloth, the character cannot benefit from a Short or Long Rest or Healing and will have the Drained Condition. The character will feel severely ill, feel burning pain, or have severe migraines and difficulty thinking (or any combination of these) while touching the material in question and should role play it as such. Cloth will not stop these symptoms but leather or thicker substances will. Weapons that are not obviously made of some other material are considered to be iron, and attacks from are considered to be “hitting skin” if they damage Life Points.\n\n3 points are awarded for materials that are likely to be very common such as leather, iron, and materia. 2 points are awarded for materials that are less likely to be common or a hindrance, such as gold, silver, or any of the Resources. No points will be awarded for materials that are unlikely to be encountered, or will rarely cause a hindrance such as butter, horse hair, or werewolf skin.\n\nStandard Allergens and Awards:\n\n• Cloth - 3 BP\n\n• Copper - 2 BP\n\n• Gold - 2 BP\n\n• Harvest - 2 BP\n\n• Hide - 2 BP\n\n• Ingot - 2 BP\n\n• Iron - 3 BP\n\n• Leather - 3 BP\n\n• Materia  - 3 BP\n\n• Night Prize - 2 BP\n\n• Other Common Allergen  - 3 BP\n\n• Other Uncommon Allergen - 2 BP\n\n• Rare Minerals - 2 BP\n\n• Scale - 2 BP\n\n• Silver - 2 BP",
+    "allergens": {
+      "Cloth": 3,
+      "Copper": 2,
+      "Gold": 2,
+      "Harvest": 2,
+      "Hide": 2,
+      "Ingot": 2,
+      "Iron": 3,
+      "Leather": 3,
+      "Materia": 3,
+      "Night Prize": 2,
+      "Other Common Allergen": 3,
+      "Other Uncommon Allergen": 2,
+      "Rare Minerals": 2,
+      "Scale": 2,
+      "Silver": 2
+    }
   },
   {
     "name": "Shunned Soul",
