@@ -295,12 +295,19 @@ export function SlotBlock({ slot, pickClassOf }) {
       </div>
       <ol className="b-slot-rows">
         {granted.map((name) => (
-          <React.Fragment key={`granted-${name}`}>
-            <li className="b-slot-row is-filled is-granted">
-              <span className="b-slot-num" title="Granted by class">★</span>
-              <button className="b-slot-pick" onClick={() => onInspect(name, fields[0], "powers")}>{name}</button>
-              <span className="b-slot-tier b-slot-granted-tag">innate</span>
-            </li>
+            <React.Fragment key={`granted-${name}`}>
+              {(() => {
+                const ent = lookupEntity(`powers:${name}`);
+                const tags = ent?.tags || [];
+                return (
+                  <li className="b-slot-row is-filled is-granted">
+                    <span className="b-slot-num" title="Granted by class">★</span>
+                    <button className="b-slot-pick" onClick={() => onInspect(name, fields[0], "powers")}>{name}</button>
+                    {tags.map((t) => <span key={t} className="b-picker-row-tag b-data">{t}</span>)}
+                    <span className="b-slot-tier b-slot-granted-tag">innate</span>
+                  </li>
+                );
+              })()}
             <InlineDetail item={name} field={fields[0]} />
           </React.Fragment>
         ))}
@@ -309,17 +316,24 @@ export function SlotBlock({ slot, pickClassOf }) {
           if (pick) {
             return (
               <React.Fragment key={i}>
-                <li className={`b-slot-row is-filled ${over ? "is-over" : ""} ${isFocused(pick.name, pick.field) ? "is-focused" : ""}`}>
-                  <span className="b-slot-num">{i + 1}</span>
-                  <button className="b-slot-pick" onClick={() => onInspect(pick.name, pick.field, "powers")}>{pick.name}</button>
-                  {slot.category === "spellsKnown" && spellTierKey({ tierList: pick.field }) && (
-                    <span className={`b-slot-tier b-tier-${spellTierKey({ tierList: pick.field })}`}>
-                      {SPELL_TIER_LABEL[pick.field]}
-                    </span>
-                  )}
-                  <button className="b-slot-action" title="Swap" aria-label={`Swap ${pick.name}`} onClick={() => onOpenSlot(slot, pick.flatIndex, false, pick.field)}>✎</button>
-                  <button className="b-slot-action" title="Clear" aria-label={`Clear ${pick.name}`} onClick={() => onOpenSlot(slot, pick.flatIndex, true, pick.field)}>✕</button>
-                </li>
+                {(() => {
+                  const ent = lookupEntity(`powers:${pick.name}`);
+                  const tags = ent?.tags || [];
+                  return (
+                    <li className={`b-slot-row is-filled ${over ? "is-over" : ""} ${isFocused(pick.name, pick.field) ? "is-focused" : ""}`}>
+                      <span className="b-slot-num">{i + 1}</span>
+                      <button className="b-slot-pick" onClick={() => onInspect(pick.name, pick.field, "powers")}>{pick.name}</button>
+                      {tags.map((t) => <span key={t} className="b-picker-row-tag b-data">{t}</span>)}
+                      {slot.category === "spellsKnown" && spellTierKey({ tierList: pick.field }) && (
+                        <span className={`b-slot-tier b-tier-${spellTierKey({ tierList: pick.field })}`}>
+                          {SPELL_TIER_LABEL[pick.field]}
+                        </span>
+                      )}
+                      <button className="b-slot-action" title="Swap" aria-label={`Swap ${pick.name}`} onClick={() => onOpenSlot(slot, pick.flatIndex, false, pick.field)}>✎</button>
+                      <button className="b-slot-action" title="Clear" aria-label={`Clear ${pick.name}`} onClick={() => onOpenSlot(slot, pick.flatIndex, true, pick.field)}>✕</button>
+                    </li>
+                  );
+                })()}
                 <InlineDetail item={pick.name} field={pick.field} />
               </React.Fragment>
             );
