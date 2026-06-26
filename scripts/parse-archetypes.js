@@ -182,13 +182,20 @@ function concretizeChoice(s, instance = 0) {
   return s.replace(/\s*\(your choice\)/i, choice ? ` (${choice})` : '');
 }
 
-const stripNotes = (s, instance = 0) =>
-  concretizeChoice(s, instance)
+const stripNotes = (s, instance = 0) => {
+  const cleaned = concretizeChoice(s, instance)
     .replace(BOOKKEEPING_NOTE, '')
     .replace(BP_SUFFIX, '')
     .replace(RANK_RE, '')
     .replace(/\s+/g, ' ')
     .trim();
+
+  if (cleaned === "Shake it Off") return "Shake It Off I";
+  if (cleaned === "Deflect Projectiles") return "Deflect Projectile";
+  if (cleaned === "Backstab (+1 damage)") return "Backstab";
+  
+  return cleaned;
+};
 
 // ─── ARCHETYPE EXTRACTION ─────────────────────────────────────────────────────
 // Each archetype is an H1 whose text nodes alternate between labeled fields
@@ -410,6 +417,22 @@ function parseArchetype(start, end) {
     console.warn(`  ⚠ ${archetype.name}: devotion mismatch — inline "${archetype.devotion}" vs Worship "${worshipDevotion}"; using Worship.`);
   }
   if (worshipDevotion) archetype.devotion = worshipDevotion;
+
+  // Fix up Extended Capacity - Novice based on class magic type
+  for (const field of ['startingSkills', 'purchasedSkills']) {
+    if (archetype[field]) {
+      archetype[field] = archetype[field].map(skill => {
+        if (skill === "Extended Capacity - Novice") {
+          if (archetype.classLevels && /Mage|Sourcerer|Artisan/.test(archetype.classLevels)) {
+            return "Extended Capacity - Novice (Arcane)";
+          } else {
+            return "Extended Capacity - Novice (Divine)";
+          }
+        }
+        return skill;
+      });
+    }
+  }
 
   return archetype;
 }

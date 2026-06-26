@@ -753,6 +753,14 @@ for (const a of read("archetypes.json")) {
       }
     }
     archetypeRefs[archetypeId][field] = [...new Set(ids)];
+    
+    // Ensure all structured refs also appear in the body-text mentions graph
+    // so the UI can linkify them even if the literal matcher missed them (due to drift).
+    for (const id of archetypeRefs[archetypeId][field]) {
+      if (!mentions[archetypeId].includes(id)) {
+        mentions[archetypeId].push(id);
+      }
+    }
   }
 }
 // Re-dedupe mentionedBy after archetype backlinks were appended.
@@ -783,6 +791,7 @@ const result = {
   discounts,
   lbpBonuses,
   excludes,
+  archetypeRefs,
 };
 
 writeFileSync(join(DATA, "refs.json"), JSON.stringify(result, null, 2));

@@ -107,7 +107,7 @@
     ],
     "basicPowers": [
       "Harry",
-      "Shake it Off"
+      "Shake It Off I"
     ]
   },
   {
@@ -768,8 +768,8 @@
     ],
     "purchasedPerks": [],
     "innatePowers": [
-      "Deflect Projectiles",
-      "Backstab (+1 damage)",
+      "Deflect Projectile",
+      "Backstab",
       "Loot"
     ],
     "utilityPowers": [
@@ -903,8 +903,8 @@
       "Carnal Creature"
     ],
     "innatePowers": [
-      "Deflect Projectiles",
-      "Backstab (+1 damage)",
+      "Deflect Projectile",
+      "Backstab",
       "Loot"
     ],
     "utilityPowers": [
