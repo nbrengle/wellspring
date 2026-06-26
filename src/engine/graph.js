@@ -1,5 +1,5 @@
 import { EFFECT_EXTRACTORS } from './extractors.js';
-import { lookupEntity, LINEAGES, CLASS_PROGRESSION, REFS, lineageChoiceSpec, allergenAward, ALLERGEN_AWARDS } from '../engine/data.js';
+import { lookupEntity, LINEAGES, CLASS_PROGRESSION, REFS, lineageChoiceSpec, powerSpellChoiceSpec, allergenAward, ALLERGEN_AWARDS } from '../engine/data.js';
 import { startingSkillGrants } from '../engine/starting-choices.js';
 import { cleanItemName, bareSkill, resolveId, entityType, getClasses, idName } from './resolver.js';
 import {
@@ -47,6 +47,14 @@ export function resolveCharacterGraph(character) {
       effects.push(...extractor(ent, character, entityId));
     }
 
+    // A power that lets you choose a spell to add to Known Spells (e.g. the Knowledge
+    // domain's Arcane Secrets) grants the chosen spell. Data-driven via
+    // powerSpellChoiceSpec — same shape as the lineage `spell` kind, no per-name case.
+    if (powerSpellChoiceSpec(ent)) {
+      const picked = character.choices?.[`powers:${ent?.baseName || ent?.name}`]
+        || character.choices?.[ent?.id];
+      if (picked) effects.push({ type: 'GRANT_SOURCE', grants: [`powers:${picked}`] });
+    }
 
     items.push({
       id: ent?.id || id,

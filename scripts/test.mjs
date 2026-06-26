@@ -15,7 +15,7 @@ import {
 import {
   budgetFor, computeSlots, spellSlots, devotionState, prereqStatus,
   LEVEL_CAP, LEGAL_MIN_LEVEL, grantedAbilities, computeSpend,
-  getMaxRanks, bookcasterSpellOptions, eligibleClassChoices, agileLearnerCapacity, basicSpellOptions
+  getMaxRanks, bookcasterSpellOptions, arcaneSecretsSpellOptions, eligibleClassChoices, agileLearnerCapacity, basicSpellOptions
 } from "../src/engine/testing.js";
 import { bareSkill, cleanItemName, getClasses, formatParameterizedName } from "../src/engine/resolver.js";
 import { formatCharacterSheet, parseCharacterSheet } from '../src/engine/sheet.js';
@@ -412,6 +412,34 @@ test('Arcane Aptitude grants the chosen spell as a Known Spell', () => {
   const aa = items.find((i) => /Arcane Aptitude/.test(i.name));
   ok(aa.effects.some((e) => e.type === 'GRANT_SOURCE' && e.grants.includes('powers:Flameburst')),
     'the picked spell is granted');
+});
+
+test('Arcane Secrets (domain power) grants the chosen arcane spell as a Known Spell', () => {
+  // powerSpellChoiceSpec drives an owned-power spell pick, keyed by choices['powers:..'].
+  const spec = powerSpellChoiceSpec({ name: 'Arcane Secrets' });
+  ok(spec?.kind === 'spell' && spec.pool.includes('Arcane'), 'Arcane Secrets = arcane spell pick');
+  const char = { classLevels: 'Cleric 6', devotion: 'The Librarian',
+    domainPowers: ['Arcane Secrets'], choices: { 'powers:Arcane Secrets': 'Arcane Barrage' } };
+  const sec = resolveCharacterGraph(char).items.find((i) => /Arcane Secrets/.test(i.name));
+  ok(sec.effects.some((e) => e.type === 'GRANT_SOURCE' && e.grants.includes('powers:Arcane Barrage')),
+    'the picked spell is granted');
+  // With no pick, no grant.
+  const none = resolveCharacterGraph({ classLevels: 'Cleric 6', devotion: 'The Librarian', domainPowers: ['Arcane Secrets'] })
+    .items.find((i) => /Arcane Secrets/.test(i.name));
+  ok(!none.effects.some((e) => e.type === 'GRANT_SOURCE'), 'no pick → no spell granted');
+});
+
+test('Arcane Secrets pool is rank-gated, not a flat list (the rules gate by castable rank)', () => {
+  // Caster with a Known Spell: the pool is gated by Arcane spell-slots held — a low
+  // caster (novice slots only) sees fewer spells than a high caster (adept unlocked).
+  const lo = arcaneSecretsSpellOptions({ classLevels: 'Mage 2', noviceSpells: ['Flameburst'] });
+  const hi = arcaneSecretsSpellOptions({ classLevels: 'Mage 10', noviceSpells: ['Flameburst'] });
+  ok(lo.length > 0 && hi.length > lo.length, 'higher caster level → strictly larger gated pool');
+  // The pool draws from ANY base arcane class, not just the character's own.
+  ok(hi.length >= 80, 'pool spans all base arcane classes (not just the owned class)');
+  // No Known Spells → the "up to Adept" branch (excludes any Greater-tier spell).
+  const noncaster = arcaneSecretsSpellOptions({ classLevels: 'Cleric 6' });
+  ok(noncaster.length > 0, 'non-caster still gets an arcane pool, capped at Adept');
 });
 
 test('cantrip-choice lineage items grant + slot the chosen cantrip (Divine Magic + the previously-broken Psionic Cantrip)', () => {
