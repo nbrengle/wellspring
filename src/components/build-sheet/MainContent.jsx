@@ -3,7 +3,7 @@ import { useBuilderState, useBuilderActions } from "../builder-context.jsx";
 import { Section, CostBadge } from "./SharedUI.jsx";
 import SubSelect from "../SubSelect.jsx";
 import { spellTierKey, spellTierLabel } from "./utils.js";
-import { ALL_SKILLS, LINEAGES, CRAFTING, RITUALS, CLASSES, DOMAINS } from "../../engine/data.js";
+import { ALL_SKILLS, LINEAGES, CRAFTING, RITUALS, CLASSES, DOMAINS, lookupEntity } from "../../engine/data.js";
 import { getMaxRanks, pickClass, agileLearnerCapacity } from "../../engine/validate.js";
 import { bareSkill, getClasses, cleanItemName } from "../../engine/resolver.js";
 import { lookupCost } from "../../engine/validate/cost-key.js";
@@ -360,10 +360,14 @@ export function ClassifiedRows({ rows, resolveType, showClass }) {
         const rankFloor = canBuyUp ? grantedFloor : 1;
         const hasRanks = (canRemove || canBuyUp) && maxR > 1 && !UNLIMITED_SKILLS.has(baseName);
 
+        const ent = lookupEntity(resolveType ? `${resolveType}:${baseName}` : baseName) || lookupEntity(resolveType ? `${resolveType}:${name}` : name);
+        const tags = ent?.tags || [];
+
         return (
           <InspectableRow key={`${field}-${index}-${name}-${grantedBy || cls || ''}`}
                           item={name} field={field} resolveType={resolveType} index={index}
                           label={<>{name}{rank > 1 && !hasRanks && <span className="b-row-rank">×{rank}</span>}</>}>
+            {tags.map((t) => <span key={t} className="b-picker-row-tag b-data">{t}</span>)}
             {showClass && cls && !fromClass && <span className="b-row-badge b-badge-class">{cls.toUpperCase()}</span>}
             {fromClass
               ? (() => {
@@ -423,9 +427,13 @@ export function EditableRows({ items, field, resolveType, removable }) {
         const maxR = getMaxRanks(item, field, character);
         const hasRanks = canRemove && maxR > 1 && !UNLIMITED_SKILLS.has(baseName);
 
+        const ent = lookupEntity(resolveType ? `${resolveType}:${baseName}` : baseName) || lookupEntity(resolveType ? `${resolveType}:${item}` : item);
+        const tags = ent?.tags || [];
+
         return (
           <InspectableRow key={`${field}-${i}-${item}`} item={item} field={field} resolveType={resolveType} index={i}
                           label={<>{item}{rank > 1 && !hasRanks && <span className="b-row-rank">×{rank}</span>}</>}>
+            {tags.map((t) => <span key={t} className="b-picker-row-tag b-data">{t}</span>)}
             <CostBadge cost={cost} />
             {canRemove && (
               <button className="b-row-remove" title="Remove" aria-label={`Remove ${item}`} onClick={() => onRemoveEntity(field, i)}>×</button>
