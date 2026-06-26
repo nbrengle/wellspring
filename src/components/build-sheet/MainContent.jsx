@@ -392,14 +392,18 @@ export function ClassifiedRows({ rows, resolveType, showClass }) {
               const tone = CLASS_TONES[t];
               return <span key={t} className={`b-picker-row-tag ${tone ? `b-tag-${tone}` : "b-data"}`}>{t}</span>;
             })}
-            {showClass && cls && !fromClass && <span className="b-row-badge b-badge-class">{cls.toUpperCase()}</span>}
+            {showClass && cls && !fromClass && (
+              <span className={`b-row-badge ${CLASS_TONES[cls] ? `b-tag-${CLASS_TONES[cls]}` : "b-badge-class"}`}>
+                {cls.toUpperCase()}
+              </span>
+            )}
             {fromClass
               ? (() => {
                   const src = grantedBy || cls;
                   return (
                     <>
                       {src && (
-                        <span className="b-row-badge b-badge-granted"
+                        <span className={`b-row-badge ${CLASS_TONES[src] ? `b-tag-${CLASS_TONES[src]}` : "b-badge-granted"}`}
                               title={specialty ? `Granted free by your ${src}'s "${specialty}" starting choice`
                                 : grantedBy ? `Granted free by your ${grantedBy} multi-class`
                                 : `Granted free by your ${src} class`}>
