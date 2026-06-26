@@ -9854,6 +9854,7 @@
       "skills:Shield Expertise",
       "powers:Deadly Remnants",
       "skills:Basic Medicine",
+      "powers:Shake It Off I",
       "skills:Short Weapons",
       "skills:Basic Shields",
       "powers:Armored Shell",
@@ -9999,8 +10000,8 @@
     "archetypes:Ranged Rogue": [
       "skills:Basic Martial Weapons",
       "skills:Weapon Specialization",
-      "powers:Deflect Projectile",
       "skills:Apprentice Alchemy",
+      "powers:Deflect Projectile",
       "powers:Acquired Tolerance",
       "skills:Thrown Weapons",
       "powers:Concealed Dart",

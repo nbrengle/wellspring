@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "parse": "node scripts/parse-megadoc.js",
+    "parse": "node scripts/parse-megadoc.js && node scripts/parse-archetypes.js",
     "link": "node scripts/link-refs.js",
     "check:data": "node scripts/check-data-drift.mjs",
     "link:audit": "node scripts/linker/link-audit.js",
