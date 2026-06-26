@@ -702,6 +702,30 @@
   border-color: rgb(217, 117, 107, 35%);
 }
 
+.b-tag-blue {
+  background: rgb(111, 168, 217, 15%);
+  color: var(--b-blue);
+  border-color: rgb(111, 168, 217, 35%);
+}
+
+.b-tag-green {
+  background: rgb(111, 191, 115, 15%);
+  color: var(--b-green);
+  border-color: rgb(111, 191, 115, 35%);
+}
+
+.b-tag-amber-deep {
+  background: rgb(184, 130, 31, 18%);
+  color: var(--b-amber-deep);
+  border-color: rgb(184, 130, 31, 40%);
+}
+
+.b-tag-indigo {
+  background: rgb(138, 124, 224, 15%);
+  color: #8a7ce0;
+  border-color: rgb(138, 124, 224, 35%);
+}
+
 /* ─── ARCHETYPE PICKER ────────────────────────────────────────────────── */
 .b-archetype-grid {
   display: grid;

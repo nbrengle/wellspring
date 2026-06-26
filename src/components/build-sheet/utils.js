@@ -1,5 +1,16 @@
 import { lookupEntity } from "../../engine/data.js";
 
+export const CLASS_TONES = {
+  Artisan: "amber",
+  Cleric: "amber-deep",
+  Druid: "green",
+  Fighter: "red",
+  Mage: "blue",
+  Rogue: "teal",
+  Socialite: "purple",
+  Sourcerer: "indigo"
+};
+
 export function spellTierKey(c) {
   if (!c) return null;
   if (c.tierList) return { noviceSpells: "novice", adeptSpells: "adept", greaterSpells: "greater", cantrips: "cantrip" }[c.tierList] || null;

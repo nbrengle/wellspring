@@ -6,25 +6,13 @@ import { availableFacets as computeAvailableFacets, passesFacets as facetsPass,
          passesFacetsExcept as facetsPassExcept, activeFacetCount as countActiveFacets,
          toggleFacetValue } from "./browse/facets.js";
 import { EntityBody } from "./DetailPane.jsx";
+import { spellTierKey, spellTierLabel, CLASS_TONES } from "./build-sheet/utils.js";
 import Overlay from "./ui/Overlay.jsx";
 
-const spellTierKey = (c) => {
-  const t = c.tierList || "";
-  if (/novice/i.test(t)) return "novice";
-  if (/adept/i.test(t)) return "adept";
-  if (/greater/i.test(t)) return "greater";
-  if (/cantrip/i.test(t)) return "cantrip";
-  return null;
-};
 
-const spellTierLabel = (c) => {
-  const k = spellTierKey(c);
-  if (k === "novice") return "Novice";
-  if (k === "adept") return "Adept";
-  if (k === "greater") return "Greater";
-  if (k === "cantrip") return "Cantrip";
-  return "";
-};
+
+
+
 
 const refreshBucket = (c) => {
   const r = (c.refresh || "").toLowerCase();
@@ -214,9 +202,10 @@ export default function PickerOverlay({ spec, character, onClose }) {
                               </span>
                             )}
                             {spellTierKey(c) && <span className={`b-picker-row-tier b-tier-${spellTierKey(c)}`}>{spellTierLabel(c)}</span>}
-                            {(entityOf.get(c.name)?.tags || []).map((t) => (
-                              <span key={t} className="b-picker-row-tag b-data">{t}</span>
-                            ))}
+                            {(entityOf.get(c.name)?.tags || []).map((t) => {
+                              const tone = CLASS_TONES[t];
+                              return <span key={t} className={`b-picker-row-tag ${tone ? `b-tag-${tone}` : "b-data"}`}>{t}</span>;
+                            })}
                             {typeof c.cost === "number" && c.cost > 0 && <span className="b-picker-row-cost">{c.cost} BP</span>}
                             {typeof c.cost === "string" && /^var/i.test(c.cost) && <span className="b-picker-row-cost">Var BP</span>}
                             {typeof c.bp === "number" && c.bp > 0 && <span className="b-picker-row-cost is-award">+{c.bp} BP</span>}
