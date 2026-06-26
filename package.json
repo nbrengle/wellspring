@@ -9,6 +9,7 @@
     "preview": "vite preview",
     "parse": "node scripts/parse-megadoc.js",
     "link": "node scripts/link-refs.js",
+    "check:data": "node scripts/check-data-drift.mjs",
     "link:audit": "node scripts/linker/link-audit.js",
     "doc:feedback": "node scripts/linker/doc-feedback.js",
     "test": "node --import ./scripts/register-json.mjs scripts/test.mjs && node --import ./scripts/register-json.mjs scripts/test-rules-enforcement.mjs && node scripts/test-browser.mjs",

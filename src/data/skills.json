@@ -480,13 +480,17 @@
     "ranks": 4,
     "category": "Magic",
     "description": "The character chooses one Sphere of magic and gains one additional Novice spell-slot in that Sphere and can use it to cast a Known spell.",
+    "parameter": "Sphere",
     "slotGrants": [
       {
         "cat": "novice",
         "n": 1
+      },
+      {
+        "cat": "spellsKnown",
+        "n": 1
       }
-    ],
-    "parameter": "Sphere"
+    ]
   },
   {
     "name": "Extended Capacity - Adept",
@@ -495,13 +499,17 @@
     "ranks": 4,
     "category": "Magic",
     "description": "The character chooses one Sphere of magic they have an Adept Spell slot for and gains one additional Adept Spell-Slot in that Sphere and can use it to cast a Known spell.",
+    "parameter": "Sphere",
     "slotGrants": [
       {
         "cat": "adept",
         "n": 1
+      },
+      {
+        "cat": "spellsKnown",
+        "n": 1
       }
-    ],
-    "parameter": "Sphere"
+    ]
   },
   {
     "name": "Extended Capacity - Greater",
@@ -510,13 +518,17 @@
     "ranks": 3,
     "category": "Magic",
     "description": "The character chooses one Sphere of magic they have a Greater Spell slot for and gains one additional Greater Spell-Slot in that Sphere and can use it to cast a Known spell.",
+    "parameter": "Sphere",
     "slotGrants": [
       {
         "cat": "greater",
         "n": 1
+      },
+      {
+        "cat": "spellsKnown",
+        "n": 1
       }
-    ],
-    "parameter": "Sphere"
+    ]
   },
   {
     "name": "Additional Cantrip",

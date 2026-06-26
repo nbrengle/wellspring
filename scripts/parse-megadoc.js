@@ -570,13 +570,25 @@ function parseClasses() {
       : /\barcane\b/i.test([description, ...(skillList('Starting Skills') || [])].join(' ')) ? 'Arcane'
       : 'Divine';
 
+    // Annotate Extended Capacity references in this class's skill lists with the
+    // class's Sphere ("Extended Capacity - Novice" → "...[Divine]"/"[Arcane]"). The
+    // doc omits the sphere on these references, but it's unambiguous from the owning
+    // caster's magicType — so we DERIVE it here (was a manual patch, PR #116) and the
+    // builder can route the granted slot to the right pool. Only touch the bare ref;
+    // leave a count suffix "(3)" / "x2" intact.
+    const withSphere = (s) => (magicType
+      ? s.replace(/\bExtended Capacity\s*-?\s*(Novice|Adept|Greater)\b(?!\s*\[)/g,
+          (m) => `${m} [${magicType}]`)
+      : s);
+    const annotateSkills = (list) => (list || []).map(withSphere);
+
     classes.push({
       name: clsName,
       type: isCaster ? 'Spellcaster' : 'Martial',
       magicType,
       description,
-      startingSkills:   skillList('Starting Skills'),
-      multiclassSkills: skillList('Multiclass Skills'),
+      startingSkills:   annotateSkills(skillList('Starting Skills')),
+      multiclassSkills: annotateSkills(skillList('Multiclass Skills')),
       multiclassGrants: parseMulticlassSkills(skillList('Multiclass Skills')),
       progression,
       specializations,
@@ -1177,8 +1189,17 @@ function parseSkills() {
       }
 
       if (cost !== null) {
-        const entry = { name, cost, prereq, ranks, category: currentCat, description: descParts.join(' ') };
-        if (parameter) entry.parameter = parameter;
+        const description = descParts.join(' ');
+        const entry = { name, cost, prereq, ranks, category: currentCat, description };
+        // Parameter: either an explicit "[Placeholder]" in the name, OR — for skills
+        // whose body says the player picks something — derived from that prose. The
+        // Extended Capacity skills read "The character chooses one Sphere of magic",
+        // so they carry a Sphere parameter even though the name has no bracket. This
+        // keeps the parameter DERIVED (was a manual post-parse patch, PR #116).
+        const derivedParam = !parameter && /\bchooses?\s+one\s+Sphere\b/i.test(description)
+          ? 'Sphere' : null;
+        const finalParam = parameter || derivedParam;
+        if (finalParam) entry.parameter = finalParam;
         skills.push(entry);
       }
       i = bodyEnd === -1 ? end : Math.min(bodyEnd, end);

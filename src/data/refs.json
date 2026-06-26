@@ -2019,7 +2019,8 @@
       "accents:Lightning",
       "powers:Disrupt",
       "effects:Drain",
-      "domains:Energy"
+      "domains:Energy",
+      "domains:Chaos"
     ],
     "powers:Dissolution": [
       "terms:Short Rest",
@@ -2076,7 +2077,9 @@
       "effects:Heal",
       "accents:Divine",
       "classes:Cleric",
-      "effects:Death"
+      "terms:Dying",
+      "effects:Death",
+      "domains:Light"
     ],
     "powers:Purposed to Death": [
       "creature-types:Spirit",
@@ -2228,8 +2231,10 @@
     ],
     "domains:Manipulation": [],
     "powers:Mind Wipe": [
+      "rules-concepts:“Slow X” Count",
       "rules-concepts:Instruction",
-      "terms:Helpless"
+      "terms:Helpless",
+      "terms:Focus"
     ],
     "powers:Subtlety": [
       "terms:Long Rest",
@@ -3648,12 +3653,14 @@
       "classes:Mage"
     ],
     "powers:Living Iron": [
+      "rules-concepts:“Quick X” Count",
       "terms:Long Rest",
       "classes:Artificer",
       "classes:Artisan",
       "effects:Mend",
       "terms:Power",
-      "terms:Armor"
+      "terms:Armor",
+      "terms:Focus"
     ],
     "powers:Brilliant Thinker": [
       "classes:Artisan",
@@ -3738,12 +3745,14 @@
       "terms:Power"
     ],
     "powers:Custom Creation": [
+      "rules-concepts:“Quick X” Count",
       "skills:Apprentice Enchanting",
       "crafting-concepts:Attunement",
       "devotions:The Steed",
       "rules-concepts:Devotions & Divine Beings",
       "rituals:Attune",
       "classes:Artisan",
+      "terms:Focus",
       "terms:Power"
     ],
     "powers:Forged From Steel": [
@@ -3800,6 +3809,7 @@
       "modifiers:Self"
     ],
     "powers:Otherworldly Sight": [
+      "rules-concepts:“Quick X” Count",
       "effects:Discern",
       "creature-types:Voidborn",
       "terms:Lineage",
@@ -3808,9 +3818,11 @@
       "creature-types:Undead",
       "modifiers:Subtle",
       "domains:Nature",
+      "terms:Focus",
       "accents:Mind"
     ],
     "powers:Perspicacity": [
+      "rules-concepts:“Quick X” Count",
       "effects:Discern",
       "terms:Conditions",
       "classes:Artisan",
@@ -3906,6 +3918,7 @@
       "classes:Artisan",
       "modifiers:Subtle",
       "terms:Count",
+      "terms:Focus",
       "accents:Mind"
     ],
     "powers:Antidote": [
@@ -3922,12 +3935,14 @@
       "effects:Cure"
     ],
     "powers:Armor Upkeep Specialist": [
+      "rules-concepts:“Quick X” Count",
       "recipes:Field Patch Kit",
       "rules-concepts:Expiration",
       "skills:Apprentice Tinkering",
       "terms:Long Rest",
       "classes:Artisan",
       "terms:Armor",
+      "terms:Focus",
       "terms:Power",
       "effects:Mend"
     ],
@@ -3956,6 +3971,7 @@
       "defenses:Counter",
       "classes:Artisan",
       "terms:Count",
+      "terms:Focus",
       "powers:Dodge",
       "modifiers:Self"
     ],
@@ -3977,10 +3993,12 @@
       "terms:Power"
     ],
     "powers:Critique Construction": [
+      "rules-concepts:“Quick X” Count",
       "terms:Short Rest",
       "effects:Weakness",
       "effects:Shatter",
       "classes:Artisan",
+      "terms:Focus",
       "terms:Power",
       "effects:Imbue"
     ],
@@ -3992,6 +4010,7 @@
       "resources:Bloom"
     ],
     "powers:Dig Deep": [
+      "rules-concepts:“Quick X” Count",
       "rules-concepts:Short",
       "terms:Incantation",
       "terms:Short Rest",
@@ -3999,15 +4018,18 @@
       "terms:Refresh",
       "classes:Artisan",
       "rules-concepts:Spikes",
+      "terms:Focus",
       "effects:Imbue"
     ],
     "powers:Forcefield": [
+      "rules-concepts:“Quick X” Count",
       "recipes:Forgesource",
       "terms:Long Rest",
       "accents:Lightning",
       "terms:Packet",
       "defenses:Protect",
       "classes:Artisan",
+      "terms:Focus",
       "effects:Grant"
     ],
     "powers:Intimidating Spines": [
@@ -4049,6 +4071,7 @@
       "accents:Mind"
     ],
     "powers:Overcharge": [
+      "rules-concepts:“Quick X” Count",
       "rules-concepts:Short",
       "terms:Spike Damage",
       "recipes:Forgesource",
@@ -4058,6 +4081,7 @@
       "rules-concepts:Duration",
       "classes:Artisan",
       "effects:Grant",
+      "terms:Focus",
       "modifiers:Self"
     ],
     "powers:Share": [
@@ -4094,6 +4118,7 @@
       "rules-concepts:Traps"
     ],
     "powers:Treat": [
+      "rules-concepts:“Slow X” Count",
       "terms:Life Points",
       "terms:Short Rest",
       "classes:Artisan",
@@ -4116,6 +4141,7 @@
       "accents:Ice"
     ],
     "powers:Weapon Upkeep Specialist": [
+      "rules-concepts:“Quick X” Count",
       "skills:Projectile Weapons",
       "recipes:Sharpening Stone",
       "terms:Spike Damage",
@@ -4124,7 +4150,8 @@
       "skills:Apprentice Tinkering",
       "terms:Long Rest",
       "domains:Creation",
-      "classes:Artisan"
+      "classes:Artisan",
+      "terms:Focus"
     ],
     "powers:Weird Wanderings": [
       "terms:Incantation",
@@ -4135,6 +4162,7 @@
       "modifiers:Self"
     ],
     "powers:Advanced Treatment": [
+      "rules-concepts:“Slow X” Count",
       "rules-concepts:Short",
       "resources:Rare Minerals",
       "terms:Life Points",
@@ -4431,7 +4459,8 @@
       "effects:Heal",
       "accents:Divine",
       "classes:Cleric",
-      "terms:Power"
+      "terms:Power",
+      "domains:Light"
     ],
     "powers:Ritual Affinity": [
       "skills:Apprentice Ritual Magic",
@@ -4941,6 +4970,7 @@
       "perks:Connections",
       "terms:Life Points",
       "terms:Short Rest",
+      "domains:Creation",
       "rituals:Attune",
       "creature-types:Animal",
       "creature-types:Plant",
@@ -4967,6 +4997,8 @@
       "terms:Short Rest",
       "terms:Long Rest",
       "skills:Tracking",
+      "terms:Dawn",
+      "resources:Bloom",
       "terms:Power",
       "effects:Grant",
       "classes:Druid",
@@ -5515,6 +5547,7 @@
       "classes:Fighter"
     ],
     "powers:Fighting Instructor": [
+      "rules-concepts:“Slow X” Count",
       "rules-concepts:Long",
       "skills:Basic Martial Weapons",
       "skills:Projectile Weapons",
@@ -5637,6 +5670,7 @@
       "terms:Short Rest",
       "classes:Fighter",
       "rules-concepts:Barrier",
+      "terms:Armor",
       "effects:Grant",
       "modifiers:Self"
     ],
@@ -5780,7 +5814,8 @@
       "terms:Wielding",
       "effects:Shatter",
       "creature-types:Plant",
-      "rules-concepts:Spikes"
+      "rules-concepts:Spikes",
+      "powers:Stop"
     ],
     "powers:Resolve": [
       "terms:Life Points",
@@ -5915,10 +5950,12 @@
       "rules-concepts:Spikes"
     ],
     "powers:Refocus": [
+      "rules-concepts:“Quick X” Count",
       "terms:Long Rest",
       "terms:Refresh",
       "classes:Fighter",
       "rules-concepts:Spikes",
+      "terms:Focus",
       "classes:Rogue",
       "accents:Mind",
       "modifiers:Self"
@@ -6059,6 +6096,7 @@
     "powers:Arcane Barrier": [
       "rules-concepts:Short",
       "terms:Short Rest",
+      "domains:Protection",
       "terms:Long Rest",
       "terms:Cantrip",
       "rules-concepts:Barrier",
@@ -6608,10 +6646,12 @@
       "classes:Rogue"
     ],
     "powers:Keen Hearing": [
+      "rules-concepts:“Quick X” Count",
       "terms:Short Rest",
       "effects:Expose",
       "creature-types:Living",
       "modifiers:Subtle",
+      "terms:Focus",
       "classes:Rogue"
     ],
     "powers:Mine": [
@@ -6620,6 +6660,7 @@
       "domains:Creation",
       "accents:Poison",
       "terms:Count",
+      "terms:Focus",
       "classes:Rogue",
       "modifiers:Self",
       "rules-concepts:Traps"
@@ -6687,6 +6728,7 @@
       "terms:Short Rest",
       "effects:Wounding",
       "effects:Silence",
+      "terms:Count",
       "terms:Focus",
       "terms:Power",
       "effects:Sleep",
@@ -6788,8 +6830,10 @@
       "modifiers:Self"
     ],
     "powers:Scavenge Armor": [
+      "rules-concepts:“Quick X” Count",
       "skills:Scavenge I",
       "rules-concepts:Ashbin",
+      "terms:Focus",
       "terms:Power",
       "classes:Rogue",
       "effects:Mend",
@@ -6947,6 +6991,7 @@
     ],
     "powers:Serious Knots": [
       "rules-concepts:“Quick X” Count",
+      "rules-concepts:“Slow X” Count",
       "rules-concepts:Instruction",
       "terms:Short Rest",
       "terms:Helpless",
@@ -7266,6 +7311,7 @@
       "accents:Agony"
     ],
     "powers:Poison Dart": [
+      "rules-concepts:“Quick X” Count",
       "rules-concepts:Short",
       "skills:Thrown Weapons",
       "terms:Short Rest",
@@ -7273,6 +7319,7 @@
       "classes:Socialite",
       "terms:Packet",
       "accents:Poison",
+      "terms:Count",
       "terms:Power",
       "effects:Drain",
       "powers:Rest"
@@ -7361,12 +7408,14 @@
       "accents:Mind"
     ],
     "powers:Fortress of the Mind": [
+      "rules-concepts:“Quick X” Count",
       "terms:Short Rest",
       "terms:Conditions",
       "classes:Socialite",
       "domains:Order",
       "terms:Accent",
       "effects:Dispel",
+      "terms:Focus",
       "accents:Mind",
       "modifiers:Self"
     ],
@@ -7516,11 +7565,7 @@
     "powers:Additional Bodyguard": [
       "powers:The Right Hand",
       "domains:Manipulation",
-      "terms:Incantation",
       "classes:Socialite",
-      "terms:Delivery",
-      "rules-concepts:Duration",
-      "terms:Refresh",
       "terms:Power",
       "modifiers:Self"
     ],
@@ -7687,7 +7732,6 @@
     ],
     "powers:Arcane Source": [
       "skills:Basic Arcane",
-      "terms:Incantation",
       "terms:Spell-slots",
       "terms:Short Rest",
       "terms:Long Rest",
@@ -7695,12 +7739,9 @@
       "accents:Lightning",
       "classes:Sourcerer",
       "rules-concepts:Spellbook",
-      "terms:Delivery",
       "terms:Wielding",
-      "rules-concepts:Duration",
       "terms:Accent",
       "rituals:Attune",
-      "terms:Refresh",
       "effects:Rebuild",
       "terms:Power",
       "powers:Sources",
@@ -7711,14 +7752,10 @@
     ],
     "powers:Astride the Weave": [
       "powers:Arcane Source",
-      "terms:Incantation",
       "terms:Base Class",
       "classes:Sourcerer",
       "rules-concepts:Incanting",
       "terms:Cantrip",
-      "terms:Delivery",
-      "rules-concepts:Duration",
-      "terms:Refresh",
       "skills:Basic Arcane",
       "terms:Armor",
       "modifiers:Self"
@@ -7726,31 +7763,21 @@
     "powers:Enduring Source": [
       "rules-concepts:“Quick X” Count",
       "powers:Arcane Source",
-      "terms:Incantation",
       "terms:Short Rest",
       "effects:Rebuild",
       "effects:Shatter",
       "classes:Sourcerer",
-      "terms:Delivery",
-      "rules-concepts:Duration",
-      "terms:Refresh",
-      "terms:Accent",
       "powers:Sources",
       "terms:Focus",
       "modifiers:Self"
     ],
     "powers:Dissipate Curse": [
       "rules-concepts:“Quick X” Count",
-      "terms:Incantation",
       "terms:Short Rest",
       "terms:Conditions",
       "classes:Sourcerer",
-      "terms:Delivery",
       "terms:Focus",
-      "rules-concepts:Duration",
-      "terms:Refresh",
       "effects:Disable",
-      "terms:Accent",
       "effects:Disarm",
       "effects:Cure",
       "effects:Root",
@@ -7758,14 +7785,10 @@
     ],
     "powers:Power of Magic": [
       "powers:Arcane Source",
-      "terms:Incantation",
       "rules-concepts:Sacrifice",
       "terms:Long Rest",
       "classes:Sourcerer",
-      "terms:Delivery",
-      "rules-concepts:Duration",
       "terms:Cantrip",
-      "terms:Refresh",
       "skills:Basic Arcane",
       "terms:Accent",
       "powers:Cancel",
@@ -7773,16 +7796,12 @@
       "modifiers:Self"
     ],
     "powers:Rote Invocation": [
-      "terms:Incantation",
       "terms:Short Rest",
       "terms:Spell-slots",
       "terms:Long Rest",
       "classes:Sourcerer",
-      "terms:Delivery",
       "rules-concepts:Duration",
-      "terms:Refresh",
       "skills:Basic Arcane",
-      "terms:Accent",
       "effects:Grant",
       "modifiers:Self"
     ],
@@ -7790,26 +7809,18 @@
       "rules-concepts:“Quick X” Count",
       "powers:Arcane Source",
       "domains:Manipulation",
-      "terms:Incantation",
       "terms:Short Rest",
       "classes:Sourcerer",
-      "terms:Delivery",
-      "rules-concepts:Duration",
       "terms:Accent",
-      "terms:Refresh",
       "powers:Sources",
       "terms:Focus",
       "modifiers:Self"
     ],
     "powers:Accent Substantiation": [
       "powers:Arcane Source",
-      "terms:Incantation",
       "classes:Sourcerer",
       "terms:Cantrip",
-      "terms:Delivery",
       "terms:Wielding",
-      "rules-concepts:Duration",
-      "terms:Refresh",
       "terms:Accent",
       "accents:Agony",
       "accents:Acid",
@@ -7820,24 +7831,17 @@
       "effects:Imprison",
       "classes:Sourcerer",
       "rules-concepts:Incanting",
-      "terms:Delivery",
       "terms:Helpless",
       "effects:Silence",
-      "rules-concepts:Duration",
       "terms:Refresh",
       "terms:Focus",
       "terms:Power",
       "modifiers:Self"
     ],
     "powers:Interlaced Shell": [
-      "terms:Incantation",
       "terms:Short Rest",
       "classes:Sourcerer",
-      "terms:Delivery",
-      "rules-concepts:Duration",
-      "terms:Refresh",
       "rules-concepts:Barrier",
-      "terms:Accent",
       "effects:Grant",
       "modifiers:Self"
     ],
@@ -9899,8 +9903,8 @@
       "powers:Reload"
     ],
     "archetypes:Balanced Cleric": [
-      "skills:Lore",
       "skills:Extended Capacity - Novice",
+      "skills:Lore",
       "skills:Basic Martial Weapons",
       "skills:Additional Cantrip",
       "powers:Refreshing Prayer",
@@ -9924,12 +9928,12 @@
       "accents:Life"
     ],
     "archetypes:Form Fighter Druid": [
+      "skills:Extended Capacity - Novice",
       "skills:Profession - Apprentice",
       "skills:Lore",
       "powers:Lesser Form of the Striking Serpent",
       "powers:Lesser Form of the Hunting Panther",
       "powers:Lesser Form of the Hulking Bear",
-      "skills:Extended Capacity - Novice",
       "powers:Nature’s Understanding",
       "powers:Message of the Flowers",
       "skills:Basic Martial Weapons",
@@ -9970,8 +9974,8 @@
       "powers:Balm"
     ],
     "archetypes:Utility Mage": [
-      "skills:Lore",
       "skills:Extended Capacity - Novice",
+      "skills:Lore",
       "skills:Apprentice Ritual Magic",
       "powers:Replicate Enhancement",
       "powers:Ritual Affinity",
@@ -11708,13 +11712,9 @@
       "powers:Grace Under Duress",
       "powers:Hard to Read",
       "powers:Arcane Source",
-      "powers:Enduring Source",
-      "powers:Dissipate Curse",
       "powers:Power of Magic",
-      "powers:Rote Invocation",
       "powers:Additional Source",
       "powers:Accent Substantiation",
-      "powers:Interlaced Shell",
       "powers:Circle of Four",
       "powers:Wild Bolt",
       "powers:Energy Shield",
@@ -11810,6 +11810,7 @@
       "powers:Mountain of Steel",
       "powers:Armored Shell",
       "powers:Armored Shell II",
+      "powers:Linked Armor",
       "powers:Wall of Steel",
       "powers:Studded Leather Armor",
       "powers:Evasion",
@@ -12054,9 +12055,11 @@
       "powers:Ghost Hand",
       "powers:Ruinous Curse",
       "powers:Mine",
+      "powers:Concealed Dart",
       "powers:Keen Eye",
       "powers:Quick Nap",
       "powers:Breach",
+      "powers:Poison Dart",
       "powers:Battlefield Commander",
       "powers:Faded Slumber",
       "powers:Destructive Resonance",
@@ -12064,7 +12067,9 @@
       "rituals:Divine Hammer"
     ],
     "terms:Counter": [],
-    "terms:Dawn": [],
+    "terms:Dawn": [
+      "powers:Find the Path"
+    ],
     "terms:Dead": [],
     "terms:Death-count": [
       "skills:Basic Medicine",
@@ -12099,17 +12104,6 @@
       "powers:Ensnare",
       "powers:Replicate Enhancement",
       "powers:Time to Go",
-      "powers:Additional Bodyguard",
-      "powers:Arcane Source",
-      "powers:Astride the Weave",
-      "powers:Enduring Source",
-      "powers:Dissipate Curse",
-      "powers:Power of Magic",
-      "powers:Rote Invocation",
-      "powers:Additional Source",
-      "powers:Accent Substantiation",
-      "powers:Unsuppressable",
-      "powers:Interlaced Shell",
       "recipes:Area Trap Augment",
       "rules-concepts:Weapon Delivery",
       "rules-concepts:Packet Delivery",
@@ -12133,6 +12127,7 @@
       "flaws:Truthbound",
       "terms:Life Points",
       "effects:Stabilize",
+      "powers:The Balance of Life",
       "powers:Severing Strikes",
       "powers:Violent Posturing",
       "devotions:Senri, Voice of Mercy",
@@ -12209,15 +12204,27 @@
       "perks:Protected Hearth",
       "ritual-concepts:Automatic Failure",
       "powers:Emotional Attunement",
+      "powers:Mind Wipe",
       "advantages:Human - Telekinesis",
       "advantages:Lost - Consume Vitality",
       "advantages:Oaksworn - Natural Healer",
       "advantages:Oaksworn - Decompose",
       "advantages:Ogrim - Assess Your Foes",
+      "powers:Living Iron",
+      "powers:Custom Creation",
+      "powers:Otherworldly Sight",
       "powers:Perspicacity",
       "powers:Acid Soak",
+      "powers:Analysis",
+      "powers:Armor Upkeep Specialist",
+      "powers:Combat Analysis",
+      "powers:Critique Construction",
+      "powers:Dig Deep",
+      "powers:Forcefield",
       "powers:Jury Rig",
+      "powers:Overcharge",
       "powers:Treat",
+      "powers:Weapon Upkeep Specialist",
       "powers:Advanced Treatment",
       "powers:Detonate",
       "powers:Exploding Arrows",
@@ -12233,6 +12240,7 @@
       "powers:Bowyer",
       "powers:Shoulder",
       "powers:Battlemind",
+      "powers:Refocus",
       "powers:Field Maintenance",
       "powers:Channel the Arcane",
       "powers:Force Shield",
@@ -12243,15 +12251,19 @@
       "powers:Deflect Projectile",
       "powers:Sinister Strike",
       "powers:Catfall",
+      "powers:Keen Hearing",
+      "powers:Mine",
       "powers:Size Up",
       "powers:Concealed Dart",
       "powers:Expert Deflect",
       "powers:Keen Eye",
+      "powers:Scavenge Armor",
       "powers:Waylay",
       "powers:Breach",
       "powers:Serious Knots",
       "powers:Sizing Up the Opposition",
       "powers:Battlefield Commander",
+      "powers:Fortress of the Mind",
       "powers:Grace Under Duress",
       "powers:Commission of Protection",
       "powers:Save the Day",
@@ -12338,19 +12350,9 @@
       "powers:Revulsion",
       "powers:Elemental Node",
       "powers:Rotten Tomato",
-      "powers:Additional Bodyguard",
       "powers:Inspirational Leader",
       "powers:Internal Battery",
-      "powers:Arcane Source",
-      "powers:Astride the Weave",
-      "powers:Enduring Source",
-      "powers:Dissipate Curse",
-      "powers:Power of Magic",
-      "powers:Rote Invocation",
-      "powers:Additional Source",
-      "powers:Accent Substantiation",
       "powers:Unsuppressable",
-      "powers:Interlaced Shell",
       "powers:Breach Teleport",
       "powers:Vaporize",
       "recipes:Scribe Novice Scroll",
@@ -13245,22 +13247,12 @@
       "powers:Never Stop Learning",
       "powers:Inspiration",
       "powers:Inspiring Performance",
-      "powers:Additional Bodyguard",
       "powers:Commission of Protection",
       "powers:Magical Empowerment",
       "powers:Training Regiment",
       "powers:Rousing Inspiration",
       "powers:Internal Battery",
-      "powers:Arcane Source",
-      "powers:Astride the Weave",
-      "powers:Enduring Source",
-      "powers:Dissipate Curse",
-      "powers:Power of Magic",
-      "powers:Rote Invocation",
-      "powers:Additional Source",
-      "powers:Accent Substantiation",
       "powers:Unsuppressable",
-      "powers:Interlaced Shell",
       "powers:Crimson Bargain",
       "powers:Spirit Chalice",
       "recipes:Malleable Beauty",
@@ -15025,6 +15017,7 @@
       "powers:Warming Elixir / Cooling Draught",
       "powers:Advanced Treatment",
       "powers:Message of the Flowers",
+      "powers:Find the Path",
       "powers:Smuggler’s Powdercase",
       "powers:It’s Who You Know",
       "recipes:Alcohol",
@@ -16664,7 +16657,9 @@
     "ritual-concepts:Implements: Magical": [],
     "ritual-concepts:The Lesser Arcana": [],
     "ritual-concepts:The Major Arcana": [],
-    "domains:Chaos": [],
+    "domains:Chaos": [
+      "powers:Disruption"
+    ],
     "powers:The Path Less Travelled": [],
     "powers:Disruption": [
       "rules-concepts:Blue"
@@ -16682,6 +16677,7 @@
       "devotions:The Great Mind",
       "powers:Custom Brew",
       "powers:Weapon Upkeep Specialist",
+      "powers:Grove",
       "powers:Mine",
       "powers:Safebox",
       "recipes:Alcohol",
@@ -16812,6 +16808,7 @@
       "accents:Radiant",
       "crafting-concepts:Measuring Time & Chants",
       "ritual-concepts:The Lesser Arcana",
+      "powers:The Balance of Life",
       "powers:No Stone Unturned",
       "powers:Bring Light to the Shadows",
       "powers:Pulse of Light",
@@ -16826,6 +16823,7 @@
       "devotions:The Pale Star",
       "devotions:Devourer",
       "challenges:Aewen - Arcane Glow",
+      "powers:Healing Touch",
       "powers:Aethereal Fade",
       "recipes:Nyte Tea",
       "recipes:Spellnaught Elixir",
@@ -16992,6 +16990,7 @@
       "powers:Mantle of Faith",
       "powers:Blade Guard",
       "powers:Barkskin",
+      "powers:Arcane Barrier",
       "powers:Mask Aura",
       "powers:Magekey",
       "powers:Flat Catch",
@@ -18232,6 +18231,7 @@
     ],
     "powers:See Magic": [],
     "powers:Stop": [
+      "powers:Raging Blows",
       "archetypes:Utility Mage"
     ],
     "powers:Arcane Barrage": [
@@ -19329,17 +19329,7 @@
       "powers:Back Alley Deals",
       "powers:Breach",
       "powers:Aesthetic Suggestion",
-      "powers:Additional Bodyguard",
-      "powers:Arcane Source",
-      "powers:Astride the Weave",
-      "powers:Enduring Source",
-      "powers:Dissipate Curse",
-      "powers:Power of Magic",
       "powers:Rote Invocation",
-      "powers:Additional Source",
-      "powers:Accent Substantiation",
-      "powers:Unsuppressable",
-      "powers:Interlaced Shell",
       "powers:Mass Flux",
       "powers:Destructive Resonance",
       "powers:Startle",
@@ -19392,11 +19382,21 @@
       "advantages:Ogrim - Regeneration",
       "advantages:Ogrim - Assess Your Foes",
       "challenges:Ogrim - Brittle Bones",
+      "powers:Living Iron",
+      "powers:Custom Creation",
+      "powers:Otherworldly Sight",
+      "powers:Perspicacity",
       "powers:Acid Soak",
       "powers:Analysis",
+      "powers:Armor Upkeep Specialist",
       "powers:Combat Analysis",
+      "powers:Critique Construction",
+      "powers:Dig Deep",
+      "powers:Forcefield",
       "powers:Jury Rig",
+      "powers:Overcharge",
       "powers:Trap Recovery",
+      "powers:Weapon Upkeep Specialist",
       "powers:Detonate",
       "powers:Exploding Arrows",
       "powers:Infuse",
@@ -19432,6 +19432,7 @@
       "powers:Archer’s Eye",
       "powers:Challenging Shout",
       "powers:Lock Down",
+      "powers:Refocus",
       "powers:Shake It Off II",
       "powers:Field Maintenance",
       "powers:Channel the Arcane",
@@ -19446,18 +19447,22 @@
       "powers:Loot",
       "powers:Sinister Strike",
       "powers:Catfall",
+      "powers:Keen Hearing",
       "powers:Size Up",
       "powers:Blunt End",
       "powers:Concealed Dart",
       "powers:Expert Deflect",
       "powers:Keen Eye",
+      "powers:Scavenge Armor",
       "powers:Waylay",
       "powers:Breach",
       "powers:Serious Knots",
       "powers:Sharp Dagger, Sharper Tongue",
+      "powers:Poison Dart",
       "powers:Rotten Tomato",
       "powers:Sizing Up the Opposition",
       "powers:Battlefield Commander",
+      "powers:Fortress of the Mind",
       "powers:Grace Under Duress",
       "powers:Let’s You and Them Fight",
       "powers:Commission of Protection",
@@ -19521,14 +19526,18 @@
       "terms:Dead",
       "terms:Death-count",
       "terms:Dying",
+      "powers:Mind Wipe",
       "powers:Dominating Presence",
       "powers:Shadow Step",
       "advantages:Chimera - Flight",
       "advantages:Chimera - Heightened Flight",
       "advantages:Lost - Consume Vitality",
       "advantages:Oaksworn - Decompose",
+      "powers:Treat",
+      "powers:Advanced Treatment",
       "powers:Hiatus",
       "powers:Holy Rest",
+      "powers:Fighting Instructor",
       "powers:Battlemind",
       "powers:Heroic Save",
       "powers:Rest",
@@ -19537,6 +19546,7 @@
       "powers:Mine",
       "powers:Quick Nap",
       "powers:Breach",
+      "powers:Serious Knots",
       "powers:Retreat",
       "powers:Faded Slumber",
       "powers:Restful Prison",
