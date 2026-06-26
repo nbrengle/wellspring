@@ -411,15 +411,15 @@ export function ClassifiedRows({ rows, resolveType, showClass }) {
                         </span>
                       )}
                       {refundedBP ? (
-                        <span className="b-row-badge b-badge-refund" title="Redundant grant refunded as free BP">
-                          +{refundedBP} BP
+                        <span className="b-row-badge b-badge-refund" title="BP spent on this item was refunded because your class grants it for free">
+                          +{refundedBP} BP REFUNDED
                         </span>
                       ) : null}
                       {canBuyUp && cost?.paidRanks > 0 && <CostBadge cost={cost} />}
                     </>
                   );
                 })()
-              : <CostBadge cost={cost} />}
+              : cost && <CostBadge cost={cost} />}
             {hasRanks && onSetRank && (
               <div className="b-row-rank-adjust">
                 <button className="b-rank-btn" type="button" onClick={() => onSetRank(field, index, rank - 1)} disabled={rank <= rankFloor}>-</button>
