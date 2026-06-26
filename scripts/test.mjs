@@ -525,6 +525,42 @@ test('grants from a granting power bought into purchasedSkills are seen (graph-d
   ok(g.list.some((x) => x.ability === 'powers:Save the Day' && /^Holding Out [Ff]or a Hero$/.test(x.source)),
      'Save the Day is granted by the purchased Holding Out for a Hero');
 });
+test('a GRANT_SOURCE grant materializes as a free, non-removable owned item (Way of the Blade → Weapon Spec)', () => {
+  // Uniform engine-driven grants: a power that grants a named entity surfaces that
+  // entity as an owned item (one render path, regardless of grant source) so the UI
+  // shows + can parameterize it — instead of the grant living only as a hidden effect.
+  // The materialized row carries source:'class' + index:-1 so the build sheet's
+  // canRemove (!fromClass && index>=0) is false: a granted ability isn't deletable.
+  const c = { classLevels: 'Rogue 4', utilityPowers: ['Way of the Blade'],
+    choices: { 'powers:Way of the Blade': 'Daggers' } };
+  const r = validate(c);
+  const granted = (r.owned?.skills || []).filter((x) => x.grantedBy === 'Way of the Blade');
+  eq(granted.length, 2, 'both granted skills surface (Weapon Spec - Daggers + Two Weapon Style)');
+  const spec = granted.find((x) => /^Weapon Spec/.test(x.name));
+  ok(spec, 'the parameterized Weapon Specialization grant is present');
+  eq(/Daggers/.test(spec.name), true, 'parameterized with the Way-of-the-Blade choice (Daggers)');
+  eq(spec.field, 'skillsGrant', 'lands in a *Grant field (engine-materialized, not a purchase)');
+  eq(spec.source, 'class', 'sourced as class so the UI treats it as non-removable');
+  eq(spec.index, -1, 'index -1 → canRemove false');
+  eq(spec.cost?.cost ?? 0, 0, 'granted ability is free');
+});
+test('a grant refunds a matching parameterized purchase, by parameter (Way of the Blade → Weapon Spec)', () => {
+  // Way of the Blade (choosing Daggers) grants "Weapon Specialization - Daggers".
+  // A previously-PURCHASED "Weapon Specialization (Daggers)" must go free + attributed
+  // — the dash vs parens form must not block the match. A different weapon must NOT.
+  const daggers = computeSpend({ classLevels: 'Rogue 4',
+    purchasedSkills: ['Weapon Specialization (Daggers)'],
+    utilityPowers: ['Way of the Blade'], choices: { 'powers:Way of the Blade': 'Daggers' } });
+  const dk = daggers.byItem['purchasedSkills:Weapon Specialization (Daggers)'];
+  eq(dk.cost, 0, 'matching weapon → refunded to free');
+  eq(dk.grant?.source, 'Way of the Blade', 'attributed to the granting power');
+
+  const swords = computeSpend({ classLevels: 'Rogue 4',
+    purchasedSkills: ['Weapon Specialization (Swords)'],
+    utilityPowers: ['Way of the Blade'], choices: { 'powers:Way of the Blade': 'Daggers' } });
+  eq(swords.byItem['purchasedSkills:Weapon Specialization (Swords)'].cost, 4,
+     'different weapon → NOT refunded (parameter precision)');
+});
 test('a selected power that grants a perk zeroes that perk (Implicit Truths → Insight)', () => {
   const c = { classLevels: 'Socialite 4', utilityPowers: ['Implicit Truths'], purchasedPerks: ['Insight'] };
   const eff = computeSpend(c).byItem['purchasedPerks:Insight'];
