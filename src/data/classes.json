@@ -1987,10 +1987,10 @@
       "One of the Cloth: Basic Armor (2)",
       "The Means of Service - Choose one of the following:",
       "Short Weapons (3)",
-      "Extended Capacity - Novice (3)",
+      "Extended Capacity - Novice [Divine] (3)",
       "Basic Medicine (2), Diagnose (1)",
       "Divine Study - Choose one of the following:",
-      "Extended Capacity- Novice x2 (6)",
+      "Extended Capacity - Novice [Divine] x2 (6)",
       "Additional Cantrip (6)",
       "Bookcaster (1) x 3, Peacecaster (3)",
       "Basic Shields (4), Advanced Shields (2)"
@@ -3255,7 +3255,7 @@
       "Natural Survival: Basic Martial Weapons (1), Profession - Apprentice (1), and either Forage I (3) or Scavenge I (3)",
       "The Song of the Land: Basic Faith (4)",
       "Budding Wisdom - Choose one of the following:",
-      "Extended Capacity - Novice (3), Lore: Nature (2)",
+      "Extended Capacity - Novice [Primal] (3), Lore [Nature] (2)",
       "Short Weapons (3), Two-Weapon Style (2)",
       "Peacecaster (3), Basic Medicine (2)"
     ],
@@ -6057,7 +6057,7 @@
       "The Arcane Unveiled: Basic Arcane (4)",
       "Dutiful Scholar: Choose a Lore Skill (2), Library Use (1), Bookcaster (1) x 2",
       "A Magical Specialty - Choose one of the following:",
-      "Extended Capacity - Novice (3) x 2",
+      "Extended Capacity - Novice [Arcane] (3) x 2",
       "Advanced Recharge (2), Lore: Arcane (2), Bookcaster (1) x 2",
       "Bookcaster (1) x 6",
       "Additional Cantrip (6)"
@@ -10441,7 +10441,7 @@
     "startingSkills": [
       "The Ritual of Beginnings: Basic Arcane (4), Warcaster (5)",
       "The Contract With the Other - Choose one of the following:",
-      "Extended Capacity - Novice x2 (6)",
+      "Extended Capacity - Novice [Occult] x2 (6)",
       "Additional Cantrip (6)",
       "Patron [Character’s Choice] (4), Gift of Hateful Retribution I (2)"
     ],

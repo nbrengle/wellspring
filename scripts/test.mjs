@@ -1148,7 +1148,7 @@ test('buying a granted skill above its free floor bills only the excess', () => 
 
   // Rank 3: one paid rank @ 3 BP; bonus rises to 3.
   let r = validate(setRank(c, 'startingSkills', i, 3));
-  eq(r.spend.byItem[`startingSkills:${i}:Extended Capacity - Novice`].cost, 3, 'rank 3 bills 1 extra rank');
+  eq(r.spend.byItem[`startingSkills:${i}:${c.startingSkills[i]}`].cost, 3, 'rank 3 bills 1 extra rank');
   eq(r.slots.find((s) => s.category === 'spellsKnown').bonus, 3, 'rank 3 grants +3 spellsKnown');
 
   // Rank 4 (max): two paid ranks @ 3 BP.

@@ -250,7 +250,7 @@ export function classifyOwnedItems(character) {
       const baseName = bareSkill(cleanItemName(r.name));
       const baseKey = baseName.toLowerCase();
       const cleanName = cleanItemName(r.name).toLowerCase();
-      const isInstance = UNLIMITED_SKILLS.has(baseName);
+      const isInstance = UNLIMITED_SKILLS.has(baseName) || !!lookupEntity(baseName)?.parameter;
 
       if (isInstance) {
         const hasParam = cleanName.includes('(');
