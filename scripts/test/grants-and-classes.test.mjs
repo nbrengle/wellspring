@@ -27,6 +27,17 @@ import CLASSES_JSON from '../../src/data/classes.json' with { type: 'json' };
 // A character built straight from an archetype mirrors what loadArchetype keeps.
 const fromArchetype = (a) => ({ ...a, archetypeName: a.name });
 
+// ─── innate powers: one dedicated handler, no double-count ────────────────────
+test('a stored innate power is materialized once, not double-counted', () => {
+  // activeInnatePowers() is the dedicated handler for innatePowers (it merges
+  // class-granted + stored, deduped). The generic power-field loop must NOT also
+  // iterate innatePowers, or every stored innate power lands in the graph twice.
+  const items = resolveCharacterGraph({ classLevels: 'Socialite 4', innatePowers: ['Practiced Manner'] })
+    .items.filter((i) => /^Practiced Manner$/.test(i.name));
+  eq(items.length, 1, 'Practiced Manner appears exactly once');
+  eq(items[0].sourceType, 'innate', 'and via the innate handler, not the generic loop');
+});
+
 // ─── cross-class / pick-a-class grants ────────────────────────────────────────
 test('Extensive Training routes its bonus slot to the CHOSEN class, attributed', () => {
   const c = { archetypeName: 'x', classes: [{ name: 'Fighter', level: 3 }, { name: 'Rogue', level: 3 }],
