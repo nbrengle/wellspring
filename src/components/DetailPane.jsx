@@ -1,7 +1,8 @@
 import React, { useMemo } from "react";
 import {
   lookupEntity, REFS, DEVOTIONS, DOMAINS,
-  UNLIMITED_SKILLS, ALL_SKILLS, LINEAGES
+  UNLIMITED_SKILLS, ALL_SKILLS, LINEAGES,
+  allergenOptions, allergenAward
 } from '../engine/data.js';
 import SubSelect from "./SubSelect.jsx";
 import { formatParameterizedName } from "../engine/resolver.js";
@@ -62,8 +63,10 @@ const PARAMETER_SUGGESTIONS = {
   "Famous": [],
   "Minor Fame": [],
   "Manse": [],
-  "Mild Allergy": ["Cloth", "Copper", "Gold", "Harvest", "Hide", "Ingot", "Iron", "Leather", "Materia", "Night Prize", "Other Common Allergen", "Other Uncommon Allergen", "Rare Minerals", "Scale", "Silver"],
-  "Severe Allergy": ["Cloth", "Copper", "Gold", "Harvest", "Hide", "Ingot", "Iron", "Leather", "Materia", "Night Prize", "Other Common Allergen", "Other Uncommon Allergen", "Rare Minerals", "Scale", "Silver"],
+  // Allergen substances come from the parsed allergen table (see data.js), not a
+  // hardcoded list — the picker options and the BP award stay in sync by construction.
+  "Mild Allergy": allergenOptions("Mild Allergy"),
+  "Severe Allergy": allergenOptions("Severe Allergy"),
   "Lost Life": LOST_LIFE_SUGGESTIONS,
   "Additional Lost Life": LOST_LIFE_SUGGESTIONS
 };
@@ -380,11 +383,10 @@ function DetailFacts({ entity, isEditable }) {
   else if (entity.cost && /^var/i.test(String(entity.cost))) facts.push(["Cost", "Variable"]);
   if (typeof entity.bp === "number" || typeof entity.bp === "string") {
     let val = entity.bp;
-    if (entity.parameter && (entity.baseName === "Mild Allergy" || entity.baseName === "Severe Allergy")) {
-      const common = ["cloth", "iron", "leather", "materia", "other common allergen"];
-      const isCommon = common.includes(String(entity.parameter).toLowerCase().trim());
-      val = entity.baseName === "Mild Allergy" ? (isCommon ? 2 : 1) : (isCommon ? 3 : 2);
-    }
+    // Allergy award is per-substance, from the parsed allergen table. With a
+    // substance chosen, show its exact award; otherwise leave the "1 or 2" range.
+    const allergyAward = allergenAward(entity.baseName, entity.parameter);
+    if (allergyAward != null) val = allergyAward;
     facts.push(["Award", `${val} BP`]);
   }
   if (entity.prereq && entity.prereq !== "None") facts.push(["Prereq", entity.prereq]);
