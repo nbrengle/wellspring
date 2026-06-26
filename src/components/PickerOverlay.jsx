@@ -9,15 +9,9 @@ import { EntityBody } from "./DetailPane.jsx";
 import { spellTierKey, spellTierLabel, CLASS_TONES } from "./build-sheet/utils.js";
 import Overlay from "./ui/Overlay.jsx";
 
-function Tag({ label, tone = "amber" }) {
-  return <span className={`b-tag b-tag-${tone}`}>{label}</span>;
-}
 
-function CostBadge({ cost }) {
-  if (cost === "Var") return <Tag label="variable BP" tone="amber" />;
-  if (cost) return <Tag label={`${cost} BP`} tone="indigo" />;
-  return null;
-}
+
+
 
 
 const refreshBucket = (c) => {
