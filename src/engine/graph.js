@@ -3,7 +3,7 @@ import { lookupEntity, LINEAGES, lineageChoiceSpec, powerSpellChoiceSpec, allerg
 import { startingSkillGrants } from '../engine/starting-choices.js';
 import { cleanItemName, bareSkill, resolveId, entityType, getClasses, idName } from './resolver.js';
 import {
-  characterLevel, rankOf, POWER_SOURCE_FIELDS,
+  characterLevel, rankOf, GENERIC_POWER_FIELDS,
   activeInnatePowers, multiclassGrants
 } from './validate/core.js';
 
@@ -112,12 +112,14 @@ export function resolveCharacterGraph(character) {
     });
   });
 
-  // 2. Process Chosen Powers
-  for (const field of POWER_SOURCE_FIELDS) {
+  // 2. Process Chosen Powers. innatePowers is excluded (GENERIC_POWER_FIELDS) —
+  // activeInnatePowers() below is its dedicated handler; iterating it here too
+  // would double-count every stored innate power.
+  for (const field of GENERIC_POWER_FIELDS) {
     (character[field] || []).forEach((itemStr, idx) => addItem(field, itemStr, 'power', idx));
   }
 
-  // 3. Process Innate Powers
+  // 3. Process Innate Powers (the dedicated handler for innatePowers).
   const innate = activeInnatePowers(character);
   for (const ip of innate) {
     if (ip.source === 'class') {
