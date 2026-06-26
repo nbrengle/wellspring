@@ -3,7 +3,6 @@
 // text. When the lineage carries a structured costuming requirement, its live
 // met/unmet status shows here too. Both lore and costumeReq hide cleanly when the
 // data lacks them (costumeReq isn't in the data yet — a parser follow-up).
-import React from "react";
 
 export default function LineageAbout({ name, description, costume }) {
   // Strip the "Costuming Challenge: …" sentence from the lore — we render the

@@ -26,7 +26,7 @@ export const idName = (id) => {
 };
 
 // Resolve a character sheet item name to its typed ID, e.g. "Basic Faith" in purchasedSkills -> "skills:Basic Faith"
-export function resolveId(item, field, character) {
+export function resolveId(item, field, _character) {
   return `${entityType(field)}:${cleanItemName(item)}`;
 }
 

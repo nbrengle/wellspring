@@ -1,10 +1,9 @@
 import { EFFECT_EXTRACTORS } from './extractors.js';
-import { lookupEntity, LINEAGES, CLASS_PROGRESSION, REFS, lineageChoiceSpec, powerSpellChoiceSpec, allergenAward, ALLERGEN_AWARDS } from '../engine/data.js';
+import { lookupEntity, LINEAGES, lineageChoiceSpec, powerSpellChoiceSpec, allergenAward, ALLERGEN_AWARDS } from '../engine/data.js';
 import { startingSkillGrants } from '../engine/starting-choices.js';
 import { cleanItemName, bareSkill, resolveId, entityType, getClasses, idName } from './resolver.js';
 import {
-  characterLevel, parseTrailingRank, rankOf,
-  BP_FIELDS, BP_POWER_FIELDS, POWER_SOURCE_FIELDS,
+  characterLevel, rankOf, POWER_SOURCE_FIELDS,
   activeInnatePowers, multiclassGrants
 } from './validate/core.js';
 
@@ -253,7 +252,7 @@ export function resolveCharacterGraph(character) {
   }
 
   // 4.6 Granted Selections — dynamic picks that belong in the graph so they count as owned items.
-  for (const [selId, val] of Object.entries(character.grantedSelections || {})) {
+  for (const val of Object.values(character.grantedSelections || {})) {
     if (!val || val === "temp") continue;
     // Extract the raw name from the value (which is "PowerName (ClassName)")
     const nameMatch = val.match(/^(.*?)(?:\s+\([^)]+\))?$/);

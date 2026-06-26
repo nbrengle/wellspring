@@ -279,7 +279,6 @@ export function spellSlots(character) {
   const primaryType = CLASSES[casters[0].name]?.magicType || 'Unknown';
   if (!pools[primaryType]) pools[primaryType] = { novice: 0, adept: 0, greater: 0 };
 
-  const spellTiers = new Set(SPELL_TIERS);
   let highestSlots = []; // array of target pool strings
   const applySpellGrants = (ent, rank = 1, itemName = null) => {
     if (!ent) return;

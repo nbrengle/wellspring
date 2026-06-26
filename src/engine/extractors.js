@@ -25,7 +25,7 @@ function extractGlobalGrants(ent, character, id) {
   return [];
 }
 
-function extractWealth(ent, character, id) {
+function extractWealth(ent, _character, _id) {
   if (ent?.wealthIncome) {
     return [{
       type: 'WEALTH', 
@@ -37,7 +37,7 @@ function extractWealth(ent, character, id) {
   return [];
 }
 
-function extractStatMods(ent, character, id) {
+function extractStatMods(ent, _character, _id) {
   if (ent?.statMods) {
     return ent.statMods.map(mod => ({ type: 'STAT', stat: mod.stat, amount: mod.n }));
   }
@@ -50,7 +50,7 @@ function extractStatMods(ent, character, id) {
 // free). Normalizing the parser too, but stay tolerant here.
 const optGrants = (o) => o?.grants || o?.grantsSkills || [];
 
-function extractChooseOne(ent, character, id) {
+function extractChooseOne(ent, character, _id) {
   if (ent?.chooseOne?.kind === 'build') {
     const chosen = character.choices?.[`powers:${ent.name}`];
     if (chosen) {

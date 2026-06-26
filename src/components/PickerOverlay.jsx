@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef, useLayoutEffect } from "react";
+import { useState, useMemo, useRef, useLayoutEffect } from "react";
 import { lookupEntity, UNLIMITED_SKILLS } from '../engine/data.js';
 import { prereqStatus } from "../engine/validate.js";
 import { browse, gameEffectAxes, axisApplies, otherBuckets } from "./browse/browse.js";
@@ -7,16 +7,6 @@ import { availableFacets as computeAvailableFacets, passesFacets as facetsPass,
          toggleFacetValue } from "./browse/facets.js";
 import { EntityBody } from "./DetailPane.jsx";
 import Overlay from "./ui/Overlay.jsx";
-
-function Tag({ label, tone = "amber" }) {
-  return <span className={`b-tag b-tag-${tone}`}>{label}</span>;
-}
-
-function CostBadge({ cost }) {
-  if (cost === "Var") return <Tag label="variable BP" tone="amber" />;
-  if (cost) return <Tag label={`${cost} BP`} tone="indigo" />;
-  return null;
-}
 
 const spellTierKey = (c) => {
   const t = c.tierList || "";

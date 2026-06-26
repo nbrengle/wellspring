@@ -76,7 +76,7 @@ export const EMPTY_CHARACTER = {
 };
 
 // ─── PURE STATE MODIFIERS ───────────────────────────────────────────────────
-export function applyClassStartingAbilities(character, className, level = 1) {
+export function applyClassStartingAbilities(character, className, _level = 1) {
   const isPrimary = getClasses(character)[0]?.name === className;
 
   let nextCharacter = { ...character };

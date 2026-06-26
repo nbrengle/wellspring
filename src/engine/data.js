@@ -522,7 +522,7 @@ const ENTITY_INDEX = new Map();
 // boilerplate so the detail pane shows the full prose, keeping the summary as a
 // separate field. Skills aren't split (no boilerplate) but parameterized ones
 // are resolved on lookup (see lookupEntity).
-const indexCollection = (items, type, { nameKey = 'name', extra = e => ({}), splitDesc = false } = {}) => {
+const indexCollection = (items, type, { nameKey = 'name', extra = () => ({}), splitDesc = false } = {}) => {
   for (const e of items) {
     const name = e[nameKey];
     if (!name) continue;

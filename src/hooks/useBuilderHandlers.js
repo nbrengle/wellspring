@@ -1,17 +1,12 @@
 import { useCallback } from "react";
 import {
-  DEVOTIONS,
-  DOMAINS,
   CLASS_POWER_SLOTS,
   CLASSES,
-  UNLIMITED_SKILLS,
-  LEVEL_TABLE,
-  LINEAGES,
 } from "../engine/data.js";
 import { EVENTS_TABLE } from "../engine/validate.js";
 import { getClasses } from "../engine/resolver.js";
 import { EMPTY_CHARACTER, applyClassStartingAbilities, loadArchetype } from "../engine/character-state.js";
-import { powerPickerSpec, entityPickerSpec } from "./usePickers.js";
+import { entityPickerSpec } from "./usePickers.js";
 import { usePickers } from "./usePickers.js";
 import { useCoreHandlers } from "./handlers/useCoreHandlers.js";
 import { useIdentityHandlers } from "./handlers/useIdentityHandlers.js";
@@ -26,9 +21,8 @@ export function useBuilderHandlers({
   setChase,
   setPicking,
   setHistory,
-  setLineageOpen,
+  setLineageOpen: _setLineageOpen,
 }) {
-  const subKey = (n) => (n || "general").toLowerCase().replace(/[^a-z0-9]+/g, "-");
 
   const handlePickArchetype = useCallback((archetype) => {
     setCharacter(loadArchetype(archetype));

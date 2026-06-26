@@ -6,7 +6,6 @@
 // Concept links inside the body call onChase → that promotes into the right DRAWER
 // (with a back-stack) for multi-step exploration. So inline = the primary glance;
 // the drawer = chasing a chain of linked concepts.
-import React from "react";
 import { EntityBody, useResolvedEntity } from "../DetailPane.jsx";
 import { useBuilderState, useBuilderActions } from "../builder-context.jsx";
 

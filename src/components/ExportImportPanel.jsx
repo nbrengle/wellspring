@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { formatCharacterSheet, parseCharacterSheet } from "../engine/sheet.js";
 import { validate, validityReasons } from "../engine/validate.js";
 import Overlay from "./ui/Overlay.jsx";

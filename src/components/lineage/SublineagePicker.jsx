@@ -9,7 +9,6 @@
 // play if your character is from that civilization. So they sit in the SAME list,
 // tagged with their required civilization (not hoisted into an "origin" section).
 // Descriptions show when present (parser follow-up — they hide cleanly when absent).
-import React from "react";
 import { subKey } from "../../engine/validate.js";
 import { parseSublineage, distinctiveFor, isCivSublineage } from "./lineage-helpers.js";
 

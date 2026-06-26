@@ -8,8 +8,7 @@
 import { bareSkill, cleanItemName, getClasses } from '../engine/resolver.js';
 import { ARCHETYPES, UNLIMITED_SKILLS, BASE_CLASSES } from './data.js';
 import { lookupCost } from './validate/cost-key.js';
-import {
-  LABEL_FIELD, SCALAR_FIELDS, ITEM_FIELDS, fieldForLabel, cleanItem, splitItems,
+import { SCALAR_FIELDS, ITEM_FIELDS, fieldForLabel, cleanItem, splitItems,
   expandInstances, CHOICE_DEFAULTS,
 } from './sheet-schema.js';
 

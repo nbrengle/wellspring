@@ -7,7 +7,6 @@
 // Required-active items (General requireds, or a picked sublineage's requireds) are
 // auto-included and NON-removable: the toggle becomes a locked ✓ marker with an
 // "auto" tag — identical treatment regardless of where the requirement comes from.
-import React from "react";
 import { lineageChoiceSpec, lineageItemImpact } from "../../engine/data.js";
 import SubChoice from "./SubChoice.jsx";
 

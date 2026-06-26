@@ -1,6 +1,5 @@
 // "What Can I Make?" tab: discipline/tier filters + Fully-Craftable and
 // Close-to-Craftable recipe card grids.
-import React from "react";
 import { DISCIPLINE_LABELS } from "./shared.jsx";
 
 export default function MakeableTab({

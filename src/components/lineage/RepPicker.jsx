@@ -9,7 +9,7 @@
 // lineage/sublineage, and the LBP it awards — so you read what you're picking before
 // you commit. We render rep-challenge data directly (these live inside lineages, not
 // as standalone entities), so we don't borrow PickerOverlay's entity-lookup model.
-import React, { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { lineageRepOptions } from "../../engine/data.js";
 import Overlay from "../ui/Overlay.jsx";
 
