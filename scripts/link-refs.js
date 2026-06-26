@@ -61,11 +61,15 @@ function buildRegistry() {
   read("crafting-concepts.json").forEach((c) => walkConcept("crafting-concepts", c, { discipline: c.discipline }));
   read("ritual-concepts.json").forEach((c) => walkConcept("ritual-concepts", c));
   // A power's mechanical references (e.g. "Short Grant", "Counter, Augmentation",
-  // "Long Rest" refresh) live in the stat-block fields, NOT the description prose.
-  // Concatenate them all so the graph sees them.
+  // "Long Rest" refresh, an incantation's "Focus"/"Quick X Count") live in the
+  // stat-block FIELDS, NOT the description prose — the parser now extracts those
+  // headers into typed fields and strips them from the description, so we must scan
+  // every field here or those reference edges are lost. Keep this list in sync with
+  // the parser's power-field set (notably `incantation`, added so RP/Focus/Quick
+  // references in the incantation still link).
   const powerBody = (p) => [
-    p.call, p.target, p.duration, p.delivery, p.refresh, p.accent, p.effect,
-    p.requirement, p.prerequisites, p.skillsAndOptions, p.description,
+    p.incantation, p.call, p.target, p.duration, p.delivery, p.refresh, p.accent,
+    p.effect, p.requirement, p.prerequisites, p.skillsAndOptions, p.description,
   ].filter(Boolean).join(" ");
 
   read("domains.json").forEach((d) => {
