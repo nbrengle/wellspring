@@ -1,6 +1,6 @@
 {
   "generatedFrom": "src/data/*.json",
-  "entities": 1369,
+  "entities": 1368,
   "mentions": {
     "skills:Basic Martial Weapons": [
       "terms:Proficiency"
@@ -501,6 +501,7 @@
       "rules-concepts:Instruction",
       "resources:Harvest",
       "resources:Raw Scale",
+      "terms:Helpless",
       "creature-types:Animal",
       "powers:Burn",
       "resources:Hide"
@@ -3628,7 +3629,12 @@
       "powers:Disrupt"
     ],
     "classes:Artisan": [
+      "skills:Lore",
+      "skills:Apprentice Ritual Magic",
       "skills:Basic Martial Weapons",
+      "skills:Apprentice Enchanting",
+      "skills:Apprentice Tinkering",
+      "skills:Apprentice Alchemy",
       "skills:Basic Medicine",
       "perks:Soothing Touch",
       "skills:Short Weapons",
@@ -3636,10 +3642,8 @@
       "skills:Basic Armor",
       "skills:Scavenge I",
       "skills:Prospect I",
-      "skills:Apprentice Tinkering",
       "skills:Forage I",
-      "perks:Hearth",
-      "skills:Lore"
+      "perks:Hearth"
     ],
     "classes:Artificer": [
       "recipes:Forgesource",
@@ -3676,7 +3680,10 @@
       "skills:Basic Shields",
       "skills:Medium Armor",
       "skills:Basic Traps",
-      "classes:Artisan"
+      "classes:Artificer",
+      "classes:Artisan",
+      "classes:Crafter",
+      "classes:Mystic"
     ],
     "powers:Pragmatist": [
       "classes:Artisan",
@@ -3740,8 +3747,6 @@
     "powers:Apt Assistant": [
       "rules-concepts:Instruction",
       "terms:Count",
-      "classes:Artisan",
-      "classes:Crafter",
       "terms:Power"
     ],
     "powers:Custom Creation": [
@@ -4909,6 +4914,7 @@
       "skills:Profession - Apprentice",
       "skills:Extended Capacity - Novice",
       "skills:Basic Martial Weapons",
+      "skills:Two Weapon Style",
       "skills:Basic Medicine",
       "skills:Short Weapons",
       "skills:Basic Faith",
@@ -6544,9 +6550,9 @@
       "terms:Martial Class",
       "skills:Basic Armor",
       "skills:Light Armor",
-      "perks:Connections",
       "skills:Basic Locks",
       "skills:Basic Traps",
+      "perks:Connections",
       "skills:Poisoner",
       "skills:Scavenge I",
       "perks:Contact",
@@ -6999,20 +7005,20 @@
       "classes:Rogue"
     ],
     "powers:Mask of Deception": [
+      "terms:Incantation",
+      "terms:Life Points",
       "effects:Obfuscate",
+      "terms:Delivery",
+      "rules-concepts:Duration",
+      "terms:Refresh",
+      "terms:Accent",
       "terms:Power",
       "effects:Expose",
-      "classes:Rogue",
-      "rules-concepts:Spikes",
-      "modifiers:Self"
-    ],
-    "powers:Trap Sense": [
-      "terms:Life Points",
-      "terms:Power",
       "effects:Death",
       "effects:Drain",
       "modifiers:Final",
       "classes:Rogue",
+      "rules-concepts:Spikes",
       "modifiers:Self",
       "rules-concepts:Traps"
     ],
@@ -7626,10 +7632,9 @@
       "powers:The Right Hand",
       "terms:Spell-slots",
       "terms:Long Rest",
-      "classes:Socialite",
       "terms:Refresh"
     ],
-    "powers:Rise Above This": [
+    "powers:Bodyguards may be inspired and call upon their inner reserves to accomplish more than they thought possible. The Bodyguard may Refresh 1 Novice or Adept Spell Slot after a quick pep talk with the Socialite. Rise Above This": [
       "rules-concepts:“Quick X” Count",
       "powers:The Right Hand",
       "classes:Socialite",
@@ -7890,17 +7895,14 @@
     ],
     "powers:Energy Shield": [
       "rules-concepts:“Quick X” Count",
-      "powers:Arcane Source",
-      "classes:Sourcerer",
-      "terms:Accent",
       "defenses:Protect",
       "skills:Basic Arcane",
-      "domains:Energy",
+      "terms:Accent",
       "terms:Focus",
       "effects:Grant",
       "modifiers:Self"
     ],
-    "powers:Infuriate": [
+    "powers:The Sourcerer throws up a shield of energy to protect themself from the elements. This gives the caster one Protect from the Accent of their Arcane Source. If the Sourcerer has more than one Arcane Accent, they may have a Protect for each of those Accents. Infuriate": [
       "rules-concepts:“Quick X” Count",
       "terms:Short Rest",
       "effects:Provoke",
@@ -8087,7 +8089,6 @@
       "accents:Force"
     ],
     "powers:Bonesplinter": [
-      "terms:Short Rest",
       "terms:Prevented",
       "classes:Sourcerer",
       "effects:Weakness",
@@ -8183,7 +8184,6 @@
       "terms:Spell-slots",
       "accents:Lightning",
       "classes:Sourcerer",
-      "effects:Piercing",
       "effects:Wounding",
       "skills:Basic Arcane",
       "terms:Accent",
@@ -10796,6 +10796,7 @@
     "skills:Two Weapon Style": [
       "skills:Advanced Great Weapon Style",
       "advantages:Lost - Ambidextrous",
+      "classes:Druid",
       "classes:Fighter",
       "powers:Fighting Instructor",
       "powers:Way of the Blade",
@@ -10879,7 +10880,7 @@
       "powers:Rote Invocation",
       "powers:Wild Bolt",
       "powers:Energy Shield",
-      "powers:Infuriate",
+      "powers:The Sourcerer throws up a shield of energy to protect themself from the elements. This gives the caster one Protect from the Accent of their Arcane Source. If the Sourcerer has more than one Arcane Accent, they may have a Protect for each of those Accents. Infuriate",
       "powers:Mass Flux",
       "powers:Whispers of the Unseen",
       "powers:Aether Lance",
@@ -11190,6 +11191,7 @@
     ],
     "skills:Apprentice Alchemy": [
       "skills:Poisoner",
+      "classes:Artisan",
       "powers:A Spoonful of Sugar",
       "recipes:Fortified Cask",
       "archetypes:Ranged Rogue",
@@ -11263,6 +11265,7 @@
     ],
     "skills:Apprentice Enchanting": [
       "perks:Mystic Armorer",
+      "classes:Artisan",
       "powers:Custom Creation",
       "archetypes:Mystic Artisan"
     ],
@@ -11275,6 +11278,7 @@
       "powers:Expert Craft"
     ],
     "skills:Apprentice Ritual Magic": [
+      "classes:Artisan",
       "powers:Adept Ritualist",
       "powers:Ritual Affinity",
       "powers:Practiced Sight",
@@ -11716,6 +11720,7 @@
       "powers:Dispel Magic",
       "powers:Spell Absorption",
       "powers:Toxic Blade",
+      "powers:Mask of Deception",
       "powers:Fortress of the Mind",
       "powers:Grace Under Duress",
       "powers:Hard to Read",
@@ -11726,7 +11731,7 @@
       "powers:Circle of Four",
       "powers:Wild Bolt",
       "powers:Energy Shield",
-      "powers:Infuriate",
+      "powers:The Sourcerer throws up a shield of energy to protect themself from the elements. This gives the caster one Protect from the Accent of their Arcane Source. If the Sourcerer has more than one Arcane Accent, they may have a Protect for each of those Accents. Infuriate",
       "powers:Mass Flux",
       "powers:Whispers of the Unseen",
       "powers:Aether Lance",
@@ -12111,6 +12116,7 @@
       "advantages:Underkin - Darksight",
       "powers:Ensnare",
       "powers:Replicate Enhancement",
+      "powers:Mask of Deception",
       "powers:Time to Go",
       "recipes:Area Trap Augment",
       "rules-concepts:Weapon Delivery",
@@ -12153,7 +12159,7 @@
       "powers:Quick Nap",
       "powers:Retreat",
       "powers:Party Planner",
-      "powers:Rise Above This",
+      "powers:Bodyguards may be inspired and call upon their inner reserves to accomplish more than they thought possible. The Bodyguard may Refresh 1 Novice or Adept Spell Slot after a quick pep talk with the Socialite. Rise Above This",
       "powers:Spirit Chalice",
       "rules-concepts:Carrying",
       "rules-concepts:Stabilized",
@@ -12275,7 +12281,7 @@
       "powers:Grace Under Duress",
       "powers:Commission of Protection",
       "powers:Save the Day",
-      "powers:Rise Above This",
+      "powers:Bodyguards may be inspired and call upon their inner reserves to accomplish more than they thought possible. The Bodyguard may Refresh 1 Novice or Adept Spell Slot after a quick pep talk with the Socialite. Rise Above This",
       "powers:This Is My Bodyguard",
       "powers:Enduring Source",
       "powers:Dissipate Curse",
@@ -12284,7 +12290,7 @@
       "powers:Faded Slumber",
       "powers:Circle of Four",
       "powers:Energy Shield",
-      "powers:Infuriate",
+      "powers:The Sourcerer throws up a shield of energy to protect themself from the elements. This gives the caster one Protect from the Accent of their Arcane Source. If the Sourcerer has more than one Arcane Accent, they may have a Protect for each of those Accents. Infuriate",
       "powers:Whispers of the Unseen",
       "powers:Destructive Resonance",
       "powers:Devastating Eruption",
@@ -12300,6 +12306,7 @@
     ],
     "terms:Helpless": [
       "skills:Combat Medic",
+      "skills:Scavenge I",
       "terms:Dying",
       "conditions:Imprisoned",
       "conditions:Slept",
@@ -12357,6 +12364,7 @@
       "powers:Freeze",
       "powers:Revulsion",
       "powers:Elemental Node",
+      "powers:Mask of Deception",
       "powers:Rotten Tomato",
       "powers:Inspirational Leader",
       "powers:Internal Battery",
@@ -12452,7 +12460,7 @@
       "powers:Catfall",
       "powers:Concealed Dart",
       "powers:Quick Nap",
-      "powers:Trap Sense",
+      "powers:Mask of Deception",
       "powers:Pit Master",
       "powers:Crimson Bargain",
       "recipes:Healing Draught",
@@ -13053,7 +13061,6 @@
       "powers:Precision Throws",
       "powers:Toxic Blade",
       "powers:Mask of Deception",
-      "powers:Trap Sense",
       "powers:Practiced Manner",
       "powers:Heart of the Group",
       "powers:Stern Willed",
@@ -13248,6 +13255,7 @@
       "powers:Sinister Strike",
       "powers:Bloodthirst",
       "powers:Reversal",
+      "powers:Mask of Deception",
       "powers:The Last Toast",
       "powers:Enduring Inspiration",
       "powers:Headliner",
@@ -13516,12 +13524,11 @@
       "powers:Rote Invocation",
       "powers:Additional Source",
       "powers:Interlaced Shell",
-      "powers:Infuriate",
+      "powers:The Sourcerer throws up a shield of energy to protect themself from the elements. This gives the caster one Protect from the Accent of their Arcane Source. If the Sourcerer has more than one Arcane Accent, they may have a Protect for each of those Accents. Infuriate",
       "powers:Destructive Resonance",
       "powers:Galvanic Shield",
       "powers:Icy Veins",
       "powers:Spirit Link",
-      "powers:Bonesplinter",
       "powers:Crimson Bargain",
       "powers:Enduring Corrosion",
       "powers:Everflowing Shield",
@@ -13823,7 +13830,7 @@
       "powers:Rest",
       "powers:Rogue’s Touch",
       "powers:Throat Slit",
-      "powers:Trap Sense",
+      "powers:Mask of Deception",
       "powers:Mark for Death",
       "powers:Spirit Chalice",
       "recipes:Aerial Doom Powder",
@@ -13974,7 +13981,7 @@
       "powers:Grit",
       "powers:Shake It Off II",
       "powers:Ambush",
-      "powers:Trap Sense",
+      "powers:Mask of Deception",
       "powers:Poison Dart",
       "powers:Iron Maiden",
       "powers:Wrack",
@@ -14227,7 +14234,7 @@
       "powers:Soothe",
       "powers:Battlefield Commander",
       "powers:Party Planner",
-      "powers:Rise Above This",
+      "powers:Bodyguards may be inspired and call upon their inner reserves to accomplish more than they thought possible. The Bodyguard may Refresh 1 Novice or Adept Spell Slot after a quick pep talk with the Socialite. Rise Above This",
       "powers:Guard and Savior",
       "recipes:Healing Draught",
       "recipes:Absolution",
@@ -14396,7 +14403,6 @@
       "powers:Soulknife",
       "powers:Warpfire",
       "powers:Devastating Eruption",
-      "powers:Arcane Backlash",
       "powers:Wrack",
       "recipes:Adderstrike Venom",
       "recipes:Holy Oil",
@@ -14423,7 +14429,7 @@
       "powers:Sharp Dagger, Sharper Tongue",
       "powers:Calming Tone",
       "powers:Save the Day",
-      "powers:Infuriate"
+      "powers:The Sourcerer throws up a shield of energy to protect themself from the elements. This gives the caster one Protect from the Accent of their Arcane Source. If the Sourcerer has more than one Arcane Accent, they may have a Protect for each of those Accents. Infuriate"
     ],
     "effects:Rebuild": [
       "effects:Mend",
@@ -16120,7 +16126,7 @@
       "powers:Soulhold Survival",
       "powers:Sap of Life",
       "powers:Practiced Sight",
-      "powers:Trap Sense",
+      "powers:Mask of Deception",
       "powers:The Last Toast",
       "powers:Devastating Eruption",
       "recipes:Lifestrike Sunshine",
@@ -16302,7 +16308,6 @@
       "powers:Reversal",
       "powers:Toxic Blade",
       "powers:Mask of Deception",
-      "powers:Trap Sense",
       "powers:Retreat",
       "powers:Stern Willed",
       "powers:Of Sound Mind",
@@ -16758,7 +16763,6 @@
       "powers:Wrest Control",
       "powers:Inspiring Performance",
       "powers:Circle of Four",
-      "powers:Energy Shield",
       "powers:Devastating Eruption",
       "recipes:Essence Infusion",
       "recipes:Combustion Paint",
@@ -17275,7 +17279,6 @@
       "powers:Opus",
       "powers:A Spoonful of Sugar",
       "powers:Adept Ritualist",
-      "powers:Apt Assistant",
       "powers:Custom Creation",
       "powers:Forged From Steel",
       "powers:Forgesource Specialist",
@@ -17341,6 +17344,7 @@
     ],
     "classes:Artificer": [
       "powers:Living Iron",
+      "powers:The Learned One",
       "powers:Opus",
       "powers:Mesmerize",
       "powers:Studied Focus",
@@ -17349,9 +17353,9 @@
     ],
     "classes:Crafter": [
       "skills:Mastercrafter",
+      "powers:The Learned One",
       "powers:Expert Craft",
       "powers:Opus",
-      "powers:Apt Assistant",
       "powers:Studied Focus",
       "powers:Aesthetic Suggestion",
       "recipes:Sharpening Stone",
@@ -17362,6 +17366,7 @@
       "rules-concepts:Dark Territory"
     ],
     "classes:Mystic": [
+      "powers:The Learned One",
       "powers:Grand Ritualist",
       "powers:Opus",
       "powers:Protected Casting",
@@ -18356,7 +18361,6 @@
       "powers:Toxic Blade",
       "powers:Serious Knots",
       "powers:Mask of Deception",
-      "powers:Trap Sense",
       "powers:Retreat",
       "recipes:Daggerpoint Cognac"
     ],
@@ -18468,7 +18472,6 @@
       "powers:Scarper"
     ],
     "powers:Mask of Deception": [],
-    "powers:Trap Sense": [],
     "powers:Retreat": [
       "conditions:Repelled"
     ],
@@ -18532,8 +18535,7 @@
       "powers:Holding Out For a Hero",
       "powers:Save the Day",
       "powers:It's Not Safe to Go Alone",
-      "powers:Magical Empowerment",
-      "powers:Rise Above This",
+      "powers:Bodyguards may be inspired and call upon their inner reserves to accomplish more than they thought possible. The Bodyguard may Refresh 1 Novice or Adept Spell Slot after a quick pep talk with the Socialite. Rise Above This",
       "powers:Steel Yourself",
       "powers:Training Regiment",
       "powers:Hidden Weapon",
@@ -18685,7 +18687,7 @@
       "powers:Holding Out For a Hero",
       "powers:It's Not Safe to Go Alone",
       "powers:Magical Empowerment",
-      "powers:Rise Above This",
+      "powers:Bodyguards may be inspired and call upon their inner reserves to accomplish more than they thought possible. The Bodyguard may Refresh 1 Novice or Adept Spell Slot after a quick pep talk with the Socialite. Rise Above This",
       "powers:Steel Yourself",
       "powers:Training Regiment",
       "powers:Hidden Weapon",
@@ -18710,7 +18712,7 @@
     ],
     "powers:It's Not Safe to Go Alone": [],
     "powers:Magical Empowerment": [],
-    "powers:Rise Above This": [],
+    "powers:Bodyguards may be inspired and call upon their inner reserves to accomplish more than they thought possible. The Bodyguard may Refresh 1 Novice or Adept Spell Slot after a quick pep talk with the Socialite. Rise Above This": [],
     "powers:Steel Yourself": [
       "archetypes:Support Socialite"
     ],
@@ -18740,7 +18742,6 @@
       "powers:Charge",
       "powers:Circle of Four",
       "powers:Wild Bolt",
-      "powers:Energy Shield",
       "powers:Mass Flux",
       "powers:Synergistic Transfer",
       "powers:Whispers of the Unseen",
@@ -18782,7 +18783,6 @@
       "powers:Additional Source",
       "powers:Accent Substantiation",
       "powers:Wild Bolt",
-      "powers:Energy Shield",
       "powers:Spirit Link",
       "recipes:Enchant Source",
       "archetypes:Blaster Sourcerer"
@@ -18819,7 +18819,7 @@
       "archetypes:Blaster Sourcerer"
     ],
     "powers:Energy Shield": [],
-    "powers:Infuriate": [],
+    "powers:The Sourcerer throws up a shield of energy to protect themself from the elements. This gives the caster one Protect from the Accent of their Arcane Source. If the Sourcerer has more than one Arcane Accent, they may have a Protect for each of those Accents. Infuriate": [],
     "powers:Mass Flux": [],
     "powers:Synergistic Transfer": [],
     "powers:Whispers of the Unseen": [],
@@ -19336,6 +19336,7 @@
       "powers:Hush",
       "powers:Back Alley Deals",
       "powers:Breach",
+      "powers:Mask of Deception",
       "powers:Aesthetic Suggestion",
       "powers:Rote Invocation",
       "powers:Mass Flux",
@@ -19475,14 +19476,14 @@
       "powers:Let’s You and Them Fight",
       "powers:Commission of Protection",
       "powers:Save the Day",
-      "powers:Rise Above This",
+      "powers:Bodyguards may be inspired and call upon their inner reserves to accomplish more than they thought possible. The Bodyguard may Refresh 1 Novice or Adept Spell Slot after a quick pep talk with the Socialite. Rise Above This",
       "powers:This Is My Bodyguard",
       "powers:Enduring Source",
       "powers:Dissipate Curse",
       "powers:Additional Source",
       "powers:Circle of Four",
       "powers:Energy Shield",
-      "powers:Infuriate",
+      "powers:The Sourcerer throws up a shield of energy to protect themself from the elements. This gives the caster one Protect from the Accent of their Arcane Source. If the Sourcerer has more than one Arcane Accent, they may have a Protect for each of those Accents. Infuriate",
       "powers:Synergistic Transfer",
       "powers:Whispers of the Unseen",
       "powers:Destructive Resonance",
@@ -19997,7 +19998,7 @@
       "powers:Knight’s Strength",
       "powers:Ghost Hand",
       "powers:Mine",
-      "powers:Trap Sense",
+      "powers:Mask of Deception",
       "powers:Aesthetic Suggestion",
       "powers:Curiosity Killed the Cat",
       "recipes:Eternal Ink",
@@ -23961,12 +23962,6 @@
       "levels": [],
       "other": []
     },
-    "powers:Trap Sense": {
-      "skills": [],
-      "anyOf": [],
-      "levels": [],
-      "other": []
-    },
     "powers:Retreat": {
       "skills": [],
       "anyOf": [],
@@ -24333,7 +24328,7 @@
       "levels": [],
       "other": []
     },
-    "powers:Rise Above This": {
+    "powers:Bodyguards may be inspired and call upon their inner reserves to accomplish more than they thought possible. The Bodyguard may Refresh 1 Novice or Adept Spell Slot after a quick pep talk with the Socialite. Rise Above This": {
       "skills": [],
       "anyOf": [],
       "levels": [],
@@ -24483,7 +24478,7 @@
       "levels": [],
       "other": []
     },
-    "powers:Infuriate": {
+    "powers:The Sourcerer throws up a shield of energy to protect themself from the elements. This gives the caster one Protect from the Accent of their Arcane Source. If the Sourcerer has more than one Arcane Accent, they may have a Protect for each of those Accents. Infuriate": {
       "skills": [],
       "anyOf": [],
       "levels": [],
@@ -24970,15 +24965,22 @@
       "skills:Basic Martial Weapons",
       "skills:Short Weapons",
       "skills:Basic Armor",
+      "skills:Apprentice Alchemy",
+      "skills:Apprentice Ritual Magic",
+      "skills:Apprentice Enchanting",
+      "skills:Apprentice Tinkering",
       "skills:Basic Medicine",
       "perks:Hearth",
       "perks:Soothing Touch"
     ],
     "powers:The Learned One": [
+      "skills:Basic Shields",
       "skills:Basic Traps",
       "skills:Medium Armor",
+      "skills:Journeyman Alchemy",
       "skills:Journeyman Enchanting",
       "skills:Journeyman Tinkering",
+      "skills:Advanced Medicine",
       "skills:Journeyman Ritual Magic"
     ],
     "powers:Expert Craft": [
@@ -25034,6 +25036,7 @@
       "skills:Basic Martial Weapons",
       "skills:Basic Faith",
       "skills:Short Weapons",
+      "skills:Two Weapon Style",
       "skills:Peacecaster",
       "skills:Basic Medicine"
     ],
@@ -25086,7 +25089,9 @@
       "skills:Short Weapons",
       "skills:Scavenge I",
       "skills:Fence",
+      "skills:Basic Traps",
       "skills:Poisoner",
+      "skills:Basic Locks",
       "perks:Connections",
       "perks:Contact"
     ],
@@ -25161,7 +25166,8 @@
       "advantages:Oaksworn - Shepherd of Life"
     ],
     "skills:Basic Locks": [
-      "advantages:Ogrim - Bone to Pick"
+      "advantages:Ogrim - Bone to Pick",
+      "classes:Rogue"
     ],
     "perks:Mystic Armorer": [
       "advantages:Underkin - Iron Touch"
@@ -25192,6 +25198,23 @@
       "classes:Rogue",
       "classes:Socialite"
     ],
+    "skills:Apprentice Alchemy": [
+      "classes:Artisan",
+      "powers:A Spoonful of Sugar"
+    ],
+    "skills:Apprentice Ritual Magic": [
+      "classes:Artisan",
+      "powers:Adept Ritualist",
+      "powers:Ritual Affinity"
+    ],
+    "skills:Apprentice Enchanting": [
+      "classes:Artisan",
+      "powers:Custom Creation"
+    ],
+    "skills:Apprentice Tinkering": [
+      "classes:Artisan",
+      "powers:Forgesource Specialist"
+    ],
     "skills:Basic Medicine": [
       "classes:Artisan",
       "classes:Cleric",
@@ -25203,17 +25226,30 @@
     "perks:Soothing Touch": [
       "classes:Artisan"
     ],
+    "skills:Basic Shields": [
+      "powers:The Learned One",
+      "powers:Shield Bearer",
+      "classes:Cleric",
+      "classes:Fighter"
+    ],
     "skills:Basic Traps": [
-      "powers:The Learned One"
+      "powers:The Learned One",
+      "classes:Rogue"
     ],
     "skills:Medium Armor": [
       "powers:The Learned One",
       "powers:Linked Armor"
     ],
+    "skills:Journeyman Alchemy": [
+      "powers:The Learned One"
+    ],
     "skills:Journeyman Enchanting": [
       "powers:The Learned One"
     ],
     "skills:Journeyman Tinkering": [
+      "powers:The Learned One"
+    ],
+    "skills:Advanced Medicine": [
       "powers:The Learned One"
     ],
     "skills:Journeyman Ritual Magic": [
@@ -25227,24 +25263,6 @@
     ],
     "skills:Greater Tinkering": [
       "powers:Expert Craft"
-    ],
-    "skills:Apprentice Alchemy": [
-      "powers:A Spoonful of Sugar"
-    ],
-    "skills:Apprentice Ritual Magic": [
-      "powers:Adept Ritualist",
-      "powers:Ritual Affinity"
-    ],
-    "skills:Apprentice Enchanting": [
-      "powers:Custom Creation"
-    ],
-    "skills:Apprentice Tinkering": [
-      "powers:Forgesource Specialist"
-    ],
-    "skills:Basic Shields": [
-      "powers:Shield Bearer",
-      "classes:Cleric",
-      "classes:Fighter"
     ],
     "perks:Medium": [
       "powers:Spirit Guide"
@@ -25285,6 +25303,11 @@
     "powers:Holy Rest": [
       "powers:Prayer of Rest"
     ],
+    "skills:Two Weapon Style": [
+      "classes:Druid",
+      "classes:Fighter",
+      "powers:Way of the Blade"
+    ],
     "skills:Projectile Weapons": [
       "powers:Hunter",
       "classes:Fighter"
@@ -25292,10 +25315,6 @@
     "skills:Light Armor": [
       "classes:Fighter",
       "classes:Rogue"
-    ],
-    "skills:Two Weapon Style": [
-      "classes:Fighter",
-      "powers:Way of the Blade"
     ],
     "skills:Great Weapons": [
       "classes:Fighter"
