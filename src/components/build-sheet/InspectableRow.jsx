@@ -15,7 +15,6 @@
 // re-implements isFocused, or injects an InlineDetail. Chasing concept links from
 // within the detail body still routes to the drawer (handled by EntityBody's
 // onInspect = onChase, wired once in InlineDetail).
-import React from "react";
 import { useBuilderState, useBuilderActions } from "../builder-context.jsx";
 import InlineDetail from "./InlineDetail.jsx";
 

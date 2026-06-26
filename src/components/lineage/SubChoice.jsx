@@ -13,7 +13,7 @@
 //               grants the chosen spell as a Known Spell.
 //   'flavor'  — free pick with no mechanical effect (Elemental Expression accent,
 //               Favored Gem). Stored in advantageChoices[item]; display only.
-import React, { useState } from "react";
+import { useState } from "react";
 import { cantripOptions, lineageSpellOptions } from "../../engine/data.js";
 import RepPicker from "./RepPicker.jsx";
 import SubSelect from "../SubSelect.jsx";

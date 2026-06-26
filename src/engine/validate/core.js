@@ -13,8 +13,8 @@
 //
 // Pure functions, no React. Re-exported by the validate.js barrel.
 
-import { LEVEL_TABLE, lookupEntity, REFS, CLASS_POWERS, CLASS_PROGRESSION, CLASS_POWER_SLOTS, EVENTS_TABLE, CLASSES } from '../data.js';
-import { cleanItemName, bareSkill, resolveId, entityType, getClasses, primaryClass } from '../resolver.js';
+import { LEVEL_TABLE, lookupEntity, CLASS_POWERS, CLASS_PROGRESSION, CLASS_POWER_SLOTS, EVENTS_TABLE, CLASSES } from '../data.js';
+import { cleanItemName, bareSkill, resolveId, entityType, getClasses } from '../resolver.js';
 
 import {
   MAX_LBP, MAX_FLAW_BP, BACKSTORY_BP, MAX_DOMAINS, DEFAULT_WEALTH, LEVEL_CAP
@@ -36,12 +36,12 @@ export const subKey = (s) => String(s || '').split(' (')[0].trim().toLowerCase()
 
 import {
   BP_FIELDS, BP_POWER_FIELDS, MARTIAL_SLOT_FIELDS, CASTER_SLOT_FIELDS,
-  ENTITY_FIELDS, CLASS_POWER_TIERS, POWER_SOURCE_FIELDS
+  ENTITY_FIELDS, CLASS_POWER_TIERS, POWER_SOURCE_FIELDS, GENERIC_POWER_FIELDS
 } from '../config.js';
 
 export {
   BP_FIELDS, BP_POWER_FIELDS, MARTIAL_SLOT_FIELDS, CASTER_SLOT_FIELDS,
-  ENTITY_FIELDS, CLASS_POWER_TIERS, POWER_SOURCE_FIELDS
+  ENTITY_FIELDS, CLASS_POWER_TIERS, POWER_SOURCE_FIELDS, GENERIC_POWER_FIELDS
 };
 
 // ─── Class / level primitives ───────────────────────────────────────────────

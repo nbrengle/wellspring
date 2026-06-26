@@ -14,7 +14,7 @@
     "doc:feedback": "node scripts/linker/doc-feedback.js",
     "test": "node --import ./scripts/register-json.mjs scripts/test.mjs && node --import ./scripts/register-json.mjs scripts/test-rules-enforcement.mjs && node scripts/test-browser.mjs",
     "shot": "node scripts/debug/shot.mjs",
-    "lint:js": "eslint .",
+    "lint:js": "eslint . --max-warnings=0",
     "lint:css": "stylelint '**/*.css'",
     "lint": "npm run lint:js && npm run lint:css",
     "format": "prettier --write ."
@@ -31,6 +31,7 @@
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.3",
+    "eslint-plugin-unused-imports": "^4.4.1",
     "globals": "^17.6.0",
     "playwright": "^1.60.0",
     "prettier": "^3.8.4",

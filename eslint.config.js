@@ -3,6 +3,7 @@ import globals from "globals";
 import react from "eslint-plugin-react";
 import reactHooks from "eslint-plugin-react-hooks";
 import reactRefresh from "eslint-plugin-react-refresh";
+import unusedImports from "eslint-plugin-unused-imports";
 import { defineConfig, globalIgnores } from "eslint/config";
 
 export default defineConfig([
@@ -21,9 +22,17 @@ export default defineConfig([
       parserOptions: { ecmaFeatures: { jsx: true } },
     },
     settings: { react: { version: "detect" } },
+    plugins: { "unused-imports": unusedImports },
     rules: {
       "react/prop-types": "off",
-      "no-unused-vars": "warn",
+      // unused-imports/no-unused-imports is auto-fixable (strips dead imports);
+      // its no-unused-vars handles the rest, ignoring intentional _-prefixed args.
+      "no-unused-vars": "off",
+      "unused-imports/no-unused-imports": "error",
+      "unused-imports/no-unused-vars": ["warn", {
+        vars: "all", varsIgnorePattern: "^_",
+        args: "after-used", argsIgnorePattern: "^_",
+      }],
       "react/no-unescaped-entities": "off",
       "react-refresh/only-export-components": "off",
       "react-hooks/rules-of-hooks": "warn",

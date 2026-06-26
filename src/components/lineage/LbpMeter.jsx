@@ -8,7 +8,6 @@
 // Calm by design: overspending reads as a neutral errand (amber), never an error —
 // taking several advantages in a row should never feel like a mistake. Sublineage /
 // required-item gaps surface as quiet notes beneath.
-import React from "react";
 
 export default function LbpMeter({ lbp, costume }) {
   const { awarded, spent, remaining, cap, capped, bonusLbp } = lbp;

@@ -1,9 +1,9 @@
 // Step 1 — Browse (pain #5: discovery). A searchable/sortable gallery of lineage
 // cards, each surfacing lore, the costuming cost, and its sublineages, so you can
 // learn what a lineage IS before committing.
-import React, { useState, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { LINEAGES } from "../../engine/data.js";
-import { lineageTagline, parseSublineage } from "./lineage-helpers.js";
+import { lineageTagline } from "./lineage-helpers.js";
 
 export default function LineageGallery({ onPick }) {
   const [query, setQuery] = useState("");

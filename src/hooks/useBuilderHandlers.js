@@ -1,17 +1,12 @@
 import { useCallback } from "react";
 import {
-  DEVOTIONS,
-  DOMAINS,
   CLASS_POWER_SLOTS,
   CLASSES,
-  UNLIMITED_SKILLS,
-  LEVEL_TABLE,
-  LINEAGES,
 } from "../engine/data.js";
 import { EVENTS_TABLE } from "../engine/validate.js";
 import { getClasses } from "../engine/resolver.js";
 import { EMPTY_CHARACTER, applyClassStartingAbilities, loadArchetype } from "../engine/character-state.js";
-import { powerPickerSpec, entityPickerSpec } from "./usePickers.js";
+import { entityPickerSpec } from "./usePickers.js";
 import { usePickers } from "./usePickers.js";
 import { useCoreHandlers } from "./handlers/useCoreHandlers.js";
 import { useIdentityHandlers } from "./handlers/useIdentityHandlers.js";
@@ -26,9 +21,8 @@ export function useBuilderHandlers({
   setChase,
   setPicking,
   setHistory,
-  setLineageOpen,
+  setLineageOpen: _setLineageOpen,
 }) {
-  const subKey = (n) => (n || "general").toLowerCase().replace(/[^a-z0-9]+/g, "-");
 
   const handlePickArchetype = useCallback((archetype) => {
     setCharacter(loadArchetype(archetype));
@@ -170,7 +164,10 @@ export function useBuilderHandlers({
   const _handleAddClass = classHandlers.handleAddClass;
   const _handleRemoveClass = classHandlers.handleRemoveClass;
 
-  const handleAddClass = useCallback((name) => _handleAddClass(name), [_handleAddClass]);
+  const handleAddClass = useCallback((name) => {
+    _handleAddClass(name);
+    setPicking(null);
+  }, [_handleAddClass, setPicking]);
   const handleRemoveClass = useCallback(
     (name) => _handleRemoveClass(name, {
       utility: "utilityPowers",
@@ -229,15 +226,17 @@ export function useBuilderHandlers({
 
   const handleClickIdentityField = useCallback(
     (field) => {
-      if (field === "class") {
-        const primary = getClasses(character)[0]?.name;
-        if (primary) handleInspect(primary, null, "classes");
-        return;
-      }
-      const item = character[field];
-      if (item) handleInspect(item, null, field);
+      // Identity-rail items (class, devotion) have no inline-detail anchor in the
+      // rail, so handleInspect's inline `view` would never render. Promote to the
+      // chase DRAWER (the right DetailPane) instead — that's where these resolve and
+      // display. Map the field name to the registry's entity type (plural) so the
+      // lookup hits: "devotion" → "devotions", "class" → "classes".
+      const RESOLVE_TYPE = { devotion: "devotions", class: "classes" };
+      const resolveType = RESOLVE_TYPE[field] || field;
+      const item = field === "class" ? getClasses(character)[0]?.name : character[field];
+      if (item) handleChase(item, null, resolveType);
     },
-    [character, handleInspect],
+    [character, handleChase],
   );
 
 

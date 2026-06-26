@@ -1,68 +1,37 @@
 // Builder — single-page character creator. State lives in the URL.
 // Decomposed into modular subcomponents in src/components/ directory.
 
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
-  DEVOTIONS,
-  DOMAINS,
-  ALL_SKILLS,
-  ALL_PERKS,
-  ALL_FLAWS,
-  CLASS_POWER_SLOTS,
-  CLASSES,
   META,
-  UNLIMITED_SKILLS,
   LEVEL_TABLE,
-  LINEAGES,
-  eligiblePowers,
 } from "./engine/data.js";
 import {
-  validate,
   characterLevel,
-  pickClass,
-  MAX_DOMAINS,
-  EVENTS_TABLE,
-  getMaxRanks,
   validityReasons,
-  subKey,
 } from "./engine/validate.js";
-import { bareSkill, cleanItemName, getClasses } from "./engine/resolver.js";
+import { getClasses } from "./engine/resolver.js";
 import {
-  STARTING_CHOICES_CONFIG,
   hasStartingChoices,
   reconcileStartingChoices,
   rebuildStartingSkills,
 } from "./engine/starting-choices.js";
-import { EMPTY_CHARACTER, applyClassStartingAbilities, loadArchetype } from "./engine/character-state.js";
 import { useCharacterState } from "./hooks/useCharacterState.js";
 import { useBuilderHandlers } from "./hooks/useBuilderHandlers.js";
 import RulesExplorer from "./RulesExplorer.jsx";
 import RecipeChecker from "./RecipeChecker.jsx";
-import { usePickers, powerPickerSpec, entityPickerSpec } from "./hooks/usePickers.js";
 import "./Builder.css";
 
 // Components
-import LineagePanel, { cleanChallengeName } from "./components/LineagePanel.jsx";
-import { requiredChallengeNames } from "./components/lineage/lineage-helpers.js";
+import LineagePanel from "./components/LineagePanel.jsx";
 import ExportImportPanel from "./components/ExportImportPanel.jsx";
 import PickerOverlay from "./components/PickerOverlay.jsx";
-import DetailPane, { formatParameterizedName } from "./components/DetailPane.jsx";
+import DetailPane from "./components/DetailPane.jsx";
 import BuildSheet, { IdentityRail } from "./components/BuildSheet.jsx";
 import { BuilderProvider } from "./components/builder-context.jsx";
 
-// ─── SLOT MODEL ──────────────────────────────────────────────────────────────
-const SLOT_FIELD = {
-  utility: "utilityPowers",
-  basic: "basicPowers",
-  advanced: "advancedPowers",
-  veteran: "veteranPowers",
-  cantrips: "cantrips",
-  spellsKnown: "noviceSpells",
-};
-
 const MAX_LEVEL = LEVEL_TABLE.length ? Math.max(...LEVEL_TABLE.map((l) => l.level)) : 15;
 const MIN_LEVEL = 1;
-const LEVEL_CAP = 10;
 
 // ─── ROOT COMPONENT ─────────────────────────────────────────────────────────
 

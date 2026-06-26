@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import { useBuilderState, useBuilderActions } from "../builder-context.jsx";
+import { useState } from "react";
 import { grantSourceRole } from "./utils.js";
 
 export function Stat({ label, value, title }) {

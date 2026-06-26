@@ -1,6 +1,5 @@
 // Right panel: the inspected recipe's reading pane — facts, ingredient list (with
 // raw/crafted badges), description/effect/process, and "add to inventory".
-import React from "react";
 import { IngredientKind } from "./shared.jsx";
 
 export default function RecipeDetail({ recipe, onInspect, onAddCrafted }) {

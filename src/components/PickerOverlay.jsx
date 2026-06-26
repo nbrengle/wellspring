@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef, useLayoutEffect } from "react";
+import { useState, useMemo, useRef, useLayoutEffect } from "react";
 import { lookupEntity, UNLIMITED_SKILLS } from '../engine/data.js';
 import { prereqStatus } from "../engine/validate.js";
 import { browse, gameEffectAxes, axisApplies, otherBuckets } from "./browse/browse.js";
@@ -20,7 +20,6 @@ function CostBadge({ cost }) {
 }
 
 
-
 const refreshBucket = (c) => {
   const r = (c.refresh || "").toLowerCase();
   if (!r || r === "none" || r === "passive") return "Passive";
@@ -40,7 +39,12 @@ const SURFACE_AXES = [
   { id: "category",     label: "Category", key: (c) => c.cat || c.tierList || "Other" },
   { id: "refresh",      label: "Refresh",  key: refreshBucket },
   { id: "alphabetical", label: "A–Z",      key: (c) => (c.name[0] || "#").toUpperCase() },
-  { id: "cost",         label: "Cost",     key: (c) => (typeof c.cost === "number" ? `${c.cost} BP` : "—") },
+  { 
+    id: "cost",
+    label: "Cost",
+    key: (c) => (typeof c.cost === "number" ? `${c.cost} BP` : "—"),
+    order: (bucket) => parseInt(bucket, 10) || 999 
+  },
 ];
 
 export default function PickerOverlay({ spec, character, onClose }) {
@@ -54,6 +58,7 @@ export default function PickerOverlay({ spec, character, onClose }) {
   const [selected, setSelected] = useState(candidates[0]?.name || null);
   const isSpells = candidates.some((c) => c.tierList && SPELL_TIER_BUCKET[c.tierList]);
   const hasRefresh = candidates.some((c) => c.refresh && c.refresh !== "None");
+  const hasCost = candidates.some((c) => c.cost != null);
   const [groupMode, setGroupMode] = useState(isSpells ? "tier" : hasRefresh ? "refresh" : "category");
   const [sortMode, setSortMode] = useState("name");
   const [readStack, setReadStack] = useState([]);
@@ -75,11 +80,11 @@ export default function PickerOverlay({ spec, character, onClose }) {
   // they don't clutter a skill/perk picker.
   const allAxes = useMemo(
     () => [
-      ...SURFACE_AXES,
+      ...SURFACE_AXES.filter((a) => a.id !== "cost" || hasCost),
       { id: "tags", label: "Tags", multi: true, keys: (c) => entityOf.get(c.name)?.tags || [], placeholder: "Untagged" },
       ...gameEffectAxes(() => entityType)
     ],
-    [entityType, entityOf],
+    [entityType, entityOf, hasCost],
   );
   const availableAxes = useMemo(
     () => allAxes.filter((a) => axisApplies(a, candidates)),
@@ -157,7 +162,7 @@ export default function PickerOverlay({ spec, character, onClose }) {
                 <label className="b-picker-sortlabel">Sort
                   <select className="b-picker-sortsel" value={sortMode} onChange={(e) => setSortMode(e.target.value)}>
                     <option value="name">A–Z</option>
-                    <option value="cost">Cost</option>
+                    {hasCost && <option value="cost">Cost</option>}
                     <option value="effect">Effect richness</option>
                   </select>
                 </label>

@@ -60,10 +60,23 @@ export const ENTITY_FIELDS = [
   'domainPowers', 'formPowers',
 ];
 
+// Every character field that stores a POWER entity. Used as a MEMBERSHIP set —
+// "is this field a power field?" (e.g. to classify or skip it). Not all of these
+// should be blindly ITERATED to materialize owned items: see GENERIC_POWER_FIELDS.
 export const POWER_SOURCE_FIELDS = [
   'innatePowers', 'utilityPowers', 'basicPowers', 'advancedPowers',
   'veteranPowers', 'classPowers', 'rightHandPowers', 'domainPowers', 'formPowers',
   'cantrips', 'noviceSpells', 'adeptSpells', 'greaterSpells', 'bookSpells',
 ];
+
+// Fields whose stored entries the GENERIC "walk the field and add an owned item"
+// loop should materialize. This excludes any power field that has a DEDICATED
+// derivation owning it end-to-end — `innatePowers` is fully resolved by
+// activeInnatePowers() (it merges class-granted + stored innates, deduped), so
+// iterating it generically too would double-count every stored innate power.
+export const FIELDS_WITH_DEDICATED_HANDLER = new Set(['innatePowers']);
+export const GENERIC_POWER_FIELDS = POWER_SOURCE_FIELDS.filter(
+  (f) => !FIELDS_WITH_DEDICATED_HANDLER.has(f),
+);
 
 export const CLASS_POWER_TIERS = new Set(['Class', 'classSkills']);

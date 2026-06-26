@@ -11,7 +11,7 @@ import { cleanItemName, resolveId, getClasses, bareSkill } from '../resolver.js'
 import { SPELL_TIERS, SLOT_CATS, BOOKCASTER_TIER_FIELD, KNOWN_SPELL_FIELDS } from '../config.js';
 import {
   rankOf, pickClass, countPicksForClass, progressionRow,
-  activeInnatePowers, CASTER_SLOT_FIELDS, MARTIAL_SLOT_FIELDS, POWER_SOURCE_FIELDS
+  activeInnatePowers, CASTER_SLOT_FIELDS, MARTIAL_SLOT_FIELDS, GENERIC_POWER_FIELDS
 } from './core.js';
 
 // Skills whose grant is scoped to a CLASS the player must choose — and the choice
@@ -72,8 +72,10 @@ export function slotGrants(character, sources = null) {
   // 1. Purchased / starting skills that grant slots (Additional Cantrip,
   //    Extended Capacity, Spell-Scholar). The grants are parser-extracted
   //    (ent.slotGrants); attribute each to the relevant class and multiply by the
-  //    item's rank ("Extended Capacity - Novice x2" → +2).
-  for (const field of ['startingSkills', 'purchasedSkills', ...POWER_SOURCE_FIELDS]) {
+  //    item's rank ("Extended Capacity - Novice x2" → +2). innatePowers is excluded
+  //    (GENERIC_POWER_FIELDS) — innate slot grants are handled by the
+  //    activeInnatePowers() loop below; iterating them here too would double-count.
+  for (const field of ['startingSkills', 'purchasedSkills', ...GENERIC_POWER_FIELDS]) {
     (character[field] || []).forEach((item, idx) => {
       const clean = cleanItemName(item);
       const bare = bareSkill(clean);
@@ -279,7 +281,6 @@ export function spellSlots(character) {
   const primaryType = CLASSES[casters[0].name]?.magicType || 'Unknown';
   if (!pools[primaryType]) pools[primaryType] = { novice: 0, adept: 0, greater: 0 };
 
-  const spellTiers = new Set(SPELL_TIERS);
   let highestSlots = []; // array of target pool strings
   const applySpellGrants = (ent, rank = 1, itemName = null) => {
     if (!ent) return;

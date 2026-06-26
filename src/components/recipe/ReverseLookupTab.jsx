@@ -1,5 +1,4 @@
 // "Reverse Lookup" tab: pick an ingredient/resource, list every recipe that uses it.
-import React from "react";
 import { REVERSE_LOOKUP } from "../../engine/recipe-solver.js";
 import { STANDARD_RESOURCES } from "./shared.jsx";
 

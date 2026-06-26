@@ -1,4 +1,3 @@
-import React from "react";
 import { useBuilderState, useBuilderActions } from "../builder-context.jsx";
 import { StatWithSources, Stat } from "./SharedUI.jsx";
 import { statTitle, statSources, sourceType, CLASS_TONES } from "./utils.js";
@@ -16,14 +15,9 @@ export function IdentityRail() {
     onSetClassLevel,
     onRemoveClass,
     onAddClass,
-    onPickDevotion,
-    onToggleDomain,
-    onClearDevotion,
     onOpenLineage,
-    onToggleBackstory,
     onInspect,
     onSetEvent,
-    onSetExtraBP,
   } = useBuilderActions();
   const classes = getClasses(character);
   return (
