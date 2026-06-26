@@ -296,10 +296,16 @@ export function resolveCharacterGraph(character) {
   // Resolve to the canonical BASE name (strips both "(param)" and " - param" forms),
   // so a granted "Weapon Specialization - Swords" and an owned "Weapon Specialization
   // (Daggers)" collapse to the same key.
+  // Dedup key for grant materialization: the base entity name PLUS any parameter,
+  // so two parameterized grants of the same base skill stay distinct (Lessons from
+  // Scars grants Lore (Historical) AND Lore (Noble) — keying on bare "Lore" would
+  // collapse them to one). A grant still dedups against an identical-param purchase.
   const bareKey = (name, ent) => {
-    const e = ent || lookupEntity(`skills:${cleanItemName(name)}`) || lookupEntity(`powers:${cleanItemName(name)}`);
-    const base = e?.baseName || e?.name || bareSkill(cleanItemName(name));
-    return base.toLowerCase();
+    const clean = cleanItemName(name);
+    const e = ent || lookupEntity(`skills:${clean}`) || lookupEntity(`powers:${clean}`);
+    const base = (e?.baseName || e?.name || bareSkill(clean)).toLowerCase();
+    const paramM = clean.match(/\(([^)]+)\)\s*$/) || clean.match(/\s-\s([^()]+)$/);
+    return paramM ? `${base}|${paramM[1].trim().toLowerCase()}` : base;
   };
   const ownedKeys = new Set(items
     .filter((it) => it.sourceType !== 'lineage')

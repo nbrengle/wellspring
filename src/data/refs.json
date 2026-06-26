@@ -25003,9 +25003,6 @@
     "powers:Shield Bearer": [
       "skills:Basic Shields"
     ],
-    "powers:Spirit Guide": [
-      "perks:Medium"
-    ],
     "powers:Detonate": [
       "powers:Explosive Impact"
     ],
@@ -25013,10 +25010,8 @@
       "powers:Curious Balm"
     ],
     "classes:Cleric": [
-      "skills:Basic Faith",
       "skills:Worship",
       "skills:Basic Martial Weapons",
-      "skills:Basic Armor",
       "skills:Short Weapons",
       "skills:Basic Medicine",
       "skills:Diagnose",
@@ -25033,8 +25028,7 @@
       "powers:Holy Rest"
     ],
     "classes:Druid": [
-      "skills:Basic Martial Weapons",
-      "skills:Basic Faith",
+      "skills:Lore (Nature)",
       "skills:Short Weapons",
       "skills:Two Weapon Style",
       "skills:Peacecaster",
@@ -25044,11 +25038,10 @@
       "skills:Projectile Weapons"
     ],
     "classes:Fighter": [
-      "skills:Basic Martial Weapons",
       "skills:Basic Shields",
-      "skills:Basic Armor",
       "skills:Light Armor",
       "skills:Projectile Weapons",
+      "skills:Lore (Historical)",
       "skills:Short Weapons",
       "skills:Advanced Shields",
       "skills:Two Weapon Style",
@@ -25057,6 +25050,10 @@
     "powers:Execute": [
       "perks:Hard to Kill",
       "perks:Carnal Creature"
+    ],
+    "powers:Lessons from Scars": [
+      "skills:Lore (Historical)",
+      "skills:Lore (Noble)"
     ],
     "powers:Linked Armor": [
       "skills:Medium Armor"
@@ -25072,21 +25069,18 @@
       "skills:Ironclad Armor"
     ],
     "classes:Mage": [
-      "skills:Basic Arcane",
       "skills:Library Use",
       "skills:Bookcaster",
       "skills:Advanced Recharge",
+      "skills:Lore (Arcane)",
       "skills:Additional Cantrip"
     ],
     "powers:Gift of Solitude": [
       "powers:Alone But Not Lonely"
     ],
     "classes:Rogue": [
-      "skills:Basic Martial Weapons",
       "skills:Thrown Weapons",
-      "skills:Basic Armor",
       "skills:Light Armor",
-      "skills:Short Weapons",
       "skills:Scavenge I",
       "skills:Fence",
       "skills:Basic Traps",
@@ -25107,10 +25101,8 @@
       "skills:Weapon Specialization"
     ],
     "classes:Socialite": [
-      "skills:Basic Martial Weapons",
       "skills:Library Use",
       "skills:Poisoner",
-      "skills:Basic Armor",
       "skills:Fence",
       "perks:Contact",
       "perks:Title",
@@ -25128,7 +25120,6 @@
       "powers:Concealed Weapon"
     ],
     "classes:Sourcerer": [
-      "skills:Basic Arcane",
       "skills:Warcaster",
       "skills:Additional Cantrip"
     ]
@@ -25177,26 +25168,17 @@
     ],
     "skills:Basic Martial Weapons": [
       "classes:Artisan",
-      "classes:Cleric",
-      "classes:Druid",
-      "classes:Fighter",
-      "classes:Rogue",
-      "classes:Socialite"
+      "classes:Cleric"
     ],
     "skills:Short Weapons": [
       "classes:Artisan",
       "classes:Cleric",
       "classes:Druid",
       "classes:Fighter",
-      "classes:Rogue",
       "classes:Socialite"
     ],
     "skills:Basic Armor": [
-      "classes:Artisan",
-      "classes:Cleric",
-      "classes:Fighter",
-      "classes:Rogue",
-      "classes:Socialite"
+      "classes:Artisan"
     ],
     "skills:Apprentice Alchemy": [
       "classes:Artisan",
@@ -25264,18 +25246,11 @@
     "skills:Greater Tinkering": [
       "powers:Expert Craft"
     ],
-    "perks:Medium": [
-      "powers:Spirit Guide"
-    ],
     "powers:Explosive Impact": [
       "powers:Detonate"
     ],
     "powers:Curious Balm": [
       "powers:Strange Token"
-    ],
-    "skills:Basic Faith": [
-      "classes:Cleric",
-      "classes:Druid"
     ],
     "skills:Worship": [
       "classes:Cleric"
@@ -25303,6 +25278,9 @@
     "powers:Holy Rest": [
       "powers:Prayer of Rest"
     ],
+    "skills:Lore (Nature)": [
+      "classes:Druid"
+    ],
     "skills:Two Weapon Style": [
       "classes:Druid",
       "classes:Fighter",
@@ -25316,6 +25294,10 @@
       "classes:Fighter",
       "classes:Rogue"
     ],
+    "skills:Lore (Historical)": [
+      "classes:Fighter",
+      "powers:Lessons from Scars"
+    ],
     "skills:Great Weapons": [
       "classes:Fighter"
     ],
@@ -25324,6 +25306,9 @@
     ],
     "perks:Carnal Creature": [
       "powers:Execute"
+    ],
+    "skills:Lore (Noble)": [
+      "powers:Lessons from Scars"
     ],
     "perks:Minor Fame": [
       "powers:Renowned Soldier",
@@ -25338,11 +25323,10 @@
     "skills:Ironclad Armor": [
       "powers:Wall of Steel"
     ],
-    "skills:Basic Arcane": [
-      "classes:Mage",
-      "classes:Sourcerer"
-    ],
     "skills:Advanced Recharge": [
+      "classes:Mage"
+    ],
+    "skills:Lore (Arcane)": [
       "classes:Mage"
     ],
     "powers:Alone But Not Lonely": [

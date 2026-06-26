@@ -14,12 +14,15 @@ function extractDiscounts(ent, character, id) {
 }
 
 function extractGlobalGrants(ent, character, id) {
-  const isChoice = ent?.chooseOne?.kind === 'build' ||
-    /\b(?:choose\s+one|gains?\s+one\s+of|one\s+of\s+the\s+following|gains?\s+one\s+skill)\b/i.test(ent?.requirement || '') ||
-    /\b(?:choose\s+one|gains?\s+one\s+of|one\s+of\s+the\s+following|gains?\s+one\s+skill)\b/i.test(ent?.description || '') ||
-    /\b(?:choose\s+one|gains?\s+one\s+of|one\s+of\s+the\s+following|gains?\s+one\s+skill)\b/i.test(ent?.skillsAndOptions || '');
-    
-  if (REFS.grants?.[id] && !isChoice) {
+  // A power with a structured chooseOne (build OR play) gates its grants behind that
+  // choice — REFS.grants lists ALL the options, so emitting them flat would wrongly
+  // grant every option for free (The Learned One = "choose one of 8" at level-up).
+  // Trust the PARSED chooseOne, not a description regex: a fixed grant can sit beside
+  // an unrelated in-play "Choose one target…" sentence (Lessons from Scars) and must
+  // still fire. So: skip only when a chooseOne structure exists.
+  const isChoiceGated = !!ent?.chooseOne;
+
+  if (REFS.grants?.[id] && !isChoiceGated) {
     return [{ type: 'GRANT_SOURCE', grants: REFS.grants[id] }];
   }
   return [];
