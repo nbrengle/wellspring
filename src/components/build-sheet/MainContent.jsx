@@ -3,7 +3,7 @@ import { useBuilderState, useBuilderActions } from "../builder-context.jsx";
 import { Section, CostBadge } from "./SharedUI.jsx";
 import SubSelect from "../SubSelect.jsx";
 import { spellTierKey, spellTierLabel } from "./utils.js";
-import { ALL_SKILLS, LINEAGES, CRAFTING, RITUALS, CLASSES, DOMAINS } from "../../engine/data.js";
+import { ALL_SKILLS, LINEAGES, CRAFTING, RITUALS, CLASSES, DOMAINS, lookupEntity } from "../../engine/data.js";
 import { getMaxRanks, pickClass, agileLearnerCapacity } from "../../engine/validate.js";
 import { bareSkill, getClasses, cleanItemName } from "../../engine/resolver.js";
 import { lookupCost } from "../../engine/validate/cost-key.js";
@@ -295,12 +295,19 @@ export function SlotBlock({ slot, pickClassOf }) {
       </div>
       <ol className="b-slot-rows">
         {granted.map((name) => (
-          <React.Fragment key={`granted-${name}`}>
-            <li className="b-slot-row is-filled is-granted">
-              <span className="b-slot-num" title="Granted by class">★</span>
-              <button className="b-slot-pick" onClick={() => onInspect(name, fields[0], "powers")}>{name}</button>
-              <span className="b-slot-tier b-slot-granted-tag">innate</span>
-            </li>
+            <React.Fragment key={`granted-${name}`}>
+              {(() => {
+                const ent = lookupEntity(`powers:${name}`);
+                const tags = ent?.tags || [];
+                return (
+                  <li className="b-slot-row is-filled is-granted">
+                    <span className="b-slot-num" title="Granted by class">★</span>
+                    <button className="b-slot-pick" onClick={() => onInspect(name, fields[0], "powers")}>{name}</button>
+                    {tags.map((t) => <span key={t} className="b-picker-row-tag b-data">{t}</span>)}
+                    <span className="b-slot-tier b-slot-granted-tag">innate</span>
+                  </li>
+                );
+              })()}
             <InlineDetail item={name} field={fields[0]} />
           </React.Fragment>
         ))}
@@ -309,17 +316,24 @@ export function SlotBlock({ slot, pickClassOf }) {
           if (pick) {
             return (
               <React.Fragment key={i}>
-                <li className={`b-slot-row is-filled ${over ? "is-over" : ""} ${isFocused(pick.name, pick.field) ? "is-focused" : ""}`}>
-                  <span className="b-slot-num">{i + 1}</span>
-                  <button className="b-slot-pick" onClick={() => onInspect(pick.name, pick.field, "powers")}>{pick.name}</button>
-                  {slot.category === "spellsKnown" && spellTierKey({ tierList: pick.field }) && (
-                    <span className={`b-slot-tier b-tier-${spellTierKey({ tierList: pick.field })}`}>
-                      {SPELL_TIER_LABEL[pick.field]}
-                    </span>
-                  )}
-                  <button className="b-slot-action" title="Swap" aria-label={`Swap ${pick.name}`} onClick={() => onOpenSlot(slot, pick.flatIndex, false, pick.field)}>✎</button>
-                  <button className="b-slot-action" title="Clear" aria-label={`Clear ${pick.name}`} onClick={() => onOpenSlot(slot, pick.flatIndex, true, pick.field)}>✕</button>
-                </li>
+                {(() => {
+                  const ent = lookupEntity(`powers:${pick.name}`);
+                  const tags = ent?.tags || [];
+                  return (
+                    <li className={`b-slot-row is-filled ${over ? "is-over" : ""} ${isFocused(pick.name, pick.field) ? "is-focused" : ""}`}>
+                      <span className="b-slot-num">{i + 1}</span>
+                      <button className="b-slot-pick" onClick={() => onInspect(pick.name, pick.field, "powers")}>{pick.name}</button>
+                      {tags.map((t) => <span key={t} className="b-picker-row-tag b-data">{t}</span>)}
+                      {slot.category === "spellsKnown" && spellTierKey({ tierList: pick.field }) && (
+                        <span className={`b-slot-tier b-tier-${spellTierKey({ tierList: pick.field })}`}>
+                          {SPELL_TIER_LABEL[pick.field]}
+                        </span>
+                      )}
+                      <button className="b-slot-action" title="Swap" aria-label={`Swap ${pick.name}`} onClick={() => onOpenSlot(slot, pick.flatIndex, false, pick.field)}>✎</button>
+                      <button className="b-slot-action" title="Clear" aria-label={`Clear ${pick.name}`} onClick={() => onOpenSlot(slot, pick.flatIndex, true, pick.field)}>✕</button>
+                    </li>
+                  );
+                })()}
                 <InlineDetail item={pick.name} field={pick.field} />
               </React.Fragment>
             );
@@ -360,10 +374,14 @@ export function ClassifiedRows({ rows, resolveType, showClass }) {
         const rankFloor = canBuyUp ? grantedFloor : 1;
         const hasRanks = (canRemove || canBuyUp) && maxR > 1 && !UNLIMITED_SKILLS.has(baseName);
 
+        const ent = lookupEntity(resolveType ? `${resolveType}:${baseName}` : baseName) || lookupEntity(resolveType ? `${resolveType}:${name}` : name);
+        const tags = ent?.tags || [];
+
         return (
           <InspectableRow key={`${field}-${index}-${name}-${grantedBy || cls || ''}`}
                           item={name} field={field} resolveType={resolveType} index={index}
                           label={<>{name}{rank > 1 && !hasRanks && <span className="b-row-rank">×{rank}</span>}</>}>
+            {tags.map((t) => <span key={t} className="b-picker-row-tag b-data">{t}</span>)}
             {showClass && cls && !fromClass && <span className="b-row-badge b-badge-class">{cls.toUpperCase()}</span>}
             {fromClass
               ? (() => {
@@ -423,9 +441,13 @@ export function EditableRows({ items, field, resolveType, removable }) {
         const maxR = getMaxRanks(item, field, character);
         const hasRanks = canRemove && maxR > 1 && !UNLIMITED_SKILLS.has(baseName);
 
+        const ent = lookupEntity(resolveType ? `${resolveType}:${baseName}` : baseName) || lookupEntity(resolveType ? `${resolveType}:${item}` : item);
+        const tags = ent?.tags || [];
+
         return (
           <InspectableRow key={`${field}-${i}-${item}`} item={item} field={field} resolveType={resolveType} index={i}
                           label={<>{item}{rank > 1 && !hasRanks && <span className="b-row-rank">×{rank}</span>}</>}>
+            {tags.map((t) => <span key={t} className="b-picker-row-tag b-data">{t}</span>)}
             <CostBadge cost={cost} />
             {canRemove && (
               <button className="b-row-remove" title="Remove" aria-label={`Remove ${item}`} onClick={() => onRemoveEntity(field, i)}>×</button>
