@@ -506,6 +506,20 @@ export const DEVOTIONS = devotionsJson.map(d => ({
 
 // ─── REFERENCE DATA (not yet surfaced in the wizard, available for later) ──────
 export const DOMAINS = domainsJson;
+
+// Divine Substitution: a Cleric may add a domain NOT in their Devotion's standard
+// domains and NOT in direct opposition to any of them. Opposition comes from the
+// parsed `opposedBy` field (the MegaDoc's Opposed Domains table). Returns the
+// eligible domain names. `standard` is the Devotion's own domain list.
+export function divineSubstitutionOptions(standard) {
+  const std = new Set((standard || []).map((d) => String(d).split(':')[0].trim()));
+  const opposedToStandard = new Set(
+    DOMAINS.filter((d) => std.has(d.name) && d.opposedBy).map((d) => d.opposedBy),
+  );
+  return DOMAINS
+    .filter((d) => !std.has(d.name) && !opposedToStandard.has(d.name))
+    .map((d) => d.name);
+}
 export const CRAFTING = craftingJson;
 export const RITUALS = ritualsJson;
 

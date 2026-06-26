@@ -350,6 +350,31 @@ export function EntityBody({ entity, view, report, choices, onSetChoice, onUpdat
           </div>
         );
       })()}
+      {(() => {
+        // Divine Substitution (Cleric Class power): pick ONE domain not in your
+        // Devotion's standard domains and not in direct opposition to them. The
+        // eligible pool (opposition-filtered) comes from the report.
+        if (!/^Divine Substitution\b/.test(entity.baseName || entity.name) || !onSetChoice) return null;
+        const powerId = "powers:Divine Substitution";
+        const pool = report?.devotion?.substitution?.options || [];
+        return (
+          <div className="b-detail-section">
+            {pool.length ? (
+              <SubSelect
+                prompt="Choose a Domain"
+                value={choices?.[powerId] || null}
+                onChange={(v) => onSetChoice(powerId, v || "")}
+                options={pool.map((d) => ({ value: d }))}
+              />
+            ) : (
+              <>
+                <h3 className="b-detail-section-title">Choose a Domain</h3>
+                <p className="b-detail-hint">Pick a Devotion first — the eligible domains depend on its standard (and opposed) domains.</p>
+              </>
+            )}
+          </div>
+        );
+      })()}
       {domainPowers && domainPowers.length > 0 && (
         <LinkList title="Domain powers" tone="purple" onInspect={onInspect}
                   ids={domainPowers.map((p) => `powers:${p.name}`)} />
