@@ -224,6 +224,19 @@ export function classifyOwnedItems(character) {
     skills.push({ name: g.skill, field: 'multiclassGrant', index: -1, source: 'class', grantedBy: g.source, refundedBP: g.bp });
   }
 
+  // Granted abilities (e.g. from Linked Armor, Lineages) are derived effects,
+  // not independent graph items — surface them as display rows so they render.
+  for (const g of grantedAbilities(character).list) {
+    const row = { name: g.abilityName, field: 'synthetic', index: -1, source: g.sourceKind, grantedBy: g.source };
+    if (g.abilityType === 'skills') skills.push(row);
+    else if (g.abilityType === 'perks' || g.abilityType === 'flaws') perks.push(row);
+    else if (g.abilityType === 'powers') {
+      const ent = lookupEntity(g.ability);
+      if (ent && CLASS_POWER_TIERS.has(ent.tier)) classPowers.push(row);
+      else innatePowers.push(row);
+    }
+  }
+
   // De-dupe by canonical name within each bucket: the same item can be listed in
   // more than one storage field (Socialite's Contact lands in both startingSkills
   // and purchasedPerks). Keep the FIRST occurrence, preferring a class grant over a

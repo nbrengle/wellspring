@@ -443,6 +443,8 @@ function DetailFacts({ entity, isEditable }) {
   if (entity.refresh && entity.refresh !== "None") facts.push(["Refresh", entity.refresh]);
   if (entity.call && entity.call !== "None") facts.push(["Call", entity.call]);
   if (entity.effect) facts.push(["Effect", entity.effect]);
+  if (entity.tags && entity.tags.length > 0) facts.push(["Tags", entity.tags.join(", ")]);
+
   if (facts.length === 0) return null;
   return (
     <dl className="b-facts">
