@@ -16,6 +16,8 @@ import craftingJson from '../data/crafting-recipes.json';
 import ritualsJson from '../data/ritual-recipes.json';
 import archetypesJson from '../data/archetypes.json';
 import refsJson from '../data/refs.json';
+// Choice/parameter spec registries — kept in their own module (see re-export below).
+import { LINEAGE_CHOICE_SPECS, lineageChoiceSpec } from './choice-specs.js';
 
 // Concept content files — the glossary and rules-reference data the linker emits
 // references to (terms:, rules-concepts:, effects:, accents:, …). Indexed below
@@ -342,37 +344,14 @@ export function lineageRepOptions() {
 //               Elemental Expression (an Accent), Favored Gem (a gem).
 // Keyed by baseName so the same mechanic is one code path, not a per-name special
 // case. New choice items only need an entry here (no new component / wiring).
-const LINEAGE_CHOICE_SPECS = {
-  'Divine Magic':        { kind: 'cantrip', pool: ['Divine'] },
-  'Psionic Cantrip':     { kind: 'cantrip', pool: ['Arcane', 'Divine'] },
-  // Arcane Aptitude: a Cantrip OR Novice spell from any Base arcane class → adds it
-  // to Known Spells. `spell` kind = a spell pick over the given magic-type + tiers.
-  'Arcane Aptitude':     { kind: 'spell', pool: ['Arcane'], tiers: ['cantrip', 'novice'] },
-  'Lost Life':           { kind: 'rep' },
-  'Additional Lost Life':{ kind: 'rep' },
-  'Elemental Expression':{ kind: 'flavor', label: 'Accent' },
-  'Favored Gem':         { kind: 'flavor', label: 'Gemstone' },
-};
-export function lineageChoiceSpec(item) {
-  const base = item?.baseName || item?.name;
-  return base ? (LINEAGE_CHOICE_SPECS[base] || null) : null;
-}
-
-// Powers that, when owned, let the character CHOOSE a spell to add to Known Spells.
-// The graph grants the chosen spell (keyed by choices['powers:<name>']) and the UI
-// offers a picker — no per-name special-casing. The pickable POOL is computed in
-// the report (rank-gated per the rules), not from a flat list here, so the spec
-// only flags which powers carry the choice.
-//   'Arcane Secrets' (Knowledge domain power) — "choose one arcane spell at a rank
-//   they are capable of casting" (or, with no Known Spells, up to Adept by level).
-//   See arcaneSecretsSpellOptions in validate/slots.js for the gated pool.
-const POWER_SPELL_CHOICE_SPECS = {
-  'Arcane Secrets': { kind: 'spell', pool: ['Arcane'] },
-};
-export function powerSpellChoiceSpec(item) {
-  const base = item?.baseName || item?.name;
-  return base ? (POWER_SPELL_CHOICE_SPECS[base] || null) : null;
-}
+// Choice/parameter spec registries now live in ./choice-specs.js so adding a new
+// pickable mechanic doesn't churn this file. Re-exported here so existing import
+// paths (`from '../engine/data.js'`) keep working; also imported for the internal
+// uses below (lineageItemImpact, lineageCantripChoices).
+export {
+  LINEAGE_CHOICE_SPECS, lineageChoiceSpec,
+  POWER_SPELL_CHOICE_SPECS, powerSpellChoiceSpec,
+} from './choice-specs.js';
 
 // Lineage cantrip CHOICES the character has actually recorded — the chosen cantrip
 // for each owned cantrip-kind item (Divine Magic, Psionic Cantrip, …). Drives both
