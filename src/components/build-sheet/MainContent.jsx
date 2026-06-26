@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import { useBuilderState, useBuilderActions } from "../builder-context.jsx";
 import { Section, CostBadge } from "./SharedUI.jsx";
 import SubSelect from "../SubSelect.jsx";
-import { spellTierKey } from "./utils.js";
+import { spellTierKey, CLASS_TONES } from "./utils.js";
 import { CLASSES, DOMAINS, lookupEntity } from "../../engine/data.js";
 import { getMaxRanks, agileLearnerCapacity } from "../../engine/validate.js";
 import { bareSkill, getClasses, cleanItemName } from "../../engine/resolver.js";
@@ -304,7 +304,10 @@ export function SlotBlock({ slot, pickClassOf }) {
                   <li className="b-slot-row is-filled is-granted">
                     <span className="b-slot-num" title="Granted by class">★</span>
                     <button className="b-slot-pick" onClick={() => onInspect(name, fields[0], "powers")}>{name}</button>
-                    {tags.map((t) => <span key={t} className="b-picker-row-tag b-data">{t}</span>)}
+                    {tags.map((t) => {
+                      const tone = CLASS_TONES[t];
+                      return <span key={t} className={`b-picker-row-tag ${tone ? `b-tag-${tone}` : "b-data"}`}>{t}</span>;
+                    })}
                     <span className="b-slot-tier b-slot-granted-tag">innate</span>
                   </li>
                 );
@@ -324,7 +327,10 @@ export function SlotBlock({ slot, pickClassOf }) {
                     <li className={`b-slot-row is-filled ${over ? "is-over" : ""} ${isFocused(pick.name, pick.field) ? "is-focused" : ""}`}>
                       <span className="b-slot-num">{i + 1}</span>
                       <button className="b-slot-pick" onClick={() => onInspect(pick.name, pick.field, "powers")}>{pick.name}</button>
-                      {tags.map((t) => <span key={t} className="b-picker-row-tag b-data">{t}</span>)}
+                      {tags.map((t) => {
+                        const tone = CLASS_TONES[t];
+                        return <span key={t} className={`b-picker-row-tag ${tone ? `b-tag-${tone}` : "b-data"}`}>{t}</span>;
+                      })}
                       {slot.category === "spellsKnown" && spellTierKey({ tierList: pick.field }) && (
                         <span className={`b-slot-tier b-tier-${spellTierKey({ tierList: pick.field })}`}>
                           {SPELL_TIER_LABEL[pick.field]}
@@ -382,7 +388,10 @@ export function ClassifiedRows({ rows, resolveType, showClass }) {
           <InspectableRow key={`${field}-${index}-${name}-${grantedBy || cls || ''}`}
                           item={name} field={field} resolveType={resolveType} index={index}
                           label={<>{name}{rank > 1 && !hasRanks && <span className="b-row-rank">×{rank}</span>}</>}>
-            {tags.map((t) => <span key={t} className="b-picker-row-tag b-data">{t}</span>)}
+            {tags.map((t) => {
+              const tone = CLASS_TONES[t];
+              return <span key={t} className={`b-picker-row-tag ${tone ? `b-tag-${tone}` : "b-data"}`}>{t}</span>;
+            })}
             {showClass && cls && !fromClass && <span className="b-row-badge b-badge-class">{cls.toUpperCase()}</span>}
             {fromClass
               ? (() => {
@@ -448,7 +457,10 @@ export function EditableRows({ items, field, resolveType, removable }) {
         return (
           <InspectableRow key={`${field}-${i}-${item}`} item={item} field={field} resolveType={resolveType} index={i}
                           label={<>{item}{rank > 1 && !hasRanks && <span className="b-row-rank">×{rank}</span>}</>}>
-            {tags.map((t) => <span key={t} className="b-picker-row-tag b-data">{t}</span>)}
+            {tags.map((t) => {
+              const tone = CLASS_TONES[t];
+              return <span key={t} className={`b-picker-row-tag ${tone ? `b-tag-${tone}` : "b-data"}`}>{t}</span>;
+            })}
             <CostBadge cost={cost} />
             {canRemove && (
               <button className="b-row-remove" title="Remove" aria-label={`Remove ${item}`} onClick={() => onRemoveEntity(field, i)}>×</button>

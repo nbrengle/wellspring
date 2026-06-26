@@ -164,7 +164,10 @@ export function useBuilderHandlers({
   const _handleAddClass = classHandlers.handleAddClass;
   const _handleRemoveClass = classHandlers.handleRemoveClass;
 
-  const handleAddClass = useCallback((name) => _handleAddClass(name), [_handleAddClass]);
+  const handleAddClass = useCallback((name) => {
+    _handleAddClass(name);
+    setPicking(null);
+  }, [_handleAddClass, setPicking]);
   const handleRemoveClass = useCallback(
     (name) => _handleRemoveClass(name, {
       utility: "utilityPowers",
