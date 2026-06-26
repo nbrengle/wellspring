@@ -103,7 +103,8 @@ export function resolveCharacterGraph(character) {
   });
 
   // 2. Process Chosen Powers
-  for (const field of POWER_SOURCE_FIELDS) {
+  const powerFields = POWER_SOURCE_FIELDS.filter(f => f !== 'innatePowers');
+  for (const field of powerFields) {
     (character[field] || []).forEach((itemStr, idx) => addItem(field, itemStr, 'power', idx));
   }
 

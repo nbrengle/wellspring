@@ -73,7 +73,11 @@ export function slotGrants(character, sources = null) {
   //    Extended Capacity, Spell-Scholar). The grants are parser-extracted
   //    (ent.slotGrants); attribute each to the relevant class and multiply by the
   //    item's rank ("Extended Capacity - Novice x2" → +2).
-  for (const field of ['startingSkills', 'purchasedSkills', ...POWER_SOURCE_FIELDS]) {
+  //    item's rank ("Extended Capacity - Novice x2" → +2).
+  // Note: innatePowers are intentionally excluded here because activeInnatePowers()
+  // handles all of them (both class-granted and user-added) in the loop below.
+  const fields = ['startingSkills', 'purchasedSkills', ...POWER_SOURCE_FIELDS.filter(f => f !== 'innatePowers')];
+  for (const field of fields) {
     (character[field] || []).forEach((item, idx) => {
       const clean = cleanItemName(item);
       const bare = bareSkill(clean);
