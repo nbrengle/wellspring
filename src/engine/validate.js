@@ -38,7 +38,7 @@ export { lbpState };
 // Slot/spell-slot accounting (validate/slots.js) and prerequisite checking
 // (validate/prereqs.js) — extracted leaves. Import the ones the orchestrator calls
 // internally; re-export the public surface so the barrel keeps its API.
-import { computeSlots, spellSlots, bookcasterSpellOptions, eligibleClassChoices, CLASS_CHOICE_SKILLS, basicSpellOptions, BASIC_SPELL_SKILLS } from './validate/slots.js';
+import { computeSlots, spellSlots, bookcasterSpellOptions, arcaneSecretsSpellOptions, eligibleClassChoices, CLASS_CHOICE_SKILLS, basicSpellOptions, BASIC_SPELL_SKILLS } from './validate/slots.js';
 export { innateBonusCantrips, eligibleClassChoices, CLASS_CHOICE_SKILLS, agileLearnerCapacity, basicSpellOptions, BASIC_SPELL_SKILLS } from './validate/slots.js';
 import { resolveCharacterGraph, grantedAbilities } from './graph.js';
 export { grantedAbilities };
@@ -419,6 +419,9 @@ export function validate(character) {
   const slots = computeSlots(character);
   const spellSlotCounts = spellSlots(character);
   const bookcasterOptions = bookcasterSpellOptions(character);
+  // Arcane Secrets (Knowledge domain power): the arcane spells the character may add
+  // to Known Spells — rank-gated for casters, capped at Adept for non-casters.
+  const arcaneSecretsOptions = arcaneSecretsSpellOptions(character);
   // Basic Arcane / Basic Faith pickable spell pools (sphere-gated; non-casters get
   // any base class of that sphere). Keyed by skill base name for the UI picker.
   const basicSpellChoices = Object.fromEntries(
@@ -484,6 +487,7 @@ export function validate(character) {
     slotsOver,
     spellSlots: spellSlotCounts,
     bookcasterOptions,
+    arcaneSecretsOptions,
     basicSpellChoices,
     stats,
     wealth,

@@ -298,6 +298,28 @@ export function divineCantripOptions() {
   return cantripOptions(['Divine']);
 }
 
+// Spells choosable from any base spellcasting class of the given magic type(s), at
+// the given spell tiers (cantrips/novice/…). Drives lineage picks like Arcane
+// Aptitude ("a Cantrip or Novice spell from any Base arcane class"). `tiers` maps to
+// the CLASS_POWERS fields.
+const SPELL_TIER_FIELD = { cantrip: 'cantrips', novice: 'noviceSpells', adept: 'adeptSpells', greater: 'greaterSpells' };
+export function lineageSpellOptions(magicTypes, tiers = ['cantrip', 'novice']) {
+  const want = new Set(magicTypes);
+  const classes = Object.entries(CLASSES)
+    .filter(([, c]) => c.type === 'Spellcaster' && want.has(c.magicType))
+    .map(([name]) => name);
+  const spells = new Set();
+  for (const cls of classes) {
+    for (const tier of tiers) {
+      const field = SPELL_TIER_FIELD[tier];
+      for (const p of (CLASS_POWERS[cls]?.[field] || [])) {
+        if (p?.name && !/^(Adept|Greater)\s+\w+\s+Power$/i.test(p.name)) spells.add(p.name);
+      }
+    }
+  }
+  return [...spells].sort();
+}
+
 // The [Repped] challenges a Lost character may rep, grouped by source lineage
 // (every lineage other than Lost). Returns [[lineageName, challenges[]], …] for
 // lineages that have at least one repped challenge. Rules knowledge — see Lost
@@ -323,6 +345,9 @@ export function lineageRepOptions() {
 const LINEAGE_CHOICE_SPECS = {
   'Divine Magic':        { kind: 'cantrip', pool: ['Divine'] },
   'Psionic Cantrip':     { kind: 'cantrip', pool: ['Arcane', 'Divine'] },
+  // Arcane Aptitude: a Cantrip OR Novice spell from any Base arcane class → adds it
+  // to Known Spells. `spell` kind = a spell pick over the given magic-type + tiers.
+  'Arcane Aptitude':     { kind: 'spell', pool: ['Arcane'], tiers: ['cantrip', 'novice'] },
   'Lost Life':           { kind: 'rep' },
   'Additional Lost Life':{ kind: 'rep' },
   'Elemental Expression':{ kind: 'flavor', label: 'Accent' },
@@ -331,6 +356,22 @@ const LINEAGE_CHOICE_SPECS = {
 export function lineageChoiceSpec(item) {
   const base = item?.baseName || item?.name;
   return base ? (LINEAGE_CHOICE_SPECS[base] || null) : null;
+}
+
+// Powers that, when owned, let the character CHOOSE a spell to add to Known Spells.
+// The graph grants the chosen spell (keyed by choices['powers:<name>']) and the UI
+// offers a picker — no per-name special-casing. The pickable POOL is computed in
+// the report (rank-gated per the rules), not from a flat list here, so the spec
+// only flags which powers carry the choice.
+//   'Arcane Secrets' (Knowledge domain power) — "choose one arcane spell at a rank
+//   they are capable of casting" (or, with no Known Spells, up to Adept by level).
+//   See arcaneSecretsSpellOptions in validate/slots.js for the gated pool.
+const POWER_SPELL_CHOICE_SPECS = {
+  'Arcane Secrets': { kind: 'spell', pool: ['Arcane'] },
+};
+export function powerSpellChoiceSpec(item) {
+  const base = item?.baseName || item?.name;
+  return base ? (POWER_SPELL_CHOICE_SPECS[base] || null) : null;
 }
 
 // Lineage cantrip CHOICES the character has actually recorded — the chosen cantrip

@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import {
   lookupEntity, REFS, DEVOTIONS, DOMAINS,
   UNLIMITED_SKILLS, ALL_SKILLS, LINEAGES,
-  allergenOptions, allergenAward
+  allergenOptions, allergenAward, powerSpellChoiceSpec
 } from '../engine/data.js';
 import SubSelect from "./SubSelect.jsx";
 import { formatParameterizedName } from "../engine/resolver.js";
@@ -346,6 +346,32 @@ export function EntityBody({ entity, view, report, choices, onSetChoice, onUpdat
                 </li>
               ))}
             </ul>
+          </div>
+        );
+      })()}
+      {(() => {
+        // A power that grants a chosen spell (Arcane Secrets) — pick one spell; the
+        // engine adds it to Known Spells. The pool is rank-gated and comes from the
+        // report (not a flat list), since the rules gate by what you can cast.
+        const spellSpec = powerSpellChoiceSpec(entity);
+        if (!spellSpec || !onSetChoice) return null;
+        const powerId = `powers:${entity.baseName || entity.name}`;
+        const pool = report?.arcaneSecretsOptions || [];
+        return (
+          <div className="b-detail-section">
+            {pool.length ? (
+              <SubSelect
+                prompt="Choose a Spell"
+                value={choices?.[powerId] || null}
+                onChange={(v) => onSetChoice(powerId, v || "")}
+                options={pool.map((s) => ({ value: s }))}
+              />
+            ) : (
+              <>
+                <h3 className="b-detail-section-title">Choose a Spell</h3>
+                <p className="b-detail-hint">No arcane spells available to learn yet.</p>
+              </>
+            )}
           </div>
         );
       })()}
