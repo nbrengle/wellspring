@@ -1,7 +1,7 @@
 import React from "react";
 import { useBuilderState, useBuilderActions } from "../builder-context.jsx";
 import { StatWithSources, Stat } from "./SharedUI.jsx";
-import { statTitle, statSources, sourceType } from "./utils.js";
+import { statTitle, statSources, sourceType, CLASS_TONES } from "./utils.js";
 import { getClasses } from "../../engine/resolver.js";
 import { EVENTS_TABLE } from "../../engine/data.js";
 import { MAX_DOMAINS } from "../../engine/validate.js";
@@ -204,7 +204,7 @@ function ClassCard({ classes, spec, onSetLevel, onRemove, onAdd, onInspect }) {
         )}
         {classes.map((c, i) => (
           <span key={c.name} className="b-class-row">
-            <button className="b-class-name" onClick={() => onInspect(c.name)} title="Inspect class">
+            <button className="b-class-name" onClick={() => onInspect(c.name)} title="Inspect class" style={{ color: CLASS_TONES[c.name] ? `var(--b-${CLASS_TONES[c.name]})` : undefined }}>
               {c.name}
               {i === 0 && spec ? ` (${spec})` : ""}
             </button>
