@@ -21,7 +21,7 @@ import { bareSkill, cleanItemName, getClasses, formatParameterizedName } from ".
 import { formatCharacterSheet, parseCharacterSheet } from '../src/engine/sheet.js';
 import { solveCrafting, RECIPES, resolveRecipe, classifyIngredient, buildCraftTree } from '../src/engine/recipe-solver.js';
 import { readFileSync } from 'node:fs';
-import { lookupEntity, eligiblePowers, DEVOTIONS, DOMAINS, REFS, CLASSES, LINEAGES, lineageChoiceSpec, lineageItemImpact } from '../src/engine/data.js';
+import { lookupEntity, eligiblePowers, DEVOTIONS, DOMAINS, REFS, CLASSES, LINEAGES, lineageChoiceSpec, lineageItemImpact, ALLERGEN_AWARDS, allergenOptions, allergenAward } from '../src/engine/data.js';
 import {
   hasStartingChoices, reconcileStartingChoices, rebuildStartingSkills,
   STARTING_CHOICES_CONFIG, optionSkills, resolveSkill,
@@ -764,6 +764,27 @@ test('allergy flaws calculate awards dynamically based on parameter', () => {
 
   const s4 = computeSpend({ classLevels: 'Fighter 10', flaws: ['Severe Allergy (Gold)'] });
   eq(s4.rawAwarded, 2, 'uncommon severe allergy awards 2 BP');
+});
+
+test('allergy awards are derived from the parsed rulebook table, not hardcoded', () => {
+  // Source of truth: the parser scrapes "Standard Allergens and Awards" into a
+  // structured `allergens` field; ALLERGEN_AWARDS / allergenAward read that field.
+  ok(ALLERGEN_AWARDS['Mild Allergy'] && ALLERGEN_AWARDS['Severe Allergy'], 'both allergy tables present');
+  eq(allergenOptions('Mild Allergy').length, 15, 'all 15 standard allergens offered');
+  // Every substance in the table prices exactly as the table says, for both flaws.
+  for (const flaw of ['Mild Allergy', 'Severe Allergy']) {
+    for (const [sub, bp] of Object.entries(ALLERGEN_AWARDS[flaw])) {
+      eq(allergenAward(flaw, sub), bp, `${flaw} (${sub}) → ${bp}`);
+      // case/whitespace-insensitive
+      eq(allergenAward(flaw, ` ${sub.toUpperCase()} `), bp, `${flaw} (${sub}) normalizes`);
+    }
+  }
+  // No substance, or one off the table → undetermined (null), not a wrong number.
+  eq(allergenAward('Mild Allergy', ''), null, 'no substance → undetermined');
+  eq(allergenAward('Mild Allergy', 'butter'), null, 'off-table substance → undetermined');
+  // The engine still books a conservative minimum for a bare allergy.
+  eq(computeSpend({ classLevels: 'Fighter 10', flaws: ['Mild Allergy'] }).rawAwarded, 1,
+     'bare Mild Allergy defaults to the table minimum (1)');
 });
 
 // ─── sub-power extraction + grant (Strange Token → Curious Balm) ──────────────

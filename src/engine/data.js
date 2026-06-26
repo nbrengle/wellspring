@@ -123,6 +123,43 @@ export const ALL_FLAWS = flawsJson.map(f => ({
   summary: splitDescription(f.description).summary,
 }));
 
+// ─── ALLERGENS ────────────────────────────────────────────────────────────────
+// Mild/Severe Allergy award a variable BP amount depending on the chosen substance
+// ("Award: 1 or 2" / "2 or 3"). The per-substance award comes from the parser:
+// scripts/parse-megadoc.js reads the rulebook's "Standard Allergens and Awards"
+// table out of each flaw's detail prose into a structured `allergens` field. The
+// engine just READS that field — no runtime prose scraping, no hardcoded substance
+// lists. A MegaDoc edit to the table flows through on the next parse.
+//
+//   ALLERGEN_AWARDS = { 'Mild Allergy': { cloth: 2, gold: 1, … }, 'Severe Allergy': {…} }
+//
+// keyed by lowercased substance, value = BP awarded (a positive magnitude).
+export const ALLERGEN_AWARDS = Object.fromEntries(
+  flawsJson
+    .filter((f) => f.allergens && Object.keys(f.allergens).length)
+    .map((f) => [
+      f.name,
+      Object.fromEntries(Object.entries(f.allergens).map(([s, bp]) => [s.toLowerCase(), bp])),
+    ]),
+);
+
+// The substances a given allergy flaw can take, in rulebook order — drives the
+// picker. From the same parsed field, so picker options and awards never drift.
+export function allergenOptions(flawName) {
+  const f = flawsJson.find((x) => x.name === flawName);
+  return Object.keys(f?.allergens || {});
+}
+
+// BP a given allergy flaw awards for a chosen substance. Returns null when the flaw
+// isn't an allergy or no (recognized) substance is chosen yet — callers decide how
+// to present an as-yet-undetermined award (the rulebook leaves it to Staff).
+export function allergenAward(flawName, substance) {
+  const table = ALLERGEN_AWARDS[flawName];
+  if (!table) return null;
+  const key = String(substance || '').toLowerCase().trim();
+  return key && key in table ? table[key] : null;
+}
+
 // ─── CLASSES ──────────────────────────────────────────────────────────────────
 // UI expects CLASSES keyed by name with { type, spellcaster, magicType,
 // description, startingSkills, multiclassSkills }. Role/keyFeatures prose is not
