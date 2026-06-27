@@ -61,6 +61,17 @@ jobs:
       - run: npm ci
       - run: node --import ./scripts/register-json.mjs scripts/test.mjs
 
+  check-data:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run check:data
+
   test-rules:
     runs-on: ubuntu-latest
     steps:
@@ -96,7 +107,7 @@ jobs:
       - run: npm run build
 
   build:
-    needs: [actionlint, lint-js, lint-css, format-check, test-unit, test-rules, test-browser, vite-build]
+    needs: [actionlint, lint-js, lint-css, format-check, test-unit, check-data, test-rules, test-browser, vite-build]
     runs-on: ubuntu-latest
     steps:
       - run: echo "All checks passed!"
