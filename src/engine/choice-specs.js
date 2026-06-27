@@ -30,16 +30,17 @@ export function lineageChoiceSpec(item) {
   return base ? (LINEAGE_CHOICE_SPECS[base] || null) : null;
 }
 
-// Powers that, when owned, let the character CHOOSE a spell to add to Known Spells.
-// The graph grants the chosen spell (keyed by choices['powers:<name>']) and the UI
-// offers a picker — no per-name special-casing. The pickable POOL is computed in
-// the report (rank-gated per the rules), not from a flat list here, so the spec
-// only flags which powers carry the choice.
-//   'Arcane Secrets' (Knowledge domain power) — "choose one arcane spell at a rank
-//   they are capable of casting" (or, with no Known Spells, up to Adept by level).
-//   See arcaneSecretsSpellOptions in validate/slots.js for the gated pool.
+// Powers that, when owned, let the character CHOOSE another spell/power to gain.
+// The graph grants the chosen ability (keyed by choices['powers:<name>'] → emitted
+// as `powers:<picked>`) and the UI offers a picker — no per-name special-casing. The
+// pickable POOL is computed in the report (`optionsKey`), not from a flat list here.
+//   'Arcane Secrets' (Knowledge domain power) — choose one arcane spell (rank-gated);
+//     pool = report.arcaneSecretsOptions (see arcaneSecretsSpellOptions in slots.js).
+//   'Weird Wanderings' (Artisan Basic power) — choose one Basic power from any
+//     non-Artisan Base Class; pool = report.weirdWanderingsOptions (slots.js).
 export const POWER_SPELL_CHOICE_SPECS = {
-  'Arcane Secrets': { kind: 'spell', pool: ['Arcane'] },
+  'Arcane Secrets':   { kind: 'spell', label: 'Choose a Spell',  optionsKey: 'arcaneSecretsOptions' },
+  'Weird Wanderings': { kind: 'power', label: 'Choose a Power',  optionsKey: 'weirdWanderingsOptions' },
 };
 export function powerSpellChoiceSpec(item) {
   const base = item?.baseName || item?.name;

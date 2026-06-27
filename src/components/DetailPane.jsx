@@ -325,26 +325,27 @@ export function EntityBody({ entity, view, report, choices, onSetChoice, onUpdat
         );
       })()}
       {(() => {
-        // A power that grants a chosen spell (Arcane Secrets) — pick one spell; the
-        // engine adds it to Known Spells. The pool is rank-gated and comes from the
-        // report (not a flat list), since the rules gate by what you can cast.
-        const spellSpec = powerSpellChoiceSpec(entity);
-        if (!spellSpec || !onSetChoice) return null;
+        // A power that grants a chosen spell/power (Arcane Secrets, Weird Wanderings)
+        // — pick one; the engine grants it. The pool comes from the report under the
+        // spec's optionsKey (rule-gated), not a flat list. Data-driven via the spec.
+        const choiceSpec = powerSpellChoiceSpec(entity);
+        if (!choiceSpec || !onSetChoice) return null;
         const powerId = `powers:${entity.baseName || entity.name}`;
-        const pool = report?.arcaneSecretsOptions || [];
+        const pool = report?.[choiceSpec.optionsKey] || [];
+        const label = choiceSpec.label || "Choose";
         return (
           <div className="b-detail-section">
             {pool.length ? (
               <SubSelect
-                prompt="Choose a Spell"
+                prompt={label}
                 value={choices?.[powerId] || null}
                 onChange={(v) => onSetChoice(powerId, v || "")}
                 options={pool.map((s) => ({ value: s }))}
               />
             ) : (
               <>
-                <h3 className="b-detail-section-title">Choose a Spell</h3>
-                <p className="b-detail-hint">No arcane spells available to learn yet.</p>
+                <h3 className="b-detail-section-title">{label}</h3>
+                <p className="b-detail-hint">No options available yet.</p>
               </>
             )}
           </div>
