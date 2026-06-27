@@ -109,7 +109,13 @@ export function useCoreHandlers({ character, setCharacter, setPicking, setView }
             pc[field] = [...pc[field]];
             pc[field].splice(flatIndex, 1);
           }
-          return { ...c, [field]: next, powerClass: pc };
+          const nextEffectiveBP = { ...(c.effectiveBP || {}) };
+          if (nextEffectiveBP[field]) {
+            const bpList = [...nextEffectiveBP[field]];
+            bpList.splice(flatIndex, 1);
+            nextEffectiveBP[field] = bpList;
+          }
+          return { ...c, [field]: next, powerClass: pc, effectiveBP: nextEffectiveBP };
         });
         return;
       }
@@ -148,7 +154,13 @@ export function useCoreHandlers({ character, setCharacter, setPicking, setView }
         rList.splice(index, 1);
         nextRanks[field] = rList;
       }
-      return { ...c, [field]: next, ranks: nextRanks };
+      const nextEffectiveBP = { ...(c.effectiveBP || {}) };
+      if (nextEffectiveBP[field]) {
+        const bpList = [...nextEffectiveBP[field]];
+        bpList.splice(index, 1);
+        nextEffectiveBP[field] = bpList;
+      }
+      return { ...c, [field]: next, ranks: nextRanks, effectiveBP: nextEffectiveBP };
     });
   }, [setCharacter]);
 
