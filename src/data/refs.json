@@ -20750,7 +20750,7 @@
     "skills:Axecraft": {
       "skills": [
         "skills:Short Weapons",
-        "skills:Weapon Specialization"
+        "skills:Weapon Specialization|axes"
       ],
       "anyOf": [],
       "levels": [
@@ -20781,7 +20781,7 @@
     "skills:Bowcraft": {
       "skills": [
         "skills:Projectile Weapons",
-        "skills:Weapon Specialization"
+        "skills:Weapon Specialization|projectile weapons"
       ],
       "anyOf": [],
       "levels": [
@@ -20811,7 +20811,7 @@
     },
     "skills:Daggercraft": {
       "skills": [
-        "skills:Weapon Specialization"
+        "skills:Weapon Specialization|daggers"
       ],
       "anyOf": [],
       "levels": [
@@ -20842,7 +20842,7 @@
     "skills:Macecraft": {
       "skills": [
         "skills:Short Weapons",
-        "skills:Weapon Specialization"
+        "skills:Weapon Specialization|maces"
       ],
       "anyOf": [],
       "levels": [
@@ -20872,10 +20872,16 @@
     },
     "skills:Polearmcraft": {
       "skills": [
-        "skills:Great Weapons",
-        "skills:Weapon Specialization"
+        "skills:Great Weapons"
       ],
-      "anyOf": [],
+      "anyOf": [
+        [
+          "skills:Weapon Specialization|polearms",
+          "skills:Weapon Specialization|swords",
+          "skills:Weapon Specialization|axes",
+          "skills:Weapon Specialization|maces"
+        ]
+      ],
       "levels": [
         "2 levels in Martial Classes"
       ],
@@ -20904,7 +20910,7 @@
     "skills:Thrown Weaponcraft": {
       "skills": [
         "skills:Thrown Weapons",
-        "skills:Weapon Specialization"
+        "skills:Weapon Specialization|thrown weapons"
       ],
       "anyOf": [],
       "levels": [
@@ -20944,7 +20950,7 @@
     },
     "skills:Bladechannel": {
       "skills": [
-        "skills:Weapon Specialization"
+        "skills:Weapon Specialization|any"
       ],
       "anyOf": [],
       "levels": [],
@@ -24733,15 +24739,9 @@
       "skills:Advanced Great Weapon Style",
       "skills:Polearmcraft"
     ],
-    "skills:Weapon Specialization": [
+    "skills:Weapon Specialization|axes": [
       "skills:Axecraft",
-      "skills:Bowcraft",
-      "skills:Daggercraft",
-      "skills:Macecraft",
-      "skills:Polearmcraft",
-      "skills:Thrown Weaponcraft",
-      "skills:Weapon Mastery",
-      "skills:Bladechannel"
+      "skills:Polearmcraft"
     ],
     "skills:Axecraft": [
       "skills:Hooked Head"
@@ -24752,11 +24752,17 @@
     "skills:Projectile Weapons": [
       "skills:Bowcraft"
     ],
+    "skills:Weapon Specialization|projectile weapons": [
+      "skills:Bowcraft"
+    ],
     "skills:Bowcraft": [
       "skills:Quick Shot"
     ],
     "skills:Quick Shot": [
       "skills:Bowmaster"
+    ],
+    "skills:Weapon Specialization|daggers": [
+      "skills:Daggercraft"
     ],
     "skills:Daggercraft": [
       "skills:Parrying Dagger"
@@ -24764,11 +24770,21 @@
     "skills:Parrying Dagger": [
       "skills:Flurry of Cuts"
     ],
+    "skills:Weapon Specialization|maces": [
+      "skills:Macecraft",
+      "skills:Polearmcraft"
+    ],
     "skills:Macecraft": [
       "skills:Toppling Blows"
     ],
     "skills:Toppling Blows": [
       "skills:Denting Blows"
+    ],
+    "skills:Weapon Specialization|polearms": [
+      "skills:Polearmcraft"
+    ],
+    "skills:Weapon Specialization|swords": [
+      "skills:Polearmcraft"
     ],
     "skills:Polearmcraft": [
       "skills:Sweeping Strike"
@@ -24779,11 +24795,20 @@
     "skills:Thrown Weapons": [
       "skills:Thrown Weaponcraft"
     ],
+    "skills:Weapon Specialization|thrown weapons": [
+      "skills:Thrown Weaponcraft"
+    ],
     "skills:Thrown Weaponcraft": [
       "skills:Shattering Toss"
     ],
     "skills:Shattering Toss": [
       "skills:Jester’s Lethality"
+    ],
+    "skills:Weapon Specialization": [
+      "skills:Weapon Mastery"
+    ],
+    "skills:Weapon Specialization|any": [
+      "skills:Bladechannel"
     ],
     "skills:Basic Arcane": [
       "skills:Concurrent Meditation",

@@ -710,10 +710,11 @@ function applySkillAlias(name) {
 // so reference links resolve despite linker/file namespace differences.
 export const lookupEntity = (id) => {
   if (!id) return null;
-  const direct = ENTITY_INDEX.get(id);
+  const baseId = id.includes('|') ? id.split('|')[0] : id;
+  const direct = ENTITY_INDEX.get(baseId);
   if (direct) return direct;
-  const type = id.slice(0, id.indexOf(':'));
-  let name = id.slice(id.indexOf(':') + 1);
+  const type = baseId.slice(0, baseId.indexOf(':'));
+  let name = baseId.slice(baseId.indexOf(':') + 1);
 
   // Map sheet / MegaDoc-prose name variants to their canonical entity names.
   // These are spellings the source uses that don't match the entity's real name
