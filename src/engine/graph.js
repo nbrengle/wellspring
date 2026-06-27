@@ -203,6 +203,34 @@ export function resolveCharacterGraph(character) {
         entity: ent,
         effects
       });
+
+      // Pick and Choose (Lost/Fractured): "purchase one Lineage Advantage from
+      // another Lineage." The recorded choice is "<Lineage> - <Advantage>"; resolve
+      // that advantage cross-lineage and materialize it as its OWN owned item with
+      // its full effects (stat mods, grants, …). Prereqs are still enforced (the
+      // advantage entity carries them, checked downstream like any advantage).
+      if ((ent?.baseName || ent?.name) === 'Pick and Choose') {
+        const pickedAdv = character.advantageChoices?.['Pick and Choose'];
+        const subEnt = pickedAdv ? lookupEntity(`advantages:${pickedAdv}`) : null;
+        if (subEnt) {
+          const subEffects = [];
+          for (const extractor of EFFECT_EXTRACTORS) {
+            subEffects.push(...extractor(subEnt, character, subEnt.id));
+          }
+          items.push({
+            id: subEnt.id,
+            name: subEnt.baseName || subEnt.name,
+            rawString: subEnt.baseName || subEnt.name,
+            field: 'lineageAdvantages',
+            sourceType: 'lineage',
+            grantedBy: 'Pick and Choose',
+            index: -1,
+            rank: 1,
+            entity: subEnt,
+            effects: subEffects,
+          });
+        }
+      }
     }
   }
 

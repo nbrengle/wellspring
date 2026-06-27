@@ -22,6 +22,10 @@ export const LINEAGE_CHOICE_SPECS = {
   'Arcane Aptitude':     { kind: 'spell', pool: ['Arcane'], tiers: ['cantrip', 'novice'] },
   'Lost Life':           { kind: 'rep' },
   'Additional Lost Life':{ kind: 'rep' },
+  // Pick and Choose (Lost/Fractured): purchase ONE advantage from another lineage.
+  // `advantage` kind = a cross-lineage advantage pick (recorded as "<Lineage> -
+  // <Advantage>"); the engine resolves + applies its full effects.
+  'Pick and Choose':     { kind: 'advantage' },
   'Elemental Expression':{ kind: 'flavor', label: 'Accent' },
   'Favored Gem':         { kind: 'flavor', label: 'Gemstone' },
 };

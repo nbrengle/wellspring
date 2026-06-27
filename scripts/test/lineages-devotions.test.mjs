@@ -13,7 +13,7 @@ import { bareSkill, cleanItemName, getClasses, formatParameterizedName } from ".
 import { formatCharacterSheet, parseCharacterSheet } from '../../src/engine/sheet.js';
 import { solveCrafting, RECIPES, resolveRecipe, classifyIngredient, buildCraftTree } from '../../src/engine/recipe-solver.js';
 import { readFileSync } from 'node:fs';
-import { lookupEntity, eligiblePowers, DEVOTIONS, DOMAINS, REFS, CLASSES, LINEAGES, lineageChoiceSpec, lineageItemImpact, ALLERGEN_AWARDS, allergenOptions, allergenAward, powerSpellChoiceSpec, divineSubstitutionOptions } from '../../src/engine/data.js';
+import { lookupEntity, eligiblePowers, DEVOTIONS, DOMAINS, REFS, CLASSES, LINEAGES, lineageChoiceSpec, lineageItemImpact, ALLERGEN_AWARDS, allergenOptions, allergenAward, powerSpellChoiceSpec, divineSubstitutionOptions, pickAndChooseOptions } from '../../src/engine/data.js';
 import { resolveCharacterGraph } from '../../src/engine/graph.js';
 import {
   hasStartingChoices, reconcileStartingChoices, rebuildStartingSkills,
@@ -77,6 +77,20 @@ test('LBP: Lost Life picker storage format (base name + rep param) resolves', ()
 
   const bare = validate({ lineage: 'Lost', lineageChallenges: [...req, 'Lost Life'], lineageAdvantages: [] }).lbp;
   eq(bare.rawAwarded, 3, 'un-repped "Lost Life" awards 0 (just the required Scarred=3)');
+});
+
+test('Pick and Choose: a cross-lineage advantage is applied with its full effects', () => {
+  // Lost "Pick and Choose" → purchase one advantage from ANOTHER lineage. The pool is
+  // every non-Lost advantage, grouped by lineage; the chosen one applies its effects.
+  const opts = pickAndChooseOptions();
+  ok(opts.length > 50, 'pool spans all non-Lost lineages');
+  ok(opts.every((o) => o.group !== 'Lost'), 'never offers a Lost advantage');
+  ok(opts.some((o) => o.advId === 'Underkin - Iron Touch'), 'options carry the lineage-qualified advId');
+  // Pick Underkin "Iron Touch" (grants the Mystic Armorer perk) → it materializes free.
+  const owned = validate({ classLevels: 'Fighter 6', lineage: 'Lost',
+    lineageAdvantages: ['Pick and Choose'], advantageChoices: { 'Pick and Choose': 'Underkin - Iron Touch' } }).owned;
+  ok((owned?.perks || []).some((p) => p.name === 'Mystic Armorer' && p.grantedBy === 'Iron Touch'),
+     'the chosen advantage’s grant is applied across lineages');
 });
 
 const findLin = (ln, nm) => {
