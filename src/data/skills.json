@@ -485,10 +485,6 @@
       {
         "cat": "novice",
         "n": 1
-      },
-      {
-        "cat": "spellsKnown",
-        "n": 1
       }
     ]
   },
@@ -504,10 +500,6 @@
       {
         "cat": "adept",
         "n": 1
-      },
-      {
-        "cat": "spellsKnown",
-        "n": 1
       }
     ]
   },
@@ -522,10 +514,6 @@
     "slotGrants": [
       {
         "cat": "greater",
-        "n": 1
-      },
-      {
-        "cat": "spellsKnown",
         "n": 1
       }
     ]
