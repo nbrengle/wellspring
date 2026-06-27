@@ -29,7 +29,7 @@ export interface StatMod {
 
 // ─── Discriminated Union for Entities ───────────────────────────────────────
 
-export interface BaseEntityDef {
+export interface BaseEntity {
   name: string;
   description?: string;
   prereq?: string;
@@ -40,7 +40,7 @@ export interface BaseEntityDef {
   requiresEntity?: string[];
 }
 
-export interface SkillDef extends BaseEntityDef {
+export interface Skill extends BaseEntity {
   type: 'skill';
   cost: number | string;
   ranks?: number;
@@ -50,7 +50,7 @@ export interface SkillDef extends BaseEntityDef {
   chooseOne?: ChooseOneConfig;
 }
 
-export interface PowerDef extends BaseEntityDef {
+export interface Power extends BaseEntity {
   type: 'power';
   tier: 'Basic' | 'Advanced' | 'Veteran' | 'Utility' | 'Class';
   parentClass?: string;
@@ -58,27 +58,27 @@ export interface PowerDef extends BaseEntityDef {
   highestSlot?: number;
 }
 
-export interface SpellDef extends BaseEntityDef {
+export interface Spell extends BaseEntity {
   type: 'spell';
   tier: 'Cantrip' | 'Novice' | 'Adept' | 'Greater';
   sphere: string; // e.g. "Arcane", "Divine"
   magicType?: string; 
 }
 
-export interface PerkDef extends BaseEntityDef {
+export interface Perk extends BaseEntity {
   type: 'perk';
   cost: number | string;
   ranks?: number;
   category?: string;
 }
 
-export interface FlawDef extends BaseEntityDef {
+export interface Flaw extends BaseEntity {
   type: 'flaw';
   award: number | string;
   category?: string;
 }
 
-export interface ClassDef extends BaseEntityDef {
+export interface Class extends BaseEntity {
   type: 'class';
   spellcaster?: boolean;
   magicType?: string;
@@ -88,7 +88,7 @@ export interface ClassDef extends BaseEntityDef {
  * A discriminated union of all possible entities that can be returned by the data layer. 
  * Allows the engine to narrow the type via `if (ent.type === 'spell') { ... }`.
  */
-export type EntityDef = SkillDef | PowerDef | SpellDef | PerkDef | FlawDef | ClassDef;
+export type Entity = Skill | Power | Spell | Perk | Flaw | Class;
 
 
 // ─── 2. Ontological Character State (V2) ────────────────────────────────────
