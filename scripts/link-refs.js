@@ -304,6 +304,18 @@ function parsePrereq(prereqText, skillForms) {
   // Split on commas, but keep "(...)" groups intact.
   const parts = prereqText.split(/,(?![^(]*\))/).map((p) => p.trim()).filter(Boolean);
   for (const part of parts) {
+    const wsMatch = part.match(/Weapon Specialization\s*\(([^)]+)\)/i);
+    if (wsMatch) {
+      const params = wsMatch[1].split(/,|\bor\b/i).map(s => s.trim().toLowerCase()).filter(Boolean);
+      const wsIds = params.map(p => `skills:Weapon Specialization|${p}`);
+      if (wsIds.length > 1) {
+        anyOf.push(wsIds);
+      } else if (wsIds.length === 1) {
+        skills.add(wsIds[0]);
+      }
+      continue;
+    }
+
     // Level requirement: "N levels in X", "Nth character-level", "Character Level N", or non-casting/class levels.
     const lvl = part.match(/(?:\d+|one|two|three|four|five|six|seven|eight|nine|ten)(?:st|nd|rd|th)?\s*(?:levels?|character-level|character level)/i)
       || part.match(/(?:level|character[- ]level)\s*(\d+)/i)

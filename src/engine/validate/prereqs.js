@@ -23,9 +23,15 @@ import { ARMOR_SKILLS } from '../config.js';
 function ownedIds(character) {
   const owned = new Set();
   const addAliases = (rawString, field, nodeId, ent) => {
-    if (nodeId) owned.add(nodeId);
+    if (nodeId) {
+      owned.add(nodeId);
+      if (nodeId.includes('|')) owned.add(nodeId.split('|')[0] + '|any');
+    }
     const fieldId = resolveId(rawString, field, character);
-    if (fieldId) owned.add(fieldId);
+    if (fieldId) {
+      owned.add(fieldId);
+      if (fieldId.includes('|')) owned.add(fieldId.split('|')[0] + '|any');
+    }
     const clean = cleanItemName(rawString);
     const bare = bareSkill(clean);
     const candidates = [
@@ -44,6 +50,11 @@ function ownedIds(character) {
   for (const node of graph.items) {
     if (node.field === 'flaws' || node.field === 'synthetic') continue;
     addAliases(node.rawString, node.field, node.id, node.entity);
+    if (node.entity && node.entity.parameter) {
+      const p = node.entity.parameter.toLowerCase();
+      owned.add(`${node.id}|${p}`);
+      owned.add(`${node.id}|any`);
+    }
   }
   // Granted abilities also satisfy prerequisites.
   for (const g of grantedAbilities(character).list) {
