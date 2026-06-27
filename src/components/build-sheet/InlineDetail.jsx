@@ -13,7 +13,7 @@ import { useBuilderState, useBuilderActions } from "../builder-context.jsx";
 // inline view targets it. Returns null otherwise — callers can drop it after any row.
 export default function InlineDetail({ item, field }) {
   const { character, report, view } = useBuilderState();
-  const { onChase, onSetChoice, onUpdateParameter } = useBuilderActions();
+  const { onChase, onSetChoice, onOpenChoicePicker, onUpdateParameter } = useBuilderActions();
 
   const isInlineHere = view?.mode === "inspect" && view.item === item && view.field === field;
 
@@ -33,6 +33,7 @@ export default function InlineDetail({ item, field }) {
           report={report}
           choices={character.choices}
           onSetChoice={onSetChoice}
+          onOpenChoicePicker={onOpenChoicePicker}
           onUpdateParameter={onUpdateParameter}
           onInspect={onChase}
         />

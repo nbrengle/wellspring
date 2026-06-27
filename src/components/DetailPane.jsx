@@ -1,17 +1,16 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import {
   lookupEntity, REFS, allergenAward, powerSpellChoiceSpec
 } from '../engine/data.js';
 import { PARAMETER_SUGGESTIONS, TYPEABLE_PARAMS } from "./parameter-suggestions.js";
 import SubSelect from "./SubSelect.jsx";
-import EntityChoicePicker from "./ui/EntityChoicePicker.jsx";
 import { formatParameterizedName } from "../engine/resolver.js";
 // Re-export so existing importers (Builder.jsx) keep their path; the impl now lives
 // in the engine where it's unit-tested.
 export { formatParameterizedName };
 
 
-export default function DetailPane({ view, report, choices, onSetChoice, onUpdateParameter, onInspect, onBack, onClose }) {
+export default function DetailPane({ view, report, choices, onSetChoice, onOpenChoicePicker, onUpdateParameter, onInspect, onBack, onClose }) {
   if (!view) {
     return (
       <aside className="b-rail b-rail-right is-empty">
@@ -21,10 +20,10 @@ export default function DetailPane({ view, report, choices, onSetChoice, onUpdat
       </aside>
     );
   }
-  return <EntityDetail view={view} report={report} choices={choices} onSetChoice={onSetChoice} onUpdateParameter={onUpdateParameter} onInspect={onInspect} onBack={onBack} onClose={onClose} />;
+  return <EntityDetail view={view} report={report} choices={choices} onSetChoice={onSetChoice} onOpenChoicePicker={onOpenChoicePicker} onUpdateParameter={onUpdateParameter} onInspect={onInspect} onBack={onBack} onClose={onClose} />;
 }
 
-function EntityDetail({ view, report, choices, onSetChoice, onUpdateParameter, onInspect, onBack, onClose }) {
+function EntityDetail({ view, report, choices, onSetChoice, onOpenChoicePicker, onUpdateParameter, onInspect, onBack, onClose }) {
   const entity = useResolvedEntity(view.item, view.field, view.resolveType);
   const { item, resolveType } = view;
 
@@ -41,7 +40,7 @@ function EntityDetail({ view, report, choices, onSetChoice, onUpdateParameter, o
         <p className="b-detail-type">{entity?.type || resolveType}</p>
       </header>
       <div className="b-detail-body">
-        <EntityBody entity={entity} view={view} report={report} choices={choices} onSetChoice={onSetChoice} onUpdateParameter={onUpdateParameter} onInspect={onInspect} />
+        <EntityBody entity={entity} view={view} report={report} choices={choices} onSetChoice={onSetChoice} onOpenChoicePicker={onOpenChoicePicker} onUpdateParameter={onUpdateParameter} onInspect={onInspect} />
       </div>
     </aside>
   );
@@ -203,7 +202,7 @@ function ParameterEditor({ baseName, entity, view, suggestions: suggestionsProp,
   );
 }
 
-export function EntityBody({ entity, view, report, choices, onSetChoice, onUpdateParameter, onInspect }) {
+export function EntityBody({ entity, view, report, choices, onSetChoice, onOpenChoicePicker, onUpdateParameter, onInspect }) {
   // Hooks must run unconditionally and in the same order every render — so this
   // useMemo is hoisted ABOVE the early `!entity` return (it already guards on
   // entity?.id internally). Calling it after the return tripped rules-of-hooks.
@@ -214,8 +213,6 @@ export function EntityBody({ entity, view, report, choices, onSetChoice, onUpdat
       .map((id) => lookupEntity(id))
       .filter((sub) => sub && sub.tier === "SubPower");
   }, [entity]);
-  // Open state for the read-pane picker (large opaque power/spell pools).
-  const [choicePicker, setChoicePicker] = useState(null);
   if (!entity) {
     return <p className="b-detail-missing">No detail available — this item may be unresolved.</p>;
   }
@@ -329,42 +326,29 @@ export function EntityBody({ entity, view, report, choices, onSetChoice, onUpdat
       })()}
       {(() => {
         // A power that grants a chosen spell/power (Arcane Secrets, Weird Wanderings)
-        // — pick one; the engine grants it. The pool comes from the report under the
-        // spec's optionsKey (rule-gated). Small pools → SubSelect pills; LARGE, opaque
-        // pools (>10 powers/spells you'd need to look up) → the read-pane picker so
-        // you can read each option before committing.
+        // — pick one; the engine grants it. Opens the SHARED PickerOverlay (search /
+        // sort / filter / group) with the rule-gated pool from report[optionsKey].
         const choiceSpec = powerSpellChoiceSpec(entity);
         if (!choiceSpec || !onSetChoice) return null;
         const powerId = `powers:${entity.baseName || entity.name}`;
         const pool = report?.[choiceSpec.optionsKey] || [];
         const label = choiceSpec.label || "Choose";
         const chosen = choices?.[powerId] || null;
-        if (!pool.length) {
-          return (
-            <div className="b-detail-section">
-              <h3 className="b-detail-section-title">{label}</h3>
-              <p className="b-detail-hint">No options available yet.</p>
-            </div>
-          );
-        }
-        if (pool.length > 10) {
-          return (
-            <div className="b-detail-section">
-              <h3 className="b-detail-section-title">{label}</h3>
-              <button className="b-lin-subchoice-btn" onClick={() => setChoicePicker({ powerId, label, pool })}>
-                {chosen || `${label}…`}<span className="b-lin-subchoice-btn-caret">⌄</span>
-              </button>
-            </div>
-          );
-        }
         return (
           <div className="b-detail-section">
-            <SubSelect
-              prompt={label}
-              value={chosen}
-              onChange={(v) => onSetChoice(powerId, v || "")}
-              options={pool.map((s) => ({ value: s }))}
-            />
+            <h3 className="b-detail-section-title">{label}</h3>
+            {pool.length ? (
+              <button
+                className="b-lin-subchoice-btn"
+                onClick={() => onOpenChoicePicker?.({
+                  title: label, entityType: "powers", options: pool,
+                  onChoose: (name) => onSetChoice(powerId, name),
+                })}>
+                {chosen || `${label}…`}<span className="b-lin-subchoice-btn-caret">⌄</span>
+              </button>
+            ) : (
+              <p className="b-detail-hint">No options available yet.</p>
+            )}
           </div>
         );
       })()}
@@ -391,7 +375,10 @@ export function EntityBody({ entity, view, report, choices, onSetChoice, onUpdat
                 <div key={slot} className="b-detail-subpick">
                   <span className="b-lin-subchoice-label">Power {slot}</span>
                   <button className="b-lin-subchoice-btn"
-                          onClick={() => setChoicePicker({ powerId: key, label: `Power ${slot} (${tag})`, pool: sf.options })}>
+                          onClick={() => onOpenChoicePicker?.({
+                            title: `Power ${slot} (${tag})`, entityType: "powers", options: sf.options,
+                            onChoose: (name) => onSetChoice(key, name),
+                          })}>
                     {pick || "Choose a Power…"}<span className="b-lin-subchoice-btn-caret">⌄</span>
                   </button>
                 </div>
@@ -407,20 +394,20 @@ export function EntityBody({ entity, view, report, choices, onSetChoice, onUpdat
         if (!/^Divine Substitution\b/.test(entity.baseName || entity.name) || !onSetChoice) return null;
         const powerId = "powers:Divine Substitution";
         const pool = report?.devotion?.substitution?.options || [];
+        const chosen = choices?.[powerId] || null;
         return (
           <div className="b-detail-section">
+            <h3 className="b-detail-section-title">Choose a Domain</h3>
             {pool.length ? (
-              <SubSelect
-                prompt="Choose a Domain"
-                value={choices?.[powerId] || null}
-                onChange={(v) => onSetChoice(powerId, v || "")}
-                options={pool.map((d) => ({ value: d }))}
-              />
+              <button className="b-lin-subchoice-btn"
+                      onClick={() => onOpenChoicePicker?.({
+                        title: "Choose a Domain", entityType: "domains", options: pool,
+                        onChoose: (name) => onSetChoice(powerId, name),
+                      })}>
+                {chosen || "Choose a Domain…"}<span className="b-lin-subchoice-btn-caret">⌄</span>
+              </button>
             ) : (
-              <>
-                <h3 className="b-detail-section-title">Choose a Domain</h3>
-                <p className="b-detail-hint">Pick a Devotion first — the eligible domains depend on its standard (and opposed) domains.</p>
-              </>
+              <p className="b-detail-hint">Pick a Devotion first — the eligible domains depend on its standard (and opposed) domains.</p>
             )}
           </div>
         );
@@ -447,17 +434,6 @@ export function EntityBody({ entity, view, report, choices, onSetChoice, onUpdat
       )}
       <ForwardLinks entity={entity} onInspect={onInspect} />
       <BackLinks entity={entity} onInspect={onInspect} />
-      {choicePicker && (
-        <EntityChoicePicker
-          title={choicePicker.label}
-          resolveType="powers"
-          options={choicePicker.pool}
-          value={choices?.[choicePicker.powerId] || null}
-          chooseLabel={(name) => `Choose ${name}`}
-          onChoose={(name) => { onSetChoice(choicePicker.powerId, name); setChoicePicker(null); }}
-          onClose={() => setChoicePicker(null)}
-        />
-      )}
     </>
   );
 }
