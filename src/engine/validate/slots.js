@@ -465,3 +465,19 @@ export function weirdWanderingsOptions() {
   }
   return [...out].sort((a, b) => a.localeCompare(b));
 }
+
+// The Specialty Tags an Artisan Basic power can carry (Artificer / Crafter / Mystic).
+export const ARTISAN_SPECIALTY_TAGS = [...new Set(
+  (CLASS_POWERS.Artisan?.basic || []).flatMap((p) => p.tags || []),
+)].sort();
+
+// Studied Focus (Artisan Advanced power): "instead of an Advanced Power, choose TWO
+// Basic Artisan Powers with the SAME Specialty Tag." Returns the Basic Artisan
+// powers carrying `tag` — the pool for BOTH of its two picks. (Tag-less call returns
+// all Basic Artisan powers, used to validate a recorded pair shares a tag.)
+export function studiedFocusOptions(tag) {
+  return (CLASS_POWERS.Artisan?.basic || [])
+    .filter((p) => p?.name && (!tag || (p.tags || []).includes(tag)))
+    .map((p) => p.name)
+    .sort((a, b) => a.localeCompare(b));
+}

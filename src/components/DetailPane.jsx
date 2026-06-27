@@ -369,6 +369,38 @@ export function EntityBody({ entity, view, report, choices, onSetChoice, onUpdat
         );
       })()}
       {(() => {
+        // Studied Focus (Artisan Advanced): pick a Specialty Tag, then TWO Basic
+        // Artisan powers of that tag. Tag = pills (3 options); each power = the
+        // read-pane picker, filtered to the chosen tag's pool.
+        if (!/^Studied Focus\b/.test(entity.baseName || entity.name) || !onSetChoice) return null;
+        const sf = report?.studiedFocus;
+        if (!sf) return null;
+        const tag = choices?.['powers:Studied Focus'] || null;
+        return (
+          <div className="b-detail-section">
+            <SubSelect
+              prompt="Specialty Tag"
+              value={tag}
+              onChange={(v) => onSetChoice('powers:Studied Focus', v || "")}
+              options={sf.tags.map((t) => ({ value: t }))}
+            />
+            {tag && [1, 2].map((slot) => {
+              const key = `powers:Studied Focus:${slot}`;
+              const pick = choices?.[key] || null;
+              return (
+                <div key={slot} className="b-detail-subpick">
+                  <span className="b-lin-subchoice-label">Power {slot}</span>
+                  <button className="b-lin-subchoice-btn"
+                          onClick={() => setChoicePicker({ powerId: key, label: `Power ${slot} (${tag})`, pool: sf.options })}>
+                    {pick || "Choose a Power…"}<span className="b-lin-subchoice-btn-caret">⌄</span>
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        );
+      })()}
+      {(() => {
         // Divine Substitution (Cleric Class power): pick ONE domain not in your
         // Devotion's standard domains and not in direct opposition to them. The
         // eligible pool (opposition-filtered) comes from the report.

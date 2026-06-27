@@ -1052,6 +1052,11 @@ function extractChooseOne(power) {
   const d = power.description || '';
   const m = d.match(CHOOSE_LEAD);
   if (!m) return;
+  // "(ie: …)" / "(e.g. …)" after the lead-in is an EXAMPLE, not the real option list
+  // (Studied Focus: "Choose one of the following: (ie: Artificer, Crafter, Mystic)").
+  // Parsing it yields garbage options — skip; such powers get their real options from
+  // a dedicated extractor (extractManualParameterizations) instead.
+  if (/^\s*\(\s*(?:ie|i\.e\.|e\.g\.|eg)\b/i.test(m[2])) return;
   // Options are the "• …" bullets after the lead-in
   let opts = [...m[2].matchAll(/•\s*([^•]+?)(?=\s*•|$)/g)].map((x) => x[1].trim()).filter(Boolean);
   

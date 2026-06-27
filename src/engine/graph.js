@@ -55,6 +55,16 @@ export function resolveCharacterGraph(character) {
       if (picked) effects.push({ type: 'GRANT_SOURCE', grants: [`powers:${picked}`] });
     }
 
+    // Studied Focus (Artisan Advanced): instead of an Advanced Power, grants the TWO
+    // chosen Basic Artisan powers (same Specialty Tag). The two picks are stored as
+    // choices['powers:Studied Focus:1'|':2']; grant whichever are set.
+    if ((ent?.baseName || ent?.name) === 'Studied Focus') {
+      for (const slot of ['1', '2']) {
+        const picked = character.choices?.[`powers:Studied Focus:${slot}`];
+        if (picked) effects.push({ type: 'GRANT_SOURCE', grants: [`powers:${picked}`] });
+      }
+    }
+
     items.push({
       id: ent?.id || id,
       name: ent?.name || cleanName,

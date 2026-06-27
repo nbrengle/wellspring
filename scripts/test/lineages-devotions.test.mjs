@@ -7,7 +7,7 @@ import {
 import {
   budgetFor, computeSlots, spellSlots, devotionState, prereqStatus,
   LEVEL_CAP, LEGAL_MIN_LEVEL, grantedAbilities, computeSpend,
-  getMaxRanks, bookcasterSpellOptions, arcaneSecretsSpellOptions, weirdWanderingsOptions, eligibleClassChoices, agileLearnerCapacity, basicSpellOptions
+  getMaxRanks, bookcasterSpellOptions, arcaneSecretsSpellOptions, weirdWanderingsOptions, studiedFocusOptions, eligibleClassChoices, agileLearnerCapacity, basicSpellOptions
 } from "../../src/engine/testing.js";
 import { bareSkill, cleanItemName, getClasses, formatParameterizedName } from "../../src/engine/resolver.js";
 import { formatCharacterSheet, parseCharacterSheet } from '../../src/engine/sheet.js';
@@ -137,6 +137,22 @@ test('Weird Wanderings grants a chosen Basic power from a non-Artisan base class
   const ww = resolveCharacterGraph(char).items.find((i) => /Weird Wanderings/.test(i.name));
   ok(ww.effects.some((e) => e.type === 'GRANT_SOURCE' && e.grants.includes('powers:Battlemind')),
     'the picked power is granted');
+});
+
+test('Studied Focus: a tag gates the pool, and both picks are granted', () => {
+  // "Instead of an Advanced Power, choose TWO Basic Artisan Powers with the same
+  // Specialty Tag." The (ie: …) example in the doc must NOT become a bogus chooseOne.
+  ok(!lookupEntity('powers:Studied Focus').chooseOne, 'no bogus chooseOne from the "(ie:)" example');
+  const crafter = studiedFocusOptions('Crafter');
+  ok(crafter.length >= 2 && crafter.every((n) => (lookupEntity(`powers:${n}`)?.tags || []).includes('Crafter')),
+     'pool is exactly the chosen tag’s Basic Artisan powers');
+  // Both picks of the same tag are granted.
+  const char = { classLevels: 'Artisan 10', classPowers: ['Studied Focus'],
+    choices: { 'powers:Studied Focus': 'Crafter', 'powers:Studied Focus:1': 'Analysis', 'powers:Studied Focus:2': 'Antidote' } };
+  const sf = resolveCharacterGraph(char).items.find((i) => /Studied Focus/.test(i.name));
+  ok(sf.effects.filter((e) => e.type === 'GRANT_SOURCE').length === 2, 'both chosen powers granted');
+  ok(sf.effects.some((e) => e.grants?.includes('powers:Analysis'))
+     && sf.effects.some((e) => e.grants?.includes('powers:Antidote')), 'the two picks specifically');
 });
 
 test('Arcane Secrets pool is rank-gated, not a flat list (the rules gate by castable rank)', () => {
