@@ -15,9 +15,9 @@
 //               Favored Gem). Stored in advantageChoices[item]; display only.
 import { useState } from "react";
 import { cantripOptions, lineageSpellOptions, pickAndChooseOptions } from "../../engine/data.js";
+import { useBuilderActions } from "../builder-context.jsx";
 import RepPicker from "./RepPicker.jsx";
 import SubSelect from "../SubSelect.jsx";
-import EntityChoicePicker from "../ui/EntityChoicePicker.jsx";
 
 const FLAVOR_OPTIONS = {
   Accent: ["Flame", "Ice", "Lightning", "Acid", "Force", "Mind", "Fear", "Shadow"],
@@ -68,37 +68,35 @@ export default function SubChoice({ spec, item, field, value, onSetChoice, onSet
 }
 
 // Pick and Choose: pick one Lineage Advantage from another lineage (80 options
-// across 7 lineages) — the read-pane picker, grouped by lineage, so you read what
-// each advantage does before committing. The choice is stored as "<Lineage> -
-// <Advantage>" (advId) so the engine resolves it cross-lineage.
+// across 7 lineages) — opens the SHARED PickerOverlay (search / sort / filter / group
+// by lineage), so you read what each advantage does before committing. The choice is
+// stored as "<Lineage> - <Advantage>" (advId) so the engine resolves it cross-lineage.
 function AdvantageChoice({ item, value, onSetChoice }) {
-  const [open, setOpen] = useState(false);
-  const options = pickAndChooseOptions().map((o) => ({ ...o, advId: o.advId, key: o.advId }));
+  const { onOpenChoicePicker } = useBuilderActions();
+  const options = pickAndChooseOptions();
   // Display the bare advantage name; the stored value is the "<Lineage> - <Advantage>" id.
   const current = options.find((o) => o.advId === value);
   return (
     <div className="b-lin-subchoice">
       <span className="b-lin-subchoice-label">Advantage</span>
-      <button type="button" className="b-lin-subchoice-btn" onClick={() => setOpen(true)}>
+      <button
+        type="button"
+        className="b-lin-subchoice-btn"
+        onClick={() => onOpenChoicePicker?.({
+          title: "Pick an advantage from another lineage",
+          subtitle: "Purchase one Lineage Advantage from another lineage — you must still meet its prerequisites.",
+          entityType: "advantages",
+          // PickerOverlay groups by `cat`; advantage names are unique across lineages,
+          // so onChoose(name) → resolve back to its lineage-qualified advId.
+          options: options.map((o) => ({ name: o.name, cat: o.group, desc: o.description })),
+          onChoose: (name) => {
+            const opt = options.find((o) => o.name === name);
+            if (opt) onSetChoice(item, opt.advId);
+          },
+        })}>
         {current ? `${current.name} (${current.group})` : "Choose an advantage…"}
         <span className="b-lin-subchoice-btn-caret">⌄</span>
       </button>
-      {open && (
-        <EntityChoicePicker
-          title="Pick an advantage from another lineage"
-          subtitle="Purchase one Lineage Advantage from another lineage — you must still meet its prerequisites."
-          options={options.map((o) => ({ name: o.name, group: o.group, description: o.description, advId: o.advId }))}
-          value={current?.name || null}
-          chooseLabel={(name) => `Choose ${name}`}
-          onChoose={(name) => {
-            // Resolve back to the advId (lineage-qualified) for the recorded choice.
-            const opt = options.find((o) => o.name === name);
-            onSetChoice(item, opt ? opt.advId : "");
-            setOpen(false);
-          }}
-          onClose={() => setOpen(false)}
-        />
-      )}
     </div>
   );
 }
