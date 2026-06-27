@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useRef, useLayoutEffect, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { grantSourceRole } from "./utils.js";
 
 export function Stat({ label, value, title }) {
@@ -12,17 +13,18 @@ export function Stat({ label, value, title }) {
 
 export function StatWithSources({ label, value, title, base, baseLabel = "base", sources = [], onInspect }) {
   const [open, setOpen] = useState(false);
+  const btnRef = useRef(null);
   const hasBreakdown = sources.length > 0;
   if (!hasBreakdown) return <Stat label={label} value={value} title={title} />;
   return (
     <div className={`b-stat b-stat-interactive ${open ? "is-open" : ""}`}>
-      <button className="b-stat-btn" onClick={() => setOpen((o) => !o)}
+      <button ref={btnRef} className="b-stat-btn" onClick={() => setOpen((o) => !o)}
               title={title} aria-expanded={open} aria-label={`${label} breakdown`}>
         <span className="b-stat-val">{value}</span>
         <span className="b-stat-label">{label} <span className="b-stat-caret">ⓘ</span></span>
       </button>
       {open && (
-        <div className="b-stat-pop" role="dialog" aria-label={`${label} sources`}>
+        <StatPopover anchorRef={btnRef} label={label} onClose={() => setOpen(false)}>
           <button className="b-stat-pop-x" aria-label="Close" onClick={() => setOpen(false)}>×</button>
           <h4 className="b-stat-pop-title">{label} breakdown</h4>
           <ul className="b-stat-pop-list">
@@ -41,9 +43,72 @@ export function StatWithSources({ label, value, title, base, baseLabel = "base",
               </li>
             ))}
           </ul>
-        </div>
+        </StatPopover>
       )}
     </div>
+  );
+}
+
+// The breakdown popover is portalled to <body> and fixed-positioned under its
+// trigger, so it escapes the identity rail's overflow clip (overflow-y:auto forces
+// overflow-x to clip, which was shearing the right edge off). It pins under the
+// button, sizes to its content, and shifts left if it would run off the viewport.
+function StatPopover({ anchorRef, label, onClose, children }) {
+  const popRef = useRef(null);
+  const [pos, setPos] = useState(null);
+
+  useLayoutEffect(() => {
+    const place = () => {
+      const a = anchorRef.current?.getBoundingClientRect();
+      const pop = popRef.current;
+      if (!a || !pop) return;
+      const w = pop.offsetWidth;
+      const margin = 8;
+      let left = a.left;
+      if (left + w > window.innerWidth - margin) left = window.innerWidth - margin - w;
+      if (left < margin) left = margin;
+      setPos({ top: a.bottom + 5, left });
+    };
+    place();
+    window.addEventListener("resize", place);
+    window.addEventListener("scroll", place, true);
+    return () => {
+      window.removeEventListener("resize", place);
+      window.removeEventListener("scroll", place, true);
+    };
+  }, [anchorRef]);
+
+  useEffect(() => {
+    const onDown = (e) => {
+      if (popRef.current?.contains(e.target) || anchorRef.current?.contains(e.target)) return;
+      onClose();
+    };
+    const onKey = (e) => { if (e.key === "Escape") onClose(); };
+    document.addEventListener("mousedown", onDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [anchorRef, onClose]);
+
+  // Portal into the themed .b-root (not document.body) so the popover keeps the
+  // builder's CSS custom properties (--b-panel etc.) — on <body> those vars are
+  // undefined, leaving the popover transparent so the page bleeds through. .b-root
+  // has no overflow clip, so the popover still escapes the identity rail's clip.
+  const host = (typeof document !== "undefined" && document.querySelector(".b-root")) || (typeof document !== "undefined" ? document.body : null);
+  if (!host) return null;
+  return createPortal(
+    <div
+      ref={popRef}
+      className="b-stat-pop"
+      role="dialog"
+      aria-label={`${label} sources`}
+      style={pos ? { top: pos.top, left: pos.left } : { visibility: "hidden" }}
+    >
+      {children}
+    </div>,
+    host,
   );
 }
 
