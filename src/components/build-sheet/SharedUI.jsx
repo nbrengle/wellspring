@@ -75,7 +75,8 @@ export function CostBadge({ cost }) {
     return (
       <span className="b-row-bp is-discounted"
             title={`${cost.base} BP, discounted ${cost.discount.amount} by ${cost.discount.source}`}>
-        {cost.cost} BP <span className="b-row-disc">−{cost.discount.amount} · {cost.discount.source}</span>
+        <span className="b-row-final-cost">{cost.cost} BP</span> 
+        <span className="b-row-disc"> (base {cost.base}, −{cost.discount.amount} {cost.discount.source})</span>
       </span>
     );
   }
