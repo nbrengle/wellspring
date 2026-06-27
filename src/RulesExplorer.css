@@ -18,6 +18,9 @@
 
 /* LEFT: Sidebar Filters */
 .b-explorer-sidebar {
+  /* Hold the declared width: as a flex child it would otherwise shrink toward its
+     content's min-width (collapsing to ~60px) because .b-explorer-browse grows. */
+  flex: 0 0 250px;
   width: 250px;
   background: var(--b-panel, #1c1813);
   border-right: 1px solid var(--b-border, #3a332a);
@@ -152,6 +155,10 @@
 /* MIDDLE: Search and Browse List */
 .b-explorer-browse {
   flex: 1.2;
+
+  /* Without min-width:0 a flex item's min-width defaults to its content size, so a
+     wide row would stop .browse from shrinking — it overflows and starves .read. */
+  min-width: 0;
   display: flex;
   flex-direction: column;
   background: var(--b-panel-2, #221d16);
@@ -296,6 +303,7 @@
 /* RIGHT: Reader Pane */
 .b-explorer-read {
   flex: 1.8;
+  min-width: 0;
   background: var(--b-bg);
   height: 100%;
   overflow: hidden;
