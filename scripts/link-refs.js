@@ -367,16 +367,31 @@ function parseGrants(text, grantLookups) {
 
   // Dynamic check for name followed by parenthesized number in description containing gains/free/choose
   if (/\b(gains?|adds?|learns?|receives?|granted|free|choose)\b/i.test(text)) {
-    const PAREN_NUM_RE = /\b([A-Z][\w’'-]+(?:\s+(?:[A-Z][\w’'-]+|of|the|and|to|a|in)){0,4})\s*\((\d+)\)/g;
+    // Allow an optional "Base: Param" prefix so a parameterized grant like
+    // "Lore: Historical (2)" / "Lore: Noble (2)" (Lessons from Scars) is captured as
+    // the parameterized skill "Lore (Historical)" — the colon form slipped past the
+    // bare-name pattern, which is why those grants were silently dropped.
+    const PAREN_NUM_RE = /\b([A-Z][\w’'-]+(?:\s+(?:[A-Z][\w’'-]+|of|the|and|to|a|in)){0,4})(?:\s*:\s*([A-Z][\w’' -]+?))?\s*\((\d+)\)/g;
     PAREN_NUM_RE.lastIndex = 0;
     while ((m = PAREN_NUM_RE.exec(text))) {
-      const name = m[1].trim();
-      for (const type of ["perk", "skill", "power"]) {
-        const { entity } = resolve(name, grantLookups[type]);
-        if (entity) {
-          out.add(entity.id);
-          break;
+      // m[1] = base name, m[2] = parameter (if "Base: Param" form).
+      const param = m[2] ? m[2].trim() : null;
+      const candidates = param ? [`${m[1].trim()} (${param})`, m[1].trim()] : [m[1].trim()];
+      let matched = false;
+      for (const name of candidates) {
+        for (const type of ["perk", "skill", "power"]) {
+          const { entity } = resolve(name, grantLookups[type]);
+          if (entity) {
+            // Preserve a chosen PARAMETER on the grant edge ("Lore: Historical" →
+            // "skills:Lore (Historical)") so two parameterized grants of the same
+            // base skill stay distinct and materialize with their parameter, instead
+            // of collapsing to one bare "skills:Lore".
+            const base = entity.id.slice(0, entity.id.indexOf(':'));
+            out.add(param && entity.parameter ? `${base}:${entity.baseName || entity.name} (${param})` : entity.id);
+            matched = true; break;
+          }
         }
+        if (matched) break;
       }
     }
   }

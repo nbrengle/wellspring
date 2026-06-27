@@ -1,9 +1,10 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import {
   lookupEntity, REFS, allergenAward, powerSpellChoiceSpec
 } from '../engine/data.js';
 import { PARAMETER_SUGGESTIONS, TYPEABLE_PARAMS } from "./parameter-suggestions.js";
 import SubSelect from "./SubSelect.jsx";
+import EntityChoicePicker from "./ui/EntityChoicePicker.jsx";
 import { formatParameterizedName } from "../engine/resolver.js";
 // Re-export so existing importers (Builder.jsx) keep their path; the impl now lives
 // in the engine where it's unit-tested.
@@ -213,6 +214,8 @@ export function EntityBody({ entity, view, report, choices, onSetChoice, onUpdat
       .map((id) => lookupEntity(id))
       .filter((sub) => sub && sub.tier === "SubPower");
   }, [entity]);
+  // Open state for the read-pane picker (large opaque power/spell pools).
+  const [choicePicker, setChoicePicker] = useState(null);
   if (!entity) {
     return <p className="b-detail-missing">No detail available — this item may be unresolved.</p>;
   }
@@ -325,28 +328,75 @@ export function EntityBody({ entity, view, report, choices, onSetChoice, onUpdat
         );
       })()}
       {(() => {
-        // A power that grants a chosen spell (Arcane Secrets) — pick one spell; the
-        // engine adds it to Known Spells. The pool is rank-gated and comes from the
-        // report (not a flat list), since the rules gate by what you can cast.
-        const spellSpec = powerSpellChoiceSpec(entity);
-        if (!spellSpec || !onSetChoice) return null;
+        // A power that grants a chosen spell/power (Arcane Secrets, Weird Wanderings)
+        // — pick one; the engine grants it. The pool comes from the report under the
+        // spec's optionsKey (rule-gated). Small pools → SubSelect pills; LARGE, opaque
+        // pools (>10 powers/spells you'd need to look up) → the read-pane picker so
+        // you can read each option before committing.
+        const choiceSpec = powerSpellChoiceSpec(entity);
+        if (!choiceSpec || !onSetChoice) return null;
         const powerId = `powers:${entity.baseName || entity.name}`;
-        const pool = report?.arcaneSecretsOptions || [];
+        const pool = report?.[choiceSpec.optionsKey] || [];
+        const label = choiceSpec.label || "Choose";
+        const chosen = choices?.[powerId] || null;
+        if (!pool.length) {
+          return (
+            <div className="b-detail-section">
+              <h3 className="b-detail-section-title">{label}</h3>
+              <p className="b-detail-hint">No options available yet.</p>
+            </div>
+          );
+        }
+        if (pool.length > 10) {
+          return (
+            <div className="b-detail-section">
+              <h3 className="b-detail-section-title">{label}</h3>
+              <button className="b-lin-subchoice-btn" onClick={() => setChoicePicker({ powerId, label, pool })}>
+                {chosen || `${label}…`}<span className="b-lin-subchoice-btn-caret">⌄</span>
+              </button>
+            </div>
+          );
+        }
         return (
           <div className="b-detail-section">
-            {pool.length ? (
-              <SubSelect
-                prompt="Choose a Spell"
-                value={choices?.[powerId] || null}
-                onChange={(v) => onSetChoice(powerId, v || "")}
-                options={pool.map((s) => ({ value: s }))}
-              />
-            ) : (
-              <>
-                <h3 className="b-detail-section-title">Choose a Spell</h3>
-                <p className="b-detail-hint">No arcane spells available to learn yet.</p>
-              </>
-            )}
+            <SubSelect
+              prompt={label}
+              value={chosen}
+              onChange={(v) => onSetChoice(powerId, v || "")}
+              options={pool.map((s) => ({ value: s }))}
+            />
+          </div>
+        );
+      })()}
+      {(() => {
+        // Studied Focus (Artisan Advanced): pick a Specialty Tag, then TWO Basic
+        // Artisan powers of that tag. Tag = pills (3 options); each power = the
+        // read-pane picker, filtered to the chosen tag's pool.
+        if (!/^Studied Focus\b/.test(entity.baseName || entity.name) || !onSetChoice) return null;
+        const sf = report?.studiedFocus;
+        if (!sf) return null;
+        const tag = choices?.['powers:Studied Focus'] || null;
+        return (
+          <div className="b-detail-section">
+            <SubSelect
+              prompt="Specialty Tag"
+              value={tag}
+              onChange={(v) => onSetChoice('powers:Studied Focus', v || "")}
+              options={sf.tags.map((t) => ({ value: t }))}
+            />
+            {tag && [1, 2].map((slot) => {
+              const key = `powers:Studied Focus:${slot}`;
+              const pick = choices?.[key] || null;
+              return (
+                <div key={slot} className="b-detail-subpick">
+                  <span className="b-lin-subchoice-label">Power {slot}</span>
+                  <button className="b-lin-subchoice-btn"
+                          onClick={() => setChoicePicker({ powerId: key, label: `Power ${slot} (${tag})`, pool: sf.options })}>
+                    {pick || "Choose a Power…"}<span className="b-lin-subchoice-btn-caret">⌄</span>
+                  </button>
+                </div>
+              );
+            })}
           </div>
         );
       })()}
@@ -397,6 +447,17 @@ export function EntityBody({ entity, view, report, choices, onSetChoice, onUpdat
       )}
       <ForwardLinks entity={entity} onInspect={onInspect} />
       <BackLinks entity={entity} onInspect={onInspect} />
+      {choicePicker && (
+        <EntityChoicePicker
+          title={choicePicker.label}
+          resolveType="powers"
+          options={choicePicker.pool}
+          value={choices?.[choicePicker.powerId] || null}
+          chooseLabel={(name) => `Choose ${name}`}
+          onChoose={(name) => { onSetChoice(choicePicker.powerId, name); setChoicePicker(null); }}
+          onClose={() => setChoicePicker(null)}
+        />
+      )}
     </>
   );
 }

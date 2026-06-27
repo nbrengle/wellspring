@@ -93,6 +93,27 @@ test('a selected power that grants a perk zeroes that perk (Implicit Truths → 
   ok(eff.grant.derived, 'derived from the graph, not a sidecar');
 });
 
+test('a fixed power grant with parameters surfaces BOTH (Lessons from Scars → 2 Lores)', () => {
+  // Lessons from Scars "gains Lore: Historical (2), Lore: Noble (2) Perks" — a FIXED
+  // (non-choice) grant of two PARAMETERIZED skills. Both must materialize, free, and
+  // distinctly (not collapse to one bare "Lore"). The in-play "Choose one target…"
+  // sentence in the same description must NOT suppress the grant.
+  const owned = validate({ classLevels: 'Fighter 6', utilityPowers: ['Lessons from Scars'] }).owned;
+  const granted = (owned?.skills || []).filter((s) => s.grantedBy === 'Lessons from Scars');
+  eq(granted.length, 2, 'both Lore grants surface');
+  ok(granted.some((s) => /Historical/.test(s.name)) && granted.some((s) => /Noble/.test(s.name)),
+     'distinct parameters preserved (Historical + Noble)');
+  ok(granted.every((s) => (s.cost?.cost ?? 0) === 0), 'both free');
+});
+test('a choice-gated grant does NOT grant every option for free (The Learned One)', () => {
+  // The Learned One is "choose one of 8 at level-up" (chooseOne kind:play). Its
+  // REFS.grants lists all 8 — emitting them flat would grant all for free. The
+  // structured chooseOne must gate them, so zero auto-grants.
+  const owned = validate({ classLevels: 'Artisan 10', classPowers: ['The Learned One'] }).owned;
+  eq((owned?.skills || []).filter((s) => s.grantedBy === 'The Learned One').length, 0,
+     'no flat grant — the choice gates it');
+});
+
 // ─── discount sources: category, firstN, refund-if-free, cap ──────────────────
 test('Human Environmental Mastery discounts a Gathering skill by 1', () => {
   const c = { lineage: 'Human', lineageAdvantages: ['Environmental Mastery'], purchasedSkills: ['Forage I'] };

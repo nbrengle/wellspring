@@ -6,7 +6,7 @@
 // spell-slot capacity (spellSlots), and the Bookcaster spell options. Re-exported
 // by the validate.js barrel.
 
-import { lookupEntity, CLASS_POWERS, CLASS_PROGRESSION, CLASS_POWER_SLOTS, CLASSES, LINEAGES, lineageCantripChoices } from '../data.js';
+import { lookupEntity, CLASS_POWERS, CLASS_PROGRESSION, CLASS_POWER_SLOTS, CLASSES, BASE_CLASSES, LINEAGES, lineageCantripChoices } from '../data.js';
 import { cleanItemName, resolveId, getClasses, bareSkill } from '../resolver.js';
 import { SPELL_TIERS, SLOT_CATS, BOOKCASTER_TIER_FIELD, KNOWN_SPELL_FIELDS } from '../config.js';
 import {
@@ -448,4 +448,36 @@ export function arcaneSecretsSpellOptions(character) {
     }
   }
   return [...spells].sort((a, b) => a.localeCompare(b));
+}
+
+// Weird Wanderings (Artisan Basic power): "choose one Basic-Tier Power from any
+// other non-Artisan Base Class" — and it "cannot have a Refresh of Spell". The pool
+// is every Basic-tier power of a base class other than Artisan, minus Spell-refresh
+// ones. (Only martial base classes have a "Basic" tier; casters use Novice/Adept/
+// Greater, so they contribute nothing here — consistent with the rule's intent.)
+export function weirdWanderingsOptions() {
+  const out = new Set();
+  for (const cls of BASE_CLASSES) {
+    if (cls === 'Artisan') continue;
+    for (const p of (CLASS_POWERS[cls]?.basic || [])) {
+      if (p?.name && !/^spell$/i.test(p.refresh || '')) out.add(p.name);
+    }
+  }
+  return [...out].sort((a, b) => a.localeCompare(b));
+}
+
+// The Specialty Tags an Artisan Basic power can carry (Artificer / Crafter / Mystic).
+export const ARTISAN_SPECIALTY_TAGS = [...new Set(
+  (CLASS_POWERS.Artisan?.basic || []).flatMap((p) => p.tags || []),
+)].sort();
+
+// Studied Focus (Artisan Advanced power): "instead of an Advanced Power, choose TWO
+// Basic Artisan Powers with the SAME Specialty Tag." Returns the Basic Artisan
+// powers carrying `tag` — the pool for BOTH of its two picks. (Tag-less call returns
+// all Basic Artisan powers, used to validate a recorded pair shares a tag.)
+export function studiedFocusOptions(tag) {
+  return (CLASS_POWERS.Artisan?.basic || [])
+    .filter((p) => p?.name && (!tag || (p.tags || []).includes(tag)))
+    .map((p) => p.name)
+    .sort((a, b) => a.localeCompare(b));
 }

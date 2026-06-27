@@ -35,7 +35,7 @@ export { lbpState };
 // Slot/spell-slot accounting (validate/slots.js) and prerequisite checking
 // (validate/prereqs.js) — extracted leaves. Import the ones the orchestrator calls
 // internally; re-export the public surface so the barrel keeps its API.
-import { computeSlots, spellSlots, bookcasterSpellOptions, arcaneSecretsSpellOptions, eligibleClassChoices, CLASS_CHOICE_SKILLS, basicSpellOptions, BASIC_SPELL_SKILLS } from './validate/slots.js';
+import { computeSlots, spellSlots, bookcasterSpellOptions, arcaneSecretsSpellOptions, weirdWanderingsOptions as weirdWanderingsPool, studiedFocusOptions as studiedFocusPool, ARTISAN_SPECIALTY_TAGS, eligibleClassChoices, CLASS_CHOICE_SKILLS, basicSpellOptions, BASIC_SPELL_SKILLS } from './validate/slots.js';
 export { innateBonusCantrips, eligibleClassChoices, CLASS_CHOICE_SKILLS, agileLearnerCapacity, basicSpellOptions, BASIC_SPELL_SKILLS } from './validate/slots.js';
 import { resolveCharacterGraph, grantedAbilities } from './graph.js';
 export { grantedAbilities };
@@ -439,6 +439,16 @@ export function validate(character) {
   // Arcane Secrets (Knowledge domain power): the arcane spells the character may add
   // to Known Spells — rank-gated for casters, capped at Adept for non-casters.
   const arcaneSecretsOptions = arcaneSecretsSpellOptions(character);
+  // Weird Wanderings (Artisan Basic power): Basic powers from any non-Artisan Base
+  // Class the Artisan may copy (no Spell-refresh).
+  const weirdWanderingsOptions = weirdWanderingsPool();
+  // Studied Focus (Artisan Advanced power): the chosen Specialty Tag + the two Basic
+  // Artisan powers it lets you pick (both must share the tag).
+  const studiedFocus = {
+    tags: ARTISAN_SPECIALTY_TAGS,
+    tag: character.choices?.['powers:Studied Focus'] || null,
+    options: studiedFocusPool(character.choices?.['powers:Studied Focus'] || null),
+  };
   // Basic Arcane / Basic Faith pickable spell pools (sphere-gated; non-casters get
   // any base class of that sphere). Keyed by skill base name for the UI picker.
   const basicSpellChoices = Object.fromEntries(
@@ -505,6 +515,8 @@ export function validate(character) {
     spellSlots: spellSlotCounts,
     bookcasterOptions,
     arcaneSecretsOptions,
+    weirdWanderingsOptions,
+    studiedFocus,
     basicSpellChoices,
     stats,
     wealth,
