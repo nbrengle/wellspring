@@ -1,9 +1,10 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import {
   lookupEntity, REFS, allergenAward, powerSpellChoiceSpec
 } from '../engine/data.js';
 import { PARAMETER_SUGGESTIONS, TYPEABLE_PARAMS } from "./parameter-suggestions.js";
 import SubSelect from "./SubSelect.jsx";
+import EntityChoicePicker from "./ui/EntityChoicePicker.jsx";
 import { formatParameterizedName } from "../engine/resolver.js";
 // Re-export so existing importers (Builder.jsx) keep their path; the impl now lives
 // in the engine where it's unit-tested.
@@ -213,6 +214,8 @@ export function EntityBody({ entity, view, report, choices, onSetChoice, onUpdat
       .map((id) => lookupEntity(id))
       .filter((sub) => sub && sub.tier === "SubPower");
   }, [entity]);
+  // Open state for the read-pane picker (large opaque power/spell pools).
+  const [choicePicker, setChoicePicker] = useState(null);
   if (!entity) {
     return <p className="b-detail-missing">No detail available — this item may be unresolved.</p>;
   }
@@ -327,27 +330,41 @@ export function EntityBody({ entity, view, report, choices, onSetChoice, onUpdat
       {(() => {
         // A power that grants a chosen spell/power (Arcane Secrets, Weird Wanderings)
         // — pick one; the engine grants it. The pool comes from the report under the
-        // spec's optionsKey (rule-gated), not a flat list. Data-driven via the spec.
+        // spec's optionsKey (rule-gated). Small pools → SubSelect pills; LARGE, opaque
+        // pools (>10 powers/spells you'd need to look up) → the read-pane picker so
+        // you can read each option before committing.
         const choiceSpec = powerSpellChoiceSpec(entity);
         if (!choiceSpec || !onSetChoice) return null;
         const powerId = `powers:${entity.baseName || entity.name}`;
         const pool = report?.[choiceSpec.optionsKey] || [];
         const label = choiceSpec.label || "Choose";
+        const chosen = choices?.[powerId] || null;
+        if (!pool.length) {
+          return (
+            <div className="b-detail-section">
+              <h3 className="b-detail-section-title">{label}</h3>
+              <p className="b-detail-hint">No options available yet.</p>
+            </div>
+          );
+        }
+        if (pool.length > 10) {
+          return (
+            <div className="b-detail-section">
+              <h3 className="b-detail-section-title">{label}</h3>
+              <button className="b-lin-subchoice-btn" onClick={() => setChoicePicker({ powerId, label, pool })}>
+                {chosen || `${label}…`}<span className="b-lin-subchoice-btn-caret">⌄</span>
+              </button>
+            </div>
+          );
+        }
         return (
           <div className="b-detail-section">
-            {pool.length ? (
-              <SubSelect
-                prompt={label}
-                value={choices?.[powerId] || null}
-                onChange={(v) => onSetChoice(powerId, v || "")}
-                options={pool.map((s) => ({ value: s }))}
-              />
-            ) : (
-              <>
-                <h3 className="b-detail-section-title">{label}</h3>
-                <p className="b-detail-hint">No options available yet.</p>
-              </>
-            )}
+            <SubSelect
+              prompt={label}
+              value={chosen}
+              onChange={(v) => onSetChoice(powerId, v || "")}
+              options={pool.map((s) => ({ value: s }))}
+            />
           </div>
         );
       })()}
@@ -398,6 +415,17 @@ export function EntityBody({ entity, view, report, choices, onSetChoice, onUpdat
       )}
       <ForwardLinks entity={entity} onInspect={onInspect} />
       <BackLinks entity={entity} onInspect={onInspect} />
+      {choicePicker && (
+        <EntityChoicePicker
+          title={choicePicker.label}
+          resolveType="powers"
+          options={choicePicker.pool}
+          value={choices?.[choicePicker.powerId] || null}
+          chooseLabel={(name) => `Choose ${name}`}
+          onChoose={(name) => { onSetChoice(choicePicker.powerId, name); setChoicePicker(null); }}
+          onClose={() => setChoicePicker(null)}
+        />
+      )}
     </>
   );
 }
