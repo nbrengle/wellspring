@@ -7,7 +7,7 @@
 // ─── 1. Core Data Models (The Rules) ────────────────────────────────────────
 
 export interface SlotGrant {
-  cat: string; // e.g. "basic", "cantrip", "spellsKnown"
+  cat: string;
   n: number;
 }
 
@@ -24,47 +24,82 @@ export interface ChooseOneConfig {
 
 export interface StatMod {
   stat: string;
-  amount: number | string; // sometimes a string like "+1/rank"
+  amount: number | string;
 }
 
-export interface EntityDef {
+// ─── Discriminated Union for Entities ───────────────────────────────────────
+
+export interface BaseEntityDef {
   name: string;
-  cost?: number | string;
-  prereq?: string;
-  ranks?: number;
-  category?: string;
   description?: string;
+  prereq?: string;
   
-  // Mechanically extracted fields
+  // Mechanically extracted prerequisites
   requiredLevel?: number;
   requiredClass?: string;
   requiresEntity?: string[];
+}
+
+export interface SkillDef extends BaseEntityDef {
+  type: 'skill';
+  cost: number | string;
+  ranks?: number;
+  category?: string; // e.g. "Martial", "Crafting"
   slotGrants?: SlotGrant[];
-  highestSlot?: number;
   stats?: StatMod[];
   chooseOne?: ChooseOneConfig;
-  tier?: string;
+}
+
+export interface PowerDef extends BaseEntityDef {
+  type: 'power';
+  tier: 'Basic' | 'Advanced' | 'Veteran' | 'Utility' | 'Class';
   parentClass?: string;
-  parameter?: string;
-  
-  // Specific to classes
+  parameter?: string; // E.g. (Swords)
+  highestSlot?: number;
+}
+
+export interface SpellDef extends BaseEntityDef {
+  type: 'spell';
+  tier: 'Cantrip' | 'Novice' | 'Adept' | 'Greater';
+  sphere: string; // e.g. "Arcane", "Divine"
+  magicType?: string; 
+}
+
+export interface PerkDef extends BaseEntityDef {
+  type: 'perk';
+  cost: number | string;
+  ranks?: number;
+  category?: string;
+}
+
+export interface FlawDef extends BaseEntityDef {
+  type: 'flaw';
+  award: number | string;
+  category?: string;
+}
+
+export interface ClassDef extends BaseEntityDef {
+  type: 'class';
   spellcaster?: boolean;
   magicType?: string;
-  
-  // Specific to spells
-  sphere?: string;
 }
+
+/** 
+ * A discriminated union of all possible entities that can be returned by the data layer. 
+ * Allows the engine to narrow the type via `if (ent.type === 'spell') { ... }`.
+ */
+export type EntityDef = SkillDef | PowerDef | SpellDef | PerkDef | FlawDef | ClassDef;
+
 
 // ─── 2. Ontological Character State (V2) ────────────────────────────────────
 
 /** 
  * Represents where a capability was acquired. 
- * E.g. "Class:Rogue", "Purchased", "Lineage", "StartingChoice:A Path Unfolds"
  */
 export type EntitySource = 'Purchased' | `Class:${string}` | 'Lineage' | `GrantedBy:${string}` | string;
 
 /**
- * A choice made by the player to add an entity (Skill, Power, etc.) to their sheet.
+ * A choice made by the player to add an entity to their sheet.
  */
 export interface CharacterChoice {
   id: string;             // UUID for safe targeted deletion/updates
@@ -77,12 +112,7 @@ export interface CharacterChoice {
   ranks?: number;         // For multi-rank purchases like Agile Learner
 }
 
-/**
- * The unified, ontologically-grouped character save state.
- * All choices are stored in buckets that mirror their nature in the rules.
- */
 export interface CharacterStateV2 {
-  // Foundational Metadata
   archetypeName?: string;
   backstoryApproved?: boolean;
   extraMaxBP?: number;
@@ -90,19 +120,16 @@ export interface CharacterStateV2 {
   wealth?: string;
   resources?: string;
   
-  // Core Paths
-  classes: Record<string, number>; // className -> level
+  classes: Record<string, number>; 
   lineage?: { name: string; choices: string[] };
-  devotions: CharacterChoice[];    // Devotion Accents, Interventions
+  devotions: CharacterChoice[];    
   
-  // Acquired Capabilities (The Ontological Buckets)
   skills: CharacterChoice[];
   perks: CharacterChoice[];
   flaws: CharacterChoice[];
   
-  powers: CharacterChoice[];       // Class powers, Domain powers, Form powers
-  spells: CharacterChoice[];       // Cantrips, Novice, Adept, Greater
+  powers: CharacterChoice[];       
+  spells: CharacterChoice[];       
   
-  // Specific Trades
   agileLearnerTrades?: Record<string, number>;
 }
