@@ -853,10 +853,7 @@ function slotGrantsFromText(name, text) {
     const cat = SLOT_TIER_TO_CAT[tier[1].toLowerCase()];
     if (cat) {
       grants.push({ cat, n: 1 });
-      // An "additional <spell-tier> spell-slot" (Extended Capacity) ALSO raises the
-      // spells-KNOWN budget — a larger slot lets you know one more spell. (Martial
-      // tiers utility/basic/advanced/veteran are plain power slots, no known-spell.)
-      if (['novice', 'adept', 'greater'].includes(cat)) grants.push({ cat: 'spellsKnown', n: 1 });
+      // [REMOVED] Per user feedback, additional spell-slots DO NOT grant spellsKnown automatically.
     }
   }
   const known = text.match(/\badds?\s+(\d+)\s+to\s+the\s+number\s+of\s+Known\s+Spells/i);
