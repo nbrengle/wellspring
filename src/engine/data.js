@@ -333,6 +333,28 @@ export function lineageRepOptions() {
     .filter(([, challenges]) => challenges.length > 0);
 }
 
+// Lost "Pick and Choose" (Fractured): may purchase ONE Lineage Advantage from
+// ANOTHER lineage. Returns every non-Lost advantage shaped for the read-pane picker:
+// { name (baseName), group (lineage), description, advId }. The chosen one is
+// recorded as "<Lineage> - <Advantage>" so the graph can resolve it cross-lineage
+// and apply its full effects (with prereqs still enforced).
+export function pickAndChooseOptions() {
+  const out = [];
+  for (const [lineage, lin] of Object.entries(LINEAGES)) {
+    if (lineage === 'Lost') continue;
+    for (const a of (lin.advantages || [])) {
+      const name = a.baseName || a.name;
+      out.push({
+        name,
+        group: lineage,
+        description: a.description || a.desc || '',
+        advId: `${lineage} - ${name}`,
+      });
+    }
+  }
+  return out.sort((x, y) => x.group.localeCompare(y.group) || x.name.localeCompare(y.name));
+}
+
 // A lineage challenge/advantage that requires the player to record a SUB-CHOICE.
 // Returns null for ordinary items, else { kind, ... }:
 //   'cantrip' — learns a chosen, castable cantrip (granted + given a slot). `pool`
