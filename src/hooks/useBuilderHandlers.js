@@ -97,6 +97,26 @@ export function useBuilderHandlers({
     );
   }, [setCharacter, setView, setHistory, setPicking]);
 
+  // Open the SHARED PickerOverlay for any "choose one of a pool" mechanic (a grant's
+  // spell/power/domain, a cross-lineage advantage, …) — the SAME picker used to add
+  // skills/powers, with its search / sort / filter / group. Callers pass a lightweight
+  // descriptor; we shape it into an entityPickerSpec. `options` is a list of names or
+  // { name, desc, cat, cost, … } candidates; `onChoose(name)` records the pick.
+  const handleOpenChoicePicker = useCallback(({ title, subtitle, entityType = "powers", options, taken, onChoose }) => {
+    const candidates = (options || []).map((o) => (typeof o === "string" ? { name: o } : o));
+    setPicking(
+      entityPickerSpec({
+        kind: "choice",
+        entityType,
+        candidates,
+        title,
+        subtitle,
+        taken: taken instanceof Set ? taken : new Set(taken || []),
+        onChoose: (name) => { onChoose?.(name); setPicking(null); },
+      }),
+    );
+  }, [setPicking]);
+
   // Primary gesture: clicking an owned item → expand its detail INLINE under the row.
   // Re-clicking the same item closes it. Moving to a DIFFERENT row (or closing) means
   // you've moved on, so it also dismisses any open chase drawer.
@@ -258,6 +278,7 @@ export function useBuilderHandlers({
     handleSetGrantedSelection,
     handleSetAgileLearnerTrade,
     handleStartBlank,
+    handleOpenChoicePicker,
     handleInspect,
     handleChase,
     handleUpdateParameter,
