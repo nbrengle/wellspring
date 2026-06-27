@@ -7,6 +7,9 @@ import { availableFacets as computeAvailableFacets, passesFacets as facetsPass,
          toggleFacetValue } from "./browse/facets.js";
 import { EntityBody } from "./DetailPane.jsx";
 import { spellTierKey, spellTierLabel, CLASS_TONES } from "./build-sheet/utils.js";
+import { PARAMETER_SUGGESTIONS, TYPEABLE_PARAMS } from "./parameter-suggestions.js";
+import { formatParameterizedName } from "../engine/resolver.js";
+import SubSelect from "./SubSelect.jsx";
 import Overlay from "./ui/Overlay.jsx";
 
 
@@ -56,6 +59,10 @@ export default function PickerOverlay({ spec, character, onClose }) {
   const [groupMode, setGroupMode] = useState(isSpells ? "tier" : hasRefresh ? "refresh" : "category");
   const [sortMode, setSortMode] = useState("name");
   const [readStack, setReadStack] = useState([]);
+  // Parameter chosen IN the picker for a parameterized pick (Lore area, Weapon Spec
+  // weapon, Profession, …) — so the pick is complete in one step, no second pass on
+  // the sheet. Reset whenever the selected candidate changes.
+  const [paramValue, setParamValue] = useState("");
 
   const lockedOf = (name) => !prereqStatus(character, `${entityType}:${name}`).met;
 
@@ -125,12 +132,28 @@ export default function PickerOverlay({ spec, character, onClose }) {
     return selected ? lookupEntity(`${entityType}:${selected}`) : null;
   }, [readStack, selected, entityType]);
 
-  const selectCandidate = (name) => { setSelected(name); setReadStack([]); };
+  const selectCandidate = (name) => { setSelected(name); setReadStack([]); setParamValue(""); };
   const followLink = (name, _field, type) => setReadStack((s) => [...s, `${type}:${name}`]);
   const readBack = () => setReadStack((s) => s.slice(0, -1));
   const isFollowing = readStack.length > 0;
   const selectedLocked = selected && lockedOf(selected);
   const selectedTaken = selected && taken.has(selected) && !UNLIMITED_SKILLS.has(selected);
+
+  // Is the SELECTED candidate parameterized (Lore → area, Weapon Specialization →
+  // weapon, Profession → area)? If so, the picker resolves the parameter in the SAME
+  // step: a chip control in the footer, and Choose commits the parameterized name
+  // ("Lore (Historical)") — no second pass on the sheet. A param is required to
+  // commit when the entity declares one (entity.parameter) or has a suggestion list.
+  const paramBase = readingEntity?.baseName || readingEntity?.name || selected;
+  const paramOptions = (selected && !isFollowing && PARAMETER_SUGGESTIONS[paramBase]) || [];
+  const paramTypeable = !!selected && !isFollowing && TYPEABLE_PARAMS.has(paramBase);
+  const isParameterized = !isFollowing && !!readingEntity?.parameter
+    || paramOptions.length > 0 || paramTypeable;
+  const commitName = isParameterized && paramValue
+    ? formatParameterizedName(paramBase, paramValue, readingEntity?.name || paramBase)
+    : selected;
+  // A parameterized pick can't be committed until a parameter is set.
+  const needsParam = isParameterized && !paramValue;
 
   return (
     <Overlay onClose={onClose} panelClassName="b-picker">
@@ -234,12 +257,24 @@ export default function PickerOverlay({ spec, character, onClose }) {
                 </div>
                 {!isFollowing && (
                   <footer className="b-read-foot">
+                    {isParameterized && (
+                      <SubSelect
+                        prompt={paramBase === "Lore" ? "Customize Area" : "Choose"}
+                        value={paramValue || null}
+                        onChange={(v) => setParamValue(v || "")}
+                        options={paramOptions}
+                        allowCustom={paramTypeable || paramOptions.length === 0}
+                        customLabel={paramBase === "Lore" ? "Type an area…" : "Type your own…"}
+                      />
+                    )}
                     {selectedLocked && (
                       <p className="b-read-warn">Prereqs not met — you can still choose it, but the build won't be legal.</p>
                     )}
-                    <button className="b-read-choose" disabled={selectedTaken}
-                            onClick={() => onChoose(selected)}>
-                      {selectedTaken ? "Already chosen" : `Choose ${selected}`}
+                    <button className="b-read-choose" disabled={selectedTaken || needsParam}
+                            onClick={() => onChoose(commitName)}>
+                      {selectedTaken ? "Already chosen"
+                        : needsParam ? "Pick an option above"
+                        : `Choose ${commitName}`}
                     </button>
                   </footer>
                 )}
