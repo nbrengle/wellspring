@@ -11,6 +11,17 @@ import type { CharacterStateV2, CharacterChoice, GraphItem, CharacterGraph, Enti
 
 const idName = (id: string) => id.split(':')[1] || id;
 
+// Parse a chosen parameter out of a raw item name ONCE, so the param is a
+// structured field on the node (GraphItem.param) instead of being re-scraped from
+// the display name in identity/bucket code. Matches the two stored forms:
+// "Lore (Arcane)" and "Profession - Apprentice". Falls back to the entity's own
+// parameter label only if the name carries no explicit value. null = no param.
+function extractParam(rawName: string): string | null {
+  const clean = cleanItemName(rawName);
+  const m = clean.match(/\(([^)]+)\)\s*$/) || clean.match(/\s-\s([^()]+)$/);
+  return m ? m[1].trim() : null;
+}
+
 
 export class CharacterGraphModel implements CharacterGraph {
   // Derived fields are LAZY + memoized getters, not eager constructor work. This
@@ -150,8 +161,9 @@ export class CharacterGraphModel implements CharacterGraph {
       if (node.field === 'synthetic' || node.field === 'lineageAdvantages' || node.field === 'lineageChallenges') continue;
 
       const clean = cleanItemName(node.rawString || node.name);
-      const paramM = clean.match(/\(([^)]+)\)\s*$/) || clean.match(/\s-\s([^()]+)$/);
-      const paramValue = paramM ? paramM[1].trim() : (node.entity?.parameter || undefined);
+      // Use the structured node.param (parsed once at creation); fall back to the
+      // entity's param label only for display when the node carries no value.
+      const paramValue = node.param ?? (node.entity?.parameter || undefined);
       const displayName = paramValue && !node.name.includes(paramValue) ? `${node.name} (${paramValue})` : node.name;
 
       const source = SOURCE_OF[node.sourceType] || (node.sourceType === 'grant' ? 'class' : 'purchased');
@@ -1065,10 +1077,11 @@ export function resolveCharacterGraph(charInput: any): CharacterGraphModel {
     }
 
     items.push({
-      id: choice.id || entityId, 
+      id: choice.id || entityId,
       entityId: entityId,
       name: ent?.name || cleanName,
       rawString: choice.entityId,
+      param: extractParam(rawName),
       field,
       sourceType,
       rank: choice.ranks || 1,
@@ -1117,11 +1130,11 @@ export function resolveCharacterGraph(charInput: any): CharacterGraphModel {
         bp = typeof ent.bp === 'number' ? ent.bp : parseInt(String(ent.bp), 10) || 0;
       }
     }
-    console.log('FLAW DEBUG:', { cleanName, rawName, entBp: ent?.bp, bp });
     items.push({
       id: ent?.id || `flaws:${cleanName}`,
       name: ent?.name || cleanName,
       rawString: (choice as any).entityId,
+      param: extractParam(rawName),
       field: 'flaws',
       sourceType: 'flaw',
       rank: 1,
@@ -1134,7 +1147,7 @@ export function resolveCharacterGraph(charInput: any): CharacterGraphModel {
 
   
   // Generate Synthesized Granted Items & Deduplicate
-  const getIdentity = (rawName: string, ent: any) => {
+  const getIdentity = (rawName: string, ent: any, param?: string | null) => {
     const clean = cleanItemName(rawName);
     const entityId = ent?.id || rawName;
     const cap = getMaxRanks(entityId);
@@ -1154,16 +1167,16 @@ export function resolveCharacterGraph(charInput: any): CharacterGraphModel {
     if (!info || reusable) return { key: baseName, cap };
 
     // Parameterized, multi-rank, not reusable (Lore, …) → param distinguishes
-    // distinct instances, each capped at one.
-    const paramM = clean.match(/\(([^)]+)\)\s*$/) || clean.match(/\s-\s([^()]+)$/);
-    const paramValue = paramM ? paramM[1].trim().toLowerCase() : (ent?.parameter ? ent.parameter.toLowerCase() : 'unknown');
+    // distinct instances, each capped at one. Read the structured node.param,
+    // falling back to the entity's param label only if absent.
+    const paramValue = (param ?? ent?.parameter ?? 'unknown').toLowerCase();
     return { key: `${baseName}|${paramValue}`, cap: 1 };
   };
 
   const itemIdentities = new Map<string, { cap: number, nodes: any[] }>();
   for (const it of items) {
     if (it.sourceType === 'lineage') continue;
-    const { key, cap } = getIdentity(it.rawString || it.name, it.entity);
+    const { key, cap } = getIdentity(it.rawString || it.name, it.entity, it.param);
     if (!itemIdentities.has(key)) itemIdentities.set(key, { cap, nodes: [] });
     itemIdentities.get(key)!.nodes.push(it);
   }
@@ -1196,7 +1209,7 @@ export function resolveCharacterGraph(charInput: any): CharacterGraphModel {
         }
         
         const gName = ent?.name || rawGidName;
-        const { key, cap } = getIdentity(gName, ent);
+        const { key, cap } = getIdentity(gName, ent, extractParam(rawGidName));
         
         let group = itemIdentities.get(key);
         if (!group) {
@@ -1228,6 +1241,7 @@ export function resolveCharacterGraph(charInput: any): CharacterGraphModel {
           id: ent?.id || gid,
           name: gName,
           rawString: gName,
+          param: extractParam(gName),
           field: `${gType}Grant`,
           sourceType: 'grant',
           grantedBy: node.name,

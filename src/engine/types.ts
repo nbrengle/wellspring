@@ -145,6 +145,10 @@ export interface GraphItem {
   id: string;
   name: string;
   rawString?: string;
+  /** The chosen parameter value (e.g. "Arcane" for Lore (Arcane)), parsed once at
+   *  node creation so downstream (identity, buckets) reads it structurally instead
+   *  of re-scraping it from the display name. null when the entity takes no param. */
+  param?: string | null;
   field: string;
   sourceType: string;
   rank: number;
