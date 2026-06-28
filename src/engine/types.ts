@@ -163,12 +163,20 @@ export interface GraphItem {
 
 
 export type ViewState = {
+  id: string;
+  entityId: string;
   param?: string;
   source: string;
   grantedBy?: string;
   free: boolean;
   cost: number;
   rank: number;
+  effects: Effect[];
+  rawString?: string;
+  field: string;
+  choiceData?: CharacterChoice;
+  specialty?: any;
+  floor?: number;
 };
 
 export type SkillView = Skill & ViewState;
