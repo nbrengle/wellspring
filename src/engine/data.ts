@@ -216,7 +216,7 @@ function powerEntry(p) {
     call: p.call ?? null,
     effect: p.effect ?? null,
     incantation: p.incantation ?? null,
-    maxRanks: p.maxRanks ?? 1,
+    ranks: p.ranks ?? 1,
     // Parser-extracted structured mechanics (read by the validator instead of
     // re-parsing the description). Keep this list in sync with enrichMechanics.
     statMods: p.statMods ?? [],

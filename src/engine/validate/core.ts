@@ -47,7 +47,9 @@ export function getLegalMinLevel(character: CharacterStateV2) {
 export function getMaxRanks(entityId: string): number {
   const ent = lookupEntity(entityId) as any;
   if (!ent) return 1;
-  const maxR = ent.maxRanks ?? ent.ranks;
+  // One field for "how many times can this be taken": `ranks`, uniform across
+  // skills, perks, and powers (powers used to call it `maxRanks`).
+  const maxR = ent.ranks;
   if (maxR === 'unlimited') return Infinity;
   if (typeof maxR === 'number') return maxR;
   if (typeof maxR === 'string') {

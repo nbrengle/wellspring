@@ -402,7 +402,7 @@ function parseSubPowerCell(cell, subNames) {
   const bodyNodes = [{ type: 'text', text: first.slice(labelAt) }, ...cell.parts.slice(1).map(text => ({ type: 'text', text }))];
   const { fields, description } = parsePowerNodes(bodyNodes);
   return {
-    name, tier: 'SubPower', tags: [], maxRanks: 1, cost: null,
+    name, tier: 'SubPower', tags: [], ranks: 1, cost: null,
     incantation: fields['incantation'] ?? null,
     call: fields['call'] ?? null,
     target: fields['target'] ?? null,
@@ -424,10 +424,13 @@ function parsePowerHeading(text) {
   const tier = tierMatch ? tierMatch[1] : 'Unknown';
   const tags = [...text.matchAll(/\[([^\]]+)\]/g)].map(m => m[1]).filter(t => t !== tier);
   const ranksMatch = text.match(/\((\d+)\)\s*$/);
-  const maxRanks = ranksMatch ? parseInt(ranksMatch[1]) : 1;
+  // Ranks = how many times this power can be taken (the "(N)" suffix). Same concept
+  // and field name as skills/perks — NOT a separate "maxRanks" — so the dedupe/cap
+  // logic reads one field everywhere.
+  const ranks = ranksMatch ? parseInt(ranksMatch[1]) : 1;
   const costMatch = text.match(/-\s*(\d+)\s*BP/);
   const cost = costMatch ? parseInt(costMatch[1]) : null;
-  return { name, tier, tags, maxRanks, cost };
+  return { name, tier, tags, ranks, cost };
 }
 
 // Collect all H4/H5 power entries under a section bounded by [start, end).
@@ -466,11 +469,11 @@ function parsePowersInRange(start, end) {
       const subCells = bodyRange.map(m => parseSubPowerCell(m, subNames)).filter(Boolean);
       // Sub-powers have no tier tag; mark them so they're identifiable + parseable.
       const parsed = parsePowerHeading(n.text);
-      const { name, tags, maxRanks, cost } = parsed;
+      const { name, tags, ranks, cost } = parsed;
       const tier = isSub ? 'SubPower' : parsed.tier;
       const { fields, description } = parsePowerNodes(bodyNodes);
       powers.push({
-        name, tier, tags, maxRanks, cost,
+        name, tier, tags, ranks, cost,
         incantation: fields['incantation'] ?? null,
         call: fields['call'] ?? null,
         target: fields['target'] ?? null,
@@ -1173,7 +1176,7 @@ function parseSkills() {
         .replace(/\s*\((?:\d+|Unlimited)\)\s*$/i, '')
         .replace(/\s\[[^\]]+\]/, '')
         .trim();
-      const maxRanks = !ranksMatch ? null
+      const parsedRanks = !ranksMatch ? null
         : /unlimited/i.test(ranksMatch[1]) ? 'unlimited'
         : parseInt(ranksMatch[1]);
       const parameter = paramMatch ? paramMatch[1].trim() : null;
@@ -1182,7 +1185,7 @@ function parseSkills() {
       const bodyEnd = nodes.findIndex((m, j) => j > i && m.type === 'heading' && m.level <= 4);
       const bodyNodes = nodes.slice(i + 1, bodyEnd === -1 ? end : Math.min(bodyEnd, end));
 
-      let cost = null, prereq = null, ranks = maxRanks;
+      let cost = null, prereq = null, ranks = parsedRanks;
       const descParts = [];
 
       for (const bn of bodyNodes) {
