@@ -41,7 +41,7 @@ export interface BaseEntity {
 }
 
 export interface Skill extends BaseEntity {
-  type: 'skill';
+  type: 'skills';
   cost: number | string;
   ranks?: number;
   category?: string; // e.g. "Martial", "Crafting"
@@ -51,7 +51,7 @@ export interface Skill extends BaseEntity {
 }
 
 export interface Power extends BaseEntity {
-  type: 'power';
+  type: 'powers';
   tier: 'Basic' | 'Advanced' | 'Veteran' | 'Utility' | 'Class';
   parentClass?: string;
   parameter?: string; // E.g. (Swords)
@@ -66,20 +66,20 @@ export interface Spell extends BaseEntity {
 }
 
 export interface Perk extends BaseEntity {
-  type: 'perk';
+  type: 'perks';
   cost: number | string;
   ranks?: number;
   category?: string;
 }
 
 export interface Flaw extends BaseEntity {
-  type: 'flaw';
+  type: 'flaws';
   award: number | string;
   category?: string;
 }
 
 export interface Class extends BaseEntity {
-  type: 'class';
+  type: 'classes';
   spellcaster?: boolean;
   magicType?: string;
 }
