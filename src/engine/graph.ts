@@ -7,7 +7,6 @@ import { cleanItemName, bareSkill, getClasses } from './resolver.js';
 import { characterLevel, getMaxRanks } from './validate/core.js';
 import { paramInfo, paramReusable } from './param-domain.js';
 import { spellSlots } from './validate/slots.js';
-import { ARMOR_SKILLS } from './config.js';
 import type { CharacterStateV2, CharacterChoice, GraphItem, CharacterGraph, Entity, Effect, EntitySource, BucketedView } from './types.js';
 
 const idName = (id: string) => id.split(':')[1] || id;
@@ -424,23 +423,8 @@ export class CharacterGraphModel implements CharacterGraph {
       }
     }
 
-    // ─── Armor/Shield penalty notes ───
-    // Characters need the corresponding skill (or higher) to avoid BP penalties.
-    // We collect the heaviest armor/shield they own and check skills.
-    const ownedArmor: string[] = [];
-    for (const node of this._items) {
-      if (node.entity?.type !== 'skills') continue;
-      const clean = cleanItemName(node.name);
-      if (ARMOR_SKILLS.has(clean) || ARMOR_SKILLS.has(bareSkill(clean))) ownedArmor.push(clean);
-    }
-    for (const g of this._grantedAbilitiesList) {
-      if (g.abilityType === 'skills') {
-        const clean = cleanItemName(g.abilityName);
-        if (ARMOR_SKILLS.has(clean) || ARMOR_SKILLS.has(bareSkill(clean))) {
-          ownedArmor.push(clean);
-        }
-      }
-    }
+    // ─── Character-creation-only perks ───
+    // Draconic Heritage must be taken at creation — surfaced as a manual-check note.
     const hasDraconicHeritage = [...owned].some(id => id.startsWith('perks:Draconic Heritage'));
     if (hasDraconicHeritage) {
       notes.push({
