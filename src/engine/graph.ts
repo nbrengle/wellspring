@@ -1,5 +1,8 @@
 import { EFFECT_EXTRACTORS } from './extractors.js';
 import { lookupEntity, allergenAward, ALLERGEN_AWARDS, LEVEL_TABLE, CLASS_PROGRESSION, REFS, CLASS_POWERS, CLASSES, BASE_CLASSES } from '../engine/data.js';
+import { startingSkillGrants } from './starting-choices.js';
+import { MAX_FLAW_BP } from './validate/core.js';
+import { costKey } from './validate/cost-key.js';
 import { cleanItemName, bareSkill, getClasses } from './resolver.js';
 import { characterLevel, getMaxRanks } from './validate/core.js';
 import { paramInfo, paramReusable } from './param-domain.js';
@@ -15,6 +18,7 @@ export class CharacterGraphModel implements CharacterGraph {
   public readonly stats: any;
   public readonly prereqs: { issues: any[]; notes: any[] };
   public readonly wealth: { base: number; income: number; total: number; sources: any[] };
+  public readonly spend: any;
   private _ownedIds: Set<string>;
   private _grantedAbilitiesList: any[];
 
@@ -30,6 +34,7 @@ export class CharacterGraphModel implements CharacterGraph {
     this._ownedIds = this.computeOwnedIds();
     this.prereqs = this.computePrereqs();
     this.wealth = this.computeWealth();
+    this.spend = this.computeSpend();
   }
 
   get activePowers(): Set<string> {
@@ -659,6 +664,238 @@ export class CharacterGraphModel implements CharacterGraph {
 
     return { base, income, total: base + income, sources };
   }
+
+  // ─── BP Spend ─────────────────────────────────────────────────────────────
+  // Full BP ledger: base costs, grants, discounts, and totals. Computed once.
+  private computeSpend(): any {
+    const startFloors = startingSkillGrants(this.character).floor;
+
+    // Build index of things granted by the character's owned items.
+    const paramKey = (typedName: any) => {
+      const c = typeof typedName === 'string' && typedName.includes(':')
+        ? typedName : `:${typedName}`;
+      let [type, rest = ''] = [c.slice(0, c.indexOf(':')), c.slice(c.indexOf(':') + 1)];
+      if (type === 'purchasedSkills' || type === 'startingSkills') type = 'skills';
+      if (type === 'purchasedPerks') type = 'perks';
+      const paren = rest.match(/^(.*?)\s*\(([^)]*)\)\s*$/);
+      const dash = rest.match(/^(.*?)\s+-\s+(.*)$/);
+      const m = paren || dash;
+      if (!m) return null;
+      return `${type}:${m[1].trim()}|${m[2].trim().toLowerCase()}`;
+    };
+    const grantIndex: any = {};
+    const grantParamIndex: any = {};
+    for (const node of this._items) {
+      for (const eff of node.effects) {
+        if (eff.type === 'GRANT_SOURCE') {
+          eff.grants.forEach((g: string) => {
+            if (!grantIndex[g]) grantIndex[g] = node.name;
+            const pk = paramKey(g);
+            if (pk && !grantParamIndex[pk]) grantParamIndex[pk] = node.name;
+          });
+        }
+      }
+    }
+
+    let rawAwarded = 0;
+    let refunded = 0;
+    const byItem: any = {};
+
+    // Phase 1: Base Costs and Grants
+    let startingExcess = 0;
+
+    let idx = -1;
+    for (const node of this._items) {
+      idx++;
+
+      const key = costKey(node);
+
+      if (node.field === 'flaws') {
+        byItem[key] = { cost: node.baseCost, base: node.baseCost, grant: null };
+        rawAwarded += (-node.baseCost);
+        continue;
+      }
+
+      let isGranted = false;
+      let grantSrc: any = null;
+      let isDerived = false;
+      const nId = node.entityId || node.id;
+      const nodeParamKey = nId && /\(|\s-\s/.test(node.rawString || '')
+        ? paramKey(`${nId.slice(0, nId.indexOf(':') + 1)}${node.rawString}`)
+        : null;
+      const normalizedId = nId
+        ? nId.replace(/^purchasedSkills:/, 'skills:').replace(/^startingSkills(:\d+)?:/, 'skills:').replace(/^purchasedPerks:/, 'perks:')
+        : null;
+
+      if (node.grantSidecar?.kind === 'grant') {
+        isGranted = true; grantSrc = node.grantSidecar.source;
+      } else if (normalizedId && grantIndex[normalizedId]) {
+        isGranted = true; grantSrc = grantIndex[normalizedId]; isDerived = true;
+      } else if (nodeParamKey && grantParamIndex[nodeParamKey]) {
+        isGranted = true; grantSrc = grantParamIndex[nodeParamKey]; isDerived = true;
+      } else if (node.sourceType === 'innate' || node.field === 'multiclassGrant') {
+        isGranted = true; grantSrc = 'class'; isDerived = true;
+      }
+
+      if (typeof node.authoredCost === 'number') {
+        if (isDerived && node.authoredCost > 0) {
+          byItem[key] = { cost: 0, base: node.baseCost, grant: { kind: 'grant', source: grantSrc, derived: true }, rank: node.rank };
+        } else {
+          byItem[key] = { cost: node.authoredCost, base: node.baseCost, grant: node.grantSidecar, rank: node.rank, authored: true };
+        }
+        continue;
+      }
+
+      if (node.sourceType === 'class') {
+        const grant = node.grantSidecar;
+        if (grant?.kind === 'discount' && grant.amount) {
+          byItem[key] = { cost: -grant.amount, base: 0, grant };
+          refunded += grant.amount;
+          continue;
+        }
+
+        const floor = startFloors[node.index];
+
+        if (isGranted) {
+          byItem[key] = { cost: -node.baseCost, base: 0, grant: { kind: 'grant', source: grantSrc, derived: true } };
+          refunded += node.baseCost;
+          continue;
+        }
+
+        if (floor && node.rank > floor) {
+          const extra = node.rank - floor;
+          const entCost = (node.baseCost / node.rank) || 0;
+          const extraCost = entCost * extra;
+          byItem[key] = { cost: extraCost, base: entCost, grant: null, rank: node.rank, freeRanks: floor, paidRanks: extra };
+          startingExcess += extraCost;
+        } else {
+          byItem[key] = { cost: 0, base: (node.baseCost / node.rank)||0, grant: null, rank: node.rank, freeRanks: floor || 1, paidRanks: 0 };
+        }
+        continue;
+      }
+
+      if (isGranted) {
+        byItem[key] = { cost: 0, base: node.baseCost, grant: { kind: 'grant', source: grantSrc, derived: true }, rank: node.rank };
+      } else {
+        byItem[key] = { cost: node.baseCost, base: node.baseCost, grant: node.grantSidecar, rank: node.rank };
+      }
+    }
+
+    // Phase 2: Apply Discounts
+    const discountSources: any[] = [];
+    for (const node of this._items) {
+      for (const eff of node.effects) {
+        if (eff.type === 'DISCOUNT_SOURCE') {
+          discountSources.push({ ...eff.discount, id: node.id, name: node.name });
+        }
+      }
+    }
+
+    const used = new Map();
+    const catCount = new Map();
+    let discountFreeBP = 0;
+    const discountsApplied: any[] = [];
+
+    for (const node of this._items) {
+      if (node.field !== 'skills' && node.field !== 'perks' && node.field !== 'purchasedSkills' && node.field !== 'purchasedPerks' && node.field !== 'startingSkills') continue;
+
+      const key = costKey(node);
+      const eff = byItem[key];
+      if (!eff || eff.authored) continue;
+
+      const catKey = node.entity?.category || cleanItemName(node.rawString).split(' ')[0];
+      const pos = catCount.get(catKey) || 0;
+      catCount.set(catKey, pos + 1);
+
+      for (const src of discountSources) {
+        if (!discountApplies(src, node, pos)) continue;
+        const min = src.min ?? 0;
+        const room = src.cap == null ? Infinity : src.cap - (used.get(src.id) || 0);
+        if (room <= 0) continue;
+
+        const reducible = Math.max(0, eff.cost - min);
+        const cut = Math.min(src.amount, reducible, room);
+
+        if (cut <= 0) {
+          if (eff.cost === 0 && (eff.grant?.kind === 'grant' || eff.freeRanks > 0) && src.refundIfFree) {
+            const refund = Math.min(src.amount, room);
+            discountFreeBP += refund;
+            used.set(src.id, (used.get(src.id) || 0) + refund);
+            discountsApplied.push({ key, source: src.name, amount: refund, asFreeBP: true });
+          }
+          continue;
+        }
+
+        eff.cost -= cut;
+        eff.discount = { source: src.name, amount: cut };
+        used.set(src.id, (used.get(src.id) || 0) + cut);
+        discountsApplied.push({ key, source: src.name, amount: cut });
+        break;
+      }
+    }
+
+    // Phase 3: Total Summation
+    let spent = 0;
+    const costFields = ['purchasedSkills', 'purchasedPerks', 'domainPowers', 'classPowers', 'formPowers', 'utilityPowers', 'basicPowers', 'advancedPowers', 'veteranPowers', 'skills', 'perks', 'powers'];
+
+    for (const node of this._items) {
+      if (costFields.includes(node.field)) {
+        const eff = byItem[costKey(node)];
+        if (eff && eff.cost > 0) {
+          spent += eff.cost;
+        }
+      }
+    }
+
+    const awarded = Math.min(rawAwarded, MAX_FLAW_BP);
+
+    return {
+      spent,
+      awarded,
+      rawAwarded,
+      flawCapped: rawAwarded > MAX_FLAW_BP,
+      refunded,
+      discountFreeBP,
+      discountsApplied,
+      net: spent - refunded - discountFreeBP,
+      byItem
+    };
+  }
+}
+
+// Determine if a discount source applies to a specific graph item
+function discountApplies(src: any, itemNode: any, pos: number): boolean {
+  const ent = itemNode.entity;
+  const itemName = itemNode.name;
+
+  if (src.exclusions?.includes(ent?.id) || src.exclusions?.includes(`perks:${cleanItemName(itemName)}`)) return false;
+
+  const cat = ent?.category;
+  if (src.scope.kind === 'category') {
+    return Array.isArray(src.scope.value) && src.scope.value.some((c: string) => c.toLowerCase() === String(cat).toLowerCase());
+  }
+  if (src.scope.kind === 'firstN') {
+    return new RegExp(`^${src.scope.value}\\b`, 'i').test(cleanItemName(itemName)) && (src.scope.n == null || pos < src.scope.n);
+  }
+  if (src.scope.kind === 'skillRanks') {
+    return new RegExp(`^${src.scope.value}\\b`, 'i').test(cleanItemName(itemName));
+  }
+  if (src.scope.kind === 'namedSkill') {
+    return bareSkill(cleanItemName(itemName)) === src.scope.value;
+  }
+  if (src.scope.kind === 'prereq') {
+    const pr = (REFS as any).prereqs?.[ent?.id];
+    const target = `perks:${src.scope.value}`;
+    return !!pr && (pr.skills?.includes(target) || pr.other?.some((o: string) => new RegExp(src.scope.value, 'i').test(o)));
+  }
+  if (src.scope.kind === 'giftEligible') {
+    if (!ent || ent.id?.startsWith('skills:')) return false;
+    if (ent.id === `perks:${src.scope.value}`) return false;
+    const prereqText = String(ent.prereq || ent.prerequisites || '');
+    if (new RegExp(`\\b${src.scope.value}\\b`, 'i').test(prereqText)) return false;
+    return true;
+  }
+  return false;
 }
 
 // Parse and check free-text level/class/armor/spell-slot/profession constraints.

@@ -37,7 +37,7 @@ import { computeSlots, spellSlots, bookcasterSpellOptions, arcaneSecretsSpellOpt
 export { innateBonusCantrips, eligibleClassChoices, CLASS_CHOICE_SKILLS, agileLearnerCapacity, basicSpellOptions, BASIC_SPELL_SKILLS } from './validate/slots.js';
 import { resolveCharacterGraph, grantedAbilities } from './graph.js';
 export { grantedAbilities };
-import { computeBP } from './validate/bp-accounting.js';
+
 import { lookupCost } from './validate/cost-key.js';
 
 
@@ -422,7 +422,7 @@ export function validate(v1) {
   // budget by a fixed +2 rather than free spend.
   const backstoryBP = characterV2.backstoryApproved ? BACKSTORY_BP : 0;
   const extraMaxBP = characterV2.extraMaxBP || 0;
-  const spend = computeBP(graph, characterV2);
+  const spend = graph.spend;
   // Flaws AWARD BP: they raise the build budget rather than offsetting spend, so a
   // character with 5 flaw BP shows "spent of (base + 5)" — more headroom — instead
   // of looking like they spent 5 less. `spend.awarded` is already capped at
