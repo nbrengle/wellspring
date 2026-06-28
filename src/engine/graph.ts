@@ -1,24 +1,31 @@
 import { EFFECT_EXTRACTORS } from './extractors.js';
-import { lookupEntity, allergenAward, ALLERGEN_AWARDS, LINEAGES } from '../engine/data.js';
-import { cleanItemName, bareSkill, idName, getClasses } from './resolver.js';
+import { lookupEntity, allergenAward, ALLERGEN_AWARDS } from '../engine/data.js';
+import { cleanItemName, bareSkill, getClasses } from './resolver.js';
 import { characterLevel } from './validate/core.js';
+import type { CharacterStateV2, CharacterChoice, GraphItem, CharacterGraph, Entity, Effect, EntitySource } from './types.js';
 
-export function resolveCharacterGraph(charInput) {
-  let character = charInput;
-  if (!character.skills && !character.perks && !character.powers) {
-    character = { ...charInput, skills: [], perks: [], flaws: [], powers: [], spells: [], devotions: [] };
-    const add = (field, arr, sourceName) => {
-      for (let i = 0; i < (charInput[field] || []).length; i++) {
-         const item = charInput[field][i];
+export function resolveCharacterGraph(charInput: any): CharacterGraph {
+  // If the input is V1 state, convert it to V2 state internally
+  let character: CharacterStateV2 = charInput;
+  if (!charInput.skills && !charInput.perks && !charInput.powers) {
+    character = { ...charInput, skills: [], perks: [], flaws: [], powers: [], spells: [], devotions: [], innatePowers: [...(charInput.innatePowers || [])] };
+    const add = (field: string, arr: keyof CharacterStateV2, sourceName: EntitySource) => {
+      // For V1, the inputs are in charInput (e.g. purchasedSkills).
+      // For innatePowers, we synthesize them into character.innatePowers during the class loop,
+      // so we should read from character for that specific field.
+      const sourceList = field === 'innatePowers' ? (character as any).innatePowers : charInput[field];
+      for (let i = 0; i < (sourceList || []).length; i++) {
+         const item = sourceList[i];
          const id = field === 'startingSkills' ? `startingSkills:${i}:${item}` : `${field}:${item}`;
-         character[arr].push({
+         const choice: CharacterChoice = {
            id,
            entityId: item,
            source: sourceName,
-           costOverride: charInput.effectiveBP?.[field]?.[i] ?? null,
+           costOverride: charInput.effectiveBP?.[field]?.[i] ?? undefined,
            ranks: charInput.ranks?.[field]?.[i] ?? 1,
-           originalIndex: i,
-         });
+           originalIndex: i, // We attach originalIndex dynamically for tests/validation bridging
+         } as any;
+         (character[arr] as CharacterChoice[]).push(choice);
       }
     };
     add('startingSkills', 'skills', 'Class:Starting');
@@ -29,13 +36,16 @@ export function resolveCharacterGraph(charInput) {
     for (const pf of powerFields) add(pf, 'powers', 'Purchased');
     const charClasses = getClasses(charInput);
     for (const c of charClasses) {
-      const clsDef = lookupEntity(`classes:${c.name}`);
+      const clsDef = lookupEntity(`classes:${c.name}`) as any;
       if (clsDef && clsDef.innate) {
         for (const p of clsDef.innate) {
           if (c.level >= (p.requiredLevel || 1)) {
-            charInput.innatePowers = charInput.innatePowers || [];
-            if (!charInput.innatePowers.includes(p.name)) {
-              charInput.innatePowers.push(p.name);
+            // FIX: Initialize innatePowers on character if it doesn't exist
+            if (!(character as any).innatePowers) {
+              (character as any).innatePowers = [];
+            }
+            if (!(character as any).innatePowers.includes(p.name)) {
+              (character as any).innatePowers.push(p.name);
             }
           }
         }
@@ -46,15 +56,16 @@ export function resolveCharacterGraph(charInput) {
     const spellFields = ['cantrips', 'bookSpells', 'spellsKnown', 'noviceSpells', 'adeptSpells', 'greaterSpells'];
     for (const sf of spellFields) add(sf, 'spells', 'Purchased');
     if (charInput.devotion) {
-       character.devotions.push({ id: `devotions:${charInput.devotion}`, entityId: `devotions:${charInput.devotion}`, source: 'Purchased' });
+       (character.devotions as CharacterChoice[]).push({ id: `devotions:${charInput.devotion}`, entityId: `devotions:${charInput.devotion}`, source: 'Purchased' });
     }
   }
-  const items = [];
+
+  const items: GraphItem[] = [];
   const charLevel = characterLevel(character);
   const classes = getClasses(character);
 
-  const addItem = (choice) => {
-    let ent = lookupEntity(choice.entityId);
+  const addItem = (choice: any) => {
+    let ent = lookupEntity(choice.entityId) as any;
     // Remove the collection prefix (e.g. "skills:") for the display name
     const rawName = choice.entityId.replace(/^[a-z]+:/i, '');
     const cleanName = cleanItemName(rawName);
@@ -66,15 +77,15 @@ export function resolveCharacterGraph(charInput) {
     }
 
     const rank = choice.ranks || 1;
-    const effects = [];
+    const effects: Effect[] = [];
 
     // Extract Base Cost
     let baseCost = 0;
     if (Array.isArray(ent?.tiers) && ent.tiers.length) {
       const n = Math.min(rank, ent.tiers.length);
-      baseCost = ent.tiers.slice(0, n).reduce((s, t) => s + (t.cost || 0), 0);
+      baseCost = ent.tiers.slice(0, n).reduce((s: number, t: any) => s + (t.cost || 0), 0);
     } else {
-      baseCost = (typeof ent?.cost === 'number' ? ent.cost : 0) * rank;
+      baseCost = (typeof ent?.cost === 'number' ? ent.cost : (ent?.lbp || 0)) * rank;
     }
 
     const entityId = ent?.id || choice.entityId;
@@ -94,16 +105,15 @@ export function resolveCharacterGraph(charInput) {
     }
 
     items.push({
-      id: choice.id || entityId, entityId: entityId,
+      id: choice.id || entityId, 
+      entityId: entityId,
       name: ent?.name || cleanName,
       rawString: choice.entityId,
       field,
       sourceType,
       rank: choice.ranks || 1,
       index: choice.originalIndex,
-      baseCost: ent?.tiers 
-        ? ent.tiers.slice(0, choice.ranks || 1).reduce((s, t) => s + (t.cost || 0), 0)
-        : (ent?.cost ?? (ent?.lbp ?? 0)) * (choice.ranks || 1),
+      baseCost: baseCost,
       authoredCost: choice.costOverride,
       grantSidecar: null,
       entity: ent,
@@ -121,7 +131,7 @@ export function resolveCharacterGraph(charInput) {
   for (const choice of character.devotions || []) addItem(choice);
 
   for (const field of ['lineageAdvantages', 'lineageChallenges']) {
-    for (const name of character[field] || []) {
+    for (const name of (character as any)[field] || []) {
       const type = field === 'lineageAdvantages' ? 'advantages' : 'challenges';
       let entityId = `${type}:${name}`;
       if (name === 'Pick and Choose' && character.advantageChoices?.['Pick and Choose']) {
@@ -134,9 +144,9 @@ export function resolveCharacterGraph(charInput) {
 
   // Process Flaws
   for (const choice of character.flaws || []) {
-    const rawName = choice.entityId.replace(/^flaws:/i, '');
+    const rawName = (choice as any).entityId.replace(/^flaws:/i, '');
     const cleanName = cleanItemName(rawName);
-    const ent = lookupEntity(`flaws:${cleanName}`);
+    const ent = lookupEntity(`flaws:${cleanName}`) as any;
     let bp = 0;
     if (ent) {
       const allergenTable = ALLERGEN_AWARDS[ent.baseName];
@@ -147,22 +157,23 @@ export function resolveCharacterGraph(charInput) {
         bp = typeof ent.bp === 'number' ? ent.bp : parseInt(String(ent.bp), 10) || 0;
       }
     }
+    console.log('FLAW DEBUG:', { cleanName, rawName, entBp: ent?.bp, bp });
     items.push({
       id: ent?.id || `flaws:${cleanName}`,
       name: ent?.name || cleanName,
-      rawString: choice.entityId,
+      rawString: (choice as any).entityId,
       field: 'flaws',
       sourceType: 'flaw',
       rank: 1,
       baseCost: -bp,
       entity: ent,
       effects: [{ type: 'FLAW_AWARD', amount: bp }],
-      choiceData: choice
+      choiceData: choice as any
     });
   }
 
   // Generate Synthesized Granted Items
-  const bareKey = (name, ent) => {
+  const bareKey = (name: string, ent: any) => {
     const clean = cleanItemName(name);
     const e = ent || lookupEntity(`skills:${clean}`) || lookupEntity(`powers:${clean}`);
     const base = (e?.baseName || e?.name || bareSkill(clean)).toLowerCase();
@@ -178,7 +189,7 @@ export function resolveCharacterGraph(charInput) {
     for (const eff of node.effects) {
       if (eff.type !== 'GRANT_SOURCE') continue;
       for (const gid of eff.grants) {
-        const ent = lookupEntity(gid);
+        const ent = lookupEntity(gid) as any;
         const gType = gid.slice(0, gid.indexOf(':'));
         const rawGidName = gid.slice(gid.indexOf(':') + 1);
         const gName = ent?.name || rawGidName;
@@ -217,7 +228,7 @@ export function resolveCharacterGraph(charInput) {
   // Tax Evasion
   const hasTaxEvasion = items.some(i => i.name === 'Tax Evasion');
   if (hasTaxEvasion) {
-    const profRanks = items.filter(i => /^Profession\\b/i.test(i.name)).length;
+    const profRanks = items.filter(i => /^\bProfession\b/i.test(i.name)).length;
     let bonus = profRanks * 3;
     if (items.some(i => i.name === 'Manse')) bonus += 2;
     if (items.some(i => i.name === 'Income')) bonus += 2;
@@ -229,6 +240,7 @@ export function resolveCharacterGraph(charInput) {
         field: 'synthetic',
         sourceType: 'synthetic',
         rank: 1,
+        baseCost: 0,
         effects: [{ type: 'WEALTH', amount: bonus, note: 'from Profession/Manse/Income' }]
       });
     }
@@ -237,13 +249,13 @@ export function resolveCharacterGraph(charInput) {
   return { character, items, characterLevel: charLevel, classes };
 }
 
-export function grantedAbilities(character) {
+export function grantedAbilities(character: any) {
   const graph = resolveCharacterGraph(character);
-  const list = [];
-  const bySource = {};
+  const list: any[] = [];
+  const bySource: Record<string, any> = {};
 
-  const addRow = (ability, sourceName, sourceId, sourceKind) => {
-    const ent = lookupEntity(ability);
+  const addRow = (ability: string, sourceName: string, sourceId: string, sourceKind: string) => {
+    const ent = lookupEntity(ability) as any;
     const row = {
       ability,
       abilityName: ent?.name || ability.split(":")[1],

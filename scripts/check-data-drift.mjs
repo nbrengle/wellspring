@@ -40,9 +40,9 @@ if (dirtyBefore) {
 let failed = false;
 try {
   // Regenerate in place, then diff against HEAD's committed data.
-  run('node', ['scripts/parse-megadoc.js']);
-  run('node', ['scripts/parse-archetypes.js']);
-  run('node', ['scripts/link-refs.js']);
+  run('npx', ['tsx', 'scripts/parse-megadoc.js']);
+  run('npx', ['tsx', 'scripts/parse-archetypes.js']);
+  run('npx', ['tsx', 'scripts/link-refs.js']);
 
   const drift = git('status', '--porcelain', '--', GENERATED);
   if (drift) {

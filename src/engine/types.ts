@@ -133,3 +133,37 @@ export interface CharacterStateV2 {
   
   agileLearnerTrades?: Record<string, number>;
 }
+
+// ─── 3. Graph Types ─────────────────────────────────────────────────────────
+
+export interface Effect {
+  type: string;
+  [key: string]: any;
+}
+
+export interface GraphItem {
+  id: string;
+  name: string;
+  rawString?: string;
+  field: string;
+  sourceType: string;
+  rank: number;
+  baseCost: number;
+  authoredCost?: number;
+  grantSidecar?: any;
+  entity?: Entity | null;
+  effects: Effect[];
+  specialty?: any;
+  floor?: number;
+  choiceData?: CharacterChoice;
+  index?: number;
+  grantedBy?: string;
+  grantKind?: string;
+}
+
+export interface CharacterGraph {
+  character: CharacterStateV2;
+  items: GraphItem[];
+  characterLevel: number;
+  classes: Record<string, number>;
+}

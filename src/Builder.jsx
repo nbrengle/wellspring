@@ -24,7 +24,6 @@ import "./Builder.css";
 
 // Components
 import LineagePanel from "./components/LineagePanel.jsx";
-import ExportImportPanel from "./components/ExportImportPanel.jsx";
 import PickerOverlay from "./components/PickerOverlay.jsx";
 import DetailPane from "./components/DetailPane.jsx";
 import BuildSheet, { IdentityRail } from "./components/BuildSheet.jsx";
@@ -45,7 +44,6 @@ export default function Builder() {
   const [view, setView] = useState(null);
   const [chase, setChase] = useState(null);
   const [picking, setPicking] = useState(null); // null | picker spec
-  const [exportOpen, setExportOpen] = useState(false);
   const [history, setHistory] = useState([]);
   const [lineageOpen, setLineageOpen] = useState(false);
 
@@ -121,7 +119,6 @@ export default function Builder() {
         character={character}
         report={report}
         onLevelChange={handlers.handleLevelChange}
-        onExport={() => setExportOpen(true)}
       />
       {mode === "explorer" ? (
         <RulesExplorer onClose={() => setMode("builder")} />
@@ -152,25 +149,6 @@ export default function Builder() {
         </BuilderProvider>
       )}
       {picking && <PickerOverlay spec={picking} character={character} onClose={() => setPicking(null)} />}
-      {exportOpen && (
-        <ExportImportPanel
-          character={character}
-          report={report}
-          onImport={(c) => {
-            let prepared = { ...c };
-            const primary = getClasses(prepared)[0]?.name;
-            if (primary && hasStartingChoices(primary)) {
-              prepared.startingChoices = reconcileStartingChoices(prepared, primary);
-              prepared = rebuildStartingSkills(prepared, primary, prepared.startingChoices);
-            }
-            setCharacter(prepared);
-            setExportOpen(false);
-            setView(null);
-            setHistory([]);
-          }}
-          onClose={() => setExportOpen(false)}
-        />
-      )}
       {lineageOpen && (
         <LineagePanel
           character={character}
@@ -204,7 +182,7 @@ function SiteFooter() {
   );
 }
 
-function BTopBar({ mode, setMode, character, report, onLevelChange, onExport }) {
+function BTopBar({ mode, setMode, character, report, onLevelChange }) {
   const level = character.archetypeName ? characterLevel(character) : null;
   const [linkCopied, setLinkCopied] = useState(false);
   const copyShareLink = () => {
@@ -286,9 +264,6 @@ function BTopBar({ mode, setMode, character, report, onLevelChange, onExport }) 
       <div className="b-topbar-actions">
         {mode === "builder" ? (
           <>
-            <button className="b-topbar-btn" onClick={onExport}>
-              Export / Import
-            </button>
             <button className={`b-topbar-btn ${linkCopied ? "is-copied" : ""}`} onClick={copyShareLink}>
               {linkCopied ? "Link copied!" : "Copy share link"}
             </button>
