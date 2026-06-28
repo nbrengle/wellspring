@@ -1,12 +1,16 @@
 import { useMemo } from "react";
 import { ARCHETYPES } from "../../engine/data.js";
+import { getClasses } from "../../engine/resolver.js";
 import Tag from "./Tag.jsx";
 
 export default function ArchetypePicker({ onPick, onStartBlank }) {
   const byClass = useMemo(() => {
     const map = new Map();
     for (const a of ARCHETYPES) {
-      const cls = a.classLevels?.split(" ")[0] || "Other";
+      // Group by the archetype's primary class. getClasses understands every class
+      // shape (the object map { Cleric: 4 } archetypes ship, an array, or the legacy
+      // classLevels string) — so this stays correct regardless of the stored form.
+      const cls = getClasses(a)[0]?.name || "Other";
       if (!map.has(cls)) map.set(cls, []);
       map.get(cls).push(a);
     }

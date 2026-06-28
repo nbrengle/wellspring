@@ -147,7 +147,7 @@ function loadWithChoices(a) {
 // reconcile+rebuild path (not just from its raw shipped skills) — i.e. making the
 // implicit choices explicit must not change the build's legality or cost.
 for (const a of ARCHETYPES) {
-  test(`archetype "${a.archetypeName}" stays 9 BP + legal through specialty reconcile`, () => {
+  test(`archetype "${a.name}" stays 9 BP + legal through specialty reconcile`, () => {
     const r = validate(loadWithChoices(a));
     const baseValid = validate(a).valid;
     if (baseValid) {
@@ -219,7 +219,7 @@ test('reconcile picks a concrete option for each archetype choice block', () => 
     'Artificer Artisan': ['Apprentice Tinkering', 'Profession - Journeyman'],
   };
   for (const [name, skills] of Object.entries(expectations)) {
-    const a = ARCHETYPES.find((x) => x.archetypeName === name);
+    const a = ARCHETYPES.find((x) => x.name === name);
     const cls = getClasses(a)[0].name;
     const choices = reconcileStartingChoices(fromArchetype(a), cls);
     // Assert the OUTCOME (the expected skill ends up granted) rather than WHICH
@@ -264,7 +264,7 @@ test('changing a Druid choice swaps its granted skills', () => {
 // Healer Druid buys Diagnose + Combat Medic, both gated on the specialty's free
 // Basic Medicine — drop it and the prereqs break, as they should.
 test('swapping away a depended-on specialty skill surfaces the broken prereq', () => {
-  const base = loadWithChoices(ARCHETYPES.find((x) => x.archetypeName === 'Healer Druid'));
+  const base = loadWithChoices(ARCHETYPES.find((x) => x.name === 'Healer Druid'));
   ok(validate(base).valid, 'archetype starts legal');
   const wisdomBlock = blockId('Druid', 'Peacecaster');
   let swapped = rebuildStartingSkills(base, 'Druid',
@@ -290,7 +290,7 @@ test('swapping away a depended-on specialty skill surfaces the broken prereq', (
 // Each choice-granted starting skill is tagged with the block that granted it, so
 // the build sheet can badge it "<Class> · <Choice>".
 test('rebuild tags granted skills with their choice-block provenance', () => {
-  const a = ARCHETYPES.find((x) => x.archetypeName === 'Healer Druid');
+  const a = ARCHETYPES.find((x) => x.name === 'Healer Druid');
   const c = loadWithChoices(a);
   const sources = Object.values(c.specialtySources || {});
   // Labels are derived from the doc's block titles; look them up rather than pin.

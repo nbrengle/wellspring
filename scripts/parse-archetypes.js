@@ -452,7 +452,10 @@ for (let i = 0; i < nodes.length; i++) {
 
 function convertToV2(v1) {
   const v2 = {
-    archetypeName: v1.name,
+    // The archetype's own name — `name`, canonical like every other entity, so UI
+    // code reads a.name uniformly. (The CHARACTER built from it carries the
+    // provenance separately as `archetypeName`; loadArchetype sets that.)
+    name: v1.name,
     classes: {},
     skills: [],
     perks: [],
