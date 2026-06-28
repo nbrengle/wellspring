@@ -4,7 +4,7 @@
 // pools resolve whether or not the pending MegaDoc spelling fixes land.
 import { test, eq, ok } from './harness.mjs';
 import { lookupEntity } from '../../src/engine/data.js';
-import { POOLS, poolSize, poolMax, poolsReferenced, poolRelation, unresolvedPoolMentions } from '../../src/engine/pool-registry.js';
+import { POOLS, poolSize, poolMax, poolsReferenced, poolRelation, unresolvedPoolMentions, characterPools } from '../../src/engine/pool-registry.js';
 import skillsJson from '../../src/data/skills.json' with { type: 'json' };
 import classesJson from '../../src/data/classes.json' with { type: 'json' };
 import domainsJson from '../../src/data/domains.json' with { type: 'json' };
@@ -62,6 +62,29 @@ test('pool-registry: poolMax folds in owned PERMANENT augments, not refills', ()
   eq(withGht.sources.length, 1, 'one permanent source');
   // a refill power owned must NOT change the max.
   eq(poolMax('healing-touch', 3, [ht, cure]).total, 9, 'Cure (refill) does not raise max');
+});
+
+test('pool-registry: characterPools resolves a character to read-layer pool records', () => {
+  // Cleric L3 owning the definer + a permanent augment + two refills.
+  const owned = [
+    { name: 'Healing Touch', source: 'class', cls: 'Cleric' },
+    { name: 'Greater Healing Touch', source: 'purchased', cls: 'Cleric' },
+    { name: 'Cure', source: 'purchased', cls: 'Cleric' },
+    { name: 'Heal', source: 'purchased', cls: 'Cleric' },
+  ];
+  const pools = characterPools(owned, (c) => (c === 'Cleric' ? 3 : 0));
+  const ht = pools.find((p) => p.id === 'healing-touch');
+  ok(ht, 'character has the Healing Touch Pool');
+  eq(ht.max.total, 12, 'max = base 9 + Greater Healing Touch (+3)');
+  eq(ht.max.sources.length, 1, 'one permanent source in the max breakdown');
+  eq(ht.refills.map((r) => r.name).sort().join(','), 'Cure,Heal', 'Cure + Heal are refills');
+  ok(!ht.refills.some((r) => r.relation !== 'refills'), 'refills are not in the max');
+});
+
+test('pool-registry: a character only HAS a pool if it owns the defining power', () => {
+  // owns a refill power (Cure) but NOT the definer → no pool.
+  const pools = characterPools([{ name: 'Cure', source: 'purchased', cls: 'Cleric' }], () => 3);
+  eq(pools.length, 0, 'no definer owned → no pool surfaces');
 });
 
 test('pool-registry: build guard surfaces pools with no derivable size', () => {

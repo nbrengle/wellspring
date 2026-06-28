@@ -152,6 +152,65 @@ export function poolMax(poolId: string, classLevel: number, owned: any[]): PoolM
   return { base, sources, total };
 }
 
+// ── Character-level resolution (read-layer shape) ────────────────────────────
+// `characterPools(character)` is the integration: given a character, produce the
+// pools they actually HAVE and everything that touches each, as a pre-sorted,
+// source-stamped record — the same shape the post-refactor bucketed read layer
+// will emit, so this slots in without rework. The UI reads this directly:
+// identity-rail tile from `max`, a "Pool" facet / breakdown from the grouped
+// powers. A character HAS a pool iff they own its defining power.
+
+export interface PoolPower { name: string; source: string; cls: string | null; relation: PoolRelation; }
+export interface CharacterPool {
+  id: string;
+  name: string;
+  classLevel: number;
+  max: PoolMaxBreakdown;                 // base + permanent (augments-max) sources
+  refills: PoolPower[];                   // temporary replenishers (not in max)
+  spends: PoolPower[];                    // powers that draw from the pool
+  augmentsMax: PoolPower[];               // the permanent contributors (mirror max.sources)
+}
+
+// Minimal shape we read off the resolved owned-set; matches classifyOwnedItems
+// entries and is forward-compatible with the read-layer Entry.
+interface OwnedLike { name: string; source?: string; cls?: string | null; }
+
+/** Resolve the character's pools from their OWNED entities + class levels.
+ *  `owned` is the flat list of owned items (today: concat of classifyOwnedItems
+ *  buckets; post-refactor: the read layer's entries). `classLevelOf(name)` returns
+ *  the level of a class the character has (for the pool's size formula). */
+export function characterPools(
+  owned: OwnedLike[],
+  classLevelOf: (className: string) => number,
+): CharacterPool[] {
+  // index owned entities to full entity defs once
+  const resolved = owned.map((o) => ({ owned: o, ent: lookupEntity(`classes:${o.name}`) || lookupEntity(`domains:${o.name}`) || lookupEntity(`skills:${o.name}`) || lookupEntity(`powers:${o.name}`) || { name: o.name } }));
+
+  const out: CharacterPool[] = [];
+  for (const pool of POOLS) {
+    // HAS the pool? owns the defining power.
+    const definer = resolved.find((r) => r.owned.name === pool.definedBy);
+    if (!definer) continue;
+
+    const classLevel = classLevelOf((definer.ent as any)?.parentClass || (definer.owned.cls || '')) || 1;
+    const toPower = (r: typeof resolved[number], relation: PoolRelation): PoolPower =>
+      ({ name: r.owned.name, source: r.owned.source ?? 'purchased', cls: r.owned.cls ?? null, relation });
+
+    const augmentsMax: PoolPower[] = [];
+    const refills: PoolPower[] = [];
+    const spends: PoolPower[] = [];
+    for (const r of resolved) {
+      const rel = poolRelation(r.ent, pool.id);
+      if (rel === 'augments-max') augmentsMax.push(toPower(r, rel));
+      else if (rel === 'refills') refills.push(toPower(r, rel));
+      else if (rel === 'spends') spends.push(toPower(r, rel));
+    }
+    const max = poolMax(pool.id, classLevel, resolved.map((r) => r.ent));
+    out.push({ id: pool.id, name: pool.name, classLevel, max, refills, spends, augmentsMax });
+  }
+  return out;
+}
+
 /** Build guard: every defining power must yield a parseable size formula, and the
  *  audit's unresolved mentions must be empty. Feed RAW entities. Returns offenders. */
 export function unresolvedPoolMentions(
