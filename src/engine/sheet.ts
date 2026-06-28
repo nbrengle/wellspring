@@ -5,6 +5,7 @@
 // and reusable for copy / download / print. The output round-trips visually with
 // the source archetype format.
 
+import { lookupEntity } from '../engine/data.js';
 import { bareSkill, cleanItemName, getClasses } from '../engine/resolver.js';
 import { ARCHETYPES, UNLIMITED_SKILLS, BASE_CLASSES } from './data.js';
 import { lookupCost } from './validate/cost-key.js';
@@ -17,7 +18,14 @@ import { SCALAR_FIELDS, ITEM_FIELDS, fieldForLabel, cleanItem, splitItems,
 // cost (purchased skills/perks, BP-bought powers, refund-bearing starting skills,
 // flaws) round-trips. Returns '' when the item has no cost/grant of note.
 function bpSuffix(name, field, report, idx) {
-  const e = lookupCost(report?.spend.byItem, field, name, idx);
+  if (!report?.spend?.byItem) return '';
+  let e = null;
+  const cleanN = cleanItemName(name);
+  if (report._graph) {
+    const node = report._graph.items.filter(n => n.field === field.replace(/^(purchased|starting)/, '').toLowerCase() && cleanItemName(n.rawString) === cleanN)[0];
+    if (node) e = report.spend.byItem[node.id];
+  }
+  if (!e) e = lookupCost(report.spend.byItem, `${field}:${cleanN}`);
   if (!e) return '';
   // Flaws award BP; a starting-skill refund is also a negative cost on a free item.
   if (e.cost < 0) {
@@ -72,6 +80,22 @@ const POWER_SECTIONS = [
 ];
 
 export function formatCharacterSheet(character, report) {
+  if (!character.startingSkills && character.skills) {
+    character = { ...character };
+    character.startingSkills = character.skills.filter(s => typeof s !== 'string' && s.source?.includes('Starting')).map(s => s.entityId || s.name);
+    character.purchasedSkills = character.skills.filter(s => typeof s !== 'string' && s.source === 'Purchased').map(s => s.entityId || s.name);
+    character.purchasedPerks = (character.perks || []).filter(s => typeof s !== 'string' && s.source === 'Purchased').map(s => s.entityId || s.name);
+    const powerFields = { innatePowers: 'Class:Innate', utilityPowers: 'Utility', basicPowers: 'Basic', advancedPowers: 'Advanced', veteranPowers: 'Veteran' };
+    for (const [pf, pt] of Object.entries(powerFields)) {
+      if (pf === 'innatePowers') {
+        character[pf] = (character.powers || []).filter(s => typeof s !== 'string' && s.source?.includes('Innate')).map(s => s.entityId || s.name);
+      } else {
+        character[pf] = (character.powers || []).filter(s => typeof s !== 'string' && s.source === 'Purchased' && lookupEntity('powers:' + (s.entityId||s.name))?.category === pt).map(s => s.entityId || s.name);
+      }
+    }
+    character.cantrips = (character.spells || []).filter(s => lookupEntity('spells:' + (s.entityId||s.name))?.tier?.toLowerCase() === 'cantrip').map(s => s.entityId || s.name);
+    character.spellsKnown = (character.spells || []).filter(s => lookupEntity('spells:' + (s.entityId||s.name))?.tier?.toLowerCase() !== 'cantrip').map(s => s.entityId || s.name);
+  }
   const lines = [];
   const classes = getClasses(character);
   const title = character.name?.trim() || character.archetypeName || 'Unnamed Character';
@@ -194,7 +218,22 @@ function parseSheetText(text) {
     const items = [...splitItems(valueStr), ...extraItems]
       .flatMap((raw) => expandInstances(raw, (b) => UNLIMITED_SKILLS.has(b), CHOICE_DEFAULTS))
       .map(cleanItem);
-    character[field] = items.map((it) => it.name);
+    
+    character[field] = items.map((it) => {
+      const match = it.name.match(/\s*x\s*(\d+)\b/i);
+      return match ? it.name.replace(match[0], '').trim() : it.name;
+    });
+    
+    const ranks = items.map((it) => {
+      const match = it.name.match(/\s*x\s*(\d+)\b/i);
+      return match ? parseInt(match[1], 10) : 1;
+    });
+    
+    if (ranks.some(r => r > 1)) {
+      if (!character.ranks) character.ranks = {};
+      character.ranks[field] = ranks;
+    }
+
     if (items.some((it) => it.bp != null)) character.effectiveBP[field] = items.map((it) => it.bp);
     if (items.some((it) => it.grant)) character.grants[field] = items.map((it) => it.grant);
   };

@@ -10,7 +10,7 @@
 // unit-testable. The character shape is the flat object from Builder.jsx.
 
 import { LEVEL_TABLE, lookupEntity, CLASS_POWER_SLOTS, DEVOTIONS, DOMAINS, CRAFTING, RITUALS, UNLIMITED_SKILLS, divineSubstitutionOptions } from '../engine/data.js';
-import { cleanItemName, bareSkill, resolveId, entityType, getClasses, primaryClass } from './resolver.js';
+import { cleanItemName, bareSkill, getClasses, primaryClass } from './resolver.js';
 
 // Shared primitives now live in validate/core.js (hotspot split). Import the ones
 // this module still uses internally, and re-export the public surface from the
@@ -19,15 +19,13 @@ import {
   MAX_LBP, MAX_FLAW_BP, BACKSTORY_BP, MAX_DOMAINS, DEFAULT_WEALTH,
   LEGAL_MIN_LEVEL, LEVEL_CAP, subKey, CLASS_POWER_TIERS, POWER_SOURCE_FIELDS,
   characterLevel, getLegalMinLevel, getMaxRanks,
-  pickClass, maxProgressionLevel,
+  maxProgressionLevel,
 } from './validate/core.js';
 export {
   MAX_LBP, MAX_FLAW_BP, BACKSTORY_BP, MAX_DOMAINS, DEFAULT_WEALTH,
   LEGAL_MIN_LEVEL, LEVEL_CAP, subKey,
   getClasses, primaryClass, characterLevel, getLegalMinLevel,
-  getMaxRanks, pickClass,
-
-};
+  getMaxRanks, };
 export { EVENTS_TABLE } from './validate/core.js';
 import { lbpState } from './validate/lbp.js';
 export { lbpState };
@@ -169,9 +167,8 @@ export function classifyOwnedItems(character) {
   // Resolve an item to its real entity (type-prefixed by its storage field first,
   // then by a free lookup across powers/perks/skills so a misfiled item resolves).
   const resolve = (item, field) => {
-    const byField = lookupEntity(resolveId(item, field, character))
-      || lookupEntity(`${entityType(field)}:${bareSkill(cleanItemName(item))}`);
-    if (byField && byField.type === entityType(field)) return byField;
+    const byField = lookupEntity(`${field}:${bareSkill(cleanItemName(item))}`);
+    if (byField) return byField;
     const clean = cleanItemName(item);
     return lookupEntity(`powers:${clean}`) || lookupEntity(`perks:${clean}`)
       || lookupEntity(`skills:${clean}`) || byField;
@@ -411,21 +408,23 @@ export function computeActiveSelections(graph, lbp) {
   return active;
 }
 
-export function validate(character) {
-  const level = characterLevel(character);
-  const legalMinLevel = getLegalMinLevel(character);
+export function validate(v1) {
+  const character = v1;
+  const graph = resolveCharacterGraph(character);
+  const characterV2 = graph.character;
+  const level = characterLevel(characterV2);
+  const legalMinLevel = getLegalMinLevel(characterV2);
   // Base budget plus DERIVED "free BP" (redundant multiclass grants award free BP
   // equal to the skill's cost). Derived from the classes, not a cached field, so
   // it's correct for any character (built, imported, or hand-edited).
-  const mcGrants = multiclassGrants(character);
+  const mcGrants = multiclassGrants(characterV2);
   const freeBP = mcGrants.freeBP;
   // "Approved backstories provide the character with 2 additional BP." Opt-in
   // (plot-team approval), so it's a flag on the character that lifts the base
   // budget by a fixed +2 rather than free spend.
-  const backstoryBP = character.backstoryApproved ? BACKSTORY_BP : 0;
-  const extraMaxBP = character.extraMaxBP || 0;
-  const graph = resolveCharacterGraph(character);
-  const spend = computeBP(graph, character);
+  const backstoryBP = characterV2.backstoryApproved ? BACKSTORY_BP : 0;
+  const extraMaxBP = characterV2.extraMaxBP || 0;
+  const spend = computeBP(graph, characterV2);
   // Flaws AWARD BP: they raise the build budget rather than offsetting spend, so a
   // character with 5 flaw BP shows "spent of (base + 5)" — more headroom — instead
   // of looking like they spent 5 less. `spend.awarded` is already capped at
@@ -433,12 +432,12 @@ export function validate(character) {
   const budget = budgetFor(level, legalMinLevel) + freeBP + backstoryBP + extraMaxBP + spend.awarded;
   const bonusBudget = bonusBudgetFor(level);
   const maxBudget = budget + bonusBudget;
-  const slots = computeSlots(character);
-  const spellSlotCounts = spellSlots(character);
-  const bookcasterOptions = bookcasterSpellOptions(character);
+  const slots = computeSlots(characterV2);
+  const spellSlotCounts = spellSlots(characterV2);
+  const bookcasterOptions = bookcasterSpellOptions(characterV2);
   // Arcane Secrets (Knowledge domain power): the arcane spells the character may add
   // to Known Spells — rank-gated for casters, capped at Adept for non-casters.
-  const arcaneSecretsOptions = arcaneSecretsSpellOptions(character);
+  const arcaneSecretsOptions = arcaneSecretsSpellOptions(characterV2);
   // Weird Wanderings (Artisan Basic power): Basic powers from any non-Artisan Base
   // Class the Artisan may copy (no Spell-refresh).
   const weirdWanderingsOptions = weirdWanderingsPool();
@@ -446,27 +445,27 @@ export function validate(character) {
   // Artisan powers it lets you pick (both must share the tag).
   const studiedFocus = {
     tags: ARTISAN_SPECIALTY_TAGS,
-    tag: character.choices?.['powers:Studied Focus'] || null,
-    options: studiedFocusPool(character.choices?.['powers:Studied Focus'] || null),
+    tag: characterV2.choices?.['powers:Studied Focus'] || null,
+    options: studiedFocusPool(characterV2.choices?.['powers:Studied Focus'] || null),
   };
   // Basic Arcane / Basic Faith pickable spell pools (sphere-gated; non-casters get
   // any base class of that sphere). Keyed by skill base name for the UI picker.
   const basicSpellChoices = Object.fromEntries(
-    Object.entries(BASIC_SPELL_SKILLS).map(([skill, mt]) => [skill, basicSpellOptions(character, mt)]),
+    Object.entries(BASIC_SPELL_SKILLS).map(([skill, mt]) => [skill, basicSpellOptions(characterV2, mt)]),
   );
   const stats = computeLevelStats(graph);
-  const wealth = computeWealthState(graph, character.wealth);
-  const devotion = devotionState(character);
-  const lbp = lbpState(character);
-  const granted = grantedAbilities(character);
-  const crafting = craftingCapability(character);
-  const owned = classifyOwnedItems(character);
+  const wealth = computeWealthState(graph, characterV2.wealth);
+  const devotion = devotionState(characterV2);
+  const lbp = lbpState(characterV2);
+  const granted = grantedAbilities(characterV2);
+  const crafting = craftingCapability(characterV2);
+  const owned = classifyOwnedItems(characterV2);
   // Class-choice grants (Extensive Combat Training / Extensive Training /
   // Spell-Scholar): the classes the player may pick for each, gated by the classes
   // they actually have. The UI reads this to offer ONLY eligible classes (not the
   // hardcoded full list) as the skill's parameter.
   const classChoices = Object.fromEntries(
-    Object.keys(CLASS_CHOICE_SKILLS).map((baseName) => [baseName, eligibleClassChoices(character, baseName)]),
+    Object.keys(CLASS_CHOICE_SKILLS).map((baseName) => [baseName, eligibleClassChoices(characterV2, baseName)]),
   );
   // Attach each classified row's computed cost record (from the BP ledger) so the
   // UI reads `row.cost` directly instead of reconstructing a ledger key per row.
@@ -476,8 +475,8 @@ export function validate(character) {
     }
   }
   const activeSelections = computeActiveSelections(graph, lbp);
-  const powerBenefits = activePowerBenefits(character);
-  const prereqs = checkPrereqs(character);
+  const powerBenefits = activePowerBenefits(characterV2);
+  const prereqs = checkPrereqs(characterV2);
   const slotsOver = slots.some((s) => s.over);
   // BP used beyond the base allowance, drawn from the bonus pool (clamped ≥0).
   const bonusUsed = Math.max(0, spend.net - budget);
@@ -505,6 +504,7 @@ export function validate(character) {
     multiclassGrants: mcGrants,
     bonusBudget,
     maxBudget,
+    _graph: graph,
     spend,
     remaining: budget - spend.net,                   // vs. base (may be negative)
     bonusUsed,
@@ -568,3 +568,5 @@ export function validityReasons(report) {
   }
   return out;
 }
+
+export { pickClass } from './validate/core.js';

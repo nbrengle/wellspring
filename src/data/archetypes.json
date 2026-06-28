@@ -1,1458 +1,1676 @@
 [
   {
-    "name": "Defensive Sword + Shield Fighter",
-    "tagline": "Guard your allies, block hits, and take a beating while you still stand.",
-    "effectiveBP": {
-      "startingSkills": [
-        null,
-        null,
-        null,
-        null,
-        null,
-        null
-      ],
-      "purchasedSkills": [
-        0,
-        5,
-        2
-      ],
-      "purchasedPerks": [
-        1,
-        1
-      ],
-      "innatePowers": [
-        null,
-        null,
-        null
-      ],
-      "utilityPowers": [
-        null,
-        null
-      ],
-      "basicPowers": [
-        null,
-        null
-      ]
+    "archetypeName": "Defensive Sword + Shield Fighter",
+    "classes": {
+      "Fighter": 4
     },
-    "grants": {
-      "startingSkills": [
-        null,
-        null,
-        null,
-        null,
-        null,
-        null
-      ],
-      "purchasedSkills": [
-        {
-          "kind": "grant",
-          "amount": null,
-          "source": "Linked Armor",
-          "sourceRole": "utility power"
-        },
-        null,
-        null
-      ],
-      "purchasedPerks": [
-        null,
-        null
-      ],
-      "innatePowers": [
-        null,
-        null,
-        null
-      ],
-      "utilityPowers": [
-        null,
-        null
-      ],
-      "basicPowers": [
-        null,
-        null
-      ]
-    },
-    "lineage": "Human",
-    "lineageChallenges": [],
-    "lineageAdvantages": [],
-    "lifePoints": "4",
-    "armorPoints": "7 (physrep up to 6 points, +1 from powers)",
-    "spikes": "2",
-    "classLevels": "Fighter 4",
+    "skills": [
+      {
+        "id": "41c33988-4e66-4f2c-b63d-b41434a8870a",
+        "entityId": "Basic Armor",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "b23b3b23-4d74-4f6f-971f-062b1a7144ae",
+        "entityId": "Light Armor",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "d8782e2a-a167-4ad6-af40-ce4747548bad",
+        "entityId": "Basic Martial Weapons",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "8a9124e8-d141-496d-950f-f44548a8899a",
+        "entityId": "Basic Shields",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "436bb27b-d162-4180-bc40-139e5d8e74f3",
+        "entityId": "Short Weapons",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "93b2bb3b-4ce6-4a7b-9734-20cbe67451ff",
+        "entityId": "Advanced Shields",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "cd1079a2-9acf-489b-bcd1-fe107041dcea",
+        "entityId": "Medium Armor",
+        "source": "Purchased",
+        "costOverride": 0
+      },
+      {
+        "id": "814e2f2a-4582-4b95-b01d-e16ed841ed27",
+        "entityId": "Shield Expertise",
+        "source": "Purchased",
+        "costOverride": 5
+      },
+      {
+        "id": "282e444f-80f4-4bb6-b657-f144d7d66a8d",
+        "entityId": "Basic Medicine",
+        "source": "Purchased",
+        "costOverride": 2
+      }
+    ],
+    "perks": [
+      {
+        "id": "28924c71-5235-4e8a-8965-ff5975b024fa",
+        "entityId": "Holding On",
+        "source": "Purchased",
+        "costOverride": 1
+      },
+      {
+        "id": "b0d76c01-dee7-4314-b161-8c2a9727d161",
+        "entityId": "Will to Live",
+        "source": "Purchased",
+        "costOverride": 1
+      }
+    ],
     "flaws": [],
-    "startingSkills": [
-      "Basic Armor",
-      "Light Armor",
-      "Basic Martial Weapons",
-      "Basic Shields",
-      "Short Weapons",
-      "Advanced Shields"
+    "powers": [
+      {
+        "id": "9710cc11-f807-4d55-b8ac-986df042519c",
+        "entityId": "Deadly Remnants",
+        "source": "Class:Innate"
+      },
+      {
+        "id": "a1efac3e-152f-430b-84b9-2eb1f384b2a2",
+        "entityId": "Fighting Instructor",
+        "source": "Class:Innate"
+      },
+      {
+        "id": "f08901df-3cdf-4149-bb20-f215221217df",
+        "entityId": "Parry Blow",
+        "source": "Class:Innate"
+      },
+      {
+        "id": "a41ae296-f4ef-4417-bbfa-044f27df29d7",
+        "entityId": "Linked Armor",
+        "source": "Purchased"
+      },
+      {
+        "id": "7cb42f7d-6a73-4b23-ad75-8a31753e5221",
+        "entityId": "Armored Shell",
+        "source": "Purchased"
+      },
+      {
+        "id": "b170f09e-a73e-4af9-8213-d3e3cb837869",
+        "entityId": "Harry",
+        "source": "Purchased"
+      },
+      {
+        "id": "152cd2a5-ea35-4b76-8dd4-4f601a4422fb",
+        "entityId": "Shake It Off I",
+        "source": "Purchased"
+      }
     ],
-    "purchasedSkills": [
-      "Medium Armor",
-      "Shield Expertise",
-      "Basic Medicine"
-    ],
-    "purchasedPerks": [
-      "Holding On",
-      "Will to Live"
-    ],
-    "innatePowers": [
-      "Deadly Remnants",
-      "Fighting Instructor",
-      "Parry Blow"
-    ],
-    "utilityPowers": [
-      "Linked Armor",
-      "Armored Shell"
-    ],
-    "basicPowers": [
-      "Harry",
-      "Shake It Off I"
-    ]
+    "spells": [],
+    "devotions": [],
+    "wealth": "None",
+    "lineage": {
+      "name": "Human",
+      "choices": []
+    }
   },
   {
-    "name": "Great Weapon Fighter",
-    "tagline": "You have a huge sword, and no one can take that away from you.",
-    "effectiveBP": {
-      "startingSkills": [
-        null,
-        null,
-        null,
-        null,
-        null
-      ],
-      "purchasedSkills": [
-        4
-      ],
-      "purchasedPerks": [
-        2,
-        3
-      ],
-      "innatePowers": [
-        null,
-        null,
-        null
-      ],
-      "utilityPowers": [
-        null,
-        null
-      ],
-      "basicPowers": [
-        null,
-        null
-      ]
+    "archetypeName": "Great Weapon Fighter",
+    "classes": {
+      "Fighter": 4
     },
-    "lineage": "Human",
-    "lineageChallenges": [],
-    "lineageAdvantages": [],
-    "lifePoints": "4",
-    "armorPoints": "4 (must be physrepped)",
-    "spikes": "2 (3 when wielding a sword)",
-    "classLevels": "Fighter 4",
+    "skills": [
+      {
+        "id": "e09151b4-03c6-456c-8405-8e6d4cf1de9f",
+        "entityId": "Basic Armor",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "c4a4a7c8-616a-480f-973c-a2bcb7646951",
+        "entityId": "Light Armor",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "244e1e6f-adde-4d78-b7a9-c8d516856cf6",
+        "entityId": "Basic Martial Weapons",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "13265797-beda-49cc-8af2-acfa3542b70c",
+        "entityId": "Basic Shields",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "970e01cd-d5fe-4f83-aeb2-e03c784f352b",
+        "entityId": "Great Weapons",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "aef961aa-e9be-4649-afd4-26337bc8c525",
+        "entityId": "Weapon Specialization (Swords)",
+        "source": "Purchased",
+        "costOverride": 4
+      }
+    ],
+    "perks": [
+      {
+        "id": "24001d45-4309-4a94-af1c-23aafd1c844a",
+        "entityId": "Ancestral Relic",
+        "source": "Purchased",
+        "costOverride": 2
+      },
+      {
+        "id": "eecce8f6-74ca-4b22-a529-b7d21412c807",
+        "entityId": "Bloody Minded",
+        "source": "Purchased",
+        "costOverride": 3
+      }
+    ],
     "flaws": [],
-    "startingSkills": [
-      "Basic Armor",
-      "Light Armor",
-      "Basic Martial Weapons",
-      "Basic Shields",
-      "Great Weapons"
+    "powers": [
+      {
+        "id": "62a5550d-e0c5-4be0-be9d-547f6ff590d4",
+        "entityId": "Deadly Remnants",
+        "source": "Class:Innate"
+      },
+      {
+        "id": "064e1d77-e876-43ca-b7a8-cf921a50ce56",
+        "entityId": "Fighting Instructor",
+        "source": "Class:Innate"
+      },
+      {
+        "id": "899b0df7-1004-4eed-82b5-876d3db0fde8",
+        "entityId": "Parry Blow",
+        "source": "Class:Innate"
+      },
+      {
+        "id": "f8d3b4bc-9650-4b66-a78e-c505b2c211b7",
+        "entityId": "Fortitude",
+        "source": "Purchased"
+      },
+      {
+        "id": "676f5954-0623-4e39-93ca-790953c094e2",
+        "entityId": "Knight’s Strength",
+        "source": "Purchased"
+      },
+      {
+        "id": "61acfad7-cc30-4da2-a139-215327da272e",
+        "entityId": "Shot Placement",
+        "source": "Purchased"
+      },
+      {
+        "id": "20daa44c-e6f7-421e-aa13-01360595c03c",
+        "entityId": "Raging Blows",
+        "source": "Purchased"
+      }
     ],
-    "purchasedSkills": [
-      "Weapon Specialization (Swords)"
-    ],
-    "purchasedPerks": [
-      "Ancestral Relic",
-      "Bloody Minded"
-    ],
-    "innatePowers": [
-      "Deadly Remnants",
-      "Fighting Instructor",
-      "Parry Blow"
-    ],
-    "utilityPowers": [
-      "Fortitude",
-      "Knight’s Strength"
-    ],
-    "basicPowers": [
-      "Shot Placement",
-      "Raging Blows"
-    ]
+    "spells": [],
+    "devotions": [],
+    "wealth": "None",
+    "lineage": {
+      "name": "Human",
+      "choices": []
+    }
   },
   {
-    "name": "Archer Fighter",
-    "tagline": "Aim carefully from the back line, and pierce through enemies with your arrows.",
-    "effectiveBP": {
-      "startingSkills": [
-        null,
-        null,
-        null,
-        null,
-        null,
-        null
-      ],
-      "purchasedSkills": [
-        3,
-        4,
-        1
-      ],
-      "purchasedPerks": [
-        1
-      ],
-      "innatePowers": [
-        null,
-        null,
-        null
-      ],
-      "utilityPowers": [
-        null,
-        null
-      ],
-      "basicPowers": [
-        null,
-        null
-      ]
+    "archetypeName": "Archer Fighter",
+    "classes": {
+      "Fighter": 4
     },
-    "lineage": "Human",
-    "lineageChallenges": [],
-    "lineageAdvantages": [],
-    "lifePoints": "4",
-    "armorPoints": "2 (Must be physrepped)",
-    "spikes": "2",
-    "classLevels": "Fighter 4",
+    "skills": [
+      {
+        "id": "2922bc9e-05aa-4ecb-9359-3175eb571f6c",
+        "entityId": "Basic Armor",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "66cd08d5-3106-4289-9834-e463df5752f6",
+        "entityId": "Light Armor",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "fcab5a8c-f6db-4482-ad9e-009b74eaf381",
+        "entityId": "Basic Martial Weapons",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "9801777a-89b5-4951-8484-183ef85390cb",
+        "entityId": "Basic Shields",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "03cb9b3d-a248-4a34-8749-ca687088ec3e",
+        "entityId": "Lore (Historical)",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "98ead1ac-c5af-48c4-91ed-512ea21b2790",
+        "entityId": "Projectile Weapons",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "77d8e5bd-5dc1-4d19-a751-df70b2f6a942",
+        "entityId": "Accuracy",
+        "source": "Purchased",
+        "costOverride": 3
+      },
+      {
+        "id": "df96d8be-ccfc-4954-b5b3-e440a3ada673",
+        "entityId": "Tracking",
+        "source": "Purchased",
+        "costOverride": 4
+      },
+      {
+        "id": "b7c8e23b-2bae-49b6-b24d-28d19d746731",
+        "entityId": "Profession - Apprentice (Smith)",
+        "source": "Purchased",
+        "costOverride": 1
+      }
+    ],
+    "perks": [
+      {
+        "id": "09751740-cc57-4440-908e-ee9579d072d6",
+        "entityId": "Deathgrip",
+        "source": "Purchased",
+        "costOverride": 1
+      }
+    ],
     "flaws": [],
-    "startingSkills": [
-      "Basic Armor",
-      "Light Armor",
-      "Basic Martial Weapons",
-      "Basic Shields",
-      "Lore (Historical)",
-      "Projectile Weapons"
+    "powers": [
+      {
+        "id": "91200e00-3db3-41d5-8527-d687476fe2c5",
+        "entityId": "Deadly Remnants",
+        "source": "Class:Innate"
+      },
+      {
+        "id": "b9198029-3910-4d14-91c3-1a7ebdc50ee0",
+        "entityId": "Fighting Instructor",
+        "source": "Class:Innate"
+      },
+      {
+        "id": "0f00a17e-1a3a-4f30-8b4e-c214eee47f12",
+        "entityId": "Parry Blow",
+        "source": "Class:Innate"
+      },
+      {
+        "id": "54747c27-f9b0-4f07-99e5-0b61d9a619e6",
+        "entityId": "Bowyer",
+        "source": "Purchased"
+      },
+      {
+        "id": "d0aeec31-1386-4ac1-9298-adcb5ecca549",
+        "entityId": "Reload",
+        "source": "Purchased"
+      },
+      {
+        "id": "da913c6d-bc59-4005-bb79-6a3244b44cf8",
+        "entityId": "Flaming Arrow",
+        "source": "Purchased"
+      },
+      {
+        "id": "d45f7ee3-a412-41a1-b59b-f1485c45ee83",
+        "entityId": "Snap Shot",
+        "source": "Purchased"
+      }
     ],
-    "purchasedSkills": [
-      "Accuracy",
-      "Tracking",
-      "Profession - Apprentice (Smith)"
-    ],
-    "purchasedPerks": [
-      "Deathgrip"
-    ],
-    "innatePowers": [
-      "Deadly Remnants",
-      "Fighting Instructor",
-      "Parry Blow"
-    ],
-    "utilityPowers": [
-      "Bowyer",
-      "Reload"
-    ],
-    "basicPowers": [
-      "Flaming Arrow",
-      "Snap Shot"
-    ]
+    "spells": [],
+    "devotions": [],
+    "wealth": "None",
+    "lineage": {
+      "name": "Human",
+      "choices": []
+    }
   },
   {
-    "name": "Balanced Cleric",
-    "tagline": "Use your divine might to heal your allies or smite your enemies.",
-    "effectiveBP": {
-      "startingSkills": [
-        null,
-        null,
-        null,
-        null,
-        null,
-        null
-      ],
-      "domainPowers": [
-        5
-      ],
-      "purchasedSkills": [
-        2,
-        1
-      ],
-      "purchasedPerks": [
-        1
-      ],
-      "innatePowers": [
-        null,
-        null,
-        null
-      ],
-      "cantrips": [
-        null,
-        null,
-        null,
-        null
-      ],
-      "noviceSpells": [
-        null,
-        null,
-        null,
-        null
-      ]
+    "archetypeName": "Balanced Cleric",
+    "classes": {
+      "Cleric": 4
     },
-    "lineage": "Human",
-    "lineageChallenges": [],
-    "lineageAdvantages": [],
-    "lifePoints": "3",
-    "armorPoints": "2 (must be physrepped)",
-    "spikes": "2",
-    "classLevels": "Cleric 4",
+    "skills": [
+      {
+        "id": "424f6989-e7ad-4383-a354-50c8c71c2652",
+        "entityId": "Basic Faith",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "256e051f-ae63-4975-982f-2e32d460f3d3",
+        "entityId": "Worship - The Mother",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "f0adcc16-f62a-4332-8dde-438b09cf5766",
+        "entityId": "Basic Martial Weapons",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "03316da3-8a55-4e78-86eb-463124deb8c2",
+        "entityId": "Basic Armor",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "99309623-9bd9-49df-9238-734012b24fd2",
+        "entityId": "Extended Capacity - Novice (Divine)",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "080315be-5b19-47cb-a506-1eb99bacf833",
+        "entityId": "Additional Cantrip",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "273fd588-8cdb-4893-98f5-23b79ebcb30f",
+        "entityId": "Lore (Religious)",
+        "source": "Purchased",
+        "costOverride": 2
+      },
+      {
+        "id": "cdcecb5f-5123-4d8b-b9c7-00e875564dcb",
+        "entityId": "Path of Panic",
+        "source": "Purchased",
+        "costOverride": 1
+      }
+    ],
+    "perks": [
+      {
+        "id": "4833b5a8-df4d-4ed8-9f60-937226c3e294",
+        "entityId": "Soothing Touch",
+        "source": "Purchased",
+        "costOverride": 1
+      }
+    ],
     "flaws": [],
-    "startingSkills": [
-      "Basic Faith",
-      "Worship - The Mother",
-      "Basic Martial Weapons",
-      "Basic Armor",
-      "Extended Capacity - Novice (Divine)",
-      "Additional Cantrip"
+    "powers": [
+      {
+        "id": "09799a21-458a-4404-bfb8-a022b288ae1a",
+        "entityId": "Ritual Affinity",
+        "source": "Class:Innate"
+      },
+      {
+        "id": "e1a6bc42-fe67-4fc0-894e-ad7fac6d5600",
+        "entityId": "Healing Touch",
+        "source": "Class:Innate"
+      },
+      {
+        "id": "15e5e517-f2a7-45fc-985c-ad5690a71518",
+        "entityId": "Refreshing Prayer",
+        "source": "Class:Innate"
+      },
+      {
+        "id": "6d96e49e-c798-4545-8986-c6890c4ee7ba",
+        "entityId": "Lifeline (Life)",
+        "source": "Purchased",
+        "costOverride": 5
+      }
     ],
-    "divineDomains": [
-      "Life",
-      "Protection"
+    "spells": [
+      {
+        "id": "8bd0f421-3e98-4796-a248-014203ad6715",
+        "entityId": "Cancel",
+        "source": "Class:Cantrip"
+      },
+      {
+        "id": "d59ab1ee-679a-453b-ac90-ac32a05c622d",
+        "entityId": "Blade Blessing",
+        "source": "Class:Cantrip"
+      },
+      {
+        "id": "e58c7a21-32f2-4402-a3c7-fae865842283",
+        "entityId": "Revivify",
+        "source": "Class:Cantrip"
+      },
+      {
+        "id": "1225f769-f006-461c-9504-808a82d4d9ee",
+        "entityId": "Devotion’s Strike",
+        "source": "Class:Cantrip"
+      },
+      {
+        "id": "33f15b12-1209-4bb0-94e4-cde01a60905b",
+        "entityId": "Cure",
+        "source": "Purchased"
+      },
+      {
+        "id": "648b6e4a-a10c-495d-a788-3c431a60076b",
+        "entityId": "Heretic’s Brand",
+        "source": "Purchased"
+      },
+      {
+        "id": "91da2472-49c7-4b36-9b27-0451df000029",
+        "entityId": "Rekindle",
+        "source": "Purchased"
+      },
+      {
+        "id": "80ea0de4-d335-4ec5-ac3b-b98bde7a1ca1",
+        "entityId": "Spirit Speak",
+        "source": "Purchased"
+      }
     ],
-    "devotionAccents": [
-      "Flame",
-      "Life"
+    "devotions": [
+      {
+        "id": "4b179f2f-52d8-4bc9-b3f1-1401ce217cf1",
+        "entityId": "devotions:The Mother",
+        "source": "Purchased"
+      }
     ],
-    "domainPowers": [
-      "Lifeline (Life)"
-    ],
-    "purchasedSkills": [
-      "Lore (Religious)",
-      "Path of Panic"
-    ],
-    "purchasedPerks": [
-      "Soothing Touch"
-    ],
-    "innatePowers": [
-      "Ritual Affinity",
-      "Healing Touch",
-      "Refreshing Prayer"
-    ],
-    "cantrips": [
-      "Cancel",
-      "Blade Blessing",
-      "Revivify",
-      "Devotion’s Strike"
-    ],
-    "noviceSpells": [
-      "Cure",
-      "Heretic’s Brand",
-      "Rekindle",
-      "Spirit Speak"
-    ],
-    "devotion": "The Mother"
+    "wealth": "None",
+    "lineage": {
+      "name": "Human",
+      "choices": []
+    }
   },
   {
-    "name": "Form Fighter Druid",
-    "tagline": "Harness your primal shapeshifting magic to fill your choice of combat roles.",
-    "effectiveBP": {
-      "startingSkills": [
-        null,
-        null,
-        null,
-        null,
-        null,
-        null
-      ],
-      "purchasedSkills": [
-        4,
-        2
-      ],
-      "purchasedPerks": [
-        3
-      ],
-      "innatePowers": [
-        null,
-        null,
-        null
-      ],
-      "cantrips": [
-        null,
-        null,
-        null
-      ],
-      "noviceSpells": [
-        null,
-        null,
-        null,
-        null
-      ]
+    "archetypeName": "Form Fighter Druid",
+    "classes": {
+      "Druid": 4
     },
-    "lineage": "Human",
-    "lineageChallenges": [],
-    "lineageAdvantages": [],
-    "lifePoints": "3",
-    "armorPoints": "0",
-    "spikes": "2",
-    "classLevels": "Druid 4",
+    "skills": [
+      {
+        "id": "f6fbc9fc-84dc-4bda-bbac-c1cfa271b2e3",
+        "entityId": "Basic Martial Weapons",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "bf67ab8d-5927-4fc6-82ff-741334abf33a",
+        "entityId": "Profession - Apprentice (Smith)",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "7d77c3e8-81e2-4889-80a8-270ac6f08230",
+        "entityId": "Basic Faith",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "0caed50d-baff-4316-b204-17b2c822128f",
+        "entityId": "Scavenge I",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "a30a9a8c-9a8b-4f33-83f0-f3db5b120f6b",
+        "entityId": "Extended Capacity - Novice (Divine)",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "6dc6eabd-a5e3-42e4-84a9-32c5fa03515f",
+        "entityId": "Lore (Nature)",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "2eefe2e7-5293-41d1-9a46-66e653ba479b",
+        "entityId": "Favored Form (Hunting Panther)",
+        "source": "Purchased",
+        "costOverride": 4
+      },
+      {
+        "id": "f048eaa0-5d92-4dda-a067-ea900941cf5c",
+        "entityId": "Red in Tooth and Claw",
+        "source": "Purchased",
+        "costOverride": 2
+      }
+    ],
+    "perks": [
+      {
+        "id": "e7dfbc41-766d-49ef-81f0-d848bcae77d9",
+        "entityId": "Insight",
+        "source": "Purchased",
+        "costOverride": 3
+      }
+    ],
     "flaws": [],
-    "startingSkills": [
-      "Basic Martial Weapons",
-      "Profession - Apprentice (Smith)",
-      "Basic Faith",
-      "Scavenge I",
-      "Extended Capacity - Novice (Divine)",
-      "Lore (Nature)"
+    "powers": [
+      {
+        "id": "a3ade443-d3f7-495b-b1a3-b24130c2af7a",
+        "entityId": "Commune with Nature",
+        "source": "Class:Innate"
+      },
+      {
+        "id": "43baf70c-1cb1-481e-8465-c7f42ab20fb8",
+        "entityId": "Message of the Flowers",
+        "source": "Class:Innate"
+      },
+      {
+        "id": "c96eb10c-fe76-4c22-ab12-d70acd42faee",
+        "entityId": "Nature’s Understanding",
+        "source": "Class:Innate"
+      }
     ],
-    "purchasedSkills": [
-      "Favored Form (Hunting Panther)",
-      "Red in Tooth and Claw"
+    "spells": [
+      {
+        "id": "95032d27-a95d-4ad4-a37e-cccb2e56d82f",
+        "entityId": "Cancel",
+        "source": "Class:Cantrip"
+      },
+      {
+        "id": "2c217a4d-0c4f-43d5-a6b1-6967d500b6d6",
+        "entityId": "Hide",
+        "source": "Class:Cantrip"
+      },
+      {
+        "id": "aa1700be-fcb5-406c-b98a-ddf9b6799258",
+        "entityId": "Festering Lash",
+        "source": "Class:Cantrip"
+      },
+      {
+        "id": "98fb4786-cfdc-440e-b1ee-b4b362f0508d",
+        "entityId": "Barkskin",
+        "source": "Purchased"
+      },
+      {
+        "id": "d5bb14e2-8acc-4e12-a3a8-237b4db54496",
+        "entityId": "Lesser Form of the Hulking Bear",
+        "source": "Purchased"
+      },
+      {
+        "id": "d89ca8e5-2f36-4d18-931e-57a155729f19",
+        "entityId": "Lesser Form of the Hunting Panther",
+        "source": "Purchased"
+      },
+      {
+        "id": "f3fe50e2-63b0-45cb-8ae1-001617e7447c",
+        "entityId": "Lesser Form of the Striking Serpent",
+        "source": "Purchased"
+      }
     ],
-    "purchasedPerks": [
-      "Insight"
-    ],
-    "innatePowers": [
-      "Commune with Nature",
-      "Message of the Flowers",
-      "Nature’s Understanding"
-    ],
-    "cantrips": [
-      "Cancel",
-      "Hide",
-      "Festering Lash"
-    ],
-    "noviceSpells": [
-      "Barkskin",
-      "Lesser Form of the Hulking Bear",
-      "Lesser Form of the Hunting Panther",
-      "Lesser Form of the Striking Serpent"
-    ]
+    "devotions": [],
+    "wealth": "None",
+    "lineage": {
+      "name": "Human",
+      "choices": []
+    }
   },
   {
-    "name": "Healer Druid",
-    "tagline": "Call upon the restorative power of nature to shelter and heal your allies.",
-    "effectiveBP": {
-      "startingSkills": [
-        null,
-        null,
-        null,
-        null,
-        null,
-        null
-      ],
-      "purchasedSkills": [
-        1,
-        1,
-        1,
-        4
-      ],
-      "purchasedPerks": [
-        2
-      ],
-      "innatePowers": [
-        null,
-        null,
-        null
-      ],
-      "cantrips": [
-        null,
-        null,
-        null
-      ],
-      "noviceSpells": [
-        null,
-        null,
-        null,
-        null,
-        null
-      ]
+    "archetypeName": "Healer Druid",
+    "classes": {
+      "Druid": 4
     },
-    "lineage": "Human",
-    "lineageChallenges": [],
-    "lineageAdvantages": [],
-    "lifePoints": "3",
-    "armorPoints": "0",
-    "spikes": "2",
-    "classLevels": "Druid 4",
+    "skills": [
+      {
+        "id": "5dc633ba-8a7c-494f-a9ed-0f4e949eb0cf",
+        "entityId": "Basic Martial Weapons",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "4e31f8fa-7e90-47b7-b326-248a78a6a577",
+        "entityId": "Profession - Apprentice (Smith)",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "5b89cb5d-6144-4d2c-8100-823417c3f1a9",
+        "entityId": "Forage I",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "6ae717e9-6a3d-4d32-9ce5-6d51d1035c9f",
+        "entityId": "Basic Faith",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "d7483943-b6d3-4f72-a7eb-97657583dc51",
+        "entityId": "Peacecaster",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "e7a453d0-b0ca-4471-afea-188dff7dc95f",
+        "entityId": "Basic Medicine",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "014d8d0b-9c1e-4563-b2de-ec6b12318e47",
+        "entityId": "Find the Path",
+        "source": "Purchased",
+        "costOverride": 1
+      },
+      {
+        "id": "695c421e-f7e4-4cfd-8ab4-33e59c4a6eeb",
+        "entityId": "Diagnose",
+        "source": "Purchased",
+        "costOverride": 1
+      },
+      {
+        "id": "d62773c0-3182-429f-a6a4-54ab97eb2a26",
+        "entityId": "Combat Medic",
+        "source": "Purchased",
+        "costOverride": 1
+      },
+      {
+        "id": "e4940ce1-82da-40c5-b7be-d22f89bcdcdb",
+        "entityId": "Spell-Scholar",
+        "source": "Purchased",
+        "costOverride": 4
+      }
+    ],
+    "perks": [
+      {
+        "id": "d21fc613-0ecb-4e7b-90e2-fba87d629ceb",
+        "entityId": "Iron Stomach",
+        "source": "Purchased",
+        "costOverride": 2
+      }
+    ],
     "flaws": [],
-    "startingSkills": [
-      "Basic Martial Weapons",
-      "Profession - Apprentice (Smith)",
-      "Forage I",
-      "Basic Faith",
-      "Peacecaster",
-      "Basic Medicine"
+    "powers": [
+      {
+        "id": "13af267a-174c-4b96-9967-d5df68972acb",
+        "entityId": "Commune with Nature",
+        "source": "Class:Innate"
+      },
+      {
+        "id": "1bc7d4b2-af17-4c4d-b099-5dbe292fbd9f",
+        "entityId": "Message of the Flowers",
+        "source": "Class:Innate"
+      },
+      {
+        "id": "ea02f616-553e-457b-8443-bdbccb54de4b",
+        "entityId": "Nature’s Understanding",
+        "source": "Class:Innate"
+      }
     ],
-    "purchasedSkills": [
-      "Find the Path",
-      "Diagnose",
-      "Combat Medic",
-      "Spell-Scholar"
+    "spells": [
+      {
+        "id": "e540ab5c-9c34-4c6e-ab31-8333407850ff",
+        "entityId": "Cancel",
+        "source": "Class:Cantrip"
+      },
+      {
+        "id": "2a833149-2e7e-4393-a21a-64369537e15a",
+        "entityId": "Care for the Fallen",
+        "source": "Class:Cantrip"
+      },
+      {
+        "id": "42124295-5a61-412a-9808-bc6e8452c98e",
+        "entityId": "Life Tap",
+        "source": "Class:Cantrip"
+      },
+      {
+        "id": "99935379-475a-4911-8d46-69432f6305ac",
+        "entityId": "Balm",
+        "source": "Purchased"
+      },
+      {
+        "id": "a1a6575e-4f67-44bd-a980-ed571bf10104",
+        "entityId": "Blessing of the Oak",
+        "source": "Purchased"
+      },
+      {
+        "id": "cfc2b414-9df8-47c2-875c-2da63e2cbc40",
+        "entityId": "Purifying Flame",
+        "source": "Purchased"
+      },
+      {
+        "id": "07498d38-c5bf-4e9a-a8a7-a768e4fcbdf1",
+        "entityId": "Quell Beast",
+        "source": "Purchased"
+      },
+      {
+        "id": "89d00236-2c7f-4067-b30b-5b262909b80d",
+        "entityId": "Sap of Life",
+        "source": "Purchased"
+      }
     ],
-    "purchasedPerks": [
-      "Iron Stomach"
-    ],
-    "innatePowers": [
-      "Commune with Nature",
-      "Message of the Flowers",
-      "Nature’s Understanding"
-    ],
-    "cantrips": [
-      "Cancel",
-      "Care for the Fallen",
-      "Life Tap"
-    ],
-    "noviceSpells": [
-      "Balm",
-      "Blessing of the Oak",
-      "Purifying Flame",
-      "Quell Beast",
-      "Sap of Life"
-    ]
+    "devotions": [],
+    "wealth": "None",
+    "lineage": {
+      "name": "Human",
+      "choices": []
+    }
   },
   {
-    "name": "Utility Mage",
-    "tagline": "Gather information and support your allies using your mental and magical prowess.",
-    "effectiveBP": {
-      "startingSkills": [
-        null,
-        null,
-        null,
-        null,
-        null,
-        null
-      ],
-      "purchasedSkills": [
-        0,
-        2,
-        null,
-        null
-      ],
-      "purchasedPerks": [
-        2,
-        3
-      ],
-      "innatePowers": [
-        null,
-        null,
-        null
-      ],
-      "cantrips": [
-        null,
-        null,
-        null
-      ],
-      "noviceSpells": [
-        null,
-        null,
-        null,
-        null
-      ],
-      "bookSpells": [
-        null,
-        null
-      ]
+    "archetypeName": "Utility Mage",
+    "classes": {
+      "Mage": 4
     },
-    "grants": {
-      "startingSkills": [
-        null,
-        null,
-        null,
-        null,
-        null,
-        null
-      ],
-      "purchasedSkills": [
-        {
-          "kind": "grant",
-          "amount": null,
-          "source": "Ritual Affinity",
-          "sourceRole": "innate power"
-        },
-        null,
-        null,
-        null
-      ],
-      "purchasedPerks": [
-        {
-          "kind": "discount",
-          "amount": 1,
-          "source": "Library Use",
-          "sourceRole": null
-        },
-        null
-      ],
-      "innatePowers": [
-        null,
-        null,
-        null
-      ],
-      "cantrips": [
-        null,
-        null,
-        null
-      ],
-      "noviceSpells": [
-        null,
-        null,
-        null,
-        null
-      ],
-      "bookSpells": [
-        null,
-        null
-      ]
-    },
-    "ranks": {
-      "startingSkills": [
-        1,
-        1,
-        1,
-        1,
-        1,
-        2
-      ],
-      "purchasedSkills": [
-        1,
-        1,
-        1,
-        1
-      ],
-      "purchasedPerks": [
-        1,
-        1
-      ],
-      "innatePowers": [
-        1,
-        1,
-        1
-      ],
-      "cantrips": [
-        1,
-        1,
-        1
-      ],
-      "noviceSpells": [
-        1,
-        1,
-        1,
-        1
-      ],
-      "bookSpells": [
-        1,
-        1
-      ]
-    },
-    "lineage": "Human",
-    "lineageChallenges": [],
-    "lineageAdvantages": [],
-    "lifePoints": "3",
-    "armorPoints": "0",
-    "spikes": "2",
-    "classLevels": "Mage 4",
+    "skills": [
+      {
+        "id": "63517c5d-f85e-437b-90ba-2afe97d6072e",
+        "entityId": "Basic Arcane",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "9dfe7858-df11-499b-aa98-ef0d18390267",
+        "entityId": "Lore (Historical)",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "d91fd158-e809-476b-8a7b-86d4a7617fc8",
+        "entityId": "Library Use",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "fbc10dd0-d3dc-4e45-9b6d-2945d0fea311",
+        "entityId": "Bookcaster (Magekey)",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "875b03c8-1e40-4d0a-98d4-7e1a2b24208a",
+        "entityId": "Bookcaster (Mask Aura)",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "27a96271-e3a2-4a10-90b9-a5806910fc09",
+        "entityId": "Extended Capacity - Novice (Arcane)",
+        "source": "Class:Starting",
+        "ranks": 2
+      },
+      {
+        "id": "6b05f500-a06f-4b7e-8cfc-a870db2c00b1",
+        "entityId": "Apprentice Ritual Magic",
+        "source": "Purchased",
+        "costOverride": 0
+      },
+      {
+        "id": "3c38a270-416b-43ad-a2b1-663d807f338b",
+        "entityId": "Arcane Charge",
+        "source": "Purchased",
+        "costOverride": 2
+      },
+      {
+        "id": "ff73282d-7949-4825-acf6-61112d7b350a",
+        "entityId": "Lore (Historical)",
+        "source": "Purchased"
+      },
+      {
+        "id": "ba8e0d19-407c-4083-bb48-213e44a42bb6",
+        "entityId": "Lore (Arcane)",
+        "source": "Purchased"
+      }
+    ],
+    "perks": [
+      {
+        "id": "4c8f4412-675c-4682-a6ac-edbac0556157",
+        "entityId": "Sharp Mind",
+        "source": "Purchased",
+        "costOverride": 2
+      },
+      {
+        "id": "f02f7e70-727c-4f03-9d97-e83b0506e998",
+        "entityId": "Sight",
+        "source": "Purchased",
+        "costOverride": 3
+      }
+    ],
     "flaws": [],
-    "startingSkills": [
-      "Basic Arcane",
-      "Lore (Historical)",
-      "Library Use",
-      "Bookcaster (Magekey)",
-      "Bookcaster (Mask Aura)",
-      "Extended Capacity - Novice (Arcane)"
+    "powers": [
+      {
+        "id": "c290c02f-c4a6-4887-afcf-d9a3505f14de",
+        "entityId": "Arcane Study",
+        "source": "Class:Innate"
+      },
+      {
+        "id": "054230db-b6a7-496b-beeb-c335bdfe41fa",
+        "entityId": "Replicate Enhancement",
+        "source": "Class:Innate"
+      },
+      {
+        "id": "1a245677-f693-44b0-b4b3-6ee156512537",
+        "entityId": "Ritual Affinity",
+        "source": "Class:Innate"
+      }
     ],
-    "purchasedSkills": [
-      "Apprentice Ritual Magic",
-      "Arcane Charge",
-      "Lore (Historical)",
-      "Lore (Arcane)"
+    "spells": [
+      {
+        "id": "cc6bd4e5-26dd-4acc-a1a0-0e12e0d201b7",
+        "entityId": "Cancel",
+        "source": "Class:Cantrip"
+      },
+      {
+        "id": "a6886451-4aea-4eac-8560-92815fd642ff",
+        "entityId": "Identify",
+        "source": "Class:Cantrip"
+      },
+      {
+        "id": "102d6881-e26a-48dd-bd69-e572731c3647",
+        "entityId": "Stop",
+        "source": "Class:Cantrip"
+      },
+      {
+        "id": "9cbee017-5ef8-434f-a705-68a38cb35b7f",
+        "entityId": "Carnate",
+        "source": "Purchased"
+      },
+      {
+        "id": "9c633866-83e2-4c0d-981b-b27c89c92071",
+        "entityId": "Freeze",
+        "source": "Purchased"
+      },
+      {
+        "id": "a2e2b271-d820-4b7f-9107-2665a864c548",
+        "entityId": "Mageskin",
+        "source": "Purchased"
+      },
+      {
+        "id": "f3cc388a-dab8-459f-b043-cf307dc01f5f",
+        "entityId": "Town Portal",
+        "source": "Purchased"
+      },
+      {
+        "id": "37c59440-87a4-4582-9e93-1bc340f117c5",
+        "entityId": "Magekey",
+        "source": "Purchased"
+      },
+      {
+        "id": "78acb9e7-a62a-4b07-85d6-a97cc4f7ad84",
+        "entityId": "Mask Aura",
+        "source": "Purchased"
+      }
     ],
-    "purchasedPerks": [
-      "Sharp Mind",
-      "Sight"
-    ],
-    "innatePowers": [
-      "Arcane Study",
-      "Replicate Enhancement",
-      "Ritual Affinity"
-    ],
-    "cantrips": [
-      "Cancel",
-      "Identify",
-      "Stop"
-    ],
-    "noviceSpells": [
-      "Carnate",
-      "Freeze",
-      "Mageskin",
-      "Town Portal"
-    ],
-    "bookSpells": [
-      "Magekey",
-      "Mask Aura"
-    ]
+    "devotions": [],
+    "wealth": "None",
+    "lineage": {
+      "name": "Human",
+      "choices": []
+    }
   },
   {
-    "name": "Ranged Rogue",
-    "tagline": "Throw knives and poisons from a safe distance.",
-    "effectiveBP": {
-      "startingSkills": [
-        null,
-        null,
-        null,
-        null,
-        null,
-        null
-      ],
-      "purchasedSkills": [
-        4,
-        2,
-        3
-      ],
-      "innatePowers": [
-        null,
-        null,
-        null
-      ],
-      "utilityPowers": [
-        null,
-        null
-      ],
-      "basicPowers": [
-        null,
-        null
-      ]
+    "archetypeName": "Ranged Rogue",
+    "classes": {
+      "Rogue": 4
     },
-    "grants": {
-      "startingSkills": [
-        null,
-        null,
-        null,
-        null,
-        null,
-        null
-      ],
-      "purchasedSkills": [
-        null,
-        {
-          "kind": "discount",
-          "amount": 1,
-          "source": "Poisoner",
-          "sourceRole": null
-        },
-        null
-      ],
-      "innatePowers": [
-        null,
-        null,
-        null
-      ],
-      "utilityPowers": [
-        null,
-        null
-      ],
-      "basicPowers": [
-        null,
-        null
-      ]
-    },
-    "lineage": "Human",
-    "lineageChallenges": [],
-    "lineageAdvantages": [],
-    "lifePoints": "3",
-    "armorPoints": "4 (must be physrepped)",
-    "spikes": "3",
-    "classLevels": "Rogue 4",
+    "skills": [
+      {
+        "id": "72d32dcf-a641-46ff-9d62-dbee2f2cd310",
+        "entityId": "Basic Armor",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "66b055f3-40d4-4a33-82f8-3d8e5825a3ac",
+        "entityId": "Light Armor",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "3c830d42-667e-4df8-9361-49c20c591296",
+        "entityId": "Basic Martial Weapons",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "e2813e3d-fa18-4a49-8f17-9dd7d66a026e",
+        "entityId": "Thrown Weapons",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "81c36cd1-1711-42e2-b58f-d253c5a2a7cc",
+        "entityId": "Basic Locks",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "e3e5d4da-3209-4597-9cb8-d326245c7226",
+        "entityId": "Poisoner",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "c369bfbb-8c41-4948-96ca-7729921b7380",
+        "entityId": "Weapon Specialization (Thrown Weapons)",
+        "source": "Purchased",
+        "costOverride": 4
+      },
+      {
+        "id": "9ed38478-80cd-4862-93f4-04b5badf0107",
+        "entityId": "Apprentice Alchemy",
+        "source": "Purchased",
+        "costOverride": 2
+      },
+      {
+        "id": "58f9838c-21bb-46b8-bda5-51fafa7f3dbf",
+        "entityId": "Forage I",
+        "source": "Purchased",
+        "costOverride": 3
+      }
+    ],
+    "perks": [],
     "flaws": [],
-    "startingSkills": [
-      "Basic Armor",
-      "Light Armor",
-      "Basic Martial Weapons",
-      "Thrown Weapons",
-      "Basic Locks",
-      "Poisoner"
+    "powers": [
+      {
+        "id": "64f515fd-3b4c-4d14-8a14-6297650cfd42",
+        "entityId": "Deflect Projectile",
+        "source": "Class:Innate"
+      },
+      {
+        "id": "db05745b-7f77-4a77-8167-4f6f86974793",
+        "entityId": "Backstab",
+        "source": "Class:Innate"
+      },
+      {
+        "id": "942350bc-2369-418a-a3d8-1bef94648e78",
+        "entityId": "Loot",
+        "source": "Class:Innate"
+      },
+      {
+        "id": "a8c68297-3899-4322-b103-0e5230819502",
+        "entityId": "Acquired Tolerance",
+        "source": "Purchased"
+      },
+      {
+        "id": "b6630a47-d257-4e28-a6a2-ab643c20b55d",
+        "entityId": "Reload",
+        "source": "Purchased"
+      },
+      {
+        "id": "82a1e511-f9d7-4332-9583-a01458676e82",
+        "entityId": "Concealed Dart",
+        "source": "Purchased"
+      },
+      {
+        "id": "ab997902-93ac-474b-ab3d-f7c5deb1f4db",
+        "entityId": "Rogue’s Aim",
+        "source": "Purchased"
+      }
     ],
-    "purchasedSkills": [
-      "Weapon Specialization (Thrown Weapons)",
-      "Apprentice Alchemy",
-      "Forage I"
-    ],
-    "purchasedPerks": [],
-    "innatePowers": [
-      "Deflect Projectile",
-      "Backstab",
-      "Loot"
-    ],
-    "utilityPowers": [
-      "Acquired Tolerance",
-      "Reload"
-    ],
-    "basicPowers": [
-      "Concealed Dart",
-      "Rogue’s Aim"
-    ]
+    "spells": [],
+    "devotions": [],
+    "wealth": "None",
+    "lineage": {
+      "name": "Human",
+      "choices": []
+    }
   },
   {
-    "name": "Skirmisher Rogue",
-    "tagline": "Position behind enemies, quickly take them out, and get away.",
-    "effectiveBP": {
-      "startingSkills": [
-        null,
-        null,
-        null,
-        null,
-        null,
-        null
-      ],
-      "purchasedSkills": [
-        3,
-        0,
-        0,
-        4,
-        1
-      ],
-      "purchasedPerks": [
-        0,
-        0,
-        1
-      ],
-      "innatePowers": [
-        null,
-        null,
-        null
-      ],
-      "utilityPowers": [
-        null,
-        null
-      ],
-      "basicPowers": [
-        null,
-        null
-      ]
+    "archetypeName": "Skirmisher Rogue",
+    "classes": {
+      "Rogue": 4
     },
-    "grants": {
-      "startingSkills": [
-        null,
-        null,
-        null,
-        null,
-        null,
-        null
-      ],
-      "purchasedSkills": [
-        null,
-        {
-          "kind": "grant",
-          "amount": null,
-          "source": "Way of the Blade",
-          "sourceRole": null
-        },
-        {
-          "kind": "grant",
-          "amount": null,
-          "source": "Way of the Blade",
-          "sourceRole": null
-        },
-        null,
-        null
-      ],
-      "purchasedPerks": [
-        {
-          "kind": "grant",
-          "amount": null,
-          "source": "Throat Slit",
-          "sourceRole": null
-        },
-        {
-          "kind": "grant",
-          "amount": null,
-          "source": "Throat Slit",
-          "sourceRole": null
-        },
-        null
-      ],
-      "innatePowers": [
-        null,
-        null,
-        null
-      ],
-      "utilityPowers": [
-        null,
-        null
-      ],
-      "basicPowers": [
-        null,
-        null
-      ]
-    },
-    "lineage": "Human",
-    "lineageChallenges": [],
-    "lineageAdvantages": [],
-    "lifePoints": "3",
-    "armorPoints": "4 (must be physrepped)",
-    "spikes": "3",
-    "classLevels": "Rogue 4",
+    "skills": [
+      {
+        "id": "99310daf-0a0b-4d48-b240-03066301bfab",
+        "entityId": "Basic Armor",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "3c30b5d7-6bcd-46c7-98cf-c32909bf779a",
+        "entityId": "Light Armor",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "6f0a9da5-b83a-4024-a9c3-c63ff27fe4f5",
+        "entityId": "Basic Martial Weapons",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "ab50f1bd-178b-4e42-bc28-936b24bcc9da",
+        "entityId": "Thrown Weapons",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "7dfae05c-4fa1-4b47-bcb2-c8f305a3cefd",
+        "entityId": "Basic Traps",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "cc177c9c-232f-410c-84d9-f838d2d55d30",
+        "entityId": "Poisoner",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "5fa561e5-021f-43b1-acf3-184df2d94cd0",
+        "entityId": "Short Weapons",
+        "source": "Purchased",
+        "costOverride": 3
+      },
+      {
+        "id": "0e714602-296e-4b0d-8906-0c8b5a59ecbc",
+        "entityId": "Two Weapon Style",
+        "source": "Purchased",
+        "costOverride": 0
+      },
+      {
+        "id": "745dd615-3317-41fb-baf1-2d4ded1fc082",
+        "entityId": "Weapon Specialization (Daggers)",
+        "source": "Purchased",
+        "costOverride": 0
+      },
+      {
+        "id": "c560997b-df06-4f19-bf5c-7ff687ab8002",
+        "entityId": "Advanced Traps",
+        "source": "Purchased",
+        "costOverride": 4
+      },
+      {
+        "id": "cea1f6e6-a61a-4abe-9a10-bf9717ff3246",
+        "entityId": "Apprentice Profession",
+        "source": "Purchased",
+        "costOverride": 1
+      }
+    ],
+    "perks": [
+      {
+        "id": "7341e609-020a-4fc7-857b-8d874410b7a1",
+        "entityId": "Deathgrip",
+        "source": "Purchased",
+        "costOverride": 0
+      },
+      {
+        "id": "6dede7e6-8db3-40f0-aaa9-d7035f98d46c",
+        "entityId": "Holding On",
+        "source": "Purchased",
+        "costOverride": 0
+      },
+      {
+        "id": "f377a312-c45e-418d-a139-c0e2c87b75c6",
+        "entityId": "Carnal Creature",
+        "source": "Purchased",
+        "costOverride": 1
+      }
+    ],
     "flaws": [],
-    "startingSkills": [
-      "Basic Armor",
-      "Light Armor",
-      "Basic Martial Weapons",
-      "Thrown Weapons",
-      "Basic Traps",
-      "Poisoner"
+    "powers": [
+      {
+        "id": "03e27aec-1fdc-4a26-9e4e-9e0b83035ce8",
+        "entityId": "Deflect Projectile",
+        "source": "Class:Innate"
+      },
+      {
+        "id": "59683879-b5f0-4f7d-ab98-503db0630f2d",
+        "entityId": "Backstab",
+        "source": "Class:Innate"
+      },
+      {
+        "id": "8e8896e8-c5fc-4098-b2f0-1529286c4c41",
+        "entityId": "Loot",
+        "source": "Class:Innate"
+      },
+      {
+        "id": "c0983c13-4604-44ef-9ffc-b30383d52b23",
+        "entityId": "Throat Slit",
+        "source": "Purchased"
+      },
+      {
+        "id": "d5a0b2a2-7567-442f-9273-682f0d85ff37",
+        "entityId": "Way of the Blade",
+        "source": "Purchased"
+      },
+      {
+        "id": "1a8ceb80-62dd-4dc1-a347-491acde45adc",
+        "entityId": "Quick Nap",
+        "source": "Purchased"
+      },
+      {
+        "id": "895d280e-f289-4dd1-b094-adf9be4515a6",
+        "entityId": "Unburdened Speed",
+        "source": "Purchased"
+      }
     ],
-    "purchasedSkills": [
-      "Short Weapons",
-      "Two Weapon Style",
-      "Weapon Specialization (Daggers)",
-      "Advanced Traps",
-      "Apprentice Profession"
-    ],
-    "purchasedPerks": [
-      "Deathgrip",
-      "Holding On",
-      "Carnal Creature"
-    ],
-    "innatePowers": [
-      "Deflect Projectile",
-      "Backstab",
-      "Loot"
-    ],
-    "utilityPowers": [
-      "Throat Slit",
-      "Way of the Blade"
-    ],
-    "basicPowers": [
-      "Quick Nap",
-      "Unburdened Speed"
-    ]
+    "spells": [],
+    "devotions": [],
+    "wealth": "None",
+    "lineage": {
+      "name": "Human",
+      "choices": []
+    }
   },
   {
-    "name": "Support Socialite",
-    "tagline": "Use your intellect and charisma to get everything you want - from a safe distance behind your bodyguard, of course.",
-    "effectiveBP": {
-      "startingSkills": [
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null
-      ],
-      "purchasedSkills": [
-        1,
-        1,
-        1
-      ],
-      "purchasedPerks": [
-        0,
-        3,
-        3
-      ],
-      "innatePowers": [
-        null,
-        null,
-        null
-      ],
-      "utilityPowers": [
-        null,
-        null
-      ],
-      "basicPowers": [
-        null,
-        null,
-        null
-      ]
+    "archetypeName": "Support Socialite",
+    "classes": {
+      "Socialite": 4
     },
-    "grants": {
-      "startingSkills": [
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null
-      ],
-      "purchasedSkills": [
-        null,
-        null,
-        null
-      ],
-      "purchasedPerks": [
-        {
-          "kind": "grant",
-          "amount": null,
-          "source": null,
-          "sourceRole": "perk"
-        },
-        null,
-        null
-      ],
-      "innatePowers": [
-        null,
-        null,
-        null
-      ],
-      "utilityPowers": [
-        null,
-        null
-      ],
-      "basicPowers": [
-        null,
-        null,
-        null
-      ]
-    },
-    "lineage": "Human",
-    "lineageChallenges": [],
-    "lineageAdvantages": [],
-    "lifePoints": "3",
-    "armorPoints": "2 (Must be physrepped)",
-    "spikes": "2",
-    "classLevels": "Socialite 4",
+    "skills": [
+      {
+        "id": "7a8e4464-aaa2-4336-a54d-0b59973dea27",
+        "entityId": "Basic Martial Weapons",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "3d2284cc-2538-49a5-9ae8-3c4c29c0cb62",
+        "entityId": "Library Use",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "3316bfb3-4fe4-450d-99c8-d72fb4b5e7d2",
+        "entityId": "Poisoner",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "c697e6ad-b507-4b19-8f05-c15d314a90ed",
+        "entityId": "Basic Armor",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "e6bc5511-328f-4e41-a04f-aa191180c260",
+        "entityId": "Lore (Historical)",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "d543f3fc-5df5-46e6-9681-6b5ad0aaa9ec",
+        "entityId": "Profession - Apprentice (Smith)",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "5f251953-9d43-46f0-999b-f16e895b73b0",
+        "entityId": "Profession - Journeyman (Smith)",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "3356da62-e2c3-4adb-bdf2-a0a36a7bb19a",
+        "entityId": "Fence",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "a02a76fd-dc40-4aca-9611-ccc5c9b14bb8",
+        "entityId": "Contact",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "6c624bbc-e14e-46a3-baac-34a05746e6b7",
+        "entityId": "The Right Hand",
+        "source": "Purchased",
+        "costOverride": 1
+      },
+      {
+        "id": "62ebd5f6-24b7-4ab2-85b7-d25f9cfb18b6",
+        "entityId": "Holding Out for a Hero",
+        "source": "Purchased",
+        "costOverride": 1
+      },
+      {
+        "id": "b04caa7c-67a0-4378-966b-5990c27a54bd",
+        "entityId": "Steel Yourself",
+        "source": "Purchased",
+        "costOverride": 1
+      }
+    ],
+    "perks": [
+      {
+        "id": "c0f6b5f1-52dc-4d38-ab12-4935a7d8be79",
+        "entityId": "Contact",
+        "source": "Purchased",
+        "costOverride": 0
+      },
+      {
+        "id": "3483dc6f-1229-4495-8b49-c126a20d96f0",
+        "entityId": "Manse",
+        "source": "Purchased",
+        "costOverride": 3
+      },
+      {
+        "id": "c543cee4-3cfa-4f83-8987-36ac69f07981",
+        "entityId": "Income",
+        "source": "Purchased",
+        "costOverride": 3
+      }
+    ],
     "flaws": [],
-    "startingSkills": [
-      "Basic Martial Weapons",
-      "Library Use",
-      "Poisoner",
-      "Basic Armor",
-      "Lore (Historical)",
-      "Profession - Apprentice (Smith)",
-      "Profession - Journeyman (Smith)",
-      "Fence",
-      "Contact"
+    "powers": [
+      {
+        "id": "2930aa5c-04f6-4f40-b8e5-21ec8edcb843",
+        "entityId": "Practiced Manner",
+        "source": "Class:Innate"
+      },
+      {
+        "id": "db3d395c-68ea-4e25-93aa-90269ca304a3",
+        "entityId": "Heart of the Group",
+        "source": "Class:Innate"
+      },
+      {
+        "id": "16c538c8-2ea4-474c-821b-01bfa2e677eb",
+        "entityId": "Stern Willed",
+        "source": "Class:Innate"
+      },
+      {
+        "id": "2c0f96a6-c912-437c-be0f-36f64c0365b2",
+        "entityId": "Sources",
+        "source": "Purchased"
+      },
+      {
+        "id": "402ce7d9-d8fa-4140-bc58-f89f9af88d92",
+        "entityId": "Tax Evasion",
+        "source": "Purchased"
+      },
+      {
+        "id": "18a5ac36-5d84-4e16-b96f-118da9ea2d66",
+        "entityId": "Enthrall",
+        "source": "Purchased"
+      },
+      {
+        "id": "744f25b4-972a-49df-84e6-ee5c7f52db0a",
+        "entityId": "Sizing Up the Opposition",
+        "source": "Purchased"
+      },
+      {
+        "id": "195bf22c-19da-44f2-a792-42ad919598b5",
+        "entityId": "Soothe",
+        "source": "Purchased"
+      }
     ],
-    "purchasedSkills": [
-      "The Right Hand",
-      "Holding Out for a Hero",
-      "Steel Yourself"
-    ],
-    "purchasedPerks": [
-      "Contact",
-      "Manse",
-      "Income"
-    ],
-    "innatePowers": [
-      "Practiced Manner",
-      "Heart of the Group",
-      "Stern Willed"
-    ],
-    "utilityPowers": [
-      "Sources",
-      "Tax Evasion"
-    ],
-    "basicPowers": [
-      "Enthrall",
-      "Sizing Up the Opposition",
-      "Soothe"
-    ]
+    "spells": [],
+    "devotions": [],
+    "wealth": "None",
+    "lineage": {
+      "name": "Human",
+      "choices": []
+    }
   },
   {
-    "name": "Blaster Sourcerer",
-    "tagline": "Never meet a problem you can’t zap to smithereens.",
-    "effectiveBP": {
-      "startingSkills": [
-        null,
-        null,
-        null,
-        null
-      ],
-      "purchasedSkills": [
-        5
-      ],
-      "purchasedPerks": [
-        3,
-        1
-      ],
-      "innatePowers": [
-        null,
-        null,
-        null,
-        null
-      ],
-      "cantrips": [
-        null,
-        null,
-        null
-      ]
+    "archetypeName": "Blaster Sourcerer",
+    "classes": {
+      "Sourcerer": 4
     },
-    "lineage": "Human",
-    "lineageChallenges": [],
-    "lineageAdvantages": [],
-    "lifePoints": "3",
-    "armorPoints": "0",
-    "spikes": "2",
-    "classLevels": "Sourcerer 4",
+    "skills": [
+      {
+        "id": "372ea0f4-5261-4e93-9515-9441e27a995e",
+        "entityId": "Basic Arcane",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "213016cf-667a-4217-bd7d-e9013902d0a6",
+        "entityId": "Advanced Recharge",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "d25382e9-2231-4d7c-8d20-6ee18a606685",
+        "entityId": "Patron (a Patron)",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "237f9f15-8f3b-4415-b8fe-ea6297f1cdf5",
+        "entityId": "Gift of Hateful Retribution I",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "3a43d8ce-7882-4be3-bcf9-e419fd1da84c",
+        "entityId": "Warcaster",
+        "source": "Purchased",
+        "costOverride": 5
+      }
+    ],
+    "perks": [
+      {
+        "id": "9becd9a5-b202-4297-8483-9566f5fa8a02",
+        "entityId": "Gift of Hateful Retribution II",
+        "source": "Purchased",
+        "costOverride": 3
+      },
+      {
+        "id": "dc936160-4639-4f3e-b83a-86c591e7536d",
+        "entityId": "Gift of Recognition",
+        "source": "Purchased",
+        "costOverride": 1
+      }
+    ],
     "flaws": [],
-    "startingSkills": [
-      "Basic Arcane",
-      "Advanced Recharge",
-      "Patron (a Patron)",
-      "Gift of Hateful Retribution I"
+    "powers": [
+      {
+        "id": "31e1594a-ed48-4f9e-9f94-ccc64f58d85a",
+        "entityId": "Internal Battery",
+        "source": "Class:Innate"
+      },
+      {
+        "id": "012ef642-0ab8-4563-ade1-e15e650b8dff",
+        "entityId": "Arcane Source",
+        "source": "Class:Innate"
+      },
+      {
+        "id": "708ae3c8-26a2-4b46-8d6d-0c21acebeb0a",
+        "entityId": "Astride the Weave",
+        "source": "Class:Innate"
+      },
+      {
+        "id": "5cb77e15-80ac-44d8-bf5d-e53697633bb9",
+        "entityId": "Enduring Source",
+        "source": "Class:Innate"
+      }
     ],
-    "purchasedSkills": [
-      "Warcaster"
+    "spells": [
+      {
+        "id": "3d1c5b8d-76ac-4f05-a7c5-6a57e7def9df",
+        "entityId": "Cancel",
+        "source": "Class:Cantrip"
+      },
+      {
+        "id": "010b59a7-7b47-458c-b2f5-7792d1d9e727",
+        "entityId": "Charge",
+        "source": "Class:Cantrip"
+      },
+      {
+        "id": "179cd04f-abd6-4348-a24f-6e3f45d74eb6",
+        "entityId": "Wild Bolt",
+        "source": "Class:Cantrip"
+      }
     ],
-    "purchasedPerks": [
-      "Gift of Hateful Retribution II",
-      "Gift of Recognition"
-    ],
-    "innatePowers": [
-      "Internal Battery",
-      "Arcane Source",
-      "Astride the Weave",
-      "Enduring Source"
-    ],
-    "cantrips": [
-      "Cancel",
-      "Charge",
-      "Wild Bolt"
-    ]
+    "devotions": [],
+    "wealth": "None",
+    "lineage": {
+      "name": "Human",
+      "choices": []
+    }
   },
   {
-    "name": "Artificer Artisan",
-    "tagline": "Smith minerals into the finest equipment, and enhance it on the battlefield.",
-    "effectiveBP": {
-      "startingSkills": [
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null
-      ],
-      "purchasedSkills": [
-        3,
-        4,
-        2,
-        0
-      ],
-      "purchasedPerks": [
-        3
-      ],
-      "innatePowers": [
-        null
-      ],
-      "utilityPowers": [
-        null,
-        null
-      ],
-      "basicPowers": [
-        null,
-        null,
-        null
-      ]
+    "archetypeName": "Artificer Artisan",
+    "classes": {
+      "Artisan": 4
     },
-    "grants": {
-      "startingSkills": [
-        null,
-        null,
-        null,
-        {
-          "kind": "discount",
-          "amount": 3,
-          "source": "Forgesource Specialist",
-          "sourceRole": null
-        },
-        null,
-        null,
-        null
-      ],
-      "purchasedSkills": [
-        null,
-        null,
-        null,
-        {
-          "kind": "grant",
-          "amount": null,
-          "source": "The Learned One",
-          "sourceRole": null
-        }
-      ],
-      "purchasedPerks": [
-        null
-      ],
-      "innatePowers": [
-        null
-      ],
-      "utilityPowers": [
-        null,
-        null
-      ],
-      "basicPowers": [
-        null,
-        null,
-        null
-      ]
-    },
-    "lineage": "Human",
-    "lineageChallenges": [],
-    "lineageAdvantages": [],
-    "lifePoints": "3",
-    "armorPoints": "4 (must be physrepped)",
-    "spikes": "2",
-    "classLevels": "Artisan 4",
+    "skills": [
+      {
+        "id": "72dd0a31-7bb0-4951-8dac-f5c5dd27effc",
+        "entityId": "Basic Martial Weapons",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "d482fce1-37e9-406c-ae18-8d4740c6da38",
+        "entityId": "Short Weapons",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "cd973380-d084-4181-a0d6-e647800ce9d1",
+        "entityId": "Basic Armor",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "ee8d847e-8fed-49cc-bdf3-ba8c3ddfb502",
+        "entityId": "Apprentice Tinkering",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "b7955a68-1a91-496b-8c6e-4f967362c91b",
+        "entityId": "Prospect I",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "eb05320c-94dc-43dc-a74e-8d4337607414",
+        "entityId": "Apprentice Profession",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "47cdbb87-af8a-4d76-ae3f-da0281705fe0",
+        "entityId": "Journeyman Profession",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "eff5d9bf-c589-4599-b432-e9c4684e349e",
+        "entityId": "Light Armor",
+        "source": "Purchased",
+        "costOverride": 3
+      },
+      {
+        "id": "8e42ff09-fbce-44fd-ad88-8e8d9a325bc7",
+        "entityId": "Journeyman Tinkering",
+        "source": "Purchased",
+        "costOverride": 4
+      },
+      {
+        "id": "3a8b442e-3ed1-40f2-88f8-3bd70e0ebb08",
+        "entityId": "Chronic Hobbyist (Cooking)",
+        "source": "Purchased",
+        "costOverride": 2
+      },
+      {
+        "id": "a72a8c06-dafa-4096-bc69-098829745c8a",
+        "entityId": "Medium Armor",
+        "source": "Purchased",
+        "costOverride": 0
+      }
+    ],
+    "perks": [
+      {
+        "id": "a308bc53-d919-435b-8598-205c9906e391",
+        "entityId": "Fortunate Finder",
+        "source": "Purchased",
+        "costOverride": 3
+      }
+    ],
     "flaws": [],
-    "startingSkills": [
-      "Basic Martial Weapons",
-      "Short Weapons",
-      "Basic Armor",
-      "Apprentice Tinkering",
-      "Prospect I",
-      "Apprentice Profession",
-      "Journeyman Profession"
+    "powers": [
+      {
+        "id": "4bff7031-e745-4cf6-9664-7dcce4b81fb3",
+        "entityId": "Living Iron",
+        "source": "Class:Innate"
+      },
+      {
+        "id": "11df8c23-0186-4283-9dec-b9bb50710653",
+        "entityId": "Forged from Steel",
+        "source": "Purchased"
+      },
+      {
+        "id": "bcb56df8-0564-41b4-86f7-2e087541b8aa",
+        "entityId": "Forgesource Specialist",
+        "source": "Purchased"
+      },
+      {
+        "id": "bef23528-ce58-4082-ba3f-5553434bc199",
+        "entityId": "Armor Upkeep Specialist",
+        "source": "Purchased"
+      },
+      {
+        "id": "eeec8a68-f7da-4c31-a3f8-753d66f238a0",
+        "entityId": "Forcefield",
+        "source": "Purchased"
+      },
+      {
+        "id": "852f0c6f-0be9-4162-9c47-52c39b949b03",
+        "entityId": "Overcharge",
+        "source": "Purchased"
+      }
     ],
-    "purchasedSkills": [
-      "Light Armor",
-      "Journeyman Tinkering",
-      "Chronic Hobbyist (Cooking)",
-      "Medium Armor"
-    ],
-    "purchasedPerks": [
-      "Fortunate Finder"
-    ],
-    "innatePowers": [
-      "Living Iron"
-    ],
-    "utilityPowers": [
-      "Forged from Steel",
-      "Forgesource Specialist"
-    ],
-    "basicPowers": [
-      "Armor Upkeep Specialist",
-      "Forcefield",
-      "Overcharge"
-    ],
-    "specialization": "Artificer"
+    "spells": [],
+    "devotions": [],
+    "wealth": "None",
+    "lineage": {
+      "name": "Human",
+      "choices": []
+    }
   },
   {
-    "name": "Crafter Artisan",
-    "tagline": "Brew up a myriad of consumable items from the safety of the tavern.",
-    "effectiveBP": {
-      "startingSkills": [
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null
-      ],
-      "purchasedSkills": [
-        3,
-        3,
-        0,
-        0
-      ],
-      "purchasedPerks": [
-        3
-      ],
-      "innatePowers": [
-        null
-      ],
-      "utilityPowers": [
-        null,
-        null
-      ],
-      "basicPowers": [
-        null,
-        null,
-        null
-      ]
+    "archetypeName": "Crafter Artisan",
+    "classes": {
+      "Artisan": 4
     },
-    "grants": {
-      "startingSkills": [
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null
-      ],
-      "purchasedSkills": [
-        null,
-        null,
-        {
-          "kind": "grant",
-          "amount": null,
-          "source": "Hunter Gatherer",
-          "sourceRole": null
-        },
-        {
-          "kind": "grant",
-          "amount": null,
-          "source": "The Learned One",
-          "sourceRole": null
-        }
-      ],
-      "purchasedPerks": [
-        null
-      ],
-      "innatePowers": [
-        null
-      ],
-      "utilityPowers": [
-        null,
-        null
-      ],
-      "basicPowers": [
-        null,
-        null,
-        null
-      ]
-    },
-    "lineage": "Human",
-    "lineageChallenges": [],
-    "lineageAdvantages": [],
-    "lifePoints": "3",
-    "armorPoints": "2 (must be physrepped)",
-    "spikes": "2",
-    "classLevels": "Artisan 4",
+    "skills": [
+      {
+        "id": "1551aea2-7de8-45ae-bce5-c5b06b74b49f",
+        "entityId": "Basic Martial Weapons",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "b7717ad5-a930-467a-b0a5-d68a776af43a",
+        "entityId": "Short Weapons",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "41ca3cdf-400a-4994-ac3c-1d0694a72d08",
+        "entityId": "Basic Armor",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "af591ae6-bcc9-4b4c-81d5-26278a2892a6",
+        "entityId": "Apprentice Alchemy",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "9cad3ed8-24b4-4cd1-a18d-5ec368797877",
+        "entityId": "Forage I",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "7c83f97b-ea49-4fbf-9309-66b90879efae",
+        "entityId": "Basic Medicine",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "6ed112f6-849f-4cae-87b7-c8043b7c87e3",
+        "entityId": "Hearth",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "91b7a766-8468-45be-a34f-16b473056f3f",
+        "entityId": "Scavenge I",
+        "source": "Purchased",
+        "costOverride": 3
+      },
+      {
+        "id": "d365cab8-2242-4f3f-a3d0-a828ba192452",
+        "entityId": "Scavenge II",
+        "source": "Purchased",
+        "costOverride": 3
+      },
+      {
+        "id": "e1ec6cdf-3d67-4959-9b4a-128bc3a4e684",
+        "entityId": "Forage II",
+        "source": "Purchased",
+        "costOverride": 0
+      },
+      {
+        "id": "683cee3f-a23f-4734-b284-b3bdfdd590ae",
+        "entityId": "Journeyman Alchemy",
+        "source": "Purchased",
+        "costOverride": 0
+      }
+    ],
+    "perks": [
+      {
+        "id": "9ea5bb21-f8ec-4983-bce5-fbf60c72cf9b",
+        "entityId": "Fortunate Finder",
+        "source": "Purchased",
+        "costOverride": 3
+      }
+    ],
     "flaws": [],
-    "startingSkills": [
-      "Basic Martial Weapons",
-      "Short Weapons",
-      "Basic Armor",
-      "Apprentice Alchemy",
-      "Forage I",
-      "Basic Medicine",
-      "Hearth"
+    "powers": [
+      {
+        "id": "bc2859c2-4754-48c7-bb5c-0ffd21214a0f",
+        "entityId": "Living Iron",
+        "source": "Class:Innate"
+      },
+      {
+        "id": "34e295ec-35b4-4b42-a44c-777150cf18ca",
+        "entityId": "A Spoonful of Sugar",
+        "source": "Purchased"
+      },
+      {
+        "id": "8e642567-c3c5-41a8-a116-73892fb68f10",
+        "entityId": "Hunter Gatherer",
+        "source": "Purchased"
+      },
+      {
+        "id": "d611b16a-947a-48ca-897f-6f0efa5afed9",
+        "entityId": "Apt Assistant",
+        "source": "Purchased"
+      },
+      {
+        "id": "8b9990e0-90d7-4270-af5e-31fc65f84b0c",
+        "entityId": "Custom Brew",
+        "source": "Purchased"
+      },
+      {
+        "id": "b630ae4a-5cd5-4056-a548-8e5a91d32a53",
+        "entityId": "Kick",
+        "source": "Purchased"
+      }
     ],
-    "purchasedSkills": [
-      "Scavenge I",
-      "Scavenge II",
-      "Forage II",
-      "Journeyman Alchemy"
-    ],
-    "purchasedPerks": [
-      "Fortunate Finder"
-    ],
-    "innatePowers": [
-      "Living Iron"
-    ],
-    "utilityPowers": [
-      "A Spoonful of Sugar",
-      "Hunter Gatherer"
-    ],
-    "basicPowers": [
-      "Apt Assistant",
-      "Custom Brew",
-      "Kick"
-    ],
-    "specialization": "Crafter"
+    "spells": [],
+    "devotions": [],
+    "wealth": "None",
+    "lineage": {
+      "name": "Human",
+      "choices": []
+    }
   },
   {
-    "name": "Mystic Artisan",
-    "tagline": "Perform magical rites to enchant weapons and uncover mysteries.",
-    "effectiveBP": {
-      "startingSkills": [
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null
-      ],
-      "purchasedSkills": [
-        4,
-        0
-      ],
-      "purchasedPerks": [
-        3,
-        3,
-        1
-      ],
-      "innatePowers": [
-        null
-      ],
-      "utilityPowers": [
-        null,
-        null
-      ],
-      "basicPowers": [
-        null,
-        null,
-        null
-      ]
+    "archetypeName": "Mystic Artisan",
+    "classes": {
+      "Artisan": 4
     },
-    "grants": {
-      "startingSkills": [
-        null,
-        null,
-        null,
-        null,
-        null,
-        {
-          "kind": "discount",
-          "amount": 2,
-          "source": "The Learned One",
-          "sourceRole": null
-        },
-        null
-      ],
-      "purchasedSkills": [
-        null,
-        {
-          "kind": "grant",
-          "amount": null,
-          "source": "The Learned One",
-          "sourceRole": null
-        }
-      ],
-      "purchasedPerks": [
-        null,
-        null,
-        null
-      ],
-      "innatePowers": [
-        null
-      ],
-      "utilityPowers": [
-        null,
-        null
-      ],
-      "basicPowers": [
-        null,
-        null,
-        null
-      ]
-    },
-    "lineage": "Human",
-    "lineageChallenges": [],
-    "lineageAdvantages": [],
-    "lifePoints": "3",
-    "armorPoints": null,
-    "spikes": "2",
-    "classLevels": "Artisan 4",
+    "skills": [
+      {
+        "id": "f6bde23b-4259-4aa0-ba86-554c448928ba",
+        "entityId": "Basic Martial Weapons",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "61631115-a6df-4b5a-a5ac-872f00dc8577",
+        "entityId": "Short Weapons",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "5c0fa22c-65cb-48cb-852c-47a55d868567",
+        "entityId": "Basic Armor",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "df0adcb6-9682-471c-8e51-14508c3fafdf",
+        "entityId": "Apprentice Enchanting",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "9b7dae52-2547-483d-8c6d-88953140668b",
+        "entityId": "Apprentice Ritual Magic",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "1ea1e2b7-d06f-4e2c-b37a-f55d63e62d7c",
+        "entityId": "Lore (Rituals)",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "d3407c25-124d-4a75-8bb5-01120cd32d42",
+        "entityId": "Forage I",
+        "source": "Class:Starting"
+      },
+      {
+        "id": "731fe20f-d9f9-4394-b687-9b0e0ec44d8e",
+        "entityId": "Journeyman Enchanting",
+        "source": "Purchased",
+        "costOverride": 4
+      },
+      {
+        "id": "085d97de-ddc6-40c4-a284-3fbe0855b3c3",
+        "entityId": "Journeyman Ritual Magic",
+        "source": "Purchased",
+        "costOverride": 0
+      }
+    ],
+    "perks": [
+      {
+        "id": "1ef9a756-2c49-4224-8b7d-3e757b5e174d",
+        "entityId": "Soothsayer",
+        "source": "Purchased",
+        "costOverride": 3
+      },
+      {
+        "id": "a699c8b0-8729-4ff6-a40d-d688cc3535b8",
+        "entityId": "Insight",
+        "source": "Purchased",
+        "costOverride": 3
+      },
+      {
+        "id": "53018390-f0b5-4c1a-ae65-be45730263b5",
+        "entityId": "Bits and Pieces",
+        "source": "Purchased",
+        "costOverride": 1
+      }
+    ],
     "flaws": [],
-    "startingSkills": [
-      "Basic Martial Weapons",
-      "Short Weapons",
-      "Basic Armor",
-      "Apprentice Enchanting",
-      "Apprentice Ritual Magic",
-      "Lore (Rituals)",
-      "Forage I"
+    "powers": [
+      {
+        "id": "71a4465a-88fc-42dc-a5c9-57f530de9e99",
+        "entityId": "Living Iron",
+        "source": "Class:Innate"
+      },
+      {
+        "id": "d60db6fe-2ee4-4059-8c9d-9ff76dc5b8d1",
+        "entityId": "Otherworldly Sight",
+        "source": "Purchased"
+      },
+      {
+        "id": "2490fbe0-2ac0-4c36-99b5-ea66cda057f8",
+        "entityId": "Protected Casting",
+        "source": "Purchased"
+      },
+      {
+        "id": "a7ffc591-cf6f-4cc1-8f4c-242321657b3b",
+        "entityId": "Aegis of the Unknown/Sundering of the Unknown",
+        "source": "Purchased"
+      },
+      {
+        "id": "d8f5c340-2571-472d-84e2-1539c7a4441e",
+        "entityId": "Dig Deep",
+        "source": "Purchased"
+      },
+      {
+        "id": "6a1d29fd-2689-4b28-8156-52f4e20d49cc",
+        "entityId": "Mesmerize",
+        "source": "Purchased"
+      }
     ],
-    "purchasedSkills": [
-      "Journeyman Enchanting",
-      "Journeyman Ritual Magic"
-    ],
-    "purchasedPerks": [
-      "Soothsayer",
-      "Insight",
-      "Bits and Pieces"
-    ],
-    "innatePowers": [
-      "Living Iron"
-    ],
-    "utilityPowers": [
-      "Otherworldly Sight",
-      "Protected Casting"
-    ],
-    "basicPowers": [
-      "Aegis of the Unknown/Sundering of the Unknown",
-      "Dig Deep",
-      "Mesmerize"
-    ],
-    "specialization": "Mystic"
+    "spells": [],
+    "devotions": [],
+    "wealth": "None",
+    "lineage": {
+      "name": "Human",
+      "choices": []
+    }
   }
 ]

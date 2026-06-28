@@ -12,7 +12,7 @@
     "check:data": "node scripts/check-data-drift.mjs",
     "link:audit": "node scripts/linker/link-audit.js",
     "doc:feedback": "node scripts/linker/doc-feedback.js",
-    "test": "node --import ./scripts/register-json.mjs scripts/test.mjs && node --import ./scripts/register-json.mjs scripts/test-rules-enforcement.mjs && node scripts/test-browser.mjs",
+    "test": "tsx ./scripts/test.mjs && tsx ./scripts/test-rules-enforcement.mjs && tsx ./scripts/test-browser.mjs",
     "shot": "node scripts/debug/shot.mjs",
     "lint:js": "eslint . --max-warnings=0",
     "lint:css": "stylelint '**/*.css'",

@@ -12,6 +12,7 @@
 import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
+import crypto from 'crypto';
 import { LABEL_FIELD, CHOICE_DEFAULTS } from '../src/engine/sheet-schema.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -445,7 +446,117 @@ for (let i = 0; i < nodes.length; i++) {
   if (n.text === 'Table of Contents') continue;
   const nextH1 = nodes.findIndex((m, j) => j > i && m.type === 'heading' && m.level === 1);
   const end = nextH1 === -1 ? nodes.length : nextH1;
-  archetypes.push(parseArchetype(i, end));
+  const v1 = parseArchetype(i, end);
+  archetypes.push(convertToV2(v1));
+}
+
+function convertToV2(v1) {
+  const v2 = {
+    archetypeName: v1.name,
+    classes: {},
+    skills: [],
+    perks: [],
+    flaws: [],
+    powers: [],
+    spells: [],
+    devotions: [],
+    wealth: v1.wealth || 'None',
+  };
+
+  // 1. Classes
+  if (v1.classLevels) {
+    const classMatch = v1.classLevels.match(/^([A-Z][a-zA-Z]+)\s+(\d+)/);
+    if (classMatch) {
+       v2.classes[classMatch[1]] = parseInt(classMatch[2], 10);
+    } else {
+       // Fallback for edge cases
+       v2.classes[v1.classLevels.split(' ')[0]] = parseInt(v1.classLevels.split(' ')[1], 10) || 1;
+    }
+  }
+
+  // 2. Lineage
+  if (v1.lineage) {
+    v2.lineage = { name: v1.lineage, choices: [] };
+    const addAdv = (arr) => {
+      for (const adv of arr || []) {
+        v2.perks.push({
+          id: crypto.randomUUID(),
+          entityId: 'advantages:' + v1.lineage + ' - ' + adv,
+          source: 'Lineage',
+        });
+        v2.lineage.choices.push(adv);
+      }
+    };
+    addAdv(v1.lineageAdvantages);
+    
+    for (const ch of v1.lineageChallenges || []) {
+      v2.flaws.push({
+        id: crypto.randomUUID(),
+        entityId: 'challenges:' + v1.lineage + ' - ' + ch,
+        source: 'Lineage'
+      });
+      v2.lineage.choices.push(ch);
+    }
+  }
+
+  // 3. Helper to create Choice objects
+  const addChoice = (fieldStr, targetArray, sourceName, fallbackPrefix = '') => {
+    const list = v1[fieldStr] || [];
+    list.forEach((item, idx) => {
+      const cost = v1.effectiveBP?.[fieldStr]?.[idx] ?? null;
+      let ranks = v1.ranks?.[fieldStr]?.[idx] ?? 1;
+      let cleanName = item;
+      
+      // Attempt to strip parameterized formats (Item - Param) -> just Item
+      const baseMatch = cleanName.match(/^([^-]+?)\\s*-/);
+      let entityId = baseMatch ? baseMatch[1].trim() : cleanName;
+      if (fallbackPrefix) entityId = fallbackPrefix + ':' + entityId;
+      else entityId = cleanName; // Will be resolved by the engine
+
+      const choice = {
+        id: crypto.randomUUID(),
+        entityId,
+        source: sourceName,
+      };
+      if (cost !== null) choice.costOverride = cost;
+      if (ranks > 1) choice.ranks = ranks;
+      
+      const paramMatch = cleanName.match(/\\((.*?)\\)/) || cleanName.match(/\\s-\\s(.*)$/);
+      if (paramMatch && !paramMatch[0].includes('your choice')) {
+        choice.parameter = paramMatch[1].trim();
+      }
+
+      targetArray.push(choice);
+    });
+  };
+
+  addChoice('startingSkills', v2.skills, 'Class:Starting');
+  addChoice('purchasedSkills', v2.skills, 'Purchased');
+  addChoice('purchasedPerks', v2.perks, 'Purchased');
+  addChoice('flaws', v2.flaws, 'Flaw');
+  
+  addChoice('innatePowers', v2.powers, 'Class:Innate');
+  addChoice('utilityPowers', v2.powers, 'Purchased');
+  addChoice('basicPowers', v2.powers, 'Purchased');
+  addChoice('advancedPowers', v2.powers, 'Purchased');
+  addChoice('veteranPowers', v2.powers, 'Purchased');
+  addChoice('classPowers', v2.powers, 'Purchased');
+  addChoice('rightHandPowers', v2.powers, 'Purchased');
+  addChoice('domainPowers', v2.powers, 'Purchased');
+  addChoice('formPowers', v2.powers, 'Purchased');
+  
+  addChoice('cantrips', v2.spells, 'Class:Cantrip');
+  addChoice('spellsKnown', v2.spells, 'Class:Known');
+  addChoice('noviceSpells', v2.spells, 'Purchased');
+  addChoice('adeptSpells', v2.spells, 'Purchased');
+  addChoice('greaterSpells', v2.spells, 'Purchased');
+  addChoice('bookSpells', v2.spells, 'Purchased');
+  
+  if (v1.devotion) {
+     v2.devotions.push({ id: crypto.randomUUID(), entityId: 'devotions:' + v1.devotion, source: 'Purchased' });
+  }
+
+  return v2;
 }
 
 writeFileSync(OUT, JSON.stringify(archetypes, null, 2));
