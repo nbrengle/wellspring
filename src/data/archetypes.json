@@ -6,49 +6,49 @@
     },
     "skills": [
       {
-        "id": "41c33988-4e66-4f2c-b63d-b41434a8870a",
+        "id": "d9ab664d-2fa9-497b-93ea-11261ebd62f2",
         "entityId": "Basic Armor",
         "source": "Class:Starting"
       },
       {
-        "id": "b23b3b23-4d74-4f6f-971f-062b1a7144ae",
+        "id": "a7e81927-199c-4f8d-80d7-b81165c856eb",
         "entityId": "Light Armor",
         "source": "Class:Starting"
       },
       {
-        "id": "d8782e2a-a167-4ad6-af40-ce4747548bad",
+        "id": "70dea43c-18f3-44a9-8799-3ae2adafb334",
         "entityId": "Basic Martial Weapons",
         "source": "Class:Starting"
       },
       {
-        "id": "8a9124e8-d141-496d-950f-f44548a8899a",
+        "id": "c4e549f7-be1d-4d6a-aea7-b732c55293c9",
         "entityId": "Basic Shields",
         "source": "Class:Starting"
       },
       {
-        "id": "436bb27b-d162-4180-bc40-139e5d8e74f3",
+        "id": "da8cf088-1a85-45ea-81af-07b04d2a9365",
         "entityId": "Short Weapons",
         "source": "Class:Starting"
       },
       {
-        "id": "93b2bb3b-4ce6-4a7b-9734-20cbe67451ff",
+        "id": "b1bbe5bd-7e25-4ec8-b4df-dcd80b1de8be",
         "entityId": "Advanced Shields",
         "source": "Class:Starting"
       },
       {
-        "id": "cd1079a2-9acf-489b-bcd1-fe107041dcea",
+        "id": "ca2b4cc7-cd4c-4400-bb5d-391fa049e8b8",
         "entityId": "Medium Armor",
         "source": "Purchased",
         "costOverride": 0
       },
       {
-        "id": "814e2f2a-4582-4b95-b01d-e16ed841ed27",
+        "id": "0e106e49-ed63-4bd6-bcb3-fa1fd9704100",
         "entityId": "Shield Expertise",
         "source": "Purchased",
         "costOverride": 5
       },
       {
-        "id": "282e444f-80f4-4bb6-b657-f144d7d66a8d",
+        "id": "3b92a1ef-153e-4758-bc6f-31ee08ff7599",
         "entityId": "Basic Medicine",
         "source": "Purchased",
         "costOverride": 2
@@ -56,13 +56,13 @@
     ],
     "perks": [
       {
-        "id": "28924c71-5235-4e8a-8965-ff5975b024fa",
+        "id": "a6804e4b-6453-4482-a50a-914208256e17",
         "entityId": "Holding On",
         "source": "Purchased",
         "costOverride": 1
       },
       {
-        "id": "b0d76c01-dee7-4314-b161-8c2a9727d161",
+        "id": "26a69970-1e25-416d-b699-41522bc3644e",
         "entityId": "Will to Live",
         "source": "Purchased",
         "costOverride": 1
@@ -71,37 +71,37 @@
     "flaws": [],
     "powers": [
       {
-        "id": "9710cc11-f807-4d55-b8ac-986df042519c",
+        "id": "e178a3f7-ca9e-43ab-b66c-14cff97b9600",
         "entityId": "Deadly Remnants",
         "source": "Class:Innate"
       },
       {
-        "id": "a1efac3e-152f-430b-84b9-2eb1f384b2a2",
+        "id": "402ee4eb-a261-4e27-ab75-1428f1d60f68",
         "entityId": "Fighting Instructor",
         "source": "Class:Innate"
       },
       {
-        "id": "f08901df-3cdf-4149-bb20-f215221217df",
+        "id": "c60e579b-cd88-4b8b-a2f0-a4f9a4ff53cd",
         "entityId": "Parry Blow",
         "source": "Class:Innate"
       },
       {
-        "id": "a41ae296-f4ef-4417-bbfa-044f27df29d7",
+        "id": "e1ad44b2-20e8-4b54-b6bb-bab0fb40b6c8",
         "entityId": "Linked Armor",
         "source": "Purchased"
       },
       {
-        "id": "7cb42f7d-6a73-4b23-ad75-8a31753e5221",
+        "id": "2a222e16-9af3-45bd-b21c-4ce904c17880",
         "entityId": "Armored Shell",
         "source": "Purchased"
       },
       {
-        "id": "b170f09e-a73e-4af9-8213-d3e3cb837869",
+        "id": "7627e71e-c204-4474-9d6f-ee083a64f73d",
         "entityId": "Harry",
         "source": "Purchased"
       },
       {
-        "id": "152cd2a5-ea35-4b76-8dd4-4f601a4422fb",
+        "id": "0f45d290-993a-4668-a244-d41ef3dc2250",
         "entityId": "Shake It Off I",
         "source": "Purchased"
       }
@@ -121,32 +121,32 @@
     },
     "skills": [
       {
-        "id": "e09151b4-03c6-456c-8405-8e6d4cf1de9f",
+        "id": "b64de357-a8a8-43b6-9640-0d978ad20fd8",
         "entityId": "Basic Armor",
         "source": "Class:Starting"
       },
       {
-        "id": "c4a4a7c8-616a-480f-973c-a2bcb7646951",
+        "id": "e56762bd-50fc-4f4c-aeef-9595179b49cd",
         "entityId": "Light Armor",
         "source": "Class:Starting"
       },
       {
-        "id": "244e1e6f-adde-4d78-b7a9-c8d516856cf6",
+        "id": "5d8ed1a8-b7ca-43e2-8181-89e2935c26d8",
         "entityId": "Basic Martial Weapons",
         "source": "Class:Starting"
       },
       {
-        "id": "13265797-beda-49cc-8af2-acfa3542b70c",
+        "id": "fdde7cd2-0c64-4212-9f20-d0b9457155a4",
         "entityId": "Basic Shields",
         "source": "Class:Starting"
       },
       {
-        "id": "970e01cd-d5fe-4f83-aeb2-e03c784f352b",
+        "id": "605f567b-b022-421c-91dc-d3c1f49a8105",
         "entityId": "Great Weapons",
         "source": "Class:Starting"
       },
       {
-        "id": "aef961aa-e9be-4649-afd4-26337bc8c525",
+        "id": "43cd494c-bf20-4141-87a1-8b9221bc4672",
         "entityId": "Weapon Specialization (Swords)",
         "source": "Purchased",
         "costOverride": 4
@@ -154,13 +154,13 @@
     ],
     "perks": [
       {
-        "id": "24001d45-4309-4a94-af1c-23aafd1c844a",
+        "id": "c81fe10b-d7c3-4b39-99ff-207ca4a15fdd",
         "entityId": "Ancestral Relic",
         "source": "Purchased",
         "costOverride": 2
       },
       {
-        "id": "eecce8f6-74ca-4b22-a529-b7d21412c807",
+        "id": "77eb8606-84c4-4a91-8934-6a4561087ebc",
         "entityId": "Bloody Minded",
         "source": "Purchased",
         "costOverride": 3
@@ -169,37 +169,37 @@
     "flaws": [],
     "powers": [
       {
-        "id": "62a5550d-e0c5-4be0-be9d-547f6ff590d4",
+        "id": "402aebaa-221a-4ede-abde-968c55d00921",
         "entityId": "Deadly Remnants",
         "source": "Class:Innate"
       },
       {
-        "id": "064e1d77-e876-43ca-b7a8-cf921a50ce56",
+        "id": "96bc54d6-ff27-4b85-860b-15039cbcffcf",
         "entityId": "Fighting Instructor",
         "source": "Class:Innate"
       },
       {
-        "id": "899b0df7-1004-4eed-82b5-876d3db0fde8",
+        "id": "a8ca326d-fce2-41be-8b48-4bbd19175667",
         "entityId": "Parry Blow",
         "source": "Class:Innate"
       },
       {
-        "id": "f8d3b4bc-9650-4b66-a78e-c505b2c211b7",
+        "id": "fc49bb5e-01b5-4901-803a-d030bcda3ae3",
         "entityId": "Fortitude",
         "source": "Purchased"
       },
       {
-        "id": "676f5954-0623-4e39-93ca-790953c094e2",
+        "id": "54232099-d9eb-4bc9-9f2d-47666f7d853c",
         "entityId": "Knight’s Strength",
         "source": "Purchased"
       },
       {
-        "id": "61acfad7-cc30-4da2-a139-215327da272e",
+        "id": "ef42ae69-6b42-4073-ad21-b01901a57cbc",
         "entityId": "Shot Placement",
         "source": "Purchased"
       },
       {
-        "id": "20daa44c-e6f7-421e-aa13-01360595c03c",
+        "id": "08f80834-365f-4248-87c7-de2e815865fd",
         "entityId": "Raging Blows",
         "source": "Purchased"
       }
@@ -219,49 +219,49 @@
     },
     "skills": [
       {
-        "id": "2922bc9e-05aa-4ecb-9359-3175eb571f6c",
+        "id": "50dae54d-6b9c-4f59-88e8-c6fd066f7963",
         "entityId": "Basic Armor",
         "source": "Class:Starting"
       },
       {
-        "id": "66cd08d5-3106-4289-9834-e463df5752f6",
+        "id": "45ec867c-e263-4915-b0dc-0fc95ebd0911",
         "entityId": "Light Armor",
         "source": "Class:Starting"
       },
       {
-        "id": "fcab5a8c-f6db-4482-ad9e-009b74eaf381",
+        "id": "ac30db21-f816-4e27-8086-be96c390dabe",
         "entityId": "Basic Martial Weapons",
         "source": "Class:Starting"
       },
       {
-        "id": "9801777a-89b5-4951-8484-183ef85390cb",
+        "id": "a621a9b7-4fa0-4c2c-8e57-d73654e84b34",
         "entityId": "Basic Shields",
         "source": "Class:Starting"
       },
       {
-        "id": "03cb9b3d-a248-4a34-8749-ca687088ec3e",
+        "id": "68ae80f5-fb85-4366-98f0-d613f3462e8b",
         "entityId": "Lore (Historical)",
         "source": "Class:Starting"
       },
       {
-        "id": "98ead1ac-c5af-48c4-91ed-512ea21b2790",
+        "id": "e3cbf12b-0909-46b0-8ca9-633c58912521",
         "entityId": "Projectile Weapons",
         "source": "Class:Starting"
       },
       {
-        "id": "77d8e5bd-5dc1-4d19-a751-df70b2f6a942",
+        "id": "627e3724-6f08-4cb6-877e-360ff9aac9f3",
         "entityId": "Accuracy",
         "source": "Purchased",
         "costOverride": 3
       },
       {
-        "id": "df96d8be-ccfc-4954-b5b3-e440a3ada673",
+        "id": "b7013153-ace9-44a2-a5e1-789bde3eee56",
         "entityId": "Tracking",
         "source": "Purchased",
         "costOverride": 4
       },
       {
-        "id": "b7c8e23b-2bae-49b6-b24d-28d19d746731",
+        "id": "591b0bcc-b850-4952-a186-daab449c3607",
         "entityId": "Profession - Apprentice (Smith)",
         "source": "Purchased",
         "costOverride": 1
@@ -269,7 +269,7 @@
     ],
     "perks": [
       {
-        "id": "09751740-cc57-4440-908e-ee9579d072d6",
+        "id": "c0a4356e-c611-4417-b62f-7de6e2453ae4",
         "entityId": "Deathgrip",
         "source": "Purchased",
         "costOverride": 1
@@ -278,37 +278,37 @@
     "flaws": [],
     "powers": [
       {
-        "id": "91200e00-3db3-41d5-8527-d687476fe2c5",
+        "id": "52698bb4-3f27-4f71-99fe-f78a4fede17b",
         "entityId": "Deadly Remnants",
         "source": "Class:Innate"
       },
       {
-        "id": "b9198029-3910-4d14-91c3-1a7ebdc50ee0",
+        "id": "b8281e93-7120-4634-a6a3-b6baec618283",
         "entityId": "Fighting Instructor",
         "source": "Class:Innate"
       },
       {
-        "id": "0f00a17e-1a3a-4f30-8b4e-c214eee47f12",
+        "id": "e4d7200f-04e5-4c24-9ec3-a6605db51397",
         "entityId": "Parry Blow",
         "source": "Class:Innate"
       },
       {
-        "id": "54747c27-f9b0-4f07-99e5-0b61d9a619e6",
+        "id": "1220da08-fdce-4e35-8ad4-1bdf239c98f1",
         "entityId": "Bowyer",
         "source": "Purchased"
       },
       {
-        "id": "d0aeec31-1386-4ac1-9298-adcb5ecca549",
+        "id": "50c679e0-ea2c-4810-bcd6-1454915ef1d3",
         "entityId": "Reload",
         "source": "Purchased"
       },
       {
-        "id": "da913c6d-bc59-4005-bb79-6a3244b44cf8",
+        "id": "826f3391-daff-4906-8ac9-43a91efbfb77",
         "entityId": "Flaming Arrow",
         "source": "Purchased"
       },
       {
-        "id": "d45f7ee3-a412-41a1-b59b-f1485c45ee83",
+        "id": "63946147-ec24-4f47-b931-c768d82519ac",
         "entityId": "Snap Shot",
         "source": "Purchased"
       }
@@ -328,43 +328,43 @@
     },
     "skills": [
       {
-        "id": "424f6989-e7ad-4383-a354-50c8c71c2652",
+        "id": "414a7beb-b703-4312-911c-f6a3352bd7ec",
         "entityId": "Basic Faith",
         "source": "Class:Starting"
       },
       {
-        "id": "256e051f-ae63-4975-982f-2e32d460f3d3",
+        "id": "cad77c2e-fd55-4e24-9193-2860a480df15",
         "entityId": "Worship - The Mother",
         "source": "Class:Starting"
       },
       {
-        "id": "f0adcc16-f62a-4332-8dde-438b09cf5766",
+        "id": "551dad41-0de6-4f03-8c1e-824b681bfa39",
         "entityId": "Basic Martial Weapons",
         "source": "Class:Starting"
       },
       {
-        "id": "03316da3-8a55-4e78-86eb-463124deb8c2",
+        "id": "b24f72d0-1192-436c-930a-51a3b24026cf",
         "entityId": "Basic Armor",
         "source": "Class:Starting"
       },
       {
-        "id": "99309623-9bd9-49df-9238-734012b24fd2",
+        "id": "bcf4f13d-79c2-461a-8b11-8c74b6808a8a",
         "entityId": "Extended Capacity - Novice (Divine)",
         "source": "Class:Starting"
       },
       {
-        "id": "080315be-5b19-47cb-a506-1eb99bacf833",
+        "id": "06c372a8-374d-4b07-911d-637bfdbac995",
         "entityId": "Additional Cantrip",
         "source": "Class:Starting"
       },
       {
-        "id": "273fd588-8cdb-4893-98f5-23b79ebcb30f",
+        "id": "57783b79-ed4a-4844-b27c-bb31f4f7b02f",
         "entityId": "Lore (Religious)",
         "source": "Purchased",
         "costOverride": 2
       },
       {
-        "id": "cdcecb5f-5123-4d8b-b9c7-00e875564dcb",
+        "id": "ba081b11-c770-4bc9-9717-9ed70d7f7b2b",
         "entityId": "Path of Panic",
         "source": "Purchased",
         "costOverride": 1
@@ -372,7 +372,7 @@
     ],
     "perks": [
       {
-        "id": "4833b5a8-df4d-4ed8-9f60-937226c3e294",
+        "id": "92e8cd5a-ab9d-41d0-8095-7dce26e81dba",
         "entityId": "Soothing Touch",
         "source": "Purchased",
         "costOverride": 1
@@ -381,22 +381,22 @@
     "flaws": [],
     "powers": [
       {
-        "id": "09799a21-458a-4404-bfb8-a022b288ae1a",
+        "id": "ddc95634-7c51-4edf-b565-5544f9ea8455",
         "entityId": "Ritual Affinity",
         "source": "Class:Innate"
       },
       {
-        "id": "e1a6bc42-fe67-4fc0-894e-ad7fac6d5600",
+        "id": "a15c498e-21a0-421f-ab69-6440b5a93724",
         "entityId": "Healing Touch",
         "source": "Class:Innate"
       },
       {
-        "id": "15e5e517-f2a7-45fc-985c-ad5690a71518",
+        "id": "7ec7cda3-3a7c-4c8b-a981-50dbeb47c3ff",
         "entityId": "Refreshing Prayer",
         "source": "Class:Innate"
       },
       {
-        "id": "6d96e49e-c798-4545-8986-c6890c4ee7ba",
+        "id": "6168198a-a4cd-483a-af25-332a54171032",
         "entityId": "Lifeline (Life)",
         "source": "Purchased",
         "costOverride": 5
@@ -404,49 +404,49 @@
     ],
     "spells": [
       {
-        "id": "8bd0f421-3e98-4796-a248-014203ad6715",
+        "id": "7cd857f7-b22b-4eaf-8bcb-ff131c6f6c92",
         "entityId": "Cancel",
         "source": "Class:Cantrip"
       },
       {
-        "id": "d59ab1ee-679a-453b-ac90-ac32a05c622d",
+        "id": "56a9c3eb-733a-40e6-a856-d63a779e5279",
         "entityId": "Blade Blessing",
         "source": "Class:Cantrip"
       },
       {
-        "id": "e58c7a21-32f2-4402-a3c7-fae865842283",
+        "id": "fcd99e9d-3951-4103-a613-2669c546fb8e",
         "entityId": "Revivify",
         "source": "Class:Cantrip"
       },
       {
-        "id": "1225f769-f006-461c-9504-808a82d4d9ee",
+        "id": "92223784-5027-4d95-a83e-953b9681901d",
         "entityId": "Devotion’s Strike",
         "source": "Class:Cantrip"
       },
       {
-        "id": "33f15b12-1209-4bb0-94e4-cde01a60905b",
+        "id": "58f602e6-2b6a-49fd-824c-7537f7cd7594",
         "entityId": "Cure",
         "source": "Purchased"
       },
       {
-        "id": "648b6e4a-a10c-495d-a788-3c431a60076b",
+        "id": "0a68bb85-3a2b-4f23-a93f-83f40c97e049",
         "entityId": "Heretic’s Brand",
         "source": "Purchased"
       },
       {
-        "id": "91da2472-49c7-4b36-9b27-0451df000029",
+        "id": "41b0b279-7e3f-498d-94c4-1b8d4b738cf3",
         "entityId": "Rekindle",
         "source": "Purchased"
       },
       {
-        "id": "80ea0de4-d335-4ec5-ac3b-b98bde7a1ca1",
+        "id": "709be7b2-2c76-417d-bda7-7337c37078ba",
         "entityId": "Spirit Speak",
         "source": "Purchased"
       }
     ],
     "devotions": [
       {
-        "id": "4b179f2f-52d8-4bc9-b3f1-1401ce217cf1",
+        "id": "2422d142-bded-47be-a4dc-c1bbbe4642a7",
         "entityId": "devotions:The Mother",
         "source": "Purchased"
       }
@@ -464,43 +464,43 @@
     },
     "skills": [
       {
-        "id": "f6fbc9fc-84dc-4bda-bbac-c1cfa271b2e3",
+        "id": "af511f65-1521-48af-9dc1-2c41b32d04be",
         "entityId": "Basic Martial Weapons",
         "source": "Class:Starting"
       },
       {
-        "id": "bf67ab8d-5927-4fc6-82ff-741334abf33a",
+        "id": "5c12c3ef-0524-4f61-962d-9cedde3f2a8e",
         "entityId": "Profession - Apprentice (Smith)",
         "source": "Class:Starting"
       },
       {
-        "id": "7d77c3e8-81e2-4889-80a8-270ac6f08230",
+        "id": "8e4a6c79-c95a-42e8-ab89-82daf570a191",
         "entityId": "Basic Faith",
         "source": "Class:Starting"
       },
       {
-        "id": "0caed50d-baff-4316-b204-17b2c822128f",
+        "id": "a7eb0e36-49c4-4252-90c8-2301ad87a3c1",
         "entityId": "Scavenge I",
         "source": "Class:Starting"
       },
       {
-        "id": "a30a9a8c-9a8b-4f33-83f0-f3db5b120f6b",
+        "id": "571d6a99-ed7d-4236-b34d-84c6f5ae7878",
         "entityId": "Extended Capacity - Novice (Divine)",
         "source": "Class:Starting"
       },
       {
-        "id": "6dc6eabd-a5e3-42e4-84a9-32c5fa03515f",
+        "id": "148dddc4-cf40-45df-bd6e-dbf834529475",
         "entityId": "Lore (Nature)",
         "source": "Class:Starting"
       },
       {
-        "id": "2eefe2e7-5293-41d1-9a46-66e653ba479b",
+        "id": "18ce86ca-56c6-482b-8524-ff52c926bd86",
         "entityId": "Favored Form (Hunting Panther)",
         "source": "Purchased",
         "costOverride": 4
       },
       {
-        "id": "f048eaa0-5d92-4dda-a067-ea900941cf5c",
+        "id": "a2ae23be-1936-4390-a614-46cc4382ba26",
         "entityId": "Red in Tooth and Claw",
         "source": "Purchased",
         "costOverride": 2
@@ -508,7 +508,7 @@
     ],
     "perks": [
       {
-        "id": "e7dfbc41-766d-49ef-81f0-d848bcae77d9",
+        "id": "aee186de-a764-49ba-9422-bb5f43ff5d18",
         "entityId": "Insight",
         "source": "Purchased",
         "costOverride": 3
@@ -517,54 +517,54 @@
     "flaws": [],
     "powers": [
       {
-        "id": "a3ade443-d3f7-495b-b1a3-b24130c2af7a",
+        "id": "aaaca8df-2c3e-41cf-b39a-e8eea640a1b2",
         "entityId": "Commune with Nature",
         "source": "Class:Innate"
       },
       {
-        "id": "43baf70c-1cb1-481e-8465-c7f42ab20fb8",
+        "id": "663a9ba4-e9f3-4270-89d5-f38b55adc823",
         "entityId": "Message of the Flowers",
         "source": "Class:Innate"
       },
       {
-        "id": "c96eb10c-fe76-4c22-ab12-d70acd42faee",
+        "id": "b51d8cc0-2b6d-44e3-819c-7aa10a86c025",
         "entityId": "Nature’s Understanding",
         "source": "Class:Innate"
       }
     ],
     "spells": [
       {
-        "id": "95032d27-a95d-4ad4-a37e-cccb2e56d82f",
+        "id": "04982497-c7f1-43b6-b4c1-93ee20299dc7",
         "entityId": "Cancel",
         "source": "Class:Cantrip"
       },
       {
-        "id": "2c217a4d-0c4f-43d5-a6b1-6967d500b6d6",
+        "id": "b576baf2-213b-448c-99a2-cb9eeb89fc61",
         "entityId": "Hide",
         "source": "Class:Cantrip"
       },
       {
-        "id": "aa1700be-fcb5-406c-b98a-ddf9b6799258",
+        "id": "5d336fd6-37e5-4698-a594-4b9cfc1f6806",
         "entityId": "Festering Lash",
         "source": "Class:Cantrip"
       },
       {
-        "id": "98fb4786-cfdc-440e-b1ee-b4b362f0508d",
+        "id": "43608127-a608-46a2-9109-7495958ca060",
         "entityId": "Barkskin",
         "source": "Purchased"
       },
       {
-        "id": "d5bb14e2-8acc-4e12-a3a8-237b4db54496",
+        "id": "7de6b267-f995-4003-ba4f-30a787139eaf",
         "entityId": "Lesser Form of the Hulking Bear",
         "source": "Purchased"
       },
       {
-        "id": "d89ca8e5-2f36-4d18-931e-57a155729f19",
+        "id": "a1038c24-a666-4046-85a1-9aee72da8ee4",
         "entityId": "Lesser Form of the Hunting Panther",
         "source": "Purchased"
       },
       {
-        "id": "f3fe50e2-63b0-45cb-8ae1-001617e7447c",
+        "id": "3c43426c-1a68-4db1-bbce-053a20655e14",
         "entityId": "Lesser Form of the Striking Serpent",
         "source": "Purchased"
       }
@@ -583,55 +583,55 @@
     },
     "skills": [
       {
-        "id": "5dc633ba-8a7c-494f-a9ed-0f4e949eb0cf",
+        "id": "006cbccb-9cb1-4769-84ee-8f141dc22ebd",
         "entityId": "Basic Martial Weapons",
         "source": "Class:Starting"
       },
       {
-        "id": "4e31f8fa-7e90-47b7-b326-248a78a6a577",
+        "id": "e4352734-3068-4b83-8b59-859951eae3a1",
         "entityId": "Profession - Apprentice (Smith)",
         "source": "Class:Starting"
       },
       {
-        "id": "5b89cb5d-6144-4d2c-8100-823417c3f1a9",
+        "id": "06c04b4b-4a7c-4b39-bd11-c7c71c52d3b8",
         "entityId": "Forage I",
         "source": "Class:Starting"
       },
       {
-        "id": "6ae717e9-6a3d-4d32-9ce5-6d51d1035c9f",
+        "id": "c3eca2b1-f622-468c-a0b6-171e2a591a7b",
         "entityId": "Basic Faith",
         "source": "Class:Starting"
       },
       {
-        "id": "d7483943-b6d3-4f72-a7eb-97657583dc51",
+        "id": "759ffa78-97f7-407d-98f6-637c9e98b021",
         "entityId": "Peacecaster",
         "source": "Class:Starting"
       },
       {
-        "id": "e7a453d0-b0ca-4471-afea-188dff7dc95f",
+        "id": "bbbf1f89-9a63-429e-a3b1-b1aff4bbb803",
         "entityId": "Basic Medicine",
         "source": "Class:Starting"
       },
       {
-        "id": "014d8d0b-9c1e-4563-b2de-ec6b12318e47",
+        "id": "e4e2b942-cc23-4588-a0dd-14e5ba544a56",
         "entityId": "Find the Path",
         "source": "Purchased",
         "costOverride": 1
       },
       {
-        "id": "695c421e-f7e4-4cfd-8ab4-33e59c4a6eeb",
+        "id": "e703ba44-28dc-4645-9aac-4368caf71dee",
         "entityId": "Diagnose",
         "source": "Purchased",
         "costOverride": 1
       },
       {
-        "id": "d62773c0-3182-429f-a6a4-54ab97eb2a26",
+        "id": "5f3602bc-f7a7-476f-a3f7-18a21d434fc7",
         "entityId": "Combat Medic",
         "source": "Purchased",
         "costOverride": 1
       },
       {
-        "id": "e4940ce1-82da-40c5-b7be-d22f89bcdcdb",
+        "id": "4dfad669-4851-4d9d-8cd5-27a184c2f071",
         "entityId": "Spell-Scholar",
         "source": "Purchased",
         "costOverride": 4
@@ -639,7 +639,7 @@
     ],
     "perks": [
       {
-        "id": "d21fc613-0ecb-4e7b-90e2-fba87d629ceb",
+        "id": "97f254f3-e351-402f-9ee8-9ad39b6b97b7",
         "entityId": "Iron Stomach",
         "source": "Purchased",
         "costOverride": 2
@@ -648,59 +648,59 @@
     "flaws": [],
     "powers": [
       {
-        "id": "13af267a-174c-4b96-9967-d5df68972acb",
+        "id": "5f2b5327-0aef-457b-8092-822333b17f1a",
         "entityId": "Commune with Nature",
         "source": "Class:Innate"
       },
       {
-        "id": "1bc7d4b2-af17-4c4d-b099-5dbe292fbd9f",
+        "id": "e2d63ec9-0690-4975-aece-97ca02e39a33",
         "entityId": "Message of the Flowers",
         "source": "Class:Innate"
       },
       {
-        "id": "ea02f616-553e-457b-8443-bdbccb54de4b",
+        "id": "fcbe21c7-8865-4aba-a190-81741cf00083",
         "entityId": "Nature’s Understanding",
         "source": "Class:Innate"
       }
     ],
     "spells": [
       {
-        "id": "e540ab5c-9c34-4c6e-ab31-8333407850ff",
+        "id": "d3fe89d4-9d19-4d45-9da9-626fbda08dff",
         "entityId": "Cancel",
         "source": "Class:Cantrip"
       },
       {
-        "id": "2a833149-2e7e-4393-a21a-64369537e15a",
+        "id": "f7279d77-0b5d-46bc-bc86-8e58bd7274b5",
         "entityId": "Care for the Fallen",
         "source": "Class:Cantrip"
       },
       {
-        "id": "42124295-5a61-412a-9808-bc6e8452c98e",
+        "id": "ce49419a-a9e7-49da-8365-18ff0e603907",
         "entityId": "Life Tap",
         "source": "Class:Cantrip"
       },
       {
-        "id": "99935379-475a-4911-8d46-69432f6305ac",
+        "id": "93d23f98-fe14-488d-b943-b69ec97c00c7",
         "entityId": "Balm",
         "source": "Purchased"
       },
       {
-        "id": "a1a6575e-4f67-44bd-a980-ed571bf10104",
+        "id": "edc48579-2d6b-4b2b-8632-91c00d4bc602",
         "entityId": "Blessing of the Oak",
         "source": "Purchased"
       },
       {
-        "id": "cfc2b414-9df8-47c2-875c-2da63e2cbc40",
+        "id": "97a97e9f-c9ed-43b6-aab0-5e745788ee9c",
         "entityId": "Purifying Flame",
         "source": "Purchased"
       },
       {
-        "id": "07498d38-c5bf-4e9a-a8a7-a768e4fcbdf1",
+        "id": "0b68b393-cf29-4836-8a06-b0d32186ab73",
         "entityId": "Quell Beast",
         "source": "Purchased"
       },
       {
-        "id": "89d00236-2c7f-4067-b30b-5b262909b80d",
+        "id": "a3f35152-48e0-4d87-970e-977aaadcf555",
         "entityId": "Sap of Life",
         "source": "Purchased"
       }
@@ -719,68 +719,68 @@
     },
     "skills": [
       {
-        "id": "63517c5d-f85e-437b-90ba-2afe97d6072e",
+        "id": "6461bc63-2769-4a3e-8f60-0b25a7fa53f9",
         "entityId": "Basic Arcane",
         "source": "Class:Starting"
       },
       {
-        "id": "9dfe7858-df11-499b-aa98-ef0d18390267",
+        "id": "a2dd8e1e-7062-4c7a-9232-36b09ee114ad",
         "entityId": "Lore (Historical)",
         "source": "Class:Starting"
       },
       {
-        "id": "d91fd158-e809-476b-8a7b-86d4a7617fc8",
+        "id": "1bdd13c1-4a7c-4f88-945f-f442fc9fe406",
         "entityId": "Library Use",
         "source": "Class:Starting"
       },
       {
-        "id": "fbc10dd0-d3dc-4e45-9b6d-2945d0fea311",
+        "id": "b803ccf8-9943-4e05-884f-d84e49400f05",
         "entityId": "Bookcaster (Magekey)",
         "source": "Class:Starting"
       },
       {
-        "id": "875b03c8-1e40-4d0a-98d4-7e1a2b24208a",
+        "id": "7ae1e9b3-5245-42a2-9e6b-27a10e28e1da",
         "entityId": "Bookcaster (Mask Aura)",
         "source": "Class:Starting"
       },
       {
-        "id": "27a96271-e3a2-4a10-90b9-a5806910fc09",
+        "id": "172543a6-3c11-4345-b936-716f5e4a0b63",
         "entityId": "Extended Capacity - Novice (Arcane)",
         "source": "Class:Starting",
         "ranks": 2
       },
       {
-        "id": "6b05f500-a06f-4b7e-8cfc-a870db2c00b1",
+        "id": "35a674b0-da5d-4202-8326-e72dbaf03b29",
         "entityId": "Apprentice Ritual Magic",
         "source": "Purchased",
         "costOverride": 0
       },
       {
-        "id": "3c38a270-416b-43ad-a2b1-663d807f338b",
+        "id": "07605631-b978-47bf-b401-f69618ffc32a",
         "entityId": "Arcane Charge",
         "source": "Purchased",
         "costOverride": 2
       },
       {
-        "id": "ff73282d-7949-4825-acf6-61112d7b350a",
+        "id": "e9299cd4-1b80-4ad0-969e-df67ae8de6e5",
         "entityId": "Lore (Historical)",
         "source": "Purchased"
       },
       {
-        "id": "ba8e0d19-407c-4083-bb48-213e44a42bb6",
+        "id": "864ba458-f42d-4ed6-b181-4b698fd5faaf",
         "entityId": "Lore (Arcane)",
         "source": "Purchased"
       }
     ],
     "perks": [
       {
-        "id": "4c8f4412-675c-4682-a6ac-edbac0556157",
+        "id": "896a6924-1e24-4078-9725-d6216db13968",
         "entityId": "Sharp Mind",
         "source": "Purchased",
         "costOverride": 2
       },
       {
-        "id": "f02f7e70-727c-4f03-9d97-e83b0506e998",
+        "id": "8a82e36b-633e-4a1b-b76e-f374430bfb8a",
         "entityId": "Sight",
         "source": "Purchased",
         "costOverride": 3
@@ -789,64 +789,64 @@
     "flaws": [],
     "powers": [
       {
-        "id": "c290c02f-c4a6-4887-afcf-d9a3505f14de",
+        "id": "b8a19ae1-bbe3-4902-936e-baec464235ff",
         "entityId": "Arcane Study",
         "source": "Class:Innate"
       },
       {
-        "id": "054230db-b6a7-496b-beeb-c335bdfe41fa",
+        "id": "0fd68ca8-1273-4f9c-889a-ce58927046c5",
         "entityId": "Replicate Enhancement",
         "source": "Class:Innate"
       },
       {
-        "id": "1a245677-f693-44b0-b4b3-6ee156512537",
+        "id": "888605a9-8201-48e8-a6d4-da7ad40fe11a",
         "entityId": "Ritual Affinity",
         "source": "Class:Innate"
       }
     ],
     "spells": [
       {
-        "id": "cc6bd4e5-26dd-4acc-a1a0-0e12e0d201b7",
+        "id": "6275dd67-78c0-46ff-b2be-240d7e2def4a",
         "entityId": "Cancel",
         "source": "Class:Cantrip"
       },
       {
-        "id": "a6886451-4aea-4eac-8560-92815fd642ff",
+        "id": "aaa244ec-0b51-4a5f-a999-df9affad66d0",
         "entityId": "Identify",
         "source": "Class:Cantrip"
       },
       {
-        "id": "102d6881-e26a-48dd-bd69-e572731c3647",
+        "id": "628c51b2-4f43-42a3-96b5-8312e47e39cf",
         "entityId": "Stop",
         "source": "Class:Cantrip"
       },
       {
-        "id": "9cbee017-5ef8-434f-a705-68a38cb35b7f",
+        "id": "1ce837e7-99c0-4f4d-a4c1-e557a6013176",
         "entityId": "Carnate",
         "source": "Purchased"
       },
       {
-        "id": "9c633866-83e2-4c0d-981b-b27c89c92071",
+        "id": "3167244b-bb41-4f6c-a7fb-7695d9228282",
         "entityId": "Freeze",
         "source": "Purchased"
       },
       {
-        "id": "a2e2b271-d820-4b7f-9107-2665a864c548",
+        "id": "5865c724-ef4b-4b50-a6c8-083471247b5c",
         "entityId": "Mageskin",
         "source": "Purchased"
       },
       {
-        "id": "f3cc388a-dab8-459f-b043-cf307dc01f5f",
+        "id": "2304f2ee-67c4-4c7b-9783-26ad3c1bbefd",
         "entityId": "Town Portal",
         "source": "Purchased"
       },
       {
-        "id": "37c59440-87a4-4582-9e93-1bc340f117c5",
+        "id": "3058d2aa-53ae-4183-bce9-81d89358035b",
         "entityId": "Magekey",
         "source": "Purchased"
       },
       {
-        "id": "78acb9e7-a62a-4b07-85d6-a97cc4f7ad84",
+        "id": "9ee9ce43-35fe-4649-ae68-a073d100c3f7",
         "entityId": "Mask Aura",
         "source": "Purchased"
       }
@@ -865,49 +865,49 @@
     },
     "skills": [
       {
-        "id": "72d32dcf-a641-46ff-9d62-dbee2f2cd310",
+        "id": "49b709c8-d120-4cec-9a22-30ad7dcd18ab",
         "entityId": "Basic Armor",
         "source": "Class:Starting"
       },
       {
-        "id": "66b055f3-40d4-4a33-82f8-3d8e5825a3ac",
+        "id": "e250e2ef-e29d-43d3-aed3-0303f3d8daa9",
         "entityId": "Light Armor",
         "source": "Class:Starting"
       },
       {
-        "id": "3c830d42-667e-4df8-9361-49c20c591296",
+        "id": "d171fbc2-707f-4a68-ab3e-29f2c7aea0e4",
         "entityId": "Basic Martial Weapons",
         "source": "Class:Starting"
       },
       {
-        "id": "e2813e3d-fa18-4a49-8f17-9dd7d66a026e",
+        "id": "414c843f-a3d4-4372-ae38-ffb6076d68fb",
         "entityId": "Thrown Weapons",
         "source": "Class:Starting"
       },
       {
-        "id": "81c36cd1-1711-42e2-b58f-d253c5a2a7cc",
+        "id": "e82fbc7f-09e3-4977-8d59-8c2304ac3aa4",
         "entityId": "Basic Locks",
         "source": "Class:Starting"
       },
       {
-        "id": "e3e5d4da-3209-4597-9cb8-d326245c7226",
+        "id": "1f00a73e-b048-4232-a1ba-b1818df64186",
         "entityId": "Poisoner",
         "source": "Class:Starting"
       },
       {
-        "id": "c369bfbb-8c41-4948-96ca-7729921b7380",
+        "id": "b2564ee7-83bb-4344-958d-a0bfd84875a4",
         "entityId": "Weapon Specialization (Thrown Weapons)",
         "source": "Purchased",
         "costOverride": 4
       },
       {
-        "id": "9ed38478-80cd-4862-93f4-04b5badf0107",
+        "id": "002aa286-ff11-4de4-844e-bd65eed8373f",
         "entityId": "Apprentice Alchemy",
         "source": "Purchased",
         "costOverride": 2
       },
       {
-        "id": "58f9838c-21bb-46b8-bda5-51fafa7f3dbf",
+        "id": "2f0c0720-64e3-458f-a597-007f77c5efe9",
         "entityId": "Forage I",
         "source": "Purchased",
         "costOverride": 3
@@ -917,37 +917,37 @@
     "flaws": [],
     "powers": [
       {
-        "id": "64f515fd-3b4c-4d14-8a14-6297650cfd42",
+        "id": "61690226-1c4c-4f62-9987-114b41ec917d",
         "entityId": "Deflect Projectile",
         "source": "Class:Innate"
       },
       {
-        "id": "db05745b-7f77-4a77-8167-4f6f86974793",
+        "id": "859df9d1-3c1f-4100-b076-15154d03ad35",
         "entityId": "Backstab",
         "source": "Class:Innate"
       },
       {
-        "id": "942350bc-2369-418a-a3d8-1bef94648e78",
+        "id": "ea347ae5-5c8a-414f-b734-38c2159f6c48",
         "entityId": "Loot",
         "source": "Class:Innate"
       },
       {
-        "id": "a8c68297-3899-4322-b103-0e5230819502",
+        "id": "1b8fe597-b620-432c-b6c8-978095217d27",
         "entityId": "Acquired Tolerance",
         "source": "Purchased"
       },
       {
-        "id": "b6630a47-d257-4e28-a6a2-ab643c20b55d",
+        "id": "8ee99501-4915-45cc-b3bd-445f8ba49f0f",
         "entityId": "Reload",
         "source": "Purchased"
       },
       {
-        "id": "82a1e511-f9d7-4332-9583-a01458676e82",
+        "id": "fbcb8837-64a3-43bc-8082-7b4a61d17443",
         "entityId": "Concealed Dart",
         "source": "Purchased"
       },
       {
-        "id": "ab997902-93ac-474b-ab3d-f7c5deb1f4db",
+        "id": "a8bd5d7b-7afb-4dda-9428-e15585aa2a56",
         "entityId": "Rogue’s Aim",
         "source": "Purchased"
       }
@@ -967,61 +967,61 @@
     },
     "skills": [
       {
-        "id": "99310daf-0a0b-4d48-b240-03066301bfab",
+        "id": "4199309f-64fa-4727-81ae-bb3bfea31d1f",
         "entityId": "Basic Armor",
         "source": "Class:Starting"
       },
       {
-        "id": "3c30b5d7-6bcd-46c7-98cf-c32909bf779a",
+        "id": "151f4345-b821-4c4a-a73f-47eb3dbcc38a",
         "entityId": "Light Armor",
         "source": "Class:Starting"
       },
       {
-        "id": "6f0a9da5-b83a-4024-a9c3-c63ff27fe4f5",
+        "id": "4f26c918-18da-4cac-8c46-ec4a47744497",
         "entityId": "Basic Martial Weapons",
         "source": "Class:Starting"
       },
       {
-        "id": "ab50f1bd-178b-4e42-bc28-936b24bcc9da",
+        "id": "a4bd5a16-cccb-42c9-bf49-c2701d15aa5f",
         "entityId": "Thrown Weapons",
         "source": "Class:Starting"
       },
       {
-        "id": "7dfae05c-4fa1-4b47-bcb2-c8f305a3cefd",
+        "id": "d1b87425-50f6-4579-87bc-39a1014b6e96",
         "entityId": "Basic Traps",
         "source": "Class:Starting"
       },
       {
-        "id": "cc177c9c-232f-410c-84d9-f838d2d55d30",
+        "id": "7552f352-eb3f-4a24-a8c4-949b820da53e",
         "entityId": "Poisoner",
         "source": "Class:Starting"
       },
       {
-        "id": "5fa561e5-021f-43b1-acf3-184df2d94cd0",
+        "id": "95c851b3-7446-4d3a-8960-1e97482a27ae",
         "entityId": "Short Weapons",
         "source": "Purchased",
         "costOverride": 3
       },
       {
-        "id": "0e714602-296e-4b0d-8906-0c8b5a59ecbc",
+        "id": "2ea20dfb-ecf4-4606-99ba-ca532f5ae25e",
         "entityId": "Two Weapon Style",
         "source": "Purchased",
         "costOverride": 0
       },
       {
-        "id": "745dd615-3317-41fb-baf1-2d4ded1fc082",
+        "id": "60fad36e-1dc4-409e-9806-33115a6c0e0b",
         "entityId": "Weapon Specialization (Daggers)",
         "source": "Purchased",
         "costOverride": 0
       },
       {
-        "id": "c560997b-df06-4f19-bf5c-7ff687ab8002",
+        "id": "bff38e44-18eb-4d8e-93a6-80afead11128",
         "entityId": "Advanced Traps",
         "source": "Purchased",
         "costOverride": 4
       },
       {
-        "id": "cea1f6e6-a61a-4abe-9a10-bf9717ff3246",
+        "id": "90a7e8f6-058d-4499-9730-9aa4512f1ea8",
         "entityId": "Apprentice Profession",
         "source": "Purchased",
         "costOverride": 1
@@ -1029,19 +1029,19 @@
     ],
     "perks": [
       {
-        "id": "7341e609-020a-4fc7-857b-8d874410b7a1",
+        "id": "bd08ebd0-121a-4b73-ac7b-1b7974ce96eb",
         "entityId": "Deathgrip",
         "source": "Purchased",
         "costOverride": 0
       },
       {
-        "id": "6dede7e6-8db3-40f0-aaa9-d7035f98d46c",
+        "id": "4407d052-eabe-4d3e-a175-ddb568757711",
         "entityId": "Holding On",
         "source": "Purchased",
         "costOverride": 0
       },
       {
-        "id": "f377a312-c45e-418d-a139-c0e2c87b75c6",
+        "id": "3978e356-1e49-43e8-989e-bc5b8299688c",
         "entityId": "Carnal Creature",
         "source": "Purchased",
         "costOverride": 1
@@ -1050,37 +1050,37 @@
     "flaws": [],
     "powers": [
       {
-        "id": "03e27aec-1fdc-4a26-9e4e-9e0b83035ce8",
+        "id": "e00d5b32-fcc3-4198-8681-d7a876d5fad3",
         "entityId": "Deflect Projectile",
         "source": "Class:Innate"
       },
       {
-        "id": "59683879-b5f0-4f7d-ab98-503db0630f2d",
+        "id": "4fb74c81-ab7b-436f-9907-2ef953eeb6db",
         "entityId": "Backstab",
         "source": "Class:Innate"
       },
       {
-        "id": "8e8896e8-c5fc-4098-b2f0-1529286c4c41",
+        "id": "a3c9d972-3c94-4a63-bb4c-6a326cb3441d",
         "entityId": "Loot",
         "source": "Class:Innate"
       },
       {
-        "id": "c0983c13-4604-44ef-9ffc-b30383d52b23",
+        "id": "a6bfa745-aead-470f-8817-c5db37416e23",
         "entityId": "Throat Slit",
         "source": "Purchased"
       },
       {
-        "id": "d5a0b2a2-7567-442f-9273-682f0d85ff37",
+        "id": "0822059d-c4e9-4ee8-8f47-3229a936aa1b",
         "entityId": "Way of the Blade",
         "source": "Purchased"
       },
       {
-        "id": "1a8ceb80-62dd-4dc1-a347-491acde45adc",
+        "id": "0fabd962-52e5-415e-90eb-6bdeb88c99e6",
         "entityId": "Quick Nap",
         "source": "Purchased"
       },
       {
-        "id": "895d280e-f289-4dd1-b094-adf9be4515a6",
+        "id": "a8855081-d559-41e7-ac24-b9080255a80e",
         "entityId": "Unburdened Speed",
         "source": "Purchased"
       }
@@ -1100,64 +1100,64 @@
     },
     "skills": [
       {
-        "id": "7a8e4464-aaa2-4336-a54d-0b59973dea27",
+        "id": "20a336a3-39b0-4ff4-a4eb-b8e4aac12399",
         "entityId": "Basic Martial Weapons",
         "source": "Class:Starting"
       },
       {
-        "id": "3d2284cc-2538-49a5-9ae8-3c4c29c0cb62",
+        "id": "12910e2e-dc0f-4250-94bf-377dfb53d00e",
         "entityId": "Library Use",
         "source": "Class:Starting"
       },
       {
-        "id": "3316bfb3-4fe4-450d-99c8-d72fb4b5e7d2",
+        "id": "68bff943-6d8b-43b3-a434-0811c6accd43",
         "entityId": "Poisoner",
         "source": "Class:Starting"
       },
       {
-        "id": "c697e6ad-b507-4b19-8f05-c15d314a90ed",
+        "id": "fdccd36e-5bc8-4cd9-a3ee-6e95b1942b0f",
         "entityId": "Basic Armor",
         "source": "Class:Starting"
       },
       {
-        "id": "e6bc5511-328f-4e41-a04f-aa191180c260",
+        "id": "1a6e4e8f-2472-4f8c-b22b-5bbd12f54a5d",
         "entityId": "Lore (Historical)",
         "source": "Class:Starting"
       },
       {
-        "id": "d543f3fc-5df5-46e6-9681-6b5ad0aaa9ec",
+        "id": "229fcbc5-d7a0-4542-bc57-935f544c6772",
         "entityId": "Profession - Apprentice (Smith)",
         "source": "Class:Starting"
       },
       {
-        "id": "5f251953-9d43-46f0-999b-f16e895b73b0",
+        "id": "b1959423-a446-46c0-ab3c-2c007bc62af6",
         "entityId": "Profession - Journeyman (Smith)",
         "source": "Class:Starting"
       },
       {
-        "id": "3356da62-e2c3-4adb-bdf2-a0a36a7bb19a",
+        "id": "bd4d7173-c46a-49db-823d-88fe19526ed9",
         "entityId": "Fence",
         "source": "Class:Starting"
       },
       {
-        "id": "a02a76fd-dc40-4aca-9611-ccc5c9b14bb8",
+        "id": "aec4195f-1e09-447e-800d-bb8c5c50c243",
         "entityId": "Contact",
         "source": "Class:Starting"
       },
       {
-        "id": "6c624bbc-e14e-46a3-baac-34a05746e6b7",
+        "id": "d04cd2cc-851e-42dc-b8d4-c2b59ad62974",
         "entityId": "The Right Hand",
         "source": "Purchased",
         "costOverride": 1
       },
       {
-        "id": "62ebd5f6-24b7-4ab2-85b7-d25f9cfb18b6",
+        "id": "21bdca79-8a4e-4708-8f35-9494fb736449",
         "entityId": "Holding Out for a Hero",
         "source": "Purchased",
         "costOverride": 1
       },
       {
-        "id": "b04caa7c-67a0-4378-966b-5990c27a54bd",
+        "id": "71dd048f-821a-4338-95f4-4196d2cafedf",
         "entityId": "Steel Yourself",
         "source": "Purchased",
         "costOverride": 1
@@ -1165,19 +1165,19 @@
     ],
     "perks": [
       {
-        "id": "c0f6b5f1-52dc-4d38-ab12-4935a7d8be79",
+        "id": "58ae0d00-074d-4c09-9ef2-bfdfbe045c20",
         "entityId": "Contact",
         "source": "Purchased",
         "costOverride": 0
       },
       {
-        "id": "3483dc6f-1229-4495-8b49-c126a20d96f0",
+        "id": "ada1811d-93fc-4eb3-a8f5-69d0e42c37e7",
         "entityId": "Manse",
         "source": "Purchased",
         "costOverride": 3
       },
       {
-        "id": "c543cee4-3cfa-4f83-8987-36ac69f07981",
+        "id": "8230dc04-362f-4ce0-88d2-73e544860c7f",
         "entityId": "Income",
         "source": "Purchased",
         "costOverride": 3
@@ -1186,42 +1186,42 @@
     "flaws": [],
     "powers": [
       {
-        "id": "2930aa5c-04f6-4f40-b8e5-21ec8edcb843",
+        "id": "af34a84f-0085-4d88-9ed3-45e312328b7b",
         "entityId": "Practiced Manner",
         "source": "Class:Innate"
       },
       {
-        "id": "db3d395c-68ea-4e25-93aa-90269ca304a3",
+        "id": "6b6e7ecc-8624-4084-9e6a-8a9fc72df13a",
         "entityId": "Heart of the Group",
         "source": "Class:Innate"
       },
       {
-        "id": "16c538c8-2ea4-474c-821b-01bfa2e677eb",
+        "id": "d533d757-2938-4a08-9833-0ad7b1791755",
         "entityId": "Stern Willed",
         "source": "Class:Innate"
       },
       {
-        "id": "2c0f96a6-c912-437c-be0f-36f64c0365b2",
+        "id": "ae27f6c3-e952-405d-bd89-445c0ba4a71f",
         "entityId": "Sources",
         "source": "Purchased"
       },
       {
-        "id": "402ce7d9-d8fa-4140-bc58-f89f9af88d92",
+        "id": "8907e973-7513-460f-9cad-1f5f9ae2a4fd",
         "entityId": "Tax Evasion",
         "source": "Purchased"
       },
       {
-        "id": "18a5ac36-5d84-4e16-b96f-118da9ea2d66",
+        "id": "67b814c5-85fe-45c4-aa7a-5f7b540f9561",
         "entityId": "Enthrall",
         "source": "Purchased"
       },
       {
-        "id": "744f25b4-972a-49df-84e6-ee5c7f52db0a",
+        "id": "ab93c9a1-978d-46d9-a5c3-b245cb23636b",
         "entityId": "Sizing Up the Opposition",
         "source": "Purchased"
       },
       {
-        "id": "195bf22c-19da-44f2-a792-42ad919598b5",
+        "id": "d5c38468-3e0e-49a2-840e-faebff892dcb",
         "entityId": "Soothe",
         "source": "Purchased"
       }
@@ -1241,27 +1241,27 @@
     },
     "skills": [
       {
-        "id": "372ea0f4-5261-4e93-9515-9441e27a995e",
+        "id": "a7eeb0bb-4847-4537-914a-7e210fc91545",
         "entityId": "Basic Arcane",
         "source": "Class:Starting"
       },
       {
-        "id": "213016cf-667a-4217-bd7d-e9013902d0a6",
+        "id": "cc1694fd-3c6f-4eab-98c1-53bd28b64743",
         "entityId": "Advanced Recharge",
         "source": "Class:Starting"
       },
       {
-        "id": "d25382e9-2231-4d7c-8d20-6ee18a606685",
+        "id": "e5ee55c1-1360-4745-8c0d-6e0e9cc906f4",
         "entityId": "Patron (a Patron)",
         "source": "Class:Starting"
       },
       {
-        "id": "237f9f15-8f3b-4415-b8fe-ea6297f1cdf5",
+        "id": "037bbca9-10b3-4bdc-80ac-e748e0b02ac3",
         "entityId": "Gift of Hateful Retribution I",
         "source": "Class:Starting"
       },
       {
-        "id": "3a43d8ce-7882-4be3-bcf9-e419fd1da84c",
+        "id": "376f7887-aa08-42df-8f7f-fff98f4e1b40",
         "entityId": "Warcaster",
         "source": "Purchased",
         "costOverride": 5
@@ -1269,13 +1269,13 @@
     ],
     "perks": [
       {
-        "id": "9becd9a5-b202-4297-8483-9566f5fa8a02",
+        "id": "5db0c1b2-f762-49a7-9aed-406f7def22a9",
         "entityId": "Gift of Hateful Retribution II",
         "source": "Purchased",
         "costOverride": 3
       },
       {
-        "id": "dc936160-4639-4f3e-b83a-86c591e7536d",
+        "id": "2fb663d7-a23c-40da-912c-be04231c9cec",
         "entityId": "Gift of Recognition",
         "source": "Purchased",
         "costOverride": 1
@@ -1284,39 +1284,39 @@
     "flaws": [],
     "powers": [
       {
-        "id": "31e1594a-ed48-4f9e-9f94-ccc64f58d85a",
+        "id": "9987aab7-b717-4dae-b6bf-1705b31ceb29",
         "entityId": "Internal Battery",
         "source": "Class:Innate"
       },
       {
-        "id": "012ef642-0ab8-4563-ade1-e15e650b8dff",
+        "id": "7d079559-ffdb-48c2-aa89-704b20bf709c",
         "entityId": "Arcane Source",
         "source": "Class:Innate"
       },
       {
-        "id": "708ae3c8-26a2-4b46-8d6d-0c21acebeb0a",
+        "id": "31fdb1fe-28c6-4a9b-86ce-a96d9bd2ee46",
         "entityId": "Astride the Weave",
         "source": "Class:Innate"
       },
       {
-        "id": "5cb77e15-80ac-44d8-bf5d-e53697633bb9",
+        "id": "37f79a9b-1507-4365-8b84-c5f1473381f6",
         "entityId": "Enduring Source",
         "source": "Class:Innate"
       }
     ],
     "spells": [
       {
-        "id": "3d1c5b8d-76ac-4f05-a7c5-6a57e7def9df",
+        "id": "34eed97c-b127-4f55-a62f-0fdca6bf5665",
         "entityId": "Cancel",
         "source": "Class:Cantrip"
       },
       {
-        "id": "010b59a7-7b47-458c-b2f5-7792d1d9e727",
+        "id": "8d1b5c47-1ab7-4263-84f9-726e6b8a2027",
         "entityId": "Charge",
         "source": "Class:Cantrip"
       },
       {
-        "id": "179cd04f-abd6-4348-a24f-6e3f45d74eb6",
+        "id": "9a0a80a4-d824-47bc-a5e4-a6117773050e",
         "entityId": "Wild Bolt",
         "source": "Class:Cantrip"
       }
@@ -1335,60 +1335,60 @@
     },
     "skills": [
       {
-        "id": "72dd0a31-7bb0-4951-8dac-f5c5dd27effc",
+        "id": "56237e0c-95d6-4fa3-866b-6ee401d06427",
         "entityId": "Basic Martial Weapons",
         "source": "Class:Starting"
       },
       {
-        "id": "d482fce1-37e9-406c-ae18-8d4740c6da38",
+        "id": "36f4e3b9-9a9b-40f8-8f88-6c887ff083f1",
         "entityId": "Short Weapons",
         "source": "Class:Starting"
       },
       {
-        "id": "cd973380-d084-4181-a0d6-e647800ce9d1",
+        "id": "46d3a7a8-f203-4cdc-8ccc-8c1196f27a69",
         "entityId": "Basic Armor",
         "source": "Class:Starting"
       },
       {
-        "id": "ee8d847e-8fed-49cc-bdf3-ba8c3ddfb502",
+        "id": "e251aeb6-caa4-4c1f-8cdf-f64adf75a404",
         "entityId": "Apprentice Tinkering",
         "source": "Class:Starting"
       },
       {
-        "id": "b7955a68-1a91-496b-8c6e-4f967362c91b",
+        "id": "9a144c39-5087-4b32-9f11-7aa6d6ba2ccb",
         "entityId": "Prospect I",
         "source": "Class:Starting"
       },
       {
-        "id": "eb05320c-94dc-43dc-a74e-8d4337607414",
+        "id": "08f3e6cf-bfe2-4ad2-a637-21bd42312bf9",
         "entityId": "Apprentice Profession",
         "source": "Class:Starting"
       },
       {
-        "id": "47cdbb87-af8a-4d76-ae3f-da0281705fe0",
+        "id": "0b9eb93e-0c06-4f43-9824-e11439bb6048",
         "entityId": "Journeyman Profession",
         "source": "Class:Starting"
       },
       {
-        "id": "eff5d9bf-c589-4599-b432-e9c4684e349e",
+        "id": "fcef3858-1cba-403c-b03b-99e0f19e1e07",
         "entityId": "Light Armor",
         "source": "Purchased",
         "costOverride": 3
       },
       {
-        "id": "8e42ff09-fbce-44fd-ad88-8e8d9a325bc7",
+        "id": "35a9c5c2-0895-4090-b21b-33abf36886cc",
         "entityId": "Journeyman Tinkering",
         "source": "Purchased",
         "costOverride": 4
       },
       {
-        "id": "3a8b442e-3ed1-40f2-88f8-3bd70e0ebb08",
+        "id": "9929d443-ba88-4091-a698-cc17edb9a591",
         "entityId": "Chronic Hobbyist (Cooking)",
         "source": "Purchased",
         "costOverride": 2
       },
       {
-        "id": "a72a8c06-dafa-4096-bc69-098829745c8a",
+        "id": "c39a8bb8-4113-43e3-b6bb-a7eaf98992b8",
         "entityId": "Medium Armor",
         "source": "Purchased",
         "costOverride": 0
@@ -1396,7 +1396,7 @@
     ],
     "perks": [
       {
-        "id": "a308bc53-d919-435b-8598-205c9906e391",
+        "id": "5e87b74d-9620-4841-90ba-56df94b6572c",
         "entityId": "Fortunate Finder",
         "source": "Purchased",
         "costOverride": 3
@@ -1405,32 +1405,32 @@
     "flaws": [],
     "powers": [
       {
-        "id": "4bff7031-e745-4cf6-9664-7dcce4b81fb3",
+        "id": "0f420924-8a10-4706-b454-20be5524e1bf",
         "entityId": "Living Iron",
         "source": "Class:Innate"
       },
       {
-        "id": "11df8c23-0186-4283-9dec-b9bb50710653",
+        "id": "8acd2679-b06f-463c-8773-14945c8f2e0c",
         "entityId": "Forged from Steel",
         "source": "Purchased"
       },
       {
-        "id": "bcb56df8-0564-41b4-86f7-2e087541b8aa",
+        "id": "97aea763-b6c3-4cc8-b740-4f5f879e1f66",
         "entityId": "Forgesource Specialist",
         "source": "Purchased"
       },
       {
-        "id": "bef23528-ce58-4082-ba3f-5553434bc199",
+        "id": "fea791f8-bb8e-45e5-a43e-f3d23e04fd1b",
         "entityId": "Armor Upkeep Specialist",
         "source": "Purchased"
       },
       {
-        "id": "eeec8a68-f7da-4c31-a3f8-753d66f238a0",
+        "id": "ef8d2dd6-9011-4e0a-af9a-10e72841b3b9",
         "entityId": "Forcefield",
         "source": "Purchased"
       },
       {
-        "id": "852f0c6f-0be9-4162-9c47-52c39b949b03",
+        "id": "33fbcd9b-d9c7-46c4-8cfe-b336e124f2f3",
         "entityId": "Overcharge",
         "source": "Purchased"
       }
@@ -1450,60 +1450,60 @@
     },
     "skills": [
       {
-        "id": "1551aea2-7de8-45ae-bce5-c5b06b74b49f",
+        "id": "199b44e0-6584-4723-82f0-332348cfe2a9",
         "entityId": "Basic Martial Weapons",
         "source": "Class:Starting"
       },
       {
-        "id": "b7717ad5-a930-467a-b0a5-d68a776af43a",
+        "id": "60c4e02a-f90b-4d0a-a232-50f491e1ba42",
         "entityId": "Short Weapons",
         "source": "Class:Starting"
       },
       {
-        "id": "41ca3cdf-400a-4994-ac3c-1d0694a72d08",
+        "id": "2e0ace30-0d4c-4a3d-90ec-535434317b7d",
         "entityId": "Basic Armor",
         "source": "Class:Starting"
       },
       {
-        "id": "af591ae6-bcc9-4b4c-81d5-26278a2892a6",
+        "id": "b9f6287f-6a12-47ac-b871-6dffbaa95d8a",
         "entityId": "Apprentice Alchemy",
         "source": "Class:Starting"
       },
       {
-        "id": "9cad3ed8-24b4-4cd1-a18d-5ec368797877",
+        "id": "e2b975bd-aa2e-4fcd-8fcc-d8e1d1b486c2",
         "entityId": "Forage I",
         "source": "Class:Starting"
       },
       {
-        "id": "7c83f97b-ea49-4fbf-9309-66b90879efae",
+        "id": "7b54bd77-c2cb-452e-a264-67ce8b7379cf",
         "entityId": "Basic Medicine",
         "source": "Class:Starting"
       },
       {
-        "id": "6ed112f6-849f-4cae-87b7-c8043b7c87e3",
+        "id": "399811b0-9862-4c45-949d-ae26d0d1f871",
         "entityId": "Hearth",
         "source": "Class:Starting"
       },
       {
-        "id": "91b7a766-8468-45be-a34f-16b473056f3f",
+        "id": "3c2123f2-75bf-4b3f-a8e3-775f419786ff",
         "entityId": "Scavenge I",
         "source": "Purchased",
         "costOverride": 3
       },
       {
-        "id": "d365cab8-2242-4f3f-a3d0-a828ba192452",
+        "id": "59703ac1-daab-44fb-8358-8a8393c8e41b",
         "entityId": "Scavenge II",
         "source": "Purchased",
         "costOverride": 3
       },
       {
-        "id": "e1ec6cdf-3d67-4959-9b4a-128bc3a4e684",
+        "id": "b3b0beb1-90aa-403b-ad82-acab822c9601",
         "entityId": "Forage II",
         "source": "Purchased",
         "costOverride": 0
       },
       {
-        "id": "683cee3f-a23f-4734-b284-b3bdfdd590ae",
+        "id": "3a6d5545-2e9d-4abd-88e1-90757a3e1d07",
         "entityId": "Journeyman Alchemy",
         "source": "Purchased",
         "costOverride": 0
@@ -1511,7 +1511,7 @@
     ],
     "perks": [
       {
-        "id": "9ea5bb21-f8ec-4983-bce5-fbf60c72cf9b",
+        "id": "dd4c25d1-460b-4135-b83e-f772834243ee",
         "entityId": "Fortunate Finder",
         "source": "Purchased",
         "costOverride": 3
@@ -1520,32 +1520,32 @@
     "flaws": [],
     "powers": [
       {
-        "id": "bc2859c2-4754-48c7-bb5c-0ffd21214a0f",
+        "id": "964a649f-e751-4d78-b5d1-70521b2fc979",
         "entityId": "Living Iron",
         "source": "Class:Innate"
       },
       {
-        "id": "34e295ec-35b4-4b42-a44c-777150cf18ca",
+        "id": "f2f2430b-9cbf-4b60-a9ea-3b3042b9e1a3",
         "entityId": "A Spoonful of Sugar",
         "source": "Purchased"
       },
       {
-        "id": "8e642567-c3c5-41a8-a116-73892fb68f10",
+        "id": "6f3304f9-031a-4ad0-b3bf-6c3629c9ed1b",
         "entityId": "Hunter Gatherer",
         "source": "Purchased"
       },
       {
-        "id": "d611b16a-947a-48ca-897f-6f0efa5afed9",
+        "id": "eb435bfb-a333-498b-8748-919915e47f60",
         "entityId": "Apt Assistant",
         "source": "Purchased"
       },
       {
-        "id": "8b9990e0-90d7-4270-af5e-31fc65f84b0c",
+        "id": "abadf96d-44db-4901-9c6b-8e99013d2ded",
         "entityId": "Custom Brew",
         "source": "Purchased"
       },
       {
-        "id": "b630ae4a-5cd5-4056-a548-8e5a91d32a53",
+        "id": "c276f39a-0ba4-4588-ac1d-843f4f9d3658",
         "entityId": "Kick",
         "source": "Purchased"
       }
@@ -1565,48 +1565,48 @@
     },
     "skills": [
       {
-        "id": "f6bde23b-4259-4aa0-ba86-554c448928ba",
+        "id": "4d83d27b-52b9-4a13-b699-f4424a46bfd6",
         "entityId": "Basic Martial Weapons",
         "source": "Class:Starting"
       },
       {
-        "id": "61631115-a6df-4b5a-a5ac-872f00dc8577",
+        "id": "0ebc03aa-5f56-48ce-bff1-987042ca3704",
         "entityId": "Short Weapons",
         "source": "Class:Starting"
       },
       {
-        "id": "5c0fa22c-65cb-48cb-852c-47a55d868567",
+        "id": "a971be52-9f56-423c-9b76-4dfbdc2d8494",
         "entityId": "Basic Armor",
         "source": "Class:Starting"
       },
       {
-        "id": "df0adcb6-9682-471c-8e51-14508c3fafdf",
+        "id": "e1f0e2cf-fc35-4d26-b00b-df25a60bbfc4",
         "entityId": "Apprentice Enchanting",
         "source": "Class:Starting"
       },
       {
-        "id": "9b7dae52-2547-483d-8c6d-88953140668b",
+        "id": "62d14610-66b5-4fb7-99d4-a403c2c8257e",
         "entityId": "Apprentice Ritual Magic",
         "source": "Class:Starting"
       },
       {
-        "id": "1ea1e2b7-d06f-4e2c-b37a-f55d63e62d7c",
+        "id": "81c07b02-115f-4eaf-af38-8fdfc552d9f8",
         "entityId": "Lore (Rituals)",
         "source": "Class:Starting"
       },
       {
-        "id": "d3407c25-124d-4a75-8bb5-01120cd32d42",
+        "id": "bf8cdb41-497d-4587-90c6-664241623da7",
         "entityId": "Forage I",
         "source": "Class:Starting"
       },
       {
-        "id": "731fe20f-d9f9-4394-b687-9b0e0ec44d8e",
+        "id": "326a2497-362d-4478-8c7d-641f1cdb55e5",
         "entityId": "Journeyman Enchanting",
         "source": "Purchased",
         "costOverride": 4
       },
       {
-        "id": "085d97de-ddc6-40c4-a284-3fbe0855b3c3",
+        "id": "dc696cf1-c910-47fc-a528-a131b58d1fd4",
         "entityId": "Journeyman Ritual Magic",
         "source": "Purchased",
         "costOverride": 0
@@ -1614,19 +1614,19 @@
     ],
     "perks": [
       {
-        "id": "1ef9a756-2c49-4224-8b7d-3e757b5e174d",
+        "id": "a0e8fcd8-2a45-427e-a7ea-17b06bb74cdf",
         "entityId": "Soothsayer",
         "source": "Purchased",
         "costOverride": 3
       },
       {
-        "id": "a699c8b0-8729-4ff6-a40d-d688cc3535b8",
+        "id": "4c73a83c-3cd9-4b2f-ad08-7e42cbc82fea",
         "entityId": "Insight",
         "source": "Purchased",
         "costOverride": 3
       },
       {
-        "id": "53018390-f0b5-4c1a-ae65-be45730263b5",
+        "id": "c916441b-bdc5-4aa8-922a-ca3e4c451f13",
         "entityId": "Bits and Pieces",
         "source": "Purchased",
         "costOverride": 1
@@ -1635,32 +1635,32 @@
     "flaws": [],
     "powers": [
       {
-        "id": "71a4465a-88fc-42dc-a5c9-57f530de9e99",
+        "id": "6dc6c686-dfe4-4f89-b464-7ed9bae5c0ff",
         "entityId": "Living Iron",
         "source": "Class:Innate"
       },
       {
-        "id": "d60db6fe-2ee4-4059-8c9d-9ff76dc5b8d1",
+        "id": "2a4fc046-02e3-4db6-9cad-9a003d7f0ffe",
         "entityId": "Otherworldly Sight",
         "source": "Purchased"
       },
       {
-        "id": "2490fbe0-2ac0-4c36-99b5-ea66cda057f8",
+        "id": "2d9828cb-9dd0-4b03-a7eb-8c0a232ee70b",
         "entityId": "Protected Casting",
         "source": "Purchased"
       },
       {
-        "id": "a7ffc591-cf6f-4cc1-8f4c-242321657b3b",
+        "id": "282b1115-43bd-4fa7-8806-dc45949573c6",
         "entityId": "Aegis of the Unknown/Sundering of the Unknown",
         "source": "Purchased"
       },
       {
-        "id": "d8f5c340-2571-472d-84e2-1539c7a4441e",
+        "id": "86b91407-cf59-41c1-81c7-f91e776b68df",
         "entityId": "Dig Deep",
         "source": "Purchased"
       },
       {
-        "id": "6a1d29fd-2689-4b28-8156-52f4e20d49cc",
+        "id": "2cfd26bf-2378-4b1a-9700-1e46e2750f4a",
         "entityId": "Mesmerize",
         "source": "Purchased"
       }

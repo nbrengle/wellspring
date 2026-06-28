@@ -1,6 +1,6 @@
 {
   "generatedFrom": "src/data/*.json",
-  "entities": 1368,
+  "entities": 1354,
   "mentions": {
     "skills:Basic Martial Weapons": [
       "terms:Proficiency"
@@ -4066,10 +4066,11 @@
     ],
     "powers:Mesmerize": [
       "rules-concepts:Short",
-      "archetypes:Crafter Artisan",
       "terms:Short Rest",
       "terms:Long Rest",
       "classes:Artificer",
+      "classes:Artisan",
+      "classes:Crafter",
       "classes:Mystic",
       "terms:Power",
       "effects:Charm",
@@ -9847,300 +9848,6 @@
       "domains:Light",
       "domains:Order"
     ],
-    "archetypes:Defensive Sword + Shield Fighter": [
-      "skills:Basic Martial Weapons",
-      "powers:Fighting Instructor",
-      "skills:Advanced Shields",
-      "skills:Shield Expertise",
-      "powers:Deadly Remnants",
-      "skills:Basic Medicine",
-      "powers:Shake It Off I",
-      "skills:Short Weapons",
-      "skills:Basic Shields",
-      "powers:Armored Shell",
-      "skills:Medium Armor",
-      "perks:Will to Live",
-      "powers:Linked Armor",
-      "skills:Basic Armor",
-      "skills:Light Armor",
-      "perks:Holding On",
-      "powers:Parry Blow",
-      "powers:Harry"
-    ],
-    "archetypes:Great Weapon Fighter": [
-      "skills:Basic Martial Weapons",
-      "skills:Weapon Specialization",
-      "powers:Fighting Instructor",
-      "powers:Knight’s Strength",
-      "perks:Ancestral Relic",
-      "powers:Deadly Remnants",
-      "powers:Shot Placement",
-      "skills:Great Weapons",
-      "skills:Basic Shields",
-      "perks:Bloody Minded",
-      "powers:Raging Blows",
-      "skills:Basic Armor",
-      "skills:Light Armor",
-      "powers:Parry Blow",
-      "powers:Fortitude"
-    ],
-    "archetypes:Archer Fighter": [
-      "skills:Profession - Apprentice",
-      "skills:Lore",
-      "skills:Basic Martial Weapons",
-      "powers:Fighting Instructor",
-      "skills:Projectile Weapons",
-      "powers:Deadly Remnants",
-      "skills:Basic Shields",
-      "powers:Flaming Arrow",
-      "skills:Basic Armor",
-      "skills:Light Armor",
-      "powers:Parry Blow",
-      "perks:Deathgrip",
-      "powers:Snap Shot",
-      "skills:Tracking",
-      "powers:Accuracy",
-      "powers:Bowyer",
-      "powers:Reload"
-    ],
-    "archetypes:Balanced Cleric": [
-      "skills:Extended Capacity - Novice",
-      "skills:Lore",
-      "skills:Basic Martial Weapons",
-      "skills:Additional Cantrip",
-      "powers:Refreshing Prayer",
-      "powers:Devotion’s Strike",
-      "powers:Ritual Affinity",
-      "perks:Soothing Touch",
-      "powers:Blade Blessing",
-      "powers:Healing Touch",
-      "powers:Path of Panic",
-      "powers:Spirit Speak",
-      "skills:Basic Armor",
-      "skills:Basic Faith",
-      "devotions:The Mother",
-      "powers:Lifeline",
-      "powers:Revivify",
-      "powers:Rekindle",
-      "skills:Worship",
-      "powers:Cancel",
-      "powers:Smite",
-      "effects:Cure",
-      "accents:Life",
-      "powers:Cure",
-      "powers:Heretics’ Brand"
-    ],
-    "archetypes:Form Fighter Druid": [
-      "skills:Extended Capacity - Novice",
-      "skills:Profession - Apprentice",
-      "skills:Lore",
-      "powers:Lesser Form of the Striking Serpent",
-      "powers:Lesser Form of the Hunting Panther",
-      "powers:Lesser Form of the Hulking Bear",
-      "powers:Nature’s Understanding",
-      "powers:Message of the Flowers",
-      "skills:Basic Martial Weapons",
-      "powers:Red in Tooth and Claw",
-      "powers:Commune with Nature",
-      "powers:Festering Lash",
-      "powers:Favored Form",
-      "skills:Basic Faith",
-      "skills:Scavenge I",
-      "powers:Barkskin",
-      "perks:Insight",
-      "powers:Cancel",
-      "resources:Hide",
-      "powers:Hide"
-    ],
-    "archetypes:Healer Druid": [
-      "skills:Profession - Apprentice",
-      "powers:Nature’s Understanding",
-      "powers:Message of the Flowers",
-      "skills:Basic Martial Weapons",
-      "powers:Commune with Nature",
-      "powers:Care for the Fallen",
-      "powers:Blessing of the Oak",
-      "powers:Purifying Flame",
-      "skills:Basic Medicine",
-      "skills:Spell-Scholar",
-      "powers:Find the Path",
-      "skills:Combat Medic",
-      "perks:Iron Stomach",
-      "skills:Basic Faith",
-      "skills:Peacecaster",
-      "powers:Quell Beast",
-      "powers:Sap of Life",
-      "skills:Diagnose",
-      "skills:Forage I",
-      "powers:Life Tap",
-      "domains:Nature",
-      "powers:Cancel",
-      "powers:Balm"
-    ],
-    "archetypes:Utility Mage": [
-      "skills:Extended Capacity - Novice",
-      "skills:Lore",
-      "skills:Apprentice Ritual Magic",
-      "powers:Replicate Enhancement",
-      "powers:Ritual Affinity",
-      "powers:Arcane Charge",
-      "skills:Basic Arcane",
-      "powers:Arcane Study",
-      "skills:Library Use",
-      "powers:Town Portal",
-      "skills:Bookcaster",
-      "perks:Sharp Mind",
-      "powers:Mask Aura",
-      "powers:Identify",
-      "powers:Mageskin",
-      "powers:Carnate",
-      "powers:Magekey",
-      "powers:Cancel",
-      "powers:Freeze",
-      "perks:Sight",
-      "powers:Stop"
-    ],
-    "archetypes:Ranged Rogue": [
-      "skills:Basic Martial Weapons",
-      "skills:Weapon Specialization",
-      "skills:Apprentice Alchemy",
-      "powers:Deflect Projectile",
-      "powers:Acquired Tolerance",
-      "skills:Thrown Weapons",
-      "powers:Concealed Dart",
-      "skills:Basic Armor",
-      "skills:Light Armor",
-      "skills:Basic Locks",
-      "powers:Rogue’s Aim",
-      "skills:Poisoner",
-      "skills:Forage I",
-      "powers:Backstab",
-      "powers:Reload",
-      "powers:Loot"
-    ],
-    "archetypes:Skirmisher Rogue": [
-      "skills:Basic Martial Weapons",
-      "skills:Weapon Specialization",
-      "powers:Deflect Projectile",
-      "skills:Two Weapon Style",
-      "powers:Way of the Blade",
-      "powers:Unburdened Speed",
-      "perks:Carnal Creature",
-      "skills:Thrown Weapons",
-      "skills:Advanced Traps",
-      "skills:Short Weapons",
-      "skills:Basic Armor",
-      "skills:Light Armor",
-      "skills:Basic Traps",
-      "powers:Throat Slit",
-      "perks:Holding On",
-      "perks:Deathgrip",
-      "powers:Quick Nap",
-      "skills:Poisoner",
-      "powers:Backstab",
-      "powers:Loot",
-      "skills:Profession - Apprentice"
-    ],
-    "archetypes:Support Socialite": [
-      "skills:Profession - Apprentice",
-      "skills:Profession - Journeyman",
-      "skills:Lore",
-      "powers:Sizing Up the Opposition",
-      "powers:Holding Out For a Hero",
-      "skills:Basic Martial Weapons",
-      "powers:Heart of the Group",
-      "powers:Practiced Manner",
-      "powers:The Right Hand",
-      "powers:Steel Yourself",
-      "powers:Stern Willed",
-      "skills:Basic Armor",
-      "skills:Library Use",
-      "powers:Tax Evasion",
-      "skills:Poisoner",
-      "powers:Enthrall",
-      "perks:Contact",
-      "powers:Sources",
-      "perks:Income",
-      "powers:Soothe",
-      "skills:Fence",
-      "perks:Manse"
-    ],
-    "archetypes:Blaster Sourcerer": [
-      "perks:Gift of Hateful Retribution",
-      "perks:Gift of Recognition",
-      "skills:Advanced Recharge",
-      "powers:Astride the Weave",
-      "powers:Internal Battery",
-      "powers:Enduring Source",
-      "powers:Arcane Source",
-      "skills:Basic Arcane",
-      "skills:Warcaster",
-      "powers:Wild Bolt",
-      "perks:Patron",
-      "powers:Cancel",
-      "powers:Charge"
-    ],
-    "archetypes:Artificer Artisan": [
-      "skills:Chronic Hobbyist",
-      "powers:Armor Upkeep Specialist",
-      "powers:Forgesource Specialist",
-      "skills:Basic Martial Weapons",
-      "skills:Apprentice Tinkering",
-      "skills:Journeyman Tinkering",
-      "powers:Forged From Steel",
-      "perks:Fortunate Finder",
-      "skills:Short Weapons",
-      "skills:Medium Armor",
-      "skills:Basic Armor",
-      "skills:Light Armor",
-      "powers:Living Iron",
-      "skills:Prospect I",
-      "powers:Forcefield",
-      "powers:Overcharge",
-      "skills:Profession - Apprentice",
-      "skills:Profession - Journeyman"
-    ],
-    "archetypes:Crafter Artisan": [
-      "skills:Basic Martial Weapons",
-      "powers:A Spoonful of Sugar",
-      "skills:Apprentice Alchemy",
-      "skills:Journeyman Alchemy",
-      "perks:Fortunate Finder",
-      "powers:Hunter Gatherer",
-      "skills:Basic Medicine",
-      "skills:Short Weapons",
-      "powers:Apt Assistant",
-      "skills:Basic Armor",
-      "skills:Scavenge II",
-      "powers:Living Iron",
-      "powers:Custom Brew",
-      "skills:Scavenge I",
-      "skills:Forage II",
-      "skills:Forage I",
-      "perks:Hearth",
-      "powers:Kick"
-    ],
-    "archetypes:Mystic Artisan": [
-      "skills:Lore",
-      "skills:Apprentice Ritual Magic",
-      "skills:Journeyman Ritual Magic",
-      "skills:Basic Martial Weapons",
-      "skills:Apprentice Enchanting",
-      "skills:Journeyman Enchanting",
-      "powers:Otherworldly Sight",
-      "powers:Protected Casting",
-      "perks:Bits and Pieces",
-      "recipes:Enchant Weapon",
-      "skills:Short Weapons",
-      "skills:Basic Armor",
-      "powers:Living Iron",
-      "perks:Soothsayer",
-      "powers:Mesmerize",
-      "skills:Forage I",
-      "powers:Dig Deep",
-      "perks:Insight",
-      "powers:Aegis of the Unknown / Sundering of the Unknown"
-    ],
     "rules-concepts:Retraining": [
       "terms:Base Class",
       "terms:Cantrip",
@@ -10614,19 +10321,7 @@
       "classes:Fighter",
       "powers:Fighting Instructor",
       "classes:Rogue",
-      "classes:Socialite",
-      "archetypes:Defensive Sword + Shield Fighter",
-      "archetypes:Great Weapon Fighter",
-      "archetypes:Archer Fighter",
-      "archetypes:Balanced Cleric",
-      "archetypes:Form Fighter Druid",
-      "archetypes:Healer Druid",
-      "archetypes:Ranged Rogue",
-      "archetypes:Skirmisher Rogue",
-      "archetypes:Support Socialite",
-      "archetypes:Artificer Artisan",
-      "archetypes:Crafter Artisan",
-      "archetypes:Mystic Artisan"
+      "classes:Socialite"
     ],
     "skills:Short Weapons": [
       "skills:Advanced Great Weapon Style",
@@ -10644,12 +10339,7 @@
       "classes:Fighter",
       "powers:Fighting Instructor",
       "classes:Rogue",
-      "classes:Socialite",
-      "archetypes:Defensive Sword + Shield Fighter",
-      "archetypes:Skirmisher Rogue",
-      "archetypes:Artificer Artisan",
-      "archetypes:Crafter Artisan",
-      "archetypes:Mystic Artisan"
+      "classes:Socialite"
     ],
     "skills:Long Weapons": [
       "powers:Wyvern’s Tooth and Claw",
@@ -10670,8 +10360,7 @@
       "powers:Raging Blows",
       "powers:Shot Placement",
       "powers:Smite",
-      "powers:Hammer Down",
-      "archetypes:Great Weapon Fighter"
+      "powers:Hammer Down"
     ],
     "skills:Projectile Weapons": [
       "skills:Weapon Specialization",
@@ -10694,8 +10383,7 @@
       "powers:Accuracy",
       "recipes:Enchant Weapon",
       "recipes:Enchant Weapon (Greater)",
-      "recipes:Minor Bow Reinforcement",
-      "archetypes:Archer Fighter"
+      "recipes:Minor Bow Reinforcement"
     ],
     "skills:Thrown Weapons": [
       "skills:Weapon Specialization",
@@ -10721,8 +10409,6 @@
       "recipes:Craft Item",
       "recipes:Sharpening Stone",
       "recipes:Drinking Knife",
-      "archetypes:Ranged Rogue",
-      "archetypes:Skirmisher Rogue",
       "rules-concepts:Weapon Delivery"
     ],
     "skills:Basic Shields": [
@@ -10731,59 +10417,36 @@
       "classes:Cleric",
       "powers:Shield of Faith",
       "classes:Fighter",
-      "powers:Fighting Instructor",
-      "archetypes:Defensive Sword + Shield Fighter",
-      "archetypes:Great Weapon Fighter",
-      "archetypes:Archer Fighter"
+      "powers:Fighting Instructor"
     ],
     "skills:Advanced Shields": [
       "classes:Cleric",
       "classes:Fighter",
-      "powers:Fighting Instructor",
-      "archetypes:Defensive Sword + Shield Fighter"
+      "powers:Fighting Instructor"
     ],
     "skills:Great Shields": [
       "powers:Fighting Instructor"
     ],
     "skills:Shield Expertise": [
-      "recipes:Shield of Deflecting",
-      "archetypes:Defensive Sword + Shield Fighter"
+      "recipes:Shield of Deflecting"
     ],
     "skills:Basic Armor": [
       "classes:Artisan",
       "classes:Cleric",
       "classes:Fighter",
       "classes:Rogue",
-      "classes:Socialite",
-      "archetypes:Defensive Sword + Shield Fighter",
-      "archetypes:Great Weapon Fighter",
-      "archetypes:Archer Fighter",
-      "archetypes:Balanced Cleric",
-      "archetypes:Ranged Rogue",
-      "archetypes:Skirmisher Rogue",
-      "archetypes:Support Socialite",
-      "archetypes:Artificer Artisan",
-      "archetypes:Crafter Artisan",
-      "archetypes:Mystic Artisan"
+      "classes:Socialite"
     ],
     "skills:Light Armor": [
       "classes:Fighter",
       "powers:Armored Shell",
       "powers:Linked Armor",
-      "classes:Rogue",
-      "archetypes:Defensive Sword + Shield Fighter",
-      "archetypes:Great Weapon Fighter",
-      "archetypes:Archer Fighter",
-      "archetypes:Ranged Rogue",
-      "archetypes:Skirmisher Rogue",
-      "archetypes:Artificer Artisan"
+      "classes:Rogue"
     ],
     "skills:Medium Armor": [
       "powers:The Learned One",
       "powers:Linked Armor",
-      "powers:Scales of the Serpent",
-      "archetypes:Defensive Sword + Shield Fighter",
-      "archetypes:Artificer Artisan"
+      "powers:Scales of the Serpent"
     ],
     "skills:Heavy Armor": [
       "powers:Scales of the Serpent",
@@ -10799,8 +10462,7 @@
       "classes:Druid",
       "classes:Fighter",
       "powers:Fighting Instructor",
-      "powers:Way of the Blade",
-      "archetypes:Skirmisher Rogue"
+      "powers:Way of the Blade"
     ],
     "skills:Advanced Two Weapon Style": [
       "skills:Advanced Great Weapon Style"
@@ -10808,10 +10470,7 @@
     "skills:Advanced Great Weapon Style": [],
     "skills:Weapon Specialization": [
       "skills:Weapon Mastery",
-      "powers:Way of the Blade",
-      "archetypes:Great Weapon Fighter",
-      "archetypes:Ranged Rogue",
-      "archetypes:Skirmisher Rogue"
+      "powers:Way of the Blade"
     ],
     "skills:Axecraft": [],
     "skills:Hooked Head": [],
@@ -10913,18 +10572,13 @@
       "rituals:Reforge",
       "rituals:Transpose Skeleton",
       "rituals:Disjunction",
-      "archetypes:Utility Mage",
-      "archetypes:Blaster Sourcerer",
       "rules-concepts:Location Cards",
       "rules-concepts:Spheres of Magic"
     ],
     "skills:Basic Faith": [
       "perks:Mystic Armorer",
       "classes:Cleric",
-      "classes:Druid",
-      "archetypes:Balanced Cleric",
-      "archetypes:Form Fighter Druid",
-      "archetypes:Healer Druid"
+      "classes:Druid"
     ],
     "skills:Concurrent Meditation": [],
     "skills:Worship": [
@@ -10933,7 +10587,6 @@
       "devotions:Druidism",
       "devotions:The Howl at the End",
       "classes:Cleric",
-      "archetypes:Balanced Cleric",
       "rules-concepts:Character Creation"
     ],
     "skills:Divine Favor": [],
@@ -10942,10 +10595,7 @@
       "classes:Cleric",
       "classes:Druid",
       "classes:Mage",
-      "classes:Sourcerer",
-      "archetypes:Balanced Cleric",
-      "archetypes:Form Fighter Druid",
-      "archetypes:Utility Mage"
+      "classes:Sourcerer"
     ],
     "skills:Extended Capacity - Adept": [],
     "skills:Extended Capacity - Greater": [],
@@ -10954,20 +10604,15 @@
       "powers:Cantrip Scholar",
       "classes:Mage",
       "classes:Sourcerer",
-      "recipes:Enchant Talisman (Rod / Orb / Wand / Source)",
-      "archetypes:Balanced Cleric"
+      "recipes:Enchant Talisman (Rod / Orb / Wand / Source)"
     ],
     "skills:Advanced Recharge": [
-      "classes:Mage",
-      "archetypes:Blaster Sourcerer"
+      "classes:Mage"
     ],
-    "skills:Spell-Scholar": [
-      "archetypes:Healer Druid"
-    ],
+    "skills:Spell-Scholar": [],
     "skills:Bookcaster": [
       "classes:Cleric",
-      "classes:Mage",
-      "archetypes:Utility Mage"
+      "classes:Mage"
     ],
     "skills:Bookcasting Expertise": [],
     "skills:Peacecaster": [
@@ -10979,16 +10624,14 @@
       "powers:Intercession",
       "powers:Cleanse",
       "powers:Judgment",
-      "classes:Druid",
-      "archetypes:Healer Druid"
+      "classes:Druid"
     ],
     "skills:Advanced Peacecasting": [],
     "skills:Warcaster": [
       "powers:Judgment",
       "classes:Sourcerer",
       "powers:Charge",
-      "powers:Enduring Corrosion",
-      "archetypes:Blaster Sourcerer"
+      "powers:Enduring Corrosion"
     ],
     "skills:Advanced Warcasting": [],
     "skills:Spell Storing": [],
@@ -11012,20 +10655,12 @@
       "classes:Rogue",
       "classes:Socialite",
       "powers:Never Stop Learning",
-      "archetypes:Archer Fighter",
-      "archetypes:Balanced Cleric",
-      "archetypes:Form Fighter Druid",
-      "archetypes:Utility Mage",
-      "archetypes:Support Socialite",
-      "archetypes:Mystic Artisan",
       "rules-concepts:It Has Been Told…"
     ],
     "skills:Library Use": [
       "perks:Sharp Mind",
       "classes:Mage",
-      "classes:Socialite",
-      "archetypes:Utility Mage",
-      "archetypes:Support Socialite"
+      "classes:Socialite"
     ],
     "skills:Research": [
       "skills:Library Use",
@@ -11036,40 +10671,24 @@
       "classes:Artisan",
       "powers:Triage",
       "classes:Cleric",
-      "classes:Druid",
-      "archetypes:Defensive Sword + Shield Fighter",
-      "archetypes:Healer Druid",
-      "archetypes:Crafter Artisan"
+      "classes:Druid"
     ],
     "skills:Diagnose": [
       "perks:Boon Bonds",
       "powers:Triage",
-      "classes:Cleric",
-      "archetypes:Healer Druid"
+      "classes:Cleric"
     ],
     "skills:Advanced Medicine": [
       "powers:The Learned One"
     ],
-    "skills:Combat Medic": [
-      "archetypes:Healer Druid"
-    ],
-    "skills:Chronic Hobbyist": [
-      "archetypes:Artificer Artisan"
-    ],
+    "skills:Combat Medic": [],
+    "skills:Chronic Hobbyist": [],
     "skills:Profession - Apprentice": [
       "classes:Druid",
-      "classes:Rogue",
-      "archetypes:Archer Fighter",
-      "archetypes:Form Fighter Druid",
-      "archetypes:Healer Druid",
-      "archetypes:Support Socialite",
-      "archetypes:Skirmisher Rogue",
-      "archetypes:Artificer Artisan"
+      "classes:Rogue"
     ],
     "skills:Profession - Journeyman": [
-      "powers:Headliner",
-      "archetypes:Support Socialite",
-      "archetypes:Artificer Artisan"
+      "powers:Headliner"
     ],
     "skills:Profession - Master": [
       "powers:Headliner"
@@ -11077,16 +10696,14 @@
     "skills:Tracking": [
       "advantages:Chimera - Keen Senses",
       "powers:Find the Path",
-      "recipes:Vision Valiant",
-      "archetypes:Archer Fighter"
+      "recipes:Vision Valiant"
     ],
     "skills:Hustle": [],
     "skills:Basic Locks": [
       "advantages:Ogrim - Bone to Pick",
       "classes:Rogue",
       "powers:What We Do",
-      "recipes:Basic Mechanical Lock",
-      "archetypes:Ranged Rogue"
+      "recipes:Basic Mechanical Lock"
     ],
     "skills:Basic Traps": [
       "powers:The Learned One",
@@ -11095,20 +10712,17 @@
       "recipes:Base Latch Trap",
       "recipes:Base Triggered Trap",
       "recipes:Alchemical Trap Augment",
-      "archetypes:Skirmisher Rogue",
       "rules-concepts:Disarming Traps"
     ],
     "skills:Advanced Traps": [
       "recipes:Base Latch Trap",
       "recipes:Base Triggered Trap",
-      "archetypes:Skirmisher Rogue",
       "rules-concepts:Disarming Traps"
     ],
     "skills:Fence": [
       "classes:Rogue",
       "powers:Back Alley Deals",
-      "classes:Socialite",
-      "archetypes:Support Socialite"
+      "classes:Socialite"
     ],
     "skills:Poisoner": [
       "advantages:Oaksworn - Nature’s Bite",
@@ -11117,10 +10731,7 @@
       "recipes:Instant Glue",
       "recipes:Aerial Doom Powder",
       "recipes:Caustic Glob",
-      "recipes:Drinking Knife",
-      "archetypes:Ranged Rogue",
-      "archetypes:Skirmisher Rogue",
-      "archetypes:Support Socialite"
+      "recipes:Drinking Knife"
     ],
     "skills:Forage I": [
       "skills:Forage II",
@@ -11138,15 +10749,9 @@
       "powers:Curse the Despoiler",
       "recipes:Generic Forged Item",
       "recipes:High Quality Foraging Sickle",
-      "recipes:Lifepot",
-      "archetypes:Healer Druid",
-      "archetypes:Ranged Rogue",
-      "archetypes:Crafter Artisan",
-      "archetypes:Mystic Artisan"
+      "recipes:Lifepot"
     ],
-    "skills:Forage II": [
-      "archetypes:Crafter Artisan"
-    ],
+    "skills:Forage II": [],
     "skills:Forage III": [
       "advantages:Oaksworn - Natural Knowledge",
       "powers:Hunter Gatherer"
@@ -11167,21 +10772,16 @@
       "classes:Rogue",
       "powers:Scavenge Armor",
       "recipes:High Quality Skinning Knife",
-      "archetypes:Form Fighter Druid",
-      "archetypes:Crafter Artisan",
       "rules-concepts:Searching"
     ],
-    "skills:Scavenge II": [
-      "archetypes:Crafter Artisan"
-    ],
+    "skills:Scavenge II": [],
     "skills:Scavenge III": [
       "advantages:Ogrim - Battlefield Vulture",
       "powers:Tanner"
     ],
     "skills:Prospect I": [
       "classes:Artisan",
-      "powers:Good Timing",
-      "archetypes:Artificer Artisan"
+      "powers:Good Timing"
     ],
     "skills:Prospect II": [],
     "skills:Prospect III": [
@@ -11193,14 +10793,11 @@
       "skills:Poisoner",
       "classes:Artisan",
       "powers:A Spoonful of Sugar",
-      "recipes:Fortified Cask",
-      "archetypes:Ranged Rogue",
-      "archetypes:Crafter Artisan"
+      "recipes:Fortified Cask"
     ],
     "skills:Journeyman Alchemy": [
       "crafting-concepts:Corrupted Alchemy",
-      "powers:The Learned One",
-      "archetypes:Crafter Artisan"
+      "powers:The Learned One"
     ],
     "skills:Greater Alchemy": [
       "powers:Expert Craft",
@@ -11253,12 +10850,10 @@
       "recipes:Lifepot",
       "recipes:Smelt Mithril Ore",
       "rituals:Enchant Workbench",
-      "archetypes:Artificer Artisan",
       "rules-concepts:Armor Points"
     ],
     "skills:Journeyman Tinkering": [
-      "powers:The Learned One",
-      "archetypes:Artificer Artisan"
+      "powers:The Learned One"
     ],
     "skills:Greater Tinkering": [
       "powers:Expert Craft"
@@ -11266,12 +10861,10 @@
     "skills:Apprentice Enchanting": [
       "perks:Mystic Armorer",
       "classes:Artisan",
-      "powers:Custom Creation",
-      "archetypes:Mystic Artisan"
+      "powers:Custom Creation"
     ],
     "skills:Journeyman Enchanting": [
-      "powers:The Learned One",
-      "archetypes:Mystic Artisan"
+      "powers:The Learned One"
     ],
     "skills:Greater Enchanting": [
       "resources:Mote of Power",
@@ -11281,17 +10874,14 @@
       "classes:Artisan",
       "powers:Adept Ritualist",
       "powers:Ritual Affinity",
-      "powers:Practiced Sight",
-      "archetypes:Utility Mage",
-      "archetypes:Mystic Artisan"
+      "powers:Practiced Sight"
     ],
     "skills:Journeyman Ritual Magic": [
       "skills:Ritual Crafting",
       "powers:Create Compact",
       "powers:The Learned One",
       "powers:Ritual Affinity",
-      "rituals:Enchant Workbench",
-      "archetypes:Mystic Artisan"
+      "rituals:Enchant Workbench"
     ],
     "skills:Greater Ritual Magic": [
       "powers:Ritual Affinity"
@@ -11318,19 +10908,15 @@
     ],
     "perks:Master Mystic Smith": [],
     "perks:Soothing Touch": [
-      "classes:Artisan",
-      "archetypes:Balanced Cleric"
+      "classes:Artisan"
     ],
     "perks:Agility": [
       "powers:Catfall"
     ],
-    "perks:Bloody Minded": [
-      "archetypes:Great Weapon Fighter"
-    ],
+    "perks:Bloody Minded": [],
     "perks:Carnal Creature": [
       "advantages:Human - Won’t Stay Dead",
-      "powers:Execute",
-      "archetypes:Skirmisher Rogue"
+      "powers:Execute"
     ],
     "perks:Cold Dead Hands": [
       "perks:Ancestral Relic",
@@ -11339,9 +10925,7 @@
     ],
     "perks:Deathgrip": [
       "advantages:Forged - Resilient Auxiliary Systems",
-      "powers:Throat Slit",
-      "archetypes:Archer Fighter",
-      "archetypes:Skirmisher Rogue"
+      "powers:Throat Slit"
     ],
     "perks:Elemental Affinity": [
       "challenges:Aewen - Accent Incompatibility"
@@ -11352,13 +10936,9 @@
     "perks:Holding On": [
       "perks:Unkillable",
       "advantages:Human - Won’t Stay Dead",
-      "powers:Throat Slit",
-      "archetypes:Defensive Sword + Shield Fighter",
-      "archetypes:Skirmisher Rogue"
+      "powers:Throat Slit"
     ],
-    "perks:Iron Stomach": [
-      "archetypes:Healer Druid"
-    ],
+    "perks:Iron Stomach": [],
     "perks:Quick Healing": [],
     "perks:Toughness": [
       "powers:Lessons from Scars",
@@ -11366,8 +10946,7 @@
     ],
     "perks:Unkillable": [],
     "perks:Will to Live": [
-      "advantages:Human - Won’t Stay Dead",
-      "archetypes:Defensive Sword + Shield Fighter"
+      "advantages:Human - Won’t Stay Dead"
     ],
     "perks:Patron": [
       "perks:Gift of Hateful Retribution",
@@ -11386,30 +10965,24 @@
       "advantages:Lost - Close Connection",
       "classes:Sourcerer",
       "rituals:Lesser Consecrate / Lesser Desecrate",
-      "rituals:Greater Consecration / Greater Desecration",
-      "archetypes:Blaster Sourcerer"
+      "rituals:Greater Consecration / Greater Desecration"
     ],
     "perks:Gift of Hateful Retribution": [
-      "classes:Sourcerer",
-      "archetypes:Blaster Sourcerer"
+      "classes:Sourcerer"
     ],
     "perks:Gift of Healing": [],
     "perks:Gift of Rebirth": [],
-    "perks:Gift of Recognition": [
-      "archetypes:Blaster Sourcerer"
-    ],
+    "perks:Gift of Recognition": [],
     "perks:Gift of Unbreakable Flesh": [],
     "perks:Ultimate Gift": [],
     "perks:Ancestral Relic": [
       "perks:Ancestral Weapon",
-      "advantages:Human - Heirloom",
-      "archetypes:Great Weapon Fighter"
+      "advantages:Human - Heirloom"
     ],
     "perks:Ancestral Weapon": [],
     "perks:Bits and Pieces": [
       "advantages:Forged - Read the Feed",
-      "powers:Headliner",
-      "archetypes:Mystic Artisan"
+      "powers:Headliner"
     ],
     "perks:Boon Bonds": [
       "advantages:Forged - Vigilant Attendant"
@@ -11432,7 +11005,6 @@
       "classes:Socialite",
       "powers:It’s Who You Know",
       "recipes:Instant Glue",
-      "archetypes:Support Socialite",
       "rules-concepts:Valid Hits",
       "rules-concepts:What is LARP?"
     ],
@@ -11466,16 +11038,14 @@
       "perks:Title",
       "defenses:Altered",
       "defenses:No Effect",
-      "powers:Tax Evasion",
-      "archetypes:Support Socialite"
+      "powers:Tax Evasion"
     ],
     "perks:Inheritance": [
       "perks:Patron"
     ],
     "perks:Manse": [
       "perks:Title",
-      "powers:Tax Evasion",
-      "archetypes:Support Socialite"
+      "powers:Tax Evasion"
     ],
     "perks:Minor Fame": [
       "perks:Famous",
@@ -11487,24 +11057,18 @@
       "perks:Income",
       "classes:Socialite"
     ],
-    "perks:Sharp Mind": [
-      "archetypes:Utility Mage"
-    ],
+    "perks:Sharp Mind": [],
     "perks:Strong Bloodline": [
       "perks:Patron"
     ],
     "perks:Fortunate Finder": [
-      "powers:Expert Craft",
-      "archetypes:Artificer Artisan",
-      "archetypes:Crafter Artisan"
+      "powers:Expert Craft"
     ],
     "perks:Insight": [
       "perks:Sight Beyond Sight",
       "perks:Sensitive",
       "advantages:Forged - Read the Feed",
-      "powers:Implicit Truths",
-      "archetypes:Form Fighter Druid",
-      "archetypes:Mystic Artisan"
+      "powers:Implicit Truths"
     ],
     "perks:Medium": [
       "skills:Advanced Shields",
@@ -11522,8 +11086,7 @@
       "challenges:Human - Squeamish",
       "powers:Lessons from Scars",
       "powers:Plausible Deniability",
-      "rituals:Ritual Trap",
-      "archetypes:Utility Mage"
+      "rituals:Ritual Trap"
     ],
     "perks:Sight Beyond Sight": [
       "perks:Sensitive"
@@ -11533,9 +11096,7 @@
       "challenges:Underkin - Sensitive Eyes",
       "challenges:Underkin - Ruby Eyes See the Prize"
     ],
-    "perks:Soothsayer": [
-      "archetypes:Mystic Artisan"
-    ],
+    "perks:Soothsayer": [],
     "perks:Strong Spirit": [],
     "perks:Hearth": [
       "perks:Arcane Hearth",
@@ -11552,8 +11113,7 @@
       "classes:Artisan",
       "recipes:Enchant Thrown Weapon",
       "recipes:Enchant Materia",
-      "rituals:Bless Food",
-      "archetypes:Crafter Artisan"
+      "rituals:Bless Food"
     ],
     "perks:Arcane Hearth": [
       "perks:Experimental Hearth"
@@ -13810,8 +13370,7 @@
       "recipes:Enchant Cypher Quill",
       "recipes:Enchant Weapon (Greater)",
       "rituals:Bless Food",
-      "rituals:Disjunction",
-      "archetypes:Balanced Cleric"
+      "rituals:Disjunction"
     ],
     "effects:Death": [
       "perks:Will to Live",
@@ -15150,7 +14709,6 @@
       "rituals:Enchant Workbench",
       "rituals:Transmutation",
       "rituals:Beckon",
-      "archetypes:Form Fighter Druid",
       "rules-concepts:Calculating Physical Armor Points"
     ],
     "resources:Ingots": [
@@ -15752,8 +15310,7 @@
       "rituals:Enchant Workbench",
       "rituals:Reforge",
       "rituals:Transpose Skeleton",
-      "rituals:Disjunction",
-      "archetypes:Balanced Cleric"
+      "rituals:Disjunction"
     ],
     "accents:Lightning": [
       "perks:Elemental Affinity",
@@ -16811,9 +16368,7 @@
     "domains:Life": [],
     "powers:Expanded Healing": [],
     "powers:Sworn to Life": [],
-    "powers:Lifeline": [
-      "archetypes:Balanced Cleric"
-    ],
+    "powers:Lifeline": [],
     "domains:Light": [
       "perks:Insight",
       "perks:Experimental Hearth",
@@ -16936,7 +16491,6 @@
       "powers:Improved Identification",
       "powers:Battlefield Commander",
       "recipes:Steel Oil",
-      "archetypes:Healer Druid",
       "rules-concepts:Devotions & Divine Beings",
       "rules-concepts:Wealth"
     ],
@@ -17033,9 +16587,7 @@
     "powers:Severing Strikes": [],
     "powers:Death to Cowards": [],
     "powers:Violent Posturing": [],
-    "devotions:The Mother": [
-      "archetypes:Balanced Cleric"
-    ],
+    "devotions:The Mother": [],
     "devotions:The Steed": [
       "powers:Custom Creation",
       "powers:Augury"
@@ -17310,6 +16862,7 @@
       "powers:Intimidating Spines",
       "powers:Jury Rig",
       "powers:Kick",
+      "powers:Mesmerize",
       "powers:Overcharge",
       "powers:Share",
       "powers:Spiritual Anchor",
@@ -17356,6 +16909,7 @@
       "powers:The Learned One",
       "powers:Expert Craft",
       "powers:Opus",
+      "powers:Mesmerize",
       "powers:Studied Focus",
       "powers:Aesthetic Suggestion",
       "recipes:Sharpening Stone",
@@ -17382,10 +16936,7 @@
       "powers:Forged From Steel",
       "powers:Mechanical Augmentation",
       "powers:Perfect Practice",
-      "recipes:Mercurial Iron Kit",
-      "archetypes:Artificer Artisan",
-      "archetypes:Crafter Artisan",
-      "archetypes:Mystic Artisan"
+      "recipes:Mercurial Iron Kit"
     ],
     "powers:Brilliant Thinker": [],
     "powers:The Learned One": [],
@@ -17394,74 +16945,44 @@
     "powers:Technical Expertise": [],
     "powers:Expert Craft": [],
     "powers:Opus": [],
-    "powers:A Spoonful of Sugar": [
-      "archetypes:Crafter Artisan"
-    ],
+    "powers:A Spoonful of Sugar": [],
     "powers:Adept Ritualist": [],
-    "powers:Apt Assistant": [
-      "archetypes:Crafter Artisan"
-    ],
+    "powers:Apt Assistant": [],
     "powers:Custom Creation": [],
-    "powers:Forged From Steel": [
-      "archetypes:Artificer Artisan"
-    ],
-    "powers:Forgesource Specialist": [
-      "archetypes:Artificer Artisan"
-    ],
+    "powers:Forged From Steel": [],
+    "powers:Forgesource Specialist": [],
     "powers:Good Timing": [],
-    "powers:Hunter Gatherer": [
-      "archetypes:Crafter Artisan"
-    ],
+    "powers:Hunter Gatherer": [],
     "powers:Mechanical Augmentation": [
       "powers:Spark of Doom"
     ],
-    "powers:Otherworldly Sight": [
-      "archetypes:Mystic Artisan"
-    ],
+    "powers:Otherworldly Sight": [],
     "powers:Perspicacity": [],
-    "powers:Protected Casting": [
-      "archetypes:Mystic Artisan"
-    ],
+    "powers:Protected Casting": [],
     "powers:Smithy’s Blessing": [],
     "powers:Shield Bearer": [],
     "powers:Spirit Guide": [],
     "powers:Tanner": [],
     "powers:Triage": [],
     "powers:Acid Soak": [],
-    "powers:Aegis of the Unknown / Sundering of the Unknown": [
-      "archetypes:Mystic Artisan"
-    ],
+    "powers:Aegis of the Unknown / Sundering of the Unknown": [],
     "powers:Analysis": [],
     "powers:Antidote": [],
-    "powers:Armor Upkeep Specialist": [
-      "archetypes:Artificer Artisan"
-    ],
+    "powers:Armor Upkeep Specialist": [],
     "powers:Borrow Knowledge": [],
     "powers:Blood Scroll": [],
     "powers:Combat Analysis": [],
     "powers:Reconstitute Summon": [],
     "powers:Create Infusion": [],
     "powers:Critique Construction": [],
-    "powers:Custom Brew": [
-      "archetypes:Crafter Artisan"
-    ],
-    "powers:Dig Deep": [
-      "archetypes:Mystic Artisan"
-    ],
-    "powers:Forcefield": [
-      "archetypes:Artificer Artisan"
-    ],
+    "powers:Custom Brew": [],
+    "powers:Dig Deep": [],
+    "powers:Forcefield": [],
     "powers:Intimidating Spines": [],
     "powers:Jury Rig": [],
-    "powers:Kick": [
-      "archetypes:Crafter Artisan"
-    ],
-    "powers:Mesmerize": [
-      "archetypes:Mystic Artisan"
-    ],
-    "powers:Overcharge": [
-      "archetypes:Artificer Artisan"
-    ],
+    "powers:Kick": [],
+    "powers:Mesmerize": [],
+    "powers:Overcharge": [],
     "powers:Share": [
       "perks:Boon Bonds",
       "perks:Medium",
@@ -17598,8 +17119,7 @@
       "recipes:Bless Holy Symbol"
     ],
     "powers:Refreshing Prayer": [
-      "skills:Concurrent Meditation",
-      "archetypes:Balanced Cleric"
+      "skills:Concurrent Meditation"
     ],
     "powers:Healing Touch": [
       "skills:Peacecaster",
@@ -17614,46 +17134,29 @@
       "powers:Intercession",
       "powers:Cleanse",
       "powers:Flame of Faith",
-      "recipes:Bless Holy Symbol",
-      "archetypes:Balanced Cleric"
+      "recipes:Bless Holy Symbol"
     ],
-    "powers:Ritual Affinity": [
-      "archetypes:Balanced Cleric",
-      "archetypes:Utility Mage"
-    ],
+    "powers:Ritual Affinity": [],
     "powers:Shield of Faith": [],
     "powers:Holy Armor": [],
     "powers:Shepherd the Faithful": [],
-    "powers:Path of Panic": [
-      "archetypes:Balanced Cleric"
-    ],
+    "powers:Path of Panic": [],
     "powers:Mantle of Faith": [],
     "powers:Cantrip Scholar": [],
     "powers:Expand Focus": [],
     "powers:Expansive Worship": [],
     "powers:Greater Healing Touch": [],
     "powers:Divine Substitution": [],
-    "powers:Blade Blessing": [
-      "archetypes:Balanced Cleric"
-    ],
+    "powers:Blade Blessing": [],
     "powers:Cancel": [
       "skills:Spell Storing",
-      "powers:Power of Magic",
-      "archetypes:Balanced Cleric",
-      "archetypes:Form Fighter Druid",
-      "archetypes:Healer Druid",
-      "archetypes:Utility Mage",
-      "archetypes:Blaster Sourcerer"
+      "powers:Power of Magic"
     ],
     "powers:Curing Prayer": [],
     "powers:Detect Devotion": [],
-    "powers:Devotion’s Strike": [
-      "archetypes:Balanced Cleric"
-    ],
+    "powers:Devotion’s Strike": [],
     "powers:Divine Bolt": [],
-    "powers:Revivify": [
-      "archetypes:Balanced Cleric"
-    ],
+    "powers:Revivify": [],
     "powers:Sense Supernatural": [],
     "powers:Shield of Devotion": [],
     "powers:Armor of Faith": [],
@@ -17691,28 +17194,20 @@
       "rituals:Projection",
       "rules-concepts:Crafting Process"
     ],
-    "powers:Cure": [
-      "archetypes:Balanced Cleric"
-    ],
+    "powers:Cure": [],
     "powers:Disable Undead": [],
     "powers:Faith’s Lash": [],
     "powers:Fortress of Faith": [],
     "powers:Heal": [],
-    "powers:Heretics’ Brand": [
-      "archetypes:Balanced Cleric"
-    ],
+    "powers:Heretics’ Brand": [],
     "powers:Intercession": [],
     "powers:Blade Guard": [],
     "powers:Prayer of Rest": [],
     "powers:Holy Rest": [
       "powers:Prayer of Rest"
     ],
-    "powers:Rekindle": [
-      "archetypes:Balanced Cleric"
-    ],
-    "powers:Spirit Speak": [
-      "archetypes:Balanced Cleric"
-    ],
+    "powers:Rekindle": [],
+    "powers:Spirit Speak": [],
     "powers:Bless Shield": [],
     "powers:Blessing": [
       "challenges:Aewen - Arcane Glow",
@@ -17811,18 +17306,9 @@
       "powers:Weasel’s Agility",
       "recipes:Bless Holy Symbol"
     ],
-    "powers:Commune with Nature": [
-      "archetypes:Form Fighter Druid",
-      "archetypes:Healer Druid"
-    ],
-    "powers:Nature’s Understanding": [
-      "archetypes:Form Fighter Druid",
-      "archetypes:Healer Druid"
-    ],
-    "powers:Message of the Flowers": [
-      "archetypes:Form Fighter Druid",
-      "archetypes:Healer Druid"
-    ],
+    "powers:Commune with Nature": [],
+    "powers:Nature’s Understanding": [],
+    "powers:Message of the Flowers": [],
     "powers:Earth’s Vitality": [],
     "powers:Natural Cycle": [
       "devotions:Druidism"
@@ -17836,16 +17322,12 @@
       "powers:Lifethrive"
     ],
     "powers:Red in Tooth and Claw": [
-      "powers:Wyvern’s Tooth and Claw",
-      "archetypes:Form Fighter Druid"
+      "powers:Wyvern’s Tooth and Claw"
     ],
     "powers:Favored Form": [
-      "powers:Flexible Form",
-      "archetypes:Form Fighter Druid"
+      "powers:Flexible Form"
     ],
-    "powers:Find the Path": [
-      "archetypes:Healer Druid"
-    ],
+    "powers:Find the Path": [],
     "powers:Hunter": [
       "skills:Profession - Master",
       "powers:Renowned Soldier",
@@ -17856,19 +17338,13 @@
       "powers:Nature’s Form"
     ],
     "powers:Antitoxin": [],
-    "powers:Care for the Fallen": [
-      "archetypes:Healer Druid"
-    ],
+    "powers:Care for the Fallen": [],
     "powers:Enchanted Thorn": [
       "powers:Lesser Form of the Hunting Panther",
       "powers:Form of the Hunting Panther"
     ],
-    "powers:Festering Lash": [
-      "archetypes:Form Fighter Druid"
-    ],
-    "powers:Hide": [
-      "archetypes:Form Fighter Druid"
-    ],
+    "powers:Festering Lash": [],
+    "powers:Hide": [],
     "powers:Life Tap": [
       "skills:Peacecaster",
       "powers:Sworn to Life",
@@ -17878,8 +17354,7 @@
       "powers:Health of the World",
       "powers:Lifethrive",
       "powers:Nature’s Blessing",
-      "recipes:Bless Holy Symbol",
-      "archetypes:Healer Druid"
+      "recipes:Bless Holy Symbol"
     ],
     "powers:Nature’s Rebuke": [],
     "powers:Nettles and Barbs": [
@@ -17887,27 +17362,16 @@
       "powers:Form of the Striking Serpent"
     ],
     "powers:Natural Remedies": [],
-    "powers:Lesser Form of the Hulking Bear": [
-      "archetypes:Form Fighter Druid"
-    ],
-    "powers:Lesser Form of the Striking Serpent": [
-      "archetypes:Form Fighter Druid"
-    ],
-    "powers:Lesser Form of the Hunting Panther": [
-      "archetypes:Form Fighter Druid"
-    ],
+    "powers:Lesser Form of the Hulking Bear": [],
+    "powers:Lesser Form of the Striking Serpent": [],
+    "powers:Lesser Form of the Hunting Panther": [],
     "powers:Arboreal Transformation": [
       "powers:Life Tap"
     ],
-    "powers:Balm": [
-      "archetypes:Healer Druid"
-    ],
-    "powers:Barkskin": [
-      "archetypes:Form Fighter Druid"
-    ],
+    "powers:Balm": [],
+    "powers:Barkskin": [],
     "powers:Blessing of the Oak": [
-      "advantages:Oaksworn - Oak Father’s Aegis",
-      "archetypes:Healer Druid"
+      "advantages:Oaksworn - Oak Father’s Aegis"
     ],
     "powers:Bounty of the Land": [],
     "powers:Corrosive Bolt": [],
@@ -17918,15 +17382,9 @@
     ],
     "powers:Frostbite": [],
     "powers:Nature’s Embrace": [],
-    "powers:Purifying Flame": [
-      "archetypes:Healer Druid"
-    ],
-    "powers:Quell Beast": [
-      "archetypes:Healer Druid"
-    ],
-    "powers:Sap of Life": [
-      "archetypes:Healer Druid"
-    ],
+    "powers:Purifying Flame": [],
+    "powers:Quell Beast": [],
+    "powers:Sap of Life": [],
     "powers:Shape Metal": [],
     "powers:Submerge": [],
     "powers:Form of the Hulking Bear": [],
@@ -18002,50 +17460,28 @@
       "powers:Healthy",
       "powers:Flesh of the Titan"
     ],
-    "powers:Deadly Remnants": [
-      "archetypes:Defensive Sword + Shield Fighter",
-      "archetypes:Great Weapon Fighter",
-      "archetypes:Archer Fighter"
-    ],
+    "powers:Deadly Remnants": [],
     "powers:Parry Blow": [
       "powers:Mountain of Steel",
       "powers:Patchwork Defense",
-      "powers:Expert Parry",
-      "archetypes:Defensive Sword + Shield Fighter",
-      "archetypes:Great Weapon Fighter",
-      "archetypes:Archer Fighter"
+      "powers:Expert Parry"
     ],
-    "powers:Fighting Instructor": [
-      "archetypes:Defensive Sword + Shield Fighter",
-      "archetypes:Great Weapon Fighter",
-      "archetypes:Archer Fighter"
-    ],
+    "powers:Fighting Instructor": [],
     "powers:Mountain of Steel": [],
     "powers:Warrior Spirit": [],
     "powers:Armored Shell": [
-      "powers:Armored Shell II",
-      "archetypes:Defensive Sword + Shield Fighter"
+      "powers:Armored Shell II"
     ],
     "powers:Armored Shell II": [],
-    "powers:Bowyer": [
-      "archetypes:Archer Fighter"
-    ],
+    "powers:Bowyer": [],
     "powers:Execute": [],
     "powers:Fortitude": [
-      "powers:Blessing of the Oak",
-      "archetypes:Great Weapon Fighter"
+      "powers:Blessing of the Oak"
     ],
-    "powers:Knight’s Strength": [
-      "archetypes:Great Weapon Fighter"
-    ],
+    "powers:Knight’s Strength": [],
     "powers:Lessons from Scars": [],
-    "powers:Linked Armor": [
-      "archetypes:Defensive Sword + Shield Fighter"
-    ],
-    "powers:Reload": [
-      "archetypes:Archer Fighter",
-      "archetypes:Ranged Rogue"
-    ],
+    "powers:Linked Armor": [],
+    "powers:Reload": [],
     "powers:Renowned Soldier": [],
     "powers:Scales of the Serpent": [
       "defenses:Counter"
@@ -18059,22 +17495,17 @@
     "powers:Disengage": [
       "powers:Rogue’s Touch"
     ],
-    "powers:Flaming Arrow": [
-      "archetypes:Archer Fighter"
-    ],
+    "powers:Flaming Arrow": [],
     "powers:Grit": [
       "powers:Shake It Off I",
       "powers:Shake It Off II"
     ],
     "powers:Harry": [
-      "advantages:Ogrim - Call To Honor",
-      "archetypes:Defensive Sword + Shield Fighter"
+      "advantages:Ogrim - Call To Honor"
     ],
     "powers:Heroic Save": [],
     "powers:Patchwork Defense": [],
-    "powers:Raging Blows": [
-      "archetypes:Great Weapon Fighter"
-    ],
+    "powers:Raging Blows": [],
     "powers:Resolve": [
       "effects:Wounding",
       "powers:Batch Process",
@@ -18087,18 +17518,10 @@
       "rules-concepts:“Hold!”",
       "rules-concepts:Narrative Hold"
     ],
-    "powers:Shake It Off I": [
-      "archetypes:Defensive Sword + Shield Fighter"
-    ],
-    "powers:Shot Placement": [
-      "archetypes:Great Weapon Fighter"
-    ],
-    "powers:Smite": [
-      "archetypes:Balanced Cleric"
-    ],
-    "powers:Snap Shot": [
-      "archetypes:Archer Fighter"
-    ],
+    "powers:Shake It Off I": [],
+    "powers:Shot Placement": [],
+    "powers:Smite": [],
+    "powers:Snap Shot": [],
     "powers:Stifle": [],
     "powers:Twin Shot": [
       "powers:Heartseeker Shot"
@@ -18164,8 +17587,7 @@
       "rules-concepts:Calculating Physical Armor Points"
     ],
     "powers:Accuracy": [
-      "powers:Fan of Blades",
-      "archetypes:Archer Fighter"
+      "powers:Fan of Blades"
     ],
     "powers:Field Maintenance": [],
     "powers:Healthy": [
@@ -18210,13 +17632,11 @@
       "recipes:Salve of Shielding"
     ],
     "powers:Arcane Study": [
-      "skills:Concurrent Meditation",
-      "archetypes:Utility Mage"
+      "skills:Concurrent Meditation"
     ],
     "powers:Replicate Enhancement": [
       "powers:Arcane Charge",
-      "powers:Mage Mend",
-      "archetypes:Utility Mage"
+      "powers:Mage Mend"
     ],
     "powers:Arcane Barrier": [
       "recipes:Salve of Shielding"
@@ -18225,9 +17645,7 @@
     "powers:Practiced Sight": [],
     "powers:Channel the Arcane": [],
     "powers:Empowered Mage Bolt": [],
-    "powers:Arcane Charge": [
-      "archetypes:Utility Mage"
-    ],
+    "powers:Arcane Charge": [],
     "powers:Force Shield": [],
     "powers:Fumble": [],
     "powers:Ghost Hand": [],
@@ -18236,52 +17654,39 @@
       "advantages:Forged - Analysis Module",
       "powers:Gift of Solitude",
       "powers:Improved Identification",
-      "recipes:Enchant Materia",
-      "archetypes:Utility Mage"
+      "recipes:Enchant Materia"
     ],
     "powers:Mage Bolt": [
       "powers:Empowered Mage Bolt"
     ],
     "powers:See Magic": [],
     "powers:Stop": [
-      "powers:Raging Blows",
-      "archetypes:Utility Mage"
+      "powers:Raging Blows"
     ],
     "powers:Arcane Barrage": [
       "powers:Energistic Specialization"
     ],
     "powers:Bolster Shield": [],
-    "powers:Carnate": [
-      "archetypes:Utility Mage"
-    ],
+    "powers:Carnate": [],
     "powers:Cripple": [],
     "powers:Flameburst": [],
     "powers:Forcebolt": [],
     "powers:Freeze": [
       "powers:Frostbite",
-      "powers:Submerge",
-      "archetypes:Utility Mage"
+      "powers:Submerge"
     ],
     "powers:Mage Armor": [],
     "powers:Mage Mend": [],
     "powers:Mage Power": [
       "powers:Channel the Arcane"
     ],
-    "powers:Mageskin": [
-      "archetypes:Utility Mage"
-    ],
-    "powers:Mask Aura": [
-      "archetypes:Utility Mage"
-    ],
+    "powers:Mageskin": [],
+    "powers:Mask Aura": [],
     "powers:Revulsion": [],
-    "powers:Magekey": [
-      "archetypes:Utility Mage"
-    ],
+    "powers:Magekey": [],
     "powers:Ruinous Curse": [],
     "powers:Shred": [],
-    "powers:Town Portal": [
-      "archetypes:Utility Mage"
-    ],
+    "powers:Town Portal": [],
     "powers:Adept Mage Power": [],
     "powers:Arcane Bridge": [],
     "powers:Betrayal": [],
@@ -18364,20 +17769,13 @@
       "powers:Retreat",
       "recipes:Daggerpoint Cognac"
     ],
-    "powers:Deflect Projectile": [
-      "archetypes:Ranged Rogue",
-      "archetypes:Skirmisher Rogue"
-    ],
+    "powers:Deflect Projectile": [],
     "powers:Backstab": [
       "powers:Sinister Strike",
-      "recipes:Daggerpoint Cognac",
-      "archetypes:Ranged Rogue",
-      "archetypes:Skirmisher Rogue"
+      "recipes:Daggerpoint Cognac"
     ],
     "powers:Loot": [
-      "powers:Eyes of the Crow",
-      "archetypes:Ranged Rogue",
-      "archetypes:Skirmisher Rogue"
+      "powers:Eyes of the Crow"
     ],
     "powers:Dodge": [
       "powers:Combat Analysis",
@@ -18392,9 +17790,7 @@
       "powers:The Last Toast"
     ],
     "powers:Sinister Strike": [],
-    "powers:Acquired Tolerance": [
-      "archetypes:Ranged Rogue"
-    ],
+    "powers:Acquired Tolerance": [],
     "powers:Back Alley Deals": [],
     "powers:Catfall": [
       "powers:Lesser Form of the Hunting Panther",
@@ -18411,17 +17807,12 @@
       "powers:Loot"
     ],
     "powers:Throat Slit": [
-      "powers:Bloodthirst",
-      "archetypes:Skirmisher Rogue"
+      "powers:Bloodthirst"
     ],
     "powers:What We Do": [],
-    "powers:Way of the Blade": [
-      "archetypes:Skirmisher Rogue"
-    ],
+    "powers:Way of the Blade": [],
     "powers:Blunt End": [],
-    "powers:Concealed Dart": [
-      "archetypes:Ranged Rogue"
-    ],
+    "powers:Concealed Dart": [],
     "powers:Expert Deflect": [],
     "powers:Evasion": [],
     "powers:Flash Attack": [],
@@ -18429,18 +17820,12 @@
     "powers:Improvised Weapon": [],
     "powers:Keen Eye": [],
     "powers:Precision Strike": [],
-    "powers:Quick Nap": [
-      "archetypes:Skirmisher Rogue"
-    ],
+    "powers:Quick Nap": [],
     "powers:Reflexive Strike": [],
-    "powers:Rogue’s Aim": [
-      "archetypes:Ranged Rogue"
-    ],
+    "powers:Rogue’s Aim": [],
     "powers:Scarper": [],
     "powers:Scavenge Armor": [],
-    "powers:Unburdened Speed": [
-      "archetypes:Skirmisher Rogue"
-    ],
+    "powers:Unburdened Speed": [],
     "powers:Uncanny Perception": [],
     "powers:Waylay": [],
     "powers:Ambush": [
@@ -18545,15 +17930,9 @@
       "powers:This Is My Bodyguard",
       "recipes:Badge of Brilliance"
     ],
-    "powers:Practiced Manner": [
-      "archetypes:Support Socialite"
-    ],
-    "powers:Heart of the Group": [
-      "archetypes:Support Socialite"
-    ],
-    "powers:Stern Willed": [
-      "archetypes:Support Socialite"
-    ],
+    "powers:Practiced Manner": [],
+    "powers:Heart of the Group": [],
+    "powers:Stern Willed": [],
     "powers:Smuggler’s Powdercase": [],
     "powers:Of Sound Mind": [
       "powers:Create Compact"
@@ -18629,23 +18008,18 @@
       "rituals:Transpose Skeleton",
       "rituals:Health to the Company",
       "rituals:Projection",
-      "archetypes:Support Socialite",
       "rules-concepts:Blue",
       "rules-concepts:Spheres of Magic",
       "rules-concepts:Wealth"
     ],
-    "powers:Tax Evasion": [
-      "archetypes:Support Socialite"
-    ],
+    "powers:Tax Evasion": [],
     "powers:Traveling Merchant": [],
     "powers:Calming Tone": [],
     "powers:Curiosity Killed the Cat": [],
     "powers:Deducing the Apparent": [],
     "powers:Diplomatic Immunity": [],
     "powers:Don’t You Know Who I Am?": [],
-    "powers:Enthrall": [
-      "archetypes:Support Socialite"
-    ],
+    "powers:Enthrall": [],
     "powers:Inspiration": [
       "powers:Heroic Save"
     ],
@@ -18655,12 +18029,8 @@
     "powers:Pocket Sand": [],
     "powers:Poison Dart": [],
     "powers:Rotten Tomato": [],
-    "powers:Soothe": [
-      "archetypes:Support Socialite"
-    ],
-    "powers:Sizing Up the Opposition": [
-      "archetypes:Support Socialite"
-    ],
+    "powers:Soothe": [],
+    "powers:Sizing Up the Opposition": [],
     "powers:Time to Go": [],
     "powers:To Dance with Death": [],
     "powers:Battlefield Commander": [],
@@ -18694,8 +18064,7 @@
       "powers:Rousing Inspiration",
       "powers:Third Hand",
       "powers:Guard and Savior",
-      "powers:This Is My Bodyguard",
-      "archetypes:Support Socialite"
+      "powers:This Is My Bodyguard"
     ],
     "powers:Additional Bodyguard": [
       "powers:The Right Hand"
@@ -18704,18 +18073,14 @@
     "powers:Commission of Protection": [
       "recipes:Badge of Brilliance"
     ],
-    "powers:Holding Out For a Hero": [
-      "archetypes:Support Socialite"
-    ],
+    "powers:Holding Out For a Hero": [],
     "powers:Save the Day": [
       "powers:Holding Out For a Hero"
     ],
     "powers:It's Not Safe to Go Alone": [],
     "powers:Magical Empowerment": [],
     "powers:Bodyguards may be inspired and call upon their inner reserves to accomplish more than they thought possible. The Bodyguard may Refresh 1 Novice or Adept Spell Slot after a quick pep talk with the Socialite. Rise Above This": [],
-    "powers:Steel Yourself": [
-      "archetypes:Support Socialite"
-    ],
+    "powers:Steel Yourself": [],
     "powers:Training Regiment": [],
     "powers:Hidden Weapon": [],
     "powers:Concealed Weapon": [
@@ -18773,9 +18138,7 @@
       "powers:Splinter Shield",
       "recipes:Enchant Source"
     ],
-    "powers:Internal Battery": [
-      "archetypes:Blaster Sourcerer"
-    ],
+    "powers:Internal Battery": [],
     "powers:Arcane Source": [
       "powers:Astride the Weave",
       "powers:Enduring Source",
@@ -18784,15 +18147,10 @@
       "powers:Accent Substantiation",
       "powers:Wild Bolt",
       "powers:Spirit Link",
-      "recipes:Enchant Source",
-      "archetypes:Blaster Sourcerer"
+      "recipes:Enchant Source"
     ],
-    "powers:Astride the Weave": [
-      "archetypes:Blaster Sourcerer"
-    ],
-    "powers:Enduring Source": [
-      "archetypes:Blaster Sourcerer"
-    ],
+    "powers:Astride the Weave": [],
+    "powers:Enduring Source": [],
     "powers:Dissipate Curse": [],
     "powers:Power of Magic": [
       "recipes:Enchant Gathering Implement"
@@ -18811,13 +18169,10 @@
       "powers:Carnate",
       "powers:Elemental Node",
       "powers:Spell Absorption",
-      "powers:Primal Ray",
-      "archetypes:Blaster Sourcerer"
+      "powers:Primal Ray"
     ],
     "powers:Circle of Four": [],
-    "powers:Wild Bolt": [
-      "archetypes:Blaster Sourcerer"
-    ],
+    "powers:Wild Bolt": [],
     "powers:Energy Shield": [],
     "powers:The Sourcerer throws up a shield of energy to protect themself from the elements. This gives the caster one Protect from the Accent of their Arcane Source. If the Sourcerer has more than one Arcane Accent, they may have a Protect for each of those Accents. Infuriate": [],
     "powers:Mass Flux": [],
@@ -19041,9 +18396,7 @@
     "recipes:Enchant Patch Kit": [],
     "recipes:Enchant Sharpening Stone": [],
     "recipes:Enchant Source": [],
-    "recipes:Enchant Weapon": [
-      "archetypes:Mystic Artisan"
-    ],
+    "recipes:Enchant Weapon": [],
     "recipes:Scribe Novice Scroll": [
       "powers:Blood Scroll"
     ],
@@ -19212,22 +18565,6 @@
     "rituals:Greater Consecration / Greater Desecration": [],
     "rituals:Health to the Company": [],
     "rituals:Projection": [],
-    "archetypes:Defensive Sword + Shield Fighter": [],
-    "archetypes:Great Weapon Fighter": [],
-    "archetypes:Archer Fighter": [],
-    "archetypes:Balanced Cleric": [],
-    "archetypes:Form Fighter Druid": [],
-    "archetypes:Healer Druid": [],
-    "archetypes:Utility Mage": [],
-    "archetypes:Ranged Rogue": [],
-    "archetypes:Skirmisher Rogue": [],
-    "archetypes:Support Socialite": [],
-    "archetypes:Blaster Sourcerer": [],
-    "archetypes:Artificer Artisan": [],
-    "archetypes:Crafter Artisan": [
-      "powers:Mesmerize"
-    ],
-    "archetypes:Mystic Artisan": [],
     "rules-concepts:Retraining": [
       "rules-concepts:Advanced Classes",
       "rules-concepts:Rebuild Policy"
@@ -25500,462 +24837,6 @@
     ]
   },
   "archetypeRefs": {
-    "archetypes:Defensive Sword + Shield Fighter": {
-      "startingSkills": [
-        "skills:Basic Armor",
-        "skills:Light Armor",
-        "skills:Basic Martial Weapons",
-        "skills:Basic Shields",
-        "skills:Short Weapons",
-        "skills:Advanced Shields"
-      ],
-      "purchasedSkills": [
-        "skills:Medium Armor",
-        "skills:Shield Expertise",
-        "skills:Basic Medicine"
-      ],
-      "purchasedPerks": [
-        "perks:Holding On",
-        "perks:Will to Live"
-      ],
-      "innatePowers": [
-        "powers:Deadly Remnants",
-        "powers:Fighting Instructor",
-        "powers:Parry Blow"
-      ],
-      "utilityPowers": [
-        "powers:Linked Armor",
-        "powers:Armored Shell"
-      ],
-      "basicPowers": [
-        "powers:Harry",
-        "powers:Shake It Off I"
-      ]
-    },
-    "archetypes:Great Weapon Fighter": {
-      "startingSkills": [
-        "skills:Basic Armor",
-        "skills:Light Armor",
-        "skills:Basic Martial Weapons",
-        "skills:Basic Shields",
-        "skills:Great Weapons"
-      ],
-      "purchasedSkills": [
-        "skills:Weapon Specialization"
-      ],
-      "purchasedPerks": [
-        "perks:Ancestral Relic",
-        "perks:Bloody Minded"
-      ],
-      "innatePowers": [
-        "powers:Deadly Remnants",
-        "powers:Fighting Instructor",
-        "powers:Parry Blow"
-      ],
-      "utilityPowers": [
-        "powers:Fortitude",
-        "powers:Knight’s Strength"
-      ],
-      "basicPowers": [
-        "powers:Shot Placement",
-        "powers:Raging Blows"
-      ]
-    },
-    "archetypes:Archer Fighter": {
-      "startingSkills": [
-        "skills:Basic Armor",
-        "skills:Light Armor",
-        "skills:Basic Martial Weapons",
-        "skills:Basic Shields",
-        "skills:Lore",
-        "skills:Projectile Weapons"
-      ],
-      "purchasedSkills": [
-        "powers:Accuracy",
-        "skills:Tracking",
-        "skills:Profession - Apprentice"
-      ],
-      "purchasedPerks": [
-        "perks:Deathgrip"
-      ],
-      "innatePowers": [
-        "powers:Deadly Remnants",
-        "powers:Fighting Instructor",
-        "powers:Parry Blow"
-      ],
-      "utilityPowers": [
-        "powers:Bowyer",
-        "powers:Reload"
-      ],
-      "basicPowers": [
-        "powers:Flaming Arrow",
-        "powers:Snap Shot"
-      ]
-    },
-    "archetypes:Balanced Cleric": {
-      "startingSkills": [
-        "skills:Basic Faith",
-        "skills:Worship",
-        "skills:Basic Martial Weapons",
-        "skills:Basic Armor",
-        "skills:Extended Capacity - Novice",
-        "skills:Additional Cantrip"
-      ],
-      "purchasedSkills": [
-        "skills:Lore",
-        "powers:Path of Panic"
-      ],
-      "purchasedPerks": [
-        "perks:Soothing Touch"
-      ],
-      "innatePowers": [
-        "powers:Ritual Affinity",
-        "powers:Healing Touch",
-        "powers:Refreshing Prayer"
-      ],
-      "cantrips": [
-        "powers:Cancel",
-        "powers:Blade Blessing",
-        "powers:Revivify",
-        "powers:Devotion’s Strike"
-      ],
-      "noviceSpells": [
-        "powers:Cure",
-        "powers:Heretics’ Brand",
-        "powers:Rekindle",
-        "powers:Spirit Speak"
-      ],
-      "domainPowers": [
-        "powers:Lifeline"
-      ]
-    },
-    "archetypes:Form Fighter Druid": {
-      "startingSkills": [
-        "skills:Basic Martial Weapons",
-        "skills:Profession - Apprentice",
-        "skills:Basic Faith",
-        "skills:Scavenge I",
-        "skills:Extended Capacity - Novice",
-        "skills:Lore"
-      ],
-      "purchasedSkills": [
-        "powers:Favored Form",
-        "powers:Red in Tooth and Claw"
-      ],
-      "purchasedPerks": [
-        "perks:Insight"
-      ],
-      "innatePowers": [
-        "powers:Commune with Nature",
-        "powers:Message of the Flowers",
-        "powers:Nature’s Understanding"
-      ],
-      "cantrips": [
-        "powers:Cancel",
-        "powers:Hide",
-        "powers:Festering Lash"
-      ],
-      "noviceSpells": [
-        "powers:Barkskin",
-        "powers:Lesser Form of the Hulking Bear",
-        "powers:Lesser Form of the Hunting Panther",
-        "powers:Lesser Form of the Striking Serpent"
-      ]
-    },
-    "archetypes:Healer Druid": {
-      "startingSkills": [
-        "skills:Basic Martial Weapons",
-        "skills:Profession - Apprentice",
-        "skills:Forage I",
-        "skills:Basic Faith",
-        "skills:Peacecaster",
-        "skills:Basic Medicine"
-      ],
-      "purchasedSkills": [
-        "powers:Find the Path",
-        "skills:Diagnose",
-        "skills:Combat Medic",
-        "skills:Spell-Scholar"
-      ],
-      "purchasedPerks": [
-        "perks:Iron Stomach"
-      ],
-      "innatePowers": [
-        "powers:Commune with Nature",
-        "powers:Message of the Flowers",
-        "powers:Nature’s Understanding"
-      ],
-      "cantrips": [
-        "powers:Cancel",
-        "powers:Care for the Fallen",
-        "powers:Life Tap"
-      ],
-      "noviceSpells": [
-        "powers:Balm",
-        "powers:Blessing of the Oak",
-        "powers:Purifying Flame",
-        "powers:Quell Beast",
-        "powers:Sap of Life"
-      ]
-    },
-    "archetypes:Utility Mage": {
-      "startingSkills": [
-        "skills:Basic Arcane",
-        "skills:Lore",
-        "skills:Library Use",
-        "skills:Bookcaster",
-        "skills:Extended Capacity - Novice"
-      ],
-      "purchasedSkills": [
-        "skills:Apprentice Ritual Magic",
-        "powers:Arcane Charge",
-        "skills:Lore"
-      ],
-      "purchasedPerks": [
-        "perks:Sharp Mind",
-        "perks:Sight"
-      ],
-      "innatePowers": [
-        "powers:Arcane Study",
-        "powers:Replicate Enhancement",
-        "powers:Ritual Affinity"
-      ],
-      "cantrips": [
-        "powers:Cancel",
-        "powers:Identify",
-        "powers:Stop"
-      ],
-      "noviceSpells": [
-        "powers:Carnate",
-        "powers:Freeze",
-        "powers:Mageskin",
-        "powers:Town Portal"
-      ],
-      "bookSpells": [
-        "powers:Magekey",
-        "powers:Mask Aura"
-      ]
-    },
-    "archetypes:Ranged Rogue": {
-      "startingSkills": [
-        "skills:Basic Armor",
-        "skills:Light Armor",
-        "skills:Basic Martial Weapons",
-        "skills:Thrown Weapons",
-        "skills:Basic Locks",
-        "skills:Poisoner"
-      ],
-      "purchasedSkills": [
-        "skills:Weapon Specialization",
-        "skills:Apprentice Alchemy",
-        "skills:Forage I"
-      ],
-      "innatePowers": [
-        "powers:Deflect Projectile",
-        "powers:Backstab",
-        "powers:Loot"
-      ],
-      "utilityPowers": [
-        "powers:Acquired Tolerance",
-        "powers:Reload"
-      ],
-      "basicPowers": [
-        "powers:Concealed Dart",
-        "powers:Rogue’s Aim"
-      ]
-    },
-    "archetypes:Skirmisher Rogue": {
-      "startingSkills": [
-        "skills:Basic Armor",
-        "skills:Light Armor",
-        "skills:Basic Martial Weapons",
-        "skills:Thrown Weapons",
-        "skills:Basic Traps",
-        "skills:Poisoner"
-      ],
-      "purchasedSkills": [
-        "skills:Short Weapons",
-        "skills:Two Weapon Style",
-        "skills:Weapon Specialization",
-        "skills:Advanced Traps",
-        "skills:Profession - Apprentice"
-      ],
-      "purchasedPerks": [
-        "perks:Deathgrip",
-        "perks:Holding On",
-        "perks:Carnal Creature"
-      ],
-      "innatePowers": [
-        "powers:Deflect Projectile",
-        "powers:Backstab",
-        "powers:Loot"
-      ],
-      "utilityPowers": [
-        "powers:Throat Slit",
-        "powers:Way of the Blade"
-      ],
-      "basicPowers": [
-        "powers:Quick Nap",
-        "powers:Unburdened Speed"
-      ]
-    },
-    "archetypes:Support Socialite": {
-      "startingSkills": [
-        "skills:Basic Martial Weapons",
-        "skills:Library Use",
-        "skills:Poisoner",
-        "skills:Basic Armor",
-        "skills:Lore",
-        "skills:Profession - Apprentice",
-        "skills:Profession - Journeyman",
-        "skills:Fence",
-        "perks:Contact"
-      ],
-      "purchasedSkills": [
-        "powers:The Right Hand",
-        "powers:Holding Out For a Hero",
-        "powers:Steel Yourself"
-      ],
-      "purchasedPerks": [
-        "perks:Contact",
-        "perks:Manse",
-        "perks:Income"
-      ],
-      "innatePowers": [
-        "powers:Practiced Manner",
-        "powers:Heart of the Group",
-        "powers:Stern Willed"
-      ],
-      "utilityPowers": [
-        "powers:Sources",
-        "powers:Tax Evasion"
-      ],
-      "basicPowers": [
-        "powers:Enthrall",
-        "powers:Sizing Up the Opposition",
-        "powers:Soothe"
-      ]
-    },
-    "archetypes:Blaster Sourcerer": {
-      "startingSkills": [
-        "skills:Basic Arcane",
-        "skills:Advanced Recharge",
-        "perks:Patron",
-        "perks:Gift of Hateful Retribution"
-      ],
-      "purchasedSkills": [
-        "skills:Warcaster"
-      ],
-      "purchasedPerks": [
-        "perks:Gift of Hateful Retribution",
-        "perks:Gift of Recognition"
-      ],
-      "innatePowers": [
-        "powers:Internal Battery",
-        "powers:Arcane Source",
-        "powers:Astride the Weave",
-        "powers:Enduring Source"
-      ],
-      "cantrips": [
-        "powers:Cancel",
-        "powers:Charge",
-        "powers:Wild Bolt"
-      ]
-    },
-    "archetypes:Artificer Artisan": {
-      "startingSkills": [
-        "skills:Basic Martial Weapons",
-        "skills:Short Weapons",
-        "skills:Basic Armor",
-        "skills:Apprentice Tinkering",
-        "skills:Prospect I",
-        "skills:Profession - Apprentice",
-        "skills:Profession - Journeyman"
-      ],
-      "purchasedSkills": [
-        "skills:Light Armor",
-        "skills:Journeyman Tinkering",
-        "skills:Chronic Hobbyist",
-        "skills:Medium Armor"
-      ],
-      "purchasedPerks": [
-        "perks:Fortunate Finder"
-      ],
-      "innatePowers": [
-        "powers:Living Iron"
-      ],
-      "utilityPowers": [
-        "powers:Forged From Steel",
-        "powers:Forgesource Specialist"
-      ],
-      "basicPowers": [
-        "powers:Armor Upkeep Specialist",
-        "powers:Forcefield",
-        "powers:Overcharge"
-      ]
-    },
-    "archetypes:Crafter Artisan": {
-      "startingSkills": [
-        "skills:Basic Martial Weapons",
-        "skills:Short Weapons",
-        "skills:Basic Armor",
-        "skills:Apprentice Alchemy",
-        "skills:Forage I",
-        "skills:Basic Medicine",
-        "perks:Hearth"
-      ],
-      "purchasedSkills": [
-        "skills:Scavenge I",
-        "skills:Forage I",
-        "skills:Journeyman Alchemy"
-      ],
-      "purchasedPerks": [
-        "perks:Fortunate Finder"
-      ],
-      "innatePowers": [
-        "powers:Living Iron"
-      ],
-      "utilityPowers": [
-        "powers:A Spoonful of Sugar",
-        "powers:Hunter Gatherer"
-      ],
-      "basicPowers": [
-        "powers:Apt Assistant",
-        "powers:Custom Brew",
-        "powers:Kick"
-      ]
-    },
-    "archetypes:Mystic Artisan": {
-      "startingSkills": [
-        "skills:Basic Martial Weapons",
-        "skills:Short Weapons",
-        "skills:Basic Armor",
-        "skills:Apprentice Enchanting",
-        "skills:Apprentice Ritual Magic",
-        "skills:Lore",
-        "skills:Forage I"
-      ],
-      "purchasedSkills": [
-        "skills:Journeyman Enchanting",
-        "skills:Journeyman Ritual Magic"
-      ],
-      "purchasedPerks": [
-        "perks:Soothsayer",
-        "perks:Insight",
-        "perks:Bits and Pieces"
-      ],
-      "innatePowers": [
-        "powers:Living Iron"
-      ],
-      "utilityPowers": [
-        "powers:Otherworldly Sight",
-        "powers:Protected Casting"
-      ],
-      "basicPowers": [
-        "powers:Aegis of the Unknown / Sundering of the Unknown",
-        "powers:Dig Deep",
-        "powers:Mesmerize"
-      ]
-    }
+    "archetypes:undefined": {}
   }
 }
