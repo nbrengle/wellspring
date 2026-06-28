@@ -11,38 +11,47 @@ export function Stat({ label, value, title }) {
   );
 }
 
-export function StatWithSources({ label, value, title, base, baseLabel = "base", sources = [], onInspect }) {
+export function StatWithSources({ label, value, title, base, baseLabel = "base", sources = [], onInspect, sublabel, extra }) {
   const [open, setOpen] = useState(false);
   const btnRef = useRef(null);
-  const hasBreakdown = sources.length > 0;
+  // The breakdown is reachable whenever there's ANYTHING to explain — a base
+  // value (e.g. Wealth's starting 8, or a pool's level base with no boosts yet),
+  // contributing sources, or an `extra` section (a pool's interacting powers).
+  // Previously base-only stats fell back to a plain, non-interactive tile, so
+  // their explanation was unreachable.
+  const hasBreakdown = base != null || sources.length > 0 || extra != null;
   if (!hasBreakdown) return <Stat label={label} value={value} title={title} />;
   return (
     <div className={`b-stat b-stat-interactive ${open ? "is-open" : ""}`}>
       <button ref={btnRef} className="b-stat-btn" onClick={() => setOpen((o) => !o)}
               title={title} aria-expanded={open} aria-label={`${label} breakdown`}>
         <span className="b-stat-val">{value}</span>
-        <span className="b-stat-label">{label} <span className="b-stat-caret">ⓘ</span></span>
+        <span className="b-stat-label">{label}</span>
+        {sublabel && <span className="b-stat-sublabel">{sublabel}</span>}
       </button>
       {open && (
         <StatPopover anchorRef={btnRef} label={label} onClose={() => setOpen(false)}>
           <button className="b-stat-pop-x" aria-label="Close" onClick={() => setOpen(false)}>×</button>
           <h4 className="b-stat-pop-title">{label} breakdown</h4>
-          <ul className="b-stat-pop-list">
-            {base != null && (
-              <li className="b-stat-pop-row">
-                <span className="b-stat-pop-name">{baseLabel}</span>
-                <span className="b-stat-pop-n">{base}</span>
-              </li>
-            )}
-            {sources.map((s, i) => (
-              <li key={`${s.name}-${i}`} className="b-stat-pop-row">
-                {s.type && onInspect
-                  ? <button className="b-stat-pop-link" onClick={() => { onInspect(s.name, null, s.type); setOpen(false); }}>{s.name}</button>
-                  : <span className="b-stat-pop-name">{s.name}</span>}
-                <span className="b-stat-pop-n">{s.n >= 0 ? `+${s.n}` : s.n}{s.note ? <span className="b-stat-pop-note"> {s.note}</span> : null}</span>
-              </li>
-            ))}
-          </ul>
+          {(base != null || sources.length > 0) && (
+            <ul className="b-stat-pop-list">
+              {base != null && (
+                <li className="b-stat-pop-row">
+                  <span className="b-stat-pop-name">{baseLabel}</span>
+                  <span className="b-stat-pop-n">{base}</span>
+                </li>
+              )}
+              {sources.map((s, i) => (
+                <li key={`${s.name}-${i}`} className="b-stat-pop-row">
+                  {s.type && onInspect
+                    ? <button className="b-stat-pop-link" onClick={() => { onInspect(s.name, null, s.type); setOpen(false); }}>{s.name}</button>
+                    : <span className="b-stat-pop-name">{s.name}</span>}
+                  <span className="b-stat-pop-n">{s.n >= 0 ? `+${s.n}` : s.n}{s.note ? <span className="b-stat-pop-note"> {s.note}</span> : null}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+          {extra && <div className="b-stat-pop-extra">{typeof extra === "function" ? extra(() => setOpen(false)) : extra}</div>}
         </StatPopover>
       )}
     </div>

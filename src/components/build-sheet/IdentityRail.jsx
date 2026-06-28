@@ -172,6 +172,16 @@ export function IdentityRail() {
         )}
       </div>
 
+      {/* Class pools (Healing Touch, Living Iron, …) get their OWN row of tiles
+          below the core stats, styled identically and tagged "pool". */}
+      {report.pools?.length > 0 && (
+        <div className="b-stat-strip b-pool-strip">
+          {report.pools.map((pool) => (
+            <PoolTile key={pool.id} pool={pool} onInspect={onInspect} />
+          ))}
+        </div>
+      )}
+
       {report.spellSlots && Object.entries(report.spellSlots).map(([magicType, slots]) => (
         <SpellSlotStrip key={magicType} magicType={Object.keys(report.spellSlots).length > 1 ? magicType : null} slots={slots} />
       ))}
@@ -313,7 +323,7 @@ function SpellSlotStrip({ magicType, slots }) {
   ];
   return (
     <div className="b-spellslots">
-      <span className="b-spellslots-label">{magicType ? `${magicType} Spell Slots` : 'Spell Slots'} (per rest)</span>
+      <span className="b-spellslots-label">{magicType ? `${magicType} Spell Slots` : 'Spell Slots'}</span>
       <div className="b-spellslots-row">
         {tiers.map((t) => (
           <div key={t.key} className={`b-spellslot b-tier-${t.key} ${slots[t.key] ? "" : "is-zero"}`}>
@@ -323,6 +333,60 @@ function SpellSlotStrip({ magicType, slots }) {
         ))}
       </div>
     </div>
+  );
+}
+
+// A class pool (Healing Touch Pool, Living Iron Pool, …): its computed maximum
+// with a base+sources breakdown (permanent augments fold into the max), plus the
+// powers that refill / spend from it. Reads report.pools entries (read-layer shape).
+// A class pool renders as a stat tile in the strip (same look as Life/Armor) with
+// a "pool" sublabel so it reads as a pool, not a raw stat. Its ⓘ breakdown shows
+// the max composition (base + permanent boosts, like Armor's sources) AND the
+// powers that refill / spend from it — all in the popover, so the tile keeps the
+// strip's footprint instead of sprawling its own card.
+function PoolTile({ pool, onInspect }) {
+  const { max } = pool;
+  const sources = (max.sources || []).map((s) => ({ name: s.name, n: s.amount, type: "powers" }));
+  const refills = pool.refills || [];
+  const spends = pool.spends || [];
+  const title = max.total != null
+    ? `${pool.name}: ${max.total} max (${max.base} base${sources.length ? " + permanent boosts" : ""}). Resets each rest.`
+    : `${pool.name}: size depends on rules not yet derivable.`;
+
+  const powersSection = (refills.length > 0 || spends.length > 0)
+    ? (close) => (
+        <>
+          <h4 className="b-stat-pop-title b-stat-pop-subhead">Interacts with</h4>
+          <ul className="b-pool-powers">
+            {spends.map((p) => (
+              <li key={`s-${p.name}`} className="b-pool-power">
+                <span className="b-pool-power-tag is-spend">spends</span>
+                <button className="b-pool-power-link" onClick={() => { onInspect?.(p.name, null, "powers"); close(); }}>{p.name}</button>
+              </li>
+            ))}
+            {refills.map((p) => (
+              <li key={`r-${p.name}`} className="b-pool-power">
+                <span className="b-pool-power-tag is-refill">refills</span>
+                <button className="b-pool-power-link" onClick={() => { onInspect?.(p.name, null, "powers"); close(); }}>{p.name}</button>
+              </li>
+            ))}
+          </ul>
+        </>
+      )
+    : null;
+
+  return (
+    <StatWithSources
+      label={pool.name.replace(/ Pool$/, "")}
+      sublabel="pool"
+      title={title}
+      value={max.total ?? "?"}
+      base={max.base ?? undefined}
+      baseLabel={`level ${pool.classLevel} base`}
+      sources={sources}
+      extra={powersSection}
+      onInspect={onInspect}
+    />
   );
 }
 
