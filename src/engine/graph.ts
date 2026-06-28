@@ -37,6 +37,18 @@ export class CharacterGraphModel implements CharacterGraph {
     }
   }
 
+  find(predicate: (node: GraphItem) => boolean): GraphItem | undefined {
+    return this._items.find(predicate);
+  }
+
+  filter(predicate: (node: GraphItem) => boolean): GraphItem[] {
+    return this._items.filter(predicate);
+  }
+
+  some(predicate: (node: GraphItem) => boolean): boolean {
+    return this._items.some(predicate);
+  }
+
   private buildBucketedView(): BucketedView {
     const view: BucketedView = {
       classes: [], innatePowers: [], basicPowers: [], advancedPowers: [],

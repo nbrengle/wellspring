@@ -236,7 +236,7 @@ test('reconcile picks a concrete option for each archetype choice block', () => 
     for (const skill of skills) {
       ok(blockId(cls, skill), `${name}: a block grants ${skill}`);
       const expectedKey = key(skill);
-      const isGranted = Array.from(v._graph).some(node => node.field === 'skills' && key(node.name) === expectedKey);
+      const isGranted = v._graph.some(node => node.field === 'skills' && key(node.name) === expectedKey);
       ok(isGranted, `${name}: reconcile + rebuild grants ${skill}`);
     }
   }

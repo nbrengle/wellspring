@@ -32,7 +32,7 @@ test('a stored innate power is materialized once, not double-counted', () => {
   // activeInnatePowers() is the dedicated handler for innatePowers (it merges
   // class-granted + stored, deduped). The generic power-field loop must NOT also
   // iterate innatePowers, or every stored innate power lands in the graph twice.
-  const items = Array.from(resolveCharacterGraph({ classLevels: 'Socialite 4', innatePowers: ['Practiced Manner'] }))
+  const items = resolveCharacterGraph({ classLevels: 'Socialite 4', innatePowers: ['Practiced Manner'] })
     .filter((i) => /^Practiced Manner$/.test(i.name));
   eq(items.length, 1, 'Practiced Manner appears exactly once');
   eq(items[0].sourceType, 'innate', 'and via the innate handler, not the generic loop');
