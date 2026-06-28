@@ -173,6 +173,12 @@ export class CharacterGraphModel implements CharacterGraph {
         free: isFree,
         cost: isFree ? 0 : (node.authoredCost ?? node.baseCost),
         rank: node.rank,
+        // Grants/synthesized items have no storage index; -1 marks them
+        // non-removable (the UI's canRemove is `!fromClass && index >= 0`).
+        index: node.index ?? (node.sourceType === 'grant' ? -1 : node.index),
+        // Which class this came from (for multiclass clarity): the granting/owning
+        // class, else the entity's parentClass.
+        cls: node.cls ?? node.entity?.parentClass ?? null,
         effects: node.effects,
         rawString: node.rawString,
         field: node.field,
@@ -186,14 +192,15 @@ export class CharacterGraphModel implements CharacterGraph {
         continue;
       }
 
+      // Entity types are PLURAL ('skills' / 'perks' / 'powers' / 'spell'); route by them.
       const t = node.entity?.type;
       const tier = (node.entity as any)?.tier;
 
       if (node.sourceType === 'innate') {
         view.innatePowers.push(viewEntry);
-      } else if (node.sourceType === 'grant' && t === 'spell') {
+      } else if (t === 'spell') {
         view.knownSpells.push(viewEntry);
-      } else if (t === 'power') {
+      } else if (t === 'powers') {
         if (tier === 'Basic') view.basicPowers.push(viewEntry);
         else if (tier === 'Advanced') view.advancedPowers.push(viewEntry);
         else if (tier === 'Veteran') view.veteranPowers.push(viewEntry);
@@ -201,9 +208,7 @@ export class CharacterGraphModel implements CharacterGraph {
         else if (tier === 'Class' || node.field === 'classPowers') view.classPowers.push(viewEntry);
         else if (node.field === 'domainPowers') view.domainPowers.push(viewEntry);
         else view.classPowers.push(viewEntry);
-      } else if (t === 'spell') {
-        view.knownSpells.push(viewEntry);
-      } else if (t === 'perk') {
+      } else if (t === 'perks') {
         view.perks.push(viewEntry);
       } else {
         view.skills.push(viewEntry);
