@@ -48,10 +48,10 @@ export function powerPickerSpec(slot, character) {
   };
 }
 
-export function entityPickerSpec({ kind, entityType, candidates, title, taken, onChoose }) {
+export function entityPickerSpec({ kind, entityType, candidates, title, subtitle, taken, onChoose }) {
   return {
     kind, entityType, title,
-    subtitle: `${candidates.length} options`,
+    subtitle: subtitle || `${candidates.length} options`,
     candidates,
     taken, onChoose,
   };

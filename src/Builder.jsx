@@ -99,6 +99,7 @@ export default function Builder() {
       onSetRank: handlers.handleSetRank,
       onSetSpecialty: handlers.handleSetSpecialty,
       onSetChoice: handlers.handleSetChoice,
+      onOpenChoicePicker: handlers.handleOpenChoicePicker,
       onUpdateParameter: handlers.handleUpdateParameter,
       onSetLineage: handlers.handleSetLineage,
       onSetSublineage: handlers.handleSetSublineage,
@@ -140,6 +141,7 @@ export default function Builder() {
                 report={report}
                 choices={character.choices}
                 onSetChoice={handlers.handleSetChoice}
+                onOpenChoicePicker={handlers.handleOpenChoicePicker}
                 onUpdateParameter={handlers.handleUpdateParameter}
                 onInspect={handlers.handleChase}
                 onBack={history.length ? handlers.handleBack : null}
