@@ -132,7 +132,7 @@ test('spells-known picker offers novice + adept (all learnable tiers)', () => {
 
 // ─── xN ranks ─────────────────────────────────────────────────────────────────
 test('xN rank multiplies a slot-granting skill (Utility Mage Extended Capacity x2)', () => {
-  const mage = ARCHETYPES.find((a) => a.archetypeName === 'Utility Mage');
+  const mage = ARCHETYPES.find((a) => a.name === 'Utility Mage');
   try {
     const r = validate(fromArchetype(mage));
     ok(r.spellSlots.Arcane.novice >= 5, `novice bonus from x2 grants (got ${r.spellSlots.Arcane.novice})`);

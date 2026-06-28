@@ -25,15 +25,15 @@ import CLASSES_JSON from '../../src/data/classes.json' with { type: 'json' };
 
 
 // A character built straight from an archetype mirrors what loadArchetype keeps.
-const fromArchetype = (a) => ({ ...a, archetypeName: a.archetypeName });
+const fromArchetype = (a) => ({ ...a, archetypeName: a.name });
 
 // ─── archetypes: 9 BP, legal ──────────────────────────────────────────────────
 for (const a of ARCHETYPES) {
-  test(`archetype "${a.archetypeName}" is evaluated`, () => {
+  test(`archetype "${a.name}" is evaluated`, () => {
     const r = validate(fromArchetype(a));
     eq(r.level, 4, 'level');
     // Skip checking BP and validity for known mathematically broken archetypes from V1
-    if (a.archetypeName !== 'Mystic Artisan' && a.archetypeName !== 'Support Socialite') {
+    if (a.name !== 'Mystic Artisan' && a.name !== 'Support Socialite') {
       ok(r.spend.net <= 9, 'BP within budget');
       ok(r.valid, `should be legal (flags: ${JSON.stringify({ over: r.overBudget, slots: r.slotsOver, prereq: r.prereqs.issues.length, below: r.belowFloor })})`);
     }
