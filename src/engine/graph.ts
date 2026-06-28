@@ -22,6 +22,11 @@ function extractParam(rawName: string): string | null {
   return m ? m[1].trim() : null;
 }
 
+// The base name with any parameter suffix stripped ("Lore (Arcane)" → "Lore").
+function stripParam(name: string): string {
+  return name.replace(/\s*\([^)]*\)\s*$/, '').replace(/\s+-\s+.*$/, '').trim();
+}
+
 
 export class CharacterGraphModel implements CharacterGraph {
   // Derived fields are LAZY + memoized getters, not eager constructor work. This
@@ -733,8 +738,11 @@ export class CharacterGraphModel implements CharacterGraph {
       let grantSrc: any = null;
       let isDerived = false;
       const nId = node.entityId || node.id;
-      const nodeParamKey = nId && /\(|\s-\s/.test(node.rawString || '')
-        ? paramKey(`${nId.slice(0, nId.indexOf(':') + 1)}${node.rawString}`)
+      // Build the grant-matching key from the node's STRUCTURED param (parsed once
+      // at creation) instead of re-scraping rawString. Key shape matches paramKey():
+      // `${type}:${base}|${param}`. null when the node carries no param.
+      const nodeParamKey = (node.param && nId)
+        ? `${nId.slice(0, nId.indexOf(':'))}:${node.entity?.baseName || stripParam(node.name)}|${node.param.toLowerCase()}`
         : null;
       const normalizedId = nId
         ? nId.replace(/^purchasedSkills:/, 'skills:').replace(/^startingSkills(:\d+)?:/, 'skills:').replace(/^purchasedPerks:/, 'perks:')
