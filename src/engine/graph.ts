@@ -404,50 +404,60 @@ export class CharacterGraphModel implements CharacterGraph {
       });
     }
 
-    // ─── Advanced Classes limit ───
+    // Independent rule families, each a single-concern check the model composes.
+    for (const sub of [
+      this.checkAdvancedClasses(),
+      this.checkCreationOnlyPerks(),
+      this.checkMutualExclusions(),
+      this.checkPowerRequirements(),
+      this.checkRepeatableCaps(),
+      this.checkLineageConstraints(),
+    ]) {
+      issues.push(...sub.issues);
+      notes.push(...sub.notes);
+    }
+
+    return { issues, notes };
+  }
+
+  // Advanced-class legality: base level ≥ 10 to take any, ≤ 2 advanced classes, and
+  // each advanced class ≤ 5 levels.
+  private checkAdvancedClasses(): { issues: any[]; notes: any[] } {
+    const issues: any[] = [];
+    const charClasses = this.classes;
     const advancedClasses = charClasses.filter(c => !BASE_CLASSES.has(c.name));
-    const baseLevel = charClasses
-      .filter(c => BASE_CLASSES.has(c.name))
-      .reduce((sum, c) => sum + c.level, 0);
+    const baseLevel = charClasses.filter(c => BASE_CLASSES.has(c.name)).reduce((sum, c) => sum + c.level, 0);
 
     if (advancedClasses.length > 0 && baseLevel < 10) {
-      issues.push({
-        id: 'classes', item: 'Advanced Classes', field: 'classes',
-        text: `Advanced classes cannot be taken until total level 10 has been reached. (Current base level: ${baseLevel})`,
-      });
+      issues.push({ id: 'classes', item: 'Advanced Classes', field: 'classes',
+        text: `Advanced classes cannot be taken until total level 10 has been reached. (Current base level: ${baseLevel})` });
     }
-
     if (advancedClasses.length > 2) {
-      issues.push({
-        id: 'classes', item: 'Advanced Classes', field: 'classes',
-        text: `Character has ${advancedClasses.length} Advanced classes but is limited to a maximum of two.`,
-      });
+      issues.push({ id: 'classes', item: 'Advanced Classes', field: 'classes',
+        text: `Character has ${advancedClasses.length} Advanced classes but is limited to a maximum of two.` });
     }
-
-    // An advanced class itself cannot exceed 5 levels
     for (const ac of advancedClasses) {
       if (ac.level > 5) {
-        issues.push({
-          id: 'classes', item: ac.name, field: 'classes',
-          text: `Advanced class ${ac.name} cannot exceed a maximum of 5 levels.`,
-        });
+        issues.push({ id: 'classes', item: ac.name, field: 'classes',
+          text: `Advanced class ${ac.name} cannot exceed a maximum of 5 levels.` });
       }
     }
+    return { issues, notes: [] };
+  }
 
-    // ─── Character-creation-only perks ───
-    // Draconic Heritage must be taken at creation — surfaced as a manual-check note.
-    const hasDraconicHeritage = [...owned].some(id => id.startsWith('perks:Draconic Heritage'));
-    if (hasDraconicHeritage) {
-      notes.push({
-        id: 'perks:Draconic Heritage',
-        item: 'Draconic Heritage',
-        field: 'purchasedPerks',
-        kind: 'other',
-        text: 'Must be taken at Character Creation.',
-      });
+  // Perks that must be taken at character creation (Draconic Heritage) → a note.
+  private checkCreationOnlyPerks(): { issues: any[]; notes: any[] } {
+    const notes: any[] = [];
+    if ([...this._ownedIds].some(id => id.startsWith('perks:Draconic Heritage'))) {
+      notes.push({ id: 'perks:Draconic Heritage', item: 'Draconic Heritage', field: 'purchasedPerks',
+        kind: 'other', text: 'Must be taken at Character Creation.' });
     }
+    return { issues: [], notes };
+  }
 
-    // ─── Mutual exclusions (perks/flaws that "cannot be taken along with" each other) ───
+  // Mutually-exclusive perks/flaws ("cannot be taken along with" each other).
+  private checkMutualExclusions(): { issues: any[]; notes: any[] } {
+    const issues: any[] = [];
     const excludes = (REFS as any).excludes || {};
     if (Object.keys(excludes).length) {
       const ownedExcl = new Set<string>();
@@ -466,16 +476,21 @@ export class CharacterGraphModel implements CharacterGraph {
           const pairKey = [id, other].sort().join('|');
           if (reportedPairs.has(pairKey)) continue;
           reportedPairs.add(pairKey);
-          issues.push({
-            id, item: idName(id), field: id.split(':')[0],
-            excludes: other,
-            text: `cannot be taken along with ${idName(other)}`,
-          });
+          issues.push({ id, item: idName(id), field: id.split(':')[0], excludes: other,
+            text: `cannot be taken along with ${idName(other)}` });
         }
       }
     }
+    return { issues, notes: [] };
+  }
 
-    // ─── Power requirements (parser-extracted: requiredLevel + requiresEntity) ───
+  // Parser-extracted power requirements: requiredLevel (per class), requiresEntity,
+  // and a take-once duplicate guard on purchased powers.
+  private checkPowerRequirements(): { issues: any[]; notes: any[] } {
+    const issues: any[] = [];
+    const owned = this._ownedIds;
+    const charClasses = this.classes;
+    const charLevel = this.characterLevel;
     const charClassLevels = new Map(charClasses.map((c) => [c.name, c.level]));
     const powerInContext = (name: string) => {
       for (const { name: cls } of charClasses) {
@@ -505,13 +520,11 @@ export class CharacterGraphModel implements CharacterGraph {
             text: `Requires ${reqClass ? `${reqClass} ` : ''}Level ${ent.requiredLevel}` });
         }
       }
-
       for (const reqName of (ent.requiresEntity || [])) {
         const ok = owned.has(`powers:${reqName}`) || owned.has(`skills:${reqName}`)
           || owned.has(`perks:${reqName}`) || owned.has(`powers:${bareSkill(reqName)}`);
         if (!ok) {
-          issues.push({ id: `powers:${name}`, item: name, field,
-            requiresEntity: reqName, text: `Requires ${reqName}` });
+          issues.push({ id: `powers:${name}`, item: name, field, requiresEntity: reqName, text: `Requires ${reqName}` });
         }
       }
     }
@@ -525,15 +538,17 @@ export class CharacterGraphModel implements CharacterGraph {
     }
     for (const [name, count] of powerCounts) {
       if (count > 1) {
-        issues.push({
-          id: `powers:${name}`, item: name, field: 'powers',
-          duplicate: count,
-          text: `selected ${count} times — a power may only be taken once`,
-        });
+        issues.push({ id: `powers:${name}`, item: name, field: 'powers', duplicate: count,
+          text: `selected ${count} times — a power may only be taken once` });
       }
     }
+    return { issues, notes: [] };
+  }
 
-    // ─── Elemental Affinity cap ───
+  // Caps on repeatable perks where the parameter must differ (Elemental Affinity:
+  // ≤2, distinct elements) or that are mutually exclusive as a group (Bloodlines: 1).
+  private checkRepeatableCaps(): { issues: any[]; notes: any[] } {
+    const issues: any[] = [];
     const elemAffinities: string[] = [];
     for (const node of this._items) {
       if (bareSkill(cleanItemName(node.name)) === 'Elemental Affinity') {
@@ -569,10 +584,15 @@ export class CharacterGraphModel implements CharacterGraph {
         text: `has ${bloodlines.length} Bloodline Perks (${bloodlines.join(', ')}) — character may only have one`,
       });
     }
+    return { issues, notes: [] };
+  }
 
-    // ─── Lineage-specific constraints ───
+  // Lineage-challenge constraints (Hot Blooded, Anti-magic, The Fractured, …).
+  private checkLineageConstraints(): { issues: any[]; notes: any[] } {
+    const issues: any[] = [];
+    const character = this.character;
     const sublineages = (character as any).sublineages || {};
-    
+
     if (sublineages["Hot Blooded"] && (character.flaws || []).includes("Pliant")) {
       issues.push({
         id: 'flaws:Pliant', item: 'Pliant', field: 'flaws',
@@ -612,8 +632,7 @@ export class CharacterGraphModel implements CharacterGraph {
         text: `cannot be taken along with the Divinity's Scourge lineage challenge`,
       });
     }
-
-    return { issues, notes };
+    return { issues, notes: [] };
   }
 
   // ─── Wealth ───────────────────────────────────────────────────────────────
