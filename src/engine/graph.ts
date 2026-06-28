@@ -1201,8 +1201,12 @@ export function resolveCharacterGraph(charInput: any): CharacterGraphModel {
              purchasedNode.effects = purchasedNode.effects || [];
              purchasedNode.effects.push({ type: 'REFUND_GRANT', source: node.name });
           }
-          // Do not push the grant if we hit cap and already refunded all purchases?
-          // Actually, if we hit cap, and there are no purchases to refund, we just drop the grant.
+          // At cap: the grant is redundant and is dropped (not added as a node).
+          // This is correct for cost — a grant's baseCost is 0, so "free BP equal to
+          // its cost" is 0; there's no BP to recover. If a PURCHASE shared the key it
+          // was refunded above (grant wins, purchase becomes free). With no purchase
+          // (e.g. two classes granting the same skill) the duplicate simply collapses
+          // to the single kept node.
           continue;
         }
 
