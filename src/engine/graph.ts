@@ -13,28 +13,34 @@ const idName = (id: string) => id.split(':')[1] || id;
 
 
 export class CharacterGraphModel implements CharacterGraph {
-  public readonly uiBuckets: BucketedView;
-  public readonly stats: any;
-  public readonly prereqs: { issues: any[]; notes: any[] };
-  public readonly wealth: { base: number; income: number; total: number; sources: any[] };
-  public readonly spend: any;
-  private _ownedIds: Set<string>;
-  private _grantedAbilitiesList: any[];
+  // Derived fields are LAZY + memoized getters, not eager constructor work. This
+  // (a) encodes the dependency DAG in the data flow — e.g. `prereqs` reads
+  // `ownedIds` reads `grantedAbilitiesList` — so it can't be broken by reordering,
+  // (b) forces each compute* to be a pure function of already-resolved fields
+  // (a getter computing from other getters can't depend on hidden mutation), which
+  // keeps every one liftable into its own module as it hotspots, and (c) avoids
+  // computing fields a given caller never reads. The cache makes each compute run
+  // at most once per instance.
+  private _memo = new Map<string, any>();
+  private memo<T>(key: string, compute: () => T): T {
+    if (!this._memo.has(key)) this._memo.set(key, compute());
+    return this._memo.get(key);
+  }
 
   constructor(
     public character: CharacterStateV2,
     private _items: GraphItem[],
     public characterLevel: number,
     public classes: { name: string; level: number }[]
-  ) {
-    this.uiBuckets = this.buildBucketedView();
-    this.stats = this.computeStats();
-    this._grantedAbilitiesList = this.computeGrantedAbilitiesList();
-    this._ownedIds = this.computeOwnedIds();
-    this.prereqs = this.computePrereqs();
-    this.wealth = this.computeWealth();
-    this.spend = this.computeSpend();
-  }
+  ) {}
+
+  get uiBuckets(): BucketedView { return this.memo('uiBuckets', () => this.buildBucketedView()); }
+  get stats(): any { return this.memo('stats', () => this.computeStats()); }
+  private get _grantedAbilitiesList(): any[] { return this.memo('granted', () => this.computeGrantedAbilitiesList()); }
+  private get _ownedIds(): Set<string> { return this.memo('ownedIds', () => this.computeOwnedIds()); }
+  get prereqs(): { issues: any[]; notes: any[] } { return this.memo('prereqs', () => this.computePrereqs()); }
+  get wealth(): { base: number; income: number; total: number; sources: any[] } { return this.memo('wealth', () => this.computeWealth()); }
+  get spend(): any { return this.memo('spend', () => this.computeSpend()); }
 
   get activePowers(): Set<string> {
     const s = new Set<string>();
