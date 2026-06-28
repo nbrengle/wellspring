@@ -12,7 +12,7 @@ const failures = [];
 
 export function test(name, fn) {
   try { fn(); passed++; }
-  catch (e) { failures.push(`${name}: ${e.message}`); }
+  catch (e) { failures.push(`${name}: ${e.message}\n${e.stack}`); }
 }
 
 export function eq(actual, expected, msg = '') {

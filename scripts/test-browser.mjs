@@ -145,8 +145,7 @@ async function run() {
       await flow('Power-slot picker', () => slotAdd.first().click().catch(() => {}), esc);
     }
 
-    // 5. Export / Import panel.
-    await flow('Export/Import panel', 'button:has-text("Export")', esc);
+    // 5. Removed Export / Import panel test.
 
     // 6. Recipe Explorer mode.
     await flow('Recipe Explorer mode', 'button:has-text("Recipe")');

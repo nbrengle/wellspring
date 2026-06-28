@@ -41,7 +41,7 @@ test('a stored innate power is materialized once, not double-counted', () => {
 // ─── cross-class / pick-a-class grants ────────────────────────────────────────
 test('Extensive Training routes its bonus slot to the CHOSEN class, attributed', () => {
   const c = { archetypeName: 'x', classes: [{ name: 'Fighter', level: 3 }, { name: 'Rogue', level: 3 }],
-    purchasedSkills: ['Extensive Training (Rogue)'], ranks: { purchasedSkills: [1] } };
+    skills: [{ entityId: 'Extensive Training (Rogue)', source: 'Purchased', ranks: 1 }] };
   const rows = computeSlots(c);
   const fu = rows.find((s) => s.cls === 'Fighter' && s.category === 'utility');
   const ru = rows.find((s) => s.cls === 'Rogue' && s.category === 'utility');
@@ -60,7 +60,7 @@ test('class-choice skills offer only the eligible classes you have', () => {
 
 test('Agile Learner trades require owning the skill and are capped by its rank', () => {
   const base = (skills, ranks, trades) => computeSlots({ classes: [{ name: 'Fighter', level: 4 }],
-    purchasedSkills: skills, ranks: { purchasedSkills: ranks }, agileLearnerTrades: trades });
+    skills: skills.map((s, i) => ({ entityId: s, source: 'Purchased', ranks: ranks[i] || 1 })), agileLearnerTrades: trades });
   const basic = (rows) => rows.find((s) => s.category === 'basic').allowed;
   const advanced = (rows) => rows.find((s) => s.category === 'advanced').allowed;
   // Owns it: trade applies (basic 2→1, advanced 0→1).
@@ -70,7 +70,7 @@ test('Agile Learner trades require owning the skill and are capped by its rank',
   r = base([], [], { Fighter: 1 });
   eq(basic(r), 2, 'unowned: basic unchanged'); eq(advanced(r), 0, 'unowned: advanced unchanged');
   // Owns 1, requests 3: clamped to capacity 1.
-  eq(agileLearnerCapacity({ purchasedSkills: ['Agile Learner'], ranks: { purchasedSkills: [1] } }), 1, 'capacity = owned ranks');
+  eq(agileLearnerCapacity({ skills: [{ entityId: 'Agile Learner', source: 'Purchased', ranks: 1 }] }), 1, 'capacity = owned ranks');
   r = base(['Agile Learner'], [1], { Fighter: 3 });
   eq(basic(r), 1, 'over-request clamped: basic -1 only');
 });
@@ -117,8 +117,13 @@ test('spells-known picker offers novice + adept (all learnable tiers)', () => {
 
 // ─── xN ranks ─────────────────────────────────────────────────────────────────
 test('xN rank multiplies a slot-granting skill (Utility Mage Extended Capacity x2)', () => {
-  const mage = ARCHETYPES.find((a) => a.name === 'Utility Mage');
-  const r = validate(fromArchetype(mage));
-  ok(r.spellSlots.Arcane.novice >= 5, `novice bonus from x2 grants (got ${r.spellSlots.Arcane.novice})`);
+  const mage = ARCHETYPES.find((a) => a.archetypeName === 'Utility Mage');
+  try {
+    const r = validate(fromArchetype(mage));
+    ok(r.spellSlots.Arcane.novice >= 5, `novice bonus from x2 grants (got ${r.spellSlots.Arcane.novice})`);
+  } catch (e) {
+    console.error(e.stack);
+    throw e;
+  }
 });
 

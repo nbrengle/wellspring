@@ -97,7 +97,14 @@ export function loadArchetype(archetype) {
   const c = { ...EMPTY_CHARACTER, archetypeName: archetype.name };
   for (const k of Object.keys(EMPTY_CHARACTER)) {
     if (k === "archetypeName") continue;
-    if (archetype[k] !== undefined) c[k] = archetype[k];
+    if (archetype[k] !== undefined) {
+      if (k === 'lineage' && typeof archetype[k] === 'object' && archetype[k] !== null) {
+        c[k] = archetype[k].name;
+        // In the future, we could also map archetype[k].choices to c.advantageChoices here
+      } else {
+        c[k] = archetype[k];
+      }
+    }
   }
   if (archetype.grants) c.grants = archetype.grants;
   if (archetype.effectiveBP) c.effectiveBP = archetype.effectiveBP;

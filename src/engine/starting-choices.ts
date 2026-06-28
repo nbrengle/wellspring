@@ -443,7 +443,8 @@ export function reconcileStartingChoices(character, className) {
   // "xN" suffix in the name when no rank sidecar is present.
   const startRanks = character.ranks?.startingSkills || [];
   const ownedPool = {};
-  (character.startingSkills || []).forEach((s, i) => {
+  const startingSkills = character.skills?.filter(s => s.source === 'Class:Starting').map(s => s.entityId) || character.startingSkills || [];
+  startingSkills.forEach((s, i) => {
     const b = skillMatchKey(s);
     ownedPool[b] = (ownedPool[b] || 0) + (startRanks[i] || parseStartingRank(s) || 1);
   });

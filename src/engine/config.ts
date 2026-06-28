@@ -30,9 +30,9 @@ export const CRAFT_DISCIPLINES = {
 export const CRAFTING_TIERS = ['Apprentice', 'Journeyman', 'Greater'];
 
 // ─── Equipment & Skills ─────────────────────────────────────────────────────
-export const ARMOR_SKILLS = [
+export const ARMOR_SKILLS = new Set([
   'Basic Armor', 'Light Armor', 'Medium Armor', 'Heavy Armor', 'Ironclad Armor'
-];
+]);
 
 // (Allergen common/uncommon split is no longer hardcoded — the per-substance
 // award is derived from each allergy flaw's rulebook table; see ALLERGEN_AWARDS

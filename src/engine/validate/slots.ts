@@ -7,10 +7,10 @@
 // by the validate.js barrel.
 
 import { lookupEntity, CLASS_POWERS, CLASS_PROGRESSION, CLASS_POWER_SLOTS, CLASSES, BASE_CLASSES, LINEAGES, lineageCantripChoices } from '../data.js';
-import { cleanItemName, resolveId, getClasses, bareSkill } from '../resolver.js';
+import { cleanItemName, getClasses, bareSkill } from '../resolver.js';
 import { SPELL_TIERS, SLOT_CATS, BOOKCASTER_TIER_FIELD, KNOWN_SPELL_FIELDS } from '../config.js';
 import {
-  rankOf, pickClass, countPicksForClass, progressionRow,
+  countPicksForClass, progressionRow, sourceClass,
   activeInnatePowers, CASTER_SLOT_FIELDS, MARTIAL_SLOT_FIELDS, GENERIC_POWER_FIELDS
 } from './core.js';
 
@@ -75,22 +75,19 @@ export function slotGrants(character, sources = null) {
   //    item's rank ("Extended Capacity - Novice x2" → +2). innatePowers is excluded
   //    (GENERIC_POWER_FIELDS) — innate slot grants are handled by the
   //    activeInnatePowers() loop below; iterating them here too would double-count.
-  for (const field of ['startingSkills', 'purchasedSkills', ...GENERIC_POWER_FIELDS]) {
-    (character[field] || []).forEach((item, idx) => {
-      const clean = cleanItemName(item);
+  for (const field of ['skills', 'powers']) {
+    (character[field] || []).forEach((item: any) => {
+      const clean = cleanItemName(item.entityId.replace(/^(skills|powers):/, ''));
       const bare = bareSkill(clean);
-      const ent = lookupEntity(resolveId(item, field, character))
-        || lookupEntity(`skills:${clean}`)
-        || lookupEntity(`powers:${clean}`)
-        || lookupEntity(`powers:${bare}`);
-      const rank = rankOf(character, field, idx);
+      const ent = lookupEntity(item.entityId) as any;
+      const rank = item.ranks || 1;
 
-      // If this is a class power granting slots (like Studied Focus), the slots
-      // belong to the class that owns the power, not just the primary martial class.
-      let targetCls = null;
-      const paramMatch = item.match(/\((.*?)\)/);
-      if (paramMatch && CLASSES[paramMatch[1].trim()]) {
-        targetCls = paramMatch[1].trim();
+      let targetCls = sourceClass(item.source);
+      if (!targetCls) {
+        const paramMatch = clean.match(/\((.*?)\)/);
+        if (paramMatch && CLASSES[paramMatch[1].trim()]) {
+          targetCls = paramMatch[1].trim();
+        }
       }
 
       if (!targetCls && ent && ent.id && ent.id.startsWith('powers:')) {
@@ -166,14 +163,11 @@ export function innateBonusCantrips(character) {
 // How many Agile Learner trades the character is entitled to — the total rank of
 // every Agile Learner skill they own (it has no maxRanks, so each purchase = one
 // more trade). 0 when the skill isn't owned.
-export function agileLearnerCapacity(character) {
-  let n = 0;
-  for (const field of ['startingSkills', 'purchasedSkills', 'classSkills']) {
-    (character[field] || []).forEach((item, idx) => {
-      if (cleanItemName(item) === 'Agile Learner') n += rankOf(character, field, idx);
-    });
-  }
-  return n;
+export function agileLearnerCapacity(character: any): number {
+  return (character.skills || []).reduce((n: number, s: any) => {
+    if (cleanItemName(s.entityId.replace('skills:', '')) === 'Agile Learner') return n + (s.ranks || 1);
+    return n;
+  }, 0);
 }
 
 // The per-class trades actually allowed: the recorded trades, clamped so the total
@@ -233,17 +227,22 @@ export function computeSlots(character) {
       const granted = grantedCantrips.filter((g) => g.cls === cls || g.cls === 'ALL').map((g) => g.name);
       // A granted (innate) cantrip never consumes a choosable slot, even if it
       // appears in the character's cantrip pick list. Exclude it from `used`.
-      const used = (character.cantrips || []).reduce((n, name, i) =>
-        n + (pickClass(character, 'cantrips', i, name) === cls && !granted.includes(name) ? 1 : 0), 0);
+      const used = (character.spells || []).reduce((n: number, choice: any) => {
+        if (sourceClass(choice.source) !== cls) return n;
+        const ent = lookupEntity(choice.entityId) as any;
+        if (ent?.tier?.toLowerCase() !== 'cantrip') return n;
+        if (granted.includes(cleanItemName(choice.entityId.replace('spells:', '')))) return n;
+        return n + (choice.ranks || 1);
+      }, 0);
       const cantripRow = mkRow('cantrips', 'Cantrips', used, prog.cantrips ?? 0);
       cantripRow.granted = granted;
       rows.push(cantripRow);
-      const known = CASTER_SLOT_FIELDS.spellsKnown
-        .reduce((n, f) => n + countPicksForClass(character, f, cls), 0);
+      const known = countPicksForClass(character, 'spells', cls, ['novice', 'adept', 'greater']);
       rows.push(mkRow('spellsKnown', 'Spells Known', known, prog.spellsKnown ?? 0));
     } else {
-      for (const [cat, field] of Object.entries(MARTIAL_SLOT_FIELDS)) {
-        rows.push(mkRow(cat, cat[0].toUpperCase() + cat.slice(1), countPicksForClass(character, field, cls), prog[cat] ?? 0));
+      const cats = ['utility', 'basic', 'advanced', 'veteran'];
+      for (const cat of cats) {
+        rows.push(mkRow(cat, cat[0].toUpperCase() + cat.slice(1), countPicksForClass(character, 'powers', cls, cat), prog[cat] ?? 0));
       }
     }
   }
@@ -306,15 +305,11 @@ export function spellSlots(character) {
     }
   };
 
-  for (const field of ['startingSkills', 'purchasedSkills', 'classSkills']) {
-    (character[field] || []).forEach((item, idx) => {
-      const ent = lookupEntity(resolveId(item, field, character))
-        || lookupEntity(`skills:${cleanItemName(item)}`);
-      applySpellGrants(ent, rankOf(character, field, idx), item);
-    });
+  for (const item of (character.skills || [])) {
+    applySpellGrants(lookupEntity(item.entityId), item.ranks || 1, item.entityId);
   }
-  for (const item of (character.purchasedPerks || [])) {
-    applySpellGrants(lookupEntity(`perks:${cleanItemName(item)}`), 1, item);
+  for (const item of (character.perks || [])) {
+    applySpellGrants(lookupEntity(item.entityId), item.ranks || 1, item.entityId);
   }
   if (character.lineage) {
     const lin = LINEAGES[character.lineage];
@@ -425,7 +420,7 @@ export function arcaneSecretsSpellOptions(character) {
   const arcaneClasses = Object.keys(CLASSES).filter(
     (n) => CLASSES[n]?.spellcaster && CLASSES[n]?.magicType === 'Arcane',
   );
-  const hasKnownSpells = KNOWN_SPELL_FIELDS.some((f) => (character[f] || []).length > 0);
+  const hasKnownSpells = (character.spells?.length > 0) || KNOWN_SPELL_FIELDS.some((f) => (character[f] || []).length > 0);
 
   let tiers;
   if (hasKnownSpells) {

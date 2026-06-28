@@ -1,5 +1,5 @@
-import { REFS } from './data.js';
-
+import { REFS, CLASSES, lookupEntity } from './data.js';
+import { getClasses } from './resolver.js';
 /**
  * Extractor plugins for the CharacterGraph.
  * Each extractor takes an entity and character context and returns an array of Effects.
@@ -14,7 +14,6 @@ function extractDiscounts(ent, character, id) {
 }
 
 function extractGlobalGrants(ent, character, id) {
-  // A power with a structured chooseOne (build OR play) gates its grants behind that
   // choice — REFS.grants lists ALL the options, so emitting them flat would wrongly
   // grant every option for free (The Learned One = "choose one of 8" at level-up).
   // Trust the PARSED chooseOne, not a description regex: a fixed grant can sit beside
@@ -68,10 +67,87 @@ function extractChooseOne(ent, character, _id) {
   return [];
 }
 
+import { lineageChoiceSpec, powerSpellChoiceSpec } from './choice-specs.js';
+
+function extractLineageChoiceSpec(ent, character, _id) {
+  if (ent?.type === 'advantages' || ent?.type === 'challenges') {
+    const spec = lineageChoiceSpec(ent);
+    if (spec?.kind === 'cantrip' || spec?.kind === 'spell') {
+      const chosen = character.advantageChoices?.[ent.name];
+      if (chosen) {
+        return [{ type: 'GRANT_SOURCE', grants: [`powers:${chosen}`] }];
+      }
+    }
+  }
+  return [];
+}
+
+function extractPowerSpellChoiceSpec(ent, character, _id) {
+  const spec = powerSpellChoiceSpec(ent);
+  if (spec && (spec.kind === 'spell' || spec.kind === 'power')) {
+    const chosen = character.choices?.[`powers:${ent.name}`];
+    if (chosen) {
+      return [{ type: 'GRANT_SOURCE', grants: [`powers:${chosen}`] }];
+    }
+  }
+  return [];
+}
+
+function extractStudiedFocus(ent, character, _id) {
+  if (ent?.name === 'Studied Focus') {
+    const pick1 = character.choices?.['powers:Studied Focus:1'];
+    const pick2 = character.choices?.['powers:Studied Focus:2'];
+    const effects = [];
+    if (pick1) effects.push({ type: 'GRANT_SOURCE', grants: [`powers:${pick1}`] });
+    if (pick2) effects.push({ type: 'GRANT_SOURCE', grants: [`powers:${pick2}`] });
+    return effects;
+  }
+  return [];
+}
+
+function extractLevelDiscounts(ent, character, id) {
+  if (!ent?.levelDiscounts || ent.levelDiscounts.length === 0) return [];
+  
+  const charClasses = getClasses(character);
+  const effects = [];
+  
+  let maxRelevantLevel = 0;
+  for (const c of charClasses) {
+    const clsDef = lookupEntity(`classes:${c.name}`);
+    if (!clsDef) continue;
+    
+    const offers = ['innate', 'utility', 'basic', 'advanced', 'veteran', 'classSkills', 'rightHandPowers']
+      .some(cat => clsDef[cat]?.some(p => (p.id || p.name) === ent.name || p.id === id || p.name === ent.name));
+      
+    if (offers && c.level > maxRelevantLevel) {
+      maxRelevantLevel = c.level;
+    }
+  }
+
+  for (const ld of ent.levelDiscounts) {
+    if (maxRelevantLevel >= ld.atLevel) {
+      effects.push({
+        type: 'DISCOUNT_SOURCE',
+        discount: {
+          scope: { kind: 'namedSkill', value: ld.skill },
+          amount: ld.amount,
+          min: 0,
+          cap: null
+        }
+      });
+    }
+  }
+  return effects;
+}
+
 export const EFFECT_EXTRACTORS = [
   extractDiscounts,
+  extractLevelDiscounts,
   extractGlobalGrants,
   extractWealth,
   extractStatMods,
-  extractChooseOne
+  extractChooseOne,
+  extractLineageChoiceSpec,
+  extractPowerSpellChoiceSpec,
+  extractStudiedFocus
 ];

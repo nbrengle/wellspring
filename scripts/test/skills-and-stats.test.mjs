@@ -163,11 +163,12 @@ test('export/import: round-tripping with ranks and instances preserves rank & pa
   const rt = parseCharacterSheet(sheet);
   // Verify parsed array matches
   eq(rt.purchasedSkills.length, 3, 'rt three purchased skills');
-  ok(rt.purchasedSkills.includes('Spell-Scholar x3'), 'rt includes Spell-Scholar with rank string suffix');
+  ok(rt.purchasedSkills.includes('Spell-Scholar'), 'rt includes bare Spell-Scholar');
+  eq(rt.ranks?.purchasedSkills?.[0], 3, 'rt extracted rank 3 into ranks object');
   
   const rtValidated = validate(rt);
   eq(rtValidated.spend.net, orig.spend.net, 'round-trip spend net');
-  eq(rtValidated.spend.byItem['purchasedSkills:Spell-Scholar x3'].rank, 3, 'round-trip Spell-Scholar rank');
+  eq(rtValidated.spend.byItem['purchasedSkills:Spell-Scholar'].rank, 3, 'round-trip Spell-Scholar rank');
   eq(rtValidated.spend.byItem['purchasedSkills:Bookcaster (Identify)'].rank, 1, 'round-trip Bookcaster (Identify) rank');
 });
 

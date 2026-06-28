@@ -4,6 +4,7 @@
 // (npm run parse) refreshes everything downstream automatically.
 
 import classesJson from '../data/classes.json';
+import type { Entity } from './types.js';
 import skillsJson from '../data/skills.json';
 import perksJson from '../data/perks.json';
 import flawsJson from '../data/flaws.json';
@@ -57,7 +58,7 @@ export const EVENTS_TABLE = eventsTableJson;
 // when re-syncing the doc.
 export const META = {
   ...metaJson,
-  appVersion: (typeof import.meta.env !== 'undefined' && import.meta.env.VITE_APP_VERSION) || metaJson.appVersion,
+  appVersion: (typeof (import.meta as any).env !== 'undefined' && (import.meta as any).env.VITE_APP_VERSION) || metaJson.appVersion,
 };
 
 // ─── SKILLS / PERKS / FLAWS ───────────────────────────────────────────────────
@@ -141,7 +142,7 @@ export const ALLERGEN_AWARDS = Object.fromEntries(
     .filter((f) => f.allergens && Object.keys(f.allergens).length)
     .map((f) => [
       f.name,
-      Object.fromEntries(Object.entries(f.allergens).map(([s, bp]) => [s.toLowerCase(), bp])),
+      Object.fromEntries(Object.entries(f.allergens as Record<string, number>).map(([s, bp]) => [s.toLowerCase(), bp])),
     ]),
 );
 
@@ -178,7 +179,7 @@ const MAGIC_TYPE = Object.fromEntries(classesJson.filter(c => c.magicType).map(c
 // When they arrive the parser should mark them (e.g. type:'Advanced' or
 // isAdvanced); exclude any such marker here so the base/advanced split stays correct.
 export const BASE_CLASSES = new Set(
-  classesJson.filter(c => c.type !== 'Advanced' && !c.isAdvanced).map(c => c.name)
+  classesJson.filter(c => c.type !== 'Advanced' && !(c as any).isAdvanced).map(c => c.name)
 );
 
 export const CLASSES = Object.fromEntries(
@@ -339,7 +340,7 @@ export function lineageRepOptions() {
 // recorded as "<Lineage> - <Advantage>" so the graph can resolve it cross-lineage
 // and apply its full effects (with prereqs still enforced).
 export function pickAndChooseOptions() {
-  const out = [];
+  const out = [] as any[];
   for (const [lineage, lin] of Object.entries(LINEAGES)) {
     if (lineage === 'Lost') continue;
     for (const a of (lin.advantages || [])) {
@@ -347,7 +348,7 @@ export function pickAndChooseOptions() {
       out.push({
         name,
         group: lineage,
-        description: a.description || a.desc || '',
+        description: (a as any).description || a.desc || '',
         advId: `${lineage} - ${name}`,
       });
     }
@@ -399,7 +400,7 @@ export function lineageItemImpact(item, lineage) {
     return [`pick ${article} ${label} (flavor)`];
   }
 
-  const out = [];
+  const out = [] as any[];
   for (const m of (item.statMods || [])) {
     const label = STAT_LABELS[m.stat] || m.stat;
     out.push(`${m.n >= 0 ? '+' : ''}${m.n} ${label}`);
@@ -431,7 +432,7 @@ export function lineageCantripChoices(character) {
   const choices = character?.advantageChoices || {};
   const lin = character?.lineage && LINEAGES[character.lineage];
   if (!lin) return [];
-  const out = [];
+  const out = [] as any[];
   for (const it of [...(lin.challenges || []), ...(lin.advantages || [])]) {
     const base = it.baseName || it.name;
     const spec = LINEAGE_CHOICE_SPECS[base];
@@ -548,7 +549,7 @@ export const RITUALS = ritualsJson;
 // ─── ARCHETYPES + REFS ────────────────────────────────────────────────────────
 // Starter character templates and the cross-reference graph the builder uses
 // to look up details, backlinks, and prereqs.
-export const ARCHETYPES = archetypesJson;
+export const ARCHETYPES = archetypesJson.map(a => ({ ...a, name: a.archetypeName }));
 export const REFS = refsJson;
 
 // Lookup by entity id, e.g. "skills:Basic Faith" → { type, name, description, ... }.
@@ -558,7 +559,7 @@ const ENTITY_INDEX = new Map();
 // boilerplate so the detail pane shows the full prose, keeping the summary as a
 // separate field. Skills aren't split (no boilerplate) but parameterized ones
 // are resolved on lookup (see lookupEntity).
-const indexCollection = (items, type, { nameKey = 'name', extra = () => ({}), splitDesc = false } = {}) => {
+const indexCollection = (items: any[], type: string, { nameKey = 'name', extra = (e?: any) => ({}) as any, splitDesc = false }: any = {}) => {
   for (const e of items) {
     const name = e[nameKey];
     if (!name) continue;
@@ -700,7 +701,7 @@ function applySkillAlias(name) {
   if (ALIAS_EXACT[lower]) return ALIAS_EXACT[lower];
   for (const [re, fn] of ALIAS_PATTERNS) {
     const m = name.match(re);
-    if (m) return name.replace(re, fn(m));
+    if (m) return name.replace(re, (fn as any)(m));
   }
   return name;
 }
@@ -708,7 +709,7 @@ function applySkillAlias(name) {
 // Lookup by entity id, e.g. "skills:Basic Faith" → { type, name, description, ... }.
 // Falls back to a canonical-name match across all types when the exact id misses,
 // so reference links resolve despite linker/file namespace differences.
-export const lookupEntity = (id) => {
+export const lookupEntity = (id: string | null | undefined): Entity | any | null => {
   if (!id) return null;
   const baseId = id.includes('|') ? id.split('|')[0] : id;
   const direct = ENTITY_INDEX.get(baseId);

@@ -54,7 +54,9 @@ export function computeBP(graph, character) {
   const paramKey = (typedName) => {
     const c = typeof typedName === 'string' && typedName.includes(':')
       ? typedName : `:${typedName}`;
-    const [type, rest = ''] = [c.slice(0, c.indexOf(':')), c.slice(c.indexOf(':') + 1)];
+    let [type, rest = ''] = [c.slice(0, c.indexOf(':')), c.slice(c.indexOf(':') + 1)];
+    if (type === 'purchasedSkills' || type === 'startingSkills') type = 'skills';
+    if (type === 'purchasedPerks') type = 'perks';
     // Normalize both "Base - Param" and "Base (Param)" to base + lowercased param.
     const paren = rest.match(/^(.*?)\s*\(([^)]*)\)\s*$/);
     const dash = rest.match(/^(.*?)\s+-\s+(.*)$/);
@@ -87,7 +89,7 @@ export function computeBP(graph, character) {
     const node = graph.items[idx];
     
     // Ledger key (shared scheme — see cost-key.js).
-    const key = costKey(node.field, node.rawString, node.index);
+    const key = costKey(node);
 
     if (node.field === 'flaws') {
       byItem[key] = { cost: node.baseCost, base: node.baseCost, grant: null };
@@ -101,13 +103,18 @@ export function computeBP(graph, character) {
     // The node's parameterized key: its base id (type:base) + the param from its
     // raw string, so a granted "Weapon Specialization - Daggers" matches a bought
     // "Weapon Specialization (Daggers)" but not "(Swords)".
-    const nodeParamKey = node.id && /\(|\s-\s/.test(node.rawString || '')
-      ? paramKey(`${node.id.slice(0, node.id.indexOf(':') + 1)}${node.rawString}`)
+    const nId = node.entityId || node.id;
+    const nodeParamKey = nId && /\(|\s-\s/.test(node.rawString || '')
+      ? paramKey(`${nId.slice(0, nId.indexOf(':') + 1)}${node.rawString}`)
       : null;
+    const normalizedId = nId
+      ? nId.replace(/^purchasedSkills:/, 'skills:').replace(/^startingSkills(:\d+)?:/, 'skills:').replace(/^purchasedPerks:/, 'perks:')
+      : null;
+      
     if (node.grantSidecar?.kind === 'grant') {
       isGranted = true; grantSrc = node.grantSidecar.source;
-    } else if (grantIndex[node.id]) {
-      isGranted = true; grantSrc = grantIndex[node.id]; isDerived = true;
+    } else if (normalizedId && grantIndex[normalizedId]) {
+      isGranted = true; grantSrc = grantIndex[normalizedId]; isDerived = true;
     } else if (nodeParamKey && grantParamIndex[nodeParamKey]) {
       isGranted = true; grantSrc = grantParamIndex[nodeParamKey]; isDerived = true;
     } else if (node.sourceType === 'innate' || node.field === 'multiclassGrant') {
@@ -124,7 +131,7 @@ export function computeBP(graph, character) {
       continue;
     }
 
-    if (node.field === 'startingSkills') {
+    if (node.sourceType === 'class') {
       const grant = node.grantSidecar;
       if (grant?.kind === 'discount' && grant.amount) {
          byItem[key] = { cost: -grant.amount, base: 0, grant };
@@ -134,6 +141,12 @@ export function computeBP(graph, character) {
       
       
       const floor = startFloors[node.index];
+      
+      if (isGranted) {
+        byItem[key] = { cost: -node.baseCost, base: 0, grant: { kind: 'grant', source: grantSrc, derived: true } };
+        refunded += node.baseCost;
+        continue;
+      }
       
       if (floor && node.rank > floor) {
         const extra = node.rank - floor;
@@ -170,9 +183,9 @@ export function computeBP(graph, character) {
   const discountsApplied = [];
 
   for (const node of graph.items) {
-    if (node.field !== 'purchasedSkills' && node.field !== 'purchasedPerks' && node.field !== 'startingSkills') continue;
+    if (node.field !== 'skills' && node.field !== 'perks' && node.field !== 'purchasedSkills' && node.field !== 'purchasedPerks' && node.field !== 'startingSkills') continue;
     
-    const key = costKey(node.field, node.rawString, node.index);
+    const key = costKey(node);
     const eff = byItem[key];
     if (!eff || eff.authored) continue;
 
@@ -190,7 +203,7 @@ export function computeBP(graph, character) {
       const cut = Math.min(src.amount, reducible, room);
       
       if (cut <= 0) {
-        if (eff.cost === 0 && eff.grant?.kind === 'grant' && src.refundIfFree) {
+        if (eff.cost === 0 && (eff.grant?.kind === 'grant' || eff.freeRanks > 0) && src.refundIfFree) {
           const refund = Math.min(src.amount, room);
           discountFreeBP += refund;
           used.set(src.id, (used.get(src.id) || 0) + refund);
@@ -208,12 +221,12 @@ export function computeBP(graph, character) {
   }
 
   // Phase 3: Total Summation
-  let spent = startingExcess;
-  const costFields = ['purchasedSkills', 'purchasedPerks', 'domainPowers', 'classPowers', 'formPowers'];
+  let spent = 0;
+  const costFields = ['purchasedSkills', 'purchasedPerks', 'domainPowers', 'classPowers', 'formPowers', 'utilityPowers', 'basicPowers', 'advancedPowers', 'veteranPowers', 'skills', 'perks', 'powers'];
   
   for (const node of graph.items) {
     if (costFields.includes(node.field)) {
-      const eff = byItem[costKey(node.field, node.rawString, node.index)];
+      const eff = byItem[costKey(node)];
       if (eff && eff.cost > 0) {
         spent += eff.cost;
       }
