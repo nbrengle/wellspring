@@ -1840,6 +1840,79 @@
   gap: 0.4rem;
 }
 
+/* ─── CLASS POOLS ─────────────────────────────────────────────────────── */
+.b-pools {
+  margin-top: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.b-pool {
+  padding: 0.5rem 0.6rem;
+  background: var(--b-panel-2);
+  border: 1px solid var(--b-border);
+  border-radius: 0.5rem;
+}
+
+/* The pool max reuses StatWithSources; make its tile fill the pool card width. */
+.b-pool-head .b-stat {
+  border: none;
+  background: none;
+  padding: 0;
+  align-items: flex-start;
+}
+
+.b-pool-powers {
+  list-style: none;
+  margin: 0.4rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.b-pool-power {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  font-size: 0.72rem;
+}
+
+.b-pool-power-tag {
+  flex: none;
+  font-size: 0.55rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.05rem 0.3rem;
+  border-radius: 0.25rem;
+}
+
+.b-pool-power-tag.is-spend {
+  color: var(--b-red, #d98a8a);
+  background: rgb(217, 138, 138, 12%);
+}
+
+.b-pool-power-tag.is-refill {
+  color: var(--b-teal, #7fc7b8);
+  background: rgb(127, 199, 184, 12%);
+}
+
+.b-pool-power-link {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font: inherit;
+  color: var(--b-text);
+  text-align: left;
+  text-decoration: underline dotted;
+}
+
+.b-pool-power-link:hover {
+  color: var(--b-amber);
+}
+
 .b-spellslot {
   display: flex;
   flex-direction: column;
