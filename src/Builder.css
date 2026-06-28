@@ -378,14 +378,19 @@
   color: var(--b-muted);
 }
 
-/* Stat strip */
+/* Stat strip — Life · Spikes · Armor · Wealth, always on ONE line (4 columns). */
 .b-stat-strip {
-  /* Life · Spikes · Armor · Wealth on ONE line — there are FOUR stats, so a 3-column
-     grid wrapped Wealth onto a second row. Four equal columns keeps them together. */
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 0.4rem;
   margin-top: 0.5rem;
+}
+
+/* Class pools get their own row below the core stats. The same 4-column template
+   makes each pool tile the SAME width as a stat tile above; tiles fill from the
+   left and any unused columns stay empty. */
+.b-pool-strip {
+  margin-top: 0.4rem;
 }
 
 .b-stat {
@@ -410,6 +415,15 @@
   text-transform: uppercase;
   color: var(--b-dim);
   white-space: nowrap;
+}
+
+/* Marks a stat tile as a class pool ("pool" under the label, purple to echo the
+   power/spell-slot palette) so it reads as a pool, not a raw stat. */
+.b-stat-sublabel {
+  font-size: 0.5rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--b-purple);
 }
 
 /* Interactive stat: clickable tile that opens a source breakdown popover. The
@@ -438,11 +452,6 @@
 
 .b-stat-interactive.is-open {
   border-color: var(--b-amber-deep);
-}
-
-.b-stat-caret {
-  opacity: 0.5;
-  font-size: 0.6rem;
 }
 
 .b-stat-pop {
@@ -484,6 +493,18 @@
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--b-muted);
+}
+
+/* An extra section inside the breakdown popover (e.g. a pool's interacting
+   powers), separated from the numeric source list above it. */
+.b-stat-pop-extra {
+  margin-top: 0.5rem;
+  padding-top: 0.4rem;
+  border-top: 1px solid var(--b-border);
+}
+
+.b-stat-pop-subhead {
+  margin: 0 0 0.3rem;
 }
 
 .b-stat-pop-list {
@@ -1841,28 +1862,10 @@
 }
 
 /* ─── CLASS POOLS ─────────────────────────────────────────────────────── */
-.b-pools {
-  margin-top: 0.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-}
 
-.b-pool {
-  padding: 0.5rem 0.6rem;
-  background: var(--b-panel-2);
-  border: 1px solid var(--b-border);
-  border-radius: 0.5rem;
-}
-
-/* The pool max reuses StatWithSources; make its tile fill the pool card width. */
-.b-pool-head .b-stat {
-  border: none;
-  background: none;
-  padding: 0;
-  align-items: flex-start;
-}
-
+/* Pools render as stat tiles in the strip (see .b-stat-sublabel for the "pool"
+   marker); their interacting powers live in the breakdown popover (.b-pool-powers
+   inside .b-stat-pop-extra). */
 .b-pool-powers {
   list-style: none;
   margin: 0.4rem 0 0;
