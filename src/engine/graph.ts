@@ -378,32 +378,19 @@ export class CharacterGraphModel implements CharacterGraph {
       }
     }
 
-    const weaponSpecs: any[] = [];
+    // Over-cap PURCHASES (flagged generically by the dedupe pass via OVER_CAP) —
+    // buying more of a thing than its cap allows is an illegal build. This is the
+    // generic replacement for the old Weapon-Spec-specific check: it covers Weapon
+    // Specialization (cap 1, two weapon types), a duplicate same-area Lore, a 5th
+    // Extended Capacity, etc., from one rule.
     for (const node of this._items) {
-      if (node.field !== 'flaws' && bareSkill(cleanItemName(node.name)) === 'Weapon Specialization') {
-        weaponSpecs.push({ item: node.name, field: node.field });
-      }
-    }
-    for (const g of this._grantedAbilitiesList) {
-      if (g.abilityType === 'skills' && bareSkill(cleanItemName(g.abilityName)) === 'Weapon Specialization') {
-        weaponSpecs.push({ item: g.abilityName, field: 'granted' });
-      }
-    }
-    // Filter out unparameterized 'Weapon Specialization' if a parameterized one is present
-    const hasParameterized = weaponSpecs.some(ws => ws.item.includes('('));
-    const filteredWeaponSpecs = hasParameterized
-      ? weaponSpecs.filter(ws => ws.item.includes('('))
-      : weaponSpecs;
-
-    if (filteredWeaponSpecs.length > 1) {
-      const types = filteredWeaponSpecs.map(ws => {
-        const m = ws.item.match(/\(([^)]+)\)/);
-        return m ? m[1].trim() : 'unspecified';
-      });
+      const overCap = node.effects?.find(e => e.type === 'OVER_CAP');
+      if (!overCap) continue;
       issues.push({
-        id: 'skills:Weapon Specialization',
-        item: 'Weapon Specialization',
-        text: `A character may only have Weapon Specialization with one weapon type (found: ${types.join(', ')}).`,
+        id: node.id, item: node.name, field: node.field,
+        text: overCap.cap === 1
+          ? `${node.name} can only be taken once.`
+          : `${node.name} can be taken at most ${overCap.cap} time(s).`,
       });
     }
 
@@ -1141,8 +1128,19 @@ export function resolveCharacterGraph(charInput: any): CharacterGraphModel {
     const reusable = paramReusable(ent, entityId);
     const baseName = (ent?.baseName || ent?.name || bareSkill(clean)).toLowerCase();
 
+    // Take-once entities (cap 1) have ONE identity regardless of parameter — the
+    // param is flavor on the single instance, not a distinguisher. e.g. Weapon
+    // Specialization (Swords) and (Axes) are the SAME identity, so a second one is
+    // redundant (free BP). Without this, a parameterized cap-1 entity keyed by
+    // base|param wrongly kept both. (Param distinguishes only when cap > 1.)
+    if (cap <= 1) return { key: baseName, cap };
+
+    // No param, or param is payload (reusable) → identity is the base; the cap
+    // governs how many total takings are kept.
     if (!info || reusable) return { key: baseName, cap };
 
+    // Parameterized, multi-rank, not reusable (Lore, …) → param distinguishes
+    // distinct instances, each capped at one.
     const paramM = clean.match(/\(([^)]+)\)\s*$/) || clean.match(/\s-\s([^()]+)$/);
     const paramValue = paramM ? paramM[1].trim().toLowerCase() : (ent?.parameter ? ent.parameter.toLowerCase() : 'unknown');
     return { key: `${baseName}|${paramValue}`, cap: 1 };
@@ -1154,6 +1152,21 @@ export function resolveCharacterGraph(charInput: any): CharacterGraphModel {
     const { key, cap } = getIdentity(it.rawString || it.name, it.entity);
     if (!itemIdentities.has(key)) itemIdentities.set(key, { cap, nodes: [] });
     itemIdentities.get(key)!.nodes.push(it);
+  }
+
+  // Enforce the cap on PURCHASES per identity. You can't buy more of a thing than
+  // its cap (e.g. two Weapon Specializations, or a 2nd Lore of the same area) —
+  // that's an illegal build, so flag the surplus purchases with an OVER_CAP effect
+  // that computePrereqs surfaces as a validation issue. (Grants that push you over
+  // cap are handled separately below — those refund as free BP, not an error.)
+  for (const group of itemIdentities.values()) {
+    const purchases = group.nodes.filter(n => n.sourceType === 'purchased');
+    if (purchases.length > group.cap) {
+      for (const surplus of purchases.slice(group.cap)) {
+        surplus.effects = surplus.effects || [];
+        surplus.effects.push({ type: 'OVER_CAP', cap: group.cap });
+      }
+    }
   }
 
   for (const node of [...items]) {
