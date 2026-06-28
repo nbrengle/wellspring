@@ -20,6 +20,7 @@ import './test/grants-and-classes.test.mjs';
 import './test/lineages-devotions.test.mjs';
 import './test/costs-and-powers.test.mjs';
 import './test/skills-and-stats.test.mjs';
+import './test/param-domain.test.mjs';
 import './test/starting-choices.test.mjs';
 import './test/validation-coverage.test.mjs';
 
