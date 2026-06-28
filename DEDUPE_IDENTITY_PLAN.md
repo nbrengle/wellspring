@@ -200,3 +200,36 @@ Steps 1–2 are pure data/parser (no engine collision). 4–5 are the engine lan
 | Scavenge II (cap 1, no param) | ×2 | keep 1; 2nd → FREE_BP |
 | Grant-on-purchase (Lessons from Scars) | buy Lore (Arcane), then granted | one node, marked free-via-grant; purchase BP refunds |
 | Arcane Secrets grant | power grants a spell | routes to Known Spells bucket, not classPowers |
+
+---
+
+## Appendix B — known gaps the model does NOT yet handle ("it gets worse at scale")
+
+Evidence: the Arcanorum source classes (Assassin, Advanced Cleric) — the kind of
+content Wellspring will keep absorbing. These break assumptions in the current
+`param-domain.ts` derivation and must be handled before it scales.
+
+1. **Inline `[A/B/C]` pools live in the Call string, not a "Choose one X:" sentence.**
+   e.g. Garrote — Call `"Silence by [Agony/Force]"`; Bonds of Protection — Call
+   `"Grant Protect vs. [Weapons/Materia/Verbal]"`. The `INLINE_LIST` regex only
+   matches `": a, b, or c"` prose, so these are missed → the guard flags them as
+   `prose-param`. Derivation must also read `[A/B/C]` brackets in Call/effect text.
+
+2. **Runtime call placeholders are NOT build-time identity params — must be ignored.**
+   e.g. `"[Name or Description] ..."`, `"Faithcast [Spell or Cantrip Name]"`,
+   `"Subtle [X] by Ingested Poison"`. These are chosen each time the power is *used*,
+   not at character build, so they have nothing to do with dedupe identity. **Danger:**
+   a parser that scrapes every `[...]` as an identity param would corrupt dedupe (e.g.
+   treat `Garrote (2)`'s two ranks as distinguished by `[Agony/Force]` when they're
+   plain COUNTED). The signal: heading-bracket / "chosen at creation" = identity param;
+   `[...]` inside a Call/Effect line = runtime, ignore.
+
+3. **`(N)` rank notation is pervasive and inline in power names** (Crimson Fever (2),
+   Final Stroke (4), …). Already handled by the #147 cap unification — confirmed it
+   generalizes — but worth noting the volume only grows.
+
+Takeaway: the build guard (`unresolvedParamDomains`) is what keeps this safe as
+content scales — new abilities that the derivation can't classify surface loudly
+rather than silently defaulting. The fix path is to teach the derivation the two
+new signals above (Call-string `[A/B/C]` pools; ignore runtime `[...]`), shrinking
+the `DECLARED` fallback rather than growing it.
