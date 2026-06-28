@@ -56,14 +56,21 @@ export function poolsReferenced(entity: any): string[] {
   return POOLS.filter((p) => p.aliases.test(text)).map((p) => p.id);
 }
 
-export type PoolRelation = 'defines' | 'augments' | 'spends' | 'mentions';
+export type PoolRelation = 'defines' | 'augments-max' | 'refills' | 'spends' | 'mentions';
+
+// A PERMANENT max-increase (augments-max) is a passive boost to the pool's size —
+// cued by "additional point(s) per … level" / "increase … maximum" and the ABSENCE
+// of an activation trigger. A TEMPORARY add (refills) puts points into the current
+// pool when an action fires — cued by "casting/cast/whenever/each time/for each".
+const PERMANENT_AUGMENT = /(additional|extra)\s+points?\s+(to|in)[^.]*\bper\b[^.]*level|increase[^.]*\b(maximum|max)\b[^.]*pool|\bper\b[^.]*level[^.]*pool/i;
+const ACTIVATION_TRIGGER = /\b(casting|cast|whenever|each time|when they|for each|upon)\b/i;
 
 /** How does this entity relate to a given pool? Derived from verb cues in prose.
- *  Precedence matters: `defines` only for the canonical definer (the loose "gains
- *  a pool" heuristic cross-matched other pools), and `spends` is checked BEFORE
- *  `augments` because spend powers ("expend N points to grant …") often also
- *  contain grant/add words. ⚠ TODO(derive): verb-cue classification is fuzzy; a
- *  cleaner signal (structured effect on the pool) should replace it. */
+ *  Precedence: `defines` (canonical definer) → `spends` (checked before adds, since
+ *  spend powers often also say "grant"/"add") → `augments-max` (PERMANENT size
+ *  boost) → `refills` (TEMPORARY add during play) → `mentions`.
+ *  ⚠ TODO(derive): verb-cue classification is fuzzy; a structured pool-effect from
+ *  the parser should replace it. */
 export function poolRelation(entity: any, poolId: string): PoolRelation | null {
   const pool = poolById.get(poolId);
   const text = textOf(entity);
@@ -73,9 +80,11 @@ export function poolRelation(entity: any, poolId: string): PoolRelation | null {
   if (/\b(expend|subtract|spend(s|ing)?|lose|draw|use|point[s]? from)\b[^.]*pool|from (the|their|its)[^.]*pool/i.test(text)) {
     return 'spends';
   }
-  // augment cues: explicitly raises the pool's size/points.
-  if (/\b(add(s|ing)?|additional point|increase)\b[^.]*pool|adds?\s+\d+\s+points?\s+to[^.]*pool/i.test(text)) {
-    return 'augments';
+  const adds = /\b(add(s|ing)?|additional point|grant)\b[^.]*pool|adds?\s+\d+\s+points?\s+to[^.]*pool/i.test(text);
+  if (adds) {
+    // permanent if it raises the MAX (per-level / maximum) and isn't an activated action.
+    if (PERMANENT_AUGMENT.test(text) && !ACTIVATION_TRIGGER.test(text)) return 'augments-max';
+    return 'refills';
   }
   return 'mentions';
 }
@@ -100,19 +109,47 @@ export function poolSizeFormula(entity: any): { mult: number; add: number } | nu
   // "<N> plus … class-level"  → level + N
   m = t.match(/(\w+)\s+plus\s+[^.]*?class.?level/i);
   if (m && num(m[1]) != null) return { mult: 1, add: num(m[1])! };
+  // "<N> (additional) point(s) … per … (class-)level"  → N per level (augment form)
+  m = t.match(/(\w+)\s+(?:additional\s+)?points?\b[^.]*?\bper\b[^.]*?level/i);
+  if (m && num(m[1]) != null) return { mult: num(m[1])!, add: 0 };
   // flat "maximum points of <N>" / "maximum of <N>"  → constant
   m = t.match(/maximum\s+(?:points\s+)?of\s+(\d+)/i);
   if (m) return { mult: 0, add: parseInt(m[1], 10) };
   return null;
 }
 
-/** Resolve a pool's numeric size for a given class level (null if formula unknown). */
+/** Resolve a pool's BASE size (definer's formula only) at a class level. null if
+ *  the formula isn't derivable. */
 export function poolSize(poolId: string, classLevel: number): number | null {
   const pool = poolById.get(poolId);
   if (!pool) return null;
   const def = lookupEntity(`classes:${pool.definedBy}`) || lookupEntity(`domains:${pool.definedBy}`);
   const f = def ? poolSizeFormula(def) : null;
   return f ? f.mult * classLevel + f.add : null;
+}
+
+export interface PoolMaxBreakdown {
+  base: number | null;                                   // definer formula
+  sources: Array<{ name: string; amount: number }>;      // permanent (augments-max) contributors
+  total: number | null;
+}
+
+/** A pool's MAXIMUM size for a character: base formula + every owned PERMANENT
+ *  (`augments-max`) contributor, each evaluated at the class level. Temporary
+ *  `refills` are NOT included — they add to the current pool during play, not the
+ *  max. Returns a breakdown so the UI can show "9 (3×L) + Greater Healing Touch (+3)".
+ *  `owned` = entities the character actually has (so unowned augments don't count). */
+export function poolMax(poolId: string, classLevel: number, owned: any[]): PoolMaxBreakdown {
+  const base = poolSize(poolId, classLevel);
+  const sources: Array<{ name: string; amount: number }> = [];
+  for (const e of owned) {
+    if (poolRelation(e, poolId) !== 'augments-max') continue;
+    const f = poolSizeFormula(e);           // e.g. "+1 per level" → {mult:1, add:0}
+    const amount = f ? f.mult * classLevel + f.add : 0;
+    sources.push({ name: e.name, amount });
+  }
+  const total = base == null ? null : base + sources.reduce((s, x) => s + x.amount, 0);
+  return { base, sources, total };
 }
 
 /** Build guard: every defining power must yield a parseable size formula, and the

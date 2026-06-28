@@ -4,7 +4,7 @@
 // pools resolve whether or not the pending MegaDoc spelling fixes land.
 import { test, eq, ok } from './harness.mjs';
 import { lookupEntity } from '../../src/engine/data.js';
-import { POOLS, poolSize, poolsReferenced, poolRelation, unresolvedPoolMentions } from '../../src/engine/pool-registry.js';
+import { POOLS, poolSize, poolMax, poolsReferenced, poolRelation, unresolvedPoolMentions } from '../../src/engine/pool-registry.js';
 import skillsJson from '../../src/data/skills.json' with { type: 'json' };
 import classesJson from '../../src/data/classes.json' with { type: 'json' };
 import domainsJson from '../../src/data/domains.json' with { type: 'json' };
@@ -39,13 +39,29 @@ test('pool-registry: tolerant matching resolves variant spellings (pre-source-fi
   // resolve to the Healing Touch Pool via the alias.
   const ght = lookupEntity('classes:Greater Healing Touch');
   ok(poolsReferenced(ght).includes('healing-touch'), 'Greater Healing Touch → healing-touch via "healing pool"');
-  eq(poolRelation(ght, 'healing-touch'), 'augments', 'Greater Healing Touch augments the pool');
+  eq(poolRelation(ght, 'healing-touch'), 'augments-max', 'Greater Healing Touch → permanent max boost (resolved via "healing pool" alias)');
 });
 
-test('pool-registry: relation classification', () => {
+test('pool-registry: relation distinguishes PERMANENT max-boost from TEMPORARY refill', () => {
   eq(poolRelation(lookupEntity('classes:Healing Touch'), 'healing-touch'), 'defines', 'Healing Touch defines its pool');
-  // Cure/Heal add points to the pool → augments (they refill it as a side effect).
-  eq(poolRelation(lookupEntity('classes:Cure'), 'healing-touch'), 'augments', 'Cure adds points → augments');
+  // Greater Healing Touch permanently raises the max ("+1 per cleric level").
+  eq(poolRelation(lookupEntity('classes:Greater Healing Touch'), 'healing-touch'), 'augments-max',
+     'Greater Healing Touch → permanent max boost');
+  // Cure/Heal add points when CAST → temporary refill, not a max change.
+  eq(poolRelation(lookupEntity('classes:Cure'), 'healing-touch'), 'refills', 'Cure → temporary refill');
+  eq(poolRelation(lookupEntity('skills:Peacecaster'), 'life-tap'), 'refills', 'Peacecaster → temporary refill');
+});
+
+test('pool-registry: poolMax folds in owned PERMANENT augments, not refills', () => {
+  const ht = lookupEntity('classes:Healing Touch');
+  const ght = lookupEntity('classes:Greater Healing Touch');
+  const cure = lookupEntity('classes:Cure');
+  eq(poolMax('healing-touch', 3, [ht]).total, 9, 'base only: 3×3');
+  const withGht = poolMax('healing-touch', 3, [ht, ght]);
+  eq(withGht.total, 12, 'base 9 + Greater Healing Touch (+3 at L3)');
+  eq(withGht.sources.length, 1, 'one permanent source');
+  // a refill power owned must NOT change the max.
+  eq(poolMax('healing-touch', 3, [ht, cure]).total, 9, 'Cure (refill) does not raise max');
 });
 
 test('pool-registry: build guard surfaces pools with no derivable size', () => {
