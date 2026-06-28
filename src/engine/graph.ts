@@ -1,21 +1,35 @@
 import { EFFECT_EXTRACTORS } from './extractors.js';
-import { lookupEntity, allergenAward, ALLERGEN_AWARDS } from '../engine/data.js';
+import { lookupEntity, allergenAward, ALLERGEN_AWARDS, LEVEL_TABLE, CLASS_PROGRESSION, REFS, CLASS_POWERS, CLASSES, BASE_CLASSES } from '../engine/data.js';
 import { cleanItemName, bareSkill, getClasses } from './resolver.js';
 import { characterLevel, getMaxRanks } from './validate/core.js';
 import { paramInfo, paramReusable } from './param-domain.js';
+import { spellSlots } from './validate/slots.js';
+import { ARMOR_SKILLS } from './config.js';
 import type { CharacterStateV2, CharacterChoice, GraphItem, CharacterGraph, Entity, Effect, EntitySource, BucketedView } from './types.js';
+
+const idName = (id: string) => id.split(':')[1] || id;
 
 
 export class CharacterGraphModel implements CharacterGraph {
   public readonly uiBuckets: BucketedView;
+  public readonly stats: any;
+  public readonly prereqs: { issues: any[]; notes: any[] };
+  public readonly wealth: { base: number; income: number; total: number; sources: any[] };
+  private _ownedIds: Set<string>;
+  private _grantedAbilitiesList: any[];
 
   constructor(
     public character: CharacterStateV2,
     private _items: GraphItem[],
     public characterLevel: number,
-    public classes: Record<string, number>
+    public classes: { name: string; level: number }[]
   ) {
     this.uiBuckets = this.buildBucketedView();
+    this.stats = this.computeStats();
+    this._grantedAbilitiesList = this.computeGrantedAbilitiesList();
+    this._ownedIds = this.computeOwnedIds();
+    this.prereqs = this.computePrereqs();
+    this.wealth = this.computeWealth();
   }
 
   get activePowers(): Set<string> {
@@ -49,6 +63,66 @@ export class CharacterGraphModel implements CharacterGraph {
     return this._items.some(predicate);
   }
 
+  private computeStats() {
+    const mods: any = { lifePoints: 0, spikes: 0, naturalArmor: 0, armor: 0 };
+    const sources: any[] = [];
+    const notes: any[] = [];
+
+    const apply = (name: string, ent: any) => {
+      if (!ent) return;
+      for (const { stat, n } of (ent.statMods || [])) {
+        if (n !== 0) {
+          mods[stat] = (mods[stat] || 0) + n;
+          sources.push({ name, stat, n });
+        }
+      }
+      for (const note of (ent.statModNotes || [])) {
+        notes.push({ name, ...note });
+      }
+    };
+
+    for (const node of this._items) {
+      for (const eff of node.effects) {
+        if (eff.type === 'STAT') {
+          mods[eff.stat] = (mods[eff.stat] || 0) + eff.amount;
+          sources.push({ name: node.name, stat: eff.stat, n: eff.amount });
+        }
+      }
+      if (node.entity?.statModNotes) {
+        for (const note of node.entity.statModNotes) {
+          notes.push({ name: node.name, ...note });
+        }
+      }
+    }
+
+    for (const { name: cls, level: clsLevel } of this.classes) {
+      const prog = CLASS_PROGRESSION[cls] || {};
+      for (let lvl = 1; lvl <= clsLevel; lvl++) {
+        apply(`${cls} L${lvl}`, prog[lvl]);
+      }
+    }
+
+    const level = this.characterLevel;
+    const minRow = LEVEL_TABLE[0] || { level: 4, lp: 3, spikes: 0 };
+    const maxRow = LEVEL_TABLE[LEVEL_TABLE.length - 1] || minRow;
+    
+    const row = LEVEL_TABLE.find((r: any) => r.level === level)
+      || (level < minRow.level ? minRow : maxRow);
+
+    const baseLp = row.lp ?? 0;
+    const baseSp = row.spikes ?? 0;
+
+    return {
+      baseLifePoints: baseLp, 
+      baseSpikes: baseSp,
+      lifePoints: baseLp + (mods.lifePoints || 0),
+      spikes: baseSp + (mods.spikes || 0),
+      armor: mods.armor || 0,
+      naturalArmor: mods.naturalArmor || 0,
+      mods: { ...mods, sources, notes },
+    };
+  }
+
   private buildBucketedView(): BucketedView {
     const view: BucketedView = {
       classes: [], innatePowers: [], basicPowers: [], advancedPowers: [],
@@ -58,8 +132,8 @@ export class CharacterGraphModel implements CharacterGraph {
 
     const SOURCE_OF = { starting: 'class', purchased: 'purchased', power: 'purchased', innate: 'class', multiclass: 'class', grantedSelection: 'class' };
 
-    for (const c in this.classes) {
-      view.classes.push({ name: c, level: this.classes[c], type: 'class' });
+    for (const { name: cls, level: clsLevel } of this.classes) {
+      view.classes.push({ name: cls, level: clsLevel, type: 'class' });
     }
 
     for (const node of this._items) {
@@ -128,6 +202,527 @@ export class CharacterGraphModel implements CharacterGraph {
 
     return view;
   }
+
+  // ─── Granted abilities list (computed from graph items) ───────────────────
+  // Walks every GRANT_SOURCE effect in the graph to build { ability, abilityName,
+  // abilityType, source, sourceId, sourceKind } rows. Computed once, reused by
+  // _ownedIds and prereqs.
+  private computeGrantedAbilitiesList(): any[] {
+    const list: any[] = [];
+    for (const node of this._items) {
+      for (const eff of node.effects) {
+        if (eff.type !== 'GRANT_SOURCE') continue;
+        for (const ability of eff.grants) {
+          const ent = lookupEntity(ability) as any;
+          list.push({
+            ability,
+            abilityName: ent?.name || ability.split(":")[1],
+            abilityType: ability.slice(0, ability.indexOf(':')),
+            source: node.name,
+            sourceId: node.id,
+            sourceKind: node.sourceType,
+          });
+        }
+      }
+    }
+    return list;
+  }
+
+  // ─── Owned IDs ────────────────────────────────────────────────────────────
+  // All entity ids the character owns, for satisfying skill-prereqs. DERIVED from
+  // the character graph (single source of truth — it already walks every owned
+  // field) plus granted abilities. For each owned item we add its resolved id and a
+  // spread of name-aliases so a prereq stated against any equivalent id
+  // (powers:/perks:/skills:, full or bare name) resolves.
+  private computeOwnedIds(): Set<string> {
+    const owned = new Set<string>();
+    for (const node of this._items) {
+      if (node.field === 'flaws' || node.field === 'synthetic') continue;
+      if (node.id) {
+        owned.add(node.id);
+        if (node.id.includes('|')) owned.add(node.id.split('|')[0] + '|any');
+      }
+      const clean = cleanItemName(node.rawString);
+      const bare = bareSkill(clean);
+      const candidates = [
+        `${node.field}:${bare}`,
+        `powers:${clean}`, `perks:${clean}`, `skills:${clean}`,
+        `powers:${bare}`, `perks:${bare}`, `skills:${bare}`,
+      ];
+      for (const cand of candidates) {
+        const e = lookupEntity(cand);
+        if (e) { owned.add(e.id); owned.add(`${e.type}:${bareSkill(e.name)}`); }
+      }
+      if (node.entity) { owned.add(node.entity.id); owned.add(`${node.entity.type}:${bareSkill(node.entity.name)}`); }
+      
+      if (node.entity && node.entity.parameter) {
+        const p = node.entity.parameter.toLowerCase();
+        owned.add(`${node.id}|${p}`);
+        owned.add(`${node.id}|any`);
+      }
+    }
+    // Granted abilities also satisfy prerequisites.
+    for (const g of this._grantedAbilitiesList) {
+      owned.add(g.ability);
+      const ent = lookupEntity(g.ability);
+      if (ent) owned.add(`${ent.type}:${bareSkill(ent.name)}`);
+    }
+    return owned;
+  }
+
+  // ─── prereqStatusFor ──────────────────────────────────────────────────────
+  // Whether a character meets the prereqs for a single entity id — used by the
+  // power picker to flag locked candidates. Returns { met, missing, anyOf, notes }
+  // where `met` is true only when all hard skill-prereqs (incl. disjunctions) are
+  // satisfied. Free-text level/other prereqs can't be auto-verified, so they don't
+  // block `met` but are surfaced as notes.
+  prereqStatusFor(entityId: string): { met: boolean; missing: any[]; anyOf: any[]; notes: any[] } {
+    const ent = lookupEntity(entityId) || lookupEntity(entityId.split(':')[0] + ':' + bareSkill(entityId.split(':')[1]));
+    const pr = (REFS as any).prereqs[ent?.id || entityId];
+    if (!pr) return { met: true, missing: [], anyOf: [], notes: [] };
+    const owned = this._ownedIds;
+    const missing = (pr.skills || []).filter((dep: string) => !owned.has(dep));
+    const unmetGroups = (pr.anyOf || []).filter((g: string[]) => !g.some((dep: string) => owned.has(dep)));
+    const notes = [...(pr.levels || []), ...(pr.other || [])];
+    return {
+      met: missing.length === 0 && unmetGroups.length === 0,
+      missing: missing.map((m: string) => ({ id: m, name: m.split(':')[1] || m })),
+      anyOf: unmetGroups.map((g: string[]) => g.map((m: string) => ({ id: m, name: m.split(':')[1] || m }))),
+      notes,
+    };
+  }
+
+  // ─── Prereqs ──────────────────────────────────────────────────────────────
+  // Prereq check across every owned item. Skill-prereqs (entity ids) are verified
+  // against ownership and become hard `issues` when unmet. Level/other prereqs are
+  // free-text. Level constraints are parsed and hard-enforced as issues, while
+  // unrecognized/other constraints surface as `notes` (manual verification).
+  private computePrereqs(): { issues: any[]; notes: any[] } {
+    const owned = this._ownedIds;
+    const issues: any[] = [];
+    const notes: any[] = [];
+    const seen = new Set<string>();
+    const charLevel = this.characterLevel;
+    const charClasses = this.classes;
+    const character = this.character;
+
+    for (const node of this._items) {
+      if (node.field === 'flaws' || node.field === 'synthetic') continue;
+      const id = node.id;
+      if (seen.has(id)) continue;
+      seen.add(id);
+      const ent = node.entity;
+      
+      // Tiered perks (Draconic Heritage): each purchased tier requires a minimum
+      // CHARACTER level (tier 2 → lvl 5, …).
+      if (Array.isArray(ent?.tiers) && ent.tiers.length) {
+        const rank = Math.min(node.rank || 1, ent.tiers.length);
+        const need = ent.tiers[rank - 1]?.level || 0;
+        if (need > charLevel) {
+          issues.push({ id, item: node.name, field: node.field, tierLevel: need, tier: rank,
+            text: `tier ${rank} requires character level ${need}` });
+        }
+      }
+
+      if (ent && ent.tier === 'SubPower') {
+        issues.push({
+          id, item: node.name, field: node.field,
+          text: `${ent.name} is a sub-power and cannot be selected directly.`,
+        });
+      }
+
+      const pr = (REFS as any).prereqs[ent?.id || id];
+      if (!pr) continue;
+
+      const missing = (pr.skills || []).filter((dep: string) => !owned.has(dep));
+      const unmetGroups = (pr.anyOf || []).filter((group: string[]) => !group.some((dep: string) => owned.has(dep)));
+      if (missing.length || unmetGroups.length) {
+        const eId = node.entity ? id.replace(/^[^:]+:/, `${node.entity.type}:`) : id;
+        issues.push({
+          id: eId, item: node.name, field: node.field,
+          missing: missing.map((m: string) => ({ id: m, name: idName(m) })),
+          anyOf: unmetGroups.map((group: string[]) => group.map((m: string) => ({ id: m, name: idName(m) }))),
+        });
+      }
+      for (const lvl of pr.levels || []) {
+        const p = node.entity;
+        if (p && p.parentClass && charClasses.every((c) => c.name !== p.parentClass)) {
+          issues.push({ id: p.id, item: node.name, field: node.field, 
+            text: `Requires a level in ${p.parentClass}` });
+        }
+        const met = checkLevelConstraint(character, lvl, owned);
+        if (met === false) {
+          issues.push({
+            id, item: node.name, field: node.field,
+            text: `Requires ${lvl}`
+          });
+        } else if (met === null) {
+          notes.push({ id, item: node.name, field: node.field, kind: 'level', text: lvl });
+        }
+      }
+      for (const o of pr.other || []) {
+        const met = checkLevelConstraint(character, o, owned);
+        if (met === false) {
+          issues.push({
+            id, item: node.name, field: node.field,
+            text: `Requires ${o}`
+          });
+        } else if (met === null) {
+          notes.push({ id, item: node.name, field: node.field, kind: 'other', text: o });
+        }
+      }
+    }
+
+    const weaponSpecs: any[] = [];
+    for (const node of this._items) {
+      if (node.field !== 'flaws' && bareSkill(cleanItemName(node.name)) === 'Weapon Specialization') {
+        weaponSpecs.push({ item: node.name, field: node.field });
+      }
+    }
+    for (const g of this._grantedAbilitiesList) {
+      if (g.abilityType === 'skills' && bareSkill(cleanItemName(g.abilityName)) === 'Weapon Specialization') {
+        weaponSpecs.push({ item: g.abilityName, field: 'granted' });
+      }
+    }
+    // Filter out unparameterized 'Weapon Specialization' if a parameterized one is present
+    const hasParameterized = weaponSpecs.some(ws => ws.item.includes('('));
+    const filteredWeaponSpecs = hasParameterized
+      ? weaponSpecs.filter(ws => ws.item.includes('('))
+      : weaponSpecs;
+
+    if (filteredWeaponSpecs.length > 1) {
+      const types = filteredWeaponSpecs.map(ws => {
+        const m = ws.item.match(/\(([^)]+)\)/);
+        return m ? m[1].trim() : 'unspecified';
+      });
+      issues.push({
+        id: 'skills:Weapon Specialization',
+        item: 'Weapon Specialization',
+        text: `A character may only have Weapon Specialization with one weapon type (found: ${types.join(', ')}).`,
+      });
+    }
+
+    // ─── Advanced Classes limit ───
+    const advancedClasses = charClasses.filter(c => !BASE_CLASSES.has(c.name));
+    const baseLevel = charClasses
+      .filter(c => BASE_CLASSES.has(c.name))
+      .reduce((sum, c) => sum + c.level, 0);
+
+    if (advancedClasses.length > 0 && baseLevel < 10) {
+      issues.push({
+        id: 'classes', item: 'Advanced Classes', field: 'classes',
+        text: `Advanced classes cannot be taken until total level 10 has been reached. (Current base level: ${baseLevel})`,
+      });
+    }
+
+    if (advancedClasses.length > 2) {
+      issues.push({
+        id: 'classes', item: 'Advanced Classes', field: 'classes',
+        text: `Character has ${advancedClasses.length} Advanced classes but is limited to a maximum of two.`,
+      });
+    }
+
+    // An advanced class itself cannot exceed 5 levels
+    for (const ac of advancedClasses) {
+      if (ac.level > 5) {
+        issues.push({
+          id: 'classes', item: ac.name, field: 'classes',
+          text: `Advanced class ${ac.name} cannot exceed a maximum of 5 levels.`,
+        });
+      }
+    }
+
+    // ─── Armor/Shield penalty notes ───
+    // Characters need the corresponding skill (or higher) to avoid BP penalties.
+    // We collect the heaviest armor/shield they own and check skills.
+    const ownedArmor: string[] = [];
+    for (const node of this._items) {
+      if (node.entity?.type !== 'skills') continue;
+      const clean = cleanItemName(node.name);
+      if (ARMOR_SKILLS.has(clean) || ARMOR_SKILLS.has(bareSkill(clean))) ownedArmor.push(clean);
+    }
+    for (const g of this._grantedAbilitiesList) {
+      if (g.abilityType === 'skills') {
+        const clean = cleanItemName(g.abilityName);
+        if (ARMOR_SKILLS.has(clean) || ARMOR_SKILLS.has(bareSkill(clean))) {
+          ownedArmor.push(clean);
+        }
+      }
+    }
+    const hasDraconicHeritage = [...owned].some(id => id.startsWith('perks:Draconic Heritage'));
+    if (hasDraconicHeritage) {
+      notes.push({
+        id: 'perks:Draconic Heritage',
+        item: 'Draconic Heritage',
+        field: 'purchasedPerks',
+        kind: 'other',
+        text: 'Must be taken at Character Creation.',
+      });
+    }
+
+    // ─── Mutual exclusions (perks/flaws that "cannot be taken along with" each other) ───
+    const excludes = (REFS as any).excludes || {};
+    if (Object.keys(excludes).length) {
+      const ownedExcl = new Set<string>();
+      for (const node of this._items) {
+        if (node.field === 'purchasedPerks' || node.field === 'flaws' || node.field === 'innatePerks') {
+          if (node.id) ownedExcl.add(node.id);
+        }
+      }
+      for (const g of this._grantedAbilitiesList) {
+        if (/^(perks|flaws):/.test(g.ability)) ownedExcl.add(g.ability);
+      }
+      const reportedPairs = new Set<string>();
+      for (const id of ownedExcl) {
+        for (const other of excludes[id] || []) {
+          if (!ownedExcl.has(other)) continue;
+          const pairKey = [id, other].sort().join('|');
+          if (reportedPairs.has(pairKey)) continue;
+          reportedPairs.add(pairKey);
+          issues.push({
+            id, item: idName(id), field: id.split(':')[0],
+            excludes: other,
+            text: `cannot be taken along with ${idName(other)}`,
+          });
+        }
+      }
+    }
+
+    // ─── Power requirements (parser-extracted: requiredLevel + requiresEntity) ───
+    const charClassLevels = new Map(charClasses.map((c) => [c.name, c.level]));
+    const powerInContext = (name: string) => {
+      for (const { name: cls } of charClasses) {
+        const tiers = (CLASS_POWERS as any)[cls];
+        if (!tiers) continue;
+        for (const list of Object.values(tiers)) {
+          if (!Array.isArray(list)) continue;
+          const hit = list.find((p: any) => p.name === name);
+          if (hit) return { ...hit, __contextClass: cls };
+        }
+      }
+      return lookupEntity(`powers:${name}`);
+    };
+
+    for (const node of this._items) {
+      if (node.entity?.type !== 'powers') continue;
+      const name = cleanItemName(node.name);
+      const field = node.field;
+      const ent = powerInContext(name) as any;
+      if (!ent) continue;
+
+      if (ent.requiredLevel > 0) {
+        const reqClass = ent.requiredClass || ent.__contextClass;
+        const have = reqClass ? (charClassLevels.get(reqClass) || 0) : charLevel;
+        if (have < ent.requiredLevel) {
+          issues.push({ id: `powers:${name}`, item: name, field,
+            text: `Requires ${reqClass ? `${reqClass} ` : ''}Level ${ent.requiredLevel}` });
+        }
+      }
+
+      for (const reqName of (ent.requiresEntity || [])) {
+        const ok = owned.has(`powers:${reqName}`) || owned.has(`skills:${reqName}`)
+          || owned.has(`perks:${reqName}`) || owned.has(`powers:${bareSkill(reqName)}`);
+        if (!ok) {
+          issues.push({ id: `powers:${name}`, item: name, field,
+            requiresEntity: reqName, text: `Requires ${reqName}` });
+        }
+      }
+    }
+
+    const powerCounts = new Map<string, number>();
+    for (const node of this._items) {
+      if (node.entity?.type !== 'powers' || node.sourceType !== 'purchased') continue;
+      const name = cleanItemName(node.name);
+      if (!name) continue;
+      powerCounts.set(name, (powerCounts.get(name) || 0) + 1);
+    }
+    for (const [name, count] of powerCounts) {
+      if (count > 1) {
+        issues.push({
+          id: `powers:${name}`, item: name, field: 'powers',
+          duplicate: count,
+          text: `selected ${count} times — a power may only be taken once`,
+        });
+      }
+    }
+
+    // ─── Elemental Affinity cap ───
+    const elemAffinities: string[] = [];
+    for (const node of this._items) {
+      if (bareSkill(cleanItemName(node.name)) === 'Elemental Affinity') {
+        elemAffinities.push(node.rawString);
+      }
+    }
+    if (elemAffinities.length) {
+      if (elemAffinities.length > 2) {
+        issues.push({
+          id: 'perks:Elemental Affinity', item: 'Elemental Affinity', field: 'purchasedPerks',
+          text: `taken ${elemAffinities.length} times — may be taken at most twice`,
+        });
+      }
+      const elements = elemAffinities
+        .map((p) => (p.match(/\(([^)]+)\)/) || [])[1]?.trim())
+        .filter(Boolean);
+      const dupElement = elements.find((e, i) => elements.findIndex((x) => x.toLowerCase() === e!.toLowerCase()) !== i);
+      if (dupElement) {
+        issues.push({
+          id: 'perks:Elemental Affinity', item: 'Elemental Affinity', field: 'purchasedPerks',
+          text: `cannot attune to ${dupElement} twice — each Elemental Affinity must be a different element`,
+        });
+      }
+    }
+
+    const bloodlines: string[] = [];
+    for (const node of this._items) {
+      if (node.entity?.category === 'Bloodline') bloodlines.push(node.rawString);
+    }
+    if (bloodlines.length > 1) {
+      issues.push({
+        id: 'perks', item: 'Bloodline Perks', field: 'purchasedPerks',
+        text: `has ${bloodlines.length} Bloodline Perks (${bloodlines.join(', ')}) — character may only have one`,
+      });
+    }
+
+    // ─── Lineage-specific constraints ───
+    const sublineages = (character as any).sublineages || {};
+    
+    if (sublineages["Hot Blooded"] && (character.flaws || []).includes("Pliant")) {
+      issues.push({
+        id: 'flaws:Pliant', item: 'Pliant', field: 'flaws',
+        text: `cannot be taken along with the Hot Blooded lineage challenge`,
+      });
+    }
+
+    if (sublineages["Anti-magic"]) {
+      const spellcastingLevels = ((character as any).classes || []).filter((c: any) => (CLASSES as any)[c.name]?.spellcaster && c.level > 0);
+      if (spellcastingLevels.length > 0) {
+        issues.push({
+          id: 'classes:' + spellcastingLevels[0].name, item: spellcastingLevels[0].name, field: 'classes',
+          text: `cannot take class levels in spellcasting classes due to Anti-magic lineage challenge`,
+        });
+      }
+      if (((character as any).startingSkills || []).includes("Ritual Magic") || ((character as any).purchasedSkills || []).includes("Ritual Magic")) {
+        issues.push({
+          id: 'skills:Ritual Magic', item: 'Ritual Magic', field: 'skills',
+          text: `cannot purchase Ritual Magic due to Anti-magic lineage challenge`,
+        });
+      }
+    }
+
+    if (sublineages["The Fractured"]) {
+      const stats = (character as any).stats || {};
+      if (stats.maxLifePoints < 1) {
+        issues.push({
+          id: 'lineage:The Fractured', item: 'The Fractured', field: 'lineage',
+          text: `cannot be taken if the character already has 1 maximum Life Point (would reduce below 1)`,
+        });
+      }
+    }
+
+    if (sublineages["Divinity's Scourge"] && (character.flaws || []).includes("Divine Vulnerability")) {
+      issues.push({
+        id: 'flaws:Divine Vulnerability', item: 'Divine Vulnerability', field: 'flaws',
+        text: `cannot be taken along with the Divinity's Scourge lineage challenge`,
+      });
+    }
+
+    return { issues, notes };
+  }
+
+  // ─── Wealth ───────────────────────────────────────────────────────────────
+  // Walk the graph for WEALTH effects and combine with the character's base wealth.
+  private computeWealth(): { base: number; income: number; total: number; sources: any[] } {
+    const DEFAULT_WEALTH = 8;
+    const characterWealth = this.character.wealth;
+    const base = characterWealth != null && characterWealth !== ''
+      ? (parseInt(String(characterWealth), 10) || DEFAULT_WEALTH)
+      : DEFAULT_WEALTH;
+
+    const sources: any[] = [];
+    let income = 0;
+
+    const add = (name: string, n: number, note: string) => {
+      if (n > 0) {
+        income += n;
+        sources.push({ name, n, note });
+      }
+    };
+
+    // The graph already extracted all WEALTH effects (including the synthetic Tax Evasion)
+    for (const node of this._items) {
+      for (const eff of node.effects) {
+        if (eff.type === 'WEALTH') {
+          add(node.name, eff.amount, eff.note);
+        }
+      }
+    }
+
+    return { base, income, total: base + income, sources };
+  }
+}
+
+// Parse and check free-text level/class/armor/spell-slot/profession constraints.
+// Returns:
+//   true  if the constraint is parsed and met.
+//   false if the constraint is parsed and failed.
+//   null  if the constraint format is unrecognized.
+function checkLevelConstraint(character: any, constraintStr: string, owned: Set<string>): boolean | null {
+  const charLevel = characterLevel(character);
+  const charClasses = getClasses(character);
+
+  // 1. "N levels in Martial Classes" or "N levels in a Martial Classes" or "N class-levels in martial classes"
+  let m = constraintStr.match(/^(\d+)\s+(?:levels?|class-levels)\s+in\s+(?:a\s+)?Martial\s+Classes/i);
+  if (m) {
+    const required = parseInt(m[1], 10);
+    const martial = charClasses.filter((c) => (CLASSES as any)[c.name]?.tags?.includes('Martial'))
+      .reduce((sum, c) => sum + c.level, 0);
+    return martial >= required;
+  }
+  // 2. "Level N [Class]" (e.g., "Level 2 Spellcaster", "Level 3 Mage")
+  m = constraintStr.match(/^Level\s+(\d+)\s+([A-Za-z\s]+)$/i);
+  if (m) {
+    const requiredLevel = parseInt(m[1], 10);
+    const classStr = m[2].trim().toLowerCase();
+    
+    // Spellcaster meta-class
+    if (classStr === 'spellcaster' || classStr === 'spellcaster class') {
+      const highestSpellcasterLevel = charClasses
+        .filter((c) => (CLASSES as any)[c.name]?.spellcaster)
+        .reduce((max, c) => Math.max(max, c.level), 0);
+      return highestSpellcasterLevel >= requiredLevel;
+    }
+    
+    // Specific class
+    const matchClass = charClasses.find((c) => c.name.toLowerCase() === classStr);
+    return matchClass ? matchClass.level >= requiredLevel : false;
+  }
+  // 3. "Level N" (general character level)
+  m = constraintStr.match(/^Level\s+(\d+)$/i);
+  if (m) {
+    return charLevel >= parseInt(m[1], 10);
+  }
+  // 4. "Light Armor", "Medium Armor", "Heavy Armor" (must be owned)
+  if (/^Light Armor|Medium Armor|Heavy Armor$/i.test(constraintStr)) {
+    return owned.has(`skills:${constraintStr}`);
+  }
+  // 5. "N Apprentice spell-slot(s)"
+  m = constraintStr.match(/^(\d+)\s+(Apprentice|Journeyman|Greater|Master)\s+spell-slots?/i);
+  if (m) {
+    const count = parseInt(m[1], 10);
+    const tier = m[2];
+    const slots = spellSlots(character);
+    const have = Object.values(slots).reduce((s: number, c: any) => s + (c[tier] || 0), 0);
+    return have >= count;
+  }
+  // 6. "N Ranks of Profession"
+  m = constraintStr.match(/^(\d+)\s+Ranks\s+of\s+Profession/i);
+  if (m) {
+    const count = parseInt(m[1], 10);
+    const profs = [...owned].filter(id => /^skills:Profession/i.test(id));
+    return profs.length >= count;
+  }
+
+  return null;
 }
 
 

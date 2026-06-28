@@ -39,10 +39,8 @@ import { resolveCharacterGraph, grantedAbilities } from './graph.js';
 export { grantedAbilities };
 import { computeBP } from './validate/bp-accounting.js';
 import { lookupCost } from './validate/cost-key.js';
-import { levelStats as computeLevelStats } from './validate/derived-stats.js';
-import { wealthState as computeWealthState } from './validate/wealth-income.js';
 
-import { checkPrereqs } from './validate/prereqs.js';
+
 export { prereqStatus, checkLevelConstraint } from './validate/prereqs.js';
 import { CRAFT_DISCIPLINES, CRAFTING_TIERS } from './config.js';
 
@@ -453,8 +451,8 @@ export function validate(v1) {
   const basicSpellChoices = Object.fromEntries(
     Object.entries(BASIC_SPELL_SKILLS).map(([skill, mt]) => [skill, basicSpellOptions(characterV2, mt)]),
   );
-  const stats = computeLevelStats(graph);
-  const wealth = computeWealthState(graph, characterV2.wealth);
+  const stats = graph.stats;
+  const wealth = graph.wealth;
   const devotion = devotionState(characterV2);
   const lbp = lbpState(characterV2);
   const granted = grantedAbilities(characterV2);
@@ -476,7 +474,7 @@ export function validate(v1) {
   }
   const activeSelections = computeActiveSelections(graph, lbp);
   const powerBenefits = activePowerBenefits(characterV2);
-  const prereqs = checkPrereqs(characterV2);
+  const prereqs = graph.prereqs;
   const slotsOver = slots.some((s) => s.over);
   // BP used beyond the base allowance, drawn from the bonus pool (clamped ≥0).
   const bonusUsed = Math.max(0, spend.net - budget);
