@@ -17,7 +17,7 @@ import { cleanItemName, bareSkill, getClasses, primaryClass } from './resolver.j
 // barrel so existing imports (`from './data/validate.js'`) keep working unchanged.
 import {
   MAX_LBP, MAX_FLAW_BP, BACKSTORY_BP, MAX_DOMAINS, DEFAULT_WEALTH,
-  LEGAL_MIN_LEVEL, LEVEL_CAP, subKey, CLASS_POWER_TIERS, POWER_SOURCE_FIELDS,
+  LEGAL_MIN_LEVEL, LEVEL_CAP, subKey, POWER_SOURCE_FIELDS,
   characterLevel, getLegalMinLevel, getMaxRanks,
   maxProgressionLevel,
 } from './validate/core.js';
