@@ -22,7 +22,7 @@ function bpSuffix(name, field, report, idx) {
   let e = null;
   const cleanN = cleanItemName(name);
   if (report._graph) {
-    const node = report._graph.items.filter(n => n.field === field.replace(/^(purchased|starting)/, '').toLowerCase() && cleanItemName(n.rawString) === cleanN)[0];
+    const node = Array.from(report._graph).filter(n => n.field === field.replace(/^(purchased|starting)/, '').toLowerCase() && cleanItemName(n.rawString) === cleanN)[0];
     if (node) e = report.spend.byItem[node.id];
   }
   if (!e) e = lookupCost(report.spend.byItem, `${field}:${cleanN}`);

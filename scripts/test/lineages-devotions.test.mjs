@@ -115,7 +115,7 @@ test('lineageChoiceSpec classifies sub-choice items by kind', () => {
 test('Arcane Aptitude grants the chosen spell as a Known Spell', () => {
   const char = { lineage: 'Aewen', lineageAdvantages: ['Arcane Aptitude'],
     advantageChoices: { 'Arcane Aptitude': 'Flameburst' }, ranks: {} };
-  const items = resolveCharacterGraph(char).items;
+  const items = Array.from(resolveCharacterGraph(char));
   const aa = items.find((i) => /Arcane Aptitude/.test(i.name));
   ok(aa.effects.some((e) => e.type === 'GRANT_SOURCE' && e.grants.includes('powers:Flameburst')),
     'the picked spell is granted');
@@ -127,12 +127,12 @@ test('Arcane Secrets (domain power) grants the chosen arcane spell as a Known Sp
   ok(spec?.kind === 'spell' && spec.optionsKey === 'arcaneSecretsOptions', 'Arcane Secrets = arcane spell pick');
   const char = { classLevels: 'Cleric 6', devotion: 'The Librarian',
     domainPowers: ['Arcane Secrets'], choices: { 'powers:Arcane Secrets': 'Arcane Barrage' } };
-  const sec = resolveCharacterGraph(char).items.find((i) => /Arcane Secrets/.test(i.name));
+  const sec = Array.from(resolveCharacterGraph(char)).find((i) => /Arcane Secrets/.test(i.name));
   ok(sec.effects.some((e) => e.type === 'GRANT_SOURCE' && e.grants.includes('powers:Arcane Barrage')),
     'the picked spell is granted');
   // With no pick, no grant.
-  const none = resolveCharacterGraph({ classLevels: 'Cleric 6', devotion: 'The Librarian', domainPowers: ['Arcane Secrets'] })
-    .items.find((i) => /Arcane Secrets/.test(i.name));
+  const none = Array.from(resolveCharacterGraph({ classLevels: 'Cleric 6', devotion: 'The Librarian', domainPowers: ['Arcane Secrets'] }))
+    .find((i) => /Arcane Secrets/.test(i.name));
   ok(!none.effects.some((e) => e.type === 'GRANT_SOURCE'), 'no pick → no spell granted');
 });
 
@@ -148,7 +148,7 @@ test('Weird Wanderings grants a chosen Basic power from a non-Artisan base class
   ok(!pool.some((n) => (lookupEntity(`powers:${n}`)?.parentClass) === 'Artisan'), 'excludes Artisan powers');
   const char = { classLevels: 'Artisan 4', basicPowers: ['Weird Wanderings'],
     choices: { 'powers:Weird Wanderings': 'Battlemind' } };
-  const ww = resolveCharacterGraph(char).items.find((i) => /Weird Wanderings/.test(i.name));
+  const ww = Array.from(resolveCharacterGraph(char)).find((i) => /Weird Wanderings/.test(i.name));
   ok(ww.effects.some((e) => e.type === 'GRANT_SOURCE' && e.grants.includes('powers:Battlemind')),
     'the picked power is granted');
 });
@@ -163,7 +163,7 @@ test('Studied Focus: a tag gates the pool, and both picks are granted', () => {
   // Both picks of the same tag are granted.
   const char = { classLevels: 'Artisan 10', classPowers: ['Studied Focus'],
     choices: { 'powers:Studied Focus': 'Crafter', 'powers:Studied Focus:1': 'Analysis', 'powers:Studied Focus:2': 'Antidote' } };
-  const sf = resolveCharacterGraph(char).items.find((i) => /Studied Focus/.test(i.name));
+  const sf = Array.from(resolveCharacterGraph(char)).find((i) => /Studied Focus/.test(i.name));
   ok(sf.effects.filter((e) => e.type === 'GRANT_SOURCE').length === 2, 'both chosen powers granted');
   ok(sf.effects.some((e) => e.grants?.includes('powers:Analysis'))
      && sf.effects.some((e) => e.grants?.includes('powers:Antidote')), 'the two picks specifically');

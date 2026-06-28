@@ -185,7 +185,7 @@ export function classifyOwnedItems(character) {
   // character. `source` is derived from the node's sourceType.
   const SOURCE_OF = { starting: 'class', purchased: 'purchased', power: 'purchased', innate: 'class', multiclass: 'class', grantedSelection: 'class' };
   const graph = resolveCharacterGraph(character);
-  for (const node of graph.items) {
+  for (const node of graph) {
     if (node.field === 'flaws' || node.field === 'synthetic' || node.field === 'lineageAdvantages' || node.field === 'lineageChallenges') continue;
     const { field, index } = node;
     const source = SOURCE_OF[node.sourceType] || 'purchased';
@@ -246,13 +246,13 @@ export function classifyOwnedItems(character) {
   }
 
   // Refunded multiclass grants (a grant that duplicates an owned skill → free BP,
-  // not an item) are a DERIVATION, not graph items — surface them as display rows.
+  // not an item) are a DERIVATION, not graph — surface them as display rows.
   for (const g of multiclassGrants(character).freeBPItems) {
     skills.push({ name: g.skill, field: 'multiclassGrant', index: -1, source: 'class', grantedBy: g.source, refundedBP: g.bp });
   }
 
   // (Granted abilities are no longer surfaced here as `synthetic` display rows.
-  // They're materialized upstream as real owned graph items — `${type}Grant`
+  // They're materialized upstream as real owned graph — `${type}Grant`
   // fields, sourceType 'grant' — by resolveCharacterGraph, then routed above by
   // the node.sourceType === 'grant' branch. One engine-driven path: the grants
   // carry a real cost (free), parameterize like any owned item, and de-dupe
@@ -397,7 +397,7 @@ export function computeActiveSelections(graph, lbp) {
       }
     }
   };
-  for (const item of graph.items) {
+  for (const item of graph) {
     if (item.field !== 'synthetic') {
       check(item.name || item.rawString);
     }

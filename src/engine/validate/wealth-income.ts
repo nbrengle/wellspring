@@ -15,7 +15,7 @@ export function wealthState(graph, characterWealth) {
   };
 
   // The graph already extracted all WEALTH effects (including the synthetic Tax Evasion)
-  for (const node of graph.items) {
+  for (const node of graph) {
     for (const eff of node.effects) {
       if (eff.type === 'WEALTH') {
         add(node.name, eff.amount, eff.note);

@@ -19,8 +19,8 @@ export function statMods(graph) {
     }
   };
 
-  // 1. Extract from the graph items (Perks, Advantages, Powers, Innates, Skills)
-  for (const node of graph.items) {
+  // 1. Extract from the graph (Perks, Advantages, Powers, Innates, Skills)
+  for (const node of graph) {
     for (const eff of node.effects) {
       if (eff.type === 'STAT') {
         mods[eff.stat] = (mods[eff.stat] || 0) + eff.amount;

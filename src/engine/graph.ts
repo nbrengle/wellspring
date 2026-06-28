@@ -7,12 +7,16 @@ import type { CharacterStateV2, CharacterChoice, GraphItem, CharacterGraph, Enti
 
 
 export class CharacterGraphModel implements CharacterGraph {
+  public readonly uiBuckets: BucketedView;
+
   constructor(
     public character: CharacterStateV2,
-    public items: GraphItem[],
+    private _items: GraphItem[],
     public characterLevel: number,
     public classes: Record<string, number>
-  ) {}
+  ) {
+    this.uiBuckets = this.buildBucketedView();
+  }
 
   get activePowers(): Set<string> {
     const s = new Set<string>();
@@ -24,10 +28,16 @@ export class CharacterGraphModel implements CharacterGraph {
   }
 
   hasEntity(entityId: string): boolean {
-    return this.items.some(i => i.id === entityId || i.entity?.id === entityId);
+    return this._items.some(i => i.id === entityId || i.entity?.id === entityId);
   }
 
-  get uiBuckets(): BucketedView {
+  *[Symbol.iterator](): IterableIterator<GraphItem> {
+    for (const node of this._items) {
+      yield node;
+    }
+  }
+
+  private buildBucketedView(): BucketedView {
     const view: BucketedView = {
       classes: [], innatePowers: [], basicPowers: [], advancedPowers: [],
       veteranPowers: [], utilityPowers: [], classPowers: [], domainPowers: [],
@@ -40,7 +50,7 @@ export class CharacterGraphModel implements CharacterGraph {
       view.classes.push({ name: c, level: this.classes[c], type: 'class' });
     }
 
-    for (const node of this.items) {
+    for (const node of this._items) {
       if (node.field === 'synthetic' || node.field === 'lineageAdvantages' || node.field === 'lineageChallenges') continue;
 
       const clean = cleanItemName(node.rawString || node.name);
@@ -59,12 +69,20 @@ export class CharacterGraphModel implements CharacterGraph {
 
       const viewEntry = {
         ...(node.entity || { name: displayName, type: 'unknown' }),
+        id: node.id,
+        entityId: node.entity?.id || node.id,
         name: displayName,
         source,
         grantedBy,
         free: isFree,
         cost: isFree ? 0 : (node.authoredCost ?? node.baseCost),
         rank: node.rank,
+        effects: node.effects,
+        rawString: node.rawString,
+        field: node.field,
+        choiceData: node.choiceData,
+        specialty: node.specialty,
+        floor: node.floor,
       } as any;
 
       if (node.field === 'flaws') {
@@ -396,7 +414,7 @@ export function grantedAbilities(character: any) {
     bySource[sourceId].abilities.push(row);
   };
 
-  for (const node of graph.items) {
+  for (const node of graph) {
     for (const eff of node.effects) {
       if (eff.type !== 'GRANT_SOURCE') continue;
       for (const ability of eff.grants) {

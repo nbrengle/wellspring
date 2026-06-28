@@ -22,7 +22,7 @@ import { ARMOR_SKILLS } from '../config.js';
 function ownedIds(character) {
   const owned = new Set();
   const graph = resolveCharacterGraph(character);
-  for (const node of graph.items) {
+  for (const node of graph) {
     if (node.field === 'flaws' || node.field === 'synthetic') continue;
     if (node.id) {
       owned.add(node.id);
@@ -154,7 +154,7 @@ export function checkPrereqs(character) {
   const charClasses = getClasses(character);
 
   const graph = resolveCharacterGraph(character);
-  for (const node of graph.items) {
+  for (const node of graph) {
     if (node.field === 'flaws' || node.field === 'synthetic') continue;
     const id = node.id;
     if (seen.has(id)) continue;
@@ -222,7 +222,7 @@ export function checkPrereqs(character) {
   }
 
   const weaponSpecs = [];
-  for (const node of graph.items) {
+  for (const node of graph) {
     if (node.field !== 'flaws' && bareSkill(cleanItemName(node.name)) === 'Weapon Specialization') {
       weaponSpecs.push({ item: node.name, field: node.field });
     }
@@ -284,7 +284,7 @@ export function checkPrereqs(character) {
   // Characters need the corresponding skill (or higher) to avoid BP penalties.
   // We collect the heaviest armor/shield they own and check skills.
   const ownedArmor = [];
-  for (const node of graph.items) {
+  for (const node of graph) {
     if (node.entity?.type !== 'skills') continue;
     const clean = cleanItemName(node.name);
     if (ARMOR_SKILLS.has(clean) || ARMOR_SKILLS.has(bareSkill(clean))) ownedArmor.push(clean);
@@ -312,7 +312,7 @@ export function checkPrereqs(character) {
   const excludes = REFS.excludes || {};
   if (Object.keys(excludes).length) {
     const ownedExcl = new Set();
-    for (const node of graph.items) {
+    for (const node of graph) {
       if (node.field === 'purchasedPerks' || node.field === 'flaws' || node.field === 'innatePerks') {
         if (node.id) ownedExcl.add(node.id);
       }
@@ -351,7 +351,7 @@ export function checkPrereqs(character) {
     return lookupEntity(`powers:${name}`);
   };
 
-  for (const node of graph.items) {
+  for (const node of graph) {
     if (node.entity?.type !== 'powers') continue;
     const name = cleanItemName(node.name);
     const field = node.field;
@@ -378,7 +378,7 @@ export function checkPrereqs(character) {
   }
 
   const powerCounts = new Map();
-  for (const node of graph.items) {
+  for (const node of graph) {
     if (node.entity?.type !== 'powers' || node.sourceType !== 'purchased') continue;
     const name = cleanItemName(node.name);
     if (!name) continue;
@@ -396,7 +396,7 @@ export function checkPrereqs(character) {
 
   // ─── Elemental Affinity cap ───
   const elemAffinities = [];
-  for (const node of graph.items) {
+  for (const node of graph) {
     if (bareSkill(cleanItemName(node.name)) === 'Elemental Affinity') {
       elemAffinities.push(node.rawString);
     }
@@ -421,7 +421,7 @@ export function checkPrereqs(character) {
   }
 
   const bloodlines = [];
-  for (const node of graph.items) {
+  for (const node of graph) {
     if (node.entity?.category === 'Bloodline') bloodlines.push(node.rawString);
   }
   if (bloodlines.length > 1) {

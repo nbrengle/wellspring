@@ -66,7 +66,7 @@ export function computeBP(graph, character) {
   };
   const grantIndex = {};
   const grantParamIndex = {};
-  for (const node of graph.items) {
+  for (const node of graph) {
     for (const eff of node.effects) {
       if (eff.type === 'GRANT_SOURCE') {
         eff.grants.forEach(g => {
@@ -85,8 +85,9 @@ export function computeBP(graph, character) {
   // Phase 1: Base Costs and Grants
   let startingExcess = 0;
   
-  for (let idx = 0; idx < graph.items.length; idx++) {
-    const node = graph.items[idx];
+  let idx = -1;
+  for (const node of graph) {
+    idx++;
     
     // Ledger key (shared scheme — see cost-key.js).
     const key = costKey(node);
@@ -169,7 +170,7 @@ export function computeBP(graph, character) {
 
   // Phase 2: Apply Discounts
   const discountSources = [];
-  graph.items.forEach(node => {
+  Array.from(graph).forEach(node => {
     node.effects.forEach(eff => {
       if (eff.type === 'DISCOUNT_SOURCE') {
         discountSources.push({ ...eff.discount, id: node.id, name: node.name });
@@ -182,7 +183,7 @@ export function computeBP(graph, character) {
   let discountFreeBP = 0;
   const discountsApplied = [];
 
-  for (const node of graph.items) {
+  for (const node of graph) {
     if (node.field !== 'skills' && node.field !== 'perks' && node.field !== 'purchasedSkills' && node.field !== 'purchasedPerks' && node.field !== 'startingSkills') continue;
     
     const key = costKey(node);
@@ -224,7 +225,7 @@ export function computeBP(graph, character) {
   let spent = 0;
   const costFields = ['purchasedSkills', 'purchasedPerks', 'domainPowers', 'classPowers', 'formPowers', 'utilityPowers', 'basicPowers', 'advancedPowers', 'veteranPowers', 'skills', 'perks', 'powers'];
   
-  for (const node of graph.items) {
+  for (const node of graph) {
     if (costFields.includes(node.field)) {
       const eff = byItem[costKey(node)];
       if (eff && eff.cost > 0) {
