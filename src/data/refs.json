@@ -1,6 +1,6 @@
 {
   "generatedFrom": "src/data/*.json",
-  "entities": 1354,
+  "entities": 1368,
   "mentions": {
     "skills:Basic Martial Weapons": [
       "terms:Proficiency"
@@ -4066,11 +4066,10 @@
     ],
     "powers:Mesmerize": [
       "rules-concepts:Short",
+      "archetypes:Crafter Artisan",
       "terms:Short Rest",
       "terms:Long Rest",
       "classes:Artificer",
-      "classes:Artisan",
-      "classes:Crafter",
       "classes:Mystic",
       "terms:Power",
       "effects:Charm",
@@ -9848,6 +9847,20 @@
       "domains:Light",
       "domains:Order"
     ],
+    "archetypes:Defensive Sword + Shield Fighter": [],
+    "archetypes:Great Weapon Fighter": [],
+    "archetypes:Archer Fighter": [],
+    "archetypes:Balanced Cleric": [],
+    "archetypes:Form Fighter Druid": [],
+    "archetypes:Healer Druid": [],
+    "archetypes:Utility Mage": [],
+    "archetypes:Ranged Rogue": [],
+    "archetypes:Skirmisher Rogue": [],
+    "archetypes:Support Socialite": [],
+    "archetypes:Blaster Sourcerer": [],
+    "archetypes:Artificer Artisan": [],
+    "archetypes:Crafter Artisan": [],
+    "archetypes:Mystic Artisan": [],
     "rules-concepts:Retraining": [
       "terms:Base Class",
       "terms:Cantrip",
@@ -16862,7 +16875,6 @@
       "powers:Intimidating Spines",
       "powers:Jury Rig",
       "powers:Kick",
-      "powers:Mesmerize",
       "powers:Overcharge",
       "powers:Share",
       "powers:Spiritual Anchor",
@@ -16909,7 +16921,6 @@
       "powers:The Learned One",
       "powers:Expert Craft",
       "powers:Opus",
-      "powers:Mesmerize",
       "powers:Studied Focus",
       "powers:Aesthetic Suggestion",
       "recipes:Sharpening Stone",
@@ -18565,6 +18576,22 @@
     "rituals:Greater Consecration / Greater Desecration": [],
     "rituals:Health to the Company": [],
     "rituals:Projection": [],
+    "archetypes:Defensive Sword + Shield Fighter": [],
+    "archetypes:Great Weapon Fighter": [],
+    "archetypes:Archer Fighter": [],
+    "archetypes:Balanced Cleric": [],
+    "archetypes:Form Fighter Druid": [],
+    "archetypes:Healer Druid": [],
+    "archetypes:Utility Mage": [],
+    "archetypes:Ranged Rogue": [],
+    "archetypes:Skirmisher Rogue": [],
+    "archetypes:Support Socialite": [],
+    "archetypes:Blaster Sourcerer": [],
+    "archetypes:Artificer Artisan": [],
+    "archetypes:Crafter Artisan": [
+      "powers:Mesmerize"
+    ],
+    "archetypes:Mystic Artisan": [],
     "rules-concepts:Retraining": [
       "rules-concepts:Advanced Classes",
       "rules-concepts:Rebuild Policy"
@@ -24837,6 +24864,19 @@
     ]
   },
   "archetypeRefs": {
-    "archetypes:undefined": {}
+    "archetypes:Defensive Sword + Shield Fighter": {},
+    "archetypes:Great Weapon Fighter": {},
+    "archetypes:Archer Fighter": {},
+    "archetypes:Balanced Cleric": {},
+    "archetypes:Form Fighter Druid": {},
+    "archetypes:Healer Druid": {},
+    "archetypes:Utility Mage": {},
+    "archetypes:Ranged Rogue": {},
+    "archetypes:Skirmisher Rogue": {},
+    "archetypes:Support Socialite": {},
+    "archetypes:Blaster Sourcerer": {},
+    "archetypes:Artificer Artisan": {},
+    "archetypes:Crafter Artisan": {},
+    "archetypes:Mystic Artisan": {}
   }
 }

@@ -8,6 +8,9 @@
 // `gameEffectFacets` supplies the in-play effect/damage/condition facets (the same
 // source the browse game-effect axes use), so grouping and filtering never diverge.
 import { gameEffectFacets } from "../../engine/game-effects.js";
+import { POOLS, poolsReferenced } from "../../engine/pool-registry.js";
+
+const POOL_NAME = Object.fromEntries(POOLS.map((p) => [p.id, p.name]));
 
 const SPELL_TIERS = new Set(["Novice", "Adept", "Greater", "Cantrip"]);
 
@@ -47,6 +50,10 @@ export const FACETS = [
   { id: "damage",     label: "Damage",     values: (e) => gameEffectFacets(e.type, facetName(e)).damage },
   { id: "effect",     label: "Effect",     values: (e) => gameEffectFacets(e.type, facetName(e)).effect },
   { id: "condition",  label: "Condition",  values: (e) => gameEffectFacets(e.type, facetName(e)).condition },
+  // Class Pool: which pool(s) this entity defines / augments / spends from / refills.
+  // Lets you browse every power that touches e.g. the Healing Touch Pool. Derived
+  // from the entity's prose (pool-registry), tolerant of source spelling variants.
+  { id: "pool",       label: "Pool",       values: (e) => poolsReferenced(e).map((id) => POOL_NAME[id] || id) },
 ];
 export const FACET_BY_ID = Object.fromEntries(FACETS.map((f) => [f.id, f]));
 

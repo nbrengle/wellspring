@@ -1,6 +1,6 @@
 [
   {
-    "archetypeName": "Defensive Sword + Shield Fighter",
+    "name": "Defensive Sword + Shield Fighter",
     "classes": {
       "Fighter": 4
     },
@@ -115,7 +115,7 @@
     }
   },
   {
-    "archetypeName": "Great Weapon Fighter",
+    "name": "Great Weapon Fighter",
     "classes": {
       "Fighter": 4
     },
@@ -213,7 +213,7 @@
     }
   },
   {
-    "archetypeName": "Archer Fighter",
+    "name": "Archer Fighter",
     "classes": {
       "Fighter": 4
     },
@@ -322,7 +322,7 @@
     }
   },
   {
-    "archetypeName": "Balanced Cleric",
+    "name": "Balanced Cleric",
     "classes": {
       "Cleric": 4
     },
@@ -458,7 +458,7 @@
     }
   },
   {
-    "archetypeName": "Form Fighter Druid",
+    "name": "Form Fighter Druid",
     "classes": {
       "Druid": 4
     },
@@ -577,7 +577,7 @@
     }
   },
   {
-    "archetypeName": "Healer Druid",
+    "name": "Healer Druid",
     "classes": {
       "Druid": 4
     },
@@ -713,7 +713,7 @@
     }
   },
   {
-    "archetypeName": "Utility Mage",
+    "name": "Utility Mage",
     "classes": {
       "Mage": 4
     },
@@ -859,7 +859,7 @@
     }
   },
   {
-    "archetypeName": "Ranged Rogue",
+    "name": "Ranged Rogue",
     "classes": {
       "Rogue": 4
     },
@@ -961,7 +961,7 @@
     }
   },
   {
-    "archetypeName": "Skirmisher Rogue",
+    "name": "Skirmisher Rogue",
     "classes": {
       "Rogue": 4
     },
@@ -1094,7 +1094,7 @@
     }
   },
   {
-    "archetypeName": "Support Socialite",
+    "name": "Support Socialite",
     "classes": {
       "Socialite": 4
     },
@@ -1235,7 +1235,7 @@
     }
   },
   {
-    "archetypeName": "Blaster Sourcerer",
+    "name": "Blaster Sourcerer",
     "classes": {
       "Sourcerer": 4
     },
@@ -1329,7 +1329,7 @@
     }
   },
   {
-    "archetypeName": "Artificer Artisan",
+    "name": "Artificer Artisan",
     "classes": {
       "Artisan": 4
     },
@@ -1444,7 +1444,7 @@
     }
   },
   {
-    "archetypeName": "Crafter Artisan",
+    "name": "Crafter Artisan",
     "classes": {
       "Artisan": 4
     },
@@ -1559,7 +1559,7 @@
     }
   },
   {
-    "archetypeName": "Mystic Artisan",
+    "name": "Mystic Artisan",
     "classes": {
       "Artisan": 4
     },

@@ -20,8 +20,23 @@ import {
   STARTING_CHOICES_CONFIG, optionSkills, resolveSkill,
   configSkillKeys, sourceStartingSkillKeys,
 } from '../../src/engine/starting-choices.js';
+import { loadArchetype } from '../../src/engine/character-state.js';
 import ARCHETYPES from '../../src/data/archetypes.json' with { type: 'json' };
 import CLASSES_JSON from '../../src/data/classes.json' with { type: 'json' };
+
+// Regression: every archetype must load — via the REAL loadArchetype path, not a
+// hand-built mirror — with its class applied. (Archetypes store classes as an
+// object map { Cleric: 4 }; loadArchetype's copy loop used to drop it because
+// `classes` isn't a key on EMPTY_CHARACTER, leaving CLASS "not set" wholesale.)
+test('loadArchetype: every archetype loads with its class set', () => {
+  for (const a of ARCHETYPES) {
+    const c = loadArchetype(a);
+    const classes = getClasses(c);
+    ok(classes.length > 0, `${a.archetypeName || a.name}: class applied`);
+    ok(classes.every((x) => x.name && x.level > 0), `${a.archetypeName || a.name}: class has name + level`);
+    eq(validate(c).level > 0, true, `${a.archetypeName || a.name}: report has a level`);
+  }
+});
 
 
 // A character built straight from an archetype mirrors what loadArchetype keeps.
@@ -117,7 +132,7 @@ test('spells-known picker offers novice + adept (all learnable tiers)', () => {
 
 // ─── xN ranks ─────────────────────────────────────────────────────────────────
 test('xN rank multiplies a slot-granting skill (Utility Mage Extended Capacity x2)', () => {
-  const mage = ARCHETYPES.find((a) => a.archetypeName === 'Utility Mage');
+  const mage = ARCHETYPES.find((a) => a.name === 'Utility Mage');
   try {
     const r = validate(fromArchetype(mage));
     ok(r.spellSlots.Arcane.novice >= 5, `novice bonus from x2 grants (got ${r.spellSlots.Arcane.novice})`);

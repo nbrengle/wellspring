@@ -549,7 +549,9 @@ export const RITUALS = ritualsJson;
 // ─── ARCHETYPES + REFS ────────────────────────────────────────────────────────
 // Starter character templates and the cross-reference graph the builder uses
 // to look up details, backlinks, and prereqs.
-export const ARCHETYPES = archetypesJson.map(a => ({ ...a, name: a.archetypeName }));
+// Archetype definitions carry `name` directly (the parser emits it) — no alias.
+// The CHARACTER built from one carries `archetypeName` as provenance (loadArchetype).
+export const ARCHETYPES = archetypesJson;
 export const REFS = refsJson;
 
 // Lookup by entity id, e.g. "skills:Basic Faith" → { type, name, description, ... }.

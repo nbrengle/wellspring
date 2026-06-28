@@ -36,6 +36,7 @@ export { lbpState };
 import { computeSlots, spellSlots, bookcasterSpellOptions, arcaneSecretsSpellOptions, weirdWanderingsOptions as weirdWanderingsPool, studiedFocusOptions as studiedFocusPool, ARTISAN_SPECIALTY_TAGS, eligibleClassChoices, CLASS_CHOICE_SKILLS, basicSpellOptions, BASIC_SPELL_SKILLS } from './validate/slots.js';
 export { innateBonusCantrips, eligibleClassChoices, CLASS_CHOICE_SKILLS, agileLearnerCapacity, basicSpellOptions, BASIC_SPELL_SKILLS } from './validate/slots.js';
 import { resolveCharacterGraph, grantedAbilities } from './graph.js';
+import { characterPools } from './pool-registry.js';
 export { grantedAbilities };
 
 import { lookupCost } from './validate/cost-key.js';
@@ -458,6 +459,12 @@ export function validate(v1) {
   const granted = grantedAbilities(characterV2);
   const crafting = craftingCapability(characterV2);
   const owned = classifyOwnedItems(characterV2);
+  // Class "pools" (Healing Touch Pool, Living Iron Pool, …): derived from the
+  // owned set + class levels. Only pools whose defining power is owned appear.
+  // Read-layer-shaped record the identity rail + a Pool facet consume directly.
+  const ownedFlat = [...owned.skills, ...owned.perks, ...owned.classPowers, ...owned.innatePowers];
+  const classLevelOf = (className) => getClasses(characterV2).find((c) => c.name === className)?.level ?? 0;
+  const pools = characterPools(ownedFlat, classLevelOf);
   // Class-choice grants (Extensive Combat Training / Extensive Training /
   // Spell-Scholar): the classes the player may pick for each, gated by the classes
   // they actually have. The UI reads this to offer ONLY eligible classes (not the
@@ -523,6 +530,7 @@ export function validate(v1) {
     grantedAbilities: granted,
     crafting,
     owned,
+    pools,
     classChoices,
     activeSelections,
     powerBenefits,
