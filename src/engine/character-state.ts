@@ -93,6 +93,25 @@ export function applyClassStartingAbilities(character, className, _level = 1) {
   return nextCharacter;
 }
 
+// Normalize any class representation to the canonical array [{name, level}]:
+//   { Cleric: 4 }            (archetype object map)
+//   [{ name, level }]        (already canonical)
+//   "Cleric 4" / "Cleric 4, Fighter 2"  (legacy classLevels string)
+function normalizeClasses(value) {
+  if (!value) return [];
+  if (Array.isArray(value)) return value;
+  if (typeof value === 'string') {
+    return value.split(',').map((part) => {
+      const m = part.trim().match(/^(.+?)\s+(\d+)$/);
+      return m ? { name: m[1], level: parseInt(m[2], 10) } : { name: part.trim(), level: 1 };
+    });
+  }
+  if (typeof value === 'object') {
+    return Object.entries(value).map(([name, level]) => ({ name: String(name), level: Number(level) || 1 }));
+  }
+  return [];
+}
+
 export function loadArchetype(archetype) {
   const c = { ...EMPTY_CHARACTER, archetypeName: archetype.name };
   for (const k of Object.keys(EMPTY_CHARACTER)) {
@@ -109,6 +128,16 @@ export function loadArchetype(archetype) {
   if (archetype.grants) c.grants = archetype.grants;
   if (archetype.effectiveBP) c.effectiveBP = archetype.effectiveBP;
   if (archetype.ranks) c.ranks = archetype.ranks;
+  // Classes are NOT a key on EMPTY_CHARACTER, so the copy loop above skips them —
+  // the archetype's class would be dropped (CLASS shows "not set"). Carry it over
+  // explicitly, normalized to the canonical array form [{name, level}] that
+  // getClasses + the class handlers use. Archetypes store it as an object map
+  // ({ Cleric: 4 }); also accept an array or a "Cleric 4" string defensively.
+  if (archetype.classes !== undefined) {
+    c.classes = normalizeClasses(archetype.classes);
+  } else if (archetype.classLevels) {
+    c.classes = normalizeClasses(archetype.classLevels);
+  }
   const primary = getClasses(c)[0]?.name;
   let out = c;
   if (primary && hasStartingChoices(primary)) {
