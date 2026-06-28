@@ -1,10 +1,107 @@
 import { EFFECT_EXTRACTORS } from './extractors.js';
 import { lookupEntity, allergenAward, ALLERGEN_AWARDS } from '../engine/data.js';
 import { cleanItemName, bareSkill, getClasses } from './resolver.js';
-import { characterLevel } from './validate/core.js';
-import type { CharacterStateV2, CharacterChoice, GraphItem, CharacterGraph, Entity, Effect, EntitySource } from './types.js';
+import { characterLevel, getMaxRanks } from './validate/core.js';
+import { paramInfo, paramReusable } from './param-domain.js';
+import type { CharacterStateV2, CharacterChoice, GraphItem, CharacterGraph, Entity, Effect, EntitySource, BucketedView } from './types.js';
 
-export function resolveCharacterGraph(charInput: any): CharacterGraph {
+
+export class CharacterGraphModel implements CharacterGraph {
+  constructor(
+    public character: CharacterStateV2,
+    public items: GraphItem[],
+    public characterLevel: number,
+    public classes: Record<string, number>
+  ) {}
+
+  get activePowers(): Set<string> {
+    const s = new Set<string>();
+    const b = this.uiBuckets;
+    for (const pool of [b.innatePowers, b.basicPowers, b.advancedPowers, b.veteranPowers, b.utilityPowers, b.classPowers, b.domainPowers]) {
+      for (const p of pool) s.add(p.id || p.name);
+    }
+    return s;
+  }
+
+  hasEntity(entityId: string): boolean {
+    return this.items.some(i => i.id === entityId || i.entity?.id === entityId);
+  }
+
+  get uiBuckets(): BucketedView {
+    const view: BucketedView = {
+      classes: [], innatePowers: [], basicPowers: [], advancedPowers: [],
+      veteranPowers: [], utilityPowers: [], classPowers: [], domainPowers: [],
+      skills: [], perks: [], flaws: [], knownSpells: []
+    };
+
+    const SOURCE_OF = { starting: 'class', purchased: 'purchased', power: 'purchased', innate: 'class', multiclass: 'class', grantedSelection: 'class' };
+
+    for (const c in this.classes) {
+      view.classes.push({ name: c, level: this.classes[c], type: 'class' });
+    }
+
+    for (const node of this.items) {
+      if (node.field === 'synthetic' || node.field === 'lineageAdvantages' || node.field === 'lineageChallenges') continue;
+
+      const clean = cleanItemName(node.rawString || node.name);
+      const paramM = clean.match(/\(([^)]+)\)\s*$/) || clean.match(/\s-\s([^()]+)$/);
+      const paramValue = paramM ? paramM[1].trim() : (node.entity?.parameter || undefined);
+      const displayName = paramValue && !node.name.includes(paramValue) ? `${node.name} (${paramValue})` : node.name;
+
+      const source = SOURCE_OF[node.sourceType] || (node.sourceType === 'grant' ? 'class' : 'purchased');
+      const isFree = node.sourceType === 'grant' || (node.effects && node.effects.some(e => e.type === 'REFUND_GRANT'));
+      
+      let grantedBy = node.grantedBy;
+      if (isFree && !grantedBy) {
+         const refundEff = node.effects?.find(e => e.type === 'REFUND_GRANT');
+         if (refundEff) grantedBy = refundEff.source;
+      }
+
+      const viewEntry = {
+        ...(node.entity || { name: displayName, type: 'unknown' }),
+        name: displayName,
+        source,
+        grantedBy,
+        free: isFree,
+        cost: isFree ? 0 : (node.authoredCost ?? node.baseCost),
+        rank: node.rank,
+      } as any;
+
+      if (node.field === 'flaws') {
+        view.flaws.push(viewEntry);
+        continue;
+      }
+
+      const t = node.entity?.type;
+      const tier = (node.entity as any)?.tier;
+
+      if (node.sourceType === 'innate') {
+        view.innatePowers.push(viewEntry);
+      } else if (node.sourceType === 'grant' && t === 'spell') {
+        view.knownSpells.push(viewEntry);
+      } else if (t === 'power') {
+        if (tier === 'Basic') view.basicPowers.push(viewEntry);
+        else if (tier === 'Advanced') view.advancedPowers.push(viewEntry);
+        else if (tier === 'Veteran') view.veteranPowers.push(viewEntry);
+        else if (tier === 'Utility') view.utilityPowers.push(viewEntry);
+        else if (tier === 'Class' || node.field === 'classPowers') view.classPowers.push(viewEntry);
+        else if (node.field === 'domainPowers') view.domainPowers.push(viewEntry);
+        else view.classPowers.push(viewEntry);
+      } else if (t === 'spell') {
+        view.knownSpells.push(viewEntry);
+      } else if (t === 'perk') {
+        view.perks.push(viewEntry);
+      } else {
+        view.skills.push(viewEntry);
+      }
+    }
+
+    return view;
+  }
+}
+
+
+export function resolveCharacterGraph(charInput: any): CharacterGraphModel {
   // If the input is V1 state, convert it to V2 state internally
   let character: CharacterStateV2 = charInput;
   if (!charInput.skills && !charInput.perks && !charInput.powers) {
@@ -172,40 +269,69 @@ export function resolveCharacterGraph(charInput: any): CharacterGraph {
     });
   }
 
-  // Generate Synthesized Granted Items
-  const bareKey = (name: string, ent: any) => {
-    const clean = cleanItemName(name);
-    const e = ent || lookupEntity(`skills:${clean}`) || lookupEntity(`powers:${clean}`);
-    const base = (e?.baseName || e?.name || bareSkill(clean)).toLowerCase();
-    const paramM = clean.match(/\(([^)]+)\)\s*$/) || clean.match(/\s-\s([^()]+)$/);
-    return paramM ? `${base}|${paramM[1].trim().toLowerCase()}` : base;
-  };
-  const ownedKeys = new Set(items
-    .filter((it) => it.sourceType !== 'lineage')
-    .map((it) => bareKey(it.rawString || it.name, it.entity)));
-  const grantedKeys = new Set();
   
+  // Generate Synthesized Granted Items & Deduplicate
+  const getIdentity = (rawName: string, ent: any) => {
+    const clean = cleanItemName(rawName);
+    const entityId = ent?.id || rawName;
+    const cap = getMaxRanks(entityId);
+    const info = paramInfo(ent);
+    const reusable = paramReusable(ent, entityId);
+    const baseName = (ent?.baseName || ent?.name || bareSkill(clean)).toLowerCase();
+
+    if (!info || reusable) return { key: baseName, cap };
+
+    const paramM = clean.match(/\(([^)]+)\)\s*$/) || clean.match(/\s-\s([^()]+)$/);
+    const paramValue = paramM ? paramM[1].trim().toLowerCase() : (ent?.parameter ? ent.parameter.toLowerCase() : 'unknown');
+    return { key: `${baseName}|${paramValue}`, cap: 1 };
+  };
+
+  const itemIdentities = new Map<string, { cap: number, nodes: any[] }>();
+  for (const it of items) {
+    if (it.sourceType === 'lineage') continue;
+    const { key, cap } = getIdentity(it.rawString || it.name, it.entity);
+    if (!itemIdentities.has(key)) itemIdentities.set(key, { cap, nodes: [] });
+    itemIdentities.get(key)!.nodes.push(it);
+  }
+
   for (const node of [...items]) {
     for (const eff of node.effects) {
       if (eff.type !== 'GRANT_SOURCE') continue;
       for (const gid of eff.grants) {
-        const ent = lookupEntity(gid) as any;
+        let ent = lookupEntity(gid) as any;
         const gType = gid.slice(0, gid.indexOf(':'));
         const rawGidName = gid.slice(gid.indexOf(':') + 1);
-        const gName = ent?.name || rawGidName;
-        const key = bareKey(rawGidName, ent);
+        if (!ent) {
+          const clean = cleanItemName(rawGidName);
+          ent = lookupEntity(`skills:${clean}`) || lookupEntity(`powers:${clean}`) || lookupEntity(`perks:${clean}`);
+        }
         
-        if (ownedKeys.has(key)) {
-          const ownedNode = items.find(it => it.sourceType !== 'lineage' && bareKey(it.rawString || it.name, it.entity) === key);
-          if (ownedNode && ownedNode.sourceType === 'purchased') {
-             ownedNode.effects.push({ type: 'REFUND_GRANT', source: node.name });
+        const gName = ent?.name || rawGidName;
+        const { key, cap } = getIdentity(gName, ent);
+        
+        let group = itemIdentities.get(key);
+        if (!group) {
+          group = { cap, nodes: [] };
+          itemIdentities.set(key, group);
+        }
+
+        // Check if we are at cap with grants + purchases
+        let grantCount = group.nodes.filter(n => n.sourceType === 'grant').length;
+        let purchaseCount = group.nodes.filter(n => n.sourceType === 'purchased').length;
+
+        if (grantCount + purchaseCount >= cap) {
+          // We are at cap. Grant wins, so refund a purchase if one exists
+          const purchasedNode = group.nodes.find(n => n.sourceType === 'purchased' && !n.effects?.some(e => e.type === 'REFUND_GRANT'));
+          if (purchasedNode) {
+             purchasedNode.effects = purchasedNode.effects || [];
+             purchasedNode.effects.push({ type: 'REFUND_GRANT', source: node.name });
           }
+          // Do not push the grant if we hit cap and already refunded all purchases?
+          // Actually, if we hit cap, and there are no purchases to refund, we just drop the grant.
           continue;
         }
-        if (grantedKeys.has(key)) continue;
-        grantedKeys.add(key);
-        
-        items.push({
+
+        const newGrant = {
           id: ent?.id || gid,
           name: gName,
           rawString: gName,
@@ -220,12 +346,13 @@ export function resolveCharacterGraph(charInput: any): CharacterGraph {
           specialty: null,
           floor: 0,
           index: -1,
-        });
+        };
+        items.push(newGrant);
+        group.nodes.push(newGrant);
       }
     }
   }
-
-  // Tax Evasion
+// Tax Evasion
   const hasTaxEvasion = items.some(i => i.name === 'Tax Evasion');
   if (hasTaxEvasion) {
     const profRanks = items.filter(i => /^\bProfession\b/i.test(i.name)).length;
@@ -246,7 +373,7 @@ export function resolveCharacterGraph(charInput: any): CharacterGraph {
     }
   }
 
-  return { character, items, characterLevel: charLevel, classes };
+  return new CharacterGraphModel(character, items, charLevel, classes);
 }
 
 export function grantedAbilities(character: any) {
