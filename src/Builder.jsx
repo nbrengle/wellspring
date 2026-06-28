@@ -10,12 +10,6 @@ import {
   characterLevel,
   validityReasons,
 } from "./engine/validate.js";
-import { getClasses } from "./engine/resolver.js";
-import {
-  hasStartingChoices,
-  reconcileStartingChoices,
-  rebuildStartingSkills,
-} from "./engine/starting-choices.js";
 import { useCharacterState } from "./hooks/useCharacterState.js";
 import { useBuilderHandlers } from "./hooks/useBuilderHandlers.js";
 import RulesExplorer from "./RulesExplorer.jsx";

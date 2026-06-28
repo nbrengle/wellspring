@@ -462,6 +462,8 @@ function convertToV2(v1) {
     devotions: [],
     wealth: v1.wealth || 'None',
   };
+  let idCounter = 0;
+  const nextId = (entityId) => crypto.createHash('md5').update(`${v1.name}:${entityId}:${idCounter++}`).digest('hex');
 
   // 1. Classes
   if (v1.classLevels) {
@@ -480,7 +482,7 @@ function convertToV2(v1) {
     const addAdv = (arr) => {
       for (const adv of arr || []) {
         v2.perks.push({
-          id: crypto.randomUUID(),
+          id: nextId('advantages:' + v1.lineage + ' - ' + adv),
           entityId: 'advantages:' + v1.lineage + ' - ' + adv,
           source: 'Lineage',
         });
@@ -491,7 +493,7 @@ function convertToV2(v1) {
     
     for (const ch of v1.lineageChallenges || []) {
       v2.flaws.push({
-        id: crypto.randomUUID(),
+        id: nextId('challenges:' + v1.lineage + ' - ' + ch),
         entityId: 'challenges:' + v1.lineage + ' - ' + ch,
         source: 'Lineage'
       });
@@ -514,7 +516,7 @@ function convertToV2(v1) {
       else entityId = cleanName; // Will be resolved by the engine
 
       const choice = {
-        id: crypto.randomUUID(),
+        id: nextId(entityId),
         entityId,
         source: sourceName,
       };
@@ -553,7 +555,7 @@ function convertToV2(v1) {
   addChoice('bookSpells', v2.spells, 'Purchased');
   
   if (v1.devotion) {
-     v2.devotions.push({ id: crypto.randomUUID(), entityId: 'devotions:' + v1.devotion, source: 'Purchased' });
+     v2.devotions.push({ id: nextId('devotions:' + v1.devotion), entityId: 'devotions:' + v1.devotion, source: 'Purchased' });
   }
 
   return v2;
