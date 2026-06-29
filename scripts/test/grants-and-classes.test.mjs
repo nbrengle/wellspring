@@ -42,6 +42,20 @@ test('loadArchetype: every archetype loads with its class set', () => {
 // A character built straight from an archetype mirrors what loadArchetype keeps.
 const fromArchetype = (a) => ({ ...a, archetypeName: a.name });
 
+// ─── grants carry params as a first-class field (#50) ─────────────────────────
+test('node.param is structured (parsed once), incl. on grants', () => {
+  // Purchased parameterized skills carry their chosen value structurally.
+  const g = resolveCharacterGraph({ classLevels: 'Cleric 4', purchasedSkills: ['Lore (Arcane)', 'Lore (Religion)'] });
+  const lore = g.filter((n) => /^Lore/.test(n.name));
+  eq(lore.map((n) => n.param).sort().join(','), 'Arcane,Religion', 'purchased Lore params are structured');
+
+  // A GRANT also carries its param (Lessons from Scars → Lore (Historical), (Noble)).
+  const g2 = resolveCharacterGraph({ classLevels: 'Fighter 6', utilityPowers: ['Lessons from Scars'] });
+  const granted = g2.filter((n) => n.sourceType === 'grant' && /Lore/.test(n.name));
+  ok(granted.length > 0 && granted.every((n) => typeof n.param === 'string' && n.param.length > 0),
+     'granted Lore nodes carry a structured param: ' + JSON.stringify(granted.map((n) => n.param)));
+});
+
 // ─── innate powers: one dedicated handler, no double-count ────────────────────
 test('a stored innate power is materialized once, not double-counted', () => {
   // activeInnatePowers() is the dedicated handler for innatePowers (it merges
