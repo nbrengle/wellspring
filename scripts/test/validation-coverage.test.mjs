@@ -28,14 +28,18 @@ import CLASSES_JSON from '../../src/data/classes.json' with { type: 'json' };
 const fromArchetype = (a) => ({ ...a, archetypeName: a.name });
 
 // ─── Weapon Specialization & Advanced Classes validation ───────────────────────
-test('validation: Weapon Specialization limit (only one type)', () => {
+test('validation: take-once cap on purchases (generic OVER_CAP, e.g. Weapon Spec)', () => {
   const clean = { archetypeName: 'x', classLevels: 'Fighter 4', startingSkills: ['Basic Martial Weapons'], purchasedSkills: ['Weapon Specialization (Swords)'] };
   const rClean = validate(clean);
   eq(rClean.prereqs.issues.length, 0, 'One specialization is legal');
 
+  // Buying a SECOND cap-1 (rank "-") skill is an illegal build — flagged generically
+  // as over-cap, NOT silently refunded to free BP (refund is for grants only).
   const multiple = { archetypeName: 'x', classLevels: 'Fighter 4', startingSkills: ['Basic Martial Weapons'], purchasedSkills: ['Weapon Specialization (Swords)', 'Weapon Specialization (Daggers)'] };
   const rMultiple = validate(multiple);
-  ok(rMultiple.prereqs.issues.some(i => i.item === 'Weapon Specialization' && i.text.includes('only have Weapon Specialization with one')), 'Multiple specializations are blocked');
+  ok(rMultiple.prereqs.issues.some(i => /Weapon Specialization/.test(i.item) && /taken once/i.test(i.text)),
+     'A second cap-1 purchase is blocked as over-cap');
+  ok(!rMultiple.valid, 'build with an over-cap purchase is invalid');
 });
 
 test('validation: Advanced Classes limits and rules', () => {

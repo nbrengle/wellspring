@@ -161,6 +161,46 @@ export interface GraphItem {
   grantKind?: string;
 }
 
+
+export type ViewState = {
+  id: string;
+  entityId: string;
+  param?: string;
+  source: string;
+  grantedBy?: string;
+  free: boolean;
+  cost: number;
+  rank: number;
+  effects: Effect[];
+  rawString?: string;
+  field: string;
+  choiceData?: CharacterChoice;
+  specialty?: any;
+  floor?: number;
+};
+
+export type SkillView = Skill & ViewState;
+export type PowerView = Power & ViewState;
+export type SpellView = Spell & ViewState;
+export type PerkView = Perk & ViewState;
+export type FlawView = Flaw & ViewState;
+export type ClassView = Class & { level: number };
+
+export interface BucketedView {
+  classes:       ClassView[];
+  innatePowers:  PowerView[];
+  basicPowers:   PowerView[];
+  advancedPowers:PowerView[];
+  veteranPowers: PowerView[];
+  utilityPowers: PowerView[];
+  classPowers:   PowerView[];
+  domainPowers:  PowerView[];
+  skills:        SkillView[];
+  perks:         PerkView[];
+  flaws:         FlawView[];
+  knownSpells:   SpellView[];
+}
+
 export interface CharacterGraph {
   character: CharacterStateV2;
   items: GraphItem[];
