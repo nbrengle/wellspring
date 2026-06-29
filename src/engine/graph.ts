@@ -7,7 +7,7 @@ import { cleanItemName, bareSkill, getClasses } from './resolver.js';
 import { characterLevel, getMaxRanks } from './validate/core.js';
 import { paramInfo, paramReusable } from './param-domain.js';
 import { spellSlots } from './validate/slots.js';
-import type { CharacterStateV2, CharacterChoice, GraphItem, CharacterGraph, Entity, Effect, EntitySource, BucketedView } from './types.js';
+import type { CharacterStateV2, V1CharacterInput, CharacterChoice, GraphItem, CharacterGraph, Entity, Effect, EntitySource, BucketedView } from './types.js';
 
 const idName = (id: string) => id.split(':')[1] || id;
 
@@ -310,7 +310,7 @@ export class CharacterGraphModel implements CharacterGraph {
   // block `met` but are surfaced as notes.
   prereqStatusFor(entityId: string): { met: boolean; missing: any[]; anyOf: any[]; notes: any[] } {
     const ent = lookupEntity(entityId) || lookupEntity(entityId.split(':')[0] + ':' + bareSkill(entityId.split(':')[1]));
-    const pr = (REFS as any).prereqs[ent?.id || entityId];
+    const pr = REFS.prereqs[ent?.id || entityId];
     if (!pr) return { met: true, missing: [], anyOf: [], notes: [] };
     const owned = this._ownedIds;
     const missing = (pr.skills || []).filter((dep: string) => !owned.has(dep));
@@ -363,7 +363,7 @@ export class CharacterGraphModel implements CharacterGraph {
         });
       }
 
-      const pr = (REFS as any).prereqs[ent?.id || id];
+      const pr = REFS.prereqs[ent?.id || id];
       if (!pr) continue;
 
       const missing = (pr.skills || []).filter((dep: string) => !owned.has(dep));
@@ -475,7 +475,7 @@ export class CharacterGraphModel implements CharacterGraph {
   // Mutually-exclusive perks/flaws ("cannot be taken along with" each other).
   private checkMutualExclusions(): { issues: any[]; notes: any[] } {
     const issues: any[] = [];
-    const excludes = (REFS as any).excludes || {};
+    const excludes = REFS.excludes || {};
     if (Object.keys(excludes).length) {
       const ownedExcl = new Set<string>();
       for (const node of this._items) {
@@ -608,9 +608,11 @@ export class CharacterGraphModel implements CharacterGraph {
   private checkLineageConstraints(): { issues: any[]; notes: any[] } {
     const issues: any[] = [];
     const character = this.character;
-    const sublineages = (character as any).sublineages || {};
+    const sublineages = character.sublineages || {};
+    const hasFlaw = (name: string) => (character.flaws || []).some((f) => f.entityId === name);
+    const hasSkill = (name: string) => (character.skills || []).some((s) => s.entityId === name);
 
-    if (sublineages["Hot Blooded"] && (character.flaws || []).includes("Pliant")) {
+    if (sublineages["Hot Blooded"] && hasFlaw("Pliant")) {
       issues.push({
         id: 'flaws:Pliant', item: 'Pliant', field: 'flaws',
         text: `cannot be taken along with the Hot Blooded lineage challenge`,
@@ -618,14 +620,14 @@ export class CharacterGraphModel implements CharacterGraph {
     }
 
     if (sublineages["Anti-magic"]) {
-      const spellcastingLevels = ((character as any).classes || []).filter((c: any) => (CLASSES as any)[c.name]?.spellcaster && c.level > 0);
+      const spellcastingLevels = character.classes.filter((c) => CLASSES[c.name]?.spellcaster && c.level > 0);
       if (spellcastingLevels.length > 0) {
         issues.push({
           id: 'classes:' + spellcastingLevels[0].name, item: spellcastingLevels[0].name, field: 'classes',
           text: `cannot take class levels in spellcasting classes due to Anti-magic lineage challenge`,
         });
       }
-      if (((character as any).startingSkills || []).includes("Ritual Magic") || ((character as any).purchasedSkills || []).includes("Ritual Magic")) {
+      if (hasSkill("Ritual Magic")) {
         issues.push({
           id: 'skills:Ritual Magic', item: 'Ritual Magic', field: 'skills',
           text: `cannot purchase Ritual Magic due to Anti-magic lineage challenge`,
@@ -634,8 +636,8 @@ export class CharacterGraphModel implements CharacterGraph {
     }
 
     if (sublineages["The Fractured"]) {
-      const stats = (character as any).stats || {};
-      if (stats.maxLifePoints < 1) {
+      const stats = character.stats || {};
+      if ((stats.maxLifePoints ?? 0) < 1) {
         issues.push({
           id: 'lineage:The Fractured', item: 'The Fractured', field: 'lineage',
           text: `cannot be taken if the character already has 1 maximum Life Point (would reduce below 1)`,
@@ -643,7 +645,7 @@ export class CharacterGraphModel implements CharacterGraph {
       }
     }
 
-    if (sublineages["Divinity's Scourge"] && (character.flaws || []).includes("Divine Vulnerability")) {
+    if (sublineages["Divinity's Scourge"] && hasFlaw("Divine Vulnerability")) {
       issues.push({
         id: 'flaws:Divine Vulnerability', item: 'Divine Vulnerability', field: 'flaws',
         text: `cannot be taken along with the Divinity's Scourge lineage challenge`,
@@ -905,7 +907,7 @@ function discountApplies(src: any, itemNode: any, pos: number): boolean {
     return bareSkill(cleanItemName(itemName)) === src.scope.value;
   }
   if (src.scope.kind === 'prereq') {
-    const pr = (REFS as any).prereqs?.[ent?.id];
+    const pr = REFS.prereqs?.[ent?.id];
     const target = `perks:${src.scope.value}`;
     return !!pr && (pr.skills?.includes(target) || pr.other?.some((o: string) => new RegExp(src.scope.value, 'i').test(o)));
   }
@@ -984,61 +986,63 @@ function checkLevelConstraint(character: any, constraintStr: string, owned: Set<
 }
 
 
-export function resolveCharacterGraph(charInput: any): CharacterGraphModel {
-  // If the input is V1 state, convert it to V2 state internally
-  let character: CharacterStateV2 = charInput;
-  if (!charInput.skills && !charInput.perks && !charInput.powers) {
-    character = { ...charInput, skills: [], perks: [], flaws: [], powers: [], spells: [], devotions: [], innatePowers: [...(charInput.innatePowers || [])] };
-    const add = (field: string, arr: keyof CharacterStateV2, sourceName: EntitySource) => {
-      // For V1, the inputs are in charInput (e.g. purchasedSkills).
-      // For innatePowers, we synthesize them into character.innatePowers during the class loop,
-      // so we should read from character for that specific field.
-      const sourceList = field === 'innatePowers' ? (character as any).innatePowers : charInput[field];
-      for (let i = 0; i < (sourceList || []).length; i++) {
-         const item = sourceList[i];
-         const id = field === 'startingSkills' ? `startingSkills:${i}:${item}` : `${field}:${item}`;
-         const choice: CharacterChoice = {
-           id,
-           entityId: item,
-           source: sourceName,
-           costOverride: charInput.effectiveBP?.[field]?.[i] ?? undefined,
-           ranks: charInput.ranks?.[field]?.[i] ?? 1,
-           originalIndex: i, // We attach originalIndex dynamically for tests/validation bridging
-         } as any;
-         (character[arr] as CharacterChoice[]).push(choice);
-      }
-    };
-    add('startingSkills', 'skills', 'Class:Starting');
-    add('purchasedSkills', 'skills', 'Purchased');
-    add('purchasedPerks', 'perks', 'Purchased');
-    add('flaws', 'flaws', 'Flaw');
-    const powerFields = ['classPowers', 'classSkills', 'rightHandPowers', 'utilityPowers', 'basicPowers', 'advancedPowers', 'veteranPowers', 'domainPowers'];
-    for (const pf of powerFields) add(pf, 'powers', 'Purchased');
-    const charClasses = getClasses(charInput);
-    for (const c of charClasses) {
-      const clsDef = lookupEntity(`classes:${c.name}`) as any;
-      if (clsDef && clsDef.innate) {
-        for (const p of clsDef.innate) {
-          if (c.level >= (p.requiredLevel || 1)) {
-            // FIX: Initialize innatePowers on character if it doesn't exist
-            if (!(character as any).innatePowers) {
-              (character as any).innatePowers = [];
-            }
-            if (!(character as any).innatePowers.includes(p.name)) {
-              (character as any).innatePowers.push(p.name);
-            }
-          }
-        }
-      }
+// Convert a raw V1-flat character (the loose object the UI/loadArchetype produce —
+// purchasedSkills/classPowers/cantrips/… arrays of name strings) into the engine's
+// V2 shape: ontological CharacterChoice[] buckets. The conversion lives HERE, at the
+// engine boundary, so everything past resolveCharacterGraph speaks only V2.
+function v1ToV2(charInput: V1CharacterInput): CharacterStateV2 {
+  const v2: CharacterStateV2 = {
+    ...charInput,
+    classes: getClasses(charInput),
+    skills: [], perks: [], flaws: [], powers: [], spells: [], devotions: [],
+  };
+
+  const add = (field: string, bucket: CharacterChoice[], source: EntitySource, items: string[] | undefined) => {
+    for (let i = 0; i < (items || []).length; i++) {
+      const item = items![i];
+      bucket.push({
+        id: field === 'startingSkills' ? `startingSkills:${i}:${item}` : `${field}:${item}`,
+        entityId: item,
+        source,
+        costOverride: charInput.effectiveBP?.[field]?.[i] ?? undefined,
+        ranks: charInput.ranks?.[field]?.[i] ?? 1,
+        originalIndex: i,
+      });
     }
-    
-    add('innatePowers', 'powers', 'Innate');
-    const spellFields = ['cantrips', 'bookSpells', 'spellsKnown', 'noviceSpells', 'adeptSpells', 'greaterSpells'];
-    for (const sf of spellFields) add(sf, 'spells', 'Purchased');
-    if (charInput.devotion) {
-       (character.devotions as CharacterChoice[]).push({ id: `devotions:${charInput.devotion}`, entityId: `devotions:${charInput.devotion}`, source: 'Purchased' });
+  };
+
+  add('startingSkills', v2.skills, 'Class:Starting', charInput.startingSkills);
+  add('purchasedSkills', v2.skills, 'Purchased', charInput.purchasedSkills);
+  add('purchasedPerks', v2.perks, 'Purchased', charInput.purchasedPerks);
+  add('flaws', v2.flaws, 'Flaw', charInput.flaws as string[] | undefined);
+  for (const pf of ['classPowers', 'classSkills', 'rightHandPowers', 'utilityPowers', 'basicPowers', 'advancedPowers', 'veteranPowers', 'domainPowers'] as const) {
+    add(pf, v2.powers, 'Purchased', charInput[pf]);
+  }
+
+  // Class-granted innate powers (level-gated) → synthesized, then converted.
+  const innate: string[] = [...(charInput.innatePowers || [])];
+  for (const c of v2.classes) {
+    const clsDef = lookupEntity(`classes:${c.name}`);
+    for (const p of clsDef?.innate || []) {
+      if (c.level >= (p.requiredLevel || 1) && !innate.includes(p.name)) innate.push(p.name);
     }
   }
+  add('innatePowers', v2.powers, 'Innate', innate);
+
+  for (const sf of ['cantrips', 'bookSpells', 'spellsKnown', 'noviceSpells', 'adeptSpells', 'greaterSpells'] as const) {
+    add(sf, v2.spells, 'Purchased', charInput[sf]);
+  }
+  if (charInput.devotion) {
+    v2.devotions.push({ id: `devotions:${charInput.devotion}`, entityId: `devotions:${charInput.devotion}`, source: 'Purchased' });
+  }
+  return v2;
+}
+
+export function resolveCharacterGraph(charInput: V1CharacterInput | CharacterStateV2): CharacterGraphModel {
+  // Convert raw V1 input to V2 at the boundary; if it's already V2, pass through.
+  const character: CharacterStateV2 = ('skills' in charInput && Array.isArray((charInput as any).skills) && (charInput as any).skills.every?.((s: any) => typeof s === 'object'))
+    ? charInput as CharacterStateV2
+    : v1ToV2(charInput as V1CharacterInput);
 
   const items: GraphItem[] = [];
   const charLevel = characterLevel(character);

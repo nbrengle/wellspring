@@ -96,6 +96,7 @@ export interface Flaw extends BaseEntity {
 
 export interface Class extends BaseEntity {
   type: 'classes';
+  innate?: { name: string; requiredLevel?: number }[];
   spellcaster?: boolean;
   magicType?: string;
 }
@@ -127,6 +128,44 @@ export interface CharacterChoice {
   parameter?: string;     // If the choice requires a parameter (e.g. Weapon Specialization - Swords)
   ranks?: number;         // For multi-rank purchases like Agile Learner
   originalIndex?: number; // Index in the source V1 field, for validation/deletion bridging
+}
+
+/** The raw, V1-flat character the UI / loadArchetype produce and edit: parallel
+ *  arrays of name strings per ontological field, plus loose metadata. Converted to
+ *  CharacterStateV2 at the engine boundary (v1ToV2). This is the LEGACY input shape;
+ *  the goal is to retire it once the UI writes V2 directly. */
+export interface V1CharacterInput {
+  name?: string;
+  archetypeName?: string;
+  classLevels?: string;
+  classes?: { name: string; level: number }[] | Record<string, number>;
+  lineage?: string | { name: string; choices: string[] };
+  sublineage?: string;
+  sublineages?: Record<string, string>;
+  devotion?: string;
+  startingSkills?: string[];
+  purchasedSkills?: string[];
+  purchasedPerks?: string[];
+  flaws?: string[];
+  classPowers?: string[];
+  classSkills?: string[];
+  rightHandPowers?: string[];
+  utilityPowers?: string[];
+  basicPowers?: string[];
+  advancedPowers?: string[];
+  veteranPowers?: string[];
+  domainPowers?: string[];
+  innatePowers?: string[];
+  cantrips?: string[];
+  bookSpells?: string[];
+  spellsKnown?: string[];
+  noviceSpells?: string[];
+  adeptSpells?: string[];
+  greaterSpells?: string[];
+  effectiveBP?: Record<string, (number | undefined)[]>;
+  ranks?: Record<string, number[]>;
+  stats?: Record<string, number>;
+  [key: string]: unknown;
 }
 
 export interface CharacterStateV2 {
