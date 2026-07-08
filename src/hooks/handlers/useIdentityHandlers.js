@@ -23,10 +23,8 @@ export function useIdentityHandlers({ character, setCharacter, setPicking }) {
       onChoose: (name) => {
         const dev = DEVOTIONS.find((d) => d.name === name);
         setCharacter((c) => {
-          const updateWorship = (list) =>
-            list.map((s) => (/^worship\b/i.test(s) ? formatParameterizedName("Worship", name, s) : s));
-          // Purchased skills are V2 CharacterChoice[] in `skills`; patch the Worship
-          // entry's entityId. Starting skills are still flat strings.
+          // All skills (starting + purchased) live in the V2 `skills` bucket; patch
+          // the Worship entry's entityId wherever it sits.
           const updateWorshipSkills = (skills) =>
             (skills || []).map((sk) =>
               /^worship\b/i.test(sk.entityId) ? { ...sk, entityId: formatParameterizedName("Worship", name, sk.entityId) } : sk,
@@ -35,7 +33,6 @@ export function useIdentityHandlers({ character, setCharacter, setPicking }) {
             ...c,
             devotion: name,
             divineDomains: (c.divineDomains || []).filter((dn) => dev?.domains.includes(dn)),
-            startingSkills: updateWorship(c.startingSkills || []),
             skills: updateWorshipSkills(c.skills),
           };
         });
@@ -65,7 +62,6 @@ export function useIdentityHandlers({ character, setCharacter, setPicking }) {
 
   const handleClearDevotion = useCallback(() => {
     setCharacter((c) => {
-      const clearWorship = (list) => list.map((s) => (/^worship\b/i.test(s) ? "Worship" : s));
       const clearWorshipSkills = (skills) =>
         (skills || []).map((sk) => (/^worship\b/i.test(sk.entityId) ? { ...sk, entityId: "Worship" } : sk));
       return {
@@ -73,7 +69,6 @@ export function useIdentityHandlers({ character, setCharacter, setPicking }) {
         devotion: null,
         divineDomains: [],
         domainPowers: [],
-        startingSkills: clearWorship(c.startingSkills || []),
         skills: clearWorshipSkills(c.skills),
       };
     });

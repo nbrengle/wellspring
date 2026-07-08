@@ -286,6 +286,13 @@ export interface GraphItem {
   index?: number;
   grantedBy?: string;
   grantKind?: string;
+  entityId?: string;
+  /** The BP cost accounting for THIS item, computed and attached here (the
+   *  spreadsheet row's cost cells) rather than looked up in a separate name-keyed
+   *  map. `graph.spend.byItem` is a derived projection of these. */
+  costEntry?: BPLedgerEntry;
+  /** Class this power/skill came from (multiclass clarity). */
+  cls?: string | null;
 }
 
 

@@ -18,7 +18,7 @@ import { resolveCharacterGraph } from '../../src/engine/graph.js';
 import {
   hasStartingChoices, reconcileStartingChoices, rebuildStartingSkills,
   STARTING_CHOICES_CONFIG, optionSkills, resolveSkill,
-  configSkillKeys, sourceStartingSkillKeys,
+  configSkillKeys, sourceStartingSkillKeys, startingSkillGrants,
 } from '../../src/engine/starting-choices.js';
 import ARCHETYPES from '../../src/data/archetypes.json' with { type: 'json' };
 import CLASSES_JSON from '../../src/data/classes.json' with { type: 'json' };
@@ -26,6 +26,17 @@ import CLASSES_JSON from '../../src/data/classes.json' with { type: 'json' };
 
 // A character built straight from an archetype mirrors what loadArchetype keeps.
 const fromArchetype = (a) => a;
+
+// Starting skills are V2-native: Class:Starting entries in the skills[] bucket.
+const startingChoices = (c) => (c.skills || []).filter((s) => s.source === 'Class:Starting');
+const startingNames = (c) => startingChoices(c).map((s) => s.entityId);
+// Rename the i-th starting skill (player picks a parameter, etc.) in place.
+const setStartingName = (c, i, name) => {
+  const starting = startingChoices(c);
+  starting[i] = { ...starting[i], entityId: name };
+  const others = (c.skills || []).filter((s) => s.source !== 'Class:Starting');
+  return { ...c, skills: [...starting, ...others] };
+};
 
 // ─── starting-choice config integrity ─────────────────────────────────────────
 // STARTING_CHOICES_CONFIG is curated (hand-transcribed from each class's prose
@@ -170,21 +181,21 @@ test('a fixed parameterized starting skill is editable + survives an unrelated s
   // specialty-choice rebuild.
   const specBlock = STARTING_CHOICES_CONFIG['Mage'][0];
   let c = rebuildStartingSkills({ classes: [{ name: 'Mage', level: 4 }] }, 'Mage', {});
-  ok(c.startingSkills.some((s) => /^Lore \(/.test(s)), 'Mage gets a parameterized Lore');
-  const li = c.startingSkills.findIndex((s) => /^Lore/.test(s));
-  c.startingSkills[li] = 'Lore (Historical)';   // player picks the area
+  ok(startingNames(c).some((s) => /^Lore \(/.test(s)), 'Mage gets a parameterized Lore');
+  const li = startingNames(c).findIndex((s) => /^Lore/.test(s));
+  c = setStartingName(c, li, 'Lore (Historical)');   // player picks the area
   c = rebuildStartingSkills(c, 'Mage', { [specBlock.id]: specBlock.options[0].label });
-  ok(c.startingSkills.includes('Lore (Historical)'), 'player Lore pick survives the swap');
+  ok(startingNames(c).includes('Lore (Historical)'), 'player Lore pick survives the swap');
 
   // Druid's base "Profession - Apprentice (your choice)" is a placeholder; a
   // player setting it to (Smith) must survive an unrelated survival-choice swap.
   const survBlock = blockId('Druid', 'Forage I');
   let d = rebuildStartingSkills({ classes: [{ name: 'Druid', level: 4 }] }, 'Druid',
     { [survBlock]: 'Forage I', ...choicesFor('Druid', 'Peacecaster') });
-  const pi = d.startingSkills.findIndex((s) => /^Profession - Apprentice/.test(s));
-  d.startingSkills[pi] = 'Profession - Apprentice (Smith)';
+  const pi = startingNames(d).findIndex((s) => /^Profession - Apprentice/.test(s));
+  d = setStartingName(d, pi, 'Profession - Apprentice (Smith)');
   d = rebuildStartingSkills(d, 'Druid', { ...d.startingChoices, [survBlock]: 'Scavenge I' });
-  ok(d.startingSkills.includes('Profession - Apprentice (Smith)'), 'player profession pick preserved');
+  ok(startingNames(d).includes('Profession - Apprentice (Smith)'), 'player profession pick preserved');
 });
 
 test('formatParameterizedName: dash form only when the base has no " - "', () => {
@@ -250,11 +261,11 @@ test('changing a Druid choice swaps its granted skills', () => {
   const blank = rebuildStartingSkills(
     { classes: [{ name: 'Druid', level: 4 }] }, 'Druid',
     { ...choicesFor('Druid', 'Forage I', 'Peacecaster') });
-  ok(blank.startingSkills.some((s) => bareSkill(cleanItemName(s)) === 'Peacecaster'), 'starts with Peacecaster');
+  ok(startingNames(blank).some((s) => bareSkill(cleanItemName(s)) === 'Peacecaster'), 'starts with Peacecaster');
 
   const swapped = rebuildStartingSkills(blank, 'Druid',
     { ...blank.startingChoices, [wisdomBlock]: optLabel('Druid', 'Two Weapon Style') });
-  const names = swapped.startingSkills.map((s) => bareSkill(cleanItemName(s)));
+  const names = startingNames(swapped).map((s) => bareSkill(cleanItemName(s)));
   ok(names.includes('Short Weapons') && names.includes('Two Weapon Style'), 'gains the new option');
   ok(!names.includes('Peacecaster') && !names.includes('Basic Medicine'), 'drops the old option');
 });
@@ -267,20 +278,8 @@ test('swapping away a depended-on specialty skill surfaces the broken prereq', (
   const base = loadWithChoices(ARCHETYPES.find((x) => x.name === 'Healer Druid'));
   ok(validate(base).valid, 'archetype starts legal');
   const wisdomBlock = blockId('Druid', 'Peacecaster');
-  let swapped = rebuildStartingSkills(base, 'Druid',
+  const swapped = rebuildStartingSkills(base, 'Druid',
     { ...base.startingChoices, [wisdomBlock]: optLabel('Druid', 'Short Weapons') });
-  
-  if (swapped.skills) {
-    const newStarting = swapped.startingSkills.map((s, i) => ({
-      entityId: s,
-      source: 'Class:Starting',
-      ranks: swapped.ranks?.startingSkills?.[i] || 1,
-    }));
-    swapped.skills = [
-      ...swapped.skills.filter(s => s.source !== 'Class:Starting'),
-      ...newStarting
-    ];
-  }
 
   const r = validate(swapped);
   ok(!r.valid, 'illegal after dropping Basic Medicine');
@@ -292,15 +291,18 @@ test('swapping away a depended-on specialty skill surfaces the broken prereq', (
 test('rebuild tags granted skills with their choice-block provenance', () => {
   const a = ARCHETYPES.find((x) => x.name === 'Healer Druid');
   const c = loadWithChoices(a);
-  const sources = Object.values(c.specialtySources || {});
+  // Provenance is derived on read (not persisted): startingSkillGrants maps each
+  // starting-skill position to its granting block label.
+  const grants = startingSkillGrants(c);
+  const sources = Object.values(grants.specialty);
   // Labels are derived from the doc's block titles; look them up rather than pin.
   const wisdomLabel = _blockBy('Druid', 'Peacecaster')?.label;
   const survivalLabel = _blockBy('Druid', 'Forage I')?.label;
   ok(sources.includes(wisdomLabel), `${wisdomLabel} grant tagged`);
   ok(sources.includes(survivalLabel), `${survivalLabel} grant tagged`);
   // A FIXED base grant (Basic Faith) carries no specialty tag.
-  const faithIdx = c.startingSkills.findIndex((s) => bareSkill(cleanItemName(s)) === 'Basic Faith');
-  ok(faithIdx >= 0 && !c.specialtySources[faithIdx], 'fixed base grant is untagged');
+  const faithIdx = startingNames(c).findIndex((s) => bareSkill(cleanItemName(s)) === 'Basic Faith');
+  ok(faithIdx >= 0 && !grants.specialty[faithIdx], 'fixed base grant is untagged');
 });
 
 // A granted "xN" specialty skill is stored once with its rank in the ranks
@@ -309,11 +311,10 @@ test('rebuild tags granted skills with their choice-block provenance', () => {
 test('granted "x2" specialty skill records rank 2 on a single row', () => {
   const c = rebuildStartingSkills({ classes: [{ name: 'Mage', level: 4 }] }, 'Mage',
     { [blockId('Mage', 'Lore')]: 'Historical', ...choicesFor('Mage', 'Extended Capacity - Novice') });
-  const idxs = c.startingSkills
-    .map((s, i) => ({ i, base: bareSkill(cleanItemName(s)) }))
-    .filter((x) => x.base === 'Extended Capacity - Novice');
-  eq(idxs.length, 1, 'stored as a single row, not two');
-  eq(c.ranks.startingSkills[idxs[0].i], 2, 'rank 2 recorded');
+  // Stored as ONE CharacterChoice carrying rank 2 (not two rows) — rank lives on the choice.
+  const ec = startingChoices(c).filter((s) => bareSkill(cleanItemName(s.entityId)) === 'Extended Capacity - Novice');
+  eq(ec.length, 1, 'stored as a single row, not two');
+  eq(ec[0].ranks, 2, 'rank 2 recorded on the choice');
   // …and it still drives the +2 novice slot bonus mechanically.
   eq(validate(c).spellSlots.Arcane.novice, 6, 'x2 grants +2 novice slots (total 6)');
 });
@@ -323,36 +324,36 @@ test('granted "x2" specialty skill records rank 2 on a single row', () => {
 // extra ranks still drive the skill's mechanical bonus. The bought-up rank also
 // survives a rebuild (e.g. when an unrelated specialty changes).
 test('buying a granted skill above its free floor bills only the excess', () => {
-  const setRank = (c, field, index, n) => {
-    const ranks = { ...(c.ranks || {}) };
-    const list = [...(ranks[field] || [])];
-    while (list.length < (c[field]?.length || 0)) list.push(1);
-    list[index] = n;
-    return { ...c, ranks: { ...ranks, [field]: list } };
+  // Set the rank on the i-th Class:Starting choice (rank lives on the choice now).
+  const setStartRank = (c, i, n) => {
+    const starting = startingChoices(c);
+    starting[i] = { ...starting[i], ranks: n };
+    const others = (c.skills || []).filter((s) => s.source !== 'Class:Starting');
+    return { ...c, skills: [...starting, ...others] };
   };
   let c = rebuildStartingSkills({ classes: [{ name: 'Mage', level: 4 }] }, 'Mage',
     { [blockId('Mage', 'Lore')]: 'Historical', ...choicesFor('Mage', 'Extended Capacity - Novice') });
-  const i = c.startingSkills.findIndex((s) => /Extended Capacity/.test(s));
-  eq(c.grantedRanks[i], 2, 'free floor is 2');
+  const i = startingNames(c).findIndex((s) => /Extended Capacity/.test(s));
+  eq(startingSkillGrants(c).floor[i], 2, 'free floor is 2');
 
   // Floor: free.
   eq(validate(c).spend.net, 0, 'floor costs nothing');
 
   // Rank 3: one paid rank @ 3 BP; bonus rises to 3.
-  let r = validate(setRank(c, 'startingSkills', i, 3));
-  eq(r.spend.byItem[`startingSkills:${i}:${c.startingSkills[i]}`].cost, 3, 'rank 3 bills 1 extra rank');
+  let r = validate(setStartRank(c, i, 3));
+  eq(r.spend.byItem[`startingSkills:${i}:${startingNames(c)[i]}`].cost, 3, 'rank 3 bills 1 extra rank');
   eq(r.spellSlots.Arcane.novice, 7, 'rank 3 grants +3 novice slots (total 7)');
 
   // Rank 4 (max): two paid ranks @ 3 BP.
-  eq(validate(setRank(c, 'startingSkills', i, 4)).spend.net, 6, 'rank 4 bills 2 extra ranks');
+  eq(validate(setStartRank(c, i, 4)).spend.net, 6, 'rank 4 bills 2 extra ranks');
 
   // Dropping back to the floor is free again.
-  eq(validate(setRank(c, 'startingSkills', i, 2)).spend.net, 0, 'back to floor is free');
+  eq(validate(setStartRank(c, i, 2)).spend.net, 0, 'back to floor is free');
 
   // A rebuild preserves the bought-up rank and the floor.
-  const rebuilt = rebuildStartingSkills(setRank(c, 'startingSkills', i, 3), 'Mage', c.startingChoices);
-  eq(rebuilt.ranks.startingSkills[i], 3, 'bought-up rank preserved through rebuild');
-  eq(rebuilt.grantedRanks[i], 2, 'free floor preserved through rebuild');
+  const rebuilt = rebuildStartingSkills(setStartRank(c, i, 3), 'Mage', c.startingChoices);
+  eq(startingChoices(rebuilt)[i].ranks, 3, 'bought-up rank preserved through rebuild');
+  eq(startingSkillGrants(rebuilt).floor[i], 2, 'free floor preserved through rebuild');
 });
 
 // A starting skill unrelated to any choice block (or a non-conforming archetype

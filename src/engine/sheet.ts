@@ -82,11 +82,11 @@ const POWER_SECTIONS = [
 ];
 
 export function formatCharacterSheet(character: any, report: BuildReport) {
-  if (!character.startingSkills && character.skills) {
+  if (character.skills || character.perks || character.powers) {
     character = { ...character };
-    character.startingSkills = character.skills.filter(s => typeof s !== 'string' && s.source?.includes('Starting')).map(s => s.entityId || s.name);
-    // Purchased skills are read straight from the skills[] bucket by the formatter
-    // (no flat purchasedSkills reconstruction — it was deleted in the skills slice).
+    // Skills (starting + purchased) are read straight from the skills[] bucket by
+    // the formatter below — no flat reconstruction. Perks/powers/spells still
+    // reconstruct flat fields here until their own slice migrates the formatter.
     character.purchasedPerks = (character.perks || []).filter(s => typeof s !== 'string' && s.source === 'Purchased').map(s => s.entityId || s.name);
     const powerFields = { innatePowers: 'Class:Innate', utilityPowers: 'Utility', basicPowers: 'Basic', advancedPowers: 'Advanced', veteranPowers: 'Veteran' };
     for (const [pf, pt] of Object.entries(powerFields)) {
@@ -127,15 +127,18 @@ export function formatCharacterSheet(character: any, report: BuildReport) {
   if (character.currentEvent) line('Active Event', character.currentEvent);
   line('Flaws', joinItems(character.flaws, 'flaws', report));
 
-  // ── Skills / perks ── (starting skills may carry a refund annotation)
-  line('Starting Skills (free)', joinItems(character.startingSkills, 'startingSkills', report));
+  // ── Skills / perks ── skills (starting + purchased) are V2 CharacterChoice[] in
+  // the skills[] bucket; the BP ledger keys starting under startingSkills:<i>: and
+  // purchased under skills:.
+  const startingSkillNames = (character.skills || [])
+    .filter((s) => typeof s !== 'string' && s.source === 'Class:Starting')
+    .map((s) => s.entityId || s.name);
+  line('Starting Skills (free)', joinItems(startingSkillNames, 'startingSkills', report));
   if (character.divineDomains?.length) line('Divine Domains', joinItems(character.divineDomains));
   if (character.devotionAccents?.length) line('Available Devotion Accents', joinItems(character.devotionAccents));
-  // Purchased skills are V2-native (skills[] bucket, source 'Purchased'); the BP
-  // ledger keys them under the 'skills' field.
   const purchasedSkillNames = (character.skills || [])
-    .filter((s: any) => typeof s !== 'string' && s.source === 'Purchased')
-    .map((s: any) => s.entityId || s.name);
+    .filter((s) => typeof s !== 'string' && s.source === 'Purchased')
+    .map((s) => s.entityId || s.name);
   line('Purchased Skills', joinItems(purchasedSkillNames, 'skills', report));
   line('Purchased Perks', joinItems(character.purchasedPerks, 'purchasedPerks', report));
 
@@ -277,23 +280,32 @@ function parseSheetText(text) {
   if (character.currentEvent) {
     character.currentEvent = parseInt(character.currentEvent, 10) || 1;
   }
-  // Purchased skills are V2-native: convert the flat field the generic parser
-  // produced into skills[] CharacterChoice entries, then drop the flat field. The
-  // parser accumulator is an untyped bag; view it through V1CharacterInput here.
+  // Skills are V2-native: convert the flat fields the generic parser produced
+  // (startingSkills / purchasedSkills) into skills[] CharacterChoice entries, then
+  // drop them. The parser accumulator is an untyped bag; view it through
+  // V1CharacterInput here.
   const ch = character as unknown as V1CharacterInput;
-  if (ch.purchasedSkills) {
-    const ranks = ch.ranks?.purchasedSkills || [];
-    const bp = ch.effectiveBP?.purchasedSkills || [];
-    const purchased: CharacterChoice[] = ch.purchasedSkills.map((name, i) => ({
+  const toChoices = (names: string[] | undefined, source: 'Purchased' | 'Class:Starting', field: string): CharacterChoice[] => {
+    const ranks = ch.ranks?.[field] || [];
+    const bp = ch.effectiveBP?.[field] || [];
+    return (names || []).map((name, i) => ({
       entityId: name,
-      source: 'Purchased',
+      source,
       ranks: ranks[i] ?? 1,
       ...(bp[i] != null ? { costOverride: bp[i] } : {}),
     }));
-    ch.skills = [...(ch.skills || []), ...purchased];
-    delete ch.purchasedSkills;
-    if (ch.ranks) delete ch.ranks.purchasedSkills;
-    if (ch.effectiveBP) delete ch.effectiveBP.purchasedSkills;
+  };
+  if (ch.startingSkills || ch.purchasedSkills) {
+    ch.skills = [
+      ...toChoices(ch.startingSkills, 'Class:Starting', 'startingSkills'),
+      ...(ch.skills || []),
+      ...toChoices(ch.purchasedSkills, 'Purchased', 'purchasedSkills'),
+    ];
+    for (const f of ['startingSkills', 'purchasedSkills'] as const) {
+      delete ch[f];
+      if (ch.ranks) delete ch.ranks[f];
+      if (ch.effectiveBP) delete ch.effectiveBP[f];
+    }
   }
   reconcileDevotion(character);
   return character;
@@ -305,10 +317,10 @@ function parseSheetText(text) {
 // fills in when no Worship skill is present. Mirrors the build-time parser so an
 // imported character resolves its devotion the same way an archetype does.
 function reconcileDevotion(character) {
-  const purchasedSkillNames = (character.skills || [])
-    .filter((s) => typeof s !== 'string' && s.source === 'Purchased')
+  // All skills live in the V2 skills[] bucket; find the Worship entry among them.
+  const skills = (character.skills || [])
+    .filter((s) => typeof s !== 'string')
     .map((s) => s.entityId || s.name);
-  const skills = [...(character.startingSkills || []), ...purchasedSkillNames];
   const worship = skills.map((s) => s.match(/^Worship\s*[-–—:]\s*(.+)$/i)).find(Boolean);
   const worshipDevotion = worship ? worship[1].trim() : null;
   if (worshipDevotion && character.devotion && character.devotion !== worshipDevotion) {
