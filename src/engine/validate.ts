@@ -414,6 +414,11 @@ export function validate(v1) {
   };
 }
 
+/** The build report validate() produces — the resolved character + all derived
+ *  views the UI reads. Inferred from the return so it tracks reality; consumers
+ *  annotate their `report` params with it instead of `any`. */
+export type BuildReport = ReturnType<typeof validate>;
+
 export function validityReasons(report) {
   if (!report) return [];
   const out = [];

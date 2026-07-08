@@ -9,6 +9,7 @@ import { lookupEntity } from '../engine/data.js';
 import { bareSkill, cleanItemName, getClasses } from '../engine/resolver.js';
 import { ARCHETYPES, UNLIMITED_SKILLS, BASE_CLASSES } from './data.js';
 import { lookupCost } from './validate/cost-key.js';
+import type { BuildReport } from './validate.js';
 import { SCALAR_FIELDS, ITEM_FIELDS, fieldForLabel, cleanItem, splitItems,
   expandInstances, CHOICE_DEFAULTS,
 } from './sheet-schema.js';
@@ -17,7 +18,7 @@ import { SCALAR_FIELDS, ITEM_FIELDS, fieldForLabel, cleanItem, splitItems,
 // effective cost from the report's byItem map so EVERY section that can carry a
 // cost (purchased skills/perks, BP-bought powers, refund-bearing starting skills,
 // flaws) round-trips. Returns '' when the item has no cost/grant of note.
-function bpSuffix(name, field, report, idx) {
+function bpSuffix(name: string, field: string, report: BuildReport, idx?: number) {
   if (!report?.spend?.byItem) return '';
   let e = null;
   const cleanN = cleanItemName(name);
@@ -47,7 +48,7 @@ function bpSuffix(name, field, report, idx) {
 
 // Join a list of item names into the "item, item" form used per section, adding
 // each item's BP suffix when a field/report is given.
-function joinItems(items, field, report) {
+function joinItems(items: any, field: string, report: BuildReport) {
   if (!items || !items.length) return 'None';
   return items.map((n, i) => {
     const costInfo = lookupCost(report?.spend.byItem, field, n, i);
@@ -79,7 +80,7 @@ const POWER_SECTIONS = [
   ['formPowers', 'Form Powers'],
 ];
 
-export function formatCharacterSheet(character, report) {
+export function formatCharacterSheet(character: any, report: BuildReport) {
   if (!character.startingSkills && character.skills) {
     character = { ...character };
     character.startingSkills = character.skills.filter(s => typeof s !== 'string' && s.source?.includes('Starting')).map(s => s.entityId || s.name);
