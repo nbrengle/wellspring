@@ -570,6 +570,24 @@ export const REFS = refsJson as RefsData;
 // Lookup by entity id, e.g. "skills:Basic Faith" → { type, name, description, ... }.
 // Used by the detail pane when an item card is clicked.
 const ENTITY_INDEX = new Map();
+
+// Two facets of entity identity, one source of truth:
+//   - `type` (SINGULAR, e.g. 'skill') — the discriminator, stored on the object.
+//   - collection (PLURAL, e.g. 'skills') — the id/key namespace.
+// Code reads `.type` off the object and BUILDS keys via collectionOf(type); it must
+// never parse an id string to recover either. This map bridges the two.
+const SINGULAR_TYPE: Record<string, string> = {
+  skills: 'skill', perks: 'perk', powers: 'power', flaws: 'flaw',
+  classes: 'class', spells: 'spell', devotions: 'devotion', domains: 'domain',
+  recipes: 'recipe', rituals: 'ritual', advantages: 'advantage', challenges: 'challenge',
+};
+const singularType = (collection: string): string => SINGULAR_TYPE[collection] ?? collection;
+const PLURAL_TYPE: Record<string, string> = Object.fromEntries(
+  Object.entries(SINGULAR_TYPE).map(([plural, singular]) => [singular, plural]),
+);
+/** The plural collection/key namespace for a singular entity type ('skill' →
+ *  'skills'). Use to BUILD an id/lookup key from a resolved object's `.type`. */
+export const collectionOf = (type: string): string => PLURAL_TYPE[type] ?? type;
 // `splitDesc` (perks/flaws): strip the duplicated table-summary + Cost/Prereq
 // boilerplate so the detail pane shows the full prose, keeping the summary as a
 // separate field. Skills aren't split (no boilerplate) but parameterized ones
@@ -581,7 +599,9 @@ const indexCollection = (items: any[], type: string, { nameKey = 'name', extra =
     const desc = splitDesc && e.description
       ? (() => { const { summary, body } = splitDescription(e.description); return { description: body, summary }; })()
       : {};
-    ENTITY_INDEX.set(`${type}:${name}`, { ...e, ...desc, ...extra(e), id: `${type}:${name}`, type, name });
+    // `id` prefix is the plural COLLECTION path (perks:Foo); `type` is the SINGULAR
+    // discriminator (perk). Two different concepts — deliberately not the same string.
+    ENTITY_INDEX.set(`${type}:${name}`, { ...e, ...desc, ...extra(e), id: `${type}:${name}`, type: singularType(type), name });
   }
 };
 indexCollection(skillsJson, 'skills');
@@ -592,17 +612,17 @@ indexCollection(domainsJson, 'domains');
 indexCollection(craftingJson, 'recipes');
 indexCollection(ritualsJson, 'rituals');
 for (const c of classesJson) {
-  ENTITY_INDEX.set(`classes:${c.name}`, { ...c, id: `classes:${c.name}`, type: 'classes' });
+  ENTITY_INDEX.set(`classes:${c.name}`, { ...c, id: `classes:${c.name}`, type: 'class' });
   for (const s of (c.specializations || [])) {
-    ENTITY_INDEX.set(`classes:${s.name}`, { ...s, id: `classes:${s.name}`, type: 'classes', parentClass: c.name });
+    ENTITY_INDEX.set(`classes:${s.name}`, { ...s, id: `classes:${s.name}`, type: 'class', parentClass: c.name });
   }
   const TIERS = ['innate','utility','basic','advanced','veteran','classSkills','rightHandPowers','cantrips','noviceSpells','adeptSpells','greaterSpells'];
   for (const t of TIERS) for (const p of (c[t] || [])) {
-    ENTITY_INDEX.set(`powers:${p.name}`, { tier: t, ...p, id: `powers:${p.name}`, type: 'powers', parentClass: c.name });
+    ENTITY_INDEX.set(`powers:${p.name}`, { tier: t, ...p, id: `powers:${p.name}`, type: 'power', parentClass: c.name });
   }
 }
 for (const d of domainsJson) for (const p of (d.powers || [])) {
-  ENTITY_INDEX.set(`powers:${p.name}`, { ...p, id: `powers:${p.name}`, type: 'powers', domain: d.name });
+  ENTITY_INDEX.set(`powers:${p.name}`, { ...p, id: `powers:${p.name}`, type: 'power', domain: d.name });
 }
 // Lineage advantages AND challenges. Keyed "<type>:<Lineage> - <name>" to match how
 // the rules relations reference them (REFS.grants/discounts) and how ownedGrantSources
@@ -615,11 +635,11 @@ for (const d of domainsJson) for (const p of (d.powers || [])) {
 for (const lin of lineagesJson) {
   for (const a of (lin.advantages || [])) {
     const id = `advantages:${lin.name} - ${a.name}`;
-    ENTITY_INDEX.set(id, { ...a, id, type: 'advantages', name: a.name, lineage: lin.name });
+    ENTITY_INDEX.set(id, { ...a, id, type: 'advantage', name: a.name, lineage: lin.name });
   }
   for (const c of (lin.challenges || [])) {
     const id = `challenges:${lin.name} - ${c.name}`;
-    ENTITY_INDEX.set(id, { ...c, id, type: 'challenges', name: c.name, lineage: lin.name });
+    ENTITY_INDEX.set(id, { ...c, id, type: 'challenge', name: c.name, lineage: lin.name });
   }
 }
 

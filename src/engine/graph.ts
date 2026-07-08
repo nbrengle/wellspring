@@ -1,5 +1,5 @@
 import { EFFECT_EXTRACTORS } from './extractors.js';
-import { lookupEntity, allergenAward, ALLERGEN_AWARDS, LEVEL_TABLE, CLASS_PROGRESSION, REFS, CLASS_POWERS, CLASSES, BASE_CLASSES } from '../engine/data.js';
+import { lookupEntity, allergenAward, ALLERGEN_AWARDS, LEVEL_TABLE, CLASS_PROGRESSION, REFS, CLASS_POWERS, CLASSES, BASE_CLASSES, collectionOf } from '../engine/data.js';
 import { startingSkillGrants } from './starting-choices.js';
 import { MAX_FLAW_BP } from './validate/core.js';
 import { costKey } from './validate/cost-key.js';
@@ -25,6 +25,12 @@ function extractParam(rawName: string): string | null {
 // The base name with any parameter suffix stripped ("Lore (Arcane)" → "Lore").
 function stripParam(name: string): string {
   return name.replace(/\s*\([^)]*\)\s*$/, '').replace(/\s+-\s+.*$/, '').trim();
+}
+
+// The plural COLLECTION/key namespace for an entity — built from its SINGULAR
+// `.type` discriminator (never parsed from the id string). Use to build id keys.
+function idPrefix(entity: { type?: string } | null | undefined): string {
+  return entity?.type ? collectionOf(entity.type) : '';
 }
 
 
@@ -217,7 +223,7 @@ export class CharacterGraphModel implements CharacterGraph {
         view.innatePowers.push(viewEntry);
       } else if (t === 'spell') {
         view.knownSpells.push(viewEntry);
-      } else if (t === 'powers') {
+      } else if (t === 'power') {
         if (tier === 'Basic') view.basicPowers.push(viewEntry);
         else if (tier === 'Advanced') view.advancedPowers.push(viewEntry);
         else if (tier === 'Veteran') view.veteranPowers.push(viewEntry);
@@ -225,7 +231,7 @@ export class CharacterGraphModel implements CharacterGraph {
         else if (tier === 'Class' || node.field === 'classPowers') view.classPowers.push(viewEntry);
         else if (node.field === 'domainPowers') view.domainPowers.push(viewEntry);
         else view.classPowers.push(viewEntry);
-      } else if (t === 'perks') {
+      } else if (t === 'perk') {
         view.perks.push(viewEntry);
       } else {
         view.skills.push(viewEntry);
@@ -283,9 +289,9 @@ export class CharacterGraphModel implements CharacterGraph {
       ];
       for (const cand of candidates) {
         const e = lookupEntity(cand);
-        if (e) { owned.add(e.id); owned.add(`${e.type}:${bareSkill(e.name)}`); }
+        if (e) { owned.add(e.id); owned.add(`${idPrefix(e)}:${bareSkill(e.name)}`); }
       }
-      if (node.entity) { owned.add(node.entity.id); owned.add(`${node.entity.type}:${bareSkill(node.entity.name)}`); }
+      if (node.entity) { owned.add(node.entity.id); owned.add(`${idPrefix(node.entity)}:${bareSkill(node.entity.name)}`); }
       
       if (node.entity && node.entity.parameter) {
         const p = node.entity.parameter.toLowerCase();
@@ -297,7 +303,7 @@ export class CharacterGraphModel implements CharacterGraph {
     for (const g of this._grantedAbilitiesList) {
       owned.add(g.ability);
       const ent = lookupEntity(g.ability);
-      if (ent) owned.add(`${ent.type}:${bareSkill(ent.name)}`);
+      if (ent) owned.add(`${idPrefix(ent)}:${bareSkill(ent.name)}`);
     }
     return owned;
   }
@@ -369,7 +375,7 @@ export class CharacterGraphModel implements CharacterGraph {
       const missing = (pr.skills || []).filter((dep: string) => !owned.has(dep));
       const unmetGroups = (pr.anyOf || []).filter((group: string[]) => !group.some((dep: string) => owned.has(dep)));
       if (missing.length || unmetGroups.length) {
-        const eId = node.entity ? id.replace(/^[^:]+:/, `${node.entity.type}:`) : id;
+        const eId = node.entity ? id.replace(/^[^:]+:/, `${idPrefix(node.entity)}:`) : id;
         issues.push({
           id: eId, item: node.name, field: node.field,
           missing: missing.map((m: string) => ({ id: m, name: idName(m) })),
@@ -523,7 +529,7 @@ export class CharacterGraphModel implements CharacterGraph {
     };
 
     for (const node of this._items) {
-      if (node.entity?.type !== 'powers') continue;
+      if (node.entity?.type !== 'power') continue;
       const name = cleanItemName(node.name);
       const field = node.field;
       const ent = powerInContext(name) as any;
@@ -548,7 +554,7 @@ export class CharacterGraphModel implements CharacterGraph {
 
     const powerCounts = new Map<string, number>();
     for (const node of this._items) {
-      if (node.entity?.type !== 'powers' || node.sourceType !== 'purchased') continue;
+      if (node.entity?.type !== 'power' || node.sourceType !== 'purchased') continue;
       const name = cleanItemName(node.name);
       if (!name) continue;
       powerCounts.set(name, (powerCounts.get(name) || 0) + 1);

@@ -70,7 +70,7 @@ function extractChooseOne(ent, character, _id) {
 import { lineageChoiceSpec, powerSpellChoiceSpec } from './choice-specs.js';
 
 function extractLineageChoiceSpec(ent, character, _id) {
-  if (ent?.type === 'advantages' || ent?.type === 'challenges') {
+  if (ent?.type === 'advantage' || ent?.type === 'challenge') {
     const spec = lineageChoiceSpec(ent);
     if (spec?.kind === 'cantrip' || spec?.kind === 'spell') {
       const chosen = character.advantageChoices?.[ent.name];
