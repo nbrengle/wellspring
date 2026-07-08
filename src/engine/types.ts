@@ -205,6 +205,39 @@ export interface CharacterStateV2 {
 
 // ─── 3. Graph Types ─────────────────────────────────────────────────────────
 
+/** Why an item is free/discounted (grant provenance) in the BP ledger. */
+export interface BPGrant {
+  kind: string;               // 'grant' | …
+  source?: string;            // the granting entity/class name
+  derived?: boolean;
+  amount?: number;
+}
+
+/** Per-item BP accounting entry (graph.spend.byItem[id]). */
+export interface BPLedgerEntry {
+  cost: number;               // BP actually charged (negative = award/refund)
+  base: number;               // the item's base cost before grants/discounts
+  grant: BPGrant | null;
+  rank?: number;
+  authored?: boolean;
+  freeRanks?: number;
+  paidRanks?: number;
+  discount?: { source: string; amount: number };
+}
+
+/** The BP ledger — graph.spend. Totals consumers actually read + the per-item
+ *  breakdown. (Accounting intermediates like `refunded`/`discountFreeBP` stay
+ *  local to computeSpend; they only feed `net`.) */
+export interface BPLedger {
+  spent: number;              // gross BP spent on purchases
+  awarded: number;            // flaw BP awarded (capped at MAX_FLAW_BP)
+  rawAwarded: number;         // flaw BP before the cap
+  flawCapped: boolean;        // true when rawAwarded exceeded the cap
+  discountsApplied: { key: string; source: string; amount: number }[];
+  net: number;                // the bottom line: spent − refunds − discounts
+  byItem: Record<string, BPLedgerEntry>;
+}
+
 export interface Effect {
   type: string;
   [key: string]: any;
