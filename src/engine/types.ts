@@ -162,6 +162,11 @@ export interface V1CharacterInput {
   noviceSpells?: string[];
   adeptSpells?: string[];
   greaterSpells?: string[];
+  divineDomains?: string[];
+  powerClass?: Record<string, string[]>;
+  choices?: Record<string, string>;
+  grantedSelections?: Record<string, unknown>;
+  agileLearnerTrades?: Record<string, number>;
   effectiveBP?: Record<string, (number | undefined)[]>;
   ranks?: Record<string, number[]>;
   stats?: Record<string, number>;

@@ -24,5 +24,6 @@ import './test/param-domain.test.mjs';
 import './test/pool-registry.test.mjs';
 import './test/starting-choices.test.mjs';
 import './test/validation-coverage.test.mjs';
+import './test/reducers.test.mjs';
 
 report();

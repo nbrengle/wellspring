@@ -700,7 +700,8 @@ export class CharacterGraphModel implements CharacterGraph {
     const paramKey = (typedName: any) => {
       const c = typeof typedName === 'string' && typedName.includes(':')
         ? typedName : `:${typedName}`;
-      let [type, rest = ''] = [c.slice(0, c.indexOf(':')), c.slice(c.indexOf(':') + 1)];
+      let type = c.slice(0, c.indexOf(':'));
+      const rest = c.slice(c.indexOf(':') + 1);
       if (type === 'purchasedSkills' || type === 'startingSkills') type = 'skills';
       if (type === 'purchasedPerks') type = 'perks';
       const paren = rest.match(/^(.*?)\s*\(([^)]*)\)\s*$/);
@@ -1236,8 +1237,8 @@ export function resolveCharacterGraph(charInput: V1CharacterInput | CharacterSta
         }
 
         // Check if we are at cap with grants + purchases
-        let grantCount = group.nodes.filter(n => n.sourceType === 'grant').length;
-        let purchaseCount = group.nodes.filter(n => n.sourceType === 'purchased').length;
+        const grantCount = group.nodes.filter(n => n.sourceType === 'grant').length;
+        const purchaseCount = group.nodes.filter(n => n.sourceType === 'purchased').length;
 
         if (grantCount + purchaseCount >= cap) {
           // We are at cap. Grant wins, so refund a purchase if one exists
