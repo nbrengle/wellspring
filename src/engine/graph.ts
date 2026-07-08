@@ -7,7 +7,7 @@ import { cleanItemName, bareSkill, getClasses } from './resolver.js';
 import { characterLevel, getMaxRanks } from './validate/core.js';
 import { paramInfo, paramReusable } from './param-domain.js';
 import { spellSlots } from './validate/slots.js';
-import type { CharacterStateV2, V1CharacterInput, CharacterChoice, GraphItem, CharacterGraph, Entity, Effect, EntitySource, BucketedView } from './types.js';
+import type { CharacterStateV2, V1CharacterInput, CharacterChoice, GraphItem, CharacterGraph, Entity, Effect, EntitySource, BucketedView, BPLedger, BPLedgerEntry } from './types.js';
 
 const idName = (id: string) => id.split(':')[1] || id;
 
@@ -62,7 +62,7 @@ export class CharacterGraphModel implements CharacterGraph {
   private get _ownedIds(): Set<string> { return this.memo('ownedIds', () => this.computeOwnedIds()); }
   get prereqs(): { issues: any[]; notes: any[] } { return this.memo('prereqs', () => this.computePrereqs()); }
   get wealth(): { base: number; income: number; total: number; sources: any[] } { return this.memo('wealth', () => this.computeWealth()); }
-  get spend(): any { return this.memo('spend', () => this.computeSpend()); }
+  get spend(): BPLedger { return this.memo('spend', () => this.computeSpend()); }
 
   get activePowers(): Set<string> {
     const s = new Set<string>();
@@ -693,7 +693,7 @@ export class CharacterGraphModel implements CharacterGraph {
 
   // ─── BP Spend ─────────────────────────────────────────────────────────────
   // Full BP ledger: base costs, grants, discounts, and totals. Computed once.
-  private computeSpend(): any {
+  private computeSpend(): BPLedger {
     const startFloors = startingSkillGrants(this.character).floor;
 
     // Build index of things granted by the character's owned items.
@@ -725,7 +725,7 @@ export class CharacterGraphModel implements CharacterGraph {
 
     let rawAwarded = 0;
     let refunded = 0;
-    const byItem: any = {};
+    const byItem: Record<string, BPLedgerEntry> = {};
 
     // Phase 1: Base Costs and Grants
     let startingExcess = 0;
@@ -878,16 +878,16 @@ export class CharacterGraphModel implements CharacterGraph {
 
     const awarded = Math.min(rawAwarded, MAX_FLAW_BP);
 
+    // `refunded` and `discountFreeBP` are accounting intermediates — they feed `net`
+    // and nothing outside reads them, so they stay local (not part of the ledger).
     return {
       spent,
       awarded,
       rawAwarded,
       flawCapped: rawAwarded > MAX_FLAW_BP,
-      refunded,
-      discountFreeBP,
       discountsApplied,
       net: spent - refunded - discountFreeBP,
-      byItem
+      byItem,
     };
   }
 }
