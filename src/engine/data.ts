@@ -552,7 +552,20 @@ export const RITUALS = ritualsJson;
 // Archetype definitions carry `name` directly (the parser emits it) — no alias.
 // The CHARACTER built from one carries `archetypeName` as provenance (loadArchetype).
 export const ARCHETYPES = archetypesJson;
-export const REFS = refsJson;
+
+// The cross-reference graph the linker emits (refs.json): per-entity-id maps of
+// grant/discount/exclusion/prereq/mention edges. Typed here at the JSON boundary so
+// consumers read REFS.prereqs[id] etc. without casting.
+export interface RefsData {
+  grants: Record<string, string[]>;
+  discounts: Record<string, unknown>;
+  excludes: Record<string, string[]>;
+  prereqs: Record<string, { skills?: string[]; anyOf?: string[][]; levels?: string[]; other?: string[] }>;
+  mentions: Record<string, string[]>;
+  lbpBonuses: Record<string, unknown>;
+  [key: string]: unknown;
+}
+export const REFS = refsJson as RefsData;
 
 // Lookup by entity id, e.g. "skills:Basic Faith" → { type, name, description, ... }.
 // Used by the detail pane when an item card is clicked.
