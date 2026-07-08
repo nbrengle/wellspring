@@ -66,28 +66,25 @@ import { CRAFT_DISCIPLINES, CRAFTING_TIERS } from './config.js';
 export function activePowerBenefits(character) {
   const levelByClass = Object.fromEntries(getClasses(character).map((c) => [c.name, c.level]));
   const out = [];
-  for (const field of POWER_SOURCE_FIELDS) {
-    for (const item of (character[field] || [])) {
-      const ent = lookupEntity(`powers:${cleanItemName(item)}`);
-      if (!ent?.levelBenefits) continue;
-      const lvl = levelByClass[ent.levelBenefitClass] ?? characterLevel(character);
-      out.push({
-        power: ent.name,
-        gateClass: ent.levelBenefitClass,
-        benefits: ent.levelBenefits.map((b) => ({ ...b, active: lvl >= b.level })),
-      });
-    }
+  for (const item of (character.powers || [])) {
+    const ent = lookupEntity(`powers:${cleanItemName(item.entityId || item.name || '')}`);
+    if (!ent?.levelBenefits) continue;
+    const lvl = levelByClass[ent.levelBenefitClass] ?? characterLevel(character);
+    out.push({
+      power: ent.name,
+      gateClass: ent.levelBenefitClass,
+      benefits: ent.levelBenefits.map((b) => ({ ...b, active: lvl >= b.level })),
+    });
   }
   return out;
 }
 
 
 // Whether the character has the Worship skill (lets them follow a devotion and
-// access its domains). Archetypes encode it as "Worship - <Devotion>", so match
-// the prefix. Any class can take it.
+// access its domains). Reads the V2 skills bucket (entityId), any source. Any
+// class can take it; "Worship - <Devotion>" matches the prefix.
 export function hasWorship(character) {
-  return [...(character?.startingSkills || []), ...(character?.purchasedSkills || [])]
-    .some((s) => /^worship\b/i.test(s));
+  return (character?.skills || []).some((s) => /^worship\b/i.test(s.entityId || s.name || ''));
 }
 
 // Devotion / domain state for the UI: the chosen devotion, the domains it grants,
@@ -127,11 +124,10 @@ export function devotionState(character) {
   };
 }
 
-// Whether the character owns the Divine Substitution Class power (in any of the
-// power fields it can be bought into).
+// Whether the character owns the Divine Substitution Class power (in the V2
+// powers bucket).
 function ownsDivineSubstitution(character) {
-  const fields = ['classPowers', 'domainPowers'];
-  return fields.some((f) => (character[f] || []).some((p) => /^Divine Substitution\b/.test(cleanItemName(p))));
+  return (character.powers || []).some((p) => /^Divine Substitution\b/.test(cleanItemName(p.entityId || p.name || '')));
 }
 
 

@@ -15,6 +15,7 @@ import { solveCrafting, RECIPES, resolveRecipe, classifyIngredient, buildCraftTr
 import { readFileSync } from 'node:fs';
 import { lookupEntity, eligiblePowers, DEVOTIONS, DOMAINS, REFS, CLASSES, LINEAGES, lineageChoiceSpec, lineageItemImpact, ALLERGEN_AWARDS, allergenOptions, allergenAward, powerSpellChoiceSpec, divineSubstitutionOptions, pickAndChooseOptions } from '../../src/engine/data.js';
 import { resolveCharacterGraph } from '../../src/engine/graph.js';
+const toV2 = (c) => resolveCharacterGraph(c).character;
 import {
   hasStartingChoices, reconcileStartingChoices, rebuildStartingSkills,
   STARTING_CHOICES_CONFIG, optionSkills, resolveSkill,
@@ -234,7 +235,7 @@ test('all 18 devotions carry domains', () => {
   for (const d of DEVOTIONS) ok(d.domains.length >= 2, `${d.name} has domains`);
 });
 test('devotionState resolves The Mother → Life/Creation/Protection', () => {
-  const ds = devotionState({ devotion: 'The Mother', divineDomains: ['Life', 'Protection'] });
+  const ds = devotionState(toV2({ devotion: 'The Mother', divineDomains: ['Life', 'Protection'] }));
   ok(ds, 'devotionState non-null');
   eq(ds.available.join(','), 'Life,Creation,Protection', 'available domains');
   eq(ds.chosen.join(','), 'Life,Protection', 'chosen domains');
@@ -262,19 +263,19 @@ test('Divine Substitution offers domains that are neither standard nor opposed',
   ok(opts.includes('Shadow') && opts.includes('War'), 'offers eligible domains');
 });
 test('Divine Substitution grants the chosen domain (opposition enforced end-to-end)', () => {
-  const ds = devotionState({
+  const ds = devotionState(toV2({
     classLevels: 'Cleric 10', devotion: 'The Mother', classPowers: ['Divine Substitution'],
     choices: { 'powers:Divine Substitution': 'Shadow' }, divineDomains: ['Shadow'],
-  });
+  }));
   ok(ds.substitution, 'substitution surfaced when the power is owned');
   eq(ds.substitution.chosen, 'Shadow', 'records the pick');
   ok(ds.available.includes('Shadow'), 'chosen domain becomes available');
   ok(ds.eligiblePowers.length > 0, 'its domain powers become purchasable');
   // A forbidden (opposed) pick is rejected: Death opposes Life → not added.
-  const bad = devotionState({
+  const bad = devotionState(toV2({
     classLevels: 'Cleric 10', devotion: 'The Mother', classPowers: ['Divine Substitution'],
     choices: { 'powers:Divine Substitution': 'Death' },
-  });
+  }));
   ok(!bad.available.includes('Death'), 'an opposed pick is refused');
 });
 
