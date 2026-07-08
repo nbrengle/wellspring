@@ -51,7 +51,7 @@ export function parseSingleComponent(part) {
   if (!part) return null;
   const match = part.match(/^(\d+|\+?\[[a-zA-Z]\]|\d+\+)\s*(.*)$/);
   if (match) {
-    let qtyStr = match[1].replace('+', '');
+    const qtyStr = match[1].replace('+', '');
     let qty = parseInt(qtyStr, 10);
     if (isNaN(qty)) qty = 1;
     const name = normalizeResourceName(match[2]);
@@ -218,8 +218,8 @@ export function solveCrafting(targetName, targetQty, inventory, path = []) {
   const targetLower = targetName.toLowerCase();
   
   // Find matching key in inventory (case insensitive)
-  let invKey = Object.keys(currentInv).find(k => k.toLowerCase() === targetLower);
-  let available = invKey ? currentInv[invKey] : 0;
+  const invKey = Object.keys(currentInv).find(k => k.toLowerCase() === targetLower);
+  const available = invKey ? currentInv[invKey] : 0;
   
   if (available >= targetQty) {
     if (invKey) currentInv[invKey] -= targetQty;
@@ -254,7 +254,7 @@ export function solveCrafting(targetName, targetQty, inventory, path = []) {
   for (const reqSet of recipe.requirements) {
     let success = true;
     let tempInv = { ...currentInv };
-    let subSteps = [];
+    const subSteps = [];
     
     for (const [reqName, reqQty] of Object.entries(reqSet)) {
       const totalReqQty = reqQty * batches;

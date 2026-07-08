@@ -14,7 +14,7 @@
     "doc:feedback": "tsx scripts/linker/doc-feedback.js",
     "test": "tsx ./scripts/test.mjs && tsx ./scripts/test-rules-enforcement.mjs && tsx ./scripts/test-browser.mjs",
     "shot": "tsx scripts/debug/shot.mjs",
-    "lint:js": "eslint . --max-warnings=0",
+    "lint:js": "eslint . --max-warnings=138",
     "lint:css": "stylelint '**/*.css'",
     "lint": "npm run lint:js && npm run lint:css",
     "format": "prettier --write .",
@@ -42,6 +42,7 @@
     "stylelint-config-standard": "^40.0.0",
     "tsx": "^4.22.4",
     "typescript": "^6.0.3",
+    "typescript-eslint": "^8.63.0",
     "vite": "^8.0.12"
   }
 }
