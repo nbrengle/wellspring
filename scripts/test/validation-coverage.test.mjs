@@ -1,6 +1,6 @@
 // validation-coverage.test.mjs — split from scripts/test.mjs (hotspot split). Owns its own
 // imports so concurrent features don't collide on one shared import block.
-import { test, eq, ok } from './harness.mjs';
+import { test, eq, ok, pSkills } from './harness.mjs';
 import {
   validate, characterLevel
 } from "../../src/engine/validate.js";
@@ -29,13 +29,13 @@ const fromArchetype = (a) => ({ ...a, archetypeName: a.name });
 
 // ─── Weapon Specialization & Advanced Classes validation ───────────────────────
 test('validation: take-once cap on purchases (generic OVER_CAP, e.g. Weapon Spec)', () => {
-  const clean = { archetypeName: 'x', classLevels: 'Fighter 4', startingSkills: ['Basic Martial Weapons'], purchasedSkills: ['Weapon Specialization (Swords)'] };
+  const clean = { archetypeName: 'x', classLevels: 'Fighter 4', startingSkills: ['Basic Martial Weapons'], ...pSkills(['Weapon Specialization (Swords)']) };
   const rClean = validate(clean);
   eq(rClean.prereqs.issues.length, 0, 'One specialization is legal');
 
   // Buying a SECOND cap-1 (rank "-") skill is an illegal build — flagged generically
   // as over-cap, NOT silently refunded to free BP (refund is for grants only).
-  const multiple = { archetypeName: 'x', classLevels: 'Fighter 4', startingSkills: ['Basic Martial Weapons'], purchasedSkills: ['Weapon Specialization (Swords)', 'Weapon Specialization (Daggers)'] };
+  const multiple = { archetypeName: 'x', classLevels: 'Fighter 4', startingSkills: ['Basic Martial Weapons'], ...pSkills(['Weapon Specialization (Swords)', 'Weapon Specialization (Daggers)']) };
   const rMultiple = validate(multiple);
   ok(rMultiple.prereqs.issues.some(i => /Weapon Specialization/.test(i.item) && /taken once/i.test(i.text)),
      'A second cap-1 purchase is blocked as over-cap');
@@ -93,14 +93,14 @@ test('parameterized skills satisfy prerequisites and undergo prerequisite checki
   // 1. Lore (Historical) satisfies Research prerequisite (Lore)
   let c = {
     classes: [{ name: 'Mage', level: 4 }],
-    purchasedSkills: ['Lore (Historical)', 'Research']
+    ...pSkills(['Lore (Historical)', 'Research'])
   };
   eq(validate(c).prereqs.issues.length, 0, 'Lore (Historical) satisfies Research');
 
   // 2. Profession - Journeyman (Smith) requires Profession - Apprentice
   c = {
     classes: [{ name: 'Mage', level: 4 }],
-    purchasedSkills: ['Profession - Journeyman (Smith)']
+    ...pSkills(['Profession - Journeyman (Smith)'])
   };
   const issues = validate(c).prereqs.issues;
   eq(issues.length, 1, 'fails missing apprentice prerequisite');
@@ -108,7 +108,7 @@ test('parameterized skills satisfy prerequisites and undergo prerequisite checki
   eq(issues[0].missing[0].id, 'skills:Profession - Apprentice', 'identifies missing base prerequisite');
 
   // 3. Adding Apprentice (Smith) satisfies the prerequisite
-  c.purchasedSkills.push('Profession - Apprentice (Smith)');
+  c.skills.push({ entityId: 'Profession - Apprentice (Smith)', source: 'Purchased', ranks: 1 });
   eq(validate(c).prereqs.issues.length, 0, 'Apprentice satisfies Journeyman');
 });
 
@@ -161,14 +161,14 @@ test('effect coverage G3: Extensive Combat Training slot grants', () => {
   // Fighter L4 with Extensive Combat Training - Basic x1 -> basic +1
   const basicECT = {
     classes: [{ name: 'Fighter', level: 4 }],
-    purchasedSkills: ['Extensive Combat Training - Basic']
+    ...pSkills(['Extensive Combat Training - Basic'])
   };
   eq(getSlot(validate(basicECT), 'basic'), 3, 'ECT Basic grants +1 basic slot');
 
   // Fighter L4 with Extensive Combat Training - Advanced x1 -> advanced +1 (since Adept tier maps to advanced)
   const advECT = {
     classes: [{ name: 'Fighter', level: 4 }],
-    purchasedSkills: ['Extensive Combat Training - Advanced']
+    ...pSkills(['Extensive Combat Training - Advanced'])
   };
   eq(getSlot(validate(advECT), 'advanced'), 1, 'ECT Advanced grants +1 advanced slot');
 });

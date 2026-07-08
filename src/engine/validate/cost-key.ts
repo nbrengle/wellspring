@@ -2,19 +2,29 @@ export function costKey(nodeOrId) {
   if (typeof nodeOrId === 'string') return nodeOrId;
   const node = nodeOrId;
   if (!node) return undefined;
-  
-  if (node.id && node.id.includes(':')) return node.id;
-  
-  // Construct a V1-style key from field and rawString/name
-  const field = node.field === 'skills' && node.sourceType === 'purchased' ? 'purchasedSkills' :
-                node.field === 'skills' && (node.sourceType === 'class' || node.sourceType === 'grant' || node.sourceType === 'lineage') ? 'startingSkills' :
-                node.field === 'perks' ? 'purchasedPerks' : node.field;
-  
-  // For startingSkills, V1 tests expect startingSkills:0:Name format
-  if (field === 'startingSkills') {
-    return `startingSkills:${node.index ?? 0}:${node.rawString || node.name}`;
+
+  // Skills are keyed by SOURCE, derived here (independent of node.id shape, which is
+  // built for identity, not for the ledger). These MUST precede the node.id
+  // short-circuit below, since a starting skill's id ('startingSkills:Name') would
+  // otherwise return without the index the ledger key needs.
+  //   - purchased → `skills:<name>`              (positional, V2-native)
+  //   - starting  → `startingSkills:<i>:<name>`  (indexed, still flat-path)
+  if (node.field === 'skills') {
+    if (node.sourceType === 'purchased') return `skills:${node.rawString || node.name}`;
+    if (node.sourceType === 'class' || node.sourceType === 'grant' || node.sourceType === 'lineage') {
+      return `startingSkills:${node.index ?? 0}:${node.rawString || node.name}`;
+    }
   }
-  return `${field}:${node.rawString || node.name}`;
+
+  // Perks key under the character field `purchasedPerks:` (not the entity-type id
+  // `perks:`), so map before the node.id short-circuit below.
+  if (node.field === 'perks') {
+    return `purchasedPerks:${node.rawString || node.name}`;
+  }
+
+  if (node.id && node.id.includes(':')) return node.id;
+
+  return `${node.field}:${node.rawString || node.name}`;
 }
 
 export function lookupCost(byItem, choiceIdOrField, name, index) {

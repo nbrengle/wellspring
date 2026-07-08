@@ -23,8 +23,11 @@ function reconcileBuildChoices(character) {
     if (dash) return `${dash[1].trim().toLowerCase()}|${dash[2].trim().toLowerCase()}`;
     return clean.toLowerCase();
   };
+  const purchasedSkillNames = (character.skills || [])
+    .filter((s) => typeof s !== "string" && s.source === "Purchased")
+    .map((s) => s.entityId || s.name);
   const owned = new Set(
-    [...(character.startingSkills || []), ...(character.purchasedSkills || []), ...(character.classSkills || [])]
+    [...(character.startingSkills || []), ...purchasedSkillNames, ...(character.classSkills || [])]
       .map(key),
   );
   const choices = { ...(character.choices || {}) };
@@ -62,7 +65,10 @@ export const EMPTY_CHARACTER = {
   wealth: null,              // null → DEFAULT_WEALTH (8); perks/sheet may set it
   resources: null,           // free-form, from the sheet
   startingSkills: [],
-  purchasedSkills: [],
+  // Purchased skills live in the V2 `skills` bucket (source 'Purchased'), added on
+  // demand by the reducers. No flat purchasedSkills, and no empty `skills: []` here:
+  // an empty bucket would trip the boundary's V2 detector and skip v1ToV2 (which
+  // still synthesizes class innate powers + starting skills for a fresh build).
   purchasedPerks: [],
   flaws: [],
   advantageChoices: {},

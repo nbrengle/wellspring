@@ -1,9 +1,10 @@
-// reducers.test.mjs — coverage for the pure character-state reducers extracted
-// from the React handler hooks (src/engine/reducers.ts). The write path used to
-// be reachable only through React and had NO test coverage; these tests are the
-// safety net that guards the upcoming V1→V2 flip (migration step 3). They assert
-// the CURRENT V1-flat behavior: parallel `c[field]` / `ranks[field]` /
-// `effectiveBP[field]` arrays, remove-by-index, append-with-rank-1.
+// reducers.test.mjs — coverage for the pure character-state reducers
+// (src/engine/reducers.ts), the character write path.
+//
+// PURCHASED SKILLS are V2-native: the reducers push/patch/remove CharacterChoice
+// entries in `character.skills` (source 'Purchased'), addressed positionally
+// among the purchased entries — no flat `purchasedSkills`, no id. Other fields
+// (perks/powers/spells) still use the flat parallel-array path until their slice.
 import { test, eq, ok } from "./harness.mjs";
 import {
   addEntity,
@@ -18,59 +19,83 @@ import {
   splitParameterizedName,
 } from "../../src/engine/reducers.js";
 
-// ─── addEntity ────────────────────────────────────────────────────────────────
-test("addEntity appends the name and a rank of 1", () => {
+// The purchased-skill entries of a character (source 'Purchased' in skills[]).
+const purchased = (c) => (c.skills || []).filter((s) => s.source === "Purchased");
+
+// ─── addEntity (purchased skills → skills[] bucket) ─────────────────────────
+test("addEntity pushes a purchased CharacterChoice with rank 1", () => {
   const c = addEntity({}, "purchasedSkills", "Athletics");
-  eq(c.purchasedSkills.length, 1, "one skill present");
-  eq(c.purchasedSkills[0], "Athletics", "skill name stored");
-  eq(c.ranks.purchasedSkills[0], 1, "rank defaults to 1");
+  const p = purchased(c);
+  eq(p.length, 1, "one purchased skill present");
+  eq(p[0].entityId, "Athletics", "entityId stored");
+  eq(p[0].source, "Purchased", "source tagged");
+  eq(p[0].ranks, 1, "rank defaults to 1");
 });
-test("addEntity keeps ranks index-aligned across multiple adds", () => {
+test("addEntity accepts the resolved 'skills' field too (row field)", () => {
+  // The picker adds via 'purchasedSkills'; a resolved row carries 'skills'. Both
+  // address the purchased bucket.
+  const c = addEntity({}, "skills", "Stealth");
+  eq(purchased(c).length, 1, "added via 'skills' field");
+});
+test("addEntity appends multiple purchased skills in order", () => {
   let c = addEntity({}, "purchasedSkills", "Athletics");
   c = addEntity(c, "purchasedSkills", "Stealth");
-  eq(c.purchasedSkills.length, 2, "both skills present");
-  eq(c.ranks.purchasedSkills.length, 2, "one rank per skill");
-  eq(c.ranks.purchasedSkills[1], 1, "second rank is 1");
+  eq(purchased(c).map((s) => s.entityId).join(","), "Athletics,Stealth", "both, in order");
 });
 test("addEntity is a no-op for a duplicate (non-unlimited) name", () => {
   const c0 = addEntity({}, "purchasedSkills", "Athletics");
   const c1 = addEntity(c0, "purchasedSkills", "Athletics");
   eq(c1, c0, "same reference returned (no change)");
-  eq(c1.purchasedSkills.length, 1, "still only one");
+  eq(purchased(c1).length, 1, "still only one");
 });
 test("addEntity does not mutate its input", () => {
-  const input = { purchasedSkills: ["Athletics"], ranks: { purchasedSkills: [1] } };
+  const input = { skills: [{ entityId: "Athletics", source: "Purchased", ranks: 1 }] };
   const out = addEntity(input, "purchasedSkills", "Stealth");
-  eq(input.purchasedSkills.length, 1, "input untouched");
-  eq(out.purchasedSkills.length, 2, "output extended");
+  eq(input.skills.length, 1, "input untouched");
+  eq(purchased(out).length, 2, "output extended");
+});
+test("addEntity preserves non-purchased (e.g. starting) skill entries", () => {
+  const input = { skills: [{ entityId: "Lore (Arcane)", source: "Class:Starting", ranks: 1 }] };
+  const out = addEntity(input, "purchasedSkills", "Athletics");
+  eq(out.skills.length, 2, "starting entry kept + purchased added");
+  eq((out.skills || []).filter((s) => s.source === "Class:Starting").length, 1, "starting preserved");
 });
 
-// ─── removeEntity ───────────────────────────────────────────────────────────
-test("removeEntity removes by index and splices the parallel arrays", () => {
+// ─── removeEntity (positional within purchased bucket) ──────────────────────
+test("removeEntity removes the purchased skill at the given position", () => {
   const c0 = {
-    purchasedSkills: ["A", "B", "C"],
-    ranks: { purchasedSkills: [1, 2, 3] },
-    effectiveBP: { purchasedSkills: [10, 20, 30] },
+    skills: [
+      { entityId: "A", source: "Purchased", ranks: 1 },
+      { entityId: "B", source: "Purchased", ranks: 2 },
+      { entityId: "C", source: "Purchased", ranks: 3 },
+    ],
   };
-  const c = removeEntity(c0, "purchasedSkills", 1);
-  eq(c.purchasedSkills.join(","), "A,C", "B removed");
-  eq(c.ranks.purchasedSkills.join(","), "1,3", "rank for B removed, alignment kept");
-  eq(c.effectiveBP.purchasedSkills.join(","), "10,30", "BP for B removed, alignment kept");
+  const c = removeEntity(c0, "skills", 1);
+  eq(purchased(c).map((s) => s.entityId).join(","), "A,C", "B removed by position");
+  eq(purchased(c).map((s) => s.ranks).join(","), "1,3", "surviving ranks intact");
+});
+test("removeEntity is a no-op for an out-of-range position", () => {
+  const c0 = { skills: [{ entityId: "A", source: "Purchased", ranks: 1 }] };
+  eq(removeEntity(c0, "skills", 5), c0, "same reference (no change)");
 });
 test("add then remove round-trips to empty", () => {
   let c = addEntity({}, "purchasedSkills", "Athletics");
   c = removeEntity(c, "purchasedSkills", 0);
-  eq(c.purchasedSkills.length, 0, "skill gone");
-  eq(c.ranks.purchasedSkills.length, 0, "rank gone");
+  eq(purchased(c).length, 0, "purchased skill gone");
 });
 
-// ─── setRank ────────────────────────────────────────────────────────────────
-test("setRank sets the rank at an index, backfilling missing ranks with 1", () => {
-  const c0 = { purchasedSkills: ["A", "B", "C"] }; // no ranks array yet
-  const c = setRank(c0, "purchasedSkills", 2, 4);
-  eq(c.ranks.purchasedSkills.length, 3, "ranks backfilled to list length");
-  eq(c.ranks.purchasedSkills[0], 1, "backfilled to 1");
-  eq(c.ranks.purchasedSkills[2], 4, "target rank set");
+// ─── setRank (rank on the CharacterChoice) ──────────────────────────────────
+test("setRank sets the rank on the purchased skill at the given position", () => {
+  const c0 = {
+    skills: [
+      { entityId: "A", source: "Purchased", ranks: 1 },
+      { entityId: "B", source: "Purchased", ranks: 1 },
+      { entityId: "C", source: "Purchased", ranks: 1 },
+    ],
+  };
+  const c = setRank(c0, "skills", 2, 4);
+  eq(purchased(c)[2].ranks, 4, "target rank set");
+  eq(purchased(c)[0].ranks, 1, "others untouched");
 });
 
 // ─── setChoice ──────────────────────────────────────────────────────────────
@@ -110,31 +135,35 @@ test("clearSlot removes a pick and keeps powerClass/effectiveBP aligned", () => 
   eq(c.effectiveBP.basicPowers.join(","), "7", "BP array spliced");
 });
 
-// ─── updateParameter ────────────────────────────────────────────────────────
-test("updateParameter renames the item at the given index", () => {
-  const c0 = { purchasedSkills: ["Lore", "Craft"] };
-  const c = updateParameter(c0, "purchasedSkills", "Lore", "Lore (History)", 0);
-  eq(c.purchasedSkills[0], "Lore (History)", "renamed in place");
-  eq(c.purchasedSkills[1], "Craft", "sibling untouched");
+// ─── updateParameter (patches the purchased-skill entityId) ─────────────────
+const mkPurchased = (...names) => ({
+  skills: names.map((entityId) => ({ entityId, source: "Purchased", ranks: 1 })),
 });
-test("updateParameter falls back to indexOf when no index is given", () => {
-  const c0 = { purchasedSkills: ["Lore", "Craft"] };
-  const c = updateParameter(c0, "purchasedSkills", "Craft", "Craft (Smithing)");
-  eq(c.purchasedSkills[1], "Craft (Smithing)", "located by oldName");
+test("updateParameter renames the purchased skill at the given position", () => {
+  const c0 = mkPurchased("Lore", "Craft");
+  const c = updateParameter(c0, "skills", "Lore", "Lore (History)", 0);
+  eq(purchased(c)[0].entityId, "Lore (History)", "renamed in place");
+  eq(purchased(c)[1].entityId, "Craft", "sibling untouched");
 });
-test("updateParameter is a no-op when the item is not found", () => {
-  const c0 = { purchasedSkills: ["Lore"] };
-  const c = updateParameter(c0, "purchasedSkills", "Missing", "Whatever");
+test("updateParameter falls back to entityId match when no index is given", () => {
+  const c0 = mkPurchased("Lore", "Craft");
+  const c = updateParameter(c0, "skills", "Craft", "Craft (Smithing)");
+  eq(purchased(c)[1].entityId, "Craft (Smithing)", "located by oldName");
+});
+test("updateParameter is a no-op when the purchased skill is not found", () => {
+  const c0 = mkPurchased("Lore");
+  const c = updateParameter(c0, "skills", "Missing", "Whatever");
   eq(c, c0, "unchanged reference");
 });
-test("updateParameter clears devotion state when Worship loses its parameter", () => {
+test("updateParameter clears devotion state when a Worship skill loses its parameter", () => {
   const c0 = {
-    purchasedSkills: ["Worship (Some Deity)"],
+    ...mkPurchased("Worship (Some Deity)"),
     devotion: "Some Deity",
     divineDomains: ["War"],
     domainPowers: ["Smite"],
   };
-  const c = updateParameter(c0, "purchasedSkills", "Worship (Some Deity)", "Worship", 0);
+  const c = updateParameter(c0, "skills", "Worship (Some Deity)", "Worship", 0);
+  eq(purchased(c)[0].entityId, "Worship", "skill entityId cleared to bare Worship");
   eq(c.devotion, null, "devotion cleared");
   eq(c.divineDomains.length, 0, "domains cleared");
   eq(c.domainPowers.length, 0, "domain powers cleared");

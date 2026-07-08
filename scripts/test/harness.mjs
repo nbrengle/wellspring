@@ -21,6 +21,20 @@ export function eq(actual, expected, msg = '') {
 
 export function ok(cond, msg = '') { if (!cond) throw new Error(msg || 'expected truthy'); }
 
+// Build the V2 `skills` bucket (source 'Purchased') from skill names (or
+// {name,ranks}). Purchased skills are V2-native (CharacterChoice[]), so a test
+// that used to pass `purchasedSkills: ['Lore (Arcane)']` now spreads
+// `...pSkills(['Lore (Arcane)'])` into the character literal. The engine keys
+// these under the `skills:` prefix in the BP ledger.
+export function pSkills(names) {
+  return {
+    skills: names.map((n) =>
+      typeof n === 'string'
+        ? { entityId: n, source: 'Purchased', ranks: 1 }
+        : { entityId: n.name, source: 'Purchased', ranks: n.ranks ?? 1 }),
+  };
+}
+
 // Printed once by the entry after all domain files have registered their tests.
 export function report() {
   console.log(`\n${passed} passed, ${failures.length} failed`);

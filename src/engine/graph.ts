@@ -1000,28 +1000,45 @@ function checkLevelConstraint(character: any, constraintStr: string, owned: Set<
 function v1ToV2(charInput: V1CharacterInput): CharacterStateV2 {
   const v2: CharacterStateV2 = {
     ...charInput,
+    _v2: true,
     classes: getClasses(charInput),
     skills: [], perks: [], flaws: [], powers: [], spells: [], devotions: [],
   };
 
-  const add = (field: string, bucket: CharacterChoice[], source: EntitySource, items: string[] | undefined) => {
+  // Idempotent: v1ToV2 may run on a char that already carries some V2 buckets
+  // (the boundary re-normalizes every resolve). A flat string item is converted to
+  // a CharacterChoice; an already-converted entry (object) is passed through as-is.
+  const add = (field: string, bucket: CharacterChoice[], source: EntitySource, items: (string | CharacterChoice)[] | undefined) => {
     for (let i = 0; i < (items || []).length; i++) {
       const item = items![i];
+      if (item && typeof item === 'object') {
+        bucket.push(item);
+        continue;
+      }
       bucket.push({
-        id: field === 'startingSkills' ? `startingSkills:${i}:${item}` : `${field}:${item}`,
-        entityId: item,
+        entityId: item as string,
         source,
         costOverride: charInput.effectiveBP?.[field]?.[i] ?? undefined,
         ranks: charInput.ranks?.[field]?.[i] ?? 1,
         originalIndex: i,
-      });
+        // The originating character field (e.g. 'classPowers'). Flat-path buckets
+        // key their BP ledger by this; skills (V2-native, no `add`) key by 'skills:'.
+        costField: field,
+      } as CharacterChoice);
     }
   };
 
-  add('startingSkills', v2.skills, 'Class:Starting', charInput.startingSkills);
-  add('purchasedSkills', v2.skills, 'Purchased', charInput.purchasedSkills);
+  // Skills are V2-native (CharacterChoice[] in charInput.skills). Preserve ALL
+  // existing bucket entries — purchased AND any the archetype/importer carried as
+  // Class:Starting. Only synthesize from the legacy flat `startingSkills` when the
+  // bucket has no starting entries yet (a from-scratch/older char).
+  for (const s of charInput.skills || []) v2.skills.push(s);
+  const hasStartingInBucket = (charInput.skills || []).some((s) => s.source === 'Class:Starting');
+  if (!hasStartingInBucket) {
+    add('startingSkills', v2.skills, 'Class:Starting', charInput.startingSkills);
+  }
   add('purchasedPerks', v2.perks, 'Purchased', charInput.purchasedPerks);
-  add('flaws', v2.flaws, 'Flaw', charInput.flaws as string[] | undefined);
+  add('flaws', v2.flaws, 'Flaw', charInput.flaws as (string | CharacterChoice)[] | undefined);
   for (const pf of ['classPowers', 'classSkills', 'rightHandPowers', 'utilityPowers', 'basicPowers', 'advancedPowers', 'veteranPowers', 'domainPowers'] as const) {
     add(pf, v2.powers, 'Purchased', charInput[pf]);
   }
@@ -1040,15 +1057,18 @@ function v1ToV2(charInput: V1CharacterInput): CharacterStateV2 {
     add(sf, v2.spells, 'Purchased', charInput[sf]);
   }
   if (charInput.devotion) {
-    v2.devotions.push({ id: `devotions:${charInput.devotion}`, entityId: `devotions:${charInput.devotion}`, source: 'Purchased' });
+    v2.devotions.push({ entityId: `devotions:${charInput.devotion}`, source: 'Purchased' });
   }
   return v2;
 }
 
 export function resolveCharacterGraph(charInput: V1CharacterInput | CharacterStateV2): CharacterGraphModel {
-  // Convert raw V1 input to V2 at the boundary; if it's already V2, pass through.
-  const character: CharacterStateV2 = ('skills' in charInput && Array.isArray((charInput as any).skills) && (charInput as any).skills.every?.((s: any) => typeof s === 'object'))
-    ? charInput as CharacterStateV2
+  // Convert V1 input to V2 at the boundary; a char already normalized by v1ToV2
+  // (marked `_v2`) passes through. The marker is the reliable discriminator —
+  // inferring from bucket contents misfired (empty `skills: []` looked V2) and
+  // re-running v1ToV2 on its own output double-wrapped already-converted entries.
+  const character: CharacterStateV2 = (charInput as CharacterStateV2)._v2
+    ? (charInput as CharacterStateV2)
     : v1ToV2(charInput as V1CharacterInput);
 
   const items: GraphItem[] = [];
@@ -1095,8 +1115,15 @@ export function resolveCharacterGraph(charInput: V1CharacterInput | CharacterSta
       else field = 'unknown';
     }
 
+    // Node id is the PARAMETER-PRESERVING instance key used for the BP ledger,
+    // prereq issue ids, and dedupe — NOT ent.id (the param-stripped BASE). Its
+    // prefix is the ORIGINATING character field: flat-path buckets carry it as
+    // `choice.costField` (e.g. 'classPowers'); V2-native skills have none, so they
+    // key under their entity collection ('skills'). Falls back to the raw entityId.
+    const idPrefixName = (choice as any).costField || (ent?.type ? idPrefix(ent) : null);
+    const nodeId = idPrefixName ? `${idPrefixName}:${cleanName}` : entityId;
     items.push({
-      id: choice.id || entityId,
+      id: nodeId,
       entityId: entityId,
       name: ent?.name || cleanName,
       rawString: choice.entityId,
@@ -1116,7 +1143,17 @@ export function resolveCharacterGraph(charInput: V1CharacterInput | CharacterSta
     });
   };
 
-  for (const choice of character.skills || []) addItem(choice);
+  // Purchased skills are addressed positionally by the UI (remove/rank pass the
+  // index among purchased entries), so stamp each with its purchased-bucket index.
+  // Starting skills keep their own originalIndex from v1ToV2 (flat path).
+  let purchasedSkillIdx = 0;
+  for (const choice of character.skills || []) {
+    if (choice.source === 'Purchased' && choice.originalIndex == null) {
+      addItem({ ...choice, originalIndex: purchasedSkillIdx++ });
+    } else {
+      addItem(choice);
+    }
+  }
   for (const choice of character.perks || []) addItem(choice);
   for (const choice of character.powers || []) addItem(choice);
   for (const choice of character.spells || []) addItem(choice);

@@ -1,6 +1,6 @@
 // grants-and-classes.test.mjs — split from scripts/test.mjs (hotspot split). Owns its own
 // imports so concurrent features don't collide on one shared import block.
-import { test, eq, ok } from './harness.mjs';
+import { test, eq, ok, pSkills } from './harness.mjs';
 import {
   validate, characterLevel
 } from "../../src/engine/validate.js";
@@ -45,7 +45,7 @@ const fromArchetype = (a) => ({ ...a, archetypeName: a.name });
 // ─── grants carry params as a first-class field (#50) ─────────────────────────
 test('node.param is structured (parsed once), incl. on grants', () => {
   // Purchased parameterized skills carry their chosen value structurally.
-  const g = resolveCharacterGraph({ classLevels: 'Cleric 4', purchasedSkills: ['Lore (Arcane)', 'Lore (Religion)'] });
+  const g = resolveCharacterGraph({ classLevels: 'Cleric 4', ...pSkills(['Lore (Arcane)', 'Lore (Religion)']) });
   const lore = g.filter((n) => /^Lore/.test(n.name));
   eq(lore.map((n) => n.param).sort().join(','), 'Arcane,Religion', 'purchased Lore params are structured');
 

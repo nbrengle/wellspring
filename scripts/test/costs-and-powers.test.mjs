@@ -1,6 +1,6 @@
 // costs-and-powers.test.mjs — split from scripts/test.mjs (hotspot split). Owns its own
 // imports so concurrent features don't collide on one shared import block.
-import { test, eq, ok } from './harness.mjs';
+import { test, eq, ok, pSkills } from './harness.mjs';
 import {
   validate, characterLevel
 } from "../../src/engine/validate.js";
@@ -42,7 +42,7 @@ test('grants from a granting power bought into purchasedSkills are seen (graph-d
   // Regression: the old per-field grant walk skipped purchasedSkills, so a Right
   // Hand power like "Holding Out for a Hero" (bought as a skill) didn't surface the
   // "Save the Day" it grants. The graph-derived grantedAbilities catches it.
-  const c = { classLevels: 'Socialite 10', purchasedSkills: ['The Right Hand', 'Holding Out for a Hero'] };
+  const c = { classLevels: 'Socialite 10', ...pSkills(['The Right Hand', 'Holding Out for a Hero']) };
   const g = grantedAbilities(c);
   // source is the canonical entity name ("...For a Hero"), resolved from the raw
   // input ("...for a Hero") — the graph normalizes via lookupEntity.
@@ -73,16 +73,16 @@ test('a grant refunds a matching parameterized purchase, by parameter (Way of th
   // A previously-PURCHASED "Weapon Specialization (Daggers)" must go free + attributed
   // — the dash vs parens form must not block the match. A different weapon must NOT.
   const daggers = computeSpend({ classLevels: 'Rogue 4',
-    purchasedSkills: ['Weapon Specialization (Daggers)'],
+    ...pSkills(['Weapon Specialization (Daggers)']),
     utilityPowers: ['Way of the Blade'], choices: { 'powers:Way of the Blade': 'Daggers' } });
-  const dk = daggers.byItem['purchasedSkills:Weapon Specialization (Daggers)'];
+  const dk = daggers.byItem['skills:Weapon Specialization (Daggers)'];
   eq(dk.cost, 0, 'matching weapon → refunded to free');
   eq(dk.grant?.source, 'Way of the Blade', 'attributed to the granting power');
 
   const swords = computeSpend({ classLevels: 'Rogue 4',
-    purchasedSkills: ['Weapon Specialization (Swords)'],
+    ...pSkills(['Weapon Specialization (Swords)']),
     utilityPowers: ['Way of the Blade'], choices: { 'powers:Way of the Blade': 'Daggers' } });
-  eq(swords.byItem['purchasedSkills:Weapon Specialization (Swords)'].cost, 4,
+  eq(swords.byItem['skills:Weapon Specialization (Swords)'].cost, 4,
      'different weapon → NOT refunded (parameter precision)');
 });
 test('a selected power that grants a perk zeroes that perk (Implicit Truths → Insight)', () => {
@@ -116,18 +116,18 @@ test('a choice-gated grant does NOT grant every option for free (The Learned One
 
 // ─── discount sources: category, firstN, refund-if-free, cap ──────────────────
 test('Human Environmental Mastery discounts a Gathering skill by 1', () => {
-  const c = { lineage: 'Human', lineageAdvantages: ['Environmental Mastery'], purchasedSkills: ['Forage I'] };
+  const c = { lineage: 'Human', lineageAdvantages: ['Environmental Mastery'], ...pSkills(['Forage I']) };
   const s = computeSpend(c);
-  eq(s.byItem['purchasedSkills:Forage I'].cost, 2, 'Forage 3→2');
-  eq(s.byItem['purchasedSkills:Forage I'].discount.source, 'Environmental Mastery', 'source on chip');
+  eq(s.byItem['skills:Forage I'].cost, 2, 'Forage 3→2');
+  eq(s.byItem['skills:Forage I'].discount.source, 'Environmental Mastery', 'source on chip');
 });
 test('Lost Wisdom of Many discounts only the first three Lore skills', () => {
   const c = { lineage: 'Lost', lineageAdvantages: ['Wisdom of Many'],
-    purchasedSkills: ['Lore (History)', 'Lore (Religion)', 'Lore (Arcana)', 'Lore (Nature)'] };
+    ...pSkills(['Lore (History)', 'Lore (Religion)', 'Lore (Arcana)', 'Lore (Nature)']) };
   const s = computeSpend(c);
-  eq(s.byItem['purchasedSkills:Lore (History)'].cost, 1, '1st discounted');
-  eq(s.byItem['purchasedSkills:Lore (Arcana)'].cost, 1, '3rd discounted');
-  eq(s.byItem['purchasedSkills:Lore (Nature)'].cost, 2, '4th full');
+  eq(s.byItem['skills:Lore (History)'].cost, 1, '1st discounted');
+  eq(s.byItem['skills:Lore (Arcana)'].cost, 1, '3rd discounted');
+  eq(s.byItem['skills:Lore (Nature)'].cost, 2, '4th full');
 });
 
 test('Patron discounts gift-eligible perks by 1, excludes Strong Bloodline + Gifts', () => {
@@ -149,15 +149,15 @@ test('Ritual Affinity discounts Ritual Magic at the granting class level', () =>
     const k = Object.keys(s.byItem).find((x) => x.endsWith(`:${skill}`));
     return s.byItem[k]?.cost;
   };
-  eq(cost({ classLevels: 'Cleric 4', purchasedSkills: ['Journeyman Ritual Magic'] }, 'Journeyman Ritual Magic'), 2, 'L4: gate not met, full 2');
-  eq(cost({ classLevels: 'Cleric 7', purchasedSkills: ['Journeyman Ritual Magic'] }, 'Journeyman Ritual Magic'), 1, 'L7: Journeyman 2→1');
-  eq(cost({ classLevels: 'Cleric 7', purchasedSkills: ['Greater Ritual Magic'] }, 'Greater Ritual Magic'), 3, 'L7: Greater gate (L12) not met, full 3');
-  eq(cost({ classLevels: 'Cleric 12', purchasedSkills: ['Greater Ritual Magic'] }, 'Greater Ritual Magic'), 2, 'L12: Greater 3→2');
+  eq(cost({ classLevels: 'Cleric 4', ...pSkills(['Journeyman Ritual Magic']) }, 'Journeyman Ritual Magic'), 2, 'L4: gate not met, full 2');
+  eq(cost({ classLevels: 'Cleric 7', ...pSkills(['Journeyman Ritual Magic']) }, 'Journeyman Ritual Magic'), 1, 'L7: Journeyman 2→1');
+  eq(cost({ classLevels: 'Cleric 7', ...pSkills(['Greater Ritual Magic']) }, 'Greater Ritual Magic'), 3, 'L7: Greater gate (L12) not met, full 3');
+  eq(cost({ classLevels: 'Cleric 12', ...pSkills(['Greater Ritual Magic']) }, 'Greater Ritual Magic'), 2, 'L12: Greater 3→2');
   // Multiclass: Cleric track at 12 gates Greater; the discount fires once.
-  eq(cost({ classes: [{ name: 'Cleric', level: 12 }, { name: 'Mage', level: 4 }], purchasedSkills: ['Greater Ritual Magic'] }, 'Greater Ritual Magic'), 2, 'Cleric12 track discounts Greater');
+  eq(cost({ classes: [{ name: 'Cleric', level: 12 }, { name: 'Mage', level: 4 }], ...pSkills(['Greater Ritual Magic']) }, 'Greater Ritual Magic'), 2, 'Cleric12 track discounts Greater');
   // No Ritual Affinity → no discount; no leak to similarly-named skills.
-  eq(cost({ classLevels: 'Fighter 7', purchasedSkills: ['Journeyman Ritual Magic'] }, 'Journeyman Ritual Magic'), 2, 'no RA → full');
-  eq(cost({ classLevels: 'Cleric 12', purchasedSkills: ['Greater Alchemy'] }, 'Greater Alchemy'), 5, 'no leak to Greater Alchemy');
+  eq(cost({ classLevels: 'Fighter 7', ...pSkills(['Journeyman Ritual Magic']) }, 'Journeyman Ritual Magic'), 2, 'no RA → full');
+  eq(cost({ classLevels: 'Cleric 12', ...pSkills(['Greater Alchemy']) }, 'Greater Alchemy'), 5, 'no leak to Greater Alchemy');
 });
 
 // ─── shared powers: same-named cross-class powers stay mechanically equivalent ───
@@ -181,27 +181,31 @@ test('shared powers are mechanically equivalent unless level-scaled', () => {
 });
 
 // ─── xN on unlimited-ranks skills → distinct instances, not rank N ────────────
+// Purchased skills import into the V2 skills[] bucket (source 'Purchased').
+const importedPurchased = (c) => (c.skills || []).filter((s) => s.source === 'Purchased').map((s) => s.entityId);
 test('import expands "Lore x2" into two distinct Lore instances', () => {
   const c = parseCharacterSheet('M\nClass Levels: Mage 4\nPurchased Skills: Lore x2');
-  eq(c.purchasedSkills.length, 2, 'two rows');
-  ok(c.purchasedSkills[0] !== c.purchasedSkills[1], 'distinct subjects');
-  ok(c.purchasedSkills.every((n) => /^Lore \(/.test(n)), 'both parameterized Lore');
+  const p = importedPurchased(c);
+  eq(p.length, 2, 'two rows');
+  ok(p[0] !== p[1], 'distinct subjects');
+  ok(p.every((n) => /^Lore \(/.test(n)), 'both parameterized Lore');
 });
 test('import expands "Bookcaster x3" into three distinct instances', () => {
   const c = parseCharacterSheet('M\nClass Levels: Mage 4\nPurchased Skills: Bookcaster x3');
-  eq(c.purchasedSkills.length, 3, 'three rows');
-  eq(new Set(c.purchasedSkills).size, 3, 'all distinct');
+  const p = importedPurchased(c);
+  eq(p.length, 3, 'three rows');
+  eq(new Set(p).size, 3, 'all distinct');
 });
 test('two Lores under Sharp Mind cost 1 each (per-instance discount), net 2', () => {
   const c = parseCharacterSheet('M\nClass Levels: Mage 4\nPurchased Perks: Sharp Mind\nPurchased Skills: Lore x2');
   const s = computeSpend(c);
-  const lores = Object.keys(s.byItem).filter((k) => /purchasedSkills:Lore/.test(k));
+  const lores = Object.keys(s.byItem).filter((k) => /skills:Lore/.test(k));
   eq(lores.length, 2, 'two distinct byItem keys');
   lores.forEach((k) => eq(s.byItem[k].cost, 1, `${k} discounted to 1`));
 });
 test('finite-ranks "Extended Capacity - Novice x2" stays one rank-2 row (not expanded)', () => {
   const c = parseCharacterSheet('M\nClass Levels: Mage 4\nPurchased Skills: Extended Capacity - Novice x2');
-  eq(c.purchasedSkills.length, 1, 'single row');
+  eq(importedPurchased(c).length, 1, 'single row');
 });
 
 // ─── tiered perks: cumulative cost + hard-enforced per-tier level gate ────────
@@ -265,10 +269,10 @@ test('Adept Ritualist level-benefits activate by Artisan class level', () => {
 
 // ─── choose-one: build-time selection grants the chosen skill free ────────────
 test('Expert Craft build-time choice grants the selected skill at 0 BP', () => {
-  const base = { classLevels: 'Artisan 10', innatePowers: ['Expert Craft'], purchasedSkills: ['Greater Alchemy'] };
-  eq(computeSpend(base).byItem['purchasedSkills:Greater Alchemy'].cost, 5, 'full cost without a choice');
+  const base = { classLevels: 'Artisan 10', innatePowers: ['Expert Craft'], ...pSkills(['Greater Alchemy']) };
+  eq(computeSpend(base).byItem['skills:Greater Alchemy'].cost, 5, 'full cost without a choice');
   const chosen = { ...base, choices: { 'powers:Expert Craft': 'Greater Alchemy' } };
-  const eff = computeSpend(chosen).byItem['purchasedSkills:Greater Alchemy'];
+  const eff = computeSpend(chosen).byItem['skills:Greater Alchemy'];
   eq(eff.cost, 0, 'free once chosen');
   eq(eff.grant.source, 'Expert Craft', 'attributed to Expert Craft');
 });
@@ -285,7 +289,7 @@ test('flaw BP award is capped at 5 (extra flaws give no more BP)', () => {
 test('flaws RAISE the budget rather than lowering spend', () => {
   // Flaw BP is awarded BP: it should lift the displayed cap (spent of base+flaws),
   // not net out of spend (which would make the build look like it spent less).
-  const base = { classLevels: 'Fighter 4', purchasedSkills: [], purchasedPerks: [] };
+  const base = { classLevels: 'Fighter 4', purchasedPerks: [] };
   const none = validate({ ...base, flaws: [] });
   const five = validate({ ...base, flaws: ['Nightmares', 'Pliant'] }); // 3 + 2 = 5
   eq(five.budget, none.budget + 5, 'budget lifts by the 5 awarded flaw BP');

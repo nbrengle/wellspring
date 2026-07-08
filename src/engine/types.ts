@@ -119,7 +119,6 @@ export type EntitySource = 'Purchased' | `Class:${string}` | 'Lineage' | `Grante
  * A choice made by the player to add an entity to their sheet.
  */
 export interface CharacterChoice {
-  id: string;             // UUID for safe targeted deletion/updates
   entityId: string;       // The canonical name/key of the entity in the rules database
   source: EntitySource;   // Where this capability came from
 
@@ -127,7 +126,13 @@ export interface CharacterChoice {
   costOverride?: number;  // E.g. from Apprentice Alchemy discount (-1)
   parameter?: string;     // If the choice requires a parameter (e.g. Weapon Specialization - Swords)
   ranks?: number;         // For multi-rank purchases like Agile Learner
-  originalIndex?: number; // Index in the source V1 field, for validation/deletion bridging
+  // originalIndex bridges the still-flat startingSkills path (index-based floor/cost
+  // keys); it's deleted with those flat fields in the startingSkills slice.
+  originalIndex?: number;
+  // Transient bridge: the originating V1 character field (e.g. 'classPowers') for
+  // flat-path buckets, so the node keeps its legacy BP-ledger key prefix. Set by
+  // v1ToV2's converter; dies with the flat fields.
+  costField?: string;
 }
 
 /** The raw, V1-flat character the UI / loadArchetype produce and edit: parallel
@@ -144,6 +149,13 @@ export interface V1CharacterInput {
   sublineages?: Record<string, string>;
   devotion?: string;
   startingSkills?: string[];
+  /** Purchased skills are V2-native: CharacterChoice[] in `skills` (source
+   *  'Purchased'), NOT a flat array. `skills` also holds starting-skill choices
+   *  once that slice lands. */
+  skills?: CharacterChoice[];
+  /** Transient: the sheet importer parses the "Purchased Skills" line into this
+   *  flat array, then converts it into `skills` (source 'Purchased') and deletes
+   *  it. No live character carries it; it exists only inside parseCharacterSheet. */
   purchasedSkills?: string[];
   purchasedPerks?: string[];
   flaws?: string[];
@@ -174,6 +186,10 @@ export interface V1CharacterInput {
 }
 
 export interface CharacterStateV2 {
+  /** Set by v1ToV2 to mark a normalized-V2 character, so the boundary
+   *  (resolveCharacterGraph) passes it through instead of re-converting (which
+   *  double-wraps already-converted bucket entries). Retire when V1 is gone. */
+  _v2?: true;
   name?: string;
   archetypeName?: string;
   backstoryApproved?: boolean;

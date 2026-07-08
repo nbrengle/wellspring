@@ -1,6 +1,6 @@
 // bp-and-levels.test.mjs — split from scripts/test.mjs (hotspot split). Owns its own
 // imports so concurrent features don't collide on one shared import block.
-import { test, eq, ok } from './harness.mjs';
+import { test, eq, ok, pSkills } from './harness.mjs';
 import {
   validate, characterLevel
 } from "../../src/engine/validate.js";
@@ -41,18 +41,18 @@ for (const a of ARCHETYPES) {
 }
 
 test('crafting capability: owned skill unlocks its discipline; tiers nest', () => {
-  const appr = validate({ archetypeName: 'x', classLevels: 'Artisan 3', purchasedSkills: ['Apprentice Alchemy'] }).crafting;
+  const appr = validate({ archetypeName: 'x', classLevels: 'Artisan 3', ...pSkills(['Apprentice Alchemy']) }).crafting;
   ok(appr.any, 'has capability');
   const al = appr.crafting.find((c) => c.discipline === 'Alchemy');
   eq(al.tier, 'Apprentice', 'apprentice tier');
   ok(al.recipes.every((r) => r.tier === 'Apprentice'), 'only apprentice recipes');
 
-  const greater = validate({ archetypeName: 'x', classLevels: 'Artisan 10', purchasedSkills: ['Greater Tinkering'] }).crafting;
+  const greater = validate({ archetypeName: 'x', classLevels: 'Artisan 10', ...pSkills(['Greater Tinkering']) }).crafting;
   const tk = greater.crafting.find((c) => c.discipline === 'Tinkering');
   eq(tk.tier, 'Greater', 'greater tier');
   ok(tk.recipes.some((r) => r.tier === 'Apprentice') && tk.recipes.some((r) => r.tier === 'Greater'), 'nests lower tiers');
 
-  const rit = validate({ archetypeName: 'x', classLevels: 'Artisan 4', purchasedSkills: ['Journeyman Ritual Magic'] }).crafting;
+  const rit = validate({ archetypeName: 'x', classLevels: 'Artisan 4', ...pSkills(['Journeyman Ritual Magic']) }).crafting;
   eq(rit.rituals.tier, 'Journeyman', 'ritual tier');
   ok(rit.rituals.count > 0, 'has rituals');
 
