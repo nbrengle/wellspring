@@ -31,9 +31,25 @@ export interface StatMod {
 
 export interface BaseEntity {
   name: string;
+  /** Type-prefixed id, e.g. "skills:Lore". Attached by the entity index. */
+  id?: string;
+  /** Name with any parameter suffix stripped ("Lore (Arcane)" → "Lore"). */
+  baseName?: string;
+  /** The parameter type/value when the item takes one (e.g. "Area of Lore"). */
+  parameter?: string;
   description?: string;
   prereq?: string;
-  
+  category?: string;
+  /** Tier label (Basic/Advanced/…/SubPower) — on powers/spells, but read broadly. */
+  tier?: string;
+  /** Rank tiers (each may gate on a character level), for tiered perks/skills. */
+  tiers?: { cost?: number; level?: number }[];
+  /** The class this belongs to (powers/class skills). */
+  parentClass?: string;
+  /** Parser-extracted stat modifiers + free-text stat notes. */
+  statMods?: StatMod[];
+  statModNotes?: { stat: string; [k: string]: unknown }[];
+
   // Mechanically extracted prerequisites
   requiredLevel?: number;
   requiredClass?: string;
@@ -80,6 +96,7 @@ export interface Flaw extends BaseEntity {
 
 export interface Class extends BaseEntity {
   type: 'classes';
+  innate?: { name: string; requiredLevel?: number }[];
   spellcaster?: boolean;
   magicType?: string;
 }
@@ -105,32 +122,84 @@ export interface CharacterChoice {
   id: string;             // UUID for safe targeted deletion/updates
   entityId: string;       // The canonical name/key of the entity in the rules database
   source: EntitySource;   // Where this capability came from
-  
+
   // Overrides & Metadata
   costOverride?: number;  // E.g. from Apprentice Alchemy discount (-1)
   parameter?: string;     // If the choice requires a parameter (e.g. Weapon Specialization - Swords)
   ranks?: number;         // For multi-rank purchases like Agile Learner
+  originalIndex?: number; // Index in the source V1 field, for validation/deletion bridging
+}
+
+/** The raw, V1-flat character the UI / loadArchetype produce and edit: parallel
+ *  arrays of name strings per ontological field, plus loose metadata. Converted to
+ *  CharacterStateV2 at the engine boundary (v1ToV2). This is the LEGACY input shape;
+ *  the goal is to retire it once the UI writes V2 directly. */
+export interface V1CharacterInput {
+  name?: string;
+  archetypeName?: string;
+  classLevels?: string;
+  classes?: { name: string; level: number }[] | Record<string, number>;
+  lineage?: string | { name: string; choices: string[] };
+  sublineage?: string;
+  sublineages?: Record<string, string>;
+  devotion?: string;
+  startingSkills?: string[];
+  purchasedSkills?: string[];
+  purchasedPerks?: string[];
+  flaws?: string[];
+  classPowers?: string[];
+  classSkills?: string[];
+  rightHandPowers?: string[];
+  utilityPowers?: string[];
+  basicPowers?: string[];
+  advancedPowers?: string[];
+  veteranPowers?: string[];
+  domainPowers?: string[];
+  innatePowers?: string[];
+  cantrips?: string[];
+  bookSpells?: string[];
+  spellsKnown?: string[];
+  noviceSpells?: string[];
+  adeptSpells?: string[];
+  greaterSpells?: string[];
+  effectiveBP?: Record<string, (number | undefined)[]>;
+  ranks?: Record<string, number[]>;
+  stats?: Record<string, number>;
+  [key: string]: unknown;
 }
 
 export interface CharacterStateV2 {
+  name?: string;
   archetypeName?: string;
   backstoryApproved?: boolean;
   extraMaxBP?: number;
   currentEvent?: number;
   wealth?: string;
   resources?: string;
-  
-  classes: Record<string, number>; 
-  lineage?: { name: string; choices: string[] };
-  devotions: CharacterChoice[];    
-  
+
+  /** Classes the character has as {name, level}. getClasses also understands the
+   *  legacy `classLevels` string and `{Name: level}` map on raw input. */
+  classes: { name: string; level: number }[];
+  lineage?: string | { name: string; choices: string[] };
+  sublineage?: string;
+  /** Sublineage-challenge map, drives lineage-constraint checks. */
+  sublineages?: Record<string, string>;
+  devotion?: string;
+  devotions: CharacterChoice[];
+
+  // The resolved ontological buckets — the engine's single (V2) shape. Raw input
+  // is converted into these at the boundary (see v1ToV2 in graph.ts).
   skills: CharacterChoice[];
   perks: CharacterChoice[];
   flaws: CharacterChoice[];
-  
-  powers: CharacterChoice[];       
-  spells: CharacterChoice[];       
-  
+  powers: CharacterChoice[];
+  spells: CharacterChoice[];
+
+  /** Per-stat overrides read by lineage checks (e.g. The Fractured). */
+  stats?: Record<string, number>;
+  advantageChoices?: Record<string, string>;
+  divineDomains?: string[];
+  choices?: Record<string, string>;
   agileLearnerTrades?: Record<string, number>;
 }
 
@@ -209,5 +278,5 @@ export interface CharacterGraph {
   character: CharacterStateV2;
   items: GraphItem[];
   characterLevel: number;
-  classes: Record<string, number>;
+  classes: { name: string; level: number }[];
 }
