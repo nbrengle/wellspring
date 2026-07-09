@@ -18,7 +18,8 @@
     "lint:css": "stylelint '**/*.css'",
     "lint": "npm run lint:js && npm run lint:css",
     "format": "prettier --write .",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "type-check:ratchet": "tsx scripts/tsc-ratchet.mjs"
   },
   "dependencies": {
     "react": "^19.2.6",
