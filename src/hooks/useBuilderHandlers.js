@@ -189,14 +189,7 @@ export function useBuilderHandlers({
     setPicking(null);
   }, [_handleAddClass, setPicking]);
   const handleRemoveClass = useCallback(
-    (name) => _handleRemoveClass(name, {
-      utility: "utilityPowers",
-      basic: "basicPowers",
-      advanced: "advancedPowers",
-      veteran: "veteranPowers",
-      cantrips: "cantrips",
-      spellsKnown: "noviceSpells",
-    }),
+    (name) => _handleRemoveClass(name),
     [_handleRemoveClass]
   );
 

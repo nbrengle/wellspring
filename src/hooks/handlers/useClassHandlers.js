@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import { getClasses } from "../../engine/resolver.js";
 import { applyClassStartingAbilities } from "../../engine/character-state.js";
-import { pickClass } from "../../engine/validate.js";
+import { sourceClass } from "../../engine/types.js";
 import { LEVEL_TABLE } from "../../engine/data.js";
 
 const MAX_LEVEL = LEVEL_TABLE.length ? Math.max(...LEVEL_TABLE.map((l) => l.level)) : 15;
@@ -52,24 +52,17 @@ export function useClassHandlers({ setCharacter }) {
     });
   }, [setCharacter]);
 
-  const handleRemoveClass = useCallback((className, SLOT_FIELD) => {
+  const handleRemoveClass = useCallback((className) => {
     setCharacter((c0) => {
       const c = toClassesForm(c0);
       if (c.classes.length <= 1) return c0;
       const classes = c.classes.filter((x) => x.name !== className);
-      const next = { ...c, classes };
-      for (const field of Object.values(SLOT_FIELD)) {
-        const picks = c[field];
-        if (!picks) continue;
-        const keep = picks
-          .map((name, i) => ({ name, i }))
-          .filter(({ name, i }) => pickClass(c, field, i, name) !== className);
-        next[field] = keep.map((k) => k.name);
-        if (c.powerClass?.[field]) {
-          next.powerClass = { ...(next.powerClass || c.powerClass) };
-          next.powerClass[field] = keep.map((k) => c.powerClass[field][k.i]);
-        }
-      }
+      // Slot powers & class-granted spells are V2-native: CharacterChoice[] sourced
+      // to the granting class. Drop the removed class's picks by reading the source —
+      // no parallel powerClass map to splice.
+      const powers = (c.powers || []).filter((p) => sourceClass(p.source) !== className);
+      const spells = (c.spells || []).filter((s) => sourceClass(s.source) !== className);
+      const next = { ...c, classes, powers, spells };
       const primary = classes[0];
       let updated = next;
       if (primary) {

@@ -4,8 +4,6 @@ import { LineageSummary, StartingChoicesSection, GrantedSelectionsSection, Agile
 import {
   ARCHETYPES
 } from '../engine/data.js';
-import { pickClass
-} from "../engine/validate.js";
 import { getClasses } from "../engine/resolver.js";
 import { useBuilderState, useBuilderActions } from "./builder-context.jsx";
 
@@ -102,8 +100,7 @@ export default function BuildSheet() {
         <Section title="Powers" tone="purple">
           <AgileLearnerSection />
           {report.slots.map((slot) => (
-            <SlotBlock key={`${slot.cls}-${slot.category}`} slot={slot}
-                       pickClassOf={(field, i, name) => pickClass(character, field, i, name)} />
+            <SlotBlock key={`${slot.cls}-${slot.category}`} slot={slot} />
           ))}
         </Section>
       )}

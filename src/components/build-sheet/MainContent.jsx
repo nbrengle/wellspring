@@ -6,6 +6,7 @@ import { spellTierKey, CLASS_TONES } from "./utils.js";
 import { CLASSES, DOMAINS, lookupEntity } from "../../engine/data.js";
 import { getMaxRanks, agileLearnerCapacity } from "../../engine/validate.js";
 import { bareSkill, getClasses, cleanItemName } from "../../engine/resolver.js";
+import { sourceClass } from "../../engine/types.js";
 import { lookupCost } from "../../engine/validate/cost-key.js";
 import { STARTING_CHOICES_CONFIG, reconcileStartingChoices } from "../../engine/starting-choices.js";
 import { UNLIMITED_SKILLS } from "../../engine/data.js";
@@ -263,20 +264,26 @@ export function AgileLearnerSection() {
   );
 }
 
-export function SlotBlock({ slot, pickClassOf }) {
+export function SlotBlock({ slot }) {
   const { character, view } = useBuilderState();
   const { onInspect, onOpenSlot } = useBuilderActions();
   const isFocused = (item, field) =>
     view?.mode === "inspect" && view.item === item && view.field === field;
-  const fields = slot.category === "spellsKnown"
+  const isSpells = slot.category === "spellsKnown";
+  const fields = isSpells
     ? ["noviceSpells", "adeptSpells", "greaterSpells"]
     : [SLOT_FIELD[slot.category]];
   const granted = slot.granted || [];
   const grantedSet = new Set(granted);
+  // Slot picks are V2-native: CharacterChoice[] in the powers/spells bucket sourced
+  // to the granting class. flatIndex is the position among a field's entries — the
+  // same addressing setSlotPick/clearSlot use (costField-scoped).
+  const bucket = isSpells ? (character.spells || []) : (character.powers || []);
   const myPicks = fields.flatMap((field) =>
-    (character[field] || [])
-      .map((name, flatIndex) => ({ name, flatIndex, field }))
-      .filter((p) => pickClassOf(field, p.flatIndex, p.name) === slot.cls && !grantedSet.has(p.name)));
+    bucket
+      .filter((p) => p.costField === field)
+      .map((p, flatIndex) => ({ name: p.entityId, flatIndex, field, source: p.source }))
+      .filter((p) => sourceClass(p.source) === slot.cls && !grantedSet.has(p.name)));
 
   const rowCount = Math.max(slot.allowed, myPicks.length);
   if (rowCount === 0 && granted.length === 0) return null;

@@ -1061,8 +1061,27 @@ function v1ToV2(charInput: V1CharacterInput): CharacterStateV2 {
     if (!isInnate(p.source)) v2.powers.push(p);
   }
   if (!bucketPowers.length) {
-    for (const pf of ['classPowers', 'classSkills', 'rightHandPowers', 'utilityPowers', 'basicPowers', 'advancedPowers', 'veteranPowers', 'domainPowers'] as const) {
+    // Purchase-style power fields (cost BP): purchased source.
+    for (const pf of ['classPowers', 'classSkills', 'rightHandPowers', 'domainPowers'] as const) {
       add(pf, v2.powers, Source.purchased(), charInput[pf]);
+    }
+    // Slot power fields (free — fill a class slot): class source. The granting class
+    // is the legacy `powerClass[field][i]` tag when present, else the primary class.
+    // (Legacy/importer path only; new chars write the bucket with the source already.)
+    for (const pf of ['utilityPowers', 'basicPowers', 'advancedPowers', 'veteranPowers'] as const) {
+      const names = charInput[pf];
+      for (let i = 0; i < (names || []).length; i++) {
+        const item = names![i];
+        if (item && typeof item === 'object') { v2.powers.push(item); continue; }
+        const cls = charInput.powerClass?.[pf]?.[i] || primaryClass;
+        v2.powers.push({
+          entityId: item as string,
+          source: Source.class(cls),
+          ranks: charInput.ranks?.[pf]?.[i] ?? 1,
+          originalIndex: i,
+          costField: pf,
+        });
+      }
     }
   }
 

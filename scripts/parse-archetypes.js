@@ -547,14 +547,16 @@ function convertToV2(v1) {
   addChoice('flaws', v2.flaws, Source.flaw());
 
   addChoice('innatePowers', v2.powers, Source.innate());
-  addChoice('utilityPowers', v2.powers, Source.purchased());
-  addChoice('basicPowers', v2.powers, Source.purchased());
-  addChoice('advancedPowers', v2.powers, Source.purchased());
-  addChoice('veteranPowers', v2.powers, Source.purchased());
+  // Slot powers fill a class progression slot (free) — sourced to the class.
+  addChoice('utilityPowers', v2.powers, Source.class(primaryClass));
+  addChoice('basicPowers', v2.powers, Source.class(primaryClass));
+  addChoice('advancedPowers', v2.powers, Source.class(primaryClass));
+  addChoice('veteranPowers', v2.powers, Source.class(primaryClass));
+  addChoice('formPowers', v2.powers, Source.class(primaryClass));
+  // Purchase-style powers cost BP.
   addChoice('classPowers', v2.powers, Source.purchased());
   addChoice('rightHandPowers', v2.powers, Source.purchased());
   addChoice('domainPowers', v2.powers, Source.purchased());
-  addChoice('formPowers', v2.powers, Source.purchased());
 
   addChoice('cantrips', v2.spells, Source.class(primaryClass));
   addChoice('spellsKnown', v2.spells, Source.class(primaryClass));

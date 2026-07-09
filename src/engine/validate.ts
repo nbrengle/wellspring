@@ -443,5 +443,3 @@ export function validityReasons(report) {
   }
   return out;
 }
-
-export { pickClass } from './validate/core.js';

@@ -234,6 +234,9 @@ export interface V1CharacterInput {
   adeptSpells?: string[];
   greaterSpells?: string[];
   divineDomains?: string[];
+  /** LEGACY: the old parallel "which class granted this slot pick" map. No live
+   *  char writes it — slot powers now carry the class in their source. v1ToV2 only
+   *  reads it as a bridge for pre-migration flat chars; dies with the flat fields. */
   powerClass?: Record<string, string[]>;
   choices?: Record<string, string>;
   grantedSelections?: Record<string, unknown>;
