@@ -6,7 +6,6 @@
     },
     "skills": [
       {
-        "id": "6a10fac1e4e24d62539fde73b2830bd8",
         "entityId": "Basic Armor",
         "source": {
           "type": "starting",
@@ -15,7 +14,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "45ff378d5d3b1153d8d9fec46b0c76ec",
         "entityId": "Light Armor",
         "source": {
           "type": "starting",
@@ -24,7 +22,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "19a7e0ba0509c1bb07b76aff9885e9bc",
         "entityId": "Basic Martial Weapons",
         "source": {
           "type": "starting",
@@ -33,7 +30,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "ce46af9df271c10b22ae312a3b20ca10",
         "entityId": "Basic Shields",
         "source": {
           "type": "starting",
@@ -42,7 +38,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "2dc009739db846220183fbd6fd924fd3",
         "entityId": "Short Weapons",
         "source": {
           "type": "starting",
@@ -51,7 +46,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "b1cb5dae4faae935e307a6a1dcad9074",
         "entityId": "Advanced Shields",
         "source": {
           "type": "starting",
@@ -60,7 +54,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "a87ffe1accc2782b2b068480443174e0",
         "entityId": "Medium Armor",
         "source": {
           "type": "purchased"
@@ -69,7 +62,6 @@
         "costOverride": 0
       },
       {
-        "id": "6283c6ee8a4d09c421bc3bdf83665c9e",
         "entityId": "Shield Expertise",
         "source": {
           "type": "purchased"
@@ -78,7 +70,6 @@
         "costOverride": 5
       },
       {
-        "id": "2c738656cfad52ece1052367af72a887",
         "entityId": "Basic Medicine",
         "source": {
           "type": "purchased"
@@ -89,7 +80,6 @@
     ],
     "perks": [
       {
-        "id": "67cda05663662539768399e25946bc35",
         "entityId": "Holding On",
         "source": {
           "type": "purchased"
@@ -98,7 +88,6 @@
         "costOverride": 1
       },
       {
-        "id": "e7d1fe5cf174feb9585fee92c48aab47",
         "entityId": "Will to Live",
         "source": {
           "type": "purchased"
@@ -110,7 +99,6 @@
     "flaws": [],
     "powers": [
       {
-        "id": "b494d6c174c1f9767c655005dd847f7a",
         "entityId": "Deadly Remnants",
         "source": {
           "type": "innate"
@@ -118,7 +106,6 @@
         "costField": "innatePowers"
       },
       {
-        "id": "e7067e135b5444bc91fd67ef55b4b4b4",
         "entityId": "Fighting Instructor",
         "source": {
           "type": "innate"
@@ -126,7 +113,6 @@
         "costField": "innatePowers"
       },
       {
-        "id": "e37dc5281cf370ee6d2b7c2381042f8b",
         "entityId": "Parry Blow",
         "source": {
           "type": "innate"
@@ -134,7 +120,6 @@
         "costField": "innatePowers"
       },
       {
-        "id": "f6a1dbbb3b0ee0c488eb90579c39f6d1",
         "entityId": "Linked Armor",
         "source": {
           "type": "class",
@@ -143,7 +128,6 @@
         "costField": "utilityPowers"
       },
       {
-        "id": "f5779000897b1fbeb97d621d9a8aad6c",
         "entityId": "Armored Shell",
         "source": {
           "type": "class",
@@ -152,7 +136,6 @@
         "costField": "utilityPowers"
       },
       {
-        "id": "f0f9d426753b31252c3845bdadea0372",
         "entityId": "Harry",
         "source": {
           "type": "class",
@@ -161,7 +144,6 @@
         "costField": "basicPowers"
       },
       {
-        "id": "1796315187077e63942364b278e9835a",
         "entityId": "Shake It Off I",
         "source": {
           "type": "class",
@@ -185,7 +167,6 @@
     },
     "skills": [
       {
-        "id": "aa534b9d66d57deb85cdf986b8db6600",
         "entityId": "Basic Armor",
         "source": {
           "type": "starting",
@@ -194,7 +175,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "826cab4f19cc9defb7ee966315d58e3f",
         "entityId": "Light Armor",
         "source": {
           "type": "starting",
@@ -203,7 +183,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "805bcd80da07928326e188180a42348e",
         "entityId": "Basic Martial Weapons",
         "source": {
           "type": "starting",
@@ -212,7 +191,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "e55b1c297945f6f34e154ff806ade66c",
         "entityId": "Basic Shields",
         "source": {
           "type": "starting",
@@ -221,7 +199,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "e6a12df7dedd978a201b0f7e15fde0b9",
         "entityId": "Great Weapons",
         "source": {
           "type": "starting",
@@ -230,7 +207,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "756545094af9bf3249f653ffcf94755a",
         "entityId": "Weapon Specialization (Swords)",
         "source": {
           "type": "purchased"
@@ -241,7 +217,6 @@
     ],
     "perks": [
       {
-        "id": "9c1f1e73dc98328ebd2431aa2b3c63fd",
         "entityId": "Ancestral Relic",
         "source": {
           "type": "purchased"
@@ -250,7 +225,6 @@
         "costOverride": 2
       },
       {
-        "id": "db7d4f18b0dae9f1e2d69f36f9787c80",
         "entityId": "Bloody Minded",
         "source": {
           "type": "purchased"
@@ -262,7 +236,6 @@
     "flaws": [],
     "powers": [
       {
-        "id": "c947f7237e507ae7c7ff3abd38d55b8e",
         "entityId": "Deadly Remnants",
         "source": {
           "type": "innate"
@@ -270,7 +243,6 @@
         "costField": "innatePowers"
       },
       {
-        "id": "333f4b811ecc0c68903cb2aa986df558",
         "entityId": "Fighting Instructor",
         "source": {
           "type": "innate"
@@ -278,7 +250,6 @@
         "costField": "innatePowers"
       },
       {
-        "id": "2254ecda30dd1b6b0e25aaa10a5fd716",
         "entityId": "Parry Blow",
         "source": {
           "type": "innate"
@@ -286,7 +257,6 @@
         "costField": "innatePowers"
       },
       {
-        "id": "da7ab73ee6ecda19601f91b3e1b6aa41",
         "entityId": "Fortitude",
         "source": {
           "type": "class",
@@ -295,7 +265,6 @@
         "costField": "utilityPowers"
       },
       {
-        "id": "57fb5d210993527ef3183c70bc1de93a",
         "entityId": "Knight’s Strength",
         "source": {
           "type": "class",
@@ -304,7 +273,6 @@
         "costField": "utilityPowers"
       },
       {
-        "id": "73efe539434a6e6a1038a617b917984c",
         "entityId": "Shot Placement",
         "source": {
           "type": "class",
@@ -313,7 +281,6 @@
         "costField": "basicPowers"
       },
       {
-        "id": "854ee5eaa67579b2ad88a9c11204c79c",
         "entityId": "Raging Blows",
         "source": {
           "type": "class",
@@ -337,7 +304,6 @@
     },
     "skills": [
       {
-        "id": "a465136b04494d1c512bcfc5a6365d29",
         "entityId": "Basic Armor",
         "source": {
           "type": "starting",
@@ -346,7 +312,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "891b9154abb29fb6b115761aa78a834c",
         "entityId": "Light Armor",
         "source": {
           "type": "starting",
@@ -355,7 +320,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "dc251c5b2136409a665f9642d6586a6a",
         "entityId": "Basic Martial Weapons",
         "source": {
           "type": "starting",
@@ -364,7 +328,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "daff68e2f8b40ddf11a263413b124e87",
         "entityId": "Basic Shields",
         "source": {
           "type": "starting",
@@ -373,7 +336,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "153792697c03bca9789fbf5c2eeb4784",
         "entityId": "Lore (Historical)",
         "source": {
           "type": "starting",
@@ -382,7 +344,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "5e7eb098ffb14dabb5b35c1719a37fa6",
         "entityId": "Projectile Weapons",
         "source": {
           "type": "starting",
@@ -391,7 +352,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "6adb7fe182dd273141521e905801b826",
         "entityId": "Accuracy",
         "source": {
           "type": "purchased"
@@ -400,7 +360,6 @@
         "costOverride": 3
       },
       {
-        "id": "5b8a212b5b46892513ace7c7f4d99ec0",
         "entityId": "Tracking",
         "source": {
           "type": "purchased"
@@ -409,7 +368,6 @@
         "costOverride": 4
       },
       {
-        "id": "091fdd2f15963a90cdd35c58b5765efd",
         "entityId": "Profession - Apprentice (Smith)",
         "source": {
           "type": "purchased"
@@ -420,7 +378,6 @@
     ],
     "perks": [
       {
-        "id": "24d3f4c369fc447acc43e9516fb1225a",
         "entityId": "Deathgrip",
         "source": {
           "type": "purchased"
@@ -432,7 +389,6 @@
     "flaws": [],
     "powers": [
       {
-        "id": "6554a62784028e714a3a39f7c5133f4d",
         "entityId": "Deadly Remnants",
         "source": {
           "type": "innate"
@@ -440,7 +396,6 @@
         "costField": "innatePowers"
       },
       {
-        "id": "80e03a5b91ccf3dfb1c9304ce64f452e",
         "entityId": "Fighting Instructor",
         "source": {
           "type": "innate"
@@ -448,7 +403,6 @@
         "costField": "innatePowers"
       },
       {
-        "id": "1c1e4da33257bb54c3239f6e8b0f90aa",
         "entityId": "Parry Blow",
         "source": {
           "type": "innate"
@@ -456,7 +410,6 @@
         "costField": "innatePowers"
       },
       {
-        "id": "709ddd2baa57f0c8386a2fce4ab2b857",
         "entityId": "Bowyer",
         "source": {
           "type": "class",
@@ -465,7 +418,6 @@
         "costField": "utilityPowers"
       },
       {
-        "id": "e71ac64c420211c2a7cee7a563155547",
         "entityId": "Reload",
         "source": {
           "type": "class",
@@ -474,7 +426,6 @@
         "costField": "utilityPowers"
       },
       {
-        "id": "9213c70f7a8468114460ce63e674d846",
         "entityId": "Flaming Arrow",
         "source": {
           "type": "class",
@@ -483,7 +434,6 @@
         "costField": "basicPowers"
       },
       {
-        "id": "45f6535b5b4e8d0bbc57a5b41352241c",
         "entityId": "Snap Shot",
         "source": {
           "type": "class",
@@ -507,7 +457,6 @@
     },
     "skills": [
       {
-        "id": "595ca0b4ba4c6183406d0c606872261f",
         "entityId": "Basic Faith",
         "source": {
           "type": "starting",
@@ -516,7 +465,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "cf867a026aa8ba44da5ebe27fd4e6759",
         "entityId": "Worship - The Mother",
         "source": {
           "type": "starting",
@@ -525,7 +473,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "fdac889c2075523efcabf622d3e3b778",
         "entityId": "Basic Martial Weapons",
         "source": {
           "type": "starting",
@@ -534,7 +481,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "a515dffa44831d3316070358266394ec",
         "entityId": "Basic Armor",
         "source": {
           "type": "starting",
@@ -543,7 +489,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "7472f1bc74802440810cb2b11556d738",
         "entityId": "Extended Capacity - Novice (Divine)",
         "source": {
           "type": "starting",
@@ -552,7 +497,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "38a1c05eab0e35e211acb0aa32b3e52b",
         "entityId": "Additional Cantrip",
         "source": {
           "type": "starting",
@@ -561,7 +505,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "a15d3c0f2a2b0b7ad40345782cfb441b",
         "entityId": "Lore (Religious)",
         "source": {
           "type": "purchased"
@@ -570,7 +513,6 @@
         "costOverride": 2
       },
       {
-        "id": "efcae4e293a61411bce51aa5aa10afc5",
         "entityId": "Path of Panic",
         "source": {
           "type": "purchased"
@@ -581,7 +523,6 @@
     ],
     "perks": [
       {
-        "id": "a5945f40786d20c3babd1f7e6a7e198c",
         "entityId": "Soothing Touch",
         "source": {
           "type": "purchased"
@@ -593,7 +534,6 @@
     "flaws": [],
     "powers": [
       {
-        "id": "dab21f468955dd9d7fbb7073c5202d7a",
         "entityId": "Ritual Affinity",
         "source": {
           "type": "innate"
@@ -601,7 +541,6 @@
         "costField": "innatePowers"
       },
       {
-        "id": "13bb54e1884763e69c6544342d2905d6",
         "entityId": "Healing Touch",
         "source": {
           "type": "innate"
@@ -609,7 +548,6 @@
         "costField": "innatePowers"
       },
       {
-        "id": "354dd769167ebe6bcf8fef500417fb2b",
         "entityId": "Refreshing Prayer",
         "source": {
           "type": "innate"
@@ -617,7 +555,6 @@
         "costField": "innatePowers"
       },
       {
-        "id": "84f062d8d217a27b56b0fb2e593ba760",
         "entityId": "Lifeline (Life)",
         "source": {
           "type": "purchased"
@@ -628,7 +565,6 @@
     ],
     "spells": [
       {
-        "id": "b8b52ee1abb405c4c20f37b7d7995e7a",
         "entityId": "Cancel",
         "source": {
           "type": "class",
@@ -637,7 +573,6 @@
         "costField": "cantrips"
       },
       {
-        "id": "2bcd6758f78d78658f2d588a956b78a3",
         "entityId": "Blade Blessing",
         "source": {
           "type": "class",
@@ -646,7 +581,6 @@
         "costField": "cantrips"
       },
       {
-        "id": "7ce54916a5a148d64786d72769e25dd1",
         "entityId": "Revivify",
         "source": {
           "type": "class",
@@ -655,7 +589,6 @@
         "costField": "cantrips"
       },
       {
-        "id": "8b47d21c048429c9426c2b7c198a2ea9",
         "entityId": "Devotion’s Strike",
         "source": {
           "type": "class",
@@ -664,7 +597,6 @@
         "costField": "cantrips"
       },
       {
-        "id": "b3f1af93bcb1897c0a8e40b0d7e2ca58",
         "entityId": "Cure",
         "source": {
           "type": "class",
@@ -673,7 +605,6 @@
         "costField": "noviceSpells"
       },
       {
-        "id": "1cd76e3c5c64f0e494cf1d2b41da3998",
         "entityId": "Heretic’s Brand",
         "source": {
           "type": "class",
@@ -682,7 +613,6 @@
         "costField": "noviceSpells"
       },
       {
-        "id": "94a92536b0f787ab414c821479b960fe",
         "entityId": "Rekindle",
         "source": {
           "type": "class",
@@ -691,7 +621,6 @@
         "costField": "noviceSpells"
       },
       {
-        "id": "436b3a5383cf6486d1be07a36b3dc369",
         "entityId": "Spirit Speak",
         "source": {
           "type": "class",
@@ -702,7 +631,6 @@
     ],
     "devotions": [
       {
-        "id": "31662b132757c839a22f3c96582fe730",
         "entityId": "devotions:The Mother",
         "source": {
           "type": "purchased"
@@ -722,7 +650,6 @@
     },
     "skills": [
       {
-        "id": "4f184a4d67b93276affa4f6bda5549c1",
         "entityId": "Basic Martial Weapons",
         "source": {
           "type": "starting",
@@ -731,7 +658,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "27383c21a0308c569b247864c6e4e372",
         "entityId": "Profession - Apprentice (Smith)",
         "source": {
           "type": "starting",
@@ -740,7 +666,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "8ddf8b3f35d0acd34377ebd1205f4683",
         "entityId": "Basic Faith",
         "source": {
           "type": "starting",
@@ -749,7 +674,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "05427b5e7af27a3eb4419f9a4a80ff2e",
         "entityId": "Scavenge I",
         "source": {
           "type": "starting",
@@ -758,7 +682,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "b07163e34a0302462bfabf39e3190df5",
         "entityId": "Extended Capacity - Novice (Divine)",
         "source": {
           "type": "starting",
@@ -767,7 +690,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "01e8d993a359218e2cf025deb18e39dd",
         "entityId": "Lore (Nature)",
         "source": {
           "type": "starting",
@@ -776,7 +698,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "f9b8477416d8a3440ca26c572c54ec4e",
         "entityId": "Favored Form (Hunting Panther)",
         "source": {
           "type": "purchased"
@@ -785,7 +706,6 @@
         "costOverride": 4
       },
       {
-        "id": "7cf3a729272886fbb9a56d33ee229e82",
         "entityId": "Red in Tooth and Claw",
         "source": {
           "type": "purchased"
@@ -796,7 +716,6 @@
     ],
     "perks": [
       {
-        "id": "36a784062201b867dbef9488e7228969",
         "entityId": "Insight",
         "source": {
           "type": "purchased"
@@ -808,7 +727,6 @@
     "flaws": [],
     "powers": [
       {
-        "id": "64abf9acc048a50686706e2521df68b3",
         "entityId": "Commune with Nature",
         "source": {
           "type": "innate"
@@ -816,7 +734,6 @@
         "costField": "innatePowers"
       },
       {
-        "id": "24ff5c7098585f2ef88e37241ec9bf69",
         "entityId": "Message of the Flowers",
         "source": {
           "type": "innate"
@@ -824,7 +741,6 @@
         "costField": "innatePowers"
       },
       {
-        "id": "e3f05735e0e73e2856c47323f2e3d0b8",
         "entityId": "Nature’s Understanding",
         "source": {
           "type": "innate"
@@ -834,7 +750,6 @@
     ],
     "spells": [
       {
-        "id": "581ef77327321b260b8df111ec02c6b6",
         "entityId": "Cancel",
         "source": {
           "type": "class",
@@ -843,7 +758,6 @@
         "costField": "cantrips"
       },
       {
-        "id": "799961ed3f06de9ad55ffcdde3727166",
         "entityId": "Hide",
         "source": {
           "type": "class",
@@ -852,7 +766,6 @@
         "costField": "cantrips"
       },
       {
-        "id": "e43bbe2879f0b816c6fc12051a8d8ace",
         "entityId": "Festering Lash",
         "source": {
           "type": "class",
@@ -861,7 +774,6 @@
         "costField": "cantrips"
       },
       {
-        "id": "4ef467a8c61a6e700da01ffca4a34cda",
         "entityId": "Barkskin",
         "source": {
           "type": "class",
@@ -870,7 +782,6 @@
         "costField": "noviceSpells"
       },
       {
-        "id": "86a56378c533bee2bfaac8730f283b7b",
         "entityId": "Lesser Form of the Hulking Bear",
         "source": {
           "type": "class",
@@ -879,7 +790,6 @@
         "costField": "noviceSpells"
       },
       {
-        "id": "4e5d4cfda8b453e5d5eee2c629f3688c",
         "entityId": "Lesser Form of the Hunting Panther",
         "source": {
           "type": "class",
@@ -888,7 +798,6 @@
         "costField": "noviceSpells"
       },
       {
-        "id": "daea28fa7636a14a5277d8ee779f1d81",
         "entityId": "Lesser Form of the Striking Serpent",
         "source": {
           "type": "class",
@@ -911,7 +820,6 @@
     },
     "skills": [
       {
-        "id": "c6585cf53763cb2d3959d9c845d2a168",
         "entityId": "Basic Martial Weapons",
         "source": {
           "type": "starting",
@@ -920,7 +828,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "0f8e77b0de71295c9c9bdf1c4d9c57ee",
         "entityId": "Profession - Apprentice (Smith)",
         "source": {
           "type": "starting",
@@ -929,7 +836,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "aaa37753ca32dcee1c1f9c05674a3f9f",
         "entityId": "Forage I",
         "source": {
           "type": "starting",
@@ -938,7 +844,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "64d2fbddb07f5e33cc63ca0284b5597a",
         "entityId": "Basic Faith",
         "source": {
           "type": "starting",
@@ -947,7 +852,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "0666b1bf50b70b5f3f0707725bd4ce29",
         "entityId": "Peacecaster",
         "source": {
           "type": "starting",
@@ -956,7 +860,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "10f450b6b4c0c3af56eb9e0bb165f2fd",
         "entityId": "Basic Medicine",
         "source": {
           "type": "starting",
@@ -965,7 +868,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "b148544cbbc4f1f8273a749eb68e8398",
         "entityId": "Find the Path",
         "source": {
           "type": "purchased"
@@ -974,7 +876,6 @@
         "costOverride": 1
       },
       {
-        "id": "f6cd62072adda8b6fcc6409b6d969aca",
         "entityId": "Diagnose",
         "source": {
           "type": "purchased"
@@ -983,7 +884,6 @@
         "costOverride": 1
       },
       {
-        "id": "8c6bdc117ddb9f769fd204632311d2d7",
         "entityId": "Combat Medic",
         "source": {
           "type": "purchased"
@@ -992,7 +892,6 @@
         "costOverride": 1
       },
       {
-        "id": "faf42cfc58ae45f5de7e123d18dcc5f8",
         "entityId": "Spell-Scholar",
         "source": {
           "type": "purchased"
@@ -1003,7 +902,6 @@
     ],
     "perks": [
       {
-        "id": "38b4dbaf4a70dfb55ce6bab5c91d79c1",
         "entityId": "Iron Stomach",
         "source": {
           "type": "purchased"
@@ -1015,7 +913,6 @@
     "flaws": [],
     "powers": [
       {
-        "id": "fc54b9216ece1205b229d5d543329085",
         "entityId": "Commune with Nature",
         "source": {
           "type": "innate"
@@ -1023,7 +920,6 @@
         "costField": "innatePowers"
       },
       {
-        "id": "954e7118046b97229241559c81a411fc",
         "entityId": "Message of the Flowers",
         "source": {
           "type": "innate"
@@ -1031,7 +927,6 @@
         "costField": "innatePowers"
       },
       {
-        "id": "4b1e43e05db629d13c2824f4d107b51c",
         "entityId": "Nature’s Understanding",
         "source": {
           "type": "innate"
@@ -1041,7 +936,6 @@
     ],
     "spells": [
       {
-        "id": "4e6057a694b854c28d69cc109fcab93d",
         "entityId": "Cancel",
         "source": {
           "type": "class",
@@ -1050,7 +944,6 @@
         "costField": "cantrips"
       },
       {
-        "id": "f2c7e9349e0ff41b6d7e8074d414d16b",
         "entityId": "Care for the Fallen",
         "source": {
           "type": "class",
@@ -1059,7 +952,6 @@
         "costField": "cantrips"
       },
       {
-        "id": "3744494b73234675ff302f80fd76c323",
         "entityId": "Life Tap",
         "source": {
           "type": "class",
@@ -1068,7 +960,6 @@
         "costField": "cantrips"
       },
       {
-        "id": "c23c43c3ee37bb59e46638611f4e3ebf",
         "entityId": "Balm",
         "source": {
           "type": "class",
@@ -1077,7 +968,6 @@
         "costField": "noviceSpells"
       },
       {
-        "id": "d6b25711f45e36fcf686337d962a602a",
         "entityId": "Blessing of the Oak",
         "source": {
           "type": "class",
@@ -1086,7 +976,6 @@
         "costField": "noviceSpells"
       },
       {
-        "id": "31f3731bdd7225feca6446eada56edb4",
         "entityId": "Purifying Flame",
         "source": {
           "type": "class",
@@ -1095,7 +984,6 @@
         "costField": "noviceSpells"
       },
       {
-        "id": "f2190b62763998f95d830e4180846c68",
         "entityId": "Quell Beast",
         "source": {
           "type": "class",
@@ -1104,7 +992,6 @@
         "costField": "noviceSpells"
       },
       {
-        "id": "5f14ec8d0f638ebe30b796d16a9ef6b2",
         "entityId": "Sap of Life",
         "source": {
           "type": "class",
@@ -1127,7 +1014,6 @@
     },
     "skills": [
       {
-        "id": "54789f0d19f515e4cdef5cf6d8e17d10",
         "entityId": "Basic Arcane",
         "source": {
           "type": "starting",
@@ -1136,7 +1022,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "057a193367e855e0486ab57050720767",
         "entityId": "Lore (Historical)",
         "source": {
           "type": "starting",
@@ -1145,7 +1030,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "84e339813aaf2b6ab92d215f8eba8aa4",
         "entityId": "Library Use",
         "source": {
           "type": "starting",
@@ -1154,7 +1038,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "a162afa3d15d7f332ace701d33b8de12",
         "entityId": "Bookcaster (Magekey)",
         "source": {
           "type": "starting",
@@ -1163,7 +1046,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "b163a626aa0289552bc364664657b79e",
         "entityId": "Bookcaster (Mask Aura)",
         "source": {
           "type": "starting",
@@ -1172,7 +1054,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "8d209289f94534a4d4bdc580c109c645",
         "entityId": "Extended Capacity - Novice (Arcane)",
         "source": {
           "type": "starting",
@@ -1182,7 +1063,6 @@
         "ranks": 2
       },
       {
-        "id": "51ced3cf63b41de1a4d3c2dc3b11e7bf",
         "entityId": "Apprentice Ritual Magic",
         "source": {
           "type": "purchased"
@@ -1191,7 +1071,6 @@
         "costOverride": 0
       },
       {
-        "id": "e07409c5ec61b9e9bf0b7702f856f56e",
         "entityId": "Arcane Charge",
         "source": {
           "type": "purchased"
@@ -1200,7 +1079,6 @@
         "costOverride": 2
       },
       {
-        "id": "3d0d58c54d463431751ddcc0d0ec87c4",
         "entityId": "Lore (Historical)",
         "source": {
           "type": "purchased"
@@ -1208,7 +1086,6 @@
         "costField": "purchasedSkills"
       },
       {
-        "id": "b7e597b53fcdccd177ae94342628a54a",
         "entityId": "Lore (Arcane)",
         "source": {
           "type": "purchased"
@@ -1218,7 +1095,6 @@
     ],
     "perks": [
       {
-        "id": "a3564be5a96e350c1f496fa5a72c567f",
         "entityId": "Sharp Mind",
         "source": {
           "type": "purchased"
@@ -1227,7 +1103,6 @@
         "costOverride": 2
       },
       {
-        "id": "832a93250ce3d1f21b6b29f55794f854",
         "entityId": "Sight",
         "source": {
           "type": "purchased"
@@ -1239,7 +1114,6 @@
     "flaws": [],
     "powers": [
       {
-        "id": "1bd24937ac4b6b566a0e5259773d2189",
         "entityId": "Arcane Study",
         "source": {
           "type": "innate"
@@ -1247,7 +1121,6 @@
         "costField": "innatePowers"
       },
       {
-        "id": "bd2fef329409d409c61e34a249906034",
         "entityId": "Replicate Enhancement",
         "source": {
           "type": "innate"
@@ -1255,7 +1128,6 @@
         "costField": "innatePowers"
       },
       {
-        "id": "33c6c20dd3f400870be2bc0aa9903403",
         "entityId": "Ritual Affinity",
         "source": {
           "type": "innate"
@@ -1265,7 +1137,6 @@
     ],
     "spells": [
       {
-        "id": "e9c6e932f5f376daf9e3842d151cdc43",
         "entityId": "Cancel",
         "source": {
           "type": "class",
@@ -1274,7 +1145,6 @@
         "costField": "cantrips"
       },
       {
-        "id": "57d8d5d861e2c563f2685473fd103dd9",
         "entityId": "Identify",
         "source": {
           "type": "class",
@@ -1283,7 +1153,6 @@
         "costField": "cantrips"
       },
       {
-        "id": "a5ac06b2fbc7dd9a3d2732ecafb6345d",
         "entityId": "Stop",
         "source": {
           "type": "class",
@@ -1292,7 +1161,6 @@
         "costField": "cantrips"
       },
       {
-        "id": "0dda31811cb5180d67b8cc782028c4ca",
         "entityId": "Carnate",
         "source": {
           "type": "class",
@@ -1301,7 +1169,6 @@
         "costField": "noviceSpells"
       },
       {
-        "id": "a58b99af9e13fa72447c243d856985ea",
         "entityId": "Freeze",
         "source": {
           "type": "class",
@@ -1310,7 +1177,6 @@
         "costField": "noviceSpells"
       },
       {
-        "id": "c26bda2121eff3cecd74ba6d40843022",
         "entityId": "Mageskin",
         "source": {
           "type": "class",
@@ -1319,7 +1185,6 @@
         "costField": "noviceSpells"
       },
       {
-        "id": "f68765169b1d0705189b7cae79e10005",
         "entityId": "Town Portal",
         "source": {
           "type": "class",
@@ -1328,7 +1193,6 @@
         "costField": "noviceSpells"
       },
       {
-        "id": "641b6da670683b7a5819717b1c6fe069",
         "entityId": "Magekey",
         "source": {
           "type": "granted",
@@ -1337,7 +1201,6 @@
         "costField": "bookSpells"
       },
       {
-        "id": "623b570c6c3c9e340dd6b0e2b3e0c5fe",
         "entityId": "Mask Aura",
         "source": {
           "type": "granted",
@@ -1360,7 +1223,6 @@
     },
     "skills": [
       {
-        "id": "5f11142cdd991bc5404456bd5f5bb42b",
         "entityId": "Basic Armor",
         "source": {
           "type": "starting",
@@ -1369,7 +1231,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "ba19d2ff7bb7c1629f145884cff22263",
         "entityId": "Light Armor",
         "source": {
           "type": "starting",
@@ -1378,7 +1239,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "fa8bd62e6b99d2311e26f9e17bd926ba",
         "entityId": "Basic Martial Weapons",
         "source": {
           "type": "starting",
@@ -1387,7 +1247,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "e7059695005ec9ddc7253e42512edc25",
         "entityId": "Thrown Weapons",
         "source": {
           "type": "starting",
@@ -1396,7 +1255,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "2379ce74c1fe867de8b8e20c4f4fb502",
         "entityId": "Basic Locks",
         "source": {
           "type": "starting",
@@ -1405,7 +1263,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "65a3af4d8cf9b1a5b4d55b25c2623159",
         "entityId": "Poisoner",
         "source": {
           "type": "starting",
@@ -1414,7 +1271,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "56bd3131210f31ce87dfa7bf8cc301ac",
         "entityId": "Weapon Specialization (Thrown Weapons)",
         "source": {
           "type": "purchased"
@@ -1423,7 +1279,6 @@
         "costOverride": 4
       },
       {
-        "id": "324cfeebc006e2bd78cc8519a6752892",
         "entityId": "Apprentice Alchemy",
         "source": {
           "type": "purchased"
@@ -1432,7 +1287,6 @@
         "costOverride": 2
       },
       {
-        "id": "bc114a21de56ace29b2530c4e6e1e636",
         "entityId": "Forage I",
         "source": {
           "type": "purchased"
@@ -1445,7 +1299,6 @@
     "flaws": [],
     "powers": [
       {
-        "id": "5bc1fae041f35faccf8b6222b632df65",
         "entityId": "Deflect Projectile",
         "source": {
           "type": "innate"
@@ -1453,7 +1306,6 @@
         "costField": "innatePowers"
       },
       {
-        "id": "3060c52bb823466f022b2217bf404748",
         "entityId": "Backstab",
         "source": {
           "type": "innate"
@@ -1461,7 +1313,6 @@
         "costField": "innatePowers"
       },
       {
-        "id": "abee5b92e3e2f2eef3810f83a92510dd",
         "entityId": "Loot",
         "source": {
           "type": "innate"
@@ -1469,7 +1320,6 @@
         "costField": "innatePowers"
       },
       {
-        "id": "5d6ca7838af51c58480ef7918aa47a9c",
         "entityId": "Acquired Tolerance",
         "source": {
           "type": "class",
@@ -1478,7 +1328,6 @@
         "costField": "utilityPowers"
       },
       {
-        "id": "f05a44bcad9217389d626f6c037b9a32",
         "entityId": "Reload",
         "source": {
           "type": "class",
@@ -1487,7 +1336,6 @@
         "costField": "utilityPowers"
       },
       {
-        "id": "07f5e3aa590c6923df1685442b47130b",
         "entityId": "Concealed Dart",
         "source": {
           "type": "class",
@@ -1496,7 +1344,6 @@
         "costField": "basicPowers"
       },
       {
-        "id": "0e963aab26bb6207f3e834e1b5843903",
         "entityId": "Rogue’s Aim",
         "source": {
           "type": "class",
@@ -1520,7 +1367,6 @@
     },
     "skills": [
       {
-        "id": "728d50be7aa4cc38abe14ba6c9863837",
         "entityId": "Basic Armor",
         "source": {
           "type": "starting",
@@ -1529,7 +1375,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "5e07e918e6d604299094a66ed3b6ed40",
         "entityId": "Light Armor",
         "source": {
           "type": "starting",
@@ -1538,7 +1383,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "1730974a56fa3d6b882c4dca296dffb9",
         "entityId": "Basic Martial Weapons",
         "source": {
           "type": "starting",
@@ -1547,7 +1391,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "759ce00b0363e44bae389e932fbb1388",
         "entityId": "Thrown Weapons",
         "source": {
           "type": "starting",
@@ -1556,7 +1399,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "5f009bb92fb237ce3a099df4b7c4eb28",
         "entityId": "Basic Traps",
         "source": {
           "type": "starting",
@@ -1565,7 +1407,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "f6e20abde0c21702622a8f8c188e7929",
         "entityId": "Poisoner",
         "source": {
           "type": "starting",
@@ -1574,7 +1415,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "6be86b65df6765ee65b439ec271fee6d",
         "entityId": "Short Weapons",
         "source": {
           "type": "purchased"
@@ -1583,7 +1423,6 @@
         "costOverride": 3
       },
       {
-        "id": "d46739139bfcae30a4676422f5dbae07",
         "entityId": "Two Weapon Style",
         "source": {
           "type": "purchased"
@@ -1592,7 +1431,6 @@
         "costOverride": 0
       },
       {
-        "id": "af73d72af2955d27ddd39eea5c7977eb",
         "entityId": "Weapon Specialization (Daggers)",
         "source": {
           "type": "purchased"
@@ -1601,7 +1439,6 @@
         "costOverride": 0
       },
       {
-        "id": "a6fdf3f633d8f5a3c174d7467820f922",
         "entityId": "Advanced Traps",
         "source": {
           "type": "purchased"
@@ -1610,7 +1447,6 @@
         "costOverride": 4
       },
       {
-        "id": "f55578a4eadd63442e1db184d7f5bc2c",
         "entityId": "Apprentice Profession",
         "source": {
           "type": "purchased"
@@ -1621,7 +1457,6 @@
     ],
     "perks": [
       {
-        "id": "c900f88f71f8d3e51ae4fb66388f607d",
         "entityId": "Deathgrip",
         "source": {
           "type": "purchased"
@@ -1630,7 +1465,6 @@
         "costOverride": 0
       },
       {
-        "id": "f35311b9898722c441daea919fc36c8d",
         "entityId": "Holding On",
         "source": {
           "type": "purchased"
@@ -1639,7 +1473,6 @@
         "costOverride": 0
       },
       {
-        "id": "a3c3b9ed802a539a8bd03eb48921da2e",
         "entityId": "Carnal Creature",
         "source": {
           "type": "purchased"
@@ -1651,7 +1484,6 @@
     "flaws": [],
     "powers": [
       {
-        "id": "6cad1868ef8cb769da3c5b3bb8141fde",
         "entityId": "Deflect Projectile",
         "source": {
           "type": "innate"
@@ -1659,7 +1491,6 @@
         "costField": "innatePowers"
       },
       {
-        "id": "404b7b341a7af1a00af106922b808710",
         "entityId": "Backstab",
         "source": {
           "type": "innate"
@@ -1667,7 +1498,6 @@
         "costField": "innatePowers"
       },
       {
-        "id": "f2dd87515acd1a48b21fff46bd94aae1",
         "entityId": "Loot",
         "source": {
           "type": "innate"
@@ -1675,7 +1505,6 @@
         "costField": "innatePowers"
       },
       {
-        "id": "0354a99fe7511db951051c9179859b39",
         "entityId": "Throat Slit",
         "source": {
           "type": "class",
@@ -1684,7 +1513,6 @@
         "costField": "utilityPowers"
       },
       {
-        "id": "10443d145be4a26d51c66179a010871c",
         "entityId": "Way of the Blade",
         "source": {
           "type": "class",
@@ -1693,7 +1521,6 @@
         "costField": "utilityPowers"
       },
       {
-        "id": "4ad0d156b79f72db22b916336232dcce",
         "entityId": "Quick Nap",
         "source": {
           "type": "class",
@@ -1702,7 +1529,6 @@
         "costField": "basicPowers"
       },
       {
-        "id": "c7c68be33f4b07379300425d6ebc2a31",
         "entityId": "Unburdened Speed",
         "source": {
           "type": "class",
@@ -1726,7 +1552,6 @@
     },
     "skills": [
       {
-        "id": "5f2dbaae7e0c360ddf11311026e14ab5",
         "entityId": "Basic Martial Weapons",
         "source": {
           "type": "starting",
@@ -1735,7 +1560,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "892208870afbb167b51382542cc7c69e",
         "entityId": "Library Use",
         "source": {
           "type": "starting",
@@ -1744,7 +1568,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "f1917f0f1928bd234c8b13cfd40f67ab",
         "entityId": "Poisoner",
         "source": {
           "type": "starting",
@@ -1753,7 +1576,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "344f56f2adb7073de92c294081db742d",
         "entityId": "Basic Armor",
         "source": {
           "type": "starting",
@@ -1762,7 +1584,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "ccb7ac5f69d03a70bc94f2ee208ee71d",
         "entityId": "Lore (Historical)",
         "source": {
           "type": "starting",
@@ -1771,7 +1592,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "d9ac036d78b8f60bff94126509d29f1d",
         "entityId": "Profession - Apprentice (Smith)",
         "source": {
           "type": "starting",
@@ -1780,7 +1600,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "e233ef34786e1626acc8fea1df5a7406",
         "entityId": "Profession - Journeyman (Smith)",
         "source": {
           "type": "starting",
@@ -1789,7 +1608,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "2e10354ee257b4a22825a481f314d8fc",
         "entityId": "Fence",
         "source": {
           "type": "starting",
@@ -1798,7 +1616,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "2a48fa9b5e5cbec2fc494a3e9255eb01",
         "entityId": "Contact",
         "source": {
           "type": "starting",
@@ -1807,7 +1624,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "84818189dc0c80ff350a0a211cdf3b8b",
         "entityId": "The Right Hand",
         "source": {
           "type": "purchased"
@@ -1816,7 +1632,6 @@
         "costOverride": 1
       },
       {
-        "id": "d956e537c90565842c50773c1633a7c5",
         "entityId": "Holding Out for a Hero",
         "source": {
           "type": "purchased"
@@ -1825,7 +1640,6 @@
         "costOverride": 1
       },
       {
-        "id": "0ced5093b173845ead09394eddbf7566",
         "entityId": "Steel Yourself",
         "source": {
           "type": "purchased"
@@ -1836,7 +1650,6 @@
     ],
     "perks": [
       {
-        "id": "dd9a7dd1ac8919d2e59d3b017b6de1f8",
         "entityId": "Contact",
         "source": {
           "type": "purchased"
@@ -1845,7 +1658,6 @@
         "costOverride": 0
       },
       {
-        "id": "b1d3bca06e87e8344a8d3540be8ffd0d",
         "entityId": "Manse",
         "source": {
           "type": "purchased"
@@ -1854,7 +1666,6 @@
         "costOverride": 3
       },
       {
-        "id": "015f766f1157cc28adfaa98423e6ef6c",
         "entityId": "Income",
         "source": {
           "type": "purchased"
@@ -1866,7 +1677,6 @@
     "flaws": [],
     "powers": [
       {
-        "id": "79e4bff4b2e3df68b52c0af6d3c71be2",
         "entityId": "Practiced Manner",
         "source": {
           "type": "innate"
@@ -1874,7 +1684,6 @@
         "costField": "innatePowers"
       },
       {
-        "id": "de32a7cdb7e932597ca50e7f99dbe5de",
         "entityId": "Heart of the Group",
         "source": {
           "type": "innate"
@@ -1882,7 +1691,6 @@
         "costField": "innatePowers"
       },
       {
-        "id": "01357d049b387018a77bba56bfa18896",
         "entityId": "Stern Willed",
         "source": {
           "type": "innate"
@@ -1890,7 +1698,6 @@
         "costField": "innatePowers"
       },
       {
-        "id": "e273678fa6209e8f212520b2f2b70e77",
         "entityId": "Sources",
         "source": {
           "type": "class",
@@ -1899,7 +1706,6 @@
         "costField": "utilityPowers"
       },
       {
-        "id": "12e558c884bea051b7d056ee227289de",
         "entityId": "Tax Evasion",
         "source": {
           "type": "class",
@@ -1908,7 +1714,6 @@
         "costField": "utilityPowers"
       },
       {
-        "id": "bb90bf1839caae58092639ec3dcf62ee",
         "entityId": "Enthrall",
         "source": {
           "type": "class",
@@ -1917,7 +1722,6 @@
         "costField": "basicPowers"
       },
       {
-        "id": "03dd1a15001a4afbaa223187031837ef",
         "entityId": "Sizing Up the Opposition",
         "source": {
           "type": "class",
@@ -1926,7 +1730,6 @@
         "costField": "basicPowers"
       },
       {
-        "id": "7e306ce97da418f9431d0acf86e7f39c",
         "entityId": "Soothe",
         "source": {
           "type": "class",
@@ -1950,7 +1753,6 @@
     },
     "skills": [
       {
-        "id": "e773bb149e8e4af6713b3163c5156132",
         "entityId": "Basic Arcane",
         "source": {
           "type": "starting",
@@ -1959,7 +1761,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "fa15e401c0224bbba55b68a33a917a9f",
         "entityId": "Advanced Recharge",
         "source": {
           "type": "starting",
@@ -1968,7 +1769,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "8fe968ef9e2a1505c60432bfaf99cb2c",
         "entityId": "Patron (a Patron)",
         "source": {
           "type": "starting",
@@ -1977,7 +1777,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "7c705cdcba86bdd36566cbad1fcf4d04",
         "entityId": "Gift of Hateful Retribution I",
         "source": {
           "type": "starting",
@@ -1986,7 +1785,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "7eb070a2b932b1fa90578bfe5fc3ec50",
         "entityId": "Warcaster",
         "source": {
           "type": "purchased"
@@ -1997,7 +1795,6 @@
     ],
     "perks": [
       {
-        "id": "76b3183c1ca13e4f9ec3e91b4d31dc5f",
         "entityId": "Gift of Hateful Retribution II",
         "source": {
           "type": "purchased"
@@ -2006,7 +1803,6 @@
         "costOverride": 3
       },
       {
-        "id": "18ce8e23a3cd61495514f46cdee96a1a",
         "entityId": "Gift of Recognition",
         "source": {
           "type": "purchased"
@@ -2018,7 +1814,6 @@
     "flaws": [],
     "powers": [
       {
-        "id": "90e1cedbee1d8318039764d24781ab14",
         "entityId": "Internal Battery",
         "source": {
           "type": "innate"
@@ -2026,7 +1821,6 @@
         "costField": "innatePowers"
       },
       {
-        "id": "c5e9fda0336be2bd22448ed290ace2cf",
         "entityId": "Arcane Source",
         "source": {
           "type": "innate"
@@ -2034,7 +1828,6 @@
         "costField": "innatePowers"
       },
       {
-        "id": "470f08c54a982400a8ddc267d7c49e1c",
         "entityId": "Astride the Weave",
         "source": {
           "type": "innate"
@@ -2042,7 +1835,6 @@
         "costField": "innatePowers"
       },
       {
-        "id": "7f380ad060756816bd19e3cda961d2ed",
         "entityId": "Enduring Source",
         "source": {
           "type": "innate"
@@ -2052,7 +1844,6 @@
     ],
     "spells": [
       {
-        "id": "dde1707068d5ff2f23ab302461bd2253",
         "entityId": "Cancel",
         "source": {
           "type": "class",
@@ -2061,7 +1852,6 @@
         "costField": "cantrips"
       },
       {
-        "id": "0e09535fb196a85b8525e3bc50b7fffa",
         "entityId": "Charge",
         "source": {
           "type": "class",
@@ -2070,7 +1860,6 @@
         "costField": "cantrips"
       },
       {
-        "id": "a33d1a69ba84baa76d0ae85f60da98dd",
         "entityId": "Wild Bolt",
         "source": {
           "type": "class",
@@ -2093,7 +1882,6 @@
     },
     "skills": [
       {
-        "id": "b8c5ac5288ee571377a1c2e0be6a631f",
         "entityId": "Basic Martial Weapons",
         "source": {
           "type": "starting",
@@ -2102,7 +1890,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "c39d526f95fa9fb11172a99a6b3dd036",
         "entityId": "Short Weapons",
         "source": {
           "type": "starting",
@@ -2111,7 +1898,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "323e302c1a20440db6674ddab3e1b20c",
         "entityId": "Basic Armor",
         "source": {
           "type": "starting",
@@ -2120,7 +1906,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "60e83984d2439a4e13e79f28e1ebe731",
         "entityId": "Apprentice Tinkering",
         "source": {
           "type": "starting",
@@ -2129,7 +1914,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "96d236b6016420cdeaa13f8d8800e92a",
         "entityId": "Prospect I",
         "source": {
           "type": "starting",
@@ -2138,7 +1922,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "c8324f67127242ea363ef6936480ebd0",
         "entityId": "Apprentice Profession",
         "source": {
           "type": "starting",
@@ -2147,7 +1930,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "5f59e0cfda4a8c65c889826b87be0bc5",
         "entityId": "Journeyman Profession",
         "source": {
           "type": "starting",
@@ -2156,7 +1938,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "1b23db154d804b9dce2301a2e467d397",
         "entityId": "Light Armor",
         "source": {
           "type": "purchased"
@@ -2165,7 +1946,6 @@
         "costOverride": 3
       },
       {
-        "id": "679a3acf829fcb183da8601150938ffb",
         "entityId": "Journeyman Tinkering",
         "source": {
           "type": "purchased"
@@ -2174,7 +1954,6 @@
         "costOverride": 4
       },
       {
-        "id": "83f1bdc3c678b3a4716035ba7fb492bc",
         "entityId": "Chronic Hobbyist (Cooking)",
         "source": {
           "type": "purchased"
@@ -2183,7 +1962,6 @@
         "costOverride": 2
       },
       {
-        "id": "1a8c15865e97a94c2beb20cd2558b4e4",
         "entityId": "Medium Armor",
         "source": {
           "type": "purchased"
@@ -2194,7 +1972,6 @@
     ],
     "perks": [
       {
-        "id": "b9d5540225e0519ba43a72a1ac59708e",
         "entityId": "Fortunate Finder",
         "source": {
           "type": "purchased"
@@ -2206,7 +1983,6 @@
     "flaws": [],
     "powers": [
       {
-        "id": "23f8dbb1ef22b3071c93218cd93cf4af",
         "entityId": "Living Iron",
         "source": {
           "type": "innate"
@@ -2214,7 +1990,6 @@
         "costField": "innatePowers"
       },
       {
-        "id": "43981fcf6291e0a7ff782dfd6112a8cc",
         "entityId": "Forged from Steel",
         "source": {
           "type": "class",
@@ -2223,7 +1998,6 @@
         "costField": "utilityPowers"
       },
       {
-        "id": "372d3a6182d0763f45fea8cde75c4503",
         "entityId": "Forgesource Specialist",
         "source": {
           "type": "class",
@@ -2232,7 +2006,6 @@
         "costField": "utilityPowers"
       },
       {
-        "id": "fd3c851b064547064033dbcd453fd693",
         "entityId": "Armor Upkeep Specialist",
         "source": {
           "type": "class",
@@ -2241,7 +2014,6 @@
         "costField": "basicPowers"
       },
       {
-        "id": "dc424fe23a4e0e5c7c374237719e9b64",
         "entityId": "Forcefield",
         "source": {
           "type": "class",
@@ -2250,7 +2022,6 @@
         "costField": "basicPowers"
       },
       {
-        "id": "c3143094f8bfaef1a4ad185b900d85b8",
         "entityId": "Overcharge",
         "source": {
           "type": "class",
@@ -2274,7 +2045,6 @@
     },
     "skills": [
       {
-        "id": "df3ac322924dd5ae4d67a2deb374a9aa",
         "entityId": "Basic Martial Weapons",
         "source": {
           "type": "starting",
@@ -2283,7 +2053,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "804b8658d32013a9144e3353b1cfa90d",
         "entityId": "Short Weapons",
         "source": {
           "type": "starting",
@@ -2292,7 +2061,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "9cb3a84feefe26ff70bf968ee7b6dff5",
         "entityId": "Basic Armor",
         "source": {
           "type": "starting",
@@ -2301,7 +2069,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "bcb76bd49145e55e7557772fd83efdba",
         "entityId": "Apprentice Alchemy",
         "source": {
           "type": "starting",
@@ -2310,7 +2077,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "dbfdfa72c79991871708fbf0f306b764",
         "entityId": "Forage I",
         "source": {
           "type": "starting",
@@ -2319,7 +2085,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "dfcde5db271df9b4007eb1d64e0225e0",
         "entityId": "Basic Medicine",
         "source": {
           "type": "starting",
@@ -2328,7 +2093,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "cbbc16710b76a46a4258c0608f48c585",
         "entityId": "Hearth",
         "source": {
           "type": "starting",
@@ -2337,7 +2101,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "989bec81c5e7458c963313fb7febe59a",
         "entityId": "Scavenge I",
         "source": {
           "type": "purchased"
@@ -2346,7 +2109,6 @@
         "costOverride": 3
       },
       {
-        "id": "01792bf29a2b9ad6fb43e4fdb3988c6e",
         "entityId": "Scavenge II",
         "source": {
           "type": "purchased"
@@ -2355,7 +2117,6 @@
         "costOverride": 3
       },
       {
-        "id": "6c58c8408630a8bb04fe609827601195",
         "entityId": "Forage II",
         "source": {
           "type": "purchased"
@@ -2364,7 +2125,6 @@
         "costOverride": 0
       },
       {
-        "id": "5d5e5c66297a0b6725e3088b73d3163b",
         "entityId": "Journeyman Alchemy",
         "source": {
           "type": "purchased"
@@ -2375,7 +2135,6 @@
     ],
     "perks": [
       {
-        "id": "8009ab1a7f6ac59a14984a5cb3d3aa6c",
         "entityId": "Fortunate Finder",
         "source": {
           "type": "purchased"
@@ -2387,7 +2146,6 @@
     "flaws": [],
     "powers": [
       {
-        "id": "68cae34b7cd8aca08f62092f52e7f191",
         "entityId": "Living Iron",
         "source": {
           "type": "innate"
@@ -2395,7 +2153,6 @@
         "costField": "innatePowers"
       },
       {
-        "id": "9f52797b5e415e4afdd5d7bfe5c545e8",
         "entityId": "A Spoonful of Sugar",
         "source": {
           "type": "class",
@@ -2404,7 +2161,6 @@
         "costField": "utilityPowers"
       },
       {
-        "id": "212cad15d83d0d2bb17073f83be0cac0",
         "entityId": "Hunter Gatherer",
         "source": {
           "type": "class",
@@ -2413,7 +2169,6 @@
         "costField": "utilityPowers"
       },
       {
-        "id": "2c26acfd9ff5dbe792f318c73bc6b74f",
         "entityId": "Apt Assistant",
         "source": {
           "type": "class",
@@ -2422,7 +2177,6 @@
         "costField": "basicPowers"
       },
       {
-        "id": "ccaf1c4e91963e25ae00eddebd3e4fe8",
         "entityId": "Custom Brew",
         "source": {
           "type": "class",
@@ -2431,7 +2185,6 @@
         "costField": "basicPowers"
       },
       {
-        "id": "ffe4de22fc794ea7514ad237e513ba99",
         "entityId": "Kick",
         "source": {
           "type": "class",
@@ -2455,7 +2208,6 @@
     },
     "skills": [
       {
-        "id": "bb5de52169bd442637ce3294a168fc36",
         "entityId": "Basic Martial Weapons",
         "source": {
           "type": "starting",
@@ -2464,7 +2216,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "fd2d806778f16da5290ab7aa56b79e2a",
         "entityId": "Short Weapons",
         "source": {
           "type": "starting",
@@ -2473,7 +2224,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "45f49350dff5cba0269c1cd0d1d64e14",
         "entityId": "Basic Armor",
         "source": {
           "type": "starting",
@@ -2482,7 +2232,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "14f4e0d0f04b0472c5821f80185a041f",
         "entityId": "Apprentice Enchanting",
         "source": {
           "type": "starting",
@@ -2491,7 +2240,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "a843c079c2fd521f296741d758c05042",
         "entityId": "Apprentice Ritual Magic",
         "source": {
           "type": "starting",
@@ -2500,7 +2248,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "50d5537b33cb682a0ae77b35bb3148f8",
         "entityId": "Lore (Rituals)",
         "source": {
           "type": "starting",
@@ -2509,7 +2256,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "b18321748340998b3861b292fe0aaab5",
         "entityId": "Forage I",
         "source": {
           "type": "starting",
@@ -2518,7 +2264,6 @@
         "costField": "startingSkills"
       },
       {
-        "id": "569f78a29486212d3db123dc9e82d3c3",
         "entityId": "Journeyman Enchanting",
         "source": {
           "type": "purchased"
@@ -2527,7 +2272,6 @@
         "costOverride": 4
       },
       {
-        "id": "d99b22c59045aa9cd5bfd2ecdf0366b7",
         "entityId": "Journeyman Ritual Magic",
         "source": {
           "type": "purchased"
@@ -2538,7 +2282,6 @@
     ],
     "perks": [
       {
-        "id": "9fb8f357cb918997c642e9676cdd22ae",
         "entityId": "Soothsayer",
         "source": {
           "type": "purchased"
@@ -2547,7 +2290,6 @@
         "costOverride": 3
       },
       {
-        "id": "5d6257ceffd2ec467187952a146aecc0",
         "entityId": "Insight",
         "source": {
           "type": "purchased"
@@ -2556,7 +2298,6 @@
         "costOverride": 3
       },
       {
-        "id": "0bd790383fe201957289ad029f6535f7",
         "entityId": "Bits and Pieces",
         "source": {
           "type": "purchased"
@@ -2568,7 +2309,6 @@
     "flaws": [],
     "powers": [
       {
-        "id": "b1c4639e099bdb4b08e9bbd308fbb0d6",
         "entityId": "Living Iron",
         "source": {
           "type": "innate"
@@ -2576,7 +2316,6 @@
         "costField": "innatePowers"
       },
       {
-        "id": "3914200d8a4ad023d733cd784e64c844",
         "entityId": "Otherworldly Sight",
         "source": {
           "type": "class",
@@ -2585,7 +2324,6 @@
         "costField": "utilityPowers"
       },
       {
-        "id": "2213df478cd6edf4d44ef1c146ec8d76",
         "entityId": "Protected Casting",
         "source": {
           "type": "class",
@@ -2594,7 +2332,6 @@
         "costField": "utilityPowers"
       },
       {
-        "id": "fa3b61d04639e5d5f6a524d501e73188",
         "entityId": "Aegis of the Unknown/Sundering of the Unknown",
         "source": {
           "type": "class",
@@ -2603,7 +2340,6 @@
         "costField": "basicPowers"
       },
       {
-        "id": "20af153e24c98990aaecedeb3f94a54d",
         "entityId": "Dig Deep",
         "source": {
           "type": "class",
@@ -2612,7 +2348,6 @@
         "costField": "basicPowers"
       },
       {
-        "id": "8d5bbae9ce69b14909ec9583ed92b6d8",
         "entityId": "Mesmerize",
         "source": {
           "type": "class",

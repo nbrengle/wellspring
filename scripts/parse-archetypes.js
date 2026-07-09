@@ -12,8 +12,8 @@
 import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
-import crypto from 'crypto';
 import { Source } from '../src/engine/types.js';
+import { choiceFromParsed, bucketForField } from '../src/engine/character-add.js';
 import { LABEL_FIELD, CHOICE_DEFAULTS } from '../src/engine/sheet-schema.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -466,8 +466,6 @@ function buildCharacter(raw) {
     devotions: [],
     wealth: raw.wealth || 'None',
   };
-  let idCounter = 0;
-  const nextId = (entityId) => crypto.createHash('md5').update(`${raw.name}:${entityId}:${idCounter++}`).digest('hex');
 
   // 1. Classes
   if (raw.classLevels) {
@@ -486,7 +484,6 @@ function buildCharacter(raw) {
     const addAdv = (arr) => {
       for (const adv of arr || []) {
         character.perks.push({
-          id: nextId('advantages:' + raw.lineage + ' - ' + adv),
           entityId: 'advantages:' + raw.lineage + ' - ' + adv,
           source: Source.lineage(),
         });
@@ -494,10 +491,9 @@ function buildCharacter(raw) {
       }
     };
     addAdv(raw.lineageAdvantages);
-    
+
     for (const ch of raw.lineageChallenges || []) {
       character.flaws.push({
-        id: nextId('challenges:' + raw.lineage + ' - ' + ch),
         entityId: 'challenges:' + raw.lineage + ' - ' + ch,
         source: Source.lineage()
       });
@@ -505,78 +501,29 @@ function buildCharacter(raw) {
     }
   }
 
-  // 3. Helper to create Choice objects
-  const addChoice = (fieldStr, targetArray, sourceName, fallbackPrefix = '') => {
-    const list = raw[fieldStr] || [];
-    list.forEach((item, idx) => {
-      const cost = raw.effectiveBP?.[fieldStr]?.[idx] ?? null;
-      let ranks = raw.ranks?.[fieldStr]?.[idx] ?? 1;
-      let cleanName = item;
-      
-      // Attempt to strip parameterized formats (Item - Param) -> just Item
-      const baseMatch = cleanName.match(/^([^-]+?)\\s*-/);
-      let entityId = baseMatch ? baseMatch[1].trim() : cleanName;
-      if (fallbackPrefix) entityId = fallbackPrefix + ':' + entityId;
-      else entityId = cleanName; // Will be resolved by the engine
-
-      const choice = {
-        id: nextId(entityId),
-        entityId,
-        source: sourceName,
-        // The originating field (e.g. 'bookSpells', 'basicPowers') — keys the BP
-        // ledger and lets the validator tell book spells (Bookcaster's own pool)
-        // apart from spells-known, which share the same tiers.
-        costField: fieldStr,
-      };
-      if (cost !== null) choice.costOverride = cost;
-      if (ranks > 1) choice.ranks = ranks;
-      
-      const paramMatch = cleanName.match(/\\((.*?)\\)/) || cleanName.match(/\\s-\\s(.*)$/);
-      if (paramMatch && !paramMatch[0].includes('your choice')) {
-        choice.parameter = paramMatch[1].trim();
-      }
-
-      targetArray.push(choice);
-    });
-  };
-
-  // Structured EntitySource per bucket. Starting skills carry the primary class;
-  // innate powers use the innate source (re-synthesized from the class at resolve);
-  // cantrips/spells-known are class-granted (free). Slot/class powers stay purchased
-  // here — the powers slice reclassifies slot powers to a class source.
+  // 3. Build each parsed section into its bucket via the SHARED write-path helper
+  // (choiceFromParsed): the section field decides bucket + source + costField; the
+  // parsed line carries name / authored BP / rank. One loop over every parseable
+  // field, in output order — no per-field addChoice, no parallel-array zip.
   const primaryClass = Object.keys(character.classes)[0] || '';
-  addChoice('startingSkills', character.skills, Source.starting(primaryClass));
-  addChoice('purchasedSkills', character.skills, Source.purchased());
-  addChoice('purchasedPerks', character.perks, Source.purchased());
-  addChoice('flaws', character.flaws, Source.flaw());
-
-  addChoice('innatePowers', character.powers, Source.innate());
-  // Slot powers fill a class progression slot (free) — sourced to the class.
-  addChoice('utilityPowers', character.powers, Source.class(primaryClass));
-  addChoice('basicPowers', character.powers, Source.class(primaryClass));
-  addChoice('advancedPowers', character.powers, Source.class(primaryClass));
-  addChoice('veteranPowers', character.powers, Source.class(primaryClass));
-  addChoice('formPowers', character.powers, Source.class(primaryClass));
-  // Purchase-style powers cost BP.
-  addChoice('classPowers', character.powers, Source.purchased());
-  addChoice('rightHandPowers', character.powers, Source.purchased());
-  addChoice('domainPowers', character.powers, Source.purchased());
-
-  // Every spell field fills a caster slot (free) and is sourced to the caster class
-  // (the class carries the sphere — Arcane vs Divine — via CLASSES[cls].magicType;
-  // the tier is on the spell entity). Cantrips, spells-known (novice/adept/greater),
-  // and book spells all resolve the same way.
-  addChoice('cantrips', character.spells, Source.class(primaryClass));
-  addChoice('spellsKnown', character.spells, Source.class(primaryClass));
-  addChoice('noviceSpells', character.spells, Source.class(primaryClass));
-  addChoice('adeptSpells', character.spells, Source.class(primaryClass));
-  addChoice('greaterSpells', character.spells, Source.class(primaryClass));
-  // Book spells are Bookcaster's OWN pool — parametrized against the granting skill,
-  // not the class's spells-known slots (they share tiers but aren't slot picks).
-  addChoice('bookSpells', character.spells, Source.granted('Bookcaster'));
+  const SECTION_ORDER = [
+    'startingSkills', 'purchasedSkills', 'purchasedPerks', 'flaws',
+    'innatePowers', 'utilityPowers', 'basicPowers', 'advancedPowers', 'veteranPowers',
+    'formPowers', 'classPowers', 'rightHandPowers', 'domainPowers',
+    'cantrips', 'spellsKnown', 'noviceSpells', 'adeptSpells', 'greaterSpells', 'bookSpells',
+  ];
+  for (const field of SECTION_ORDER) {
+    (raw[field] || []).forEach((name, idx) => {
+      character[bucketForField(field)].push(choiceFromParsed({
+        field, name,
+        cost: raw.effectiveBP?.[field]?.[idx] ?? null,
+        rank: raw.ranks?.[field]?.[idx] ?? 1,
+      }, primaryClass));
+    });
+  }
 
   if (raw.devotion) {
-     character.devotions.push({ id: nextId('devotions:' + raw.devotion), entityId: 'devotions:' + raw.devotion, source: Source.purchased() });
+    character.devotions.push({ entityId: 'devotions:' + raw.devotion, source: Source.purchased() });
   }
 
   return character;
