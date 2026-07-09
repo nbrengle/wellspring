@@ -30,20 +30,20 @@ const SPELL_TIER_FIELD: Record<string, string> = {
 
 // Caster tiers — a 'power'-typed entity with one of these tiers is a SPELL (the data
 // models spells as powers whose tier is a caster tier). Bucket routing keys on this,
-// not on `type` alone.
-const CASTER_TIERS = new Set(['Cantrip', 'Novice', 'Adept', 'Greater']);
-const isSpellEntity = (ent: Entity | { type: string; tier?: string } | null): boolean =>
-  !!ent && (ent.type === 'spell' || CASTER_TIERS.has((ent as any).tier));
+// not on `type` alone. `tier` lives on BaseEntity, so it reads off any Entity.
+const CASTER_TIERS = new Set<string>(['Cantrip', 'Novice', 'Adept', 'Greater']);
+const isSpellEntity = (ent: Entity | null): boolean =>
+  !!ent && (ent.type === 'spell' || (ent.tier != null && CASTER_TIERS.has(ent.tier)));
 
 /** Which V2 bucket an entity lives in. Spells are powers with a caster tier, so we
- *  route on the entity, not the bare type. */
-function bucketOf(ent: Entity | { type: string; tier?: string } | null): keyof Pick<CharacterStateV2, 'skills' | 'perks' | 'powers' | 'spells' | 'flaws'> {
+ *  route on the entity, not the bare type. A null entity (unknown name) → skills. */
+function bucketOf(ent: Entity | null): keyof Pick<CharacterStateV2, 'skills' | 'perks' | 'powers' | 'spells' | 'flaws'> {
   if (isSpellEntity(ent)) return 'spells';
   switch (ent?.type) {
-    case 'skill': return 'skills';
     case 'perk': return 'perks';
     case 'power': return 'powers';
     case 'flaw': return 'flaws';
+    case 'skill':
     default: return 'skills';
   }
 }
@@ -80,11 +80,11 @@ const SPELL_FIELDS = new Set(['cantrips', 'spellsKnown', 'noviceSpells', 'adeptS
  *  granting class. Slot powers/spells are class-sourced (free); everything else the
  *  player buys is purchased. Callers override via opts.source for starting/innate/
  *  granted provenance. */
-function deriveSource(ent: Entity, cls: string | undefined): EntitySource {
-  const tier = (ent as any).tier as string | undefined;
+function deriveSource(ent: Entity | null, cls: string | undefined): EntitySource {
+  const tier = ent?.tier;
   // Caster slot spells (cantrips + spells-known) are class-sourced (free).
   if (isSpellEntity(ent)) return Source.class(cls || '');
-  if (ent.type === 'power') {
+  if (ent?.type === 'power') {
     // Innate powers are class grants (level-gated), not player picks.
     if (tier === 'Innate') return Source.innate(cls);
     // Basic/Advanced/Veteran/Utility fill a class slot (free); Class-tier powers
@@ -92,18 +92,18 @@ function deriveSource(ent: Entity, cls: string | undefined): EntitySource {
     if (tier && POWER_TIER_FIELD[tier]) return Source.class(cls || '');
     return Source.purchased();
   }
-  if (ent.type === 'flaw') return Source.flaw();
-  // skills + perks the player buys.
+  if (ent?.type === 'flaw') return Source.flaw();
+  // skills + perks the player buys (and the unknown-name fallback).
   return Source.purchased();
 }
 
 /** Derive the costField (BP-ledger key prefix) from the entity's tier. Skills/perks
  *  key by their own bucket, so they get no costField. Callers override via
  *  opts.costField for classPowers/domainPowers/bookSpells. */
-function deriveCostField(ent: Entity): string | undefined {
-  const tier = (ent as any).tier as string | undefined;
+function deriveCostField(ent: Entity | null): string | undefined {
+  const tier = ent?.tier;
   if (isSpellEntity(ent)) return (tier && SPELL_TIER_FIELD[tier]) || 'noviceSpells';
-  if (ent.type === 'power') {
+  if (ent?.type === 'power') {
     if (tier === 'Innate') return 'innatePowers';
     return (tier && POWER_TIER_FIELD[tier]) || 'classPowers';
   }
@@ -117,21 +117,18 @@ function deriveCostField(ent: Entity): string | undefined {
  * dedupe); this primitive appends.
  */
 export function addToCharacter(char: CharacterStateV2, name: string, opts: AddOpts = {}): CharacterStateV2 {
-  const ent = lookupEntity(name) as Entity | null;
-  const type = ent?.type ?? 'skill';
+  const ent: Entity | null = lookupEntity(name);
   // A caller-supplied field wins the bucket routing (the UI knows the slot clicked);
   // otherwise derive from the entity (spells are powers with a caster tier).
-  const bucket = opts.field
-    ? (SPELL_FIELDS.has(opts.field) ? 'spells' : bucketOf(ent))
-    : bucketOf(ent);
+  const bucket = opts.field && SPELL_FIELDS.has(opts.field) ? 'spells' : bucketOf(ent);
 
   const cls = opts.cls
-    ?? (ent as any)?.parentClass
+    ?? ent?.parentClass
     ?? (getClasses(char).length === 1 ? getClasses(char)[0].name : undefined);
 
   const entityId = opts.param ? `${name} (${opts.param})` : name;
-  const source = opts.source ?? deriveSource(ent ?? ({ type } as Entity), cls);
-  const costField = opts.costField ?? opts.field ?? deriveCostField(ent ?? ({ type } as Entity));
+  const source = opts.source ?? deriveSource(ent, cls);
+  const costField = opts.costField ?? opts.field ?? deriveCostField(ent);
 
   const choice: CharacterChoice = {
     entityId,
