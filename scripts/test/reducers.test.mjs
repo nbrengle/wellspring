@@ -203,13 +203,14 @@ test("updateParameter clears devotion state when a Worship skill loses its param
     ...mkPurchased("Worship (Some Deity)"),
     devotion: "Some Deity",
     divineDomains: ["War"],
-    domainPowers: ["Smite"],
+    // Domain powers are V2-native: CharacterChoice[] in `powers`, costField 'domainPowers'.
+    powers: [{ entityId: "Smite", source: Source.purchased(), ranks: 1, costField: "domainPowers" }],
   };
   const c = updateParameter(c0, "skills", "Worship (Some Deity)", "Worship", 0);
   eq(purchased(c)[0].entityId, "Worship", "skill entityId cleared to bare Worship");
   eq(c.devotion, null, "devotion cleared");
   eq(c.divineDomains.length, 0, "domains cleared");
-  eq(c.domainPowers.length, 0, "domain powers cleared");
+  eq((c.powers || []).filter((p) => p.costField === "domainPowers").length, 0, "domain powers cleared");
 });
 
 // ─── splitParameterizedName ─────────────────────────────────────────────────

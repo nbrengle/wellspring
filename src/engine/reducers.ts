@@ -3,17 +3,17 @@
 // lift of a `setCharacter(c => …)` body, so the write path — previously only
 // reachable through React — is directly unit-testable.
 //
-// These currently operate on the V1-flat shape (parallel `c[field]` /
-// `ranks[field]` / `effectiveBP[field]` arrays, remove-by-index). The V2 flip
-// (push CharacterChoice into character.skills/…, cost/rank on the object, remove
-// by id) happens in a later migration step; until then these mirror the legacy
-// behavior exactly.
+// These operate on CharacterStateV2: every add/remove/rename patches an ontological
+// CharacterChoice[] bucket (skills/perks/powers/spells/flaws), addressed positionally
+// among the relevant sub-list. There is no flat shape — a pick's provenance is its
+// source and its BP key is its costField, both on the CharacterChoice.
 
-import type { V1CharacterInput, CharacterChoice } from "./types.js";
+import type { CharacterStateV2, CharacterChoice } from "./types.js";
 import { Source, isPurchased } from "./types.js";
+import { addToCharacter } from "./character-add.js";
 import { UNLIMITED_SKILLS, DEVOTIONS, DOMAINS } from "./data.js";
 
-type Char = V1CharacterInput;
+type Char = CharacterStateV2;
 
 // ─── V2 purchased-bucket helpers ────────────────────────────────────────────
 // Purchased skills and perks are V2-native: CharacterChoice[] entries (source
@@ -75,9 +75,10 @@ export function updateParameter(
   newName: string,
   index: number | null = null,
 ): Char {
-  // Purchased skills/perks live in the V2 bucket; patch the entry's entityId in
-  // place, then fall through to the shared Worship reconciliation (a Worship skill
-  // can be a purchased entry).
+  // Everything lives in a V2 bucket; patch the entry's entityId in place, then fall
+  // through to the shared Worship reconciliation (a Worship skill can be purchased).
+  // Purchased skills/perks address by position among purchased entries; power/spell
+  // fields address by position among their costField entries.
   let nextChar: Char;
   const bucket = purchasedBucketKey(field);
   if (bucket) {
@@ -86,15 +87,22 @@ export function updateParameter(
     if (idx < 0 || idx >= cur.length) return c;
     nextChar = withPurchased(c, bucket, cur.map((s, i) => (i === idx ? { ...s, entityId: newName } : s)));
   } else {
-    const list = (c[field] as string[] | undefined) || [];
-    const idx = index !== null && index >= 0 ? index : list.indexOf(oldName);
-    if (idx < 0) return c;
-    const next = [...list];
-    next[idx] = newName;
-    nextChar = { ...c, [field]: next };
+    const cur = fieldEntries(c, field);
+    const idx = index !== null && index >= 0 ? index : cur.findIndex((s) => s.entityId === oldName);
+    if (idx < 0 || idx >= cur.length) return c;
+    nextChar = withField(c, field, cur.map((s, i) => (i === idx ? { ...s, entityId: newName } : s)));
   }
 
   const { baseName, paramVal } = splitParameterizedName(newName);
+
+  // Domain powers are V2-native: CharacterChoice[] in `powers` (costField
+  // 'domainPowers'). Keep the entries whose domain is still available; drop the rest.
+  const keepDomainPowers = (keep: (basePower: string, full: string) => boolean): CharacterChoice[] =>
+    (nextChar.powers || []).filter((p) => {
+      if (p.costField !== "domainPowers") return true;
+      const full = p.entityId;
+      return keep(full.replace(/\s*\(.+\)$/, ""), full);
+    });
 
   if (baseName === "Worship") {
     if (!paramVal) {
@@ -102,7 +110,7 @@ export function updateParameter(
       // present-but-empty devotion key the legacy handler wrote.
       nextChar.devotion = null as unknown as undefined;
       nextChar.divineDomains = [];
-      nextChar.domainPowers = [];
+      nextChar.powers = keepDomainPowers(() => false);
     } else {
       const dev = DEVOTIONS.find(
         (d) =>
@@ -115,13 +123,11 @@ export function updateParameter(
       if (dev) {
         const remainingDomains = (c.divineDomains || []).filter((dn) => dev.domains.includes(dn));
         nextChar.divineDomains = remainingDomains;
-        nextChar.domainPowers = (c.domainPowers || []).filter((p) => {
-          const basePower = p.replace(/\s*\(.+\)$/, "");
-          return remainingDomains.some((dn) => {
+        nextChar.powers = keepDomainPowers((basePower, full) =>
+          remainingDomains.some((dn) => {
             const dom = DOMAINS.find((x) => x.name === dn);
-            return dom?.powers.some((x) => x.name === basePower || x.name === p);
-          });
-        });
+            return dom?.powers.some((x) => x.name === basePower || x.name === full);
+          }));
       }
     }
   }
@@ -194,15 +200,11 @@ export function addEntity(c: Char, field: string, name: string): Char {
     if (cur.some((p) => p.entityId === name)) return c;
     return withField(c, field, [...cur, { entityId: name, source: Source.purchased(), ranks: 1, costField: field }]);
   }
-  const list = (c[field] as string[] | undefined) || [];
-  if (list.includes(name) && !UNLIMITED_SKILLS.has(name)) return c;
-  const next = [...list, name];
-  const nextRanks = { ...(c.ranks || {}) };
-  const rList = [...(nextRanks[field] || [])];
-  while (rList.length < list.length) rList.push(1);
-  rList.push(1);
-  nextRanks[field] = rList;
-  return { ...c, [field]: next, ranks: nextRanks };
+  if (field === "flaws") {
+    if ((c.flaws || []).some((f) => f.entityId === name)) return c;
+    return addToCharacter(c as CharacterStateV2, name) as Char;
+  }
+  return c;
 }
 
 /** Remove the entity at position `index`. For purchased skills the index is into
@@ -219,25 +221,16 @@ export function removeEntity(c: Char, field: string, index: number): Char {
     if (index < 0 || index >= cur.length) return c;
     return withField(c, field, cur.filter((_, i) => i !== index));
   }
-  const next = [...((c[field] as string[] | undefined) || [])];
-  next.splice(index, 1);
-  const nextRanks = { ...(c.ranks || {}) };
-  if (nextRanks[field]) {
-    const rList = [...nextRanks[field]];
-    rList.splice(index, 1);
-    nextRanks[field] = rList;
+  if (field === "flaws") {
+    const cur = c.flaws || [];
+    if (index < 0 || index >= cur.length) return c;
+    return { ...c, flaws: cur.filter((_, i) => i !== index) };
   }
-  const nextEffectiveBP = { ...(c.effectiveBP || {}) };
-  if (nextEffectiveBP[field]) {
-    const bpList = [...nextEffectiveBP[field]];
-    bpList.splice(index, 1);
-    nextEffectiveBP[field] = bpList;
-  }
-  return { ...c, [field]: next, ranks: nextRanks, effectiveBP: nextEffectiveBP };
+  return c;
 }
 
-/** Set the rank of the entity at position `index`. Purchased skills carry rank on
- *  the CharacterChoice; flat fields keep it in the parallel ranks array. */
+/** Set the rank of the purchased entity at position `index` (rank lives on the
+ *  CharacterChoice). */
 export function setRank(c: Char, field: string, index: number, nextRank: number): Char {
   const bucket = purchasedBucketKey(field);
   if (bucket) {
@@ -245,13 +238,7 @@ export function setRank(c: Char, field: string, index: number, nextRank: number)
     if (index < 0 || index >= cur.length) return c;
     return withPurchased(c, bucket, cur.map((s, i) => (i === index ? { ...s, ranks: nextRank } : s)));
   }
-  const nextRanks = { ...(c.ranks || {}) };
-  const rList = [...(nextRanks[field] || [])];
-  const listLen = (c[field] as string[] | undefined)?.length || 0;
-  while (rList.length < listLen) rList.push(1);
-  rList[index] = nextRank;
-  nextRanks[field] = rList;
-  return { ...c, ranks: nextRanks };
+  return c;
 }
 
 /** Record a granted-power selection under `grantedSelections[selectionId]`. */

@@ -266,8 +266,9 @@ export interface CharacterStateV2 {
   devotion?: string;
   devotions: CharacterChoice[];
 
-  // The resolved ontological buckets — the engine's single (V2) shape. Raw input
-  // is converted into these at the boundary (see v1ToV2 in graph.ts).
+  // The ontological buckets — the engine's single (V2) shape. Every producer (UI
+  // reducers, loadArchetype, the sheet importer, the test factory) writes these
+  // directly via addToCharacter.
   skills: CharacterChoice[];
   perks: CharacterChoice[];
   flaws: CharacterChoice[];
@@ -280,6 +281,11 @@ export interface CharacterStateV2 {
   divineDomains?: string[];
   choices?: Record<string, string>;
   agileLearnerTrades?: Record<string, number>;
+  /** Selections made for granted "choose one" powers, keyed by selection id. */
+  grantedSelections?: Record<string, unknown>;
+  /** Lineage picks (names). Read directly by the graph's lineage-item resolution. */
+  lineageChallenges?: string[];
+  lineageAdvantages?: string[];
 }
 
 // ─── 3. Graph Types ─────────────────────────────────────────────────────────
