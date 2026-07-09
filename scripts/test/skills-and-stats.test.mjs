@@ -1,6 +1,6 @@
 // skills-and-stats.test.mjs — split from scripts/test.mjs (hotspot split). Owns its own
 // imports so concurrent features don't collide on one shared import block.
-import { test, eq, ok, pSkills } from './harness.mjs';
+import { test, eq, ok, pSkills, isPurchased } from './harness.mjs';
 import {
   validate, characterLevel
 } from "../../src/engine/validate.js";
@@ -153,7 +153,7 @@ test('export/import: round-tripping with ranks and instances preserves rank & pa
 
   const rt = parseCharacterSheet(sheet);
   // Round-trip parses back into the V2 skills[] bucket (source 'Purchased').
-  const rtPurchased = (rt.skills || []).filter(s => s.source === 'Purchased');
+  const rtPurchased = (rt.skills || []).filter(s => isPurchased(s.source));
   eq(rtPurchased.length, 3, 'rt three purchased skills');
   ok(rtPurchased.some(s => s.entityId === 'Spell-Scholar'), 'rt includes bare Spell-Scholar');
   eq(rtPurchased.find(s => s.entityId === 'Spell-Scholar')?.ranks, 3, 'rt preserved rank 3 on the choice');

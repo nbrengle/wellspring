@@ -110,10 +110,63 @@ export type Entity = Skill | Power | Spell | Perk | Flaw | Class;
 
 // ─── 2. Ontological Character State (V2) ────────────────────────────────────
 
-/** 
- * Represents where a capability was acquired. 
+/**
+ * Represents where a capability was acquired — a STRUCTURED discriminated union on
+ * `type`, so consumers read `source.type` / `source.name` instead of parsing a
+ * compound `'Class:Fighter'` string. Compound source strings do NOT exist in the
+ * engine anymore (and never leak into refs.json — that stays name-keyed).
+ *
+ *  - purchased : bought with BP (skills, perks, classPowers, spells).
+ *  - class     : fills a class-progression slot (basic/advanced/veteran/utility
+ *                power) — FREE; `name` is the granting class.
+ *  - starting  : a class's granted starting skill; `class` is that class.
+ *  - innate    : a class innate power (level-gated grant); `class` when known.
+ *  - granted   : granted by another owned entity; `by` is that entity.
+ *  - lineage   : granted by the character's lineage.
+ *  - flaw      : a flaw (awards BP).
  */
-export type EntitySource = 'Purchased' | `Class:${string}` | 'Lineage' | `GrantedBy:${string}` | string;
+export type EntitySource =
+  | { type: 'purchased' }
+  | { type: 'class'; name: string }
+  | { type: 'starting'; class: string }
+  | { type: 'innate'; class?: string }
+  | { type: 'granted'; by: string }
+  | { type: 'lineage' }
+  | { type: 'flaw' };
+
+// ─── EntitySource constructors + readers ────────────────────────────────────
+// Constructors keep source-object creation in one place; readers let call-sites
+// ask a structural question instead of switching on `type` inline.
+
+export const Source = {
+  purchased: (): EntitySource => ({ type: 'purchased' }),
+  class: (name: string): EntitySource => ({ type: 'class', name }),
+  starting: (cls: string): EntitySource => ({ type: 'starting', class: cls }),
+  innate: (cls?: string): EntitySource => ({ type: 'innate', ...(cls ? { class: cls } : {}) }),
+  granted: (by: string): EntitySource => ({ type: 'granted', by }),
+  lineage: (): EntitySource => ({ type: 'lineage' }),
+  flaw: (): EntitySource => ({ type: 'flaw' }),
+};
+
+export const isPurchased = (s: EntitySource | undefined): boolean => s?.type === 'purchased';
+export const isStarting = (s: EntitySource | undefined): boolean => s?.type === 'starting';
+export const isInnate = (s: EntitySource | undefined): boolean => s?.type === 'innate';
+export const isFlaw = (s: EntitySource | undefined): boolean => s?.type === 'flaw';
+
+/** The class a choice belongs to, when its source names one (class-slot, starting,
+ *  or innate power). null otherwise. Replaces the old sourceClass('Class:X') parse. */
+export function sourceClass(s: EntitySource | undefined): string | null {
+  if (!s) return null;
+  if (s.type === 'class') return s.name;
+  if (s.type === 'starting') return s.class;
+  if (s.type === 'innate') return s.class ?? null;
+  return null;
+}
+
+/** The granting entity when the source is a grant (else null). */
+export function grantedBy(s: EntitySource | undefined): string | null {
+  return s?.type === 'granted' ? s.by : null;
+}
 
 /**
  * A choice made by the player to add an entity to their sheet.

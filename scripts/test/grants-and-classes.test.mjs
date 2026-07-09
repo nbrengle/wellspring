@@ -1,6 +1,6 @@
 // grants-and-classes.test.mjs — split from scripts/test.mjs (hotspot split). Owns its own
 // imports so concurrent features don't collide on one shared import block.
-import { test, eq, ok, pSkills } from './harness.mjs';
+import { test, eq, ok, pSkills, Source } from './harness.mjs';
 import {
   validate, characterLevel
 } from "../../src/engine/validate.js";
@@ -70,7 +70,7 @@ test('a stored innate power is materialized once, not double-counted', () => {
 // ─── cross-class / pick-a-class grants ────────────────────────────────────────
 test('Extensive Training routes its bonus slot to the CHOSEN class, attributed', () => {
   const c = { archetypeName: 'x', classes: [{ name: 'Fighter', level: 3 }, { name: 'Rogue', level: 3 }],
-    skills: [{ entityId: 'Extensive Training (Rogue)', source: 'Purchased', ranks: 1 }] };
+    skills: [{ entityId: 'Extensive Training (Rogue)', source: Source.purchased(), ranks: 1 }] };
   const rows = computeSlots(c);
   const fu = rows.find((s) => s.cls === 'Fighter' && s.category === 'utility');
   const ru = rows.find((s) => s.cls === 'Rogue' && s.category === 'utility');
@@ -89,7 +89,7 @@ test('class-choice skills offer only the eligible classes you have', () => {
 
 test('Agile Learner trades require owning the skill and are capped by its rank', () => {
   const base = (skills, ranks, trades) => computeSlots({ classes: [{ name: 'Fighter', level: 4 }],
-    skills: skills.map((s, i) => ({ entityId: s, source: 'Purchased', ranks: ranks[i] || 1 })), agileLearnerTrades: trades });
+    skills: skills.map((s, i) => ({ entityId: s, source: Source.purchased(), ranks: ranks[i] || 1 })), agileLearnerTrades: trades });
   const basic = (rows) => rows.find((s) => s.category === 'basic').allowed;
   const advanced = (rows) => rows.find((s) => s.category === 'advanced').allowed;
   // Owns it: trade applies (basic 2→1, advanced 0→1).
@@ -99,7 +99,7 @@ test('Agile Learner trades require owning the skill and are capped by its rank',
   r = base([], [], { Fighter: 1 });
   eq(basic(r), 2, 'unowned: basic unchanged'); eq(advanced(r), 0, 'unowned: advanced unchanged');
   // Owns 1, requests 3: clamped to capacity 1.
-  eq(agileLearnerCapacity({ skills: [{ entityId: 'Agile Learner', source: 'Purchased', ranks: 1 }] }), 1, 'capacity = owned ranks');
+  eq(agileLearnerCapacity({ skills: [{ entityId: 'Agile Learner', source: Source.purchased(), ranks: 1 }] }), 1, 'capacity = owned ranks');
   r = base(['Agile Learner'], [1], { Fighter: 3 });
   eq(basic(r), 1, 'over-request clamped: basic -1 only');
 });

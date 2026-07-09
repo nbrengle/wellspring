@@ -1,6 +1,6 @@
 // costs-and-powers.test.mjs — split from scripts/test.mjs (hotspot split). Owns its own
 // imports so concurrent features don't collide on one shared import block.
-import { test, eq, ok, pSkills } from './harness.mjs';
+import { test, eq, ok, pSkills, isPurchased } from './harness.mjs';
 import {
   validate, characterLevel
 } from "../../src/engine/validate.js";
@@ -182,7 +182,7 @@ test('shared powers are mechanically equivalent unless level-scaled', () => {
 
 // ─── xN on unlimited-ranks skills → distinct instances, not rank N ────────────
 // Purchased skills import into the V2 skills[] bucket (source 'Purchased').
-const importedPurchased = (c) => (c.skills || []).filter((s) => s.source === 'Purchased').map((s) => s.entityId);
+const importedPurchased = (c) => (c.skills || []).filter((s) => isPurchased(s.source)).map((s) => s.entityId);
 test('import expands "Lore x2" into two distinct Lore instances', () => {
   const c = parseCharacterSheet('M\nClass Levels: Mage 4\nPurchased Skills: Lore x2');
   const p = importedPurchased(c);

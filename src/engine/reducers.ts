@@ -10,6 +10,7 @@
 // behavior exactly.
 
 import type { V1CharacterInput, CharacterChoice } from "./types.js";
+import { Source, isPurchased } from "./types.js";
 import { UNLIMITED_SKILLS, DEVOTIONS, DOMAINS } from "./data.js";
 
 type Char = V1CharacterInput;
@@ -34,12 +35,12 @@ const PURCHASED_BUCKET_OF: Record<string, "skills" | "perks"> = {
 const purchasedBucketKey = (field: string) => PURCHASED_BUCKET_OF[field];
 
 const purchasedEntries = (c: Char, bucket: "skills" | "perks"): CharacterChoice[] =>
-  (c[bucket] || []).filter((s) => s.source === "Purchased");
+  (c[bucket] || []).filter((s) => isPurchased(s.source));
 
 // Replace the character's purchased entries in `bucket` with `next`, preserving
 // any non-purchased entries (granted/starting) in order.
 function withPurchased(c: Char, bucket: "skills" | "perks", next: CharacterChoice[]): Char {
-  const others = (c[bucket] || []).filter((s) => s.source !== "Purchased");
+  const others = (c[bucket] || []).filter((s) => !isPurchased(s.source));
   return { ...c, [bucket]: [...others, ...next] };
 }
 
@@ -167,7 +168,7 @@ export function addEntity(c: Char, field: string, name: string): Char {
   if (bucket) {
     const cur = purchasedEntries(c, bucket);
     if (cur.some((s) => s.entityId === name) && !UNLIMITED_SKILLS.has(name)) return c;
-    return withPurchased(c, bucket, [...cur, { entityId: name, source: "Purchased", ranks: 1 }]);
+    return withPurchased(c, bucket, [...cur, { entityId: name, source: Source.purchased(), ranks: 1 }]);
   }
   const list = (c[field] as string[] | undefined) || [];
   if (list.includes(name) && !UNLIMITED_SKILLS.has(name)) return c;
