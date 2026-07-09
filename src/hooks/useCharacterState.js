@@ -14,7 +14,7 @@ export function readFromHash() {
 }
 
 export function writeToHash(character) {
-  if (!character.archetypeName && !character.name && character.startingSkills.length === 0) {
+  if (!character.archetypeName && !character.name && !(character.skills || []).length) {
     if (window.location.hash) window.history.replaceState(null, "", window.location.pathname);
     return;
   }

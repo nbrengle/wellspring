@@ -178,10 +178,9 @@ const CRAFT_TIER_RANK = { Apprentice: 1, Journeyman: 2, Greater: 3 };
 // Every skill the character possesses (starting + purchased + granted), bare of
 // any "(parameter)" suffix. Shared basis for capability checks.
 export function ownedSkillNames(character) {
-  const names = new Set([
-    ...(character.startingSkills || []),
-    ...(character.purchasedSkills || []),
-  ].map(bareSkill));
+  // All owned skills (starting + purchased) are CharacterChoice[] in skills[].
+  const skillNames = (character.skills || []).map((s) => s.entityId);
+  const names = new Set(skillNames.map(bareSkill));
   for (const g of grantedAbilities(character).list) {
     if (g.abilityType === 'skills') names.add(bareSkill(g.abilityName));
   }

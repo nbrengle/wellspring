@@ -1,6 +1,6 @@
 // skills-and-stats.test.mjs — split from scripts/test.mjs (hotspot split). Owns its own
 // imports so concurrent features don't collide on one shared import block.
-import { test, eq, ok } from './harness.mjs';
+import { test, eq, ok, pSkills } from './harness.mjs';
 import {
   validate, characterLevel
 } from "../../src/engine/validate.js";
@@ -112,21 +112,13 @@ test('getMaxRanks returns correct limits from JSON metadata', () => {
 });
 
 test('ranks: computeSpend calculates correctly for multi-rank skills', () => {
-  const c = {
-    classLevels: 'Mage 4',
-    purchasedSkills: ['Spell-Scholar'],
-    ranks: { purchasedSkills: [3] }
-  };
+  const c = { classLevels: 'Mage 4', ...pSkills([{ name: 'Spell-Scholar', ranks: 3 }]) };
   const s = computeSpend(c);
-  eq(s.byItem['purchasedSkills:Spell-Scholar'].cost, 12, 'Spell-Scholar rank 3 costs 4 * 3 = 12');
+  eq(s.byItem['skills:Spell-Scholar'].cost, 12, 'Spell-Scholar rank 3 costs 4 * 3 = 12');
 });
 
 test('dedupe: unlimited-ranks (instance-based) skills are not collapsed', () => {
-  const c = {
-    classLevels: 'Mage 4',
-    purchasedSkills: ['Bookcaster (Identify)', 'Bookcaster (Mageskin)'],
-    ranks: { purchasedSkills: [1, 1] }
-  };
+  const c = { classLevels: 'Mage 4', ...pSkills(['Bookcaster (Identify)', 'Bookcaster (Mageskin)']) };
   const r = validate(c);
   eq(r.spend.net, 2, 'Two instances of Bookcaster cost 1 each, net 2 BP');
   // Verify both instances are kept in the owned skills list
@@ -139,20 +131,19 @@ test('dedupe: class starting Bookcaster skills + additional purchased Bookcaster
   const c = {
     classes: [{ name: 'Mage', level: 4 }], // starts with Bookcaster, Bookcaster
     startingSkills: ['Bookcaster (Magekey)', 'Bookcaster (Mask Aura)'],
-    purchasedSkills: ['Bookcaster (Identify)'],
-    ranks: { startingSkills: [1, 1], purchasedSkills: [1] }
+    ...pSkills(['Bookcaster (Identify)']),
+    ranks: { startingSkills: [1, 1] }
   };
   const r = validate(c);
   // Mage starting Bookcaster is free. Purchased Bookcaster should cost 1 BP.
-  eq(r.spend.byItem['purchasedSkills:Bookcaster (Identify)'].cost, 1, 'Purchased Bookcaster costs 1 BP');
+  eq(r.spend.byItem['skills:Bookcaster (Identify)'].cost, 1, 'Purchased Bookcaster costs 1 BP');
   eq(r.spend.net, 1, 'Total spend net should be 1 BP (purchased Bookcaster)');
 });
 
 test('export/import: round-tripping with ranks and instances preserves rank & parameters', () => {
   const c = {
     classLevels: 'Mage 5',
-    purchasedSkills: ['Spell-Scholar', 'Bookcaster (Identify)', 'Bookcaster (Mageskin)'],
-    ranks: { purchasedSkills: [3, 1, 1] }
+    ...pSkills([{ name: 'Spell-Scholar', ranks: 3 }, 'Bookcaster (Identify)', 'Bookcaster (Mageskin)']),
   };
   const orig = validate(c);
   const sheet = formatCharacterSheet(c, orig);
@@ -161,14 +152,15 @@ test('export/import: round-tripping with ranks and instances preserves rank & pa
   ok(sheet.includes('Bookcaster (Mageskin) - 1 BP'), 'Prints Bookcaster (Mageskin)');
 
   const rt = parseCharacterSheet(sheet);
-  // Verify parsed array matches
-  eq(rt.purchasedSkills.length, 3, 'rt three purchased skills');
-  ok(rt.purchasedSkills.includes('Spell-Scholar'), 'rt includes bare Spell-Scholar');
-  eq(rt.ranks?.purchasedSkills?.[0], 3, 'rt extracted rank 3 into ranks object');
-  
+  // Round-trip parses back into the V2 skills[] bucket (source 'Purchased').
+  const rtPurchased = (rt.skills || []).filter(s => s.source === 'Purchased');
+  eq(rtPurchased.length, 3, 'rt three purchased skills');
+  ok(rtPurchased.some(s => s.entityId === 'Spell-Scholar'), 'rt includes bare Spell-Scholar');
+  eq(rtPurchased.find(s => s.entityId === 'Spell-Scholar')?.ranks, 3, 'rt preserved rank 3 on the choice');
+
   const rtValidated = validate(rt);
   eq(rtValidated.spend.net, orig.spend.net, 'round-trip spend net');
-  eq(rtValidated.spend.byItem['purchasedSkills:Spell-Scholar'].rank, 3, 'round-trip Spell-Scholar rank');
-  eq(rtValidated.spend.byItem['purchasedSkills:Bookcaster (Identify)'].rank, 1, 'round-trip Bookcaster (Identify) rank');
+  eq(rtValidated.spend.byItem['skills:Spell-Scholar'].rank, 3, 'round-trip Spell-Scholar rank');
+  eq(rtValidated.spend.byItem['skills:Bookcaster (Identify)'].rank, 1, 'round-trip Bookcaster (Identify) rank');
 });
 

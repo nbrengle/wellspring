@@ -39,8 +39,6 @@ export const ARMOR_SKILLS = new Set([
 // in data.js.)
 
 // ─── Character State Field Mappings ─────────────────────────────────────────
-export const BP_FIELDS = ['purchasedSkills', 'purchasedPerks'];
-export const BP_POWER_FIELDS = ['domainPowers', 'classPowers', 'formPowers'];
 export const MARTIAL_SLOT_FIELDS = {
   utility: 'utilityPowers',
   basic: 'basicPowers',
@@ -51,14 +49,6 @@ export const CASTER_SLOT_FIELDS = {
   cantrips: 'cantrips',
   spellsKnown: ['noviceSpells', 'adeptSpells', 'greaterSpells'],
 };
-
-export const ENTITY_FIELDS = [
-  'startingSkills', 'purchasedSkills', 'purchasedPerks',
-  'innatePowers', 'utilityPowers', 'basicPowers', 'advancedPowers',
-  'veteranPowers', 'classPowers', 'rightHandPowers', 'cantrips',
-  'noviceSpells', 'adeptSpells', 'greaterSpells', 'bookSpells',
-  'domainPowers', 'formPowers',
-];
 
 // Every character field that stores a POWER entity. Used as a MEMBERSHIP set —
 // "is this field a power field?" (e.g. to classify or skip it). Not all of these
@@ -78,5 +68,3 @@ export const FIELDS_WITH_DEDICATED_HANDLER = new Set(['innatePowers']);
 export const GENERIC_POWER_FIELDS = POWER_SOURCE_FIELDS.filter(
   (f) => !FIELDS_WITH_DEDICATED_HANDLER.has(f),
 );
-
-export const CLASS_POWER_TIERS = new Set(['Class', 'classSkills']);

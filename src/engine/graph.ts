@@ -694,8 +694,6 @@ export class CharacterGraphModel implements CharacterGraph {
   // ─── BP Spend ─────────────────────────────────────────────────────────────
   // Full BP ledger: base costs, grants, discounts, and totals. Computed once.
   private computeSpend(): BPLedger {
-    const startFloors = startingSkillGrants(this.character).floor;
-
     // Build index of things granted by the character's owned items.
     const paramKey = (typedName: any) => {
       const c = typeof typedName === 'string' && typedName.includes(':')
@@ -729,16 +727,18 @@ export class CharacterGraphModel implements CharacterGraph {
     const byItem: Record<string, BPLedgerEntry> = {};
 
     // Phase 1: Base Costs and Grants
+    //
+    // The cost entry lives ON the node (node.costEntry) — the spreadsheet-row model:
+    // each owned item carries its own base/rank/floor/discount/you-pay. Phases 2–3
+    // and the total read the entry off the node; nothing looks a cost up by a string
+    // key or array index. `byItem` (below) is a derived name-keyed PROJECTION built
+    // once at the end for external/UI consumers, not the engine's source of truth.
     let startingExcess = 0;
+    const setEntry = (node: GraphItem, entry: BPLedgerEntry) => { node.costEntry = entry; };
 
-    let idx = -1;
     for (const node of this._items) {
-      idx++;
-
-      const key = costKey(node);
-
       if (node.field === 'flaws') {
-        byItem[key] = { cost: node.baseCost, base: node.baseCost, grant: null };
+        setEntry(node, { cost: node.baseCost, base: node.baseCost, grant: null });
         rawAwarded += (-node.baseCost);
         continue;
       }
@@ -769,9 +769,9 @@ export class CharacterGraphModel implements CharacterGraph {
 
       if (typeof node.authoredCost === 'number') {
         if (isDerived && node.authoredCost > 0) {
-          byItem[key] = { cost: 0, base: node.baseCost, grant: { kind: 'grant', source: grantSrc, derived: true }, rank: node.rank };
+          setEntry(node, { cost: 0, base: node.baseCost, grant: { kind: 'grant', source: grantSrc, derived: true }, rank: node.rank });
         } else {
-          byItem[key] = { cost: node.authoredCost, base: node.baseCost, grant: node.grantSidecar, rank: node.rank, authored: true };
+          setEntry(node, { cost: node.authoredCost, base: node.baseCost, grant: node.grantSidecar, rank: node.rank, authored: true });
         }
         continue;
       }
@@ -779,15 +779,15 @@ export class CharacterGraphModel implements CharacterGraph {
       if (node.sourceType === 'class') {
         const grant = node.grantSidecar;
         if (grant?.kind === 'discount' && grant.amount) {
-          byItem[key] = { cost: -grant.amount, base: 0, grant };
+          setEntry(node, { cost: -grant.amount, base: 0, grant });
           refunded += grant.amount;
           continue;
         }
 
-        const floor = startFloors[node.index];
+        const floor = node.floor;
 
         if (isGranted) {
-          byItem[key] = { cost: -node.baseCost, base: 0, grant: { kind: 'grant', source: grantSrc, derived: true } };
+          setEntry(node, { cost: -node.baseCost, base: 0, grant: { kind: 'grant', source: grantSrc, derived: true } });
           refunded += node.baseCost;
           continue;
         }
@@ -796,18 +796,18 @@ export class CharacterGraphModel implements CharacterGraph {
           const extra = node.rank - floor;
           const entCost = (node.baseCost / node.rank) || 0;
           const extraCost = entCost * extra;
-          byItem[key] = { cost: extraCost, base: entCost, grant: null, rank: node.rank, freeRanks: floor, paidRanks: extra };
+          setEntry(node, { cost: extraCost, base: entCost, grant: null, rank: node.rank, freeRanks: floor, paidRanks: extra });
           startingExcess += extraCost;
         } else {
-          byItem[key] = { cost: 0, base: (node.baseCost / node.rank)||0, grant: null, rank: node.rank, freeRanks: floor || 1, paidRanks: 0 };
+          setEntry(node, { cost: 0, base: (node.baseCost / node.rank)||0, grant: null, rank: node.rank, freeRanks: floor || 1, paidRanks: 0 });
         }
         continue;
       }
 
       if (isGranted) {
-        byItem[key] = { cost: 0, base: node.baseCost, grant: { kind: 'grant', source: grantSrc, derived: true }, rank: node.rank };
+        setEntry(node, { cost: 0, base: node.baseCost, grant: { kind: 'grant', source: grantSrc, derived: true }, rank: node.rank });
       } else {
-        byItem[key] = { cost: node.baseCost, base: node.baseCost, grant: node.grantSidecar, rank: node.rank };
+        setEntry(node, { cost: node.baseCost, base: node.baseCost, grant: node.grantSidecar, rank: node.rank });
       }
     }
 
@@ -827,10 +827,9 @@ export class CharacterGraphModel implements CharacterGraph {
     const discountsApplied: any[] = [];
 
     for (const node of this._items) {
-      if (node.field !== 'skills' && node.field !== 'perks' && node.field !== 'purchasedSkills' && node.field !== 'purchasedPerks' && node.field !== 'startingSkills') continue;
+      if (node.field !== 'skills' && node.field !== 'perks') continue;
 
-      const key = costKey(node);
-      const eff = byItem[key];
+      const eff = node.costEntry;
       if (!eff || eff.authored) continue;
 
       const catKey = node.entity?.category || cleanItemName(node.rawString).split(' ')[0];
@@ -851,7 +850,7 @@ export class CharacterGraphModel implements CharacterGraph {
             const refund = Math.min(src.amount, room);
             discountFreeBP += refund;
             used.set(src.id, (used.get(src.id) || 0) + refund);
-            discountsApplied.push({ key, source: src.name, amount: refund, asFreeBP: true });
+            discountsApplied.push({ key: node.id, source: src.name, amount: refund, asFreeBP: true });
           }
           continue;
         }
@@ -859,22 +858,25 @@ export class CharacterGraphModel implements CharacterGraph {
         eff.cost -= cut;
         eff.discount = { source: src.name, amount: cut };
         used.set(src.id, (used.get(src.id) || 0) + cut);
-        discountsApplied.push({ key, source: src.name, amount: cut });
+        discountsApplied.push({ key: node.id, source: src.name, amount: cut });
         break;
       }
     }
 
-    // Phase 3: Total Summation
+    // Phase 3: Total Summation — read the you-pay cost straight off each node's
+    // entry (flaws carry a negative "cost" that feeds rawAwarded, not spend).
     let spent = 0;
-    const costFields = ['purchasedSkills', 'purchasedPerks', 'domainPowers', 'classPowers', 'formPowers', 'utilityPowers', 'basicPowers', 'advancedPowers', 'veteranPowers', 'skills', 'perks', 'powers'];
-
     for (const node of this._items) {
-      if (costFields.includes(node.field)) {
-        const eff = byItem[costKey(node)];
-        if (eff && eff.cost > 0) {
-          spent += eff.cost;
-        }
-      }
+      if (node.field === 'flaws') continue;
+      const eff = node.costEntry;
+      if (eff && eff.cost > 0) spent += eff.cost;
+    }
+
+    // Derived name-keyed projection for external/UI consumers (sheet, validate rows).
+    // Not the engine's source of truth — that's node.costEntry. Later readers move
+    // to reading cost off the resolved row and this can go.
+    for (const node of this._items) {
+      if (node.costEntry) byItem[costKey(node)] = node.costEntry;
     }
 
     const awarded = Math.min(rawAwarded, MAX_FLAW_BP);
@@ -1000,28 +1002,45 @@ function checkLevelConstraint(character: any, constraintStr: string, owned: Set<
 function v1ToV2(charInput: V1CharacterInput): CharacterStateV2 {
   const v2: CharacterStateV2 = {
     ...charInput,
+    _v2: true,
     classes: getClasses(charInput),
     skills: [], perks: [], flaws: [], powers: [], spells: [], devotions: [],
   };
 
-  const add = (field: string, bucket: CharacterChoice[], source: EntitySource, items: string[] | undefined) => {
+  // Idempotent: v1ToV2 may run on a char that already carries some V2 buckets
+  // (the boundary re-normalizes every resolve). A flat string item is converted to
+  // a CharacterChoice; an already-converted entry (object) is passed through as-is.
+  const add = (field: string, bucket: CharacterChoice[], source: EntitySource, items: (string | CharacterChoice)[] | undefined) => {
     for (let i = 0; i < (items || []).length; i++) {
       const item = items![i];
+      if (item && typeof item === 'object') {
+        bucket.push(item);
+        continue;
+      }
       bucket.push({
-        id: field === 'startingSkills' ? `startingSkills:${i}:${item}` : `${field}:${item}`,
-        entityId: item,
+        entityId: item as string,
         source,
         costOverride: charInput.effectiveBP?.[field]?.[i] ?? undefined,
         ranks: charInput.ranks?.[field]?.[i] ?? 1,
         originalIndex: i,
-      });
+        // The originating character field (e.g. 'classPowers'). Flat-path buckets
+        // key their BP ledger by this; skills (V2-native, no `add`) key by 'skills:'.
+        costField: field,
+      } as CharacterChoice);
     }
   };
 
-  add('startingSkills', v2.skills, 'Class:Starting', charInput.startingSkills);
-  add('purchasedSkills', v2.skills, 'Purchased', charInput.purchasedSkills);
+  // Skills are V2-native (CharacterChoice[] in charInput.skills). Preserve ALL
+  // existing bucket entries — purchased AND any the archetype/importer carried as
+  // Class:Starting. Only synthesize from the legacy flat `startingSkills` when the
+  // bucket has no starting entries yet (a from-scratch/older char).
+  for (const s of charInput.skills || []) v2.skills.push(s);
+  const hasStartingInBucket = (charInput.skills || []).some((s) => s.source === 'Class:Starting');
+  if (!hasStartingInBucket) {
+    add('startingSkills', v2.skills, 'Class:Starting', charInput.startingSkills);
+  }
   add('purchasedPerks', v2.perks, 'Purchased', charInput.purchasedPerks);
-  add('flaws', v2.flaws, 'Flaw', charInput.flaws as string[] | undefined);
+  add('flaws', v2.flaws, 'Flaw', charInput.flaws as (string | CharacterChoice)[] | undefined);
   for (const pf of ['classPowers', 'classSkills', 'rightHandPowers', 'utilityPowers', 'basicPowers', 'advancedPowers', 'veteranPowers', 'domainPowers'] as const) {
     add(pf, v2.powers, 'Purchased', charInput[pf]);
   }
@@ -1040,15 +1059,18 @@ function v1ToV2(charInput: V1CharacterInput): CharacterStateV2 {
     add(sf, v2.spells, 'Purchased', charInput[sf]);
   }
   if (charInput.devotion) {
-    v2.devotions.push({ id: `devotions:${charInput.devotion}`, entityId: `devotions:${charInput.devotion}`, source: 'Purchased' });
+    v2.devotions.push({ entityId: `devotions:${charInput.devotion}`, source: 'Purchased' });
   }
   return v2;
 }
 
 export function resolveCharacterGraph(charInput: V1CharacterInput | CharacterStateV2): CharacterGraphModel {
-  // Convert raw V1 input to V2 at the boundary; if it's already V2, pass through.
-  const character: CharacterStateV2 = ('skills' in charInput && Array.isArray((charInput as any).skills) && (charInput as any).skills.every?.((s: any) => typeof s === 'object'))
-    ? charInput as CharacterStateV2
+  // Convert V1 input to V2 at the boundary; a char already normalized by v1ToV2
+  // (marked `_v2`) passes through. The marker is the reliable discriminator —
+  // inferring from bucket contents misfired (empty `skills: []` looked V2) and
+  // re-running v1ToV2 on its own output double-wrapped already-converted entries.
+  const character: CharacterStateV2 = (charInput as CharacterStateV2)._v2
+    ? (charInput as CharacterStateV2)
     : v1ToV2(charInput as V1CharacterInput);
 
   const items: GraphItem[] = [];
@@ -1095,8 +1117,15 @@ export function resolveCharacterGraph(charInput: V1CharacterInput | CharacterSta
       else field = 'unknown';
     }
 
+    // Node id is the PARAMETER-PRESERVING instance key used for the BP ledger,
+    // prereq issue ids, and dedupe — NOT ent.id (the param-stripped BASE). Its
+    // prefix is the ORIGINATING character field: flat-path buckets carry it as
+    // `choice.costField` (e.g. 'classPowers'); V2-native skills have none, so they
+    // key under their entity collection ('skills'). Falls back to the raw entityId.
+    const idPrefixName = (choice as any).costField || (ent?.type ? idPrefix(ent) : null);
+    const nodeId = idPrefixName ? `${idPrefixName}:${cleanName}` : entityId;
     items.push({
-      id: choice.id || entityId,
+      id: nodeId,
       entityId: entityId,
       name: ent?.name || cleanName,
       rawString: choice.entityId,
@@ -1116,7 +1145,22 @@ export function resolveCharacterGraph(charInput: V1CharacterInput | CharacterSta
     });
   };
 
-  for (const choice of character.skills || []) addItem(choice);
+  // Skills carry a bucket-relative position per source: purchased skills use it for
+  // removal (the UI passes the index among purchased entries); starting skills use
+  // it only so the derived byItem projection has a distinct key per row and the
+  // floor/specialty zip lines up. It is NOT an identity — the dedupe pass tells
+  // duplicates apart.
+  let purchasedSkillIdx = 0;
+  let startingSkillIdx = 0;
+  for (const choice of character.skills || []) {
+    if (choice.source === 'Purchased') {
+      addItem({ ...choice, originalIndex: choice.originalIndex ?? purchasedSkillIdx++ });
+    } else if (choice.source === 'Class:Starting') {
+      addItem({ ...choice, originalIndex: startingSkillIdx++ });
+    } else {
+      addItem(choice);
+    }
+  }
   for (const choice of character.perks || []) addItem(choice);
   for (const choice of character.powers || []) addItem(choice);
   for (const choice of character.spells || []) addItem(choice);
@@ -1296,6 +1340,23 @@ export function resolveCharacterGraph(charInput: V1CharacterInput | CharacterSta
         baseCost: 0,
         effects: [{ type: 'WEALTH', amount: bonus, note: 'from Profession/Manse/Income' }]
       });
+    }
+  }
+
+  // Attach the free-rank floor + specialty provenance onto each starting-skill node
+  // (the spreadsheet "free floor" / "granted-by" columns). Derived on read from the
+  // class's starting-choice config — not persisted — so it survives import/round-trip.
+  // startingSkillGrants yields them positioned over the Class:Starting entries in
+  // bucket order; we walk the starting nodes in that same order to zip them on. This
+  // order is iteration, NOT an identity — duplicates are still told apart by the
+  // dedupe pass, never by position.
+  const grants = startingSkillGrants(character);
+  let startingNodeIdx = 0;
+  for (const node of items) {
+    if (node.field === 'skills' && node.sourceType === 'class') {
+      if (grants.specialty[startingNodeIdx] != null) node.specialty = grants.specialty[startingNodeIdx];
+      if (grants.floor[startingNodeIdx] != null) node.floor = grants.floor[startingNodeIdx];
+      startingNodeIdx++;
     }
   }
 

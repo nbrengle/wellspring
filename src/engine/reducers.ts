@@ -9,10 +9,34 @@
 // by id) happens in a later migration step; until then these mirror the legacy
 // behavior exactly.
 
-import type { V1CharacterInput } from "./types.js";
+import type { V1CharacterInput, CharacterChoice } from "./types.js";
 import { UNLIMITED_SKILLS, DEVOTIONS, DOMAINS } from "./data.js";
 
 type Char = V1CharacterInput;
+
+// ─── V2 bucket helpers (skills slice) ───────────────────────────────────────
+// Purchased skills are V2-native: they live as CharacterChoice[] in
+// `character.skills` (source 'Purchased'), NOT in the flat `purchasedSkills`
+// array. These helpers own that bucket. The UI addresses a purchased skill by
+// its position among the PURCHASED entries (the row index the bucketed view
+// emits), so removal/rank are positional within that filtered sub-list — no id
+// (see the CharacterChoice shape: id was dropped as a non-load-bearing conceit).
+
+// Field names that address the purchased-skills bucket. The picker adds via
+// 'purchasedSkills'; a resolved row carries 'skills'. Both mean "the purchased
+// skills bucket".
+const PURCHASED_SKILL_FIELDS = new Set(["purchasedSkills", "skills"]);
+const isPurchasedSkillField = (field: string) => PURCHASED_SKILL_FIELDS.has(field);
+
+const purchasedSkills = (c: Char): CharacterChoice[] =>
+  (c.skills || []).filter((s) => s.source === "Purchased");
+
+// Replace the character's purchased-skill entries with `next`, preserving any
+// non-purchased entries (granted/starting skills the boundary may add) in order.
+function withPurchasedSkills(c: Char, next: CharacterChoice[]): Char {
+  const others = (c.skills || []).filter((s) => s.source !== "Purchased");
+  return { ...c, skills: [...others, ...next] };
+}
 
 /** Set or clear a per-power choice option. Clears when option is null or already set. */
 export function setChoice(c: Char, powerId: string, option: string | null): Char {
@@ -45,13 +69,23 @@ export function updateParameter(
   newName: string,
   index: number | null = null,
 ): Char {
-  const list = (c[field] as string[] | undefined) || [];
-  const idx = index !== null && index >= 0 ? index : list.indexOf(oldName);
-  if (idx < 0) return c;
-  const next = [...list];
-  next[idx] = newName;
-
-  const nextChar: Char = { ...c, [field]: next };
+  // Purchased skills live in the V2 bucket; patch the entry's entityId in place,
+  // then fall through to the shared Worship reconciliation (a Worship skill can be
+  // a purchased entry).
+  let nextChar: Char;
+  if (isPurchasedSkillField(field)) {
+    const cur = purchasedSkills(c);
+    const idx = index !== null && index >= 0 ? index : cur.findIndex((s) => s.entityId === oldName);
+    if (idx < 0 || idx >= cur.length) return c;
+    nextChar = withPurchasedSkills(c, cur.map((s, i) => (i === idx ? { ...s, entityId: newName } : s)));
+  } else {
+    const list = (c[field] as string[] | undefined) || [];
+    const idx = index !== null && index >= 0 ? index : list.indexOf(oldName);
+    if (idx < 0) return c;
+    const next = [...list];
+    next[idx] = newName;
+    nextChar = { ...c, [field]: next };
+  }
 
   const { baseName, paramVal } = splitParameterizedName(newName);
 
@@ -120,8 +154,14 @@ export function clearSlot(c: Char, field: string, flatIndex: number): Char {
 }
 
 /** Add a named entity to `field`, appending a rank of 1. No-op if the name is
- *  already present and not in UNLIMITED_SKILLS. */
+ *  already present and not in UNLIMITED_SKILLS. Purchased skills route to the V2
+ *  `skills` bucket; other fields stay on the flat parallel-array path. */
 export function addEntity(c: Char, field: string, name: string): Char {
+  if (isPurchasedSkillField(field)) {
+    const cur = purchasedSkills(c);
+    if (cur.some((s) => s.entityId === name) && !UNLIMITED_SKILLS.has(name)) return c;
+    return withPurchasedSkills(c, [...cur, { entityId: name, source: "Purchased", ranks: 1 }]);
+  }
   const list = (c[field] as string[] | undefined) || [];
   if (list.includes(name) && !UNLIMITED_SKILLS.has(name)) return c;
   const next = [...list, name];
@@ -133,9 +173,14 @@ export function addEntity(c: Char, field: string, name: string): Char {
   return { ...c, [field]: next, ranks: nextRanks };
 }
 
-/** Remove the entity at `field[index]`, splicing the parallel ranks and
- *  effectiveBP arrays to keep them index-aligned. */
+/** Remove the entity at position `index`. For purchased skills the index is into
+ *  the purchased-skills bucket; for flat fields it splices the parallel arrays. */
 export function removeEntity(c: Char, field: string, index: number): Char {
+  if (isPurchasedSkillField(field)) {
+    const cur = purchasedSkills(c);
+    if (index < 0 || index >= cur.length) return c;
+    return withPurchasedSkills(c, cur.filter((_, i) => i !== index));
+  }
   const next = [...((c[field] as string[] | undefined) || [])];
   next.splice(index, 1);
   const nextRanks = { ...(c.ranks || {}) };
@@ -153,8 +198,14 @@ export function removeEntity(c: Char, field: string, index: number): Char {
   return { ...c, [field]: next, ranks: nextRanks, effectiveBP: nextEffectiveBP };
 }
 
-/** Set the rank of `field[index]`, backfilling missing ranks with 1. */
+/** Set the rank of the entity at position `index`. Purchased skills carry rank on
+ *  the CharacterChoice; flat fields keep it in the parallel ranks array. */
 export function setRank(c: Char, field: string, index: number, nextRank: number): Char {
+  if (isPurchasedSkillField(field)) {
+    const cur = purchasedSkills(c);
+    if (index < 0 || index >= cur.length) return c;
+    return withPurchasedSkills(c, cur.map((s, i) => (i === index ? { ...s, ranks: nextRank } : s)));
+  }
   const nextRanks = { ...(c.ranks || {}) };
   const rList = [...(nextRanks[field] || [])];
   const listLen = (c[field] as string[] | undefined)?.length || 0;

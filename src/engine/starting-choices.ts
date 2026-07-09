@@ -438,15 +438,15 @@ export function reconcileStartingChoices(character, className) {
   const configs = STARTING_CHOICES_CONFIG[className] || [];
   if (!configs.length) return {};
   // Owned starting skills by canonical key, RANK-AWARE: a skill stored once with
-  // rank 2 (e.g. "Extended Capacity - Novice" at ranks[5]===2) counts as two
-  // copies, so an option asking for "x2" still matches. Falls back to a trailing
-  // "xN" suffix in the name when no rank sidecar is present.
-  const startRanks = character.ranks?.startingSkills || [];
+  // rank 2 (e.g. "Extended Capacity - Novice") counts as two copies, so an option
+  // asking for "x2" still matches. Rank comes off the CharacterChoice; falls back
+  // to a trailing "xN" in the name. Starting skills are the Class:Starting entries
+  // of the V2 skills[] bucket.
   const ownedPool = {};
-  const startingSkills = character.skills?.filter(s => s.source === 'Class:Starting').map(s => s.entityId) || character.startingSkills || [];
-  startingSkills.forEach((s, i) => {
-    const b = skillMatchKey(s);
-    ownedPool[b] = (ownedPool[b] || 0) + (startRanks[i] || parseStartingRank(s) || 1);
+  const startingEntries = (character.skills || []).filter((s) => s.source === 'Class:Starting');
+  startingEntries.forEach((choice) => {
+    const b = skillMatchKey(choice.entityId);
+    ownedPool[b] = (ownedPool[b] || 0) + (choice.ranks || parseStartingRank(choice.entityId) || 1);
   });
 
   // Need-counts for one option, keyed by canonical skill key.
@@ -537,8 +537,12 @@ export function startingSkillGrants(character) {
   const byBase = {};
   for (const t of expected) (byBase[skillMatchKey(t.name)] = byBase[skillMatchKey(t.name)] || []).push(t);
   const kept = {};
-  (character.startingSkills || []).forEach((item, idx) => {
-    const base = skillMatchKey(item);
+  // Key specialty/floor by the starting skill's index AMONG the Class:Starting
+  // entries of the bucket — the same index the graph stamps as node.originalIndex,
+  // so floor billing (startFloors[node.index]) lines up.
+  const startingEntries = (character.skills || []).filter((s) => s.source === 'Class:Starting');
+  startingEntries.forEach((choice, idx) => {
+    const base = skillMatchKey(choice.entityId);
     const templates = byBase[base] || [];
     const k = kept[base] || 0;
     if (k < templates.length) {
@@ -589,21 +593,22 @@ export function rebuildStartingSkills(character, primaryClassName, updatedChoice
     }
   }
 
-  const currentSkills = character.startingSkills || [];
-  const currentRanks = character.ranks?.startingSkills || [];
-  const nextSkills = [];
-  const nextRanks = [];
+  // Starting skills are V2-native: CharacterChoice[] with source 'Class:Starting'
+  // in character.skills. Purchased (and any other-source) entries are preserved
+  // untouched; only the Class:Starting ones are rebuilt.
+  const allSkills = character.skills || [];
+  const currentStarting = allSkills.filter((s) => s.source === 'Class:Starting');
+  const otherSkills = allSkills.filter((s) => s.source !== 'Class:Starting');
 
+  const nextStarting = [];
   const keptCounts = {};
-  const pushItem = (name, rank) => {
-    nextSkills.push(name);
-    nextRanks.push(rank || 1);
-  };
+  const pushItem = (name, rank) =>
+    nextStarting.push({ entityId: name, source: 'Class:Starting', ranks: rank || 1 });
 
-  // Keep current items that still belong (matched to an expected template),
-  // plus any items unrelated to the choices.
-  for (let i = 0; i < currentSkills.length; i++) {
-    const item = currentSkills[i];
+  // Keep current starting items that still belong (matched to an expected
+  // template), plus any unrelated to the choices.
+  for (const choice of currentStarting) {
+    const item = choice.entityId;
     const base = skillMatchKey(item);
     const templates = expectedByBase[base] || [];
     const kept = keptCounts[base] || 0;
@@ -611,7 +616,7 @@ export function rebuildStartingSkills(character, primaryClassName, updatedChoice
       const t = templates[kept];
       const floor = t.rank || 1;
       // Preserve any rank the user bought ABOVE the free floor; never below it.
-      const total = Math.max(floor, currentRanks[i] || floor);
+      const total = Math.max(floor, choice.ranks || floor);
       // Name: when the chosen OPTION pins a specific parameter (e.g. the Lore
       // dropdown selects "Lore (Arcane)"), the template wins so switching the
       // choice actually changes the subject. When the template is parameter-less
@@ -622,7 +627,7 @@ export function rebuildStartingSkills(character, primaryClassName, updatedChoice
       keptCounts[base] = kept + 1;
     } else if (!choiceKeys.has(base)) {
       // Unrelated to any choice block — preserve as-is (keeps its current rank).
-      pushItem(item, currentRanks[i] || 1);
+      pushItem(item, choice.ranks || 1);
     }
     // else: a choice-block skill that's no longer expected → dropped (old choice).
   }
@@ -634,14 +639,12 @@ export function rebuildStartingSkills(character, primaryClassName, updatedChoice
     }
   }
 
-  const grants = startingSkillGrants({ ...character, startingSkills: nextSkills, startingChoices: choices, ranks: { ...(character.ranks || {}), startingSkills: nextRanks } });
+  // Provenance (which block granted each) + the free-rank floor are NOT persisted;
+  // they're derived on read by startingSkillGrants, so they survive import/round-trip.
   return {
     ...character,
-    startingSkills: nextSkills,
-    ranks: { ...(character.ranks || {}), startingSkills: nextRanks },
+    skills: [...nextStarting, ...otherSkills],
     startingChoices: choices,
-    specialtySources: grants.specialty,
-    grantedRanks: grants.floor,
   };
 }
 
