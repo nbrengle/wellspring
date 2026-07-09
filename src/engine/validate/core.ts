@@ -68,12 +68,16 @@ export function requiredLevel(power: any) {
 // read — re-exported from types so validators share one definition.
 export { sourceClass };
 
-// Count a field's picks belonging to `cls`.
+// Count a field's picks belonging to `cls`. A choice belongs to `cls` when its
+// source names that class (sourceClass) — so class-slot spells/powers count, but
+// GRANTED picks (e.g. Bookcaster's book spells, source {granted, by:'Bookcaster'})
+// do not: they're the granting entity's own pool, not the class's slots, even when
+// they share the novice/adept/greater tiers.
 export function countPicksForClass(
-  state: CharacterStateV2, 
-  category: 'powers' | 'spells', 
-  cls: string, 
-  tierFilter?: string | string[]
+  state: CharacterStateV2,
+  category: 'powers' | 'spells',
+  cls: string,
+  tierFilter?: string | string[],
 ): number {
   const arr = state[category] || [];
   return arr.reduce((n, choice) => {

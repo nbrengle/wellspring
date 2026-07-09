@@ -523,6 +523,10 @@ function convertToV2(v1) {
         id: nextId(entityId),
         entityId,
         source: sourceName,
+        // The originating field (e.g. 'bookSpells', 'basicPowers') — keys the BP
+        // ledger and lets the validator tell book spells (Bookcaster's own pool)
+        // apart from spells-known, which share the same tiers.
+        costField: fieldStr,
       };
       if (cost !== null) choice.costOverride = cost;
       if (ranks > 1) choice.ranks = ranks;
@@ -558,12 +562,18 @@ function convertToV2(v1) {
   addChoice('rightHandPowers', v2.powers, Source.purchased());
   addChoice('domainPowers', v2.powers, Source.purchased());
 
+  // Every spell field fills a caster slot (free) and is sourced to the caster class
+  // (the class carries the sphere — Arcane vs Divine — via CLASSES[cls].magicType;
+  // the tier is on the spell entity). Cantrips, spells-known (novice/adept/greater),
+  // and book spells all resolve the same way.
   addChoice('cantrips', v2.spells, Source.class(primaryClass));
   addChoice('spellsKnown', v2.spells, Source.class(primaryClass));
-  addChoice('noviceSpells', v2.spells, Source.purchased());
-  addChoice('adeptSpells', v2.spells, Source.purchased());
-  addChoice('greaterSpells', v2.spells, Source.purchased());
-  addChoice('bookSpells', v2.spells, Source.purchased());
+  addChoice('noviceSpells', v2.spells, Source.class(primaryClass));
+  addChoice('adeptSpells', v2.spells, Source.class(primaryClass));
+  addChoice('greaterSpells', v2.spells, Source.class(primaryClass));
+  // Book spells are Bookcaster's OWN pool — parametrized against the granting skill,
+  // not the class's spells-known slots (they share tiers but aren't slot picks).
+  addChoice('bookSpells', v2.spells, Source.granted('Bookcaster'));
 
   if (v1.devotion) {
      v2.devotions.push({ id: nextId('devotions:' + v1.devotion), entityId: 'devotions:' + v1.devotion, source: Source.purchased() });

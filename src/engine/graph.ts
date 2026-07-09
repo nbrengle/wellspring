@@ -365,8 +365,9 @@ export class CharacterGraphModel implements CharacterGraph {
 
       // A sub-power can't be SELECTED directly — but it's legitimate when a grant
       // confers it (e.g. Holding Out for a Hero grants the sub-power Save the Day).
-      // Only flag a directly-chosen (purchased) one, not a granted/class one.
-      if (ent && ent.tier === 'SubPower' && node.sourceType === 'purchased') {
+      // Flag a player-CHOSEN one (purchased, or a class-slot pick), NOT a granted or
+      // innate one. (Slot picks are sourceType 'class' — still a direct selection.)
+      if (ent && ent.tier === 'SubPower' && (node.sourceType === 'purchased' || node.sourceType === 'class')) {
         issues.push({
           id, item: node.name, field: node.field,
           text: `${ent.name} is a sub-power and cannot be selected directly.`,
@@ -1102,12 +1103,18 @@ function v1ToV2(charInput: V1CharacterInput): CharacterStateV2 {
   add('innatePowers', v2.powers, Source.innate(), innate);
 
   // Spells are V2-native (CharacterChoice[] in charInput.spells) — preserve the
-  // bucket; synth from flat spell fields only when the bucket is empty.
+  // bucket; synth from flat spell fields only when the bucket is empty. Every spell
+  // field (cantrips / spells-known / book) fills a caster slot and is FREE, so it's
+  // class-sourced — the granting caster class. Legacy flat chars carry no per-spell
+  // class, so attribute to the primary class (matches the single-caster common case;
+  // new chars write the bucket with the source already set).
   for (const s of charInput.spells || []) v2.spells.push(s);
   if (!(charInput.spells || []).length) {
-    for (const sf of ['cantrips', 'bookSpells', 'spellsKnown', 'noviceSpells', 'adeptSpells', 'greaterSpells'] as const) {
-      add(sf, v2.spells, Source.purchased(), charInput[sf]);
+    for (const sf of ['cantrips', 'spellsKnown', 'noviceSpells', 'adeptSpells', 'greaterSpells'] as const) {
+      add(sf, v2.spells, Source.class(primaryClass), charInput[sf]);
     }
+    // Book spells are Bookcaster's own pool — granted by that skill, not class slots.
+    add('bookSpells', v2.spells, Source.granted('Bookcaster'), charInput.bookSpells);
   }
   if (charInput.devotion) {
     v2.devotions.push({ entityId: `devotions:${charInput.devotion}`, source: Source.purchased() });

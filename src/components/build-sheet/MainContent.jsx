@@ -269,8 +269,10 @@ export function SlotBlock({ slot }) {
   const { onInspect, onOpenSlot } = useBuilderActions();
   const isFocused = (item, field) =>
     view?.mode === "inspect" && view.item === item && view.field === field;
-  const isSpells = slot.category === "spellsKnown";
-  const fields = isSpells
+  // Cantrips + spells-known are spell categories (bucket: spells); spells-known
+  // spans three tier fields, cantrips its own. Martial powers use the powers bucket.
+  const isSpells = slot.category === "spellsKnown" || slot.category === "cantrips";
+  const fields = slot.category === "spellsKnown"
     ? ["noviceSpells", "adeptSpells", "greaterSpells"]
     : [SLOT_FIELD[slot.category]];
   const granted = slot.granted || [];

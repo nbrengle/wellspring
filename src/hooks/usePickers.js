@@ -21,8 +21,10 @@ export function powerPickerSpec(slot, character) {
     const c = candidates.find((x) => x.name === name);
     return c?.tierList || "noviceSpells";
   };
-  const isSpells = category === "spellsKnown";
-  const takenFields = isSpells
+  // Cantrips and spells-known are both spell categories (bucket: spells); martial
+  // power categories use the powers bucket. spells-known spans three tier fields.
+  const isSpells = category === "spellsKnown" || category === "cantrips";
+  const takenFields = category === "spellsKnown"
     ? ["noviceSpells", "adeptSpells", "greaterSpells"] : [field];
   const taken = new Set();
   const counts = {};
