@@ -447,16 +447,16 @@ for (let i = 0; i < nodes.length; i++) {
   if (n.text === 'Table of Contents') continue;
   const nextH1 = nodes.findIndex((m, j) => j > i && m.type === 'heading' && m.level === 1);
   const end = nextH1 === -1 ? nodes.length : nextH1;
-  const v1 = parseArchetype(i, end);
-  archetypes.push(convertToV2(v1));
+  const raw = parseArchetype(i, end);
+  archetypes.push(buildCharacter(raw));
 }
 
-function convertToV2(v1) {
-  const v2 = {
+function buildCharacter(raw) {
+  const character = {
     // The archetype's own name — `name`, canonical like every other entity, so UI
     // code reads a.name uniformly. (The CHARACTER built from it carries the
     // provenance separately as `archetypeName`; loadArchetype sets that.)
-    name: v1.name,
+    name: raw.name,
     classes: {},
     skills: [],
     perks: [],
@@ -464,53 +464,53 @@ function convertToV2(v1) {
     powers: [],
     spells: [],
     devotions: [],
-    wealth: v1.wealth || 'None',
+    wealth: raw.wealth || 'None',
   };
   let idCounter = 0;
-  const nextId = (entityId) => crypto.createHash('md5').update(`${v1.name}:${entityId}:${idCounter++}`).digest('hex');
+  const nextId = (entityId) => crypto.createHash('md5').update(`${raw.name}:${entityId}:${idCounter++}`).digest('hex');
 
   // 1. Classes
-  if (v1.classLevels) {
-    const classMatch = v1.classLevels.match(/^([A-Z][a-zA-Z]+)\s+(\d+)/);
+  if (raw.classLevels) {
+    const classMatch = raw.classLevels.match(/^([A-Z][a-zA-Z]+)\s+(\d+)/);
     if (classMatch) {
-       v2.classes[classMatch[1]] = parseInt(classMatch[2], 10);
+       character.classes[classMatch[1]] = parseInt(classMatch[2], 10);
     } else {
        // Fallback for edge cases
-       v2.classes[v1.classLevels.split(' ')[0]] = parseInt(v1.classLevels.split(' ')[1], 10) || 1;
+       character.classes[raw.classLevels.split(' ')[0]] = parseInt(raw.classLevels.split(' ')[1], 10) || 1;
     }
   }
 
   // 2. Lineage
-  if (v1.lineage) {
-    v2.lineage = { name: v1.lineage, choices: [] };
+  if (raw.lineage) {
+    character.lineage = { name: raw.lineage, choices: [] };
     const addAdv = (arr) => {
       for (const adv of arr || []) {
-        v2.perks.push({
-          id: nextId('advantages:' + v1.lineage + ' - ' + adv),
-          entityId: 'advantages:' + v1.lineage + ' - ' + adv,
+        character.perks.push({
+          id: nextId('advantages:' + raw.lineage + ' - ' + adv),
+          entityId: 'advantages:' + raw.lineage + ' - ' + adv,
           source: Source.lineage(),
         });
-        v2.lineage.choices.push(adv);
+        character.lineage.choices.push(adv);
       }
     };
-    addAdv(v1.lineageAdvantages);
+    addAdv(raw.lineageAdvantages);
     
-    for (const ch of v1.lineageChallenges || []) {
-      v2.flaws.push({
-        id: nextId('challenges:' + v1.lineage + ' - ' + ch),
-        entityId: 'challenges:' + v1.lineage + ' - ' + ch,
+    for (const ch of raw.lineageChallenges || []) {
+      character.flaws.push({
+        id: nextId('challenges:' + raw.lineage + ' - ' + ch),
+        entityId: 'challenges:' + raw.lineage + ' - ' + ch,
         source: Source.lineage()
       });
-      v2.lineage.choices.push(ch);
+      character.lineage.choices.push(ch);
     }
   }
 
   // 3. Helper to create Choice objects
   const addChoice = (fieldStr, targetArray, sourceName, fallbackPrefix = '') => {
-    const list = v1[fieldStr] || [];
+    const list = raw[fieldStr] || [];
     list.forEach((item, idx) => {
-      const cost = v1.effectiveBP?.[fieldStr]?.[idx] ?? null;
-      let ranks = v1.ranks?.[fieldStr]?.[idx] ?? 1;
+      const cost = raw.effectiveBP?.[fieldStr]?.[idx] ?? null;
+      let ranks = raw.ranks?.[fieldStr]?.[idx] ?? 1;
       let cleanName = item;
       
       // Attempt to strip parameterized formats (Item - Param) -> just Item
@@ -544,42 +544,42 @@ function convertToV2(v1) {
   // innate powers use the innate source (re-synthesized from the class at resolve);
   // cantrips/spells-known are class-granted (free). Slot/class powers stay purchased
   // here — the powers slice reclassifies slot powers to a class source.
-  const primaryClass = Object.keys(v2.classes)[0] || '';
-  addChoice('startingSkills', v2.skills, Source.starting(primaryClass));
-  addChoice('purchasedSkills', v2.skills, Source.purchased());
-  addChoice('purchasedPerks', v2.perks, Source.purchased());
-  addChoice('flaws', v2.flaws, Source.flaw());
+  const primaryClass = Object.keys(character.classes)[0] || '';
+  addChoice('startingSkills', character.skills, Source.starting(primaryClass));
+  addChoice('purchasedSkills', character.skills, Source.purchased());
+  addChoice('purchasedPerks', character.perks, Source.purchased());
+  addChoice('flaws', character.flaws, Source.flaw());
 
-  addChoice('innatePowers', v2.powers, Source.innate());
+  addChoice('innatePowers', character.powers, Source.innate());
   // Slot powers fill a class progression slot (free) — sourced to the class.
-  addChoice('utilityPowers', v2.powers, Source.class(primaryClass));
-  addChoice('basicPowers', v2.powers, Source.class(primaryClass));
-  addChoice('advancedPowers', v2.powers, Source.class(primaryClass));
-  addChoice('veteranPowers', v2.powers, Source.class(primaryClass));
-  addChoice('formPowers', v2.powers, Source.class(primaryClass));
+  addChoice('utilityPowers', character.powers, Source.class(primaryClass));
+  addChoice('basicPowers', character.powers, Source.class(primaryClass));
+  addChoice('advancedPowers', character.powers, Source.class(primaryClass));
+  addChoice('veteranPowers', character.powers, Source.class(primaryClass));
+  addChoice('formPowers', character.powers, Source.class(primaryClass));
   // Purchase-style powers cost BP.
-  addChoice('classPowers', v2.powers, Source.purchased());
-  addChoice('rightHandPowers', v2.powers, Source.purchased());
-  addChoice('domainPowers', v2.powers, Source.purchased());
+  addChoice('classPowers', character.powers, Source.purchased());
+  addChoice('rightHandPowers', character.powers, Source.purchased());
+  addChoice('domainPowers', character.powers, Source.purchased());
 
   // Every spell field fills a caster slot (free) and is sourced to the caster class
   // (the class carries the sphere — Arcane vs Divine — via CLASSES[cls].magicType;
   // the tier is on the spell entity). Cantrips, spells-known (novice/adept/greater),
   // and book spells all resolve the same way.
-  addChoice('cantrips', v2.spells, Source.class(primaryClass));
-  addChoice('spellsKnown', v2.spells, Source.class(primaryClass));
-  addChoice('noviceSpells', v2.spells, Source.class(primaryClass));
-  addChoice('adeptSpells', v2.spells, Source.class(primaryClass));
-  addChoice('greaterSpells', v2.spells, Source.class(primaryClass));
+  addChoice('cantrips', character.spells, Source.class(primaryClass));
+  addChoice('spellsKnown', character.spells, Source.class(primaryClass));
+  addChoice('noviceSpells', character.spells, Source.class(primaryClass));
+  addChoice('adeptSpells', character.spells, Source.class(primaryClass));
+  addChoice('greaterSpells', character.spells, Source.class(primaryClass));
   // Book spells are Bookcaster's OWN pool — parametrized against the granting skill,
   // not the class's spells-known slots (they share tiers but aren't slot picks).
-  addChoice('bookSpells', v2.spells, Source.granted('Bookcaster'));
+  addChoice('bookSpells', character.spells, Source.granted('Bookcaster'));
 
-  if (v1.devotion) {
-     v2.devotions.push({ id: nextId('devotions:' + v1.devotion), entityId: 'devotions:' + v1.devotion, source: Source.purchased() });
+  if (raw.devotion) {
+     character.devotions.push({ id: nextId('devotions:' + raw.devotion), entityId: 'devotions:' + raw.devotion, source: Source.purchased() });
   }
 
-  return v2;
+  return character;
 }
 
 writeFileSync(OUT, JSON.stringify(archetypes, null, 2));

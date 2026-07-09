@@ -7,7 +7,8 @@
 //      cantrip and spells-known counts. These don't draw from BP.
 //
 // Pure functions, no React, so the UI calls them in a useMemo and they stay
-// unit-testable. The character shape is the flat object from Builder.jsx.
+// unit-testable. The input is a CharacterState; resolveCharacterGraph derives the
+// class innates + devotion entry, and everything downstream reads the resolved graph.
 
 import { LEVEL_TABLE, lookupEntity, CLASS_POWER_SLOTS, DEVOTIONS, DOMAINS, CRAFTING, RITUALS, UNLIMITED_SKILLS, divineSubstitutionOptions } from '../engine/data.js';
 import { cleanItemName, bareSkill, getClasses, primaryClass } from './resolver.js';
@@ -271,22 +272,21 @@ export function computeActiveSelections(graph, lbp) {
   return active;
 }
 
-export function validate(v1) {
-  const character = v1;
+export function validate(character) {
   const graph = resolveCharacterGraph(character);
-  const characterV2 = graph.character;
-  const level = characterLevel(characterV2);
-  const legalMinLevel = getLegalMinLevel(characterV2);
+  const resolved = graph.character;
+  const level = characterLevel(resolved);
+  const legalMinLevel = getLegalMinLevel(resolved);
   // Base budget plus DERIVED "free BP" (redundant multiclass grants award free BP
   // equal to the skill's cost). Derived from the classes, not a cached field, so
   // it's correct for any character (built, imported, or hand-edited).
-  const mcGrants = multiclassGrants(characterV2);
+  const mcGrants = multiclassGrants(resolved);
   const freeBP = mcGrants.freeBP;
   // "Approved backstories provide the character with 2 additional BP." Opt-in
   // (plot-team approval), so it's a flag on the character that lifts the base
   // budget by a fixed +2 rather than free spend.
-  const backstoryBP = characterV2.backstoryApproved ? BACKSTORY_BP : 0;
-  const extraMaxBP = characterV2.extraMaxBP || 0;
+  const backstoryBP = resolved.backstoryApproved ? BACKSTORY_BP : 0;
+  const extraMaxBP = resolved.extraMaxBP || 0;
   const spend = graph.spend;
   // Flaws AWARD BP: they raise the build budget rather than offsetting spend, so a
   // character with 5 flaw BP shows "spent of (base + 5)" — more headroom — instead
@@ -295,12 +295,12 @@ export function validate(v1) {
   const budget = budgetFor(level, legalMinLevel) + freeBP + backstoryBP + extraMaxBP + spend.awarded;
   const bonusBudget = bonusBudgetFor(level);
   const maxBudget = budget + bonusBudget;
-  const slots = computeSlots(characterV2);
-  const spellSlotCounts = spellSlots(characterV2);
-  const bookcasterOptions = bookcasterSpellOptions(characterV2);
+  const slots = computeSlots(resolved);
+  const spellSlotCounts = spellSlots(resolved);
+  const bookcasterOptions = bookcasterSpellOptions(resolved);
   // Arcane Secrets (Knowledge domain power): the arcane spells the character may add
   // to Known Spells — rank-gated for casters, capped at Adept for non-casters.
-  const arcaneSecretsOptions = arcaneSecretsSpellOptions(characterV2);
+  const arcaneSecretsOptions = arcaneSecretsSpellOptions(resolved);
   // Weird Wanderings (Artisan Basic power): Basic powers from any non-Artisan Base
   // Class the Artisan may copy (no Spell-refresh).
   const weirdWanderingsOptions = weirdWanderingsPool();
@@ -308,33 +308,33 @@ export function validate(v1) {
   // Artisan powers it lets you pick (both must share the tag).
   const studiedFocus = {
     tags: ARTISAN_SPECIALTY_TAGS,
-    tag: characterV2.choices?.['powers:Studied Focus'] || null,
-    options: studiedFocusPool(characterV2.choices?.['powers:Studied Focus'] || null),
+    tag: resolved.choices?.['powers:Studied Focus'] || null,
+    options: studiedFocusPool(resolved.choices?.['powers:Studied Focus'] || null),
   };
   // Basic Arcane / Basic Faith pickable spell pools (sphere-gated; non-casters get
   // any base class of that sphere). Keyed by skill base name for the UI picker.
   const basicSpellChoices = Object.fromEntries(
-    Object.entries(BASIC_SPELL_SKILLS).map(([skill, mt]) => [skill, basicSpellOptions(characterV2, mt)]),
+    Object.entries(BASIC_SPELL_SKILLS).map(([skill, mt]) => [skill, basicSpellOptions(resolved, mt)]),
   );
   const stats = graph.stats;
   const wealth = graph.wealth;
-  const devotion = devotionState(characterV2);
-  const lbp = lbpState(characterV2);
-  const granted = grantedAbilities(characterV2);
-  const crafting = craftingCapability(characterV2);
-  const owned = classifyOwnedItems(characterV2);
+  const devotion = devotionState(resolved);
+  const lbp = lbpState(resolved);
+  const granted = grantedAbilities(resolved);
+  const crafting = craftingCapability(resolved);
+  const owned = classifyOwnedItems(resolved);
   // Class "pools" (Healing Touch Pool, Living Iron Pool, …): derived from the
   // owned set + class levels. Only pools whose defining power is owned appear.
   // Read-layer-shaped record the identity rail + a Pool facet consume directly.
   const ownedFlat = [...owned.skills, ...owned.perks, ...owned.classPowers, ...owned.innatePowers];
-  const classLevelOf = (className) => getClasses(characterV2).find((c) => c.name === className)?.level ?? 0;
+  const classLevelOf = (className) => getClasses(resolved).find((c) => c.name === className)?.level ?? 0;
   const pools = characterPools(ownedFlat, classLevelOf);
   // Class-choice grants (Extensive Combat Training / Extensive Training /
   // Spell-Scholar): the classes the player may pick for each, gated by the classes
   // they actually have. The UI reads this to offer ONLY eligible classes (not the
   // hardcoded full list) as the skill's parameter.
   const classChoices = Object.fromEntries(
-    Object.keys(CLASS_CHOICE_SKILLS).map((baseName) => [baseName, eligibleClassChoices(characterV2, baseName)]),
+    Object.keys(CLASS_CHOICE_SKILLS).map((baseName) => [baseName, eligibleClassChoices(resolved, baseName)]),
   );
   // Attach each classified row's computed cost record (from the BP ledger) so the
   // UI reads `row.cost` directly instead of reconstructing a ledger key per row.
@@ -344,7 +344,7 @@ export function validate(v1) {
     }
   }
   const activeSelections = computeActiveSelections(graph, lbp);
-  const powerBenefits = activePowerBenefits(characterV2);
+  const powerBenefits = activePowerBenefits(resolved);
   const prereqs = graph.prereqs;
   const slotsOver = slots.some((s) => s.over);
   // BP used beyond the base allowance, drawn from the bonus pool (clamped ≥0).

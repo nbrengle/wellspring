@@ -29,7 +29,7 @@ export function costKey(nodeOrId) {
 
 export function lookupCost(byItem, choiceIdOrField, name, index) {
   if (arguments.length > 2) {
-    // V1 legacy lookup
+    // Field-keyed lookup: `${field}:${name}` (or `${field}:${index}:${name}`).
     let key = `${choiceIdOrField}:${name}`;
     if (index !== undefined) key = `${choiceIdOrField}:${index}:${name}`; // mainly for startingSkills
     if (byItem && byItem[key]) return byItem[key];
