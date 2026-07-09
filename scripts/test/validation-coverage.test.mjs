@@ -1,6 +1,6 @@
 // validation-coverage.test.mjs — split from scripts/test.mjs (hotspot split). Owns its own
 // imports so concurrent features don't collide on one shared import block.
-import { test, eq, ok, pSkills } from './harness.mjs';
+import { test, eq, ok, pSkills, Source } from './harness.mjs';
 import {
   validate, characterLevel
 } from "../../src/engine/validate.js";
@@ -108,7 +108,7 @@ test('parameterized skills satisfy prerequisites and undergo prerequisite checki
   eq(issues[0].missing[0].id, 'skills:Profession - Apprentice', 'identifies missing base prerequisite');
 
   // 3. Adding Apprentice (Smith) satisfies the prerequisite
-  c.skills.push({ entityId: 'Profession - Apprentice (Smith)', source: 'Purchased', ranks: 1 });
+  c.skills.push({ entityId: 'Profession - Apprentice (Smith)', source: Source.purchased(), ranks: 1 });
   eq(validate(c).prereqs.issues.length, 0, 'Apprentice satisfies Journeyman');
 });
 

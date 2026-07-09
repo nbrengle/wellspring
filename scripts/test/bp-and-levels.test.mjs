@@ -1,6 +1,6 @@
 // bp-and-levels.test.mjs — split from scripts/test.mjs (hotspot split). Owns its own
 // imports so concurrent features don't collide on one shared import block.
-import { test, eq, ok, pSkills } from './harness.mjs';
+import { test, eq, ok, pSkills, Source } from './harness.mjs';
 import {
   validate, characterLevel
 } from "../../src/engine/validate.js";
@@ -134,7 +134,7 @@ test('a granted cantrip in the pick list does not double-count', () => {
   // Older archetypes ship "Cancel" as a cantrip pick; it must not consume a slot.
   const r = computeSlots({
     archetypeName: 'x', classes: [{ name: 'Mage', level: 2 }],
-    spells: [{ entityId: 'Cancel', source: 'Class:Mage' }, { entityId: 'Force Shield', source: 'Class:Mage' }],
+    spells: [{ entityId: 'Cancel', source: Source.class('Mage') }, { entityId: 'Force Shield', source: Source.class('Mage') }],
   }).find((s) => s.category === 'cantrips');
   eq(r.used, 1, 'only the non-granted pick counts');
   ok(!r.over, 'not over the cap');

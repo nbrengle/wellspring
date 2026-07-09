@@ -10,7 +10,8 @@ import { bareSkill, cleanItemName, getClasses } from '../engine/resolver.js';
 import { ARCHETYPES, UNLIMITED_SKILLS, BASE_CLASSES } from './data.js';
 import { lookupCost } from './validate/cost-key.js';
 import type { BuildReport } from './validate.js';
-import type { CharacterChoice, V1CharacterInput } from './types.js';
+import type { CharacterChoice, V1CharacterInput, EntitySource } from './types.js';
+import { Source, isPurchased, isStarting, isInnate } from './types.js';
 import { SCALAR_FIELDS, ITEM_FIELDS, fieldForLabel, cleanItem, splitItems,
   expandInstances, CHOICE_DEFAULTS,
 } from './sheet-schema.js';
@@ -90,9 +91,9 @@ export function formatCharacterSheet(character: any, report: BuildReport) {
     const powerFields = { innatePowers: 'Class:Innate', utilityPowers: 'Utility', basicPowers: 'Basic', advancedPowers: 'Advanced', veteranPowers: 'Veteran' };
     for (const [pf, pt] of Object.entries(powerFields)) {
       if (pf === 'innatePowers') {
-        character[pf] = (character.powers || []).filter(s => typeof s !== 'string' && s.source?.includes('Innate')).map(s => s.entityId || s.name);
+        character[pf] = (character.powers || []).filter(s => typeof s !== 'string' && isInnate(s.source)).map(s => s.entityId || s.name);
       } else {
-        character[pf] = (character.powers || []).filter(s => typeof s !== 'string' && s.source === 'Purchased' && lookupEntity('powers:' + (s.entityId||s.name))?.category === pt).map(s => s.entityId || s.name);
+        character[pf] = (character.powers || []).filter(s => typeof s !== 'string' && isPurchased(s.source) && lookupEntity('powers:' + (s.entityId||s.name))?.category === pt).map(s => s.entityId || s.name);
       }
     }
     character.cantrips = (character.spells || []).filter(s => lookupEntity('spells:' + (s.entityId||s.name))?.tier?.toLowerCase() === 'cantrip').map(s => s.entityId || s.name);
@@ -130,17 +131,17 @@ export function formatCharacterSheet(character: any, report: BuildReport) {
   // the skills[] bucket; the BP ledger keys starting under startingSkills:<i>: and
   // purchased under skills:.
   const startingSkillNames = (character.skills || [])
-    .filter((s) => typeof s !== 'string' && s.source === 'Class:Starting')
+    .filter((s) => typeof s !== 'string' && isStarting(s.source))
     .map((s) => s.entityId || s.name);
   line('Starting Skills (free)', joinItems(startingSkillNames, 'startingSkills', report));
   if (character.divineDomains?.length) line('Divine Domains', joinItems(character.divineDomains));
   if (character.devotionAccents?.length) line('Available Devotion Accents', joinItems(character.devotionAccents));
   const purchasedSkillNames = (character.skills || [])
-    .filter((s) => typeof s !== 'string' && s.source === 'Purchased')
+    .filter((s) => typeof s !== 'string' && isPurchased(s.source))
     .map((s) => s.entityId || s.name);
   line('Purchased Skills', joinItems(purchasedSkillNames, 'skills', report));
   const purchasedPerkNames = (character.perks || [])
-    .filter((s) => typeof s !== 'string' && s.source === 'Purchased')
+    .filter((s) => typeof s !== 'string' && isPurchased(s.source))
     .map((s) => s.entityId || s.name);
   line('Purchased Perks', joinItems(purchasedPerkNames, 'purchasedPerks', report));
 
@@ -287,7 +288,8 @@ function parseSheetText(text) {
   // drop them. The parser accumulator is an untyped bag; view it through
   // V1CharacterInput here.
   const ch = character as unknown as V1CharacterInput;
-  const toChoices = (names: string[] | undefined, source: 'Purchased' | 'Class:Starting', field: string): CharacterChoice[] => {
+  const primaryClass = getClasses(ch)[0]?.name || '';
+  const toChoices = (names: string[] | undefined, source: EntitySource, field: string): CharacterChoice[] => {
     const ranks = ch.ranks?.[field] || [];
     const bp = ch.effectiveBP?.[field] || [];
     return (names || []).map((name, i) => ({
@@ -299,9 +301,9 @@ function parseSheetText(text) {
   };
   if (ch.startingSkills || ch.purchasedSkills) {
     ch.skills = [
-      ...toChoices(ch.startingSkills, 'Class:Starting', 'startingSkills'),
+      ...toChoices(ch.startingSkills, Source.starting(primaryClass), 'startingSkills'),
       ...(ch.skills || []),
-      ...toChoices(ch.purchasedSkills, 'Purchased', 'purchasedSkills'),
+      ...toChoices(ch.purchasedSkills, Source.purchased(), 'purchasedSkills'),
     ];
     for (const f of ['startingSkills', 'purchasedSkills'] as const) {
       delete ch[f];
@@ -309,9 +311,9 @@ function parseSheetText(text) {
       if (ch.effectiveBP) delete ch.effectiveBP[f];
     }
   }
-  // Perks: same flat→bucket conversion (source 'Purchased').
+  // Perks: same flat→bucket conversion (purchased).
   if (ch.purchasedPerks) {
-    ch.perks = [...(ch.perks || []), ...toChoices(ch.purchasedPerks, 'Purchased', 'purchasedPerks')];
+    ch.perks = [...(ch.perks || []), ...toChoices(ch.purchasedPerks, Source.purchased(), 'purchasedPerks')];
     delete ch.purchasedPerks;
     if (ch.ranks) delete ch.ranks.purchasedPerks;
     if (ch.effectiveBP) delete ch.effectiveBP.purchasedPerks;

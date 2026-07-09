@@ -8,6 +8,7 @@ import { characterLevel, getMaxRanks } from './validate/core.js';
 import { paramInfo, paramReusable } from './param-domain.js';
 import { spellSlots } from './validate/slots.js';
 import type { CharacterStateV2, V1CharacterInput, CharacterChoice, GraphItem, CharacterGraph, Entity, Effect, EntitySource, BucketedView, BPLedger, BPLedgerEntry } from './types.js';
+import { Source, isPurchased, isStarting, isInnate } from './types.js';
 
 const idName = (id: string) => id.split(':')[1] || id;
 
@@ -1033,34 +1034,35 @@ function v1ToV2(charInput: V1CharacterInput): CharacterStateV2 {
     }
   };
 
+  const primaryClass = v2.classes[0]?.name || '';
   // Skills are V2-native (CharacterChoice[] in charInput.skills). Preserve ALL
   // existing bucket entries — purchased AND any the archetype/importer carried as
-  // Class:Starting. Only synthesize from the legacy flat `startingSkills` when the
+  // starting. Only synthesize from the legacy flat `startingSkills` when the
   // bucket has no starting entries yet (a from-scratch/older char).
   for (const s of charInput.skills || []) v2.skills.push(s);
-  const hasStartingInBucket = (charInput.skills || []).some((s) => s.source === 'Class:Starting');
+  const hasStartingInBucket = (charInput.skills || []).some((s) => isStarting(s.source));
   if (!hasStartingInBucket) {
-    add('startingSkills', v2.skills, 'Class:Starting', charInput.startingSkills);
+    add('startingSkills', v2.skills, Source.starting(primaryClass), charInput.startingSkills);
   }
   // Perks are V2-native (CharacterChoice[] in charInput.perks). Preserve existing
   // bucket entries; synthesize from the legacy flat `purchasedPerks` only when the
   // bucket is empty (older char / importer pre-conversion).
   for (const p of charInput.perks || []) v2.perks.push(p);
   if (!(charInput.perks || []).length) {
-    add('purchasedPerks', v2.perks, 'Purchased', charInput.purchasedPerks);
+    add('purchasedPerks', v2.perks, Source.purchased(), charInput.purchasedPerks);
   }
-  add('flaws', v2.flaws, 'Flaw', charInput.flaws as (string | CharacterChoice)[] | undefined);
+  add('flaws', v2.flaws, Source.flaw(), charInput.flaws as (string | CharacterChoice)[] | undefined);
   // Powers are V2-native (CharacterChoice[] in charInput.powers) — preserve any the
   // archetype/importer carried, EXCEPT innate-sourced ones (those are re-synthesized
   // below from the class, so preserving them too would double-count). Synthesize
   // from the flat power fields only when the bucket is empty (older/importer char).
   const bucketPowers = charInput.powers || [];
   for (const p of bucketPowers) {
-    if (p.source !== 'Innate' && !String(p.source).includes('Innate')) v2.powers.push(p);
+    if (!isInnate(p.source)) v2.powers.push(p);
   }
   if (!bucketPowers.length) {
     for (const pf of ['classPowers', 'classSkills', 'rightHandPowers', 'utilityPowers', 'basicPowers', 'advancedPowers', 'veteranPowers', 'domainPowers'] as const) {
-      add(pf, v2.powers, 'Purchased', charInput[pf]);
+      add(pf, v2.powers, Source.purchased(), charInput[pf]);
     }
   }
 
@@ -1068,7 +1070,7 @@ function v1ToV2(charInput: V1CharacterInput): CharacterStateV2 {
   // from both the flat innatePowers field and any innate entries the bucket carried.
   const innate: string[] = [
     ...(charInput.innatePowers || []),
-    ...bucketPowers.filter((p) => p.source === 'Innate' || String(p.source).includes('Innate')).map((p) => p.entityId),
+    ...bucketPowers.filter((p) => isInnate(p.source)).map((p) => p.entityId),
   ];
   for (const c of v2.classes) {
     const clsDef = lookupEntity(`classes:${c.name}`);
@@ -1076,18 +1078,20 @@ function v1ToV2(charInput: V1CharacterInput): CharacterStateV2 {
       if (c.level >= (p.requiredLevel || 1) && !innate.includes(p.name)) innate.push(p.name);
     }
   }
-  add('innatePowers', v2.powers, 'Innate', innate);
+  // No class on the innate source here: the old string form was a bare 'Innate'
+  // (sourceClass → null). Per-class attribution is a later (powers-slice) concern.
+  add('innatePowers', v2.powers, Source.innate(), innate);
 
   // Spells are V2-native (CharacterChoice[] in charInput.spells) — preserve the
   // bucket; synth from flat spell fields only when the bucket is empty.
   for (const s of charInput.spells || []) v2.spells.push(s);
   if (!(charInput.spells || []).length) {
     for (const sf of ['cantrips', 'bookSpells', 'spellsKnown', 'noviceSpells', 'adeptSpells', 'greaterSpells'] as const) {
-      add(sf, v2.spells, 'Purchased', charInput[sf]);
+      add(sf, v2.spells, Source.purchased(), charInput[sf]);
     }
   }
   if (charInput.devotion) {
-    v2.devotions.push({ entityId: `devotions:${charInput.devotion}`, source: 'Purchased' });
+    v2.devotions.push({ entityId: `devotions:${charInput.devotion}`, source: Source.purchased() });
   }
   return v2;
 }
@@ -1134,9 +1138,15 @@ export function resolveCharacterGraph(charInput: V1CharacterInput | CharacterSta
       effects.push(...extractor(ent, character, entityId));
     }
 
-    // Bridge legacy fields for validation
-    const sourceParts = (choice.source || 'Purchased').split(':');
-    const sourceType = sourceParts[0].toLowerCase();
+    // The node model's internal sourceType string, derived from the structured
+    // source's `type`. `starting` maps to 'class' (a starting skill was the old
+    // 'Class:Starting' string → sourceType 'class'); `granted` → 'grant'.
+    const src: EntitySource = (choice.source as EntitySource) || Source.purchased();
+    const SOURCE_TYPE: Record<EntitySource['type'], string> = {
+      purchased: 'purchased', class: 'class', starting: 'class',
+      innate: 'innate', granted: 'grant', lineage: 'lineage', flaw: 'flaw',
+    };
+    const sourceType = SOURCE_TYPE[src.type] || 'purchased';
     
     // Determine the field based on the entity prefix or fallback
     let field = choice.entityId.split(':')[0];
@@ -1181,9 +1191,9 @@ export function resolveCharacterGraph(charInput: V1CharacterInput | CharacterSta
   let purchasedSkillIdx = 0;
   let startingSkillIdx = 0;
   for (const choice of character.skills || []) {
-    if (choice.source === 'Purchased') {
+    if (isPurchased(choice.source)) {
       addItem({ ...choice, originalIndex: choice.originalIndex ?? purchasedSkillIdx++ });
-    } else if (choice.source === 'Class:Starting') {
+    } else if (isStarting(choice.source)) {
       addItem({ ...choice, originalIndex: startingSkillIdx++ });
     } else {
       addItem(choice);
@@ -1201,7 +1211,7 @@ export function resolveCharacterGraph(charInput: V1CharacterInput | CharacterSta
       if (name === 'Pick and Choose' && character.advantageChoices?.['Pick and Choose']) {
         entityId = `advantages:${character.advantageChoices['Pick and Choose']}`;
       }
-      const choice = { entityId, ranks: 1, source: 'Lineage:Lineage' };
+      const choice = { entityId, ranks: 1, source: Source.lineage() };
       addItem(choice);
     }
   }

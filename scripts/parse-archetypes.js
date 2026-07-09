@@ -13,6 +13,7 @@ import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import crypto from 'crypto';
+import { Source } from '../src/engine/types.js';
 import { LABEL_FIELD, CHOICE_DEFAULTS } from '../src/engine/sheet-schema.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -487,7 +488,7 @@ function convertToV2(v1) {
         v2.perks.push({
           id: nextId('advantages:' + v1.lineage + ' - ' + adv),
           entityId: 'advantages:' + v1.lineage + ' - ' + adv,
-          source: 'Lineage',
+          source: Source.lineage(),
         });
         v2.lineage.choices.push(adv);
       }
@@ -498,7 +499,7 @@ function convertToV2(v1) {
       v2.flaws.push({
         id: nextId('challenges:' + v1.lineage + ' - ' + ch),
         entityId: 'challenges:' + v1.lineage + ' - ' + ch,
-        source: 'Lineage'
+        source: Source.lineage()
       });
       v2.lineage.choices.push(ch);
     }
@@ -535,30 +536,35 @@ function convertToV2(v1) {
     });
   };
 
-  addChoice('startingSkills', v2.skills, 'Class:Starting');
-  addChoice('purchasedSkills', v2.skills, 'Purchased');
-  addChoice('purchasedPerks', v2.perks, 'Purchased');
-  addChoice('flaws', v2.flaws, 'Flaw');
-  
-  addChoice('innatePowers', v2.powers, 'Class:Innate');
-  addChoice('utilityPowers', v2.powers, 'Purchased');
-  addChoice('basicPowers', v2.powers, 'Purchased');
-  addChoice('advancedPowers', v2.powers, 'Purchased');
-  addChoice('veteranPowers', v2.powers, 'Purchased');
-  addChoice('classPowers', v2.powers, 'Purchased');
-  addChoice('rightHandPowers', v2.powers, 'Purchased');
-  addChoice('domainPowers', v2.powers, 'Purchased');
-  addChoice('formPowers', v2.powers, 'Purchased');
-  
-  addChoice('cantrips', v2.spells, 'Class:Cantrip');
-  addChoice('spellsKnown', v2.spells, 'Class:Known');
-  addChoice('noviceSpells', v2.spells, 'Purchased');
-  addChoice('adeptSpells', v2.spells, 'Purchased');
-  addChoice('greaterSpells', v2.spells, 'Purchased');
-  addChoice('bookSpells', v2.spells, 'Purchased');
-  
+  // Structured EntitySource per bucket. Starting skills carry the primary class;
+  // innate powers use the innate source (re-synthesized from the class at resolve);
+  // cantrips/spells-known are class-granted (free). Slot/class powers stay purchased
+  // here — the powers slice reclassifies slot powers to a class source.
+  const primaryClass = Object.keys(v2.classes)[0] || '';
+  addChoice('startingSkills', v2.skills, Source.starting(primaryClass));
+  addChoice('purchasedSkills', v2.skills, Source.purchased());
+  addChoice('purchasedPerks', v2.perks, Source.purchased());
+  addChoice('flaws', v2.flaws, Source.flaw());
+
+  addChoice('innatePowers', v2.powers, Source.innate());
+  addChoice('utilityPowers', v2.powers, Source.purchased());
+  addChoice('basicPowers', v2.powers, Source.purchased());
+  addChoice('advancedPowers', v2.powers, Source.purchased());
+  addChoice('veteranPowers', v2.powers, Source.purchased());
+  addChoice('classPowers', v2.powers, Source.purchased());
+  addChoice('rightHandPowers', v2.powers, Source.purchased());
+  addChoice('domainPowers', v2.powers, Source.purchased());
+  addChoice('formPowers', v2.powers, Source.purchased());
+
+  addChoice('cantrips', v2.spells, Source.class(primaryClass));
+  addChoice('spellsKnown', v2.spells, Source.class(primaryClass));
+  addChoice('noviceSpells', v2.spells, Source.purchased());
+  addChoice('adeptSpells', v2.spells, Source.purchased());
+  addChoice('greaterSpells', v2.spells, Source.purchased());
+  addChoice('bookSpells', v2.spells, Source.purchased());
+
   if (v1.devotion) {
-     v2.devotions.push({ id: nextId('devotions:' + v1.devotion), entityId: 'devotions:' + v1.devotion, source: 'Purchased' });
+     v2.devotions.push({ id: nextId('devotions:' + v1.devotion), entityId: 'devotions:' + v1.devotion, source: Source.purchased() });
   }
 
   return v2;

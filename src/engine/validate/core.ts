@@ -3,6 +3,7 @@
 import { LEVEL_TABLE, lookupEntity, CLASS_POWERS, CLASS_PROGRESSION, CLASS_POWER_SLOTS, EVENTS_TABLE, CLASSES } from '../data.js';
 import { cleanItemName, bareSkill, getClasses } from '../resolver.js';
 import type { CharacterStateV2, CharacterChoice } from '../types.js';
+import { sourceClass } from '../types.js';
 
 import {
   MAX_LBP, MAX_FLAW_BP, BACKSTORY_BP, MAX_DOMAINS, DEFAULT_WEALTH, LEVEL_CAP
@@ -75,10 +76,9 @@ export function pickClass(character: any, field: string, index: number, name: st
   return null;
 }
 
-export function sourceClass(source: string): string | null {
-  if (source?.startsWith('Class:')) return source.substring(6);
-  return null;
-}
+// The class a choice's source names (class-slot / starting / innate). Structured
+// read — re-exported from types so validators share one definition.
+export { sourceClass };
 
 // Count a field's picks belonging to `cls`.
 export function countPicksForClass(

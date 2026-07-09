@@ -13,6 +13,7 @@
 import classesJson from '../data/classes.json';
 import { lookupEntity, ALL_SKILLS } from './data.js';
 import { bareSkill, cleanItemName, getClasses } from '../engine/resolver.js';
+import { Source, isStarting } from './types.js';
 
 // ─── STARTING SKILLS, DERIVED FROM THE PARSED MEGADOC ──────────────────────────
 // The MegaDoc is the single source of truth. The parser already captures each
@@ -443,7 +444,7 @@ export function reconcileStartingChoices(character, className) {
   // to a trailing "xN" in the name. Starting skills are the Class:Starting entries
   // of the V2 skills[] bucket.
   const ownedPool = {};
-  const startingEntries = (character.skills || []).filter((s) => s.source === 'Class:Starting');
+  const startingEntries = (character.skills || []).filter((s) => isStarting(s.source));
   startingEntries.forEach((choice) => {
     const b = skillMatchKey(choice.entityId);
     ownedPool[b] = (ownedPool[b] || 0) + (choice.ranks || parseStartingRank(choice.entityId) || 1);
@@ -540,7 +541,7 @@ export function startingSkillGrants(character) {
   // Key specialty/floor by the starting skill's index AMONG the Class:Starting
   // entries of the bucket — the same index the graph stamps as node.originalIndex,
   // so floor billing (startFloors[node.index]) lines up.
-  const startingEntries = (character.skills || []).filter((s) => s.source === 'Class:Starting');
+  const startingEntries = (character.skills || []).filter((s) => isStarting(s.source));
   startingEntries.forEach((choice, idx) => {
     const base = skillMatchKey(choice.entityId);
     const templates = byBase[base] || [];
@@ -593,17 +594,17 @@ export function rebuildStartingSkills(character, primaryClassName, updatedChoice
     }
   }
 
-  // Starting skills are V2-native: CharacterChoice[] with source 'Class:Starting'
-  // in character.skills. Purchased (and any other-source) entries are preserved
-  // untouched; only the Class:Starting ones are rebuilt.
+  // Starting skills are V2-native: CharacterChoice[] with a `starting` source in
+  // character.skills. Purchased (and any other-source) entries are preserved
+  // untouched; only the starting ones are rebuilt.
   const allSkills = character.skills || [];
-  const currentStarting = allSkills.filter((s) => s.source === 'Class:Starting');
-  const otherSkills = allSkills.filter((s) => s.source !== 'Class:Starting');
+  const currentStarting = allSkills.filter((s) => isStarting(s.source));
+  const otherSkills = allSkills.filter((s) => !isStarting(s.source));
 
   const nextStarting = [];
   const keptCounts = {};
   const pushItem = (name, rank) =>
-    nextStarting.push({ entityId: name, source: 'Class:Starting', ranks: rank || 1 });
+    nextStarting.push({ entityId: name, source: Source.starting(primaryClassName), ranks: rank || 1 });
 
   // Keep current starting items that still belong (matched to an expected
   // template), plus any unrelated to the choices.

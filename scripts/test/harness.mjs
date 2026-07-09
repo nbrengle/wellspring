@@ -7,6 +7,12 @@
 // hotspot). The entry (scripts/test.mjs) imports every domain file, then calls
 // report() once for a single pass/fail tally + exit code.
 
+import { Source, isPurchased, isStarting } from "../../src/engine/types.js";
+
+// Re-exported so test files build/read structured sources without each importing
+// from the engine directly (they already import test helpers from here).
+export { Source, isPurchased, isStarting };
+
 let passed = 0;
 const failures = [];
 
@@ -30,8 +36,8 @@ export function pSkills(names) {
   return {
     skills: names.map((n) =>
       typeof n === 'string'
-        ? { entityId: n, source: 'Purchased', ranks: 1 }
-        : { entityId: n.name, source: 'Purchased', ranks: n.ranks ?? 1 }),
+        ? { entityId: n, source: Source.purchased(), ranks: 1 }
+        : { entityId: n.name, source: Source.purchased(), ranks: n.ranks ?? 1 }),
   };
 }
 
@@ -42,8 +48,8 @@ export function pPerks(names) {
   return {
     perks: names.map((n) =>
       typeof n === 'string'
-        ? { entityId: n, source: 'Purchased', ranks: 1 }
-        : { entityId: n.name, source: 'Purchased', ranks: n.ranks ?? 1 }),
+        ? { entityId: n, source: Source.purchased(), ranks: 1 }
+        : { entityId: n.name, source: Source.purchased(), ranks: n.ranks ?? 1 }),
   };
 }
 

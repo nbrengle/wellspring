@@ -1,6 +1,6 @@
 // starting-choices.test.mjs — split from scripts/test.mjs (hotspot split). Owns its own
 // imports so concurrent features don't collide on one shared import block.
-import { test, eq, ok } from './harness.mjs';
+import { test, eq, ok, Source, isStarting } from './harness.mjs';
 import {
   validate, characterLevel
 } from "../../src/engine/validate.js";
@@ -27,14 +27,14 @@ import CLASSES_JSON from '../../src/data/classes.json' with { type: 'json' };
 // A character built straight from an archetype mirrors what loadArchetype keeps.
 const fromArchetype = (a) => a;
 
-// Starting skills are V2-native: Class:Starting entries in the skills[] bucket.
-const startingChoices = (c) => (c.skills || []).filter((s) => s.source === 'Class:Starting');
+// Starting skills are V2-native: starting-sourced entries in the skills[] bucket.
+const startingChoices = (c) => (c.skills || []).filter((s) => isStarting(s.source));
 const startingNames = (c) => startingChoices(c).map((s) => s.entityId);
 // Rename the i-th starting skill (player picks a parameter, etc.) in place.
 const setStartingName = (c, i, name) => {
   const starting = startingChoices(c);
   starting[i] = { ...starting[i], entityId: name };
-  const others = (c.skills || []).filter((s) => s.source !== 'Class:Starting');
+  const others = (c.skills || []).filter((s) => !isStarting(s.source));
   return { ...c, skills: [...starting, ...others] };
 };
 
@@ -129,22 +129,22 @@ function loadWithChoices(a) {
   if (primary && hasStartingChoices(primary)) {
     c.startingChoices = reconcileStartingChoices(c, primary);
     
-    // Temporarily extract Class:Starting skills into startingSkills
+    // Temporarily extract starting skills into startingSkills
     if (c.skills) {
-      c.startingSkills = c.skills.filter(s => s.source === 'Class:Starting').map(s => s.entityId);
+      c.startingSkills = c.skills.filter(s => isStarting(s.source)).map(s => s.entityId);
     }
-    
+
     const rebuilt = rebuildStartingSkills(c, primary, c.startingChoices);
-    
+
     // Propagate the rebuilt starting skills back into the V2 skills array
     if (rebuilt.skills) {
       const newStarting = rebuilt.startingSkills.map((s, i) => ({
         entityId: s,
-        source: 'Class:Starting',
+        source: Source.starting(primary),
         ranks: rebuilt.ranks?.startingSkills?.[i] || 1,
       }));
       rebuilt.skills = [
-        ...rebuilt.skills.filter(s => s.source !== 'Class:Starting'),
+        ...rebuilt.skills.filter(s => !isStarting(s.source)),
         ...newStarting
       ];
     }
@@ -328,7 +328,7 @@ test('buying a granted skill above its free floor bills only the excess', () => 
   const setStartRank = (c, i, n) => {
     const starting = startingChoices(c);
     starting[i] = { ...starting[i], ranks: n };
-    const others = (c.skills || []).filter((s) => s.source !== 'Class:Starting');
+    const others = (c.skills || []).filter((s) => !isStarting(s.source));
     return { ...c, skills: [...starting, ...others] };
   };
   let c = rebuildStartingSkills({ classes: [{ name: 'Mage', level: 4 }] }, 'Mage',
