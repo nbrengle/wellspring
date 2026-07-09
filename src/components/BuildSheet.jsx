@@ -80,7 +80,7 @@ export default function BuildSheet() {
           {!report.devotion.worship && (
             <p className="b-empty">Take the Worship skill to purchase domain powers.</p>
           )}
-          <EditableRows items={character.domainPowers} field="domainPowers" resolveType="powers" removable={() => true} />
+          <EditableRows items={(character.powers || []).filter((p) => p.costField === "domainPowers").map((p) => p.entityId)} field="domainPowers" resolveType="powers" removable={() => true} />
         </Section>
       )}
 

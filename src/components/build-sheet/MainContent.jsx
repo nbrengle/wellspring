@@ -380,7 +380,7 @@ export function ClassifiedRows({ rows, resolveType, showClass }) {
         const cost = row.cost;
         const fromClass = source === "class";
         const canRemove = !fromClass && index >= 0;
-        const rank = cost?.rank || (index >= 0 ? character.ranks?.[field]?.[index] : null) || 1;
+        const rank = cost?.rank || 1;
 
         const baseName = bareSkill(cleanItemName(name));
         const maxR = getMaxRanks(name, field, character);
