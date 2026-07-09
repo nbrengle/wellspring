@@ -10,8 +10,9 @@ import { bareSkill, cleanItemName, getClasses } from '../engine/resolver.js';
 import { ARCHETYPES, UNLIMITED_SKILLS, BASE_CLASSES } from './data.js';
 import { lookupCost } from './validate/cost-key.js';
 import type { BuildReport } from './validate.js';
-import type { CharacterChoice, CharacterStateV2, EntitySource } from './types.js';
-import { Source, isPurchased, isStarting } from './types.js';
+import type { CharacterChoice, CharacterStateV2 } from './types.js';
+import { isPurchased, isStarting } from './types.js';
+import { choiceFromParsed } from './character-add.js';
 
 /** The mutable accumulator the sheet IMPORTER builds up field-by-field: a partial V2
  *  character (buckets fill in as lines parse) plus the transient flat name-lists the
@@ -297,21 +298,17 @@ function parseSheetText(text) {
   // text parser produces flat lists, not because a character is ever flat.
   const ch = character as ParsedSheet;
   const primaryClass = getClasses(ch)[0]?.name || '';
-  const toChoices = (names: string[] | undefined, source: EntitySource, field: string): CharacterChoice[] => {
-    const ranks = ch.ranks?.[field] || [];
-    const bp = ch.effectiveBP?.[field] || [];
-    return (names || []).map((name, i) => ({
-      entityId: name,
-      source,
-      ranks: ranks[i] ?? 1,
-      ...(bp[i] != null ? { costOverride: bp[i] } : {}),
-    }));
-  };
+  // Each parsed section → its bucket via the SAME choiceFromParsed the archetype
+  // parser uses (the shared build step); the parallel ranks/effectiveBP arrays are
+  // zipped in here and then dropped.
+  const toChoices = (names: string[] | undefined, field: string): CharacterChoice[] =>
+    (names || []).map((name, i) =>
+      choiceFromParsed({ field, name, cost: ch.effectiveBP?.[field]?.[i] ?? null, rank: ch.ranks?.[field]?.[i] ?? 1 }, primaryClass));
   if (ch.startingSkills || ch.purchasedSkills) {
     ch.skills = [
-      ...toChoices(ch.startingSkills, Source.starting(primaryClass), 'startingSkills'),
+      ...toChoices(ch.startingSkills, 'startingSkills'),
       ...(ch.skills || []),
-      ...toChoices(ch.purchasedSkills, Source.purchased(), 'purchasedSkills'),
+      ...toChoices(ch.purchasedSkills, 'purchasedSkills'),
     ];
     for (const f of ['startingSkills', 'purchasedSkills'] as const) {
       delete ch[f];
@@ -319,9 +316,9 @@ function parseSheetText(text) {
       if (ch.effectiveBP) delete ch.effectiveBP[f];
     }
   }
-  // Perks: same flat→bucket conversion (purchased).
+  // Perks: same flat→bucket conversion.
   if (ch.purchasedPerks) {
-    ch.perks = [...(ch.perks || []), ...toChoices(ch.purchasedPerks, Source.purchased(), 'purchasedPerks')];
+    ch.perks = [...(ch.perks || []), ...toChoices(ch.purchasedPerks, 'purchasedPerks')];
     delete ch.purchasedPerks;
     if (ch.ranks) delete ch.ranks.purchasedPerks;
     if (ch.effectiveBP) delete ch.effectiveBP.purchasedPerks;
