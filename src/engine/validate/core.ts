@@ -61,20 +61,8 @@ export function getMaxRanks(entityId: string): number {
 export function requiredLevel(power: any) {
   return power?.requiredLevel ?? 0;
 }
-
-// Extract class from source, e.g. 'Class:Fighter' -> 'Fighter'
-
-// Which class a power pick belongs to (explicit tag, else the sole class, else the
-// power's parentClass when the character has that class).
-export function pickClass(character: any, field: string, index: number, name: string): string | null {
-  const tag = character.powerClass?.[field]?.[index];
-  if (tag) return tag;
-  const classNames = getClasses(character).map((c: any) => c.name);
-  if (classNames.length === 1) return classNames[0];
-  const ent = lookupEntity(`powers:${name}`);
-  if (ent?.parentClass && classNames.includes(ent.parentClass)) return ent.parentClass;
-  return null;
-}
+// (pickClass removed — a slot power's granting class now lives in its structured
+//  source (Source.class), read via sourceClass(). No parallel powerClass map.)
 
 // The class a choice's source names (class-slot / starting / innate). Structured
 // read — re-exported from types so validators share one definition.

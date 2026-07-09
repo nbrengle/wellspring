@@ -123,28 +123,32 @@
         "id": "f6a1dbbb3b0ee0c488eb90579c39f6d1",
         "entityId": "Linked Armor",
         "source": {
-          "type": "purchased"
+          "type": "class",
+          "name": "Fighter"
         }
       },
       {
         "id": "f5779000897b1fbeb97d621d9a8aad6c",
         "entityId": "Armored Shell",
         "source": {
-          "type": "purchased"
+          "type": "class",
+          "name": "Fighter"
         }
       },
       {
         "id": "f0f9d426753b31252c3845bdadea0372",
         "entityId": "Harry",
         "source": {
-          "type": "purchased"
+          "type": "class",
+          "name": "Fighter"
         }
       },
       {
         "id": "1796315187077e63942364b278e9835a",
         "entityId": "Shake It Off I",
         "source": {
-          "type": "purchased"
+          "type": "class",
+          "name": "Fighter"
         }
       }
     ],
@@ -256,28 +260,32 @@
         "id": "da7ab73ee6ecda19601f91b3e1b6aa41",
         "entityId": "Fortitude",
         "source": {
-          "type": "purchased"
+          "type": "class",
+          "name": "Fighter"
         }
       },
       {
         "id": "57fb5d210993527ef3183c70bc1de93a",
         "entityId": "Knight’s Strength",
         "source": {
-          "type": "purchased"
+          "type": "class",
+          "name": "Fighter"
         }
       },
       {
         "id": "73efe539434a6e6a1038a617b917984c",
         "entityId": "Shot Placement",
         "source": {
-          "type": "purchased"
+          "type": "class",
+          "name": "Fighter"
         }
       },
       {
         "id": "854ee5eaa67579b2ad88a9c11204c79c",
         "entityId": "Raging Blows",
         "source": {
-          "type": "purchased"
+          "type": "class",
+          "name": "Fighter"
         }
       }
     ],
@@ -405,28 +413,32 @@
         "id": "709ddd2baa57f0c8386a2fce4ab2b857",
         "entityId": "Bowyer",
         "source": {
-          "type": "purchased"
+          "type": "class",
+          "name": "Fighter"
         }
       },
       {
         "id": "e71ac64c420211c2a7cee7a563155547",
         "entityId": "Reload",
         "source": {
-          "type": "purchased"
+          "type": "class",
+          "name": "Fighter"
         }
       },
       {
         "id": "9213c70f7a8468114460ce63e674d846",
         "entityId": "Flaming Arrow",
         "source": {
-          "type": "purchased"
+          "type": "class",
+          "name": "Fighter"
         }
       },
       {
         "id": "45f6535b5b4e8d0bbc57a5b41352241c",
         "entityId": "Snap Shot",
         "source": {
-          "type": "purchased"
+          "type": "class",
+          "name": "Fighter"
         }
       }
     ],
@@ -1293,28 +1305,32 @@
         "id": "5d6ca7838af51c58480ef7918aa47a9c",
         "entityId": "Acquired Tolerance",
         "source": {
-          "type": "purchased"
+          "type": "class",
+          "name": "Rogue"
         }
       },
       {
         "id": "f05a44bcad9217389d626f6c037b9a32",
         "entityId": "Reload",
         "source": {
-          "type": "purchased"
+          "type": "class",
+          "name": "Rogue"
         }
       },
       {
         "id": "07f5e3aa590c6923df1685442b47130b",
         "entityId": "Concealed Dart",
         "source": {
-          "type": "purchased"
+          "type": "class",
+          "name": "Rogue"
         }
       },
       {
         "id": "0e963aab26bb6207f3e834e1b5843903",
         "entityId": "Rogue’s Aim",
         "source": {
-          "type": "purchased"
+          "type": "class",
+          "name": "Rogue"
         }
       }
     ],
@@ -1474,28 +1490,32 @@
         "id": "0354a99fe7511db951051c9179859b39",
         "entityId": "Throat Slit",
         "source": {
-          "type": "purchased"
+          "type": "class",
+          "name": "Rogue"
         }
       },
       {
         "id": "10443d145be4a26d51c66179a010871c",
         "entityId": "Way of the Blade",
         "source": {
-          "type": "purchased"
+          "type": "class",
+          "name": "Rogue"
         }
       },
       {
         "id": "4ad0d156b79f72db22b916336232dcce",
         "entityId": "Quick Nap",
         "source": {
-          "type": "purchased"
+          "type": "class",
+          "name": "Rogue"
         }
       },
       {
         "id": "c7c68be33f4b07379300425d6ebc2a31",
         "entityId": "Unburdened Speed",
         "source": {
-          "type": "purchased"
+          "type": "class",
+          "name": "Rogue"
         }
       }
     ],
@@ -1663,35 +1683,40 @@
         "id": "e273678fa6209e8f212520b2f2b70e77",
         "entityId": "Sources",
         "source": {
-          "type": "purchased"
+          "type": "class",
+          "name": "Socialite"
         }
       },
       {
         "id": "12e558c884bea051b7d056ee227289de",
         "entityId": "Tax Evasion",
         "source": {
-          "type": "purchased"
+          "type": "class",
+          "name": "Socialite"
         }
       },
       {
         "id": "bb90bf1839caae58092639ec3dcf62ee",
         "entityId": "Enthrall",
         "source": {
-          "type": "purchased"
+          "type": "class",
+          "name": "Socialite"
         }
       },
       {
         "id": "03dd1a15001a4afbaa223187031837ef",
         "entityId": "Sizing Up the Opposition",
         "source": {
-          "type": "purchased"
+          "type": "class",
+          "name": "Socialite"
         }
       },
       {
         "id": "7e306ce97da418f9431d0acf86e7f39c",
         "entityId": "Soothe",
         "source": {
-          "type": "purchased"
+          "type": "class",
+          "name": "Socialite"
         }
       }
     ],
@@ -1950,35 +1975,40 @@
         "id": "43981fcf6291e0a7ff782dfd6112a8cc",
         "entityId": "Forged from Steel",
         "source": {
-          "type": "purchased"
+          "type": "class",
+          "name": "Artisan"
         }
       },
       {
         "id": "372d3a6182d0763f45fea8cde75c4503",
         "entityId": "Forgesource Specialist",
         "source": {
-          "type": "purchased"
+          "type": "class",
+          "name": "Artisan"
         }
       },
       {
         "id": "fd3c851b064547064033dbcd453fd693",
         "entityId": "Armor Upkeep Specialist",
         "source": {
-          "type": "purchased"
+          "type": "class",
+          "name": "Artisan"
         }
       },
       {
         "id": "dc424fe23a4e0e5c7c374237719e9b64",
         "entityId": "Forcefield",
         "source": {
-          "type": "purchased"
+          "type": "class",
+          "name": "Artisan"
         }
       },
       {
         "id": "c3143094f8bfaef1a4ad185b900d85b8",
         "entityId": "Overcharge",
         "source": {
-          "type": "purchased"
+          "type": "class",
+          "name": "Artisan"
         }
       }
     ],
@@ -2108,35 +2138,40 @@
         "id": "9f52797b5e415e4afdd5d7bfe5c545e8",
         "entityId": "A Spoonful of Sugar",
         "source": {
-          "type": "purchased"
+          "type": "class",
+          "name": "Artisan"
         }
       },
       {
         "id": "212cad15d83d0d2bb17073f83be0cac0",
         "entityId": "Hunter Gatherer",
         "source": {
-          "type": "purchased"
+          "type": "class",
+          "name": "Artisan"
         }
       },
       {
         "id": "2c26acfd9ff5dbe792f318c73bc6b74f",
         "entityId": "Apt Assistant",
         "source": {
-          "type": "purchased"
+          "type": "class",
+          "name": "Artisan"
         }
       },
       {
         "id": "ccaf1c4e91963e25ae00eddebd3e4fe8",
         "entityId": "Custom Brew",
         "source": {
-          "type": "purchased"
+          "type": "class",
+          "name": "Artisan"
         }
       },
       {
         "id": "ffe4de22fc794ea7514ad237e513ba99",
         "entityId": "Kick",
         "source": {
-          "type": "purchased"
+          "type": "class",
+          "name": "Artisan"
         }
       }
     ],
@@ -2266,35 +2301,40 @@
         "id": "3914200d8a4ad023d733cd784e64c844",
         "entityId": "Otherworldly Sight",
         "source": {
-          "type": "purchased"
+          "type": "class",
+          "name": "Artisan"
         }
       },
       {
         "id": "2213df478cd6edf4d44ef1c146ec8d76",
         "entityId": "Protected Casting",
         "source": {
-          "type": "purchased"
+          "type": "class",
+          "name": "Artisan"
         }
       },
       {
         "id": "fa3b61d04639e5d5f6a524d501e73188",
         "entityId": "Aegis of the Unknown/Sundering of the Unknown",
         "source": {
-          "type": "purchased"
+          "type": "class",
+          "name": "Artisan"
         }
       },
       {
         "id": "20af153e24c98990aaecedeb3f94a54d",
         "entityId": "Dig Deep",
         "source": {
-          "type": "purchased"
+          "type": "class",
+          "name": "Artisan"
         }
       },
       {
         "id": "8d5bbae9ce69b14909ec9583ed92b6d8",
         "entityId": "Mesmerize",
         "source": {
-          "type": "purchased"
+          "type": "class",
+          "name": "Artisan"
         }
       }
     ],

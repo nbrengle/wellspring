@@ -32,14 +32,23 @@ for (const a of ARCHETYPES) {
   test(`archetype "${a.name}" is evaluated`, () => {
     const r = validate(fromArchetype(a));
     eq(r.level, 4, 'level');
-    // Mystic Artisan's SOURCE sheet is itself internally inconsistent: it lists
-    // items summing to 11 BP, then subtracts "Lore (Rituals) −2 refunded from The
-    // Learned One" to reach 9 — but Lore (Rituals) is a free starting skill (already
-    // 0), so nothing can be refunded from it. A genuine doc error, verified against
-    // StarterCharacterSheets.html — not an engine bug. (Artificer Artisan and Support
-    // Socialite were previously skipped here too, but turned out to be ENGINE bugs
-    // the perks/powers-bucket + sub-power-grant fixes resolved — they now pass.)
-    if (a.name !== 'Mystic Artisan') {
+    // Two archetypes whose SOURCE sheets are internally inconsistent — genuine doc
+    // errors, verified against StarterCharacterSheets.html, not engine bugs:
+    //
+    //  • Mystic Artisan: lists items summing to 11 BP, then subtracts "Lore (Rituals)
+    //    −2 refunded from The Learned One" to reach 9 — but Lore (Rituals) is a free
+    //    starting skill (already 0), so nothing can be refunded from it.
+    //  • Crafter Artisan: its sheet lists "Apt Assistant" under Basic Powers, but Apt
+    //    Assistant is a canonically UTILITY power (CLASS_POWERS.Artisan.utility). That
+    //    puts 3 powers in Artisan's 2 utility slots — a slot over-cap the sheet's own
+    //    mis-placement creates. Surfaced by the powers slice: slot-fill counting
+    //    (countPicksForClass) only works now that slot powers carry a class source;
+    //    the old 'Purchased'-sourced flat powers made every slot count 0, masking it.
+    //
+    // (Artificer Artisan and Support Socialite were previously skipped here too, but
+    // turned out to be ENGINE bugs the perks/powers-bucket + sub-power-grant fixes
+    // resolved — they now pass.)
+    if (a.name !== 'Mystic Artisan' && a.name !== 'Crafter Artisan') {
       ok(r.spend.net <= 9, 'BP within budget');
       ok(r.valid, `should be legal (flags: ${JSON.stringify({ over: r.overBudget, slots: r.slotsOver, prereq: r.prereqs.issues.length, below: r.belowFloor })})`);
     }

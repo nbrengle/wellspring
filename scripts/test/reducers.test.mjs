@@ -6,7 +6,7 @@
 // among the purchased entries — no flat `purchasedSkills`, no id. Other fields
 // (perks/powers/spells) still use the flat parallel-array path until their slice.
 import { test, eq, ok } from "./harness.mjs";
-import { Source, isPurchased, isStarting } from "../../src/engine/types.js";
+import { Source, isPurchased, isStarting, sourceClass } from "../../src/engine/types.js";
 import {
   addEntity,
   removeEntity,
@@ -112,28 +112,46 @@ test("setChoice clears when option is null", () => {
   ok(!("pow1" in c.choices), "null clears the choice");
 });
 
-// ─── slot pick / clear ──────────────────────────────────────────────────────
-test("setSlotPick places a power and records the granting class", () => {
-  const c = setSlotPick({}, "basicPowers", 0, "Cleave", "Fighter");
-  eq(c.basicPowers[0], "Cleave", "power placed");
-  eq(c.powerClass.basicPowers[0], "Fighter", "class recorded");
+// ─── slot pick / clear (V2 powers bucket) ───────────────────────────────────
+// Slot powers are CharacterChoice[] in powers[], costField = the slot field, and
+// sourced Source.class(<grantingClass>) — the class lives IN the source, not a
+// parallel powerClass map. Addressing is positional among a field's entries.
+const slotEntries = (c, field) => (c.powers || []).filter((p) => p.costField === field);
+test("setSlotPick places a power sourced to the granting class", () => {
+  const c = setSlotPick({}, "basicPowers", 0, "Battlemind", "Fighter");
+  const e = slotEntries(c, "basicPowers");
+  eq(e.length, 1, "one slot entry");
+  eq(e[0].entityId, "Battlemind", "power placed");
+  eq(sourceClass(e[0].source), "Fighter", "granting class in source");
+  eq(e[0].costField, "basicPowers", "costField preserved for BP keying");
 });
 test("setSlotPick with flatIndex < 0 appends", () => {
-  const c0 = setSlotPick({}, "basicPowers", 0, "Cleave", "Fighter");
-  const c = setSlotPick(c0, "basicPowers", -1, "Guard", "Fighter");
-  eq(c.basicPowers.join(","), "Cleave,Guard", "appended at end");
-  eq(c.powerClass.basicPowers.join(","), "Fighter,Fighter", "class array aligned");
+  const c0 = setSlotPick({}, "basicPowers", 0, "Battlemind", "Fighter");
+  const c = setSlotPick(c0, "basicPowers", -1, "Disengage", "Fighter");
+  eq(slotEntries(c, "basicPowers").map((p) => p.entityId).join(","), "Battlemind,Disengage", "appended at end");
 });
-test("clearSlot removes a pick and keeps powerClass/effectiveBP aligned", () => {
-  const c0 = {
-    basicPowers: ["Cleave", "Guard"],
-    powerClass: { basicPowers: ["Fighter", "Barbarian"] },
-    effectiveBP: { basicPowers: [5, 7] },
-  };
-  const c = clearSlot(c0, "basicPowers", 0);
-  eq(c.basicPowers.join(","), "Guard", "first pick removed");
-  eq(c.powerClass.basicPowers.join(","), "Barbarian", "class array spliced");
-  eq(c.effectiveBP.basicPowers.join(","), "7", "BP array spliced");
+test("setSlotPick keeps other-field power entries untouched", () => {
+  const c0 = setSlotPick({}, "utilityPowers", 0, "Bowyer", "Fighter");
+  const c = setSlotPick(c0, "basicPowers", 0, "Battlemind", "Fighter");
+  eq(slotEntries(c, "utilityPowers").length, 1, "utility entry preserved");
+  eq(slotEntries(c, "basicPowers").length, 1, "basic entry added");
+});
+test("clearSlot removes the pick at the given position", () => {
+  let c = setSlotPick({}, "basicPowers", 0, "Battlemind", "Fighter");
+  c = setSlotPick(c, "basicPowers", -1, "Disengage", "Fighter");
+  c = clearSlot(c, "basicPowers", 0);
+  eq(slotEntries(c, "basicPowers").map((p) => p.entityId).join(","), "Disengage", "first pick removed");
+});
+test("clearSlot is a no-op for an out-of-range position", () => {
+  const c0 = setSlotPick({}, "basicPowers", 0, "Battlemind", "Fighter");
+  eq(clearSlot(c0, "basicPowers", 9), c0, "same reference (no change)");
+});
+test("addEntity routes classPowers to the powers bucket (purchased)", () => {
+  const c = addEntity({}, "classPowers", "Cantrip Scholar");
+  const e = slotEntries(c, "classPowers");
+  eq(e.length, 1, "class power in bucket");
+  ok(isPurchased(e[0].source), "purchased source");
+  eq(e[0].costField, "classPowers", "costField preserved");
 });
 
 // ─── updateParameter (patches the purchased-skill entityId) ─────────────────

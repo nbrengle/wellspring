@@ -21,12 +21,17 @@ export function powerPickerSpec(slot, character) {
     const c = candidates.find((x) => x.name === name);
     return c?.tierList || "noviceSpells";
   };
-  const takenFields = category === "spellsKnown"
+  const isSpells = category === "spellsKnown";
+  const takenFields = isSpells
     ? ["noviceSpells", "adeptSpells", "greaterSpells"] : [field];
   const taken = new Set();
   const counts = {};
+  // Existing picks are V2-native CharacterChoice[] in the powers/spells bucket,
+  // keyed by costField (the slot field).
+  const bucket = isSpells ? (character.spells || []) : (character.powers || []);
   for (const f of takenFields) {
-    for (const powerName of (character[f] || [])) {
+    for (const choice of bucket.filter((p) => p.costField === f)) {
+      const powerName = choice.entityId;
       if (powerName) {
         counts[powerName] = (counts[powerName] || 0) + 1;
       }
@@ -76,7 +81,7 @@ export function usePickers({ character, report, setPicking, handleAddClass, hand
       }));
       setPicking(entityPickerSpec({
         kind: "domainPower", entityType: "powers", candidates: eligible, title: "Add a domain power",
-        taken: new Set(character.domainPowers || []),
+        taken: new Set((character.powers || []).filter((p) => p.costField === "domainPowers").map((p) => p.entityId)),
         onChoose: (name) => handleAddEntity("domainPowers", name),
       }));
       return;

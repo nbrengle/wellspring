@@ -129,35 +129,46 @@ export function updateParameter(
   return nextChar;
 }
 
-/** Place a picked power in a slot at `field[at]`, recording the granting class in
- *  the parallel `powerClass[field]` array. Appends when flatIndex < 0. */
-export function setSlotPick(c: Char, field: string, flatIndex: number, powerName: string, cls: string): Char {
-  const next = [...((c[field] as string[] | undefined) || [])];
-  const pc: Record<string, string[]> = { ...(c.powerClass || {}) };
-  pc[field] = [...(pc[field] || [])];
-  const at = flatIndex >= 0 ? flatIndex : next.length;
-  next[at] = powerName;
-  pc[field][at] = cls;
-  return { ...c, [field]: next, powerClass: pc };
+// ─── V2 slot-power helpers ──────────────────────────────────────────────────
+// Slot powers (basic/advanced/veteran/utility) are V2-native: CharacterChoice[]
+// entries in `character.powers`, sourced `Source.class(<grantingClass>)` (a slot
+// pick is FREE and belongs to the class whose slot it fills — the granting class
+// lives IN the source, replacing the old parallel `powerClass[field]` map). Each
+// entry keeps `costField` = the flat power field it came from (e.g. 'basicPowers')
+// so the BP ledger keys it under that prefix. Addressing is positional among the
+// entries sharing that costField (the row index the slot view emits).
+
+// Power fields added via the plain "Add a …" picker (handleAddEntity) rather than
+// a class slot: these COST BP and route to the powers bucket with a purchased
+// source, addressed positionally among their costField like purchased skills.
+const PURCHASED_POWER_FIELDS = new Set(['classPowers', 'domainPowers']);
+
+const powerEntries = (c: Char, field: string): CharacterChoice[] =>
+  (c.powers || []).filter((p) => p.costField === field);
+
+// Replace the powers-bucket entries with costField `field` by `next`, preserving
+// every other power entry (other fields, innate, granted) in order.
+function withPowerField(c: Char, field: string, next: CharacterChoice[]): Char {
+  const others = (c.powers || []).filter((p) => p.costField !== field);
+  return { ...c, powers: [...others, ...next] };
 }
 
-/** Clear a slot pick at `field[flatIndex]`, splicing the parallel powerClass and
- *  effectiveBP arrays to keep them index-aligned. */
+/** Place a picked power in a slot, sourced to the granting class. `flatIndex` is
+ *  the position among the field's slot entries; < 0 (or past the end) appends. */
+export function setSlotPick(c: Char, field: string, flatIndex: number, powerName: string, cls: string): Char {
+  const cur = powerEntries(c, field);
+  const entry: CharacterChoice = { entityId: powerName, source: Source.class(cls), ranks: 1, costField: field };
+  const next = [...cur];
+  if (flatIndex >= 0 && flatIndex < next.length) next[flatIndex] = entry;
+  else next.push(entry);
+  return withPowerField(c, field, next);
+}
+
+/** Clear the slot pick at `flatIndex` among the field's slot entries. */
 export function clearSlot(c: Char, field: string, flatIndex: number): Char {
-  const next = [...((c[field] as string[] | undefined) || [])];
-  next.splice(flatIndex, 1);
-  const pc: Record<string, string[]> = { ...(c.powerClass || {}) };
-  if (pc[field]) {
-    pc[field] = [...pc[field]];
-    pc[field].splice(flatIndex, 1);
-  }
-  const nextEffectiveBP = { ...(c.effectiveBP || {}) };
-  if (nextEffectiveBP[field]) {
-    const bpList = [...nextEffectiveBP[field]];
-    bpList.splice(flatIndex, 1);
-    nextEffectiveBP[field] = bpList;
-  }
-  return { ...c, [field]: next, powerClass: pc, effectiveBP: nextEffectiveBP };
+  const cur = powerEntries(c, field);
+  if (flatIndex < 0 || flatIndex >= cur.length) return c;
+  return withPowerField(c, field, cur.filter((_, i) => i !== flatIndex));
 }
 
 /** Add a named entity to `field`, appending a rank of 1. No-op if the name is
@@ -169,6 +180,11 @@ export function addEntity(c: Char, field: string, name: string): Char {
     const cur = purchasedEntries(c, bucket);
     if (cur.some((s) => s.entityId === name) && !UNLIMITED_SKILLS.has(name)) return c;
     return withPurchased(c, bucket, [...cur, { entityId: name, source: Source.purchased(), ranks: 1 }]);
+  }
+  if (PURCHASED_POWER_FIELDS.has(field)) {
+    const cur = powerEntries(c, field);
+    if (cur.some((p) => p.entityId === name)) return c;
+    return withPowerField(c, field, [...cur, { entityId: name, source: Source.purchased(), ranks: 1, costField: field }]);
   }
   const list = (c[field] as string[] | undefined) || [];
   if (list.includes(name) && !UNLIMITED_SKILLS.has(name)) return c;
@@ -189,6 +205,11 @@ export function removeEntity(c: Char, field: string, index: number): Char {
     const cur = purchasedEntries(c, bucket);
     if (index < 0 || index >= cur.length) return c;
     return withPurchased(c, bucket, cur.filter((_, i) => i !== index));
+  }
+  if (PURCHASED_POWER_FIELDS.has(field)) {
+    const cur = powerEntries(c, field);
+    if (index < 0 || index >= cur.length) return c;
+    return withPowerField(c, field, cur.filter((_, i) => i !== index));
   }
   const next = [...((c[field] as string[] | undefined) || [])];
   next.splice(index, 1);

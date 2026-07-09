@@ -7,11 +7,11 @@
 // hotspot). The entry (scripts/test.mjs) imports every domain file, then calls
 // report() once for a single pass/fail tally + exit code.
 
-import { Source, isPurchased, isStarting } from "../../src/engine/types.js";
+import { Source, isPurchased, isStarting, sourceClass } from "../../src/engine/types.js";
 
 // Re-exported so test files build/read structured sources without each importing
 // from the engine directly (they already import test helpers from here).
-export { Source, isPurchased, isStarting };
+export { Source, isPurchased, isStarting, sourceClass };
 
 let passed = 0;
 const failures = [];
