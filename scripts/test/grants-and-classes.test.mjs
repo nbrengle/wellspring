@@ -1,6 +1,7 @@
 // grants-and-classes.test.mjs — split from scripts/test.mjs (hotspot split). Owns its own
 // imports so concurrent features don't collide on one shared import block.
 import { test, eq, ok, pSkills, Source } from './harness.mjs';
+import { makeChar } from './make-char.mjs';
 import {
   validate, characterLevel
 } from "../../src/engine/validate.js";
@@ -45,12 +46,12 @@ const fromArchetype = (a) => ({ ...a, archetypeName: a.name });
 // ─── grants carry params as a first-class field (#50) ─────────────────────────
 test('node.param is structured (parsed once), incl. on grants', () => {
   // Purchased parameterized skills carry their chosen value structurally.
-  const g = resolveCharacterGraph({ classLevels: 'Cleric 4', ...pSkills(['Lore (Arcane)', 'Lore (Religion)']) });
+  const g = resolveCharacterGraph(makeChar('Cleric 4', { add: ['Lore (Arcane)', 'Lore (Religion)'] }));
   const lore = g.filter((n) => /^Lore/.test(n.name));
   eq(lore.map((n) => n.param).sort().join(','), 'Arcane,Religion', 'purchased Lore params are structured');
 
   // A GRANT also carries its param (Lessons from Scars → Lore (Historical), (Noble)).
-  const g2 = resolveCharacterGraph({ classLevels: 'Fighter 6', utilityPowers: ['Lessons from Scars'] });
+  const g2 = resolveCharacterGraph(makeChar('Fighter 6', { add: ['Lessons from Scars'] }));
   const granted = g2.filter((n) => n.sourceType === 'grant' && /Lore/.test(n.name));
   ok(granted.length > 0 && granted.every((n) => typeof n.param === 'string' && n.param.length > 0),
      'granted Lore nodes carry a structured param: ' + JSON.stringify(granted.map((n) => n.param)));
@@ -61,7 +62,7 @@ test('a stored innate power is materialized once, not double-counted', () => {
   // activeInnatePowers() is the dedicated handler for innatePowers (it merges
   // class-granted + stored, deduped). The generic power-field loop must NOT also
   // iterate innatePowers, or every stored innate power lands in the graph twice.
-  const items = resolveCharacterGraph({ classLevels: 'Socialite 4', innatePowers: ['Practiced Manner'] })
+  const items = resolveCharacterGraph(makeChar('Socialite 4', { add: ['Practiced Manner'] }))
     .filter((i) => /^Practiced Manner$/.test(i.name));
   eq(items.length, 1, 'Practiced Manner appears exactly once');
   eq(items[0].sourceType, 'innate', 'and via the innate handler, not the generic loop');
@@ -145,10 +146,13 @@ test('multiclass grants are derived (new skills free, redundant → free BP)', (
   // Rogue (2nd class) grants Basic Martial Weapons (1) + Thrown Weapons (3).
   // The character (a Fighter) already has BMW → that becomes free BP; Thrown is
   // a new free skill. Derived purely from the class list — nothing cached.
-  const c = {
-    archetypeName: 'x', classes: [{ name: 'Fighter', level: 2 }, { name: 'Rogue', level: 2 }],
-    startingSkills: ['Basic Martial Weapons', 'Basic Armor'],
-  };
+  const c = makeChar([{ name: 'Fighter', level: 2 }, { name: 'Rogue', level: 2 }], {
+    archetypeName: 'x', startingKit: false,
+    add: [
+      { name: 'Basic Martial Weapons', source: Source.starting('Fighter') },
+      { name: 'Basic Armor', source: Source.starting('Fighter') },
+    ],
+  });
   const r = validate(c);
   const granted = r.multiclassGrants.skills.map((g) => g.name);
   ok(granted.includes('Thrown Weapons'), 'Thrown Weapons granted as new free skill');

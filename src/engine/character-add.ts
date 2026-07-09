@@ -85,6 +85,8 @@ function deriveSource(ent: Entity, cls: string | undefined): EntitySource {
   // Caster slot spells (cantrips + spells-known) are class-sourced (free).
   if (isSpellEntity(ent)) return Source.class(cls || '');
   if (ent.type === 'power') {
+    // Innate powers are class grants (level-gated), not player picks.
+    if (tier === 'Innate') return Source.innate(cls);
     // Basic/Advanced/Veteran/Utility fill a class slot (free); Class-tier powers
     // (classPowers) are purchased.
     if (tier && POWER_TIER_FIELD[tier]) return Source.class(cls || '');
@@ -101,7 +103,10 @@ function deriveSource(ent: Entity, cls: string | undefined): EntitySource {
 function deriveCostField(ent: Entity): string | undefined {
   const tier = (ent as any).tier as string | undefined;
   if (isSpellEntity(ent)) return (tier && SPELL_TIER_FIELD[tier]) || 'noviceSpells';
-  if (ent.type === 'power') return (tier && POWER_TIER_FIELD[tier]) || 'classPowers';
+  if (ent.type === 'power') {
+    if (tier === 'Innate') return 'innatePowers';
+    return (tier && POWER_TIER_FIELD[tier]) || 'classPowers';
+  }
   return undefined;
 }
 

@@ -39,13 +39,14 @@ const EMPTY = () => ({
  *        onto the character verbatim.
  */
 export function makeChar(classSpec, opts = {}) {
-  const { add = [], ...scalars } = opts;
+  const { add = [], startingKit = true, ...scalars } = opts;
   let c = { ...EMPTY(), classes: parseClasses(classSpec), ...scalars };
 
   // Seed class starting abilities (starting skills) the way the app does when a
   // class is chosen — so a bare makeChar('Fighter 4') already owns its starting kit.
+  // Pass startingKit:false for a precise test that controls its own starting skills.
   const primary = c.classes[0];
-  if (primary) c = applyClassStartingAbilities(c, primary.name, primary.level);
+  if (primary && startingKit) c = applyClassStartingAbilities(c, primary.name, primary.level);
 
   // Funnel every intent item through the one real add API.
   for (const item of add) {

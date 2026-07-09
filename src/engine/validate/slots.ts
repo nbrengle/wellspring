@@ -397,8 +397,12 @@ export function bookcasterSpellOptions(character) {
   }
   // Spells the character actually knows (their spells-known picks). A known spell
   // is offered even if its tier later falls out of `accessible` — you still know it.
+  // Spells-known are V2 CharacterChoice[] in `spells`, keyed by their tier costField.
   const knownSet = new Set();
-  for (const f of KNOWN_SPELL_FIELDS) for (const name of (character[f] || [])) knownSet.add(cleanItemName(name));
+  const knownFields = new Set(KNOWN_SPELL_FIELDS);
+  for (const choice of (character.spells || [])) {
+    if (knownFields.has(choice.costField)) knownSet.add(cleanItemName(choice.entityId));
+  }
 
   const sort = (arr) => [...arr].sort((a, b) => a.localeCompare(b));
   const known = sort(knownSet);
@@ -420,7 +424,7 @@ export function arcaneSecretsSpellOptions(character) {
   const arcaneClasses = Object.keys(CLASSES).filter(
     (n) => CLASSES[n]?.spellcaster && CLASSES[n]?.magicType === 'Arcane',
   );
-  const hasKnownSpells = (character.spells?.length > 0) || KNOWN_SPELL_FIELDS.some((f) => (character[f] || []).length > 0);
+  const hasKnownSpells = (character.spells?.length || 0) > 0;
 
   let tiers;
   if (hasKnownSpells) {

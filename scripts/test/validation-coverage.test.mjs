@@ -1,6 +1,7 @@
 // validation-coverage.test.mjs — split from scripts/test.mjs (hotspot split). Owns its own
 // imports so concurrent features don't collide on one shared import block.
 import { test, eq, ok, pSkills, Source } from './harness.mjs';
+import { makeChar } from './make-char.mjs';
 import {
   validate, characterLevel
 } from "../../src/engine/validate.js";
@@ -29,13 +30,13 @@ const fromArchetype = (a) => ({ ...a, archetypeName: a.name });
 
 // ─── Weapon Specialization & Advanced Classes validation ───────────────────────
 test('validation: take-once cap on purchases (generic OVER_CAP, e.g. Weapon Spec)', () => {
-  const clean = { archetypeName: 'x', classLevels: 'Fighter 4', startingSkills: ['Basic Martial Weapons'], ...pSkills(['Weapon Specialization (Swords)']) };
+  const clean = makeChar('Fighter 4', { archetypeName: 'x', add: ['Weapon Specialization (Swords)'] });
   const rClean = validate(clean);
   eq(rClean.prereqs.issues.length, 0, 'One specialization is legal');
 
   // Buying a SECOND cap-1 (rank "-") skill is an illegal build — flagged generically
   // as over-cap, NOT silently refunded to free BP (refund is for grants only).
-  const multiple = { archetypeName: 'x', classLevels: 'Fighter 4', startingSkills: ['Basic Martial Weapons'], ...pSkills(['Weapon Specialization (Swords)', 'Weapon Specialization (Daggers)']) };
+  const multiple = makeChar('Fighter 4', { archetypeName: 'x', add: ['Weapon Specialization (Swords)', 'Weapon Specialization (Daggers)'] });
   const rMultiple = validate(multiple);
   ok(rMultiple.prereqs.issues.some(i => /Weapon Specialization/.test(i.item) && /taken once/i.test(i.text)),
      'A second cap-1 purchase is blocked as over-cap');
@@ -69,12 +70,7 @@ test('validation: Fighter Level 2 and Healthy power increase Life Points', () =>
   eq(rF2.stats.lifePoints, 3 + 1, 'Fighter 2 grants +1 LP');
 
   // Fighter 6 character taking Healthy power gets +1 LP.
-  const fighter6Healthy = {
-    archetypeName: 'x',
-    classes: [{ name: 'Fighter', level: 6 }],
-    classPowers: ['Healthy'],
-    lifePoints: NaN
-  };
+  const fighter6Healthy = makeChar('Fighter 6', { archetypeName: 'x', add: ['Healthy'], lifePoints: NaN });
   const rHealthy = validate(fighter6Healthy);
   // Fighter level 6 base from level table is 4 LP.
   // Fighter level 2 bonus gives +1 LP.
@@ -84,7 +80,7 @@ test('validation: Fighter Level 2 and Healthy power increase Life Points', () =>
 });
 
 test('validation: Draconic Heritage character creation note', () => {
-  const c = { archetypeName: 'x', classLevels: 'Fighter 4', purchasedPerks: ['Draconic Heritage (Flame)'] };
+  const c = makeChar('Fighter 4', { archetypeName: 'x', add: ['Draconic Heritage (Flame)'] });
   const r = validate(c);
   ok(r.prereqs.notes.some(n => n.item === 'Draconic Heritage' && n.text.includes('Must be taken at Character Creation')), 'Heritage note is registered');
 });
@@ -234,15 +230,10 @@ test('every entity referenced by a rules relation resolves (no dangling refs)', 
 
 // ─── perks and powers bug fixes ───────────────────────────────────────────────
 test('Execute power makes Hard to Kill free even if sheet has positive authored cost', () => {
-  const char = {
+  const char = makeChar('Fighter 4', {
     archetypeName: 'Custom Fighter',
-    classLevels: 'Fighter 4',
-    utilityPowers: ['Execute'],
-    purchasedPerks: ['Hard to Kill'],
-    effectiveBP: {
-      purchasedPerks: [1]
-    }
-  };
+    add: ['Execute', { name: 'Hard to Kill', cost: 1 }],
+  });
   const r = validate(char);
   const costInfo = r.spend.byItem['purchasedPerks:Hard to Kill'];
   ok(costInfo, 'costInfo for Hard to Kill exists');

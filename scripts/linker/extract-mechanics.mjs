@@ -24,6 +24,8 @@
 import { readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { makeChar } from '../test/make-char.mjs';
+import { Source } from '../../src/engine/types.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const read = (f) => JSON.parse(readFileSync(join(__dirname, '..', '..', 'src', 'data', f), 'utf8'));
@@ -97,13 +99,12 @@ for (const e of entities) {
 // innatePowers (a power not on the owning class may compute nothing → reported as a
 // non-hit, i.e. "needs context"); advantages need a specific lineage so are skipped.
 function charForEntity(type, name) {
-  const base = { lineage: 'Human', classLevels: 'Fighter 4' };
-  if (type === 'skill' || type === 'power:classSkills') return { ...base, purchasedSkills: [name] };
-  if (type === 'perk') return { ...base, purchasedPerks: [name] };
-  if (type === 'flaw') return { ...base, flaws: [name] };
   if (type === 'advantage') return null;
-  if (type.startsWith('power:') || type.startsWith('domain') || type.startsWith('devotion')) return { ...base, innatePowers: [name] };
-  return { ...base, innatePowers: [name] };
+  // Powers are forced as an innate grant (a power off the owning class may compute
+  // nothing otherwise). Skills/perks/flaws auto-route by entity type.
+  const forceInnate = type.startsWith('power:') || type.startsWith('domain') || type.startsWith('devotion');
+  const item = forceInnate ? { name, source: Source.innate() } : name;
+  return makeChar('Fighter 4', { lineage: 'Human', add: [item] });
 }
 
 // ── --audit-stats: cross-check the HIGH-CONFIDENCE permanent stat mods against

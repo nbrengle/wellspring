@@ -1,6 +1,7 @@
 // scripts/test-rules-enforcement.mjs
 import { validate } from "../src/engine/validate.js";
 import { REFS } from '../src/engine/data.js';
+import { makeChar } from './test/make-char.mjs';
 import { readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -32,11 +33,7 @@ for (const s of skills) {
   if (pr && (pr.skills.length > 0 || pr.anyOf.length > 0)) {
     // Construct character sheet with this skill parameter if needed, but without prereqs.
     const item = s.parameter ? `${s.name} (Test Parameter)` : s.name;
-    const char = {
-      lineage: 'Human',
-      classLevels: 'Fighter 4',
-      purchasedSkills: [item]
-    };
+    const char = makeChar('Fighter 4', { lineage: 'Human', add: [item] });
     const res = validate(char);
     const hasIssue = res.prereqs.issues.some(issue => {
       const issueClean = issue.item.replace(/\s*-\s*\d+\s*BP$/i, '').trim();
@@ -52,11 +49,7 @@ for (const p of perks) {
   const id = `perks:${p.name}`;
   const pr = REFS.prereqs[id];
   if (pr && (pr.skills.length > 0 || pr.anyOf.length > 0)) {
-    const char = {
-      lineage: 'Human',
-      classLevels: 'Fighter 4',
-      purchasedPerks: [p.name]
-    };
+    const char = makeChar('Fighter 4', { lineage: 'Human', add: [p.name] });
     const res = validate(char);
     const hasIssue = res.prereqs.issues.some(issue => {
       const issueClean = issue.item.replace(/\s*-\s*\d+\s*BP$/i, '').trim();
@@ -76,11 +69,8 @@ for (const s of skills) {
   if (pr && (pr.levels.length > 0 || pr.other.length > 0)) {
     const item = s.parameter ? `${s.name} (Test Parameter)` : s.name;
     const isCasterRequirement = [...pr.levels, ...pr.other].some(r => r.includes('non-casting') || r.includes('Armor'));
-    const char = {
-      lineage: 'Human',
-      classLevels: isCasterRequirement ? 'Mage 4' : 'Fighter 4', // below lvl 10, below base classes requirement etc.
-      purchasedSkills: [item]
-    };
+    // below lvl 10, below base classes requirement etc.
+    const char = makeChar(isCasterRequirement ? 'Mage 4' : 'Fighter 4', { lineage: 'Human', add: [item] });
     const res = validate(char);
     if (res.valid) {
       reportGap('Soft-Requirement', s.name, `Level/Other requirement (${[...pr.levels, ...pr.other].join('; ')}) is NOT enforced as a hard validation failure.`);
@@ -93,11 +83,7 @@ for (const p of perks) {
   const pr = REFS.prereqs[id];
   if (pr && (pr.levels.length > 0 || pr.other.length > 0)) {
     const isCasterRequirement = [...pr.levels, ...pr.other].some(r => r.includes('non-casting') || r.includes('Armor'));
-    const char = {
-      lineage: 'Human',
-      classLevels: isCasterRequirement ? 'Mage 4' : 'Fighter 4',
-      purchasedPerks: [p.name]
-    };
+    const char = makeChar(isCasterRequirement ? 'Mage 4' : 'Fighter 4', { lineage: 'Human', add: [p.name] });
     const res = validate(char);
     if (res.valid) {
       reportGap('Soft-Requirement', p.name, `Level/Other requirement (${[...pr.levels, ...pr.other].join('; ')}) is NOT enforced as a hard validation failure.`);
@@ -113,27 +99,16 @@ for (const s of skills) {
   const fighterStarting = new Set(['Basic Martial Weapons', 'Basic Shields', 'Basic Armor', 'Light Armor', 'Great Weapons']);
   if (fighterStarting.has(s.name)) continue;
 
-  const char = {
-    lineage: 'Human',
-    classLevels: 'Fighter 4',
-    purchasedSkills: [item],
-    startingSkills: ['Basic Martial Weapons', 'Basic Shields', 'Basic Armor', 'Light Armor', 'Great Weapons']
-  };
+  const purchased = [item];
   // Add prerequisites to character sheet so they don't block.
   const pr = REFS.prereqs[`skills:${s.name}`];
   if (pr) {
-    for (const dep of pr.skills) {
-      const depName = idName(dep);
-      char.purchasedSkills.push(depName);
-    }
+    for (const dep of pr.skills) purchased.push(idName(dep));
     for (const group of pr.anyOf) {
-      if (group.length > 0) {
-        const depName = idName(group[0]);
-        char.purchasedSkills.push(depName);
-      }
+      if (group.length > 0) purchased.push(idName(group[0]));
     }
   }
-
+  const char = makeChar('Fighter 4', { lineage: 'Human', add: purchased });
   const res = validate(char);
   const itemCostObj = res.spend.byItem[`purchasedSkills:${item}`];
   if (itemCostObj) {
@@ -148,19 +123,14 @@ for (const s of skills) {
 }
 
 for (const p of perks) {
-  const char = {
-    lineage: 'Human',
-    classLevels: 'Fighter 4',
-    purchasedPerks: [p.name]
-  };
+  const add = [p.name];
   const pr = REFS.prereqs[`perks:${p.name}`];
   if (pr) {
-    char.purchasedSkills = [];
     for (const dep of pr.skills) {
-      const depName = idName(dep);
-      if (dep.startsWith('skills:')) char.purchasedSkills.push(depName);
+      if (dep.startsWith('skills:')) add.push(idName(dep));
     }
   }
+  const char = makeChar('Fighter 4', { lineage: 'Human', add });
   const res = validate(char);
   const itemCostObj = res.spend.byItem[`purchasedPerks:${p.name}`];
   if (itemCostObj) {
@@ -175,11 +145,7 @@ for (const p of perks) {
 }
 
 for (const f of flaws) {
-  const char = {
-    lineage: 'Human',
-    classLevels: 'Fighter 4',
-    flaws: [f.name]
-  };
+  const char = makeChar('Fighter 4', { lineage: 'Human', add: [f.name] });
   const res = validate(char);
   const itemCostObj = res.spend.byItem[`flaws:${f.name}`];
   if (itemCostObj) {
@@ -197,7 +163,6 @@ for (const f of flaws) {
 //    each other). For each unordered exclusion pair, a character holding BOTH halves
 //    must produce a validation issue; and holding just one must NOT.
 console.log("\nChecking mutual-exclusion enforcement...");
-const fieldFor = (id) => (id.startsWith('flaws:') ? 'flaws' : 'purchasedPerks');
 const seenPairs = new Set();
 for (const [id, others] of Object.entries(REFS.excludes || {})) {
   for (const other of others) {
@@ -205,15 +170,12 @@ for (const [id, others] of Object.entries(REFS.excludes || {})) {
     if (seenPairs.has(key)) continue;
     seenPairs.add(key);
     const a = idName(id), b = idName(other);
-    // Both halves → must be flagged.
-    const both = { lineage: 'Human', classLevels: 'Fighter 4' };
-    (both[fieldFor(id)] = both[fieldFor(id)] || []).push(a);
-    (both[fieldFor(other)] = both[fieldFor(other)] || []).push(b);
+    // Both halves → must be flagged. (add[] auto-routes perks/flaws by entity type.)
+    const both = makeChar('Fighter 4', { lineage: 'Human', add: [a, b] });
     const flagged = validate(both).prereqs.issues.some((i) => i.excludes === id || i.excludes === other);
     if (!flagged) reportGap('Mutual-Exclusion', `${a} ⊗ ${b}`, 'Holding both halves is not flagged.');
     // One half → must NOT be flagged.
-    const oneChar = { lineage: 'Human', classLevels: 'Fighter 4' };
-    (oneChar[fieldFor(id)] = oneChar[fieldFor(id)] || []).push(a);
+    const oneChar = makeChar('Fighter 4', { lineage: 'Human', add: [a] });
     const falsePos = validate(oneChar).prereqs.issues.some((i) => i.excludes);
     if (falsePos) reportGap('Mutual-Exclusion', a, 'Flagged an exclusion while holding only one half.');
   }
@@ -224,10 +186,10 @@ for (const [id, others] of Object.entries(REFS.excludes || {})) {
 //    be flagged; selecting it once must not.
 console.log("\nChecking no-duplicate-power enforcement...");
 {
-  const dup = validate({ lineage: 'Human', classLevels: 'Fighter 4', basicPowers: ['Parry Blow', 'Parry Blow'] });
+  const dup = validate(makeChar('Fighter 4', { lineage: 'Human', add: ['Parry Blow', 'Parry Blow'] }));
   const dupFlagged = dup.prereqs.issues.some((i) => i.duplicate && i.item === 'Parry Blow');
   if (!dupFlagged) reportGap('Duplicate-Power', 'Parry Blow', 'Selecting the same power twice is not flagged.');
-  const single = validate({ lineage: 'Human', classLevels: 'Fighter 4', basicPowers: ['Parry Blow'] });
+  const single = validate(makeChar('Fighter 4', { lineage: 'Human', add: ['Parry Blow'] }));
   if (single.prereqs.issues.some((i) => i.duplicate)) {
     reportGap('Duplicate-Power', 'Parry Blow', 'Flagged a duplicate while the power was selected only once.');
   }
@@ -236,8 +198,7 @@ console.log("\nChecking no-duplicate-power enforcement...");
 // 7. Verify Elemental Affinity cap (≤2 instances, each a distinct element).
 console.log("\nChecking Elemental Affinity cap enforcement...");
 {
-  const base = { lineage: 'Human', classLevels: 'Fighter 4' };
-  const issuesFor = (perks) => validate({ ...base, purchasedPerks: perks }).prereqs.issues
+  const issuesFor = (perks) => validate(makeChar('Fighter 4', { lineage: 'Human', add: perks })).prereqs.issues
     .filter((i) => i.id === 'perks:Elemental Affinity');
   // legal: two distinct elements
   if (issuesFor(['Elemental Affinity (Flame)', 'Elemental Affinity (Ice)']).length) {

@@ -1,6 +1,7 @@
 // bp-and-levels.test.mjs — split from scripts/test.mjs (hotspot split). Owns its own
 // imports so concurrent features don't collide on one shared import block.
 import { test, eq, ok, pSkills, Source } from './harness.mjs';
+import { makeChar } from './make-char.mjs';
 import {
   validate, characterLevel
 } from "../../src/engine/validate.js";
@@ -56,25 +57,25 @@ for (const a of ARCHETYPES) {
 }
 
 test('crafting capability: owned skill unlocks its discipline; tiers nest', () => {
-  const appr = validate({ archetypeName: 'x', classLevels: 'Artisan 3', ...pSkills(['Apprentice Alchemy']) }).crafting;
+  const appr = validate(makeChar('Artisan 3', { archetypeName: 'x', add: ['Apprentice Alchemy'] })).crafting;
   ok(appr.any, 'has capability');
   const al = appr.crafting.find((c) => c.discipline === 'Alchemy');
   eq(al.tier, 'Apprentice', 'apprentice tier');
   ok(al.recipes.every((r) => r.tier === 'Apprentice'), 'only apprentice recipes');
 
-  const greater = validate({ archetypeName: 'x', classLevels: 'Artisan 10', ...pSkills(['Greater Tinkering']) }).crafting;
+  const greater = validate(makeChar('Artisan 10', { archetypeName: 'x', add: ['Greater Tinkering'] })).crafting;
   const tk = greater.crafting.find((c) => c.discipline === 'Tinkering');
   eq(tk.tier, 'Greater', 'greater tier');
   ok(tk.recipes.some((r) => r.tier === 'Apprentice') && tk.recipes.some((r) => r.tier === 'Greater'), 'nests lower tiers');
 
-  const rit = validate({ archetypeName: 'x', classLevels: 'Artisan 4', ...pSkills(['Journeyman Ritual Magic']) }).crafting;
+  const rit = validate(makeChar('Artisan 4', { archetypeName: 'x', add: ['Journeyman Ritual Magic'] })).crafting;
   eq(rit.rituals.tier, 'Journeyman', 'ritual tier');
   ok(rit.rituals.count > 0, 'has rituals');
 
-  ok(!validate({ archetypeName: 'x', classLevels: 'Fighter 4' }).crafting.any, 'non-crafter has none');
+  ok(!validate(makeChar('Fighter 4', { archetypeName: 'x' })).crafting.any, 'non-crafter has none');
 });
 test('wealth + resources round-trip through the text sheet', () => {
-  const c = { archetypeName: 'x', classLevels: 'Fighter 4', wealth: '12', resources: 'A horse, a debt to House Varn' };
+  const c = makeChar('Fighter 4', { archetypeName: 'x', wealth: '12', resources: 'A horse, a debt to House Varn' });
   const rt = parseCharacterSheet(formatCharacterSheet(c, validate(c)));
   eq(rt.wealth, '12', 'wealth preserved');
   eq(rt.resources, 'A horse, a debt to House Varn', 'resources preserved');
@@ -93,7 +94,7 @@ test('Bookcaster spell options: known vs other accessible spells', () => {
   ok(l4.other.length > 0, 'Mage L4 has accessible (other) options');
   ok(l4.other.includes('Mage Armor'), 'includes a novice Mage spell');
   // A known spell moves to the `known` group and out of `other`.
-  const withKnown = bookcasterSpellOptions(mk('Mage', 4, { noviceSpells: ['Mage Armor'] }));
+  const withKnown = bookcasterSpellOptions(makeChar('Mage 4', { archetypeName: 'x', add: ['Mage Armor'] }));
   ok(withKnown.known.includes('Mage Armor'), 'picked spell is in Known group');
   ok(!withKnown.other.includes('Mage Armor'), 'and not duplicated in Other');
   // Higher level unlocks more accessible spells (adept tier opens at L6: 6/2/0).
