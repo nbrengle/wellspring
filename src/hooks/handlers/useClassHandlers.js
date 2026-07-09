@@ -8,19 +8,25 @@ const MAX_LEVEL = LEVEL_TABLE.length ? Math.max(...LEVEL_TABLE.map((l) => l.leve
 const MIN_LEVEL = 1;
 
 export function useClassHandlers({ setCharacter }) {
-  const handleLevelChange = useCallback((next) => {
-    const level = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, next));
-    setCharacter((c) => {
-      if (!c.classLevels) return c;
-      return { ...c, classLevels: c.classLevels.replace(/\d+/, String(level)) };
-    });
-  }, [setCharacter]);
-
   const toClassesForm = (c) => {
     if (Array.isArray(c.classes) && c.classes.length) return c;
     const classes = getClasses(c);
-    return { ...c, classes, classLevels: undefined };
+    return { ...c, classes };
   };
+
+  // The single-class level +/- buttons set the PRIMARY class's level. V2-native:
+  // patch the classes array (no flat classLevels string), then re-seed starting
+  // abilities for the new level.
+  const handleLevelChange = useCallback((next) => {
+    const level = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, next));
+    setCharacter((c0) => {
+      const c = toClassesForm(c0);
+      const primary = c.classes[0];
+      if (!primary) return c0;
+      const nextClasses = c.classes.map((x, i) => (i === 0 ? { ...x, level } : x));
+      return applyClassStartingAbilities({ ...c, classes: nextClasses }, primary.name, level);
+    });
+  }, [setCharacter]);
 
   const handleSetClassLevel = useCallback((className, level) => {
     setCharacter((c0) => {

@@ -182,69 +182,9 @@ export interface CharacterChoice {
   // originalIndex bridges the still-flat startingSkills path (index-based floor/cost
   // keys); it's deleted with those flat fields in the startingSkills slice.
   originalIndex?: number;
-  // Transient bridge: the originating V1 character field (e.g. 'classPowers') for
-  // flat-path buckets, so the node keeps its legacy BP-ledger key prefix. Set by
-  // v1ToV2's converter; dies with the flat fields.
+  // The originating field (e.g. 'basicPowers') — keys the node's BP-ledger prefix
+  // and lets the validator tell same-tier picks apart (book spells vs spells-known).
   costField?: string;
-}
-
-/** The raw, V1-flat character the UI / loadArchetype produce and edit: parallel
- *  arrays of name strings per ontological field, plus loose metadata. Converted to
- *  CharacterStateV2 at the engine boundary (v1ToV2). This is the LEGACY input shape;
- *  the goal is to retire it once the UI writes V2 directly. */
-export interface V1CharacterInput {
-  name?: string;
-  archetypeName?: string;
-  classLevels?: string;
-  classes?: { name: string; level: number }[] | Record<string, number>;
-  lineage?: string | { name: string; choices: string[] };
-  sublineage?: string;
-  sublineages?: Record<string, string>;
-  devotion?: string;
-  /** All skills (starting + purchased) are V2-native: CharacterChoice[] in `skills`,
-   *  source 'Class:Starting' or 'Purchased'. No flat skill arrays on a live char. */
-  skills?: CharacterChoice[];
-  /** Perks are V2-native: CharacterChoice[] in `perks` (source 'Purchased'). */
-  perks?: CharacterChoice[];
-  /** Powers/spells are V2-native buckets (archetypes ship them here); the flat power/
-   *  spell fields below are the legacy/importer shape, not migrated in the perks slice. */
-  powers?: CharacterChoice[];
-  spells?: CharacterChoice[];
-  /** Transient: the sheet importer parses the "Starting/Purchased Skills" and
-   *  "Purchased Perks" lines into these flat arrays, then converts them into the
-   *  `skills`/`perks` buckets and deletes them. No live character carries them;
-   *  they exist only inside parseCharacterSheet. */
-  startingSkills?: string[];
-  purchasedSkills?: string[];
-  purchasedPerks?: string[];
-  flaws?: string[];
-  classPowers?: string[];
-  classSkills?: string[];
-  rightHandPowers?: string[];
-  utilityPowers?: string[];
-  basicPowers?: string[];
-  advancedPowers?: string[];
-  veteranPowers?: string[];
-  domainPowers?: string[];
-  innatePowers?: string[];
-  cantrips?: string[];
-  bookSpells?: string[];
-  spellsKnown?: string[];
-  noviceSpells?: string[];
-  adeptSpells?: string[];
-  greaterSpells?: string[];
-  divineDomains?: string[];
-  /** LEGACY: the old parallel "which class granted this slot pick" map. No live
-   *  char writes it — slot powers now carry the class in their source. v1ToV2 only
-   *  reads it as a bridge for pre-migration flat chars; dies with the flat fields. */
-  powerClass?: Record<string, string[]>;
-  choices?: Record<string, string>;
-  grantedSelections?: Record<string, unknown>;
-  agileLearnerTrades?: Record<string, number>;
-  effectiveBP?: Record<string, (number | undefined)[]>;
-  ranks?: Record<string, number[]>;
-  stats?: Record<string, number>;
-  [key: string]: unknown;
 }
 
 export interface CharacterStateV2 {
@@ -266,8 +206,9 @@ export interface CharacterStateV2 {
   devotion?: string;
   devotions: CharacterChoice[];
 
-  // The resolved ontological buckets — the engine's single (V2) shape. Raw input
-  // is converted into these at the boundary (see v1ToV2 in graph.ts).
+  // The ontological buckets — the engine's single (V2) shape. Every producer (UI
+  // reducers, loadArchetype, the sheet importer, the test factory) writes these
+  // directly via addToCharacter.
   skills: CharacterChoice[];
   perks: CharacterChoice[];
   flaws: CharacterChoice[];
@@ -280,6 +221,11 @@ export interface CharacterStateV2 {
   divineDomains?: string[];
   choices?: Record<string, string>;
   agileLearnerTrades?: Record<string, number>;
+  /** Selections made for granted "choose one" powers, keyed by selection id. */
+  grantedSelections?: Record<string, unknown>;
+  /** Lineage picks (names). Read directly by the graph's lineage-item resolution. */
+  lineageChallenges?: string[];
+  lineageAdvantages?: string[];
 }
 
 // ─── 3. Graph Types ─────────────────────────────────────────────────────────

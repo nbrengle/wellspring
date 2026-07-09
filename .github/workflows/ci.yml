@@ -40,6 +40,20 @@ jobs:
       - run: npm ci
       - run: npm run lint:css
 
+  type-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      # Ratchet gate: the tsc --noEmit error count must not exceed the baseline in
+      # scripts/tsc-ratchet.mjs. New code can't add type errors; the count only
+      # ratchets down toward 0, at which point this becomes a hard `tsc --noEmit`.
+      - run: npm run type-check:ratchet
+
   format-check:
     runs-on: ubuntu-latest
     steps:
@@ -107,7 +121,7 @@ jobs:
       - run: npm run build
 
   build:
-    needs: [actionlint, lint-js, lint-css, format-check, test-unit, check-data, test-rules, test-browser, vite-build]
+    needs: [actionlint, lint-js, lint-css, type-check, format-check, test-unit, check-data, test-rules, test-browser, vite-build]
     runs-on: ubuntu-latest
     steps:
       - run: echo "All checks passed!"
