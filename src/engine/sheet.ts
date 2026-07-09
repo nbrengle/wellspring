@@ -12,19 +12,13 @@ import { lookupCost } from './validate/cost-key.js';
 import type { BuildReport } from './validate.js';
 import type { CharacterChoice, CharacterStateV2 } from './types.js';
 import { isPurchased, isStarting } from './types.js';
-import { choiceFromParsed } from './character-add.js';
+import { choiceFromParsed, bucketForField } from './character-add.js';
 
-/** The mutable accumulator the sheet IMPORTER builds up field-by-field: a partial V2
- *  character (buckets fill in as lines parse) plus the transient flat name-lists the
- *  text parser emits (converted to skills/perks buckets, then deleted, before the
- *  character is returned). Local to the importer — no live character carries these. */
-type ParsedSheet = Partial<CharacterStateV2> & {
-  startingSkills?: string[];
-  purchasedSkills?: string[];
-  purchasedPerks?: string[];
-  ranks?: Record<string, number[]>;
-  effectiveBP?: Record<string, (number | undefined)[]>;
-};
+/** The mutable accumulator the sheet IMPORTER builds up as it walks the text: a
+ *  partial character whose buckets are filled — in one pass after parsing — from the
+ *  parsed section items. Local to the importer; the returned value is a real
+ *  character (buckets populated, scalars set). */
+type ParsedSheet = Partial<CharacterStateV2>;
 import { SCALAR_FIELDS, ITEM_FIELDS, fieldForLabel, cleanItem, splitItems,
   expandInstances, CHOICE_DEFAULTS,
 } from './sheet-schema.js';
@@ -210,7 +204,10 @@ function labelOf(line) {
 function parseSheetText(text) {
   const raw = String(text).replace(/\r/g, '');
   const rows = raw.split('\n').map((l) => l.trim());
-  const character = { name: '', archetypeName: 'Imported Character', effectiveBP: {}, grants: {} };
+  const character = { name: '', archetypeName: 'Imported Character' };
+  // Parsed section items, accumulated during the walk and turned into bucket entries
+  // in one pass AFTER parsing (so the class — needed for the source — is known).
+  const parsedItems = [];
 
   // First non-empty line = name; an immediately following non-"Label:" line that
   // isn't a known field is the tagline.
@@ -240,24 +237,18 @@ function parseSheetText(text) {
     const items = [...splitItems(valueStr), ...extraItems]
       .flatMap((raw) => expandInstances(raw, (b) => UNLIMITED_SKILLS.has(b), CHOICE_DEFAULTS))
       .map(cleanItem);
-    
-    character[field] = items.map((it) => {
-      const match = it.name.match(/\s*x\s*(\d+)\b/i);
-      return match ? it.name.replace(match[0], '').trim() : it.name;
-    });
-    
-    const ranks = items.map((it) => {
-      const match = it.name.match(/\s*x\s*(\d+)\b/i);
-      return match ? parseInt(match[1], 10) : 1;
-    });
-    
-    if (ranks.some(r => r > 1)) {
-      if (!character.ranks) character.ranks = {};
-      character.ranks[field] = ranks;
-    }
 
-    if (items.some((it) => it.bp != null)) character.effectiveBP[field] = items.map((it) => it.bp);
-    if (items.some((it) => it.grant)) character.grants[field] = items.map((it) => it.grant);
+    // Accumulate each item as a parsed line {field, name, cost, rank} — no parallel
+    // arrays. The trailing "xN" is the rank; strip it from the name.
+    for (const it of items) {
+      const rankMatch = it.name.match(/\s*x\s*(\d+)\b/i);
+      parsedItems.push({
+        field,
+        name: rankMatch ? it.name.replace(rankMatch[0], '').trim() : it.name,
+        cost: it.bp ?? null,
+        rank: rankMatch ? parseInt(rankMatch[1], 10) : 1,
+      });
+    }
   };
 
   for (; i < rows.length; i++) {
@@ -286,42 +277,19 @@ function parseSheetText(text) {
     apply(lab.label, lab.value, extra);
     i = j - 1;
   }
-  if (!Object.keys(character.effectiveBP).length) delete character.effectiveBP;
-  if (!Object.keys(character.grants).length) delete character.grants;
   if (character.currentEvent) {
     character.currentEvent = parseInt(character.currentEvent, 10) || 1;
   }
-  // The generic sheet parser emits transient flat name-lists (startingSkills /
-  // purchasedSkills / purchasedPerks) with parallel ranks/effectiveBP; convert them
-  // into the skills[]/perks[] CharacterChoice buckets, then drop them. This is the
-  // ONLY flat→bucket conversion left — it lives at the import boundary because the
-  // text parser produces flat lists, not because a character is ever flat.
+  // Build every parsed section into its bucket through the SAME choiceFromParsed the
+  // archetype parser uses (the shared build step) — skills, perks, powers, spells,
+  // flaws all import the same way now (not just skills/perks). No flat name-lists,
+  // no parallel arrays: the parsed item carries name/cost/rank, the field decides
+  // bucket + source + costField.
   const ch = character as ParsedSheet;
+  ch.skills ||= []; ch.perks ||= []; ch.powers ||= []; ch.spells ||= []; ch.flaws ||= [];
   const primaryClass = getClasses(ch)[0]?.name || '';
-  // Each parsed section → its bucket via the SAME choiceFromParsed the archetype
-  // parser uses (the shared build step); the parallel ranks/effectiveBP arrays are
-  // zipped in here and then dropped.
-  const toChoices = (names: string[] | undefined, field: string): CharacterChoice[] =>
-    (names || []).map((name, i) =>
-      choiceFromParsed({ field, name, cost: ch.effectiveBP?.[field]?.[i] ?? null, rank: ch.ranks?.[field]?.[i] ?? 1 }, primaryClass));
-  if (ch.startingSkills || ch.purchasedSkills) {
-    ch.skills = [
-      ...toChoices(ch.startingSkills, 'startingSkills'),
-      ...(ch.skills || []),
-      ...toChoices(ch.purchasedSkills, 'purchasedSkills'),
-    ];
-    for (const f of ['startingSkills', 'purchasedSkills'] as const) {
-      delete ch[f];
-      if (ch.ranks) delete ch.ranks[f];
-      if (ch.effectiveBP) delete ch.effectiveBP[f];
-    }
-  }
-  // Perks: same flat→bucket conversion.
-  if (ch.purchasedPerks) {
-    ch.perks = [...(ch.perks || []), ...toChoices(ch.purchasedPerks, 'purchasedPerks')];
-    delete ch.purchasedPerks;
-    if (ch.ranks) delete ch.ranks.purchasedPerks;
-    if (ch.effectiveBP) delete ch.effectiveBP.purchasedPerks;
+  for (const item of parsedItems) {
+    ch[bucketForField(item.field)].push(choiceFromParsed(item, primaryClass));
   }
   reconcileDevotion(character);
   return character;
