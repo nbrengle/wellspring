@@ -10,8 +10,20 @@ import { bareSkill, cleanItemName, getClasses } from '../engine/resolver.js';
 import { ARCHETYPES, UNLIMITED_SKILLS, BASE_CLASSES } from './data.js';
 import { lookupCost } from './validate/cost-key.js';
 import type { BuildReport } from './validate.js';
-import type { CharacterChoice, V1CharacterInput, EntitySource } from './types.js';
-import { Source, isPurchased, isStarting, isInnate } from './types.js';
+import type { CharacterChoice, CharacterStateV2, EntitySource } from './types.js';
+import { Source, isPurchased, isStarting } from './types.js';
+
+/** The mutable accumulator the sheet IMPORTER builds up field-by-field: a partial V2
+ *  character (buckets fill in as lines parse) plus the transient flat name-lists the
+ *  text parser emits (converted to skills/perks buckets, then deleted, before the
+ *  character is returned). Local to the importer — no live character carries these. */
+type ParsedSheet = Partial<CharacterStateV2> & {
+  startingSkills?: string[];
+  purchasedSkills?: string[];
+  purchasedPerks?: string[];
+  ranks?: Record<string, number[]>;
+  effectiveBP?: Record<string, (number | undefined)[]>;
+};
 import { SCALAR_FIELDS, ITEM_FIELDS, fieldForLabel, cleanItem, splitItems,
   expandInstances, CHOICE_DEFAULTS,
 } from './sheet-schema.js';
@@ -65,6 +77,9 @@ function joinItems(items: any, field: string, report: BuildReport) {
 
 // Power/spell sections in source order. These carry no BP suffix in the source
 // (they're slot-filled, not purchased), so they're listed plain.
+// Which POWER_SECTIONS fields live in the `spells` bucket (the rest are `powers`).
+const SPELL_SECTION_FIELDS = new Set(['cantrips', 'noviceSpells', 'adeptSpells', 'greaterSpells', 'bookSpells']);
+
 const POWER_SECTIONS = [
   ['innatePowers', 'Innate Powers'],
   ['utilityPowers', 'Utility Powers'],
@@ -83,22 +98,12 @@ const POWER_SECTIONS = [
 ];
 
 export function formatCharacterSheet(character: any, report: BuildReport) {
-  if (character.skills || character.perks || character.powers) {
-    character = { ...character };
-    // Skills + perks are read straight from their buckets by the formatter below —
-    // no flat reconstruction. Powers/spells still reconstruct flat fields here until
-    // their own slice migrates the formatter.
-    const powerFields = { innatePowers: 'Class:Innate', utilityPowers: 'Utility', basicPowers: 'Basic', advancedPowers: 'Advanced', veteranPowers: 'Veteran' };
-    for (const [pf, pt] of Object.entries(powerFields)) {
-      if (pf === 'innatePowers') {
-        character[pf] = (character.powers || []).filter(s => typeof s !== 'string' && isInnate(s.source)).map(s => s.entityId || s.name);
-      } else {
-        character[pf] = (character.powers || []).filter(s => typeof s !== 'string' && isPurchased(s.source) && lookupEntity('powers:' + (s.entityId||s.name))?.category === pt).map(s => s.entityId || s.name);
-      }
-    }
-    character.cantrips = (character.spells || []).filter(s => lookupEntity('spells:' + (s.entityId||s.name))?.tier?.toLowerCase() === 'cantrip').map(s => s.entityId || s.name);
-    character.spellsKnown = (character.spells || []).filter(s => lookupEntity('spells:' + (s.entityId||s.name))?.tier?.toLowerCase() !== 'cantrip').map(s => s.entityId || s.name);
-  }
+  // Powers + spells are read straight from their V2 buckets — each section is the
+  // entries whose costField matches (basicPowers/cantrips/…). No flat reconstruction.
+  const bucketFor = (field: string): CharacterChoice[] =>
+    (SPELL_SECTION_FIELDS.has(field) ? character.spells : character.powers) || [];
+  const powerSectionNames = (field: string): string[] =>
+    bucketFor(field).filter((s: CharacterChoice) => s.costField === field).map((s) => s.entityId);
   const lines = [];
   const classes = getClasses(character);
   const title = character.name?.trim() || character.archetypeName || 'Unnamed Character';
@@ -145,13 +150,15 @@ export function formatCharacterSheet(character: any, report: BuildReport) {
     .map((s) => s.entityId || s.name);
   line('Purchased Perks', joinItems(purchasedPerkNames, 'purchasedPerks', report));
 
-  // ── Powers / spells ── (domain/class powers may be BP-bought)
+  // ── Powers / spells ── each section reads its bucket by costField (domain/class
+  // powers may be BP-bought). Innate powers come from the resolved report so the
+  // engine-synthesized (non-selectable) ones are excluded.
   for (const [field, label] of POWER_SECTIONS) {
     const items = field === 'innatePowers'
-      ? (report?.owned?.innatePowers || character.innatePowers || [])
+      ? (report?.owned?.innatePowers || [])
           .filter((ip) => typeof ip === 'string' || ip.field !== 'synthetic')
           .map((ip) => ip.name || ip)
-      : character[field];
+      : powerSectionNames(field);
     if (items?.length) line(label, joinItems(items, field, report));
   }
 
@@ -283,11 +290,12 @@ function parseSheetText(text) {
   if (character.currentEvent) {
     character.currentEvent = parseInt(character.currentEvent, 10) || 1;
   }
-  // Skills are V2-native: convert the flat fields the generic parser produced
-  // (startingSkills / purchasedSkills) into skills[] CharacterChoice entries, then
-  // drop them. The parser accumulator is an untyped bag; view it through
-  // V1CharacterInput here.
-  const ch = character as unknown as V1CharacterInput;
+  // The generic sheet parser emits transient flat name-lists (startingSkills /
+  // purchasedSkills / purchasedPerks) with parallel ranks/effectiveBP; convert them
+  // into the skills[]/perks[] CharacterChoice buckets, then drop them. This is the
+  // ONLY flat→bucket conversion left — it lives at the import boundary because the
+  // text parser produces flat lists, not because a character is ever flat.
+  const ch = character as ParsedSheet;
   const primaryClass = getClasses(ch)[0]?.name || '';
   const toChoices = (names: string[] | undefined, source: EntitySource, field: string): CharacterChoice[] => {
     const ranks = ch.ranks?.[field] || [];
