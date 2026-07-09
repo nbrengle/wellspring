@@ -49,10 +49,13 @@ function reconcileBuildChoices(character) {
 }
 
 // ─── INITIAL STATE TEMPLATE ──────────────────────────────────────────────────
+// A blank CharacterStateV2: empty ontological buckets, no class. Everything a
+// character owns is a CharacterChoice in one of the buckets — there are no flat
+// name-arrays. applyClassStartingAbilities seeds starting skills when a class is
+// chosen; the reducers (addToCharacter) add the rest.
 export const EMPTY_CHARACTER = {
   name: "",
   archetypeName: null,       // which archetype this was loaded from (for the badge)
-  classLevels: null,         // "Cleric 4" — single class for now
   specialization: null,      // "Mystic" / "Crafter" / "Artificer" — only for Artisan
   lineage: null,             // "Human" / "Aewen" / ...
   sublineage: null,
@@ -62,17 +65,10 @@ export const EMPTY_CHARACTER = {
   spikes: null,
   wealth: null,              // null → DEFAULT_WEALTH (8); perks/sheet may set it
   resources: null,           // free-form, from the sheet
-  // Skills and perks live in their V2 buckets as CharacterChoice[] — no flat
-  // startingSkills/purchasedSkills/purchasedPerks. applyClassStartingAbilities
-  // populates starting skills when a class is chosen; the reducers add purchased.
-  flaws: [],
+  classes: [],
+  skills: [], perks: [], powers: [], spells: [], flaws: [], devotions: [],
   advantageChoices: {},
   grantedSelections: {},
-  innatePowers: [], utilityPowers: [], basicPowers: [],
-  advancedPowers: [], veteranPowers: [], classPowers: [],
-  rightHandPowers: [], cantrips: [],
-  noviceSpells: [], adeptSpells: [], greaterSpells: [], bookSpells: [],
-  domainPowers: [], formPowers: [],
   agileLearnerTrades: {},
 };
 
@@ -129,11 +125,10 @@ export function loadArchetype(archetype) {
   if (archetype.grants) c.grants = archetype.grants;
   if (archetype.effectiveBP) c.effectiveBP = archetype.effectiveBP;
   if (archetype.ranks) c.ranks = archetype.ranks;
-  // Classes are NOT a key on EMPTY_CHARACTER, so the copy loop above skips them —
-  // the archetype's class would be dropped (CLASS shows "not set"). Carry it over
-  // explicitly, normalized to the canonical array form [{name, level}] that
-  // getClasses + the class handlers use. Archetypes store it as an object map
-  // ({ Cleric: 4 }); also accept an array or a "Cleric 4" string defensively.
+  // Normalize classes to the canonical array form [{name, level}] that getClasses +
+  // the class handlers use. Archetypes store it as an object map ({ Cleric: 4 }); the
+  // copy loop above would carry that raw shape, so overwrite with the normalized form.
+  // (Also accept a "Cleric 4" string defensively from older data.)
   if (archetype.classes !== undefined) {
     c.classes = normalizeClasses(archetype.classes);
   } else if (archetype.classLevels) {
