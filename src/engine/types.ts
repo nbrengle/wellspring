@@ -148,14 +148,13 @@ export interface V1CharacterInput {
   sublineage?: string;
   sublineages?: Record<string, string>;
   devotion?: string;
-  startingSkills?: string[];
-  /** Purchased skills are V2-native: CharacterChoice[] in `skills` (source
-   *  'Purchased'), NOT a flat array. `skills` also holds starting-skill choices
-   *  once that slice lands. */
+  /** All skills (starting + purchased) are V2-native: CharacterChoice[] in `skills`,
+   *  source 'Class:Starting' or 'Purchased'. No flat skill arrays on a live char. */
   skills?: CharacterChoice[];
-  /** Transient: the sheet importer parses the "Purchased Skills" line into this
-   *  flat array, then converts it into `skills` (source 'Purchased') and deletes
-   *  it. No live character carries it; it exists only inside parseCharacterSheet. */
+  /** Transient: the sheet importer parses the "Starting/Purchased Skills" lines into
+   *  these flat arrays, then converts them into `skills` and deletes them. No live
+   *  character carries them; they exist only inside parseCharacterSheet. */
+  startingSkills?: string[];
   purchasedSkills?: string[];
   purchasedPerks?: string[];
   flaws?: string[];
