@@ -32,8 +32,14 @@ for (const a of ARCHETYPES) {
   test(`archetype "${a.name}" is evaluated`, () => {
     const r = validate(fromArchetype(a));
     eq(r.level, 4, 'level');
-    // Skip checking BP and validity for known mathematically broken archetypes from V1
-    if (a.name !== 'Mystic Artisan' && a.name !== 'Support Socialite') {
+    // Mystic Artisan's SOURCE sheet is itself internally inconsistent: it lists
+    // items summing to 11 BP, then subtracts "Lore (Rituals) −2 refunded from The
+    // Learned One" to reach 9 — but Lore (Rituals) is a free starting skill (already
+    // 0), so nothing can be refunded from it. A genuine doc error, verified against
+    // StarterCharacterSheets.html — not an engine bug. (Artificer Artisan and Support
+    // Socialite were previously skipped here too, but turned out to be ENGINE bugs
+    // the perks/powers-bucket + sub-power-grant fixes resolved — they now pass.)
+    if (a.name !== 'Mystic Artisan') {
       ok(r.spend.net <= 9, 'BP within budget');
       ok(r.valid, `should be legal (flags: ${JSON.stringify({ over: r.overBudget, slots: r.slotsOver, prereq: r.prereqs.issues.length, below: r.belowFloor })})`);
     }

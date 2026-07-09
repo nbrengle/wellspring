@@ -35,6 +35,18 @@ export function pSkills(names) {
   };
 }
 
+// Same, for the V2 `perks` bucket (source 'Purchased'). A test that used to pass
+// `purchasedPerks: ['Toughness']` now spreads `...pPerks(['Toughness'])`. The BP
+// ledger keys these under the `purchasedPerks:` prefix.
+export function pPerks(names) {
+  return {
+    perks: names.map((n) =>
+      typeof n === 'string'
+        ? { entityId: n, source: 'Purchased', ranks: 1 }
+        : { entityId: n.name, source: 'Purchased', ranks: n.ranks ?? 1 }),
+  };
+}
+
 // Printed once by the entry after all domain files have registered their tests.
 export function report() {
   console.log(`\n${passed} passed, ${failures.length} failed`);

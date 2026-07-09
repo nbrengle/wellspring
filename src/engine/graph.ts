@@ -362,7 +362,10 @@ export class CharacterGraphModel implements CharacterGraph {
         }
       }
 
-      if (ent && ent.tier === 'SubPower') {
+      // A sub-power can't be SELECTED directly — but it's legitimate when a grant
+      // confers it (e.g. Holding Out for a Hero grants the sub-power Save the Day).
+      // Only flag a directly-chosen (purchased) one, not a granted/class one.
+      if (ent && ent.tier === 'SubPower' && node.sourceType === 'purchased') {
         issues.push({
           id, item: node.name, field: node.field,
           text: `${ent.name} is a sub-power and cannot be selected directly.`,
@@ -1039,14 +1042,34 @@ function v1ToV2(charInput: V1CharacterInput): CharacterStateV2 {
   if (!hasStartingInBucket) {
     add('startingSkills', v2.skills, 'Class:Starting', charInput.startingSkills);
   }
-  add('purchasedPerks', v2.perks, 'Purchased', charInput.purchasedPerks);
+  // Perks are V2-native (CharacterChoice[] in charInput.perks). Preserve existing
+  // bucket entries; synthesize from the legacy flat `purchasedPerks` only when the
+  // bucket is empty (older char / importer pre-conversion).
+  for (const p of charInput.perks || []) v2.perks.push(p);
+  if (!(charInput.perks || []).length) {
+    add('purchasedPerks', v2.perks, 'Purchased', charInput.purchasedPerks);
+  }
   add('flaws', v2.flaws, 'Flaw', charInput.flaws as (string | CharacterChoice)[] | undefined);
-  for (const pf of ['classPowers', 'classSkills', 'rightHandPowers', 'utilityPowers', 'basicPowers', 'advancedPowers', 'veteranPowers', 'domainPowers'] as const) {
-    add(pf, v2.powers, 'Purchased', charInput[pf]);
+  // Powers are V2-native (CharacterChoice[] in charInput.powers) — preserve any the
+  // archetype/importer carried, EXCEPT innate-sourced ones (those are re-synthesized
+  // below from the class, so preserving them too would double-count). Synthesize
+  // from the flat power fields only when the bucket is empty (older/importer char).
+  const bucketPowers = charInput.powers || [];
+  for (const p of bucketPowers) {
+    if (p.source !== 'Innate' && !String(p.source).includes('Innate')) v2.powers.push(p);
+  }
+  if (!bucketPowers.length) {
+    for (const pf of ['classPowers', 'classSkills', 'rightHandPowers', 'utilityPowers', 'basicPowers', 'advancedPowers', 'veteranPowers', 'domainPowers'] as const) {
+      add(pf, v2.powers, 'Purchased', charInput[pf]);
+    }
   }
 
-  // Class-granted innate powers (level-gated) → synthesized, then converted.
-  const innate: string[] = [...(charInput.innatePowers || [])];
+  // Class-granted innate powers (level-gated) → synthesized, then converted. Seed
+  // from both the flat innatePowers field and any innate entries the bucket carried.
+  const innate: string[] = [
+    ...(charInput.innatePowers || []),
+    ...bucketPowers.filter((p) => p.source === 'Innate' || String(p.source).includes('Innate')).map((p) => p.entityId),
+  ];
   for (const c of v2.classes) {
     const clsDef = lookupEntity(`classes:${c.name}`);
     for (const p of clsDef?.innate || []) {
@@ -1055,8 +1078,13 @@ function v1ToV2(charInput: V1CharacterInput): CharacterStateV2 {
   }
   add('innatePowers', v2.powers, 'Innate', innate);
 
-  for (const sf of ['cantrips', 'bookSpells', 'spellsKnown', 'noviceSpells', 'adeptSpells', 'greaterSpells'] as const) {
-    add(sf, v2.spells, 'Purchased', charInput[sf]);
+  // Spells are V2-native (CharacterChoice[] in charInput.spells) — preserve the
+  // bucket; synth from flat spell fields only when the bucket is empty.
+  for (const s of charInput.spells || []) v2.spells.push(s);
+  if (!(charInput.spells || []).length) {
+    for (const sf of ['cantrips', 'bookSpells', 'spellsKnown', 'noviceSpells', 'adeptSpells', 'greaterSpells'] as const) {
+      add(sf, v2.spells, 'Purchased', charInput[sf]);
+    }
   }
   if (charInput.devotion) {
     v2.devotions.push({ entityId: `devotions:${charInput.devotion}`, source: 'Purchased' });

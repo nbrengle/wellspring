@@ -84,10 +84,9 @@ const POWER_SECTIONS = [
 export function formatCharacterSheet(character: any, report: BuildReport) {
   if (character.skills || character.perks || character.powers) {
     character = { ...character };
-    // Skills (starting + purchased) are read straight from the skills[] bucket by
-    // the formatter below — no flat reconstruction. Perks/powers/spells still
-    // reconstruct flat fields here until their own slice migrates the formatter.
-    character.purchasedPerks = (character.perks || []).filter(s => typeof s !== 'string' && s.source === 'Purchased').map(s => s.entityId || s.name);
+    // Skills + perks are read straight from their buckets by the formatter below —
+    // no flat reconstruction. Powers/spells still reconstruct flat fields here until
+    // their own slice migrates the formatter.
     const powerFields = { innatePowers: 'Class:Innate', utilityPowers: 'Utility', basicPowers: 'Basic', advancedPowers: 'Advanced', veteranPowers: 'Veteran' };
     for (const [pf, pt] of Object.entries(powerFields)) {
       if (pf === 'innatePowers') {
@@ -140,7 +139,10 @@ export function formatCharacterSheet(character: any, report: BuildReport) {
     .filter((s) => typeof s !== 'string' && s.source === 'Purchased')
     .map((s) => s.entityId || s.name);
   line('Purchased Skills', joinItems(purchasedSkillNames, 'skills', report));
-  line('Purchased Perks', joinItems(character.purchasedPerks, 'purchasedPerks', report));
+  const purchasedPerkNames = (character.perks || [])
+    .filter((s) => typeof s !== 'string' && s.source === 'Purchased')
+    .map((s) => s.entityId || s.name);
+  line('Purchased Perks', joinItems(purchasedPerkNames, 'purchasedPerks', report));
 
   // ── Powers / spells ── (domain/class powers may be BP-bought)
   for (const [field, label] of POWER_SECTIONS) {
@@ -306,6 +308,13 @@ function parseSheetText(text) {
       if (ch.ranks) delete ch.ranks[f];
       if (ch.effectiveBP) delete ch.effectiveBP[f];
     }
+  }
+  // Perks: same flat→bucket conversion (source 'Purchased').
+  if (ch.purchasedPerks) {
+    ch.perks = [...(ch.perks || []), ...toChoices(ch.purchasedPerks, 'Purchased', 'purchasedPerks')];
+    delete ch.purchasedPerks;
+    if (ch.ranks) delete ch.ranks.purchasedPerks;
+    if (ch.effectiveBP) delete ch.effectiveBP.purchasedPerks;
   }
   reconcileDevotion(character);
   return character;
