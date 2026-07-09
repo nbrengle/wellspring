@@ -1,6 +1,7 @@
 // costs-and-powers.test.mjs — split from scripts/test.mjs (hotspot split). Owns its own
 // imports so concurrent features don't collide on one shared import block.
 import { test, eq, ok, pSkills, isPurchased } from './harness.mjs';
+import { makeChar } from './make-char.mjs';
 import {
   validate, characterLevel
 } from "../../src/engine/validate.js";
@@ -42,7 +43,7 @@ test('grants from a granting power bought into purchasedSkills are seen (graph-d
   // Regression: the old per-field grant walk skipped purchasedSkills, so a Right
   // Hand power like "Holding Out for a Hero" (bought as a skill) didn't surface the
   // "Save the Day" it grants. The graph-derived grantedAbilities catches it.
-  const c = { classLevels: 'Socialite 10', ...pSkills(['The Right Hand', 'Holding Out for a Hero']) };
+  const c = makeChar('Socialite 10', { add: ['The Right Hand', 'Holding Out for a Hero'] });
   const g = grantedAbilities(c);
   // source is the canonical entity name ("...For a Hero"), resolved from the raw
   // input ("...for a Hero") — the graph normalizes via lookupEntity.
@@ -55,8 +56,8 @@ test('a GRANT_SOURCE grant materializes as a free, non-removable owned item (Way
   // shows + can parameterize it — instead of the grant living only as a hidden effect.
   // The materialized row carries source:'class' + index:-1 so the build sheet's
   // canRemove (!fromClass && index>=0) is false: a granted ability isn't deletable.
-  const c = { classLevels: 'Rogue 4', utilityPowers: ['Way of the Blade'],
-    choices: { 'powers:Way of the Blade': 'Daggers' } };
+  const c = makeChar('Rogue 4', { add: ['Way of the Blade'],
+    choices: { 'powers:Way of the Blade': 'Daggers' } });
   const r = validate(c);
   const granted = (r.owned?.skills || []).filter((x) => x.grantedBy === 'Way of the Blade');
   eq(granted.length, 2, 'both granted skills surface (Weapon Spec - Daggers + Two Weapon Style)');
@@ -72,21 +73,21 @@ test('a grant refunds a matching parameterized purchase, by parameter (Way of th
   // Way of the Blade (choosing Daggers) grants "Weapon Specialization - Daggers".
   // A previously-PURCHASED "Weapon Specialization (Daggers)" must go free + attributed
   // — the dash vs parens form must not block the match. A different weapon must NOT.
-  const daggers = computeSpend({ classLevels: 'Rogue 4',
-    ...pSkills(['Weapon Specialization (Daggers)']),
-    utilityPowers: ['Way of the Blade'], choices: { 'powers:Way of the Blade': 'Daggers' } });
+  const daggers = computeSpend(makeChar('Rogue 4', {
+    add: ['Weapon Specialization (Daggers)', 'Way of the Blade'],
+    choices: { 'powers:Way of the Blade': 'Daggers' } }));
   const dk = daggers.byItem['skills:Weapon Specialization (Daggers)'];
   eq(dk.cost, 0, 'matching weapon → refunded to free');
   eq(dk.grant?.source, 'Way of the Blade', 'attributed to the granting power');
 
-  const swords = computeSpend({ classLevels: 'Rogue 4',
-    ...pSkills(['Weapon Specialization (Swords)']),
-    utilityPowers: ['Way of the Blade'], choices: { 'powers:Way of the Blade': 'Daggers' } });
+  const swords = computeSpend(makeChar('Rogue 4', {
+    add: ['Weapon Specialization (Swords)', 'Way of the Blade'],
+    choices: { 'powers:Way of the Blade': 'Daggers' } }));
   eq(swords.byItem['skills:Weapon Specialization (Swords)'].cost, 4,
      'different weapon → NOT refunded (parameter precision)');
 });
 test('a selected power that grants a perk zeroes that perk (Implicit Truths → Insight)', () => {
-  const c = { classLevels: 'Socialite 4', utilityPowers: ['Implicit Truths'], purchasedPerks: ['Insight'] };
+  const c = makeChar('Socialite 4', { add: ['Implicit Truths', 'Insight'] });
   const eff = computeSpend(c).byItem['purchasedPerks:Insight'];
   eq(eff.cost, 0, 'Insight free');
   eq(eff.grant.source, 'Implicit Truths', 'grant source attributed');
@@ -98,7 +99,7 @@ test('a fixed power grant with parameters surfaces BOTH (Lessons from Scars → 
   // (non-choice) grant of two PARAMETERIZED skills. Both must materialize, free, and
   // distinctly (not collapse to one bare "Lore"). The in-play "Choose one target…"
   // sentence in the same description must NOT suppress the grant.
-  const owned = validate({ classLevels: 'Fighter 6', utilityPowers: ['Lessons from Scars'] }).owned;
+  const owned = validate(makeChar('Fighter 6', { add: ['Lessons from Scars'] })).owned;
   const granted = (owned?.skills || []).filter((s) => s.grantedBy === 'Lessons from Scars');
   eq(granted.length, 2, 'both Lore grants surface');
   ok(granted.some((s) => /Historical/.test(s.name)) && granted.some((s) => /Noble/.test(s.name)),
@@ -109,7 +110,7 @@ test('a choice-gated grant does NOT grant every option for free (The Learned One
   // The Learned One is "choose one of 8 at level-up" (chooseOne kind:play). Its
   // REFS.grants lists all 8 — emitting them flat would grant all for free. The
   // structured chooseOne must gate them, so zero auto-grants.
-  const owned = validate({ classLevels: 'Artisan 10', classPowers: ['The Learned One'] }).owned;
+  const owned = validate(makeChar('Artisan 10', { add: ['The Learned One'] })).owned;
   eq((owned?.skills || []).filter((s) => s.grantedBy === 'The Learned One').length, 0,
      'no flat grant — the choice gates it');
 });
@@ -131,7 +132,7 @@ test('Lost Wisdom of Many discounts only the first three Lore skills', () => {
 });
 
 test('Patron discounts gift-eligible perks by 1, excludes Strong Bloodline + Gifts', () => {
-  const c = { classLevels: 'Cleric 4', purchasedPerks: ['Patron', 'Greedy Soul', 'Strong Bloodline'] };
+  const c = makeChar('Cleric 4', { add: ['Patron', 'Greedy Soul', 'Strong Bloodline'] });
   const s = computeSpend(c);
   eq(s.byItem['purchasedPerks:Greedy Soul'].cost, 2, 'Greedy Soul 3→2');
   eq(s.byItem['purchasedPerks:Greedy Soul'].discount.source, 'Patron', 'attributed to Patron');
@@ -149,15 +150,15 @@ test('Ritual Affinity discounts Ritual Magic at the granting class level', () =>
     const k = Object.keys(s.byItem).find((x) => x.endsWith(`:${skill}`));
     return s.byItem[k]?.cost;
   };
-  eq(cost({ classLevels: 'Cleric 4', ...pSkills(['Journeyman Ritual Magic']) }, 'Journeyman Ritual Magic'), 2, 'L4: gate not met, full 2');
-  eq(cost({ classLevels: 'Cleric 7', ...pSkills(['Journeyman Ritual Magic']) }, 'Journeyman Ritual Magic'), 1, 'L7: Journeyman 2→1');
-  eq(cost({ classLevels: 'Cleric 7', ...pSkills(['Greater Ritual Magic']) }, 'Greater Ritual Magic'), 3, 'L7: Greater gate (L12) not met, full 3');
-  eq(cost({ classLevels: 'Cleric 12', ...pSkills(['Greater Ritual Magic']) }, 'Greater Ritual Magic'), 2, 'L12: Greater 3→2');
+  eq(cost(makeChar('Cleric 4', { add: ['Journeyman Ritual Magic'] }), 'Journeyman Ritual Magic'), 2, 'L4: gate not met, full 2');
+  eq(cost(makeChar('Cleric 7', { add: ['Journeyman Ritual Magic'] }), 'Journeyman Ritual Magic'), 1, 'L7: Journeyman 2→1');
+  eq(cost(makeChar('Cleric 7', { add: ['Greater Ritual Magic'] }), 'Greater Ritual Magic'), 3, 'L7: Greater gate (L12) not met, full 3');
+  eq(cost(makeChar('Cleric 12', { add: ['Greater Ritual Magic'] }), 'Greater Ritual Magic'), 2, 'L12: Greater 3→2');
   // Multiclass: Cleric track at 12 gates Greater; the discount fires once.
-  eq(cost({ classes: [{ name: 'Cleric', level: 12 }, { name: 'Mage', level: 4 }], ...pSkills(['Greater Ritual Magic']) }, 'Greater Ritual Magic'), 2, 'Cleric12 track discounts Greater');
+  eq(cost(makeChar('Cleric 12, Mage 4', { add: ['Greater Ritual Magic'] }), 'Greater Ritual Magic'), 2, 'Cleric12 track discounts Greater');
   // No Ritual Affinity → no discount; no leak to similarly-named skills.
-  eq(cost({ classLevels: 'Fighter 7', ...pSkills(['Journeyman Ritual Magic']) }, 'Journeyman Ritual Magic'), 2, 'no RA → full');
-  eq(cost({ classLevels: 'Cleric 12', ...pSkills(['Greater Alchemy']) }, 'Greater Alchemy'), 5, 'no leak to Greater Alchemy');
+  eq(cost(makeChar('Fighter 7', { add: ['Journeyman Ritual Magic'] }), 'Journeyman Ritual Magic'), 2, 'no RA → full');
+  eq(cost(makeChar('Cleric 12', { add: ['Greater Alchemy'] }), 'Greater Alchemy'), 5, 'no leak to Greater Alchemy');
 });
 
 // ─── shared powers: same-named cross-class powers stay mechanically equivalent ───
@@ -210,18 +211,18 @@ test('finite-ranks "Extended Capacity - Novice x2" stays one rank-2 row (not exp
 
 // ─── tiered perks: cumulative cost + hard-enforced per-tier level gate ────────
 test('Draconic Heritage rank 2 costs cumulative tier sum (2+3=5)', () => {
-  const c = { classLevels: 'Mage 5', purchasedPerks: ['Draconic Heritage'], ranks: { purchasedPerks: [2] } };
+  const c = makeChar('Mage 5', { add: [{ name: 'Draconic Heritage', ranks: 2 }] });
   eq(computeSpend(c).byItem['purchasedPerks:Draconic Heritage'].cost, 5, 'tiers 1+2');
 });
 test('Draconic Heritage rank 4 costs 2+3+4+5 = 14 (not base×4)', () => {
-  const c = { classLevels: 'Mage 15', purchasedPerks: ['Draconic Heritage'], ranks: { purchasedPerks: [4] } };
+  const c = makeChar('Mage 15', { add: [{ name: 'Draconic Heritage', ranks: 4 }] });
   eq(computeSpend(c).byItem['purchasedPerks:Draconic Heritage'].cost, 14, 'all four tiers');
 });
 test('tier level gate is hard-enforced (rank 2 below char level 5 is an issue)', () => {
-  const below = validate({ classLevels: 'Mage 4', purchasedPerks: ['Draconic Heritage'], ranks: { purchasedPerks: [2] } });
+  const below = validate(makeChar('Mage 4', { add: [{ name: 'Draconic Heritage', ranks: 2 }] }));
   ok(below.prereqs.issues.some((i) => /tier 2 requires character level 5/.test(i.text || '')), 'gated');
   ok(!below.valid, 'invalid below the gate');
-  const at = validate({ classLevels: 'Mage 5', purchasedPerks: ['Draconic Heritage'], ranks: { purchasedPerks: [2] } });
+  const at = validate(makeChar('Mage 5', { add: [{ name: 'Draconic Heritage', ranks: 2 }] }));
   ok(!at.prereqs.issues.some((i) => i.tier), 'clears at the required level');
 });
 
@@ -231,45 +232,45 @@ test('tier level gate is hard-enforced (rank 2 below char level 5 is an issue)',
 // shared across classes with different requirements).
 test('power level requirement is enforced', () => {
   // Warrior Spirit requires Fighter Level 10.
-  const below = validate({ classLevels: 'Fighter 4', innatePowers: ['Warrior Spirit'] });
+  const below = validate(makeChar('Fighter 4', { add: ['Warrior Spirit'] }));
   ok(below.prereqs.issues.some((i) => i.item === 'Warrior Spirit' && /Fighter Level 10/.test(i.text)), 'flagged below level');
-  const at = validate({ classLevels: 'Fighter 10', innatePowers: ['Warrior Spirit'] });
+  const at = validate(makeChar('Fighter 10', { add: ['Warrior Spirit'] }));
   ok(!at.prereqs.issues.some((i) => i.item === 'Warrior Spirit'), 'clears at level');
 });
 test('power entity requirement is enforced (Expert Parry needs Parry Blow)', () => {
   // Parry Blow is a Fighter innate at L3. A Fighter 2 doesn't have it yet, so
   // Expert Parry's requiresEntity is unmet → flagged.
-  const missing = validate({ classLevels: 'Fighter 2', advancedPowers: ['Expert Parry'] });
+  const missing = validate(makeChar('Fighter 2', { add: ['Expert Parry'] }));
   ok(missing.prereqs.issues.some((i) => i.item === 'Expert Parry' && i.requiresEntity === 'Parry Blow'), 'flagged without prerequisite');
   // A Fighter 6 AUTO-gets Parry Blow (innate), which satisfies the requirement —
   // the prereq check now sees auto-granted innates (graph-derived ownedIds), so it
   // clears without needing to separately select Parry Blow.
-  const auto = validate({ classLevels: 'Fighter 6', advancedPowers: ['Expert Parry'] });
+  const auto = validate(makeChar('Fighter 6', { add: ['Expert Parry'] }));
   ok(!auto.prereqs.issues.some((i) => i.item === 'Expert Parry'), 'clears when the prerequisite is auto-granted as an innate');
 });
 test('shared power name resolves requirement per owning class (no false positive)', () => {
   // "Ritual Affinity" exists for both Cleric (Cleric L3) and Mage (Mage L3). A
   // Cleric who owns it at Cleric L3 must NOT be flagged with the Mage requirement.
-  const cleric = validate({ classLevels: 'Cleric 4', innatePowers: ['Ritual Affinity'] });
+  const cleric = validate(makeChar('Cleric 4', { add: ['Ritual Affinity'] }));
   ok(!cleric.prereqs.issues.some((i) => i.item === 'Ritual Affinity'), 'cleric version satisfied, not the mage one');
 });
 
 // ─── per-level power benefits (Adept Ritualist) ──────────────────────────────
 test('Adept Ritualist level-benefits activate by Artisan class level', () => {
-  const at1 = validate({ classLevels: 'Artisan 1', utilityPowers: ['Adept Ritualist'] });
+  const at1 = validate(makeChar('Artisan 1', { add: ['Adept Ritualist'] }));
   const pb1 = at1.powerBenefits.find((b) => b.power === 'Adept Ritualist');
   ok(pb1, 'powerBenefits present');
   eq(pb1.gateClass, 'Artisan', 'gates on Artisan level');
   eq(pb1.benefits.find((b) => b.level === 1).active, true, 'L1 active at Artisan 1');
   eq(pb1.benefits.find((b) => b.level === 3).active, false, 'L3 locked at Artisan 1');
-  const at7 = validate({ classLevels: 'Artisan 7', utilityPowers: ['Adept Ritualist'] });
+  const at7 = validate(makeChar('Artisan 7', { add: ['Adept Ritualist'] }));
   const pb7 = at7.powerBenefits.find((b) => b.power === 'Adept Ritualist');
   ok(pb7.benefits.every((b) => b.active), 'all active at Artisan 7');
 });
 
 // ─── choose-one: build-time selection grants the chosen skill free ────────────
 test('Expert Craft build-time choice grants the selected skill at 0 BP', () => {
-  const base = { classLevels: 'Artisan 10', innatePowers: ['Expert Craft'], ...pSkills(['Greater Alchemy']) };
+  const base = makeChar('Artisan 10', { add: ['Expert Craft', 'Greater Alchemy'] });
   eq(computeSpend(base).byItem['skills:Greater Alchemy'].cost, 5, 'full cost without a choice');
   const chosen = { ...base, choices: { 'powers:Expert Craft': 'Greater Alchemy' } };
   const eff = computeSpend(chosen).byItem['skills:Greater Alchemy'];
@@ -280,7 +281,7 @@ test('Expert Craft build-time choice grants the selected skill at 0 BP', () => {
 // ─── flaw BP award capped at 5 (rules limit) ─────────────────────────────────
 test('flaw BP award is capped at 5 (extra flaws give no more BP)', () => {
   const manyFlaws = ['Binding Oath of Charity', 'Binding Oath of Peace', 'Torn Soul']; // 5+5+4 = 14 raw
-  const s = computeSpend({ classLevels: 'Fighter 10', flaws: manyFlaws });
+  const s = computeSpend(makeChar('Fighter 10', { add: manyFlaws }));
   eq(s.awarded, 5, 'awarded clamped to 5');
   ok(s.rawAwarded > 5, 'rawAwarded reflects the uncapped sum');
   ok(s.flawCapped, 'flawCapped flagged');
@@ -289,29 +290,28 @@ test('flaw BP award is capped at 5 (extra flaws give no more BP)', () => {
 test('flaws RAISE the budget rather than lowering spend', () => {
   // Flaw BP is awarded BP: it should lift the displayed cap (spent of base+flaws),
   // not net out of spend (which would make the build look like it spent less).
-  const base = { classLevels: 'Fighter 4', purchasedPerks: [] };
-  const none = validate({ ...base, flaws: [] });
-  const five = validate({ ...base, flaws: ['Nightmares', 'Pliant'] }); // 3 + 2 = 5
+  const none = validate(makeChar('Fighter 4'));
+  const five = validate(makeChar('Fighter 4', { add: ['Nightmares', 'Pliant'] })); // 3 + 2 = 5
   eq(five.budget, none.budget + 5, 'budget lifts by the 5 awarded flaw BP');
   eq(five.spend.net, none.spend.net, 'spend is unchanged by flaws (not netted down)');
   eq(five.remaining, none.remaining + 5, 'remaining grows by the flaw award');
   ok(!five.overBudget, 'awarding budget headroom does not flag over-budget');
   // The lift is capped at MAX_FLAW_BP just like the award.
-  const eight = validate({ ...base, flaws: ['Nightmares', 'Pliant', 'Outdoor Discomfort'] }); // 3+2+3=8
+  const eight = validate(makeChar('Fighter 4', { add: ['Nightmares', 'Pliant', 'Outdoor Discomfort'] })); // 3+2+3=8
   eq(eight.budget, none.budget + 5, 'budget lift is capped at 5 even with more flaw BP');
 });
 
 test('allergy flaws calculate awards dynamically based on parameter', () => {
-  const s1 = computeSpend({ classLevels: 'Fighter 10', flaws: ['Mild Allergy (Iron)'] });
+  const s1 = computeSpend(makeChar('Fighter 10', { add: ['Mild Allergy (Iron)'] }));
   eq(s1.rawAwarded, 2, 'common mild allergy awards 2 BP');
 
-  const s2 = computeSpend({ classLevels: 'Fighter 10', flaws: ['Mild Allergy (Gold)'] });
+  const s2 = computeSpend(makeChar('Fighter 10', { add: ['Mild Allergy (Gold)'] }));
   eq(s2.rawAwarded, 1, 'uncommon mild allergy awards 1 BP');
 
-  const s3 = computeSpend({ classLevels: 'Fighter 10', flaws: ['Severe Allergy (Iron)'] });
+  const s3 = computeSpend(makeChar('Fighter 10', { add: ['Severe Allergy (Iron)'] }));
   eq(s3.rawAwarded, 3, 'common severe allergy awards 3 BP');
 
-  const s4 = computeSpend({ classLevels: 'Fighter 10', flaws: ['Severe Allergy (Gold)'] });
+  const s4 = computeSpend(makeChar('Fighter 10', { add: ['Severe Allergy (Gold)'] }));
   eq(s4.rawAwarded, 2, 'uncommon severe allergy awards 2 BP');
 });
 
@@ -332,7 +332,7 @@ test('allergy awards are derived from the parsed rulebook table, not hardcoded',
   eq(allergenAward('Mild Allergy', ''), null, 'no substance → undetermined');
   eq(allergenAward('Mild Allergy', 'butter'), null, 'off-table substance → undetermined');
   // The engine still books a conservative minimum for a bare allergy.
-  eq(computeSpend({ classLevels: 'Fighter 10', flaws: ['Mild Allergy'] }).rawAwarded, 1,
+  eq(computeSpend(makeChar('Fighter 10', { add: ['Mild Allergy'] })).rawAwarded, 1,
      'bare Mild Allergy defaults to the table minimum (1)');
 });
 
@@ -343,7 +343,7 @@ test('inline sub-powers are extracted as entities', () => {
   ok(lookupEntity('powers:Curious Balm').effect, 'sub-power carries its stat block (effect)');
 });
 test('a power that grants a sub-power surfaces it as a free granted ability', () => {
-  const g = grantedAbilities({ classLevels: 'Artisan 10', advancedPowers: ['Strange Token'] });
+  const g = grantedAbilities(makeChar('Artisan 10', { add: ['Strange Token'] }));
   ok(g.list.some((x) => x.ability === 'powers:Curious Balm' && x.source === 'Strange Token'), 'Curious Balm granted by Strange Token');
 });
 

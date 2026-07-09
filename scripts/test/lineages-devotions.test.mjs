@@ -1,6 +1,7 @@
 // lineages-devotions.test.mjs — split from scripts/test.mjs (hotspot split). Owns its own
 // imports so concurrent features don't collide on one shared import block.
-import { test, eq, ok } from './harness.mjs';
+import { test, eq, ok, Source } from './harness.mjs';
+import { makeChar } from './make-char.mjs';
 import {
   validate, characterLevel
 } from "../../src/engine/validate.js";
@@ -88,8 +89,8 @@ test('Pick and Choose: a cross-lineage advantage is applied with its full effect
   ok(opts.every((o) => o.group !== 'Lost'), 'never offers a Lost advantage');
   ok(opts.some((o) => o.advId === 'Underkin - Iron Touch'), 'options carry the lineage-qualified advId');
   // Pick Underkin "Iron Touch" (grants the Mystic Armorer perk) → it materializes free.
-  const owned = validate({ classLevels: 'Fighter 6', lineage: 'Lost',
-    lineageAdvantages: ['Pick and Choose'], advantageChoices: { 'Pick and Choose': 'Underkin - Iron Touch' } }).owned;
+  const owned = validate(makeChar('Fighter 6', { lineage: 'Lost',
+    lineageAdvantages: ['Pick and Choose'], advantageChoices: { 'Pick and Choose': 'Underkin - Iron Touch' } })).owned;
   ok((owned?.perks || []).some((p) => p.name === 'Mystic Armorer' && p.grantedBy === 'Iron Touch'),
      'the chosen advantage’s grant is applied across lineages');
 });
@@ -126,13 +127,13 @@ test('Arcane Secrets (domain power) grants the chosen arcane spell as a Known Sp
   // powerSpellChoiceSpec drives an owned-power spell pick, keyed by choices['powers:..'].
   const spec = powerSpellChoiceSpec({ name: 'Arcane Secrets' });
   ok(spec?.kind === 'spell' && spec.optionsKey === 'arcaneSecretsOptions', 'Arcane Secrets = arcane spell pick');
-  const char = { classLevels: 'Cleric 6', devotion: 'The Librarian',
-    domainPowers: ['Arcane Secrets'], choices: { 'powers:Arcane Secrets': 'Arcane Barrage' } };
+  const char = makeChar('Cleric 6', { devotion: 'The Librarian',
+    add: [{ name: 'Arcane Secrets', field: 'domainPowers' }], choices: { 'powers:Arcane Secrets': 'Arcane Barrage' } });
   const sec = resolveCharacterGraph(char).find((i) => /Arcane Secrets/.test(i.name));
   ok(sec.effects.some((e) => e.type === 'GRANT_SOURCE' && e.grants.includes('powers:Arcane Barrage')),
     'the picked spell is granted');
   // With no pick, no grant.
-  const none = resolveCharacterGraph({ classLevels: 'Cleric 6', devotion: 'The Librarian', domainPowers: ['Arcane Secrets'] })
+  const none = resolveCharacterGraph(makeChar('Cleric 6', { devotion: 'The Librarian', add: [{ name: 'Arcane Secrets', field: 'domainPowers' }] }))
     .find((i) => /Arcane Secrets/.test(i.name));
   ok(!none.effects.some((e) => e.type === 'GRANT_SOURCE'), 'no pick → no spell granted');
 });
@@ -147,8 +148,8 @@ test('Weird Wanderings grants a chosen Basic power from a non-Artisan base class
   ok(pool.includes('Battlemind'), 'offers a Fighter Basic power');
   // No Artisan powers (it copies from OTHER classes) and no Spell-refresh powers.
   ok(!pool.some((n) => (lookupEntity(`powers:${n}`)?.parentClass) === 'Artisan'), 'excludes Artisan powers');
-  const char = { classLevels: 'Artisan 4', basicPowers: ['Weird Wanderings'],
-    choices: { 'powers:Weird Wanderings': 'Battlemind' } };
+  const char = makeChar('Artisan 4', { add: ['Weird Wanderings'],
+    choices: { 'powers:Weird Wanderings': 'Battlemind' } });
   const ww = resolveCharacterGraph(char).find((i) => /Weird Wanderings/.test(i.name));
   ok(ww.effects.some((e) => e.type === 'GRANT_SOURCE' && e.grants.includes('powers:Battlemind')),
     'the picked power is granted');
@@ -162,8 +163,8 @@ test('Studied Focus: a tag gates the pool, and both picks are granted', () => {
   ok(crafter.length >= 2 && crafter.every((n) => (lookupEntity(`powers:${n}`)?.tags || []).includes('Crafter')),
      'pool is exactly the chosen tag’s Basic Artisan powers');
   // Both picks of the same tag are granted.
-  const char = { classLevels: 'Artisan 10', classPowers: ['Studied Focus'],
-    choices: { 'powers:Studied Focus': 'Crafter', 'powers:Studied Focus:1': 'Analysis', 'powers:Studied Focus:2': 'Antidote' } };
+  const char = makeChar('Artisan 10', { add: ['Studied Focus'],
+    choices: { 'powers:Studied Focus': 'Crafter', 'powers:Studied Focus:1': 'Analysis', 'powers:Studied Focus:2': 'Antidote' } });
   const sf = resolveCharacterGraph(char).find((i) => /Studied Focus/.test(i.name));
   ok(sf.effects.filter((e) => e.type === 'GRANT_SOURCE').length === 2, 'both chosen powers granted');
   ok(sf.effects.some((e) => e.grants?.includes('powers:Analysis'))
@@ -173,21 +174,21 @@ test('Studied Focus: a tag gates the pool, and both picks are granted', () => {
 test('Arcane Secrets pool is rank-gated, not a flat list (the rules gate by castable rank)', () => {
   // Caster with a Known Spell: the pool is gated by Arcane spell-slots held — a low
   // caster (novice slots only) sees fewer spells than a high caster (adept unlocked).
-  const lo = arcaneSecretsSpellOptions({ classLevels: 'Mage 2', noviceSpells: ['Flameburst'] });
-  const hi = arcaneSecretsSpellOptions({ classLevels: 'Mage 10', noviceSpells: ['Flameburst'] });
+  const lo = arcaneSecretsSpellOptions(makeChar('Mage 2', { add: ['Flameburst'] }));
+  const hi = arcaneSecretsSpellOptions(makeChar('Mage 10', { add: ['Flameburst'] }));
   ok(lo.length > 0 && hi.length > lo.length, 'higher caster level → strictly larger gated pool');
   // The pool draws from ANY base arcane class, not just the character's own.
   ok(hi.length >= 80, 'pool spans all base arcane classes (not just the owned class)');
   // No Known Spells → the "up to Adept" branch (excludes any Greater-tier spell).
-  const noncaster = arcaneSecretsSpellOptions({ classLevels: 'Cleric 6' });
+  const noncaster = arcaneSecretsSpellOptions(makeChar('Cleric 6'));
   ok(noncaster.length > 0, 'non-caster still gets an arcane pool, capped at Adept');
 });
 
 test('cantrip-choice lineage items grant + slot the chosen cantrip (Divine Magic + the previously-broken Psionic Cantrip)', () => {
-  const dm = validate({ classLevels: 'Cleric 4', lineage: 'Lost', lineageAdvantages: ['Divine Magic'], advantageChoices: { 'Divine Magic': 'Cancel' } });
+  const dm = validate(makeChar('Cleric 4', { lineage: 'Lost', lineageAdvantages: ['Divine Magic'], advantageChoices: { 'Divine Magic': 'Cancel' } }));
   ok(dm.grantedAbilities.list.some(g => g.ability === 'powers:Cancel'), 'Divine Magic grants the chosen cantrip (unchanged)');
   // Psionic Cantrip was hardcoded-out before; the generalized path fixes it.
-  const pc = validate({ classLevels: 'Mage 4', lineage: 'Human', sublineage: 'Psionic', lineageAdvantages: ['Psionic Cantrip'], advantageChoices: { 'Psionic Cantrip': 'Cancel' } });
+  const pc = validate(makeChar('Mage 4', { lineage: 'Human', sublineage: 'Psionic', lineageAdvantages: ['Psionic Cantrip'], advantageChoices: { 'Psionic Cantrip': 'Cancel' } }));
   ok(pc.grantedAbilities.list.some(g => g.ability === 'powers:Cancel'), 'Psionic Cantrip now grants the chosen cantrip');
 });
 
@@ -263,8 +264,8 @@ test('Divine Substitution offers domains that are neither standard nor opposed',
   ok(opts.includes('Shadow') && opts.includes('War'), 'offers eligible domains');
 });
 test('Divine Substitution grants the chosen domain (opposition enforced end-to-end)', () => {
-  const ds = devotionState(toV2({
-    classLevels: 'Cleric 10', devotion: 'The Mother', classPowers: ['Divine Substitution'],
+  const ds = devotionState(makeChar('Cleric 10', {
+    devotion: 'The Mother', add: ['Divine Substitution'],
     choices: { 'powers:Divine Substitution': 'Shadow' }, divineDomains: ['Shadow'],
   }));
   ok(ds.substitution, 'substitution surfaced when the power is owned');
@@ -272,8 +273,8 @@ test('Divine Substitution grants the chosen domain (opposition enforced end-to-e
   ok(ds.available.includes('Shadow'), 'chosen domain becomes available');
   ok(ds.eligiblePowers.length > 0, 'its domain powers become purchasable');
   // A forbidden (opposed) pick is rejected: Death opposes Life → not added.
-  const bad = devotionState(toV2({
-    classLevels: 'Cleric 10', devotion: 'The Mother', classPowers: ['Divine Substitution'],
+  const bad = devotionState(makeChar('Cleric 10', {
+    devotion: 'The Mother', add: ['Divine Substitution'],
     choices: { 'powers:Divine Substitution': 'Death' },
   }));
   ok(!bad.available.includes('Death'), 'an opposed pick is refused');
@@ -281,7 +282,10 @@ test('Divine Substitution grants the chosen domain (opposition enforced end-to-e
 
 // ─── prereqs (disjunction) ────────────────────────────────────────────────────
 test('prereq disjunction: Basic Faith satisfies "Basic Arcane or Basic Faith"', () => {
-  const c = { archetypeName: 'x', classes: [{ name: 'Cleric', level: 4 }], startingSkills: ['Basic Faith', 'Extended Capacity - Novice'] };
+  const c = makeChar('Cleric 4', { archetypeName: 'x', add: [
+    { name: 'Basic Faith', source: Source.starting('Cleric') },
+    { name: 'Extended Capacity - Novice', source: Source.starting('Cleric') },
+  ] });
   const ps = prereqStatus(c, 'skills:Extended Capacity - Novice');
   ok(ps.met, 'met with Basic Faith');
 });

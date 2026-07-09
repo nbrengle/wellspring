@@ -7,8 +7,8 @@ import { cleanItemName, bareSkill, getClasses } from './resolver.js';
 import { characterLevel, getMaxRanks } from './validate/core.js';
 import { paramInfo, paramReusable } from './param-domain.js';
 import { spellSlots } from './validate/slots.js';
-import type { CharacterStateV2, V1CharacterInput, CharacterChoice, GraphItem, CharacterGraph, Entity, Effect, EntitySource, BucketedView, BPLedger, BPLedgerEntry } from './types.js';
-import { Source, isPurchased, isStarting, isInnate } from './types.js';
+import type { CharacterStateV2, GraphItem, CharacterGraph, Entity, Effect, EntitySource, BucketedView, BPLedger, BPLedgerEntry } from './types.js';
+import { Source, isPurchased, isStarting } from './types.js';
 
 const idName = (id: string) => id.split(':')[1] || id;
 
@@ -1000,136 +1000,43 @@ function checkLevelConstraint(character: any, constraintStr: string, owned: Set<
 }
 
 
-// Convert a raw V1-flat character (the loose object the UI/loadArchetype produce —
-// purchasedSkills/classPowers/cantrips/… arrays of name strings) into the engine's
-// V2 shape: ontological CharacterChoice[] buckets. The conversion lives HERE, at the
-// engine boundary, so everything past resolveCharacterGraph speaks only V2.
-function v1ToV2(charInput: V1CharacterInput): CharacterStateV2 {
-  const v2: CharacterStateV2 = {
-    ...charInput,
-    _v2: true,
-    classes: getClasses(charInput),
-    skills: [], perks: [], flaws: [], powers: [], spells: [], devotions: [],
-  };
-
-  // Idempotent: v1ToV2 may run on a char that already carries some V2 buckets
-  // (the boundary re-normalizes every resolve). A flat string item is converted to
-  // a CharacterChoice; an already-converted entry (object) is passed through as-is.
-  const add = (field: string, bucket: CharacterChoice[], source: EntitySource, items: (string | CharacterChoice)[] | undefined) => {
-    for (let i = 0; i < (items || []).length; i++) {
-      const item = items![i];
-      if (item && typeof item === 'object') {
-        bucket.push(item);
-        continue;
-      }
-      bucket.push({
-        entityId: item as string,
-        source,
-        costOverride: charInput.effectiveBP?.[field]?.[i] ?? undefined,
-        ranks: charInput.ranks?.[field]?.[i] ?? 1,
-        originalIndex: i,
-        // The originating character field (e.g. 'classPowers'). Flat-path buckets
-        // key their BP ledger by this; skills (V2-native, no `add`) key by 'skills:'.
-        costField: field,
-      } as CharacterChoice);
-    }
-  };
-
-  const primaryClass = v2.classes[0]?.name || '';
-  // Skills are V2-native (CharacterChoice[] in charInput.skills). Preserve ALL
-  // existing bucket entries — purchased AND any the archetype/importer carried as
-  // starting. Only synthesize from the legacy flat `startingSkills` when the
-  // bucket has no starting entries yet (a from-scratch/older char).
-  for (const s of charInput.skills || []) v2.skills.push(s);
-  const hasStartingInBucket = (charInput.skills || []).some((s) => isStarting(s.source));
-  if (!hasStartingInBucket) {
-    add('startingSkills', v2.skills, Source.starting(primaryClass), charInput.startingSkills);
-  }
-  // Perks are V2-native (CharacterChoice[] in charInput.perks). Preserve existing
-  // bucket entries; synthesize from the legacy flat `purchasedPerks` only when the
-  // bucket is empty (older char / importer pre-conversion).
-  for (const p of charInput.perks || []) v2.perks.push(p);
-  if (!(charInput.perks || []).length) {
-    add('purchasedPerks', v2.perks, Source.purchased(), charInput.purchasedPerks);
-  }
-  add('flaws', v2.flaws, Source.flaw(), charInput.flaws as (string | CharacterChoice)[] | undefined);
-  // Powers are V2-native (CharacterChoice[] in charInput.powers) — preserve any the
-  // archetype/importer carried, EXCEPT innate-sourced ones (those are re-synthesized
-  // below from the class, so preserving them too would double-count). Synthesize
-  // from the flat power fields only when the bucket is empty (older/importer char).
-  const bucketPowers = charInput.powers || [];
-  for (const p of bucketPowers) {
-    if (!isInnate(p.source)) v2.powers.push(p);
-  }
-  if (!bucketPowers.length) {
-    // Purchase-style power fields (cost BP): purchased source.
-    for (const pf of ['classPowers', 'classSkills', 'rightHandPowers', 'domainPowers'] as const) {
-      add(pf, v2.powers, Source.purchased(), charInput[pf]);
-    }
-    // Slot power fields (free — fill a class slot): class source. The granting class
-    // is the legacy `powerClass[field][i]` tag when present, else the primary class.
-    // (Legacy/importer path only; new chars write the bucket with the source already.)
-    for (const pf of ['utilityPowers', 'basicPowers', 'advancedPowers', 'veteranPowers'] as const) {
-      const names = charInput[pf];
-      for (let i = 0; i < (names || []).length; i++) {
-        const item = names![i];
-        if (item && typeof item === 'object') { v2.powers.push(item); continue; }
-        const cls = charInput.powerClass?.[pf]?.[i] || primaryClass;
-        v2.powers.push({
-          entityId: item as string,
-          source: Source.class(cls),
-          ranks: charInput.ranks?.[pf]?.[i] ?? 1,
-          originalIndex: i,
-          costField: pf,
-        });
-      }
-    }
-  }
-
-  // Class-granted innate powers (level-gated) → synthesized, then converted. Seed
-  // from both the flat innatePowers field and any innate entries the bucket carried.
-  const innate: string[] = [
-    ...(charInput.innatePowers || []),
-    ...bucketPowers.filter((p) => isInnate(p.source)).map((p) => p.entityId),
-  ];
-  for (const c of v2.classes) {
+// Normalize a V2 character at the engine boundary: seed the two facts that are
+// DERIVED (not stored on the character) — class-granted innate powers and the
+// devotion bucket entry — so everything past resolveCharacterGraph sees a complete
+// V2 character. Idempotent: re-running never double-seeds (innates dedupe by name,
+// the devotion entry is only added when absent). This is the last remnant of the
+// old v1ToV2 flat→V2 bridge; the flat conversion is gone (the character is born V2).
+function normalizeV2(character: CharacterStateV2): CharacterStateV2 {
+  const classes = getClasses(character);
+  const powers = [...(character.powers || [])];
+  // Class-granted innate powers (level-gated) are DERIVED from the class list, not
+  // stored on the character. Seed the ones the character qualifies for that aren't
+  // already present (dedupe by name keeps this idempotent across re-resolves).
+  const owned = new Set(powers.map((p) => p.entityId));
+  for (const c of classes) {
     const clsDef = lookupEntity(`classes:${c.name}`);
     for (const p of clsDef?.innate || []) {
-      if (c.level >= (p.requiredLevel || 1) && !innate.includes(p.name)) innate.push(p.name);
+      if (c.level >= (p.requiredLevel || 1) && !owned.has(p.name)) {
+        owned.add(p.name);
+        powers.push({ entityId: p.name, source: Source.innate(), ranks: 1, costField: 'innatePowers' });
+      }
     }
   }
-  // No class on the innate source here: the old string form was a bare 'Innate'
-  // (sourceClass → null). Per-class attribution is a later (powers-slice) concern.
-  add('innatePowers', v2.powers, Source.innate(), innate);
 
-  // Spells are V2-native (CharacterChoice[] in charInput.spells) — preserve the
-  // bucket; synth from flat spell fields only when the bucket is empty. Every spell
-  // field (cantrips / spells-known / book) fills a caster slot and is FREE, so it's
-  // class-sourced — the granting caster class. Legacy flat chars carry no per-spell
-  // class, so attribute to the primary class (matches the single-caster common case;
-  // new chars write the bucket with the source already set).
-  for (const s of charInput.spells || []) v2.spells.push(s);
-  if (!(charInput.spells || []).length) {
-    for (const sf of ['cantrips', 'spellsKnown', 'noviceSpells', 'adeptSpells', 'greaterSpells'] as const) {
-      add(sf, v2.spells, Source.class(primaryClass), charInput[sf]);
-    }
-    // Book spells are Bookcaster's own pool — granted by that skill, not class slots.
-    add('bookSpells', v2.spells, Source.granted('Bookcaster'), charInput.bookSpells);
+  // The `devotion` scalar becomes a devotions-bucket entry (added only when absent).
+  const devotions = [...(character.devotions || [])];
+  if (character.devotion && !devotions.some((d) => d.entityId === `devotions:${character.devotion}`)) {
+    devotions.push({ entityId: `devotions:${character.devotion}`, source: Source.purchased() });
   }
-  if (charInput.devotion) {
-    v2.devotions.push({ entityId: `devotions:${charInput.devotion}`, source: Source.purchased() });
-  }
-  return v2;
+
+  return { ...character, classes, powers, devotions };
 }
 
-export function resolveCharacterGraph(charInput: V1CharacterInput | CharacterStateV2): CharacterGraphModel {
-  // Convert V1 input to V2 at the boundary; a char already normalized by v1ToV2
-  // (marked `_v2`) passes through. The marker is the reliable discriminator —
-  // inferring from bucket contents misfired (empty `skills: []` looked V2) and
-  // re-running v1ToV2 on its own output double-wrapped already-converted entries.
-  const character: CharacterStateV2 = (charInput as CharacterStateV2)._v2
-    ? (charInput as CharacterStateV2)
-    : v1ToV2(charInput as V1CharacterInput);
+export function resolveCharacterGraph(charInput: CharacterStateV2): CharacterGraphModel {
+  // The character is born V2 (UI reducers, loadArchetype, the sheet importer, and
+  // the test factory all produce V2 buckets). At the boundary we only DERIVE the
+  // two facts that aren't stored — class innate powers + the devotion entry.
+  const character = normalizeV2(charInput);
 
   const items: GraphItem[] = [];
   const charLevel = characterLevel(character);
