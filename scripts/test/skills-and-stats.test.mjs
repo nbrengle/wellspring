@@ -48,8 +48,8 @@ test('class progression LP bonus applies and is level-gated', () => {
   eq(validate({ classes: [{ name: 'Cleric', level: 7 }] }).stats.lifePoints, 5, 'Cleric L7 = 4 + 1 bonus');
 });
 test('Healthy class skill adds +1 max Life Point', () => {
-  const without = validate({ classes: [{ name: 'Fighter', level: 6 }] }).stats.lifePoints;
-  const withH = validate({ classes: [{ name: 'Fighter', level: 6 }], classSkills: ['Healthy'] }).stats;
+  const without = validate(makeChar('Fighter 6')).stats.lifePoints;
+  const withH = validate(makeChar('Fighter 6', { add: ['Healthy'] })).stats;
   eq(withH.lifePoints, without + 1, 'Healthy adds +1 LP');
   ok(withH.mods.sources.some((s) => s.name === 'Healthy' && s.stat === 'lifePoints'), 'Healthy is a recorded LP source');
 });

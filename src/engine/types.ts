@@ -248,10 +248,6 @@ export interface V1CharacterInput {
 }
 
 export interface CharacterStateV2 {
-  /** Set by v1ToV2 to mark a normalized-V2 character, so the boundary
-   *  (resolveCharacterGraph) passes it through instead of re-converting (which
-   *  double-wraps already-converted bucket entries). Retire when V1 is gone. */
-  _v2?: true;
   name?: string;
   archetypeName?: string;
   backstoryApproved?: boolean;

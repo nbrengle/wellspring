@@ -9,6 +9,8 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { validate } from "../src/engine/validate.js";
 import { grantedAbilities } from "../src/engine/testing.js";
+import { addToCharacter } from '../src/engine/character-add.js';
+import { makeChar } from './test/make-char.mjs';
 import { formatCharacterSheet } from '../src/data/sheet.js';
 import { CLASS_POWERS, REFS, ALL_PERKS, LINEAGES, lookupEntity } from '../src/engine/data.js';
 import { classPowers, rawPower } from './effect-score.mjs';
@@ -31,7 +33,7 @@ const TIER_FIELD = {
 // Build the strongest LEGAL loadout for a class list: fill each slot the validator
 // grants with that class's highest-scoring powers of a matching tier.
 function buildStrongest(name, classLevels) {
-  const character = { name, archetypeName: 'Custom Build', classLevels };
+  let character = makeChar(classLevels, { name, archetypeName: 'Custom Build' });
   const r = validate(character);
   // Pool per class — a slot belongs to ONE class (slot.cls), and a power may only
   // fill its own class's slot (a Cleric slot can't hold a Sourcerer spell).
@@ -51,7 +53,7 @@ function buildStrongest(name, classLevels) {
         : t.includes(slot.category);
       if (!ok) continue;
       const field = TIER_FIELD[p.tier] || TIER_FIELD[slot.category] || slot.category;
-      (character[field] = character[field] || []).push(p.name);
+      character = addToCharacter(character, p.name, { field, cls: slot.cls });
       used.add(p.name); n--;
     }
   }
@@ -104,16 +106,17 @@ function layerPerksAndLineage(character) {
     }
   }
 
-  // 2. Perks: spend the BP budget on the highest-value legal perks.
-  character.purchasedPerks = character.purchasedPerks || [];
+  // 2. Perks: spend the BP budget on the highest-value legal perks. Add each through
+  //    the real API; keep a snapshot so an over-budget/illegal pick can be reverted.
   const perkPool = ALL_PERKS
     .map((p) => ({ name: p.name, cost: p.cost || 0, v: entityValue(`perks:${p.name}`) }))
     .filter((p) => p.v > 0).sort((a, b) => b.v - a.v);
   for (const p of perkPool) {
-    if (character.purchasedPerks.includes(p.name)) continue;
-    character.purchasedPerks.push(p.name);
+    if ((character.perks || []).some((e) => e.entityId === p.name)) continue;
+    const before = character;
+    character = addToCharacter(character, p.name);
     const r = validate(character);
-    if (!r.valid || r.overBudget) character.purchasedPerks.pop();
+    if (!r.valid || r.overBudget) character = before;
   }
   return character;
 }
