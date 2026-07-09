@@ -69,7 +69,8 @@ export function lbpState(character) {
   // any the character owns; the highest stated newMax raises the challenge cap.
   const lbpB = REFS.lbpBonuses || {};
   let bonusLbp = 0, cap = MAX_LBP;
-  for (const name of (character.purchasedPerks || [])) {
+  const perkNames = (character.perks || []).map((p) => (typeof p === 'string' ? p : p.entityId));
+  for (const name of perkNames) {
     const b = lbpB[`perks:${cleanItemName(name)}`];
     if (b) { bonusLbp += b.extra || 0; if (b.newMax) cap = Math.max(cap, b.newMax); }
   }

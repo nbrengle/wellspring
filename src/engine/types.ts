@@ -151,9 +151,16 @@ export interface V1CharacterInput {
   /** All skills (starting + purchased) are V2-native: CharacterChoice[] in `skills`,
    *  source 'Class:Starting' or 'Purchased'. No flat skill arrays on a live char. */
   skills?: CharacterChoice[];
-  /** Transient: the sheet importer parses the "Starting/Purchased Skills" lines into
-   *  these flat arrays, then converts them into `skills` and deletes them. No live
-   *  character carries them; they exist only inside parseCharacterSheet. */
+  /** Perks are V2-native: CharacterChoice[] in `perks` (source 'Purchased'). */
+  perks?: CharacterChoice[];
+  /** Powers/spells are V2-native buckets (archetypes ship them here); the flat power/
+   *  spell fields below are the legacy/importer shape, not migrated in the perks slice. */
+  powers?: CharacterChoice[];
+  spells?: CharacterChoice[];
+  /** Transient: the sheet importer parses the "Starting/Purchased Skills" and
+   *  "Purchased Perks" lines into these flat arrays, then converts them into the
+   *  `skills`/`perks` buckets and deletes them. No live character carries them;
+   *  they exist only inside parseCharacterSheet. */
   startingSkills?: string[];
   purchasedSkills?: string[];
   purchasedPerks?: string[];

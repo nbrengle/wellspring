@@ -62,10 +62,9 @@ export const EMPTY_CHARACTER = {
   spikes: null,
   wealth: null,              // null → DEFAULT_WEALTH (8); perks/sheet may set it
   resources: null,           // free-form, from the sheet
-  // Skills (starting + purchased) live in the V2 `skills` bucket as CharacterChoice[]
-  // — no flat startingSkills/purchasedSkills. applyClassStartingAbilities populates
-  // the starting entries when a class is chosen; the reducers add purchased ones.
-  purchasedPerks: [],
+  // Skills and perks live in their V2 buckets as CharacterChoice[] — no flat
+  // startingSkills/purchasedSkills/purchasedPerks. applyClassStartingAbilities
+  // populates starting skills when a class is chosen; the reducers add purchased.
   flaws: [],
   advantageChoices: {},
   grantedSelections: {},
