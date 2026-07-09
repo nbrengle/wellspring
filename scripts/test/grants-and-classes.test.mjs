@@ -13,7 +13,7 @@ import { bareSkill, cleanItemName, getClasses, formatParameterizedName } from ".
 import { formatCharacterSheet, parseCharacterSheet } from '../../src/engine/sheet.js';
 import { solveCrafting, RECIPES, resolveRecipe, classifyIngredient, buildCraftTree } from '../../src/engine/recipe-solver.js';
 import { readFileSync } from 'node:fs';
-import { lookupEntity, eligiblePowers, DEVOTIONS, DOMAINS, REFS, CLASSES, LINEAGES, lineageChoiceSpec, lineageItemImpact, ALLERGEN_AWARDS, allergenOptions, allergenAward, powerSpellChoiceSpec } from '../../src/engine/data.js';
+import { lookupEntity, eligiblePowers, CLASS_POWERS, DEVOTIONS, DOMAINS, REFS, CLASSES, LINEAGES, lineageChoiceSpec, lineageItemImpact, ALLERGEN_AWARDS, allergenOptions, allergenAward, powerSpellChoiceSpec } from '../../src/engine/data.js';
 import { resolveCharacterGraph } from '../../src/engine/graph.js';
 import {
   hasStartingChoices, reconcileStartingChoices, rebuildStartingSkills,
@@ -65,6 +65,30 @@ test('a stored innate power is materialized once, not double-counted', () => {
     .filter((i) => /^Practiced Manner$/.test(i.name));
   eq(items.length, 1, 'Practiced Manner appears exactly once');
   eq(items[0].sourceType, 'innate', 'and via the innate handler, not the generic loop');
+});
+
+// ─── caster spells: sphere/tier + Bookcaster pool ────────────────────────────
+test('book spells (Bookcaster grant) do not consume spells-known slots', () => {
+  // Book spells share the novice/adept/greater tiers but are Bookcaster's OWN pool
+  // (source {granted, by:'Bookcaster'}), not the class's slots — they must not count.
+  const nov = CLASS_POWERS['Mage'].noviceSpells;
+  const c = { classes: [{ name: 'Mage', level: 4 }], spells: [
+    { entityId: 'spells:' + nov[0].name, source: Source.class('Mage'), costField: 'noviceSpells' },
+    { entityId: 'spells:' + nov[1].name, source: Source.granted('Bookcaster'), costField: 'bookSpells' },
+  ] };
+  const row = computeSlots(c).find((s) => s.category === 'spellsKnown');
+  eq(row.used, 1, 'only the class-slot spell counts; the book spell does not');
+});
+test('divine and arcane spells count against their own class (multiclass)', () => {
+  const cNov = CLASS_POWERS['Cleric'].noviceSpells[0].name;
+  const mNov = CLASS_POWERS['Mage'].noviceSpells[0].name;
+  const c = { classes: [{ name: 'Cleric', level: 6 }, { name: 'Mage', level: 4 }], spells: [
+    { entityId: 'spells:' + cNov, source: Source.class('Cleric'), costField: 'noviceSpells' },
+    { entityId: 'spells:' + mNov, source: Source.class('Mage'), costField: 'noviceSpells' },
+  ] };
+  const rows = computeSlots(c);
+  eq(rows.find((s) => s.cls === 'Cleric' && s.category === 'spellsKnown').used, 1, 'Cleric counts its divine spell');
+  eq(rows.find((s) => s.cls === 'Mage' && s.category === 'spellsKnown').used, 1, 'Mage counts its arcane spell');
 });
 
 // ─── cross-class / pick-a-class grants ────────────────────────────────────────

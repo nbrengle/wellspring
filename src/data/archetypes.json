@@ -11,7 +11,8 @@
         "source": {
           "type": "starting",
           "class": "Fighter"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "45ff378d5d3b1153d8d9fec46b0c76ec",
@@ -19,7 +20,8 @@
         "source": {
           "type": "starting",
           "class": "Fighter"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "19a7e0ba0509c1bb07b76aff9885e9bc",
@@ -27,7 +29,8 @@
         "source": {
           "type": "starting",
           "class": "Fighter"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "ce46af9df271c10b22ae312a3b20ca10",
@@ -35,7 +38,8 @@
         "source": {
           "type": "starting",
           "class": "Fighter"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "2dc009739db846220183fbd6fd924fd3",
@@ -43,7 +47,8 @@
         "source": {
           "type": "starting",
           "class": "Fighter"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "b1cb5dae4faae935e307a6a1dcad9074",
@@ -51,7 +56,8 @@
         "source": {
           "type": "starting",
           "class": "Fighter"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "a87ffe1accc2782b2b068480443174e0",
@@ -59,6 +65,7 @@
         "source": {
           "type": "purchased"
         },
+        "costField": "purchasedSkills",
         "costOverride": 0
       },
       {
@@ -67,6 +74,7 @@
         "source": {
           "type": "purchased"
         },
+        "costField": "purchasedSkills",
         "costOverride": 5
       },
       {
@@ -75,6 +83,7 @@
         "source": {
           "type": "purchased"
         },
+        "costField": "purchasedSkills",
         "costOverride": 2
       }
     ],
@@ -85,6 +94,7 @@
         "source": {
           "type": "purchased"
         },
+        "costField": "purchasedPerks",
         "costOverride": 1
       },
       {
@@ -93,6 +103,7 @@
         "source": {
           "type": "purchased"
         },
+        "costField": "purchasedPerks",
         "costOverride": 1
       }
     ],
@@ -103,21 +114,24 @@
         "entityId": "Deadly Remnants",
         "source": {
           "type": "innate"
-        }
+        },
+        "costField": "innatePowers"
       },
       {
         "id": "e7067e135b5444bc91fd67ef55b4b4b4",
         "entityId": "Fighting Instructor",
         "source": {
           "type": "innate"
-        }
+        },
+        "costField": "innatePowers"
       },
       {
         "id": "e37dc5281cf370ee6d2b7c2381042f8b",
         "entityId": "Parry Blow",
         "source": {
           "type": "innate"
-        }
+        },
+        "costField": "innatePowers"
       },
       {
         "id": "f6a1dbbb3b0ee0c488eb90579c39f6d1",
@@ -125,7 +139,8 @@
         "source": {
           "type": "class",
           "name": "Fighter"
-        }
+        },
+        "costField": "utilityPowers"
       },
       {
         "id": "f5779000897b1fbeb97d621d9a8aad6c",
@@ -133,7 +148,8 @@
         "source": {
           "type": "class",
           "name": "Fighter"
-        }
+        },
+        "costField": "utilityPowers"
       },
       {
         "id": "f0f9d426753b31252c3845bdadea0372",
@@ -141,7 +157,8 @@
         "source": {
           "type": "class",
           "name": "Fighter"
-        }
+        },
+        "costField": "basicPowers"
       },
       {
         "id": "1796315187077e63942364b278e9835a",
@@ -149,7 +166,8 @@
         "source": {
           "type": "class",
           "name": "Fighter"
-        }
+        },
+        "costField": "basicPowers"
       }
     ],
     "spells": [],
@@ -172,7 +190,8 @@
         "source": {
           "type": "starting",
           "class": "Fighter"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "826cab4f19cc9defb7ee966315d58e3f",
@@ -180,7 +199,8 @@
         "source": {
           "type": "starting",
           "class": "Fighter"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "805bcd80da07928326e188180a42348e",
@@ -188,7 +208,8 @@
         "source": {
           "type": "starting",
           "class": "Fighter"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "e55b1c297945f6f34e154ff806ade66c",
@@ -196,7 +217,8 @@
         "source": {
           "type": "starting",
           "class": "Fighter"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "e6a12df7dedd978a201b0f7e15fde0b9",
@@ -204,7 +226,8 @@
         "source": {
           "type": "starting",
           "class": "Fighter"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "756545094af9bf3249f653ffcf94755a",
@@ -212,6 +235,7 @@
         "source": {
           "type": "purchased"
         },
+        "costField": "purchasedSkills",
         "costOverride": 4
       }
     ],
@@ -222,6 +246,7 @@
         "source": {
           "type": "purchased"
         },
+        "costField": "purchasedPerks",
         "costOverride": 2
       },
       {
@@ -230,6 +255,7 @@
         "source": {
           "type": "purchased"
         },
+        "costField": "purchasedPerks",
         "costOverride": 3
       }
     ],
@@ -240,21 +266,24 @@
         "entityId": "Deadly Remnants",
         "source": {
           "type": "innate"
-        }
+        },
+        "costField": "innatePowers"
       },
       {
         "id": "333f4b811ecc0c68903cb2aa986df558",
         "entityId": "Fighting Instructor",
         "source": {
           "type": "innate"
-        }
+        },
+        "costField": "innatePowers"
       },
       {
         "id": "2254ecda30dd1b6b0e25aaa10a5fd716",
         "entityId": "Parry Blow",
         "source": {
           "type": "innate"
-        }
+        },
+        "costField": "innatePowers"
       },
       {
         "id": "da7ab73ee6ecda19601f91b3e1b6aa41",
@@ -262,7 +291,8 @@
         "source": {
           "type": "class",
           "name": "Fighter"
-        }
+        },
+        "costField": "utilityPowers"
       },
       {
         "id": "57fb5d210993527ef3183c70bc1de93a",
@@ -270,7 +300,8 @@
         "source": {
           "type": "class",
           "name": "Fighter"
-        }
+        },
+        "costField": "utilityPowers"
       },
       {
         "id": "73efe539434a6e6a1038a617b917984c",
@@ -278,7 +309,8 @@
         "source": {
           "type": "class",
           "name": "Fighter"
-        }
+        },
+        "costField": "basicPowers"
       },
       {
         "id": "854ee5eaa67579b2ad88a9c11204c79c",
@@ -286,7 +318,8 @@
         "source": {
           "type": "class",
           "name": "Fighter"
-        }
+        },
+        "costField": "basicPowers"
       }
     ],
     "spells": [],
@@ -309,7 +342,8 @@
         "source": {
           "type": "starting",
           "class": "Fighter"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "891b9154abb29fb6b115761aa78a834c",
@@ -317,7 +351,8 @@
         "source": {
           "type": "starting",
           "class": "Fighter"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "dc251c5b2136409a665f9642d6586a6a",
@@ -325,7 +360,8 @@
         "source": {
           "type": "starting",
           "class": "Fighter"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "daff68e2f8b40ddf11a263413b124e87",
@@ -333,7 +369,8 @@
         "source": {
           "type": "starting",
           "class": "Fighter"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "153792697c03bca9789fbf5c2eeb4784",
@@ -341,7 +378,8 @@
         "source": {
           "type": "starting",
           "class": "Fighter"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "5e7eb098ffb14dabb5b35c1719a37fa6",
@@ -349,7 +387,8 @@
         "source": {
           "type": "starting",
           "class": "Fighter"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "6adb7fe182dd273141521e905801b826",
@@ -357,6 +396,7 @@
         "source": {
           "type": "purchased"
         },
+        "costField": "purchasedSkills",
         "costOverride": 3
       },
       {
@@ -365,6 +405,7 @@
         "source": {
           "type": "purchased"
         },
+        "costField": "purchasedSkills",
         "costOverride": 4
       },
       {
@@ -373,6 +414,7 @@
         "source": {
           "type": "purchased"
         },
+        "costField": "purchasedSkills",
         "costOverride": 1
       }
     ],
@@ -383,6 +425,7 @@
         "source": {
           "type": "purchased"
         },
+        "costField": "purchasedPerks",
         "costOverride": 1
       }
     ],
@@ -393,21 +436,24 @@
         "entityId": "Deadly Remnants",
         "source": {
           "type": "innate"
-        }
+        },
+        "costField": "innatePowers"
       },
       {
         "id": "80e03a5b91ccf3dfb1c9304ce64f452e",
         "entityId": "Fighting Instructor",
         "source": {
           "type": "innate"
-        }
+        },
+        "costField": "innatePowers"
       },
       {
         "id": "1c1e4da33257bb54c3239f6e8b0f90aa",
         "entityId": "Parry Blow",
         "source": {
           "type": "innate"
-        }
+        },
+        "costField": "innatePowers"
       },
       {
         "id": "709ddd2baa57f0c8386a2fce4ab2b857",
@@ -415,7 +461,8 @@
         "source": {
           "type": "class",
           "name": "Fighter"
-        }
+        },
+        "costField": "utilityPowers"
       },
       {
         "id": "e71ac64c420211c2a7cee7a563155547",
@@ -423,7 +470,8 @@
         "source": {
           "type": "class",
           "name": "Fighter"
-        }
+        },
+        "costField": "utilityPowers"
       },
       {
         "id": "9213c70f7a8468114460ce63e674d846",
@@ -431,7 +479,8 @@
         "source": {
           "type": "class",
           "name": "Fighter"
-        }
+        },
+        "costField": "basicPowers"
       },
       {
         "id": "45f6535b5b4e8d0bbc57a5b41352241c",
@@ -439,7 +488,8 @@
         "source": {
           "type": "class",
           "name": "Fighter"
-        }
+        },
+        "costField": "basicPowers"
       }
     ],
     "spells": [],
@@ -462,7 +512,8 @@
         "source": {
           "type": "starting",
           "class": "Cleric"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "cf867a026aa8ba44da5ebe27fd4e6759",
@@ -470,7 +521,8 @@
         "source": {
           "type": "starting",
           "class": "Cleric"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "fdac889c2075523efcabf622d3e3b778",
@@ -478,7 +530,8 @@
         "source": {
           "type": "starting",
           "class": "Cleric"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "a515dffa44831d3316070358266394ec",
@@ -486,7 +539,8 @@
         "source": {
           "type": "starting",
           "class": "Cleric"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "7472f1bc74802440810cb2b11556d738",
@@ -494,7 +548,8 @@
         "source": {
           "type": "starting",
           "class": "Cleric"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "38a1c05eab0e35e211acb0aa32b3e52b",
@@ -502,7 +557,8 @@
         "source": {
           "type": "starting",
           "class": "Cleric"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "a15d3c0f2a2b0b7ad40345782cfb441b",
@@ -510,6 +566,7 @@
         "source": {
           "type": "purchased"
         },
+        "costField": "purchasedSkills",
         "costOverride": 2
       },
       {
@@ -518,6 +575,7 @@
         "source": {
           "type": "purchased"
         },
+        "costField": "purchasedSkills",
         "costOverride": 1
       }
     ],
@@ -528,6 +586,7 @@
         "source": {
           "type": "purchased"
         },
+        "costField": "purchasedPerks",
         "costOverride": 1
       }
     ],
@@ -538,21 +597,24 @@
         "entityId": "Ritual Affinity",
         "source": {
           "type": "innate"
-        }
+        },
+        "costField": "innatePowers"
       },
       {
         "id": "13bb54e1884763e69c6544342d2905d6",
         "entityId": "Healing Touch",
         "source": {
           "type": "innate"
-        }
+        },
+        "costField": "innatePowers"
       },
       {
         "id": "354dd769167ebe6bcf8fef500417fb2b",
         "entityId": "Refreshing Prayer",
         "source": {
           "type": "innate"
-        }
+        },
+        "costField": "innatePowers"
       },
       {
         "id": "84f062d8d217a27b56b0fb2e593ba760",
@@ -560,6 +622,7 @@
         "source": {
           "type": "purchased"
         },
+        "costField": "domainPowers",
         "costOverride": 5
       }
     ],
@@ -570,7 +633,8 @@
         "source": {
           "type": "class",
           "name": "Cleric"
-        }
+        },
+        "costField": "cantrips"
       },
       {
         "id": "2bcd6758f78d78658f2d588a956b78a3",
@@ -578,7 +642,8 @@
         "source": {
           "type": "class",
           "name": "Cleric"
-        }
+        },
+        "costField": "cantrips"
       },
       {
         "id": "7ce54916a5a148d64786d72769e25dd1",
@@ -586,7 +651,8 @@
         "source": {
           "type": "class",
           "name": "Cleric"
-        }
+        },
+        "costField": "cantrips"
       },
       {
         "id": "8b47d21c048429c9426c2b7c198a2ea9",
@@ -594,35 +660,44 @@
         "source": {
           "type": "class",
           "name": "Cleric"
-        }
+        },
+        "costField": "cantrips"
       },
       {
         "id": "b3f1af93bcb1897c0a8e40b0d7e2ca58",
         "entityId": "Cure",
         "source": {
-          "type": "purchased"
-        }
+          "type": "class",
+          "name": "Cleric"
+        },
+        "costField": "noviceSpells"
       },
       {
         "id": "1cd76e3c5c64f0e494cf1d2b41da3998",
         "entityId": "Heretic’s Brand",
         "source": {
-          "type": "purchased"
-        }
+          "type": "class",
+          "name": "Cleric"
+        },
+        "costField": "noviceSpells"
       },
       {
         "id": "94a92536b0f787ab414c821479b960fe",
         "entityId": "Rekindle",
         "source": {
-          "type": "purchased"
-        }
+          "type": "class",
+          "name": "Cleric"
+        },
+        "costField": "noviceSpells"
       },
       {
         "id": "436b3a5383cf6486d1be07a36b3dc369",
         "entityId": "Spirit Speak",
         "source": {
-          "type": "purchased"
-        }
+          "type": "class",
+          "name": "Cleric"
+        },
+        "costField": "noviceSpells"
       }
     ],
     "devotions": [
@@ -652,7 +727,8 @@
         "source": {
           "type": "starting",
           "class": "Druid"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "27383c21a0308c569b247864c6e4e372",
@@ -660,7 +736,8 @@
         "source": {
           "type": "starting",
           "class": "Druid"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "8ddf8b3f35d0acd34377ebd1205f4683",
@@ -668,7 +745,8 @@
         "source": {
           "type": "starting",
           "class": "Druid"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "05427b5e7af27a3eb4419f9a4a80ff2e",
@@ -676,7 +754,8 @@
         "source": {
           "type": "starting",
           "class": "Druid"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "b07163e34a0302462bfabf39e3190df5",
@@ -684,7 +763,8 @@
         "source": {
           "type": "starting",
           "class": "Druid"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "01e8d993a359218e2cf025deb18e39dd",
@@ -692,7 +772,8 @@
         "source": {
           "type": "starting",
           "class": "Druid"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "f9b8477416d8a3440ca26c572c54ec4e",
@@ -700,6 +781,7 @@
         "source": {
           "type": "purchased"
         },
+        "costField": "purchasedSkills",
         "costOverride": 4
       },
       {
@@ -708,6 +790,7 @@
         "source": {
           "type": "purchased"
         },
+        "costField": "purchasedSkills",
         "costOverride": 2
       }
     ],
@@ -718,6 +801,7 @@
         "source": {
           "type": "purchased"
         },
+        "costField": "purchasedPerks",
         "costOverride": 3
       }
     ],
@@ -728,21 +812,24 @@
         "entityId": "Commune with Nature",
         "source": {
           "type": "innate"
-        }
+        },
+        "costField": "innatePowers"
       },
       {
         "id": "24ff5c7098585f2ef88e37241ec9bf69",
         "entityId": "Message of the Flowers",
         "source": {
           "type": "innate"
-        }
+        },
+        "costField": "innatePowers"
       },
       {
         "id": "e3f05735e0e73e2856c47323f2e3d0b8",
         "entityId": "Nature’s Understanding",
         "source": {
           "type": "innate"
-        }
+        },
+        "costField": "innatePowers"
       }
     ],
     "spells": [
@@ -752,7 +839,8 @@
         "source": {
           "type": "class",
           "name": "Druid"
-        }
+        },
+        "costField": "cantrips"
       },
       {
         "id": "799961ed3f06de9ad55ffcdde3727166",
@@ -760,7 +848,8 @@
         "source": {
           "type": "class",
           "name": "Druid"
-        }
+        },
+        "costField": "cantrips"
       },
       {
         "id": "e43bbe2879f0b816c6fc12051a8d8ace",
@@ -768,35 +857,44 @@
         "source": {
           "type": "class",
           "name": "Druid"
-        }
+        },
+        "costField": "cantrips"
       },
       {
         "id": "4ef467a8c61a6e700da01ffca4a34cda",
         "entityId": "Barkskin",
         "source": {
-          "type": "purchased"
-        }
+          "type": "class",
+          "name": "Druid"
+        },
+        "costField": "noviceSpells"
       },
       {
         "id": "86a56378c533bee2bfaac8730f283b7b",
         "entityId": "Lesser Form of the Hulking Bear",
         "source": {
-          "type": "purchased"
-        }
+          "type": "class",
+          "name": "Druid"
+        },
+        "costField": "noviceSpells"
       },
       {
         "id": "4e5d4cfda8b453e5d5eee2c629f3688c",
         "entityId": "Lesser Form of the Hunting Panther",
         "source": {
-          "type": "purchased"
-        }
+          "type": "class",
+          "name": "Druid"
+        },
+        "costField": "noviceSpells"
       },
       {
         "id": "daea28fa7636a14a5277d8ee779f1d81",
         "entityId": "Lesser Form of the Striking Serpent",
         "source": {
-          "type": "purchased"
-        }
+          "type": "class",
+          "name": "Druid"
+        },
+        "costField": "noviceSpells"
       }
     ],
     "devotions": [],
@@ -818,7 +916,8 @@
         "source": {
           "type": "starting",
           "class": "Druid"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "0f8e77b0de71295c9c9bdf1c4d9c57ee",
@@ -826,7 +925,8 @@
         "source": {
           "type": "starting",
           "class": "Druid"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "aaa37753ca32dcee1c1f9c05674a3f9f",
@@ -834,7 +934,8 @@
         "source": {
           "type": "starting",
           "class": "Druid"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "64d2fbddb07f5e33cc63ca0284b5597a",
@@ -842,7 +943,8 @@
         "source": {
           "type": "starting",
           "class": "Druid"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "0666b1bf50b70b5f3f0707725bd4ce29",
@@ -850,7 +952,8 @@
         "source": {
           "type": "starting",
           "class": "Druid"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "10f450b6b4c0c3af56eb9e0bb165f2fd",
@@ -858,7 +961,8 @@
         "source": {
           "type": "starting",
           "class": "Druid"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "b148544cbbc4f1f8273a749eb68e8398",
@@ -866,6 +970,7 @@
         "source": {
           "type": "purchased"
         },
+        "costField": "purchasedSkills",
         "costOverride": 1
       },
       {
@@ -874,6 +979,7 @@
         "source": {
           "type": "purchased"
         },
+        "costField": "purchasedSkills",
         "costOverride": 1
       },
       {
@@ -882,6 +988,7 @@
         "source": {
           "type": "purchased"
         },
+        "costField": "purchasedSkills",
         "costOverride": 1
       },
       {
@@ -890,6 +997,7 @@
         "source": {
           "type": "purchased"
         },
+        "costField": "purchasedSkills",
         "costOverride": 4
       }
     ],
@@ -900,6 +1008,7 @@
         "source": {
           "type": "purchased"
         },
+        "costField": "purchasedPerks",
         "costOverride": 2
       }
     ],
@@ -910,21 +1019,24 @@
         "entityId": "Commune with Nature",
         "source": {
           "type": "innate"
-        }
+        },
+        "costField": "innatePowers"
       },
       {
         "id": "954e7118046b97229241559c81a411fc",
         "entityId": "Message of the Flowers",
         "source": {
           "type": "innate"
-        }
+        },
+        "costField": "innatePowers"
       },
       {
         "id": "4b1e43e05db629d13c2824f4d107b51c",
         "entityId": "Nature’s Understanding",
         "source": {
           "type": "innate"
-        }
+        },
+        "costField": "innatePowers"
       }
     ],
     "spells": [
@@ -934,7 +1046,8 @@
         "source": {
           "type": "class",
           "name": "Druid"
-        }
+        },
+        "costField": "cantrips"
       },
       {
         "id": "f2c7e9349e0ff41b6d7e8074d414d16b",
@@ -942,7 +1055,8 @@
         "source": {
           "type": "class",
           "name": "Druid"
-        }
+        },
+        "costField": "cantrips"
       },
       {
         "id": "3744494b73234675ff302f80fd76c323",
@@ -950,42 +1064,53 @@
         "source": {
           "type": "class",
           "name": "Druid"
-        }
+        },
+        "costField": "cantrips"
       },
       {
         "id": "c23c43c3ee37bb59e46638611f4e3ebf",
         "entityId": "Balm",
         "source": {
-          "type": "purchased"
-        }
+          "type": "class",
+          "name": "Druid"
+        },
+        "costField": "noviceSpells"
       },
       {
         "id": "d6b25711f45e36fcf686337d962a602a",
         "entityId": "Blessing of the Oak",
         "source": {
-          "type": "purchased"
-        }
+          "type": "class",
+          "name": "Druid"
+        },
+        "costField": "noviceSpells"
       },
       {
         "id": "31f3731bdd7225feca6446eada56edb4",
         "entityId": "Purifying Flame",
         "source": {
-          "type": "purchased"
-        }
+          "type": "class",
+          "name": "Druid"
+        },
+        "costField": "noviceSpells"
       },
       {
         "id": "f2190b62763998f95d830e4180846c68",
         "entityId": "Quell Beast",
         "source": {
-          "type": "purchased"
-        }
+          "type": "class",
+          "name": "Druid"
+        },
+        "costField": "noviceSpells"
       },
       {
         "id": "5f14ec8d0f638ebe30b796d16a9ef6b2",
         "entityId": "Sap of Life",
         "source": {
-          "type": "purchased"
-        }
+          "type": "class",
+          "name": "Druid"
+        },
+        "costField": "noviceSpells"
       }
     ],
     "devotions": [],
@@ -1007,7 +1132,8 @@
         "source": {
           "type": "starting",
           "class": "Mage"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "057a193367e855e0486ab57050720767",
@@ -1015,7 +1141,8 @@
         "source": {
           "type": "starting",
           "class": "Mage"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "84e339813aaf2b6ab92d215f8eba8aa4",
@@ -1023,7 +1150,8 @@
         "source": {
           "type": "starting",
           "class": "Mage"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "a162afa3d15d7f332ace701d33b8de12",
@@ -1031,7 +1159,8 @@
         "source": {
           "type": "starting",
           "class": "Mage"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "b163a626aa0289552bc364664657b79e",
@@ -1039,7 +1168,8 @@
         "source": {
           "type": "starting",
           "class": "Mage"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "8d209289f94534a4d4bdc580c109c645",
@@ -1048,6 +1178,7 @@
           "type": "starting",
           "class": "Mage"
         },
+        "costField": "startingSkills",
         "ranks": 2
       },
       {
@@ -1056,6 +1187,7 @@
         "source": {
           "type": "purchased"
         },
+        "costField": "purchasedSkills",
         "costOverride": 0
       },
       {
@@ -1064,6 +1196,7 @@
         "source": {
           "type": "purchased"
         },
+        "costField": "purchasedSkills",
         "costOverride": 2
       },
       {
@@ -1071,14 +1204,16 @@
         "entityId": "Lore (Historical)",
         "source": {
           "type": "purchased"
-        }
+        },
+        "costField": "purchasedSkills"
       },
       {
         "id": "b7e597b53fcdccd177ae94342628a54a",
         "entityId": "Lore (Arcane)",
         "source": {
           "type": "purchased"
-        }
+        },
+        "costField": "purchasedSkills"
       }
     ],
     "perks": [
@@ -1088,6 +1223,7 @@
         "source": {
           "type": "purchased"
         },
+        "costField": "purchasedPerks",
         "costOverride": 2
       },
       {
@@ -1096,6 +1232,7 @@
         "source": {
           "type": "purchased"
         },
+        "costField": "purchasedPerks",
         "costOverride": 3
       }
     ],
@@ -1106,21 +1243,24 @@
         "entityId": "Arcane Study",
         "source": {
           "type": "innate"
-        }
+        },
+        "costField": "innatePowers"
       },
       {
         "id": "bd2fef329409d409c61e34a249906034",
         "entityId": "Replicate Enhancement",
         "source": {
           "type": "innate"
-        }
+        },
+        "costField": "innatePowers"
       },
       {
         "id": "33c6c20dd3f400870be2bc0aa9903403",
         "entityId": "Ritual Affinity",
         "source": {
           "type": "innate"
-        }
+        },
+        "costField": "innatePowers"
       }
     ],
     "spells": [
@@ -1130,7 +1270,8 @@
         "source": {
           "type": "class",
           "name": "Mage"
-        }
+        },
+        "costField": "cantrips"
       },
       {
         "id": "57d8d5d861e2c563f2685473fd103dd9",
@@ -1138,7 +1279,8 @@
         "source": {
           "type": "class",
           "name": "Mage"
-        }
+        },
+        "costField": "cantrips"
       },
       {
         "id": "a5ac06b2fbc7dd9a3d2732ecafb6345d",
@@ -1146,49 +1288,62 @@
         "source": {
           "type": "class",
           "name": "Mage"
-        }
+        },
+        "costField": "cantrips"
       },
       {
         "id": "0dda31811cb5180d67b8cc782028c4ca",
         "entityId": "Carnate",
         "source": {
-          "type": "purchased"
-        }
+          "type": "class",
+          "name": "Mage"
+        },
+        "costField": "noviceSpells"
       },
       {
         "id": "a58b99af9e13fa72447c243d856985ea",
         "entityId": "Freeze",
         "source": {
-          "type": "purchased"
-        }
+          "type": "class",
+          "name": "Mage"
+        },
+        "costField": "noviceSpells"
       },
       {
         "id": "c26bda2121eff3cecd74ba6d40843022",
         "entityId": "Mageskin",
         "source": {
-          "type": "purchased"
-        }
+          "type": "class",
+          "name": "Mage"
+        },
+        "costField": "noviceSpells"
       },
       {
         "id": "f68765169b1d0705189b7cae79e10005",
         "entityId": "Town Portal",
         "source": {
-          "type": "purchased"
-        }
+          "type": "class",
+          "name": "Mage"
+        },
+        "costField": "noviceSpells"
       },
       {
         "id": "641b6da670683b7a5819717b1c6fe069",
         "entityId": "Magekey",
         "source": {
-          "type": "purchased"
-        }
+          "type": "granted",
+          "by": "Bookcaster"
+        },
+        "costField": "bookSpells"
       },
       {
         "id": "623b570c6c3c9e340dd6b0e2b3e0c5fe",
         "entityId": "Mask Aura",
         "source": {
-          "type": "purchased"
-        }
+          "type": "granted",
+          "by": "Bookcaster"
+        },
+        "costField": "bookSpells"
       }
     ],
     "devotions": [],
@@ -1210,7 +1365,8 @@
         "source": {
           "type": "starting",
           "class": "Rogue"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "ba19d2ff7bb7c1629f145884cff22263",
@@ -1218,7 +1374,8 @@
         "source": {
           "type": "starting",
           "class": "Rogue"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "fa8bd62e6b99d2311e26f9e17bd926ba",
@@ -1226,7 +1383,8 @@
         "source": {
           "type": "starting",
           "class": "Rogue"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "e7059695005ec9ddc7253e42512edc25",
@@ -1234,7 +1392,8 @@
         "source": {
           "type": "starting",
           "class": "Rogue"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "2379ce74c1fe867de8b8e20c4f4fb502",
@@ -1242,7 +1401,8 @@
         "source": {
           "type": "starting",
           "class": "Rogue"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "65a3af4d8cf9b1a5b4d55b25c2623159",
@@ -1250,7 +1410,8 @@
         "source": {
           "type": "starting",
           "class": "Rogue"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "56bd3131210f31ce87dfa7bf8cc301ac",
@@ -1258,6 +1419,7 @@
         "source": {
           "type": "purchased"
         },
+        "costField": "purchasedSkills",
         "costOverride": 4
       },
       {
@@ -1266,6 +1428,7 @@
         "source": {
           "type": "purchased"
         },
+        "costField": "purchasedSkills",
         "costOverride": 2
       },
       {
@@ -1274,6 +1437,7 @@
         "source": {
           "type": "purchased"
         },
+        "costField": "purchasedSkills",
         "costOverride": 3
       }
     ],
@@ -1285,21 +1449,24 @@
         "entityId": "Deflect Projectile",
         "source": {
           "type": "innate"
-        }
+        },
+        "costField": "innatePowers"
       },
       {
         "id": "3060c52bb823466f022b2217bf404748",
         "entityId": "Backstab",
         "source": {
           "type": "innate"
-        }
+        },
+        "costField": "innatePowers"
       },
       {
         "id": "abee5b92e3e2f2eef3810f83a92510dd",
         "entityId": "Loot",
         "source": {
           "type": "innate"
-        }
+        },
+        "costField": "innatePowers"
       },
       {
         "id": "5d6ca7838af51c58480ef7918aa47a9c",
@@ -1307,7 +1474,8 @@
         "source": {
           "type": "class",
           "name": "Rogue"
-        }
+        },
+        "costField": "utilityPowers"
       },
       {
         "id": "f05a44bcad9217389d626f6c037b9a32",
@@ -1315,7 +1483,8 @@
         "source": {
           "type": "class",
           "name": "Rogue"
-        }
+        },
+        "costField": "utilityPowers"
       },
       {
         "id": "07f5e3aa590c6923df1685442b47130b",
@@ -1323,7 +1492,8 @@
         "source": {
           "type": "class",
           "name": "Rogue"
-        }
+        },
+        "costField": "basicPowers"
       },
       {
         "id": "0e963aab26bb6207f3e834e1b5843903",
@@ -1331,7 +1501,8 @@
         "source": {
           "type": "class",
           "name": "Rogue"
-        }
+        },
+        "costField": "basicPowers"
       }
     ],
     "spells": [],
@@ -1354,7 +1525,8 @@
         "source": {
           "type": "starting",
           "class": "Rogue"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "5e07e918e6d604299094a66ed3b6ed40",
@@ -1362,7 +1534,8 @@
         "source": {
           "type": "starting",
           "class": "Rogue"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "1730974a56fa3d6b882c4dca296dffb9",
@@ -1370,7 +1543,8 @@
         "source": {
           "type": "starting",
           "class": "Rogue"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "759ce00b0363e44bae389e932fbb1388",
@@ -1378,7 +1552,8 @@
         "source": {
           "type": "starting",
           "class": "Rogue"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "5f009bb92fb237ce3a099df4b7c4eb28",
@@ -1386,7 +1561,8 @@
         "source": {
           "type": "starting",
           "class": "Rogue"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "f6e20abde0c21702622a8f8c188e7929",
@@ -1394,7 +1570,8 @@
         "source": {
           "type": "starting",
           "class": "Rogue"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "6be86b65df6765ee65b439ec271fee6d",
@@ -1402,6 +1579,7 @@
         "source": {
           "type": "purchased"
         },
+        "costField": "purchasedSkills",
         "costOverride": 3
       },
       {
@@ -1410,6 +1588,7 @@
         "source": {
           "type": "purchased"
         },
+        "costField": "purchasedSkills",
         "costOverride": 0
       },
       {
@@ -1418,6 +1597,7 @@
         "source": {
           "type": "purchased"
         },
+        "costField": "purchasedSkills",
         "costOverride": 0
       },
       {
@@ -1426,6 +1606,7 @@
         "source": {
           "type": "purchased"
         },
+        "costField": "purchasedSkills",
         "costOverride": 4
       },
       {
@@ -1434,6 +1615,7 @@
         "source": {
           "type": "purchased"
         },
+        "costField": "purchasedSkills",
         "costOverride": 1
       }
     ],
@@ -1444,6 +1626,7 @@
         "source": {
           "type": "purchased"
         },
+        "costField": "purchasedPerks",
         "costOverride": 0
       },
       {
@@ -1452,6 +1635,7 @@
         "source": {
           "type": "purchased"
         },
+        "costField": "purchasedPerks",
         "costOverride": 0
       },
       {
@@ -1460,6 +1644,7 @@
         "source": {
           "type": "purchased"
         },
+        "costField": "purchasedPerks",
         "costOverride": 1
       }
     ],
@@ -1470,21 +1655,24 @@
         "entityId": "Deflect Projectile",
         "source": {
           "type": "innate"
-        }
+        },
+        "costField": "innatePowers"
       },
       {
         "id": "404b7b341a7af1a00af106922b808710",
         "entityId": "Backstab",
         "source": {
           "type": "innate"
-        }
+        },
+        "costField": "innatePowers"
       },
       {
         "id": "f2dd87515acd1a48b21fff46bd94aae1",
         "entityId": "Loot",
         "source": {
           "type": "innate"
-        }
+        },
+        "costField": "innatePowers"
       },
       {
         "id": "0354a99fe7511db951051c9179859b39",
@@ -1492,7 +1680,8 @@
         "source": {
           "type": "class",
           "name": "Rogue"
-        }
+        },
+        "costField": "utilityPowers"
       },
       {
         "id": "10443d145be4a26d51c66179a010871c",
@@ -1500,7 +1689,8 @@
         "source": {
           "type": "class",
           "name": "Rogue"
-        }
+        },
+        "costField": "utilityPowers"
       },
       {
         "id": "4ad0d156b79f72db22b916336232dcce",
@@ -1508,7 +1698,8 @@
         "source": {
           "type": "class",
           "name": "Rogue"
-        }
+        },
+        "costField": "basicPowers"
       },
       {
         "id": "c7c68be33f4b07379300425d6ebc2a31",
@@ -1516,7 +1707,8 @@
         "source": {
           "type": "class",
           "name": "Rogue"
-        }
+        },
+        "costField": "basicPowers"
       }
     ],
     "spells": [],
@@ -1539,7 +1731,8 @@
         "source": {
           "type": "starting",
           "class": "Socialite"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "892208870afbb167b51382542cc7c69e",
@@ -1547,7 +1740,8 @@
         "source": {
           "type": "starting",
           "class": "Socialite"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "f1917f0f1928bd234c8b13cfd40f67ab",
@@ -1555,7 +1749,8 @@
         "source": {
           "type": "starting",
           "class": "Socialite"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "344f56f2adb7073de92c294081db742d",
@@ -1563,7 +1758,8 @@
         "source": {
           "type": "starting",
           "class": "Socialite"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "ccb7ac5f69d03a70bc94f2ee208ee71d",
@@ -1571,7 +1767,8 @@
         "source": {
           "type": "starting",
           "class": "Socialite"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "d9ac036d78b8f60bff94126509d29f1d",
@@ -1579,7 +1776,8 @@
         "source": {
           "type": "starting",
           "class": "Socialite"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "e233ef34786e1626acc8fea1df5a7406",
@@ -1587,7 +1785,8 @@
         "source": {
           "type": "starting",
           "class": "Socialite"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "2e10354ee257b4a22825a481f314d8fc",
@@ -1595,7 +1794,8 @@
         "source": {
           "type": "starting",
           "class": "Socialite"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "2a48fa9b5e5cbec2fc494a3e9255eb01",
@@ -1603,7 +1803,8 @@
         "source": {
           "type": "starting",
           "class": "Socialite"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "84818189dc0c80ff350a0a211cdf3b8b",
@@ -1611,6 +1812,7 @@
         "source": {
           "type": "purchased"
         },
+        "costField": "purchasedSkills",
         "costOverride": 1
       },
       {
@@ -1619,6 +1821,7 @@
         "source": {
           "type": "purchased"
         },
+        "costField": "purchasedSkills",
         "costOverride": 1
       },
       {
@@ -1627,6 +1830,7 @@
         "source": {
           "type": "purchased"
         },
+        "costField": "purchasedSkills",
         "costOverride": 1
       }
     ],
@@ -1637,6 +1841,7 @@
         "source": {
           "type": "purchased"
         },
+        "costField": "purchasedPerks",
         "costOverride": 0
       },
       {
@@ -1645,6 +1850,7 @@
         "source": {
           "type": "purchased"
         },
+        "costField": "purchasedPerks",
         "costOverride": 3
       },
       {
@@ -1653,6 +1859,7 @@
         "source": {
           "type": "purchased"
         },
+        "costField": "purchasedPerks",
         "costOverride": 3
       }
     ],
@@ -1663,21 +1870,24 @@
         "entityId": "Practiced Manner",
         "source": {
           "type": "innate"
-        }
+        },
+        "costField": "innatePowers"
       },
       {
         "id": "de32a7cdb7e932597ca50e7f99dbe5de",
         "entityId": "Heart of the Group",
         "source": {
           "type": "innate"
-        }
+        },
+        "costField": "innatePowers"
       },
       {
         "id": "01357d049b387018a77bba56bfa18896",
         "entityId": "Stern Willed",
         "source": {
           "type": "innate"
-        }
+        },
+        "costField": "innatePowers"
       },
       {
         "id": "e273678fa6209e8f212520b2f2b70e77",
@@ -1685,7 +1895,8 @@
         "source": {
           "type": "class",
           "name": "Socialite"
-        }
+        },
+        "costField": "utilityPowers"
       },
       {
         "id": "12e558c884bea051b7d056ee227289de",
@@ -1693,7 +1904,8 @@
         "source": {
           "type": "class",
           "name": "Socialite"
-        }
+        },
+        "costField": "utilityPowers"
       },
       {
         "id": "bb90bf1839caae58092639ec3dcf62ee",
@@ -1701,7 +1913,8 @@
         "source": {
           "type": "class",
           "name": "Socialite"
-        }
+        },
+        "costField": "basicPowers"
       },
       {
         "id": "03dd1a15001a4afbaa223187031837ef",
@@ -1709,7 +1922,8 @@
         "source": {
           "type": "class",
           "name": "Socialite"
-        }
+        },
+        "costField": "basicPowers"
       },
       {
         "id": "7e306ce97da418f9431d0acf86e7f39c",
@@ -1717,7 +1931,8 @@
         "source": {
           "type": "class",
           "name": "Socialite"
-        }
+        },
+        "costField": "basicPowers"
       }
     ],
     "spells": [],
@@ -1740,7 +1955,8 @@
         "source": {
           "type": "starting",
           "class": "Sourcerer"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "fa15e401c0224bbba55b68a33a917a9f",
@@ -1748,7 +1964,8 @@
         "source": {
           "type": "starting",
           "class": "Sourcerer"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "8fe968ef9e2a1505c60432bfaf99cb2c",
@@ -1756,7 +1973,8 @@
         "source": {
           "type": "starting",
           "class": "Sourcerer"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "7c705cdcba86bdd36566cbad1fcf4d04",
@@ -1764,7 +1982,8 @@
         "source": {
           "type": "starting",
           "class": "Sourcerer"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "7eb070a2b932b1fa90578bfe5fc3ec50",
@@ -1772,6 +1991,7 @@
         "source": {
           "type": "purchased"
         },
+        "costField": "purchasedSkills",
         "costOverride": 5
       }
     ],
@@ -1782,6 +2002,7 @@
         "source": {
           "type": "purchased"
         },
+        "costField": "purchasedPerks",
         "costOverride": 3
       },
       {
@@ -1790,6 +2011,7 @@
         "source": {
           "type": "purchased"
         },
+        "costField": "purchasedPerks",
         "costOverride": 1
       }
     ],
@@ -1800,28 +2022,32 @@
         "entityId": "Internal Battery",
         "source": {
           "type": "innate"
-        }
+        },
+        "costField": "innatePowers"
       },
       {
         "id": "c5e9fda0336be2bd22448ed290ace2cf",
         "entityId": "Arcane Source",
         "source": {
           "type": "innate"
-        }
+        },
+        "costField": "innatePowers"
       },
       {
         "id": "470f08c54a982400a8ddc267d7c49e1c",
         "entityId": "Astride the Weave",
         "source": {
           "type": "innate"
-        }
+        },
+        "costField": "innatePowers"
       },
       {
         "id": "7f380ad060756816bd19e3cda961d2ed",
         "entityId": "Enduring Source",
         "source": {
           "type": "innate"
-        }
+        },
+        "costField": "innatePowers"
       }
     ],
     "spells": [
@@ -1831,7 +2057,8 @@
         "source": {
           "type": "class",
           "name": "Sourcerer"
-        }
+        },
+        "costField": "cantrips"
       },
       {
         "id": "0e09535fb196a85b8525e3bc50b7fffa",
@@ -1839,7 +2066,8 @@
         "source": {
           "type": "class",
           "name": "Sourcerer"
-        }
+        },
+        "costField": "cantrips"
       },
       {
         "id": "a33d1a69ba84baa76d0ae85f60da98dd",
@@ -1847,7 +2075,8 @@
         "source": {
           "type": "class",
           "name": "Sourcerer"
-        }
+        },
+        "costField": "cantrips"
       }
     ],
     "devotions": [],
@@ -1869,7 +2098,8 @@
         "source": {
           "type": "starting",
           "class": "Artisan"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "c39d526f95fa9fb11172a99a6b3dd036",
@@ -1877,7 +2107,8 @@
         "source": {
           "type": "starting",
           "class": "Artisan"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "323e302c1a20440db6674ddab3e1b20c",
@@ -1885,7 +2116,8 @@
         "source": {
           "type": "starting",
           "class": "Artisan"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "60e83984d2439a4e13e79f28e1ebe731",
@@ -1893,7 +2125,8 @@
         "source": {
           "type": "starting",
           "class": "Artisan"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "96d236b6016420cdeaa13f8d8800e92a",
@@ -1901,7 +2134,8 @@
         "source": {
           "type": "starting",
           "class": "Artisan"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "c8324f67127242ea363ef6936480ebd0",
@@ -1909,7 +2143,8 @@
         "source": {
           "type": "starting",
           "class": "Artisan"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "5f59e0cfda4a8c65c889826b87be0bc5",
@@ -1917,7 +2152,8 @@
         "source": {
           "type": "starting",
           "class": "Artisan"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "1b23db154d804b9dce2301a2e467d397",
@@ -1925,6 +2161,7 @@
         "source": {
           "type": "purchased"
         },
+        "costField": "purchasedSkills",
         "costOverride": 3
       },
       {
@@ -1933,6 +2170,7 @@
         "source": {
           "type": "purchased"
         },
+        "costField": "purchasedSkills",
         "costOverride": 4
       },
       {
@@ -1941,6 +2179,7 @@
         "source": {
           "type": "purchased"
         },
+        "costField": "purchasedSkills",
         "costOverride": 2
       },
       {
@@ -1949,6 +2188,7 @@
         "source": {
           "type": "purchased"
         },
+        "costField": "purchasedSkills",
         "costOverride": 0
       }
     ],
@@ -1959,6 +2199,7 @@
         "source": {
           "type": "purchased"
         },
+        "costField": "purchasedPerks",
         "costOverride": 3
       }
     ],
@@ -1969,7 +2210,8 @@
         "entityId": "Living Iron",
         "source": {
           "type": "innate"
-        }
+        },
+        "costField": "innatePowers"
       },
       {
         "id": "43981fcf6291e0a7ff782dfd6112a8cc",
@@ -1977,7 +2219,8 @@
         "source": {
           "type": "class",
           "name": "Artisan"
-        }
+        },
+        "costField": "utilityPowers"
       },
       {
         "id": "372d3a6182d0763f45fea8cde75c4503",
@@ -1985,7 +2228,8 @@
         "source": {
           "type": "class",
           "name": "Artisan"
-        }
+        },
+        "costField": "utilityPowers"
       },
       {
         "id": "fd3c851b064547064033dbcd453fd693",
@@ -1993,7 +2237,8 @@
         "source": {
           "type": "class",
           "name": "Artisan"
-        }
+        },
+        "costField": "basicPowers"
       },
       {
         "id": "dc424fe23a4e0e5c7c374237719e9b64",
@@ -2001,7 +2246,8 @@
         "source": {
           "type": "class",
           "name": "Artisan"
-        }
+        },
+        "costField": "basicPowers"
       },
       {
         "id": "c3143094f8bfaef1a4ad185b900d85b8",
@@ -2009,7 +2255,8 @@
         "source": {
           "type": "class",
           "name": "Artisan"
-        }
+        },
+        "costField": "basicPowers"
       }
     ],
     "spells": [],
@@ -2032,7 +2279,8 @@
         "source": {
           "type": "starting",
           "class": "Artisan"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "804b8658d32013a9144e3353b1cfa90d",
@@ -2040,7 +2288,8 @@
         "source": {
           "type": "starting",
           "class": "Artisan"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "9cb3a84feefe26ff70bf968ee7b6dff5",
@@ -2048,7 +2297,8 @@
         "source": {
           "type": "starting",
           "class": "Artisan"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "bcb76bd49145e55e7557772fd83efdba",
@@ -2056,7 +2306,8 @@
         "source": {
           "type": "starting",
           "class": "Artisan"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "dbfdfa72c79991871708fbf0f306b764",
@@ -2064,7 +2315,8 @@
         "source": {
           "type": "starting",
           "class": "Artisan"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "dfcde5db271df9b4007eb1d64e0225e0",
@@ -2072,7 +2324,8 @@
         "source": {
           "type": "starting",
           "class": "Artisan"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "cbbc16710b76a46a4258c0608f48c585",
@@ -2080,7 +2333,8 @@
         "source": {
           "type": "starting",
           "class": "Artisan"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "989bec81c5e7458c963313fb7febe59a",
@@ -2088,6 +2342,7 @@
         "source": {
           "type": "purchased"
         },
+        "costField": "purchasedSkills",
         "costOverride": 3
       },
       {
@@ -2096,6 +2351,7 @@
         "source": {
           "type": "purchased"
         },
+        "costField": "purchasedSkills",
         "costOverride": 3
       },
       {
@@ -2104,6 +2360,7 @@
         "source": {
           "type": "purchased"
         },
+        "costField": "purchasedSkills",
         "costOverride": 0
       },
       {
@@ -2112,6 +2369,7 @@
         "source": {
           "type": "purchased"
         },
+        "costField": "purchasedSkills",
         "costOverride": 0
       }
     ],
@@ -2122,6 +2380,7 @@
         "source": {
           "type": "purchased"
         },
+        "costField": "purchasedPerks",
         "costOverride": 3
       }
     ],
@@ -2132,7 +2391,8 @@
         "entityId": "Living Iron",
         "source": {
           "type": "innate"
-        }
+        },
+        "costField": "innatePowers"
       },
       {
         "id": "9f52797b5e415e4afdd5d7bfe5c545e8",
@@ -2140,7 +2400,8 @@
         "source": {
           "type": "class",
           "name": "Artisan"
-        }
+        },
+        "costField": "utilityPowers"
       },
       {
         "id": "212cad15d83d0d2bb17073f83be0cac0",
@@ -2148,7 +2409,8 @@
         "source": {
           "type": "class",
           "name": "Artisan"
-        }
+        },
+        "costField": "utilityPowers"
       },
       {
         "id": "2c26acfd9ff5dbe792f318c73bc6b74f",
@@ -2156,7 +2418,8 @@
         "source": {
           "type": "class",
           "name": "Artisan"
-        }
+        },
+        "costField": "basicPowers"
       },
       {
         "id": "ccaf1c4e91963e25ae00eddebd3e4fe8",
@@ -2164,7 +2427,8 @@
         "source": {
           "type": "class",
           "name": "Artisan"
-        }
+        },
+        "costField": "basicPowers"
       },
       {
         "id": "ffe4de22fc794ea7514ad237e513ba99",
@@ -2172,7 +2436,8 @@
         "source": {
           "type": "class",
           "name": "Artisan"
-        }
+        },
+        "costField": "basicPowers"
       }
     ],
     "spells": [],
@@ -2195,7 +2460,8 @@
         "source": {
           "type": "starting",
           "class": "Artisan"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "fd2d806778f16da5290ab7aa56b79e2a",
@@ -2203,7 +2469,8 @@
         "source": {
           "type": "starting",
           "class": "Artisan"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "45f49350dff5cba0269c1cd0d1d64e14",
@@ -2211,7 +2478,8 @@
         "source": {
           "type": "starting",
           "class": "Artisan"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "14f4e0d0f04b0472c5821f80185a041f",
@@ -2219,7 +2487,8 @@
         "source": {
           "type": "starting",
           "class": "Artisan"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "a843c079c2fd521f296741d758c05042",
@@ -2227,7 +2496,8 @@
         "source": {
           "type": "starting",
           "class": "Artisan"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "50d5537b33cb682a0ae77b35bb3148f8",
@@ -2235,7 +2505,8 @@
         "source": {
           "type": "starting",
           "class": "Artisan"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "b18321748340998b3861b292fe0aaab5",
@@ -2243,7 +2514,8 @@
         "source": {
           "type": "starting",
           "class": "Artisan"
-        }
+        },
+        "costField": "startingSkills"
       },
       {
         "id": "569f78a29486212d3db123dc9e82d3c3",
@@ -2251,6 +2523,7 @@
         "source": {
           "type": "purchased"
         },
+        "costField": "purchasedSkills",
         "costOverride": 4
       },
       {
@@ -2259,6 +2532,7 @@
         "source": {
           "type": "purchased"
         },
+        "costField": "purchasedSkills",
         "costOverride": 0
       }
     ],
@@ -2269,6 +2543,7 @@
         "source": {
           "type": "purchased"
         },
+        "costField": "purchasedPerks",
         "costOverride": 3
       },
       {
@@ -2277,6 +2552,7 @@
         "source": {
           "type": "purchased"
         },
+        "costField": "purchasedPerks",
         "costOverride": 3
       },
       {
@@ -2285,6 +2561,7 @@
         "source": {
           "type": "purchased"
         },
+        "costField": "purchasedPerks",
         "costOverride": 1
       }
     ],
@@ -2295,7 +2572,8 @@
         "entityId": "Living Iron",
         "source": {
           "type": "innate"
-        }
+        },
+        "costField": "innatePowers"
       },
       {
         "id": "3914200d8a4ad023d733cd784e64c844",
@@ -2303,7 +2581,8 @@
         "source": {
           "type": "class",
           "name": "Artisan"
-        }
+        },
+        "costField": "utilityPowers"
       },
       {
         "id": "2213df478cd6edf4d44ef1c146ec8d76",
@@ -2311,7 +2590,8 @@
         "source": {
           "type": "class",
           "name": "Artisan"
-        }
+        },
+        "costField": "utilityPowers"
       },
       {
         "id": "fa3b61d04639e5d5f6a524d501e73188",
@@ -2319,7 +2599,8 @@
         "source": {
           "type": "class",
           "name": "Artisan"
-        }
+        },
+        "costField": "basicPowers"
       },
       {
         "id": "20af153e24c98990aaecedeb3f94a54d",
@@ -2327,7 +2608,8 @@
         "source": {
           "type": "class",
           "name": "Artisan"
-        }
+        },
+        "costField": "basicPowers"
       },
       {
         "id": "8d5bbae9ce69b14909ec9583ed92b6d8",
@@ -2335,7 +2617,8 @@
         "source": {
           "type": "class",
           "name": "Artisan"
-        }
+        },
+        "costField": "basicPowers"
       }
     ],
     "spells": [],

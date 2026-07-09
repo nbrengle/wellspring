@@ -154,6 +154,30 @@ test("addEntity routes classPowers to the powers bucket (purchased)", () => {
   eq(e[0].costField, "classPowers", "costField preserved");
 });
 
+// ─── slot pick / clear (V2 spells bucket) ───────────────────────────────────
+// Caster slot picks (cantrips / spells-known tier fields) route to the SPELLS
+// bucket, not powers — same setSlotPick/clearSlot, bucket chosen by the field.
+const spellEntries = (c, field) => (c.spells || []).filter((p) => p.costField === field);
+test("setSlotPick routes a cantrip to the spells bucket", () => {
+  const c = setSlotPick({}, "cantrips", 0, "Force Shield", "Mage");
+  eq((c.powers || []).length, 0, "not in powers bucket");
+  const e = spellEntries(c, "cantrips");
+  eq(e.length, 1, "cantrip in spells bucket");
+  eq(sourceClass(e[0].source), "Mage", "granting caster class in source");
+});
+test("setSlotPick routes a known spell to its tier field in the spells bucket", () => {
+  const c = setSlotPick({}, "noviceSpells", 0, "Firebolt", "Mage");
+  eq(spellEntries(c, "noviceSpells").length, 1, "novice spell in spells bucket");
+  eq((c.powers || []).length, 0, "not in powers bucket");
+});
+test("clearSlot removes a spell pick without touching powers", () => {
+  let c = setSlotPick({}, "cantrips", 0, "Force Shield", "Mage");
+  c = setSlotPick(c, "basicPowers", 0, "Battlemind", "Fighter");
+  c = clearSlot(c, "cantrips", 0);
+  eq(spellEntries(c, "cantrips").length, 0, "cantrip cleared");
+  eq(slotEntries(c, "basicPowers").length, 1, "power entry untouched");
+});
+
 // ─── updateParameter (patches the purchased-skill entityId) ─────────────────
 const mkPurchased = (...names) => ({
   skills: names.map((entityId) => ({ entityId, source: Source.purchased(), ranks: 1 })),
