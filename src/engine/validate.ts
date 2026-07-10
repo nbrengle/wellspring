@@ -21,7 +21,7 @@ import {
   divineSubstitutionOptions,
 } from "../engine/data.js";
 import { cleanItemName, bareSkill, getClasses, primaryClass } from "./resolver.js";
-import type { CharacterState, CharacterChoice, Effect } from "./types.js";
+import type { CharacterState, CharacterChoice } from "./types.js";
 
 // Shared primitives now live in validate/core.js (hotspot split). Import the ones
 // this module still uses internally, and re-export the public surface from the
