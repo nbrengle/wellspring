@@ -371,7 +371,7 @@
         "statMods": [
           {
             "stat": "naturalArmor",
-            "n": 3
+            "amount": 3
           }
         ]
       },
@@ -388,7 +388,7 @@
         "statMods": [
           {
             "stat": "naturalArmor",
-            "n": 4
+            "amount": 4
           }
         ]
       },
@@ -1123,7 +1123,7 @@
         "statMods": [
           {
             "stat": "lifePoints",
-            "n": -1
+            "amount": -1
           }
         ]
       },
@@ -1441,7 +1441,7 @@
         "statMods": [
           {
             "stat": "lifePoints",
-            "n": 1
+            "amount": 1
           }
         ]
       },
@@ -1485,7 +1485,7 @@
         "statMods": [
           {
             "stat": "naturalArmor",
-            "n": 2
+            "amount": 2
           }
         ]
       },
@@ -1502,7 +1502,7 @@
         "statMods": [
           {
             "stat": "naturalArmor",
-            "n": 3
+            "amount": 3
           }
         ]
       },

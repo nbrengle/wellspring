@@ -145,7 +145,7 @@
     "statMods": [
       {
         "stat": "lifePoints",
-        "n": 1
+        "amount": 1
       }
     ]
   },

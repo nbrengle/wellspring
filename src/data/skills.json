@@ -89,7 +89,7 @@
     "statMods": [
       {
         "stat": "armor",
-        "n": 2
+        "amount": 2
       }
     ]
   },
@@ -103,7 +103,7 @@
     "statMods": [
       {
         "stat": "armor",
-        "n": 4
+        "amount": 4
       }
     ]
   },
@@ -117,7 +117,7 @@
     "statMods": [
       {
         "stat": "armor",
-        "n": 6
+        "amount": 6
       }
     ]
   },
@@ -131,7 +131,7 @@
     "statMods": [
       {
         "stat": "armor",
-        "n": 8
+        "amount": 8
       }
     ]
   },
@@ -153,7 +153,7 @@
     "statMods": [
       {
         "stat": "armor",
-        "n": 1
+        "amount": 1
       }
     ]
   },
@@ -191,7 +191,7 @@
     "statMods": [
       {
         "stat": "spikes",
-        "n": 1
+        "amount": 1
       }
     ]
   },
@@ -253,7 +253,7 @@
     "statMods": [
       {
         "stat": "spikes",
-        "n": 1
+        "amount": 1
       }
     ]
   },

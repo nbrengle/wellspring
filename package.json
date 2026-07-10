@@ -14,7 +14,7 @@
     "doc:feedback": "tsx scripts/linker/doc-feedback.js",
     "test": "tsx ./scripts/test.mjs && tsx ./scripts/test-rules-enforcement.mjs && tsx ./scripts/test-browser.mjs",
     "shot": "tsx scripts/debug/shot.mjs",
-    "lint:js": "eslint . --max-warnings=73",
+    "lint:js": "eslint . --max-warnings=0",
     "lint:css": "stylelint '**/*.css'",
     "lint": "npm run lint:js && npm run lint:css",
     "format": "prettier --write .",
