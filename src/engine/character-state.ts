@@ -31,7 +31,10 @@ function reconcileBuildChoices(character: CharacterState) {
   // All owned skills (starting + purchased) live in the skills[] bucket.
   const ownedSkillNames = (character.skills || [])
     .filter((s: unknown) => typeof s !== "string")
-    .map((s: unknown) => (s as { entityId?: string; name: string }).entityId || (s as { entityId?: string; name: string }).name);
+    .map(
+      (s: unknown) =>
+        (s as { entityId?: string; name: string }).entityId || (s as { entityId?: string; name: string }).name,
+    );
   const owned = new Set(ownedSkillNames.map(key));
   const choices = { ...(character.choices || {}) };
   for (const ent of getAllEntities()) {
@@ -97,15 +100,15 @@ export function applyClassStartingAbilities(character: CharacterState, className
 }
 
 export function loadArchetype(archetype: Record<string, unknown>) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const c: any = { ...EMPTY_CHARACTER, archetypeName: archetype.name as string | null };
-  for (const k of Object.keys(EMPTY_CHARACTER)) {
+  const c = { ...EMPTY_CHARACTER, archetypeName: archetype.name as string | null } as CharacterState;
+  for (const k of Object.keys(EMPTY_CHARACTER) as (keyof CharacterState)[]) {
     if (k === "archetypeName") continue;
-    if (archetype[k] !== undefined) {
-      if (k === "lineage" && typeof archetype[k] === "object" && archetype[k] !== null) {
-        c[k] = (archetype[k] as { name: string }).name;
+    const archValue = archetype[k];
+    if (archValue !== undefined) {
+      if (k === "lineage" && typeof archValue === "object" && archValue !== null) {
+        c.lineage = (archValue as { name: string }).name;
       } else {
-        c[k] = archetype[k];
+        (c as unknown as Record<string, unknown>)[k] = archValue;
       }
     }
   }

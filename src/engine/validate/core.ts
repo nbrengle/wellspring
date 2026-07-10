@@ -107,12 +107,27 @@ export function maxProgressionLevel(cls: string) {
   return levels.length ? Math.max(...levels) : 4;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function progressionRow(cls: string, level: number): Record<string, any> {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const prog = (CLASS_PROGRESSION as Record<string, any>)[cls] || {};
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return prog[level] || prog[Math.min(level, maxProgressionLevel(cls))] || (CLASS_POWER_SLOTS as Record<string, any>)[cls] || {};
+export interface ProgressionRow {
+  utility?: number;
+  basic?: number;
+  advanced?: number;
+  veteran?: number;
+  bonus?: number | null;
+  cantrips?: number;
+  spellsKnown?: number;
+  slots?: string;
+  innateCantrips?: number;
+  statMods?: string;
+}
+
+export function progressionRow(cls: string, level: number): ProgressionRow {
+  const prog = (CLASS_PROGRESSION as unknown as Record<string, Record<number, ProgressionRow>>)[cls] || {};
+  return (
+    prog[level] ||
+    prog[Math.min(level, maxProgressionLevel(cls))] ||
+    (CLASS_POWER_SLOTS as unknown as Record<string, ProgressionRow>)[cls] ||
+    {}
+  );
 }
 
 // ─── Grant cluster ──────────────────────────────────────────────────────────

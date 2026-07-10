@@ -130,7 +130,7 @@ export function parseRequirements(str: string) {
       .filter(Boolean);
     const parsedParts = parts.map((p: string) => parseSingleComponent(p)).filter(Boolean);
     if (parsedParts.length === parts.length) {
-      return parsedParts.map((p: any) => ({ [p.name]: p.qty }));
+      return parsedParts.map((p: { name: string; qty: number } | null) => (p ? { [p.name]: p.qty } : {}));
     }
   }
 
@@ -152,10 +152,13 @@ export function parseRequirements(str: string) {
       .map((c: string) => parseSingleComponent(c))
       .filter(Boolean);
     if (choices.length > 0) {
-      return choices.map((c: any) => ({
-        ...baseReqs,
-        [c.name]: (baseReqs[c.name] || 0) + c.qty,
-      }));
+      return choices.map((c: { name: string; qty: number } | null) => {
+        if (!c) return baseReqs;
+        return {
+          ...baseReqs,
+          [c.name]: (baseReqs[c.name] || 0) + c.qty,
+        };
+      });
     }
   }
 
@@ -170,7 +173,7 @@ export function parseRequirements(str: string) {
 }
 
 // Parse batch yield from text
-function parseYield(recipe: any) {
+function parseYield(recipe: { usesPerBatch?: string | number; yield?: string | number }) {
   const str = String(recipe.usesPerBatch || recipe.yield || "1")
     .toLowerCase()
     .trim();
@@ -405,7 +408,7 @@ export function buildCraftTree(
 
 // Calculate details for a target recipe that cannot be made
 // (Shows exactly what materials are missing and how much is available/needed)
-export function getRecipeDeficit(recipe: any, inventory: Inventory) {
+export function getRecipeDeficit(recipe: { requirements: Record<string, number>[] }, inventory: Inventory) {
   let closestDeficit: Shortfall[] | null = null;
   let minMissingCount = Infinity;
 

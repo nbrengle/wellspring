@@ -37,9 +37,7 @@ export const LINEAGE_CHOICE_SPECS: Record<string, ChoiceSpec> = {
   "Elemental Expression": { kind: "flavor", label: "Accent" },
   "Favored Gem": { kind: "flavor", label: "Gemstone" },
 };
-export function lineageChoiceSpec(
-  item: { baseName?: string; name?: string } | null | undefined,
-): ChoiceSpec | null {
+export function lineageChoiceSpec(item: { baseName?: string; name?: string } | null | undefined): ChoiceSpec | null {
   const base = item?.baseName || item?.name;
   return base ? LINEAGE_CHOICE_SPECS[base] || null : null;
 }
@@ -56,9 +54,7 @@ export const POWER_SPELL_CHOICE_SPECS: Record<string, ChoiceSpec> = {
   "Arcane Secrets": { kind: "spell", label: "Choose a Spell", optionsKey: "arcaneSecretsOptions" },
   "Weird Wanderings": { kind: "power", label: "Choose a Power", optionsKey: "weirdWanderingsOptions" },
 };
-export function powerSpellChoiceSpec(
-  item: { baseName?: string; name?: string } | null | undefined,
-): ChoiceSpec | null {
+export function powerSpellChoiceSpec(item: { baseName?: string; name?: string } | null | undefined): ChoiceSpec | null {
   const base = item?.baseName || item?.name;
   return base ? POWER_SPELL_CHOICE_SPECS[base] || null : null;
 }
