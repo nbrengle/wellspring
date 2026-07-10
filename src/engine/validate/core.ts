@@ -2,7 +2,7 @@
 
 import { LEVEL_TABLE, lookupEntity, CLASS_POWERS, CLASS_PROGRESSION, CLASS_POWER_SLOTS, EVENTS_TABLE, CLASSES } from '../data.js';
 import { cleanItemName, bareSkill, getClasses } from '../resolver.js';
-import type { CharacterStateV2, CharacterChoice } from '../types.js';
+import type { CharacterStateV2 } from '../types.js';
 import { sourceClass } from '../types.js';
 
 import {

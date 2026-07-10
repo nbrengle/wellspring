@@ -5,7 +5,6 @@
 // and reusable for copy / download / print. The output round-trips visually with
 // the source archetype format.
 
-import { lookupEntity } from '../engine/data.js';
 import { bareSkill, cleanItemName, getClasses } from '../engine/resolver.js';
 import { ARCHETYPES, UNLIMITED_SKILLS, BASE_CLASSES } from './data.js';
 import { lookupCost } from './validate/cost-key.js';
@@ -27,7 +26,7 @@ import { SCALAR_FIELDS, ITEM_FIELDS, fieldForLabel, cleanItem, splitItems,
 // effective cost from the report's byItem map so EVERY section that can carry a
 // cost (purchased skills/perks, BP-bought powers, refund-bearing starting skills,
 // flaws) round-trips. Returns '' when the item has no cost/grant of note.
-function bpSuffix(name: string, field: string, report: BuildReport, idx?: number) {
+function bpSuffix(name: string, field: string, report: BuildReport) {
   if (!report?.spend?.byItem) return '';
   let e = null;
   const cleanN = cleanItemName(name);
@@ -66,7 +65,7 @@ function joinItems(items: any, field: string, report: BuildReport) {
     const showRank = rank > 1 && !UNLIMITED_SKILLS.has(baseName);
     const nameCleaned = n.replace(/\s*x\s*\d+\b/i, '');
     const nameWithRank = showRank ? `${nameCleaned} x${rank}` : nameCleaned;
-    return `${nameWithRank}${field ? bpSuffix(n, field, report, i) : ''}`;
+    return `${nameWithRank}${field ? bpSuffix(n, field, report) : ''}`;
   }).join(', ');
 }
 

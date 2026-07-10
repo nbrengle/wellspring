@@ -7,7 +7,7 @@ import { cleanItemName, bareSkill, getClasses } from './resolver.js';
 import { characterLevel, getMaxRanks } from './validate/core.js';
 import { paramInfo, paramReusable } from './param-domain.js';
 import { spellSlots } from './validate/slots.js';
-import type { CharacterStateV2, GraphItem, CharacterGraph, Entity, Effect, EntitySource, BucketedView, BPLedger, BPLedgerEntry } from './types.js';
+import type { CharacterStateV2, GraphItem, CharacterGraph, Effect, EntitySource, BucketedView, BPLedger, BPLedgerEntry } from './types.js';
 import { Source, isPurchased, isStarting } from './types.js';
 
 const idName = (id: string) => id.split(':')[1] || id;
@@ -172,7 +172,6 @@ export class CharacterGraphModel implements CharacterGraph {
     for (const node of this._items) {
       if (node.field === 'synthetic' || node.field === 'lineageAdvantages' || node.field === 'lineageChallenges') continue;
 
-      const clean = cleanItemName(node.rawString || node.name);
       // Use the structured node.param (parsed once at creation); fall back to the
       // entity's param label only for display when the node carries no value.
       const paramValue = node.param ?? (node.entity?.parameter || undefined);
@@ -738,7 +737,6 @@ export class CharacterGraphModel implements CharacterGraph {
     // and the total read the entry off the node; nothing looks a cost up by a string
     // key or array index. `byItem` (below) is a derived name-keyed PROJECTION built
     // once at the end for external/UI consumers, not the engine's source of truth.
-    let startingExcess = 0;
     const setEntry = (node: GraphItem, entry: BPLedgerEntry) => { node.costEntry = entry; };
 
     for (const node of this._items) {
@@ -793,7 +791,6 @@ export class CharacterGraphModel implements CharacterGraph {
           const entCost = (node.baseCost / node.rank) || 0;
           const extraCost = entCost * extra;
           setEntry(node, { cost: extraCost, base: entCost, grant: null, rank: node.rank, freeRanks: floor, paidRanks: extra });
-          startingExcess += extraCost;
         } else {
           setEntry(node, { cost: 0, base: (node.baseCost / node.rank)||0, grant: null, rank: node.rank, freeRanks: floor || 1, paidRanks: 0 });
         }

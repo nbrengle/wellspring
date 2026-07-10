@@ -592,7 +592,7 @@ export const collectionOf = (type: string): string => PLURAL_TYPE[type] ?? type;
 // boilerplate so the detail pane shows the full prose, keeping the summary as a
 // separate field. Skills aren't split (no boilerplate) but parameterized ones
 // are resolved on lookup (see lookupEntity).
-const indexCollection = (items: any[], type: string, { nameKey = 'name', extra = (e?: any) => ({}) as any, splitDesc = false }: any = {}) => {
+const indexCollection = (items: any[], type: string, { nameKey = 'name', extra = (_e?: any) => ({}) as any, splitDesc = false }: any = {}) => {
   for (const e of items) {
     const name = e[nameKey];
     if (!name) continue;

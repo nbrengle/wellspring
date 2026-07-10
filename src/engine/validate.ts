@@ -10,7 +10,7 @@
 // unit-testable. The input is a CharacterState; resolveCharacterGraph derives the
 // class innates + devotion entry, and everything downstream reads the resolved graph.
 
-import { LEVEL_TABLE, lookupEntity, CLASS_POWER_SLOTS, DEVOTIONS, DOMAINS, CRAFTING, RITUALS, UNLIMITED_SKILLS, divineSubstitutionOptions } from '../engine/data.js';
+import { LEVEL_TABLE, lookupEntity, CLASS_POWER_SLOTS, DEVOTIONS, DOMAINS, CRAFTING, RITUALS, divineSubstitutionOptions } from '../engine/data.js';
 import { cleanItemName, bareSkill, getClasses, primaryClass } from './resolver.js';
 
 // Shared primitives now live in validate/core.js (hotspot split). Import the ones
@@ -18,7 +18,7 @@ import { cleanItemName, bareSkill, getClasses, primaryClass } from './resolver.j
 // barrel so existing imports (`from './data/validate.js'`) keep working unchanged.
 import {
   MAX_LBP, MAX_FLAW_BP, BACKSTORY_BP, MAX_DOMAINS, DEFAULT_WEALTH,
-  LEGAL_MIN_LEVEL, LEVEL_CAP, subKey, POWER_SOURCE_FIELDS,
+  LEGAL_MIN_LEVEL, LEVEL_CAP, subKey,
   characterLevel, getLegalMinLevel, getMaxRanks,
   maxProgressionLevel,
 } from './validate/core.js';
