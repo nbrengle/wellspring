@@ -1307,15 +1307,7 @@ function normalizeCharacter(character: CharacterState): CharacterState {
     devotions.push({ entityId: `devotions:${character.devotion}`, source: Source.purchased() });
   }
 
-  // Migrate legacy saves: domain powers used to live in `powers` tagged
-  // costField:'domainPowers'. They now have their own bucket — lift any stragglers
-  // out of `powers` and merge with domainPowers (dedupe by entityId). Idempotent.
-  const strayDomain = powers.filter((p) => p.costField === "domainPowers");
-  const powersClean = strayDomain.length ? powers.filter((p) => p.costField !== "domainPowers") : powers;
-  const domainSeen = new Set((character.domainPowers || []).map((p) => p.entityId));
-  const domainPowers = [...(character.domainPowers || []), ...strayDomain.filter((p) => !domainSeen.has(p.entityId))];
-
-  return { ...character, classes, powers: powersClean, domainPowers, devotions };
+  return { ...character, classes, powers, devotions };
 }
 
 export function resolveCharacterGraph(charInput: CharacterState): CharacterGraphModel {
