@@ -215,15 +215,6 @@ export class CharacterGraphModel implements CharacterGraph {
       knownSpells: [],
     };
 
-    const SOURCE_OF = {
-      starting: "class",
-      purchased: "purchased",
-      power: "purchased",
-      innate: "class",
-      multiclass: "class",
-      grantedSelection: "class",
-    };
-
     for (const { name: cls, level: clsLevel } of this.classes) {
       view.classes.push({ name: cls, level: clsLevel, type: "class" });
     }
@@ -237,10 +228,8 @@ export class CharacterGraphModel implements CharacterGraph {
       const paramValue = node.param ?? (node.entity?.parameter || undefined);
       const displayName = paramValue && !node.name.includes(paramValue) ? `${node.name} (${paramValue})` : node.name;
 
-      const source = SOURCE_OF[node.sourceType] || (node.sourceType === "grant" ? "class" : "purchased");
       const isFree =
         node.sourceType === "grant" || (node.effects && node.effects.some((e) => e.type === "REFUND_GRANT"));
-
       let grantedBy = node.grantedBy;
       if (isFree && !grantedBy) {
         const refundEff = node.effects?.find((e) => e.type === "REFUND_GRANT");
@@ -252,7 +241,7 @@ export class CharacterGraphModel implements CharacterGraph {
         id: node.id,
         entityId: node.entity?.id || node.id,
         name: displayName,
-        source,
+        sourceType: node.sourceType,
         grantedBy,
         free: isFree,
         cost: isFree ? 0 : (node.authoredCost ?? node.baseCost),

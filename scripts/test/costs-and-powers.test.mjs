@@ -93,8 +93,8 @@ test("a GRANT_SOURCE grant materializes as a free, non-removable owned item (Way
   // Uniform engine-driven grants: a power that grants a named entity surfaces that
   // entity as an owned item (one render path, regardless of grant source) so the UI
   // shows + can parameterize it — instead of the grant living only as a hidden effect.
-  // The materialized row carries source:'class' + index:-1 so the build sheet's
-  // canRemove (!fromClass && index>=0) is false: a granted ability isn't deletable.
+  // The materialized row carries sourceType:'grant' + index:-1 so the build sheet's
+  // canRemove (sourceType === 'purchased' && index>=0) is false: a granted ability isn't deletable.
   const c = makeChar("Rogue 4", { add: ["Way of the Blade"], choices: { "powers:Way of the Blade": "Daggers" } });
   const r = validate(c);
   const granted = (r.owned?.skills || []).filter((x) => x.grantedBy === "Way of the Blade");
@@ -103,7 +103,7 @@ test("a GRANT_SOURCE grant materializes as a free, non-removable owned item (Way
   ok(spec, "the parameterized Weapon Specialization grant is present");
   eq(/Daggers/.test(spec.name), true, "parameterized with the Way-of-the-Blade choice (Daggers)");
   eq(spec.field, "skillsGrant", "lands in a *Grant field (engine-materialized, not a purchase)");
-  eq(spec.source, "class", "sourced as class so the UI treats it as non-removable");
+  eq(spec.sourceType, "grant", "sourceType grant so the UI treats it as non-removable");
   eq(spec.index, -1, "index -1 → canRemove false");
   eq(spec.cost?.cost ?? 0, 0, "granted ability is free");
 });
