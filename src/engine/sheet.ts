@@ -13,6 +13,7 @@ import type { CharacterChoice, CharacterState, BPLedgerEntry } from "./types.js"
 import { isPurchased, isStarting } from "./types.js";
 import { choiceFromParsed, bucketForField } from "./character-add.js";
 import type { ParsedItem } from "./character-add.js";
+import { CHARACTER_BUCKETS } from "./config.js";
 
 /** A character plus the display-only fields the formatter reads (computed stats the
  *  sheet may carry, and the archetype tagline). All optional — the report supplies
@@ -336,12 +337,7 @@ function parseSheetText(text: string) {
   // no parallel arrays: the parsed item carries name/cost/rank, the field decides
   // bucket + source + costField.
   const ch = character as ParsedSheet;
-  ch.skills ||= [];
-  ch.perks ||= [];
-  ch.powers ||= [];
-  ch.domainPowers ||= [];
-  ch.spells ||= [];
-  ch.flaws ||= [];
+  for (const b of CHARACTER_BUCKETS) ch[b] ||= [];
   const primaryClass = getClasses(ch)[0]?.name || "";
   for (const item of parsedItems) {
     const bucket = ch[bucketForField(item.field)] as CharacterChoice[];

@@ -14,6 +14,7 @@ import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 import { Source } from "../src/engine/types.js";
 import { choiceFromParsed, bucketForField } from "../src/engine/character-add.js";
+import { emptyBuckets } from "../src/engine/config.js";
 import { LABEL_FIELD, CHOICE_DEFAULTS } from "../src/engine/sheet-schema.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -450,12 +451,7 @@ function buildCharacter(raw) {
     // provenance separately as `archetypeName`; loadArchetype sets that.)
     name: raw.name,
     classes: {},
-    skills: [],
-    perks: [],
-    flaws: [],
-    powers: [],
-    domainPowers: [],
-    spells: [],
+    ...emptyBuckets(),
     devotions: [],
     wealth: raw.wealth || "None",
   };

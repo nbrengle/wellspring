@@ -14,6 +14,22 @@ export const MAX_DOMAINS = 2;
 export const DEFAULT_WEALTH = 8;
 export const LEVEL_CAP = 10;
 
+// ─── Character Storage Buckets ──────────────────────────────────────────────
+// The SINGLE source of truth for the CharacterChoice[] buckets on CharacterState.
+// Every producer inits these (EMPTY_CHARACTER, the sheet importer, the archetype
+// parser) and the add-path types against them — all DERIVED from this list, so a
+// new bucket is declared once here (plus its field on CharacterState) and can't
+// drift across the init/type sites. NOT the materialized view (BucketedView) or
+// the owned/classified sets — those are view concepts with their own shape.
+export const CHARACTER_BUCKETS = ["skills", "perks", "flaws", "powers", "domainPowers", "spells"] as const;
+
+/** A fresh, empty set of the storage buckets — the one place that materializes the
+ *  `{ skills: [], perks: [], … }` shape. Every character producer spreads this so
+ *  none re-lists the buckets by hand. */
+export function emptyBuckets(): Record<(typeof CHARACTER_BUCKETS)[number], []> {
+  return Object.fromEntries(CHARACTER_BUCKETS.map((b) => [b, []])) as Record<(typeof CHARACTER_BUCKETS)[number], []>;
+}
+
 export const SPELL_TIERS = new Set(["novice", "adept", "greater"]);
 export const SLOT_CATS = ["cantrips", "spellsKnown", "utility", "basic", "advanced", "veteran"];
 export const BOOKCASTER_TIER_FIELD = { novice: "noviceSpells", adept: "adeptSpells", greater: "greaterSpells" };
