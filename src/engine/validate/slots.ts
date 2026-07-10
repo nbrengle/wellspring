@@ -20,6 +20,33 @@ import { cleanItemName, getClasses } from "../resolver.js";
 import { SPELL_TIERS, SLOT_CATS, BOOKCASTER_TIER_FIELD, KNOWN_SPELL_FIELDS } from "../config.js";
 import { countPicksForClass, progressionRow, sourceClass, activeInnatePowers } from "./core.js";
 
+// ─── Structured slot/spell shapes ───────────────────────────────────────────
+/** One power/spell slot row for a class+category: how many are `used` vs `allowed`
+ *  (`base` from the class progression + `bonus` from grants), plus provenance. */
+interface SlotRow {
+  cls: string;
+  category: string;
+  label: string;
+  used: number;
+  base: number;
+  bonus: number;
+  allowed: number;
+  bonusFrom: string[];
+  granted?: string[]; // innate (locked) cantrips granted to a caster row
+  over?: boolean;
+}
+/** A caster's per-tier spell-slot capacity, pooled by magic type. */
+export interface SpellPool {
+  novice: number;
+  adept: number;
+  greater: number;
+}
+/** An innate (locked) cantrip granted by progression: which class (or 'ALL'). */
+interface GrantedCantrip {
+  cls: string;
+  name: string;
+}
+
 // Skills whose grant is scoped to a CLASS the player must choose — and the choice
 // is gated by the classes they actually have levels in (the rules: "from a
 // non-casting class that they have levels in", "a spell-casting class in which they
@@ -58,12 +85,12 @@ export function eligibleClassChoices(character, baseName) {
 // the bonus lands on the correct per-class slot row.
 // `sources` (optional) is filled with { "cls:cat": [grantingItemName, …] } so the
 // slot UI can show WHICH skill granted a bonus slot (the "auditable" attribution).
-export function slotGrants(character, sources = null) {
-  const grants = {};
+export function slotGrants(character, sources: Record<string, string[]> | null = null) {
+  const grants: Record<string, number> = {};
   // computeSlots categories only. Raw spell-tier grants (novice/adept/greater) are
   // the province of spellSlots(), not the slot-cap budget here — skip them.
   const cats = new Set(SLOT_CATS);
-  const addTo = (cls, cat, n, source) => {
+  const addTo = (cls: string | undefined, cat: string, n: number, source?: string) => {
     if (!cls || !cats.has(cat)) return;
     const k = `${cls}:${cat}`;
     grants[k] = (grants[k] || 0) + n;
@@ -73,7 +100,8 @@ export function slotGrants(character, sources = null) {
   const casterClass = classes.find((c) => CLASSES[c.name]?.spellcaster)?.name;
   const martialClass = classes.find((c) => !CLASSES[c.name]?.spellcaster)?.name;
   // Route a category to the class whose slot it belongs to.
-  const classFor = (cat) => (cat === "cantrips" || cat === "spellsKnown" ? casterClass : martialClass);
+  const classFor = (cat: string): string | undefined =>
+    cat === "cantrips" || cat === "spellsKnown" ? casterClass : martialClass;
 
   // 1. Purchased / starting skills that grant slots (Additional Cantrip,
   //    Extended Capacity, Spell-Scholar). The grants are parser-extracted
@@ -133,8 +161,8 @@ export function slotGrants(character, sources = null) {
 // Cantrips a caster is GRANTED for free (locked, not choosable) by the
 // progression "Innate Bonus Cantrip: <name>" prose. Returns [{ cls, name }],
 // deduped per class+name.
-export function innateBonusCantrips(character) {
-  const out = [];
+export function innateBonusCantrips(character): GrantedCantrip[] {
+  const out: GrantedCantrip[] = [];
   const seen = new Set();
   for (const { name: cls, level: clsLevel } of getClasses(character)) {
     const classCantrips = new Set((CLASS_POWERS[cls]?.cantrips || []).map((c) => c.name));
@@ -201,7 +229,7 @@ export function computeSlots(character) {
   const classes = getClasses(character).filter((c) => CLASS_POWER_SLOTS[c.name]);
   if (!classes.length) return [];
   const multi = classes.length > 1;
-  const bonusSources = {};
+  const bonusSources: Record<string, string[]> = {};
   const bonus = slotGrants(character, bonusSources);
   // Free, locked cantrips granted by progression ("Innate Bonus Cantrip: Cancel").
   const grantedCantrips = innateBonusCantrips(character);
@@ -212,12 +240,12 @@ export function computeSlots(character) {
   // character that doesn't own the skill) would silently shift slots for free.
   const agileTrades = clampAgileTrades(character, classes);
 
-  const rows = [];
+  const rows: SlotRow[] = [];
   for (const { name: cls, level } of classes) {
     // Clamp to the highest documented progression level (base classes cap at 10).
     const prog = progressionRow(cls, level);
     const isCaster = CLASSES[cls]?.spellcaster;
-    const mkRow = (category, label, used, baseVal) => {
+    const mkRow = (category: string, label: string, used: number, baseVal: number): SlotRow => {
       let b = bonus[`${cls}:${category}`] || 0;
       if (!isCaster) {
         if (category === "basic") b -= agileTrades[cls] || 0;
@@ -276,7 +304,7 @@ export function spellSlots(character) {
   const casters = getClasses(character).filter((c) => CLASSES[c.name]?.spellcaster);
   if (!casters.length) return null; // not a caster
 
-  const pools = {};
+  const pools: Record<string, SpellPool> = {};
   const agileTrades = character.agileLearnerTrades || {};
 
   // Sum each caster class's progression "N/N/N" slots at its own level.
@@ -300,8 +328,8 @@ export function spellSlots(character) {
   const primaryType = CLASSES[casters[0].name]?.magicType || "Unknown";
   if (!pools[primaryType]) pools[primaryType] = { novice: 0, adept: 0, greater: 0 };
 
-  const highestSlots = []; // array of target pool strings
-  const applySpellGrants = (ent, rank = 1, itemName = null) => {
+  const highestSlots: string[] = []; // array of target pool strings
+  const applySpellGrants = (ent: any, rank = 1, itemName: string | null = null) => {
     if (!ent) return;
 
     let targetPool = primaryType;
@@ -379,7 +407,7 @@ export function basicSpellOptions(character, magicType) {
     ? myCasterClasses
     : Object.keys(CLASSES).filter((n) => CLASSES[n]?.spellcaster && CLASSES[n]?.magicType === magicType);
 
-  const spells = new Set();
+  const spells = new Set<string>();
   for (const cls of sourceClasses) {
     const byTier = CLASS_POWERS[cls];
     if (!byTier) continue;
@@ -404,7 +432,7 @@ export function bookcasterSpellOptions(character) {
 
   // Every accessible spell from the caster classes' lists, filtered by whether
   // they have spell slots in that class's magic type.
-  const accessible = new Set();
+  const accessible = new Set<string>();
   for (const { name: cls } of casters) {
     const byTier = CLASS_POWERS[cls];
     if (!byTier) continue;
@@ -465,7 +493,7 @@ export function arcaneSecretsSpellOptions(character) {
     tiers = ["cantrip", "novice", "adept"];
   }
 
-  const spells = new Set();
+  const spells = new Set<string>();
   for (const cls of arcaneClasses) {
     const byTier = CLASS_POWERS[cls];
     if (!byTier) continue;
@@ -484,7 +512,7 @@ export function arcaneSecretsSpellOptions(character) {
 // ones. (Only martial base classes have a "Basic" tier; casters use Novice/Adept/
 // Greater, so they contribute nothing here — consistent with the rule's intent.)
 export function weirdWanderingsOptions() {
-  const out = new Set();
+  const out = new Set<string>();
   for (const cls of BASE_CLASSES) {
     if (cls === "Artisan") continue;
     for (const p of CLASS_POWERS[cls]?.basic || []) {

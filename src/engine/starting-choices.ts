@@ -642,7 +642,11 @@ export function startingSkillGrants(character) {
 // Provenance (which block granted each skill) and the free-rank floor are NOT
 // persisted on the character — they're derived on read by startingSkillGrants, so
 // they can't be lost on import / round-trip.
-export function rebuildStartingSkills(character, primaryClassName, updatedChoices = null) {
+export function rebuildStartingSkills(
+  character,
+  primaryClassName: string,
+  updatedChoices: Record<string, string> | null = null,
+) {
   const choices = updatedChoices || character.startingChoices || {};
 
   const expectedList = expectedStartingSkills(primaryClassName, choices);

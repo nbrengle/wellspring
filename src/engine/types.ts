@@ -188,22 +188,33 @@ export interface CharacterChoice {
 
 export interface CharacterState {
   name?: string;
-  archetypeName?: string;
+  archetypeName?: string | null;
   backstoryApproved?: boolean;
   extraMaxBP?: number;
   currentEvent?: number;
-  wealth?: string;
-  resources?: string;
+  wealth?: string | number | null;
+  resources?: string | null;
 
   /** Classes the character has as {name, level}. getClasses also understands the
    *  legacy `classLevels` string and `{Name: level}` map on raw input. */
   classes: { name: string; level: number }[];
-  lineage?: string | { name: string; choices: string[] };
-  sublineage?: string;
+  lineage?: string | { name: string; choices: string[] } | null;
+  sublineage?: string | null;
   /** Sublineage-challenge map, drives lineage-constraint checks. */
   sublineages?: Record<string, string>;
-  devotion?: string;
+  devotion?: string | null;
   devotions: CharacterChoice[];
+
+  /** Artisan-only: "Mystic" / "Crafter" / "Artificer". */
+  specialization?: string | null;
+  /** Point-in-time derived-stat overrides carried on the state when set by the
+   *  sheet importer / archetype loader (otherwise derived; see wellspring-derived-stats). */
+  lifePoints?: number | null;
+  armorPoints?: number | null;
+  spikes?: number | null;
+  /** Per-class starting choose-one selections, keyed by choice id. Seeded by
+   *  reconcileStartingChoices when a primary class is set. */
+  startingChoices?: Record<string, string>;
 
   // The ontological buckets — the engine's single shape. Every producer (UI
   // reducers, loadArchetype, the sheet importer, the test factory) writes these
@@ -262,10 +273,28 @@ export interface BPLedger {
   byItem: Record<string, BPLedgerEntry>;
 }
 
-export interface Effect {
-  type: string;
-  [key: string]: any;
+/** A BP discount scope + amount, as emitted by discount extractors and consumed in
+ *  the spend phase. `scope.value` is the parameter the discount is keyed to (e.g. a
+ *  skill name); null-cap means uncapped. */
+export interface DiscountSpec {
+  scope: { kind: string; value: string | string[] };
+  amount: number;
+  min?: number | null;
+  cap?: number | null;
+  refundIfFree?: boolean;
+  exclusions?: string[];
 }
+
+/** A single game/build effect emitted by an extractor and applied by the graph.
+ *  Discriminated on `type` so each variant's payload is statically known. */
+export type Effect =
+  | { type: "STAT"; stat: string; amount: number }
+  | { type: "GRANT_SOURCE"; grants: string[] }
+  | { type: "DISCOUNT_SOURCE"; discount: DiscountSpec }
+  | { type: "WEALTH"; amount: number; note?: string }
+  | { type: "FLAW_AWARD"; amount: number }
+  | { type: "OVER_CAP"; cap: number }
+  | { type: "REFUND_GRANT"; source: string };
 
 export interface GraphItem {
   id: string;

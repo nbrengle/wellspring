@@ -4,7 +4,7 @@
 // (npm run parse) refreshes everything downstream automatically.
 
 import classesJson from "../data/classes.json";
-import type { Entity } from "./types.js";
+import type { Entity, DiscountSpec } from "./types.js";
 import skillsJson from "../data/skills.json";
 import perksJson from "../data/perks.json";
 import flawsJson from "../data/flaws.json";
@@ -196,6 +196,11 @@ export const CLASSES = Object.fromEntries(
       startingSkills: c.startingSkills,
       multiclassSkills: c.multiclassSkills,
       multiclassGrants: c.multiclassGrants || [],
+      // The parser does not emit class tags today, so this is always empty; a
+      // "Martial Classes" prereq that reads it therefore never matches on tags.
+      // Kept as a typed seam so that consumer (prereqs) type-checks and lights up
+      // for free once the data carries tags. See wellspring-class-tags note.
+      tags: (c as { tags?: string[] }).tags ?? ([] as string[]),
     },
   ]),
 );
@@ -569,13 +574,18 @@ export const ARCHETYPES = archetypesJson;
 // The cross-reference graph the linker emits (refs.json): per-entity-id maps of
 // grant/discount/exclusion/prereq/mention edges. Typed here at the JSON boundary so
 // consumers read REFS.prereqs[id] etc. without casting.
+/** A perk's effect on the Lineage-BP economy: extra LBP granted and/or a raised cap. */
+export interface LbpBonus {
+  extra?: number;
+  newMax?: number;
+}
 export interface RefsData {
   grants: Record<string, string[]>;
-  discounts: Record<string, unknown>;
+  discounts: Record<string, DiscountSpec>;
   excludes: Record<string, string[]>;
   prereqs: Record<string, { skills?: string[]; anyOf?: string[][]; levels?: string[]; other?: string[] }>;
   mentions: Record<string, string[]>;
-  lbpBonuses: Record<string, unknown>;
+  lbpBonuses: Record<string, LbpBonus>;
   [key: string]: unknown;
 }
 export const REFS = refsJson as RefsData;
