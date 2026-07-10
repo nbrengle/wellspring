@@ -110,6 +110,66 @@ function deriveCostField(ent: Entity | null): string | undefined {
   return undefined;
 }
 
+// ─── Sheet-field → EntitySource ─────────────────────────────────────────────
+// The archetype HTML + the character-sheet importer parse a SECTION HEADER
+// ("Basic Powers:", "Purchased Skills:") into a field, and the section is the
+// authority on provenance (not the entity). This maps that field to its source —
+// the single place the "which section means which source" rule lives, shared by
+// both text parsers. `primaryClass` fills class/starting sources.
+export function sourceForField(field: string, primaryClass: string): EntitySource {
+  switch (field) {
+    case 'startingSkills': return Source.starting(primaryClass);
+    case 'innatePowers': return Source.innate();
+    case 'bookSpells': return Source.granted('Bookcaster');
+    // Slot powers + all caster spells fill a class slot (free) — sourced to the class.
+    case 'utilityPowers': case 'basicPowers': case 'advancedPowers':
+    case 'veteranPowers': case 'formPowers':
+    case 'cantrips': case 'spellsKnown':
+    case 'noviceSpells': case 'adeptSpells': case 'greaterSpells':
+      return Source.class(primaryClass);
+    case 'flaws': return Source.flaw();
+    // Everything else the sheet lists is bought with BP.
+    default: return Source.purchased();
+  }
+}
+
+// Which bucket a parsed SECTION field lands in (routes by field, the section's
+// authority — not by looking the entity up).
+const FIELD_BUCKET: Record<string, keyof Pick<CharacterStateV2, 'skills' | 'perks' | 'powers' | 'spells' | 'flaws'>> = {
+  startingSkills: 'skills', purchasedSkills: 'skills',
+  purchasedPerks: 'perks', flaws: 'flaws',
+};
+export function bucketForField(field: string): keyof Pick<CharacterStateV2, 'skills' | 'perks' | 'powers' | 'spells' | 'flaws'> {
+  return FIELD_BUCKET[field] ?? (SPELL_FIELDS.has(field) ? 'spells' : 'powers');
+}
+
+// A parsed item from a sheet (archetype HTML or an imported character sheet): the
+// section field it fell under + the raw name, plus any BP/rank the line carried.
+// The single intermediate both text parsers emit — a dumb "add this named thing to
+// this section", meaningless on its own.
+export interface ParsedItem {
+  field: string;
+  name: string;
+  cost?: number | null;  // authored effective BP (null/undefined = derive at resolve)
+  rank?: number;
+}
+
+/** Turn a parsed item into a CharacterChoice for its bucket — the shared "build"
+ *  step both text parsers use, so neither re-implements the flat→bucket zip. The
+ *  section field decides source (sourceForField) + costField; the entityId is the
+ *  raw name VERBATIM — the engine resolves the "Base - Tier (Param)" form itself
+ *  (extractParam at node creation), so no separate `parameter` field is needed. */
+export function choiceFromParsed(item: ParsedItem, primaryClass: string): CharacterChoice {
+  const choice: CharacterChoice = {
+    entityId: item.name,
+    source: sourceForField(item.field, primaryClass),
+    costField: item.field,
+  };
+  if (item.cost != null) choice.costOverride = item.cost;
+  if (item.rank && item.rank > 1) choice.ranks = item.rank;
+  return choice;
+}
+
 /**
  * Add an entity (by name) to a character, returning a new character. The bucket,
  * source, and costField are DERIVED from the entity unless overridden in `opts`.

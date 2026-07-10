@@ -1000,12 +1000,11 @@ function checkLevelConstraint(character: any, constraintStr: string, owned: Set<
 }
 
 
-// Normalize a V2 character at the engine boundary: seed the two facts that are
-// DERIVED (not stored on the character) — class-granted innate powers and the
-// devotion bucket entry — so everything past resolveCharacterGraph sees a complete
-// V2 character. Idempotent: re-running never double-seeds (innates dedupe by name,
-// the devotion entry is only added when absent). This is the last remnant of the
-// old v1ToV2 flat→V2 bridge; the flat conversion is gone (the character is born V2).
+// Normalize a character at the engine boundary: seed the two facts that are DERIVED
+// (not stored on the character) — class-granted innate powers and the devotion bucket
+// entry — so everything past resolveCharacterGraph sees a complete character.
+// Idempotent: re-running never double-seeds (innates dedupe by name, the devotion
+// entry is added only when absent).
 function normalizeV2(character: CharacterStateV2): CharacterStateV2 {
   const classes = getClasses(character);
   const powers = [...(character.powers || [])];
