@@ -19,7 +19,7 @@ import { resolveCharacterGraph } from "../graph.js";
 // where `met` is true only when all hard skill-prereqs (incl. disjunctions) are
 // satisfied. Free-text level/other prereqs can't be auto-verified, so they don't
 // block `met` but are surfaced as notes.
-export function prereqStatus(character, entityId) {
+export function prereqStatus(character: any, entityId: string): any {
   const graph = resolveCharacterGraph(character);
   return graph.prereqStatusFor(entityId);
 }
@@ -29,7 +29,7 @@ export function prereqStatus(character, entityId) {
 //   true  if the constraint is parsed and met.
 //   false if the constraint is parsed and failed.
 //   null  if the constraint format is unrecognized.
-export function checkLevelConstraint(character, constraintStr, owned) {
+export function checkLevelConstraint(character: any, constraintStr: string, owned: Set<string>): boolean | null {
   const charLevel = characterLevel(character);
   const charClasses = getClasses(character);
 
