@@ -52,66 +52,55 @@ export function setChoice(c: Char, powerId: string, option: string | null): Char
   return { ...c, choices };
 }
 
-/** Parse a display name into its base name and parameter, handling both
- *  `Base (param)` and `Base - param` forms. */
-export function splitParameterizedName(name: string): { baseName: string; paramVal: string } {
-  const paramMatch = name.match(/^(.*?)\s*\(([^()]*)\)\s*$/);
-  if (paramMatch) {
-    return { baseName: paramMatch[1].trim(), paramVal: paramMatch[2].trim() };
-  }
-  const dashIdx = name.indexOf(" - ");
-  if (dashIdx > 0) {
-    return { baseName: name.slice(0, dashIdx).trim(), paramVal: name.slice(dashIdx + 3).trim() };
-  }
-  return { baseName: name.trim(), paramVal: "" };
-}
+/** Set the `parameter` field of the item at `field`'s row `index` to `value` (clear
+ *  when empty), reconciling devotion/domain state when that row is "Worship".
+ *  Parametrization is a FIELD — changing it is a one-field patch at a known row, not
+ *  a find-by-old-name / rebuild-the-id-string dance. The UI passes the raw chosen
+ *  value; nothing concatenates or re-parses a "Base (Param)" string. */
+export function setParameter(c: Char, field: string, index: number, value: string): Char {
+  const paramVal = (value || "").trim();
+  const patch = (s: CharacterChoice): CharacterChoice => {
+    const next = { ...s };
+    if (paramVal) next.parameter = paramVal;
+    else delete next.parameter;
+    return next;
+  };
 
-/** Rename a parameterized item in-place at `field[index]` (or by matching
- *  `oldName`), reconciling devotion/domain state when the item is "Worship". */
-export function updateParameter(
-  c: Char,
-  field: string,
-  oldName: string,
-  newName: string,
-  index: number | null = null,
-): Char {
-  // Everything lives in a bucket; patch the entry's entityId in place, then fall
-  // through to the shared Worship reconciliation (a Worship skill can be purchased).
-  // Purchased skills/perks address by position among purchased entries; power/spell
-  // fields address by position among their costField entries.
   let nextChar: Char;
+  let baseEntity: string | undefined;
   const bucket = purchasedBucketKey(field);
   if (bucket) {
     const cur = purchasedEntries(c, bucket);
-    const idx = index !== null && index >= 0 ? index : cur.findIndex((s) => s.entityId === oldName);
-    if (idx < 0 || idx >= cur.length) return c;
+    if (index < 0 || index >= cur.length) return c;
+    baseEntity = cur[index].entityId;
     nextChar = withPurchased(
       c,
       bucket,
-      cur.map((s, i) => (i === idx ? { ...s, entityId: newName } : s)),
+      cur.map((s, i) => (i === index ? patch(s) : s)),
     );
   } else {
     const cur = fieldEntries(c, field);
-    const idx = index !== null && index >= 0 ? index : cur.findIndex((s) => s.entityId === oldName);
-    if (idx < 0 || idx >= cur.length) return c;
+    if (index < 0 || index >= cur.length) return c;
+    baseEntity = cur[index].entityId;
     nextChar = withField(
       c,
       field,
-      cur.map((s, i) => (i === idx ? { ...s, entityId: newName } : s)),
+      cur.map((s, i) => (i === index ? patch(s) : s)),
     );
   }
-
-  const { baseName, paramVal } = splitParameterizedName(newName);
 
   // Domain powers live in their own `domainPowers` bucket. Keep the entries whose
   // domain is still available; drop the rest.
   const keepDomainPowers = (keep: (basePower: string, full: string) => boolean): CharacterChoice[] =>
     (nextChar.domainPowers || []).filter((p) => {
-      const full = p.entityId;
-      return keep(full.replace(/\s*\(.+\)$/, ""), full);
+      // entityId is stored bare; the param (if any) lives in the field. `full`
+      // reconstructs the display form for callers that match either.
+      const basePower = p.entityId;
+      const full = p.parameter ? `${p.entityId} (${p.parameter})` : p.entityId;
+      return keep(basePower, full);
     });
 
-  if (baseName === "Worship") {
+  if (baseEntity === "Worship") {
     if (!paramVal) {
       // null (not undefined) to match handleClearDevotion — a present-but-empty
       // devotion key, distinct from "never set".

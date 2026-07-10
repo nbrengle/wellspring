@@ -61,10 +61,10 @@ test("a novice spell lands in spells[] with noviceSpells costField", () => {
 });
 
 // ─── opts overrides (the rare non-derivable cases) ──────────────────────────
-test("param opt builds the parameterized entityId", () => {
+test("param opt stores the parameter as a field, entityId stays bare", () => {
   const c = addToCharacter(base(), "Lore", { param: "Arcane" });
-  eq(c.skills[0].entityId, "Lore (Arcane)", "param appended");
-  eq(c.skills[0].parameter, "Arcane", "param recorded");
+  eq(c.skills[0].entityId, "Lore", "entityId is the bare entity (param never concatenated)");
+  eq(c.skills[0].parameter, "Arcane", "param recorded in the field");
 });
 test("source opt forces provenance (e.g. a starting skill)", () => {
   const c = addToCharacter(base(), "Basic Martial Weapons", { source: { type: "starting", class: "Fighter" } });

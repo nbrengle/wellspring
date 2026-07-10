@@ -240,8 +240,10 @@ function ParameterEditor({ baseName, entity, view, suggestions: suggestionsProp,
   const sectionLabel = baseName === "Lore" ? "Customize Area" : isSpellChoice ? "Choose a Spell" : "Choose";
 
   const choose = (opt) => {
-    const newName = opt ? formatParameterizedName(baseName, opt, entity.name) : entity.baseName || baseName;
-    onUpdateParameter(view.field, entity.name, newName, view.index);
+    // Param is a FIELD: pass the raw chosen value + the row index. The display name
+    // (base + param) is only for keeping the open pane pointed at the row.
+    const displayName = opt ? formatParameterizedName(baseName, opt, entity.name) : entity.baseName || baseName;
+    onUpdateParameter(view.field, view.index, opt || "", displayName);
   };
 
   return (
