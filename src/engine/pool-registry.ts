@@ -22,6 +22,7 @@
 
 import { lookupEntity } from "./data.js";
 import { Entity } from "./types.js";
+import { parseWordNumber } from "./resolver.js";
 
 export interface PoolDef {
   id: string;
@@ -101,19 +102,13 @@ export function poolRelation(entity: Entity | null | undefined, poolId: string):
 }
 
 // ── Pool size formula (TECH DEBT — TODO(derive) regular forms; declare residual) ─
-const WORD_NUM: Record<string, number> = { one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, ten: 10 };
 
 /** Parse a defining power's size formula into { mult, add } so size = mult*level + add.
  *  Handles "three times … class-level" / "3 x … level" / "10 plus … level" / flat
  *  "maximum points of N". Returns null if the prose isn't recognized (→ guard). */
 export function poolSizeFormula(entity: Entity | null | undefined): { mult: number; add: number } | null {
   const t = textOf(entity).replace(/\s+/g, " ");
-  const num = (s: string): number | null => {
-    const w = WORD_NUM[s.toLowerCase()];
-    if (w != null) return w;
-    const n = parseInt(s, 10);
-    return isNaN(n) ? null : n;
-  };
+  const num = parseWordNumber;
   // "<N> (times|x) … class-level"  → mult*level
   let m = t.match(/(\w+)\s*(?:times|x)\s+[^.]*?class.?level/i);
   if (m && num(m[1]) != null) return { mult: num(m[1])!, add: 0 };
