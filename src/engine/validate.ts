@@ -21,6 +21,7 @@ import {
   divineSubstitutionOptions,
 } from "../engine/data.js";
 import { cleanItemName, bareSkill, getClasses, primaryClass } from "./resolver.js";
+import type { CharacterState, CharacterChoice, BaseEntity, BPLedgerEntry } from "./types.js";
 
 // Shared primitives now live in validate/core.js (hotspot split). Import the ones
 // this module still uses internally, and re-export the public surface from the
@@ -112,17 +113,17 @@ interface PowerBenefit {
   gateClass: string;
   benefits: { level: number; text: string; active: boolean }[];
 }
-export function activePowerBenefits(character): PowerBenefit[] {
+export function activePowerBenefits(character: CharacterState) {
   const levelByClass = Object.fromEntries(getClasses(character).map((c) => [c.name, c.level]));
   const out: PowerBenefit[] = [];
   for (const item of character.powers || []) {
-    const ent = lookupEntity(`powers:${cleanItemName(item.entityId || item.name || "")}`);
+    const ent = lookupEntity(`powers:${cleanItemName(item.entityId || (item as any).name || "")}`);
     if (!ent?.levelBenefits) continue;
-    const lvl = levelByClass[ent.levelBenefitClass ?? ""] ?? characterLevel(character);
+    const lvl = levelByClass[ent.levelBenefitClass] ?? characterLevel(character);
     out.push({
       power: ent.name,
-      gateClass: ent.levelBenefitClass ?? "",
-      benefits: ent.levelBenefits.map((b) => ({ ...b, active: lvl >= b.level })),
+      gateClass: ent.levelBenefitClass,
+      benefits: ent.levelBenefits.map((b: any) => ({ ...b, active: lvl >= b.level })),
     });
   }
   return out;
@@ -131,15 +132,15 @@ export function activePowerBenefits(character): PowerBenefit[] {
 // Whether the character has the Worship skill (lets them follow a devotion and
 // access its domains). Reads the skills bucket (entityId), any source. Any
 // class can take it; "Worship - <Devotion>" matches the prefix.
-export function hasWorship(character) {
-  return (character?.skills || []).some((s) => /^worship\b/i.test(s.entityId || s.name || ""));
+export function hasWorship(character: CharacterState) {
+  return (character?.skills || []).some((s: CharacterChoice & { name?: string }) => /^worship\b/i.test(s.entityId || s.name || ""));
 }
 
 // Devotion / domain state for the UI: the chosen devotion, the domains it grants,
 // the character's selected domains (≤2, intersected with what the devotion has),
 // whether Worship is held, and the domain powers available to purchase from the
 // selected domains. Returns null when no devotion is set.
-export function devotionState(character) {
+export function devotionState(character: CharacterState) {
   const devName = character?.devotion;
   if (!devName) return null;
   const dev = DEVOTIONS.find((d) => d.name === devName || d.baseName === devName);
@@ -153,7 +154,7 @@ export function devotionState(character) {
   const ownsSubstitution = ownsDivineSubstitution(character);
   const substitutionOptions = ownsSubstitution ? divineSubstitutionOptions(standard) : [];
   const subPick = character.choices?.["powers:Divine Substitution"];
-  const substituted = ownsSubstitution && subPick && substitutionOptions.includes(subPick) ? subPick : null;
+  const substituted = ownsSubstitution && subPick && substitutionOptions.includes(subPick) ? subPick : undefined;
 
   const available = substituted ? [...standard, substituted] : standard;
   const chosen = (character.divineDomains || []).filter((d) => available.includes(d)).slice(0, MAX_DOMAINS);
@@ -176,8 +177,8 @@ export function devotionState(character) {
 
 // Whether the character owns the Divine Substitution Class power (in the
 // powers bucket).
-function ownsDivineSubstitution(character) {
-  return (character.powers || []).some((p) => /^Divine Substitution\b/.test(cleanItemName(p.entityId || p.name || "")));
+function ownsDivineSubstitution(character: CharacterState) {
+  return (character.powers || []).some((p: CharacterChoice & { name?: string }) => /^Divine Substitution\b/.test(cleanItemName(p.entityId || p.name || "")));
 }
 
 // Normalization functions getClasses and primaryClass are now imported from ./resolver.js
@@ -190,7 +191,7 @@ function ownsDivineSubstitution(character) {
 import { multiclassGrants } from "./validate/core.js";
 export { multiclassGrants };
 
-export function classifyOwnedItems(character) {
+export function classifyOwnedItems(character: CharacterState) {
   // The single resolution site is the CharacterGraph: project its bucketed read
   // layer (graph.uiBuckets) into the 4 buckets the build sheet + pickers read.
   // No second graph-walk, no parallel dedupe/misfile machinery — the model already
@@ -203,18 +204,13 @@ export function classifyOwnedItems(character) {
   const mcGrants = multiclassGrants(character).skills;
   for (const mc of mcGrants) {
     skills.push({
-      id: mc.name,
-      entityId: `skills:${mc.name}`,
       name: mc.name,
       field: "skills",
       sourceType: "multiclass",
-      type: "skill",
-      cost: 0,
-      free: true,
       cls: mc.source,
+      index: -1,
       rank: 1,
-      effects: [],
-    });
+    } as any);
   }
 
   return {
@@ -237,9 +233,9 @@ const CRAFT_TIER_RANK = { Apprentice: 1, Journeyman: 2, Greater: 3 };
 
 // Every skill the character possesses (starting + purchased + granted), bare of
 // any "(parameter)" suffix. Shared basis for capability checks.
-export function ownedSkillNames(character) {
+export function ownedSkillNames(character: CharacterState) {
   // All owned skills (starting + purchased) are CharacterChoice[] in skills[].
-  const skillNames = (character.skills || []).map((s) => s.entityId);
+  const skillNames = (character.skills || []).map((s: CharacterChoice) => s.entityId);
   const names = new Set(skillNames.map(bareSkill));
   for (const g of grantedAbilities(character).list) {
     if (g.abilityType === "skills") names.add(bareSkill(g.abilityName));
@@ -252,12 +248,12 @@ export function ownedSkillNames(character) {
 // Returns { crafting: [{ discipline, tier, count, recipes:[...] }], rituals:
 // { tier, recipes:[...] }|null, any: bool }. `tier` is the HIGHEST unlocked
 // (subsumes lower); recipes lists every makeable recipe at or below that tier.
-export function craftingCapability(character) {
+export function craftingCapability(character: CharacterState) {
   const owned = ownedSkillNames(character);
-  const topTier = (stem) => {
+  const topTier = (stem: string) => {
     let best = 0;
     for (const t of CRAFTING_TIERS) {
-      if (owned.has(`${t} ${stem}`)) best = Math.max(best, CRAFT_TIER_RANK[t]);
+      if (owned.has(`${t} ${stem}`)) best = Math.max(best, CRAFT_TIER_RANK[t as keyof typeof CRAFT_TIER_RANK]);
     }
     return best; // 0 = none
   };
@@ -271,8 +267,8 @@ export function craftingCapability(character) {
   for (const [discipline, stem] of Object.entries(CRAFT_DISCIPLINES)) {
     const rank = topTier(stem);
     if (!rank) continue;
-    const tier = Object.keys(CRAFT_TIER_RANK).find((t) => CRAFT_TIER_RANK[t] === rank);
-    const recipes = CRAFTING.filter((r) => r.discipline === discipline && CRAFT_TIER_RANK[r.tier] <= rank).map((r) => ({
+    const tier = Object.keys(CRAFT_TIER_RANK).find((t) => CRAFT_TIER_RANK[t as keyof typeof CRAFT_TIER_RANK] === rank);
+    const recipes = CRAFTING.filter((r) => r.discipline === discipline && CRAFT_TIER_RANK[r.tier as keyof typeof CRAFT_TIER_RANK] <= rank).map((r) => ({
       name: r.name,
       tier: r.tier,
     }));
@@ -282,8 +278,8 @@ export function craftingCapability(character) {
   const ritualRank = topTier("Ritual Magic");
   let rituals: { tier: string | undefined; count: number; recipes: { name: string; tier: string }[] } | null = null;
   if (ritualRank) {
-    const tier = Object.keys(CRAFT_TIER_RANK).find((t) => CRAFT_TIER_RANK[t] === ritualRank);
-    const recipes = RITUALS.filter((r) => CRAFT_TIER_RANK[r.tier] <= ritualRank).map((r) => ({
+    const tier = Object.keys(CRAFT_TIER_RANK).find((t) => CRAFT_TIER_RANK[t as keyof typeof CRAFT_TIER_RANK] === ritualRank);
+    const recipes = RITUALS.filter((r) => CRAFT_TIER_RANK[r.tier as keyof typeof CRAFT_TIER_RANK] <= ritualRank).map((r) => ({
       name: r.name,
       tier: r.tier,
     }));
@@ -296,7 +292,7 @@ export function craftingCapability(character) {
 // Base Build Points from the level table (9 at level 4). Below the table's floor
 // the rule is "2 BP per level", so we extrapolate down (L3=7, L2=5, L1=3) rather
 // than report 0 — even though such a character is flagged below-floor / invalid.
-export function budgetFor(level, legalMinLevel = 4) {
+export function budgetFor(level: number, legalMinLevel = 4) {
   const row = LEVEL_TABLE.find((l) => l.level === level);
   if (row) return row.bp;
   const floor = LEVEL_TABLE.find((l) => l.level === legalMinLevel);
@@ -308,11 +304,11 @@ export function budgetFor(level, legalMinLevel = 4) {
 // to their total character level (MegaDoc "Bonus BP" rule). It's optional/earned,
 // so it's surfaced as headroom above the base budget rather than free spend — a
 // build that exceeds base but stays within base+bonus is "legal with bonus BP".
-export function bonusBudgetFor(level) {
+export function bonusBudgetFor(level: number) {
   return level;
 }
 
-export function computeActiveSelections(graph, lbp) {
+export function computeActiveSelections(graph: any, lbp: any) {
   // A granted "choose one" selection surfaced for the UI, tagged with the entity that
   // granted it. `gs` is parser-shaped (open), so we widen it and add sourceName.
   const active: (Record<string, unknown> & { sourceName: string })[] = [];
@@ -335,7 +331,7 @@ export function computeActiveSelections(graph, lbp) {
   return active;
 }
 
-export function validate(character) {
+export function validate(character: CharacterState) {
   const graph = resolveCharacterGraph(character);
   const resolved = graph.character;
   const level = characterLevel(resolved);
@@ -372,7 +368,7 @@ export function validate(character) {
   const studiedFocus = {
     tags: ARTISAN_SPECIALTY_TAGS,
     tag: resolved.choices?.["powers:Studied Focus"] || null,
-    options: studiedFocusPool(resolved.choices?.["powers:Studied Focus"] || null),
+    options: studiedFocusPool(resolved.choices?.["powers:Studied Focus"] || undefined),
   };
   // Basic Arcane / Basic Faith pickable spell pools (sphere-gated; non-casters get
   // any base class of that sphere). Keyed by skill base name for the UI picker.
@@ -389,14 +385,8 @@ export function validate(character) {
   // Class "pools" (Healing Touch Pool, Living Iron Pool, …): derived from the
   // owned set + class levels. Only pools whose defining power is owned appear.
   // Read-layer-shaped record the identity rail + a Pool facet consume directly.
-  const ownedFlat = [
-    ...owned.skills,
-    ...owned.perks,
-    ...owned.classPowers,
-    ...owned.domainPowers,
-    ...owned.innatePowers,
-  ];
-  const classLevelOf = (className) => getClasses(resolved).find((c) => c.name === className)?.level ?? 0;
+  const ownedFlat = [...owned.skills, ...owned.perks, ...owned.classPowers, ...owned.innatePowers];
+  const classLevelOf = (className: string) => getClasses(resolved).find((c) => c.name === className)?.level ?? 0;
   const pools = characterPools(ownedFlat, classLevelOf);
   // Class-choice grants (Extensive Combat Training / Extensive Training /
   // Spell-Scholar): the classes the player may pick for each, gated by the classes
@@ -407,8 +397,8 @@ export function validate(character) {
   );
   // Attach each classified row's computed cost record (from the BP ledger) so the
   // UI reads `row.cost` directly instead of reconstructing a ledger key per row.
-  for (const bucket of ["skills", "perks", "classPowers", "domainPowers", "flaws", "innatePowers"]) {
-    for (const row of owned[bucket]) {
+  for (const bucket of ["skills", "perks", "classPowers", "domainPowers", "flaws", "innatePowers"] as const) {
+    for (const row of (owned[bucket as keyof typeof owned] as any[])) {
       const key = costKey(row);
       if (key) {
         row.cost = spend.byItem[key];
@@ -501,8 +491,8 @@ export function validityReasons(report: BuildReport | null | undefined) {
       continue;
     }
     const need = [
-      ...(iss.missing || []).map((m) => m.name),
-      ...(iss.anyOf || []).map((g) => g.map((m) => m.name).join(" or ")),
+      ...(iss.missing || []).map((m: any) => m.name),
+      ...(iss.anyOf || []).map((g: any) => g.map((m: any) => m.name).join(" or ")),
     ].join(", ");
     out.push(`${iss.item} needs: ${need}`);
   }
@@ -513,7 +503,7 @@ export function validityReasons(report: BuildReport | null | undefined) {
     if (lbp.needsSublineage)
       out.push(`Lineage: select the ${lbp.requiredSublineages.join("/")} sublineage to take its items`);
     if (lbp.missingRequired?.length)
-      out.push(`Lineage: missing required ${lbp.missingRequired.map((c) => c.baseName).join(", ")}`);
+      out.push(`Lineage: missing required ${lbp.missingRequired.map((c: any) => c.baseName).join(", ")}`);
   }
   for (const n of report.prereqs?.notes || []) {
     out.push(`Note (${n.item}): ${n.text}`);
