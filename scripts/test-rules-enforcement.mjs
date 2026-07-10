@@ -32,8 +32,9 @@ for (const s of skills) {
   const pr = REFS.prereqs[id];
   if (pr && (pr.skills.length > 0 || pr.anyOf.length > 0)) {
     // Construct character sheet with this skill parameter if needed, but without prereqs.
+    // Use a blank class rather than Fighter, since Fighter gives many basic proficiencies for free!
     const item = s.parameter ? `${s.name} (Test Parameter)` : s.name;
-    const char = makeChar("Fighter 4", { lineage: "Human", add: [item] });
+    const char = makeChar("Peasant 4", { lineage: "Human", add: [item] });
     const res = validate(char);
     const hasIssue = res.prereqs.issues.some((issue) => {
       const issueClean = issue.item.replace(/\s*-\s*\d+\s*BP$/i, "").trim();
@@ -49,7 +50,7 @@ for (const p of perks) {
   const id = `perks:${p.name}`;
   const pr = REFS.prereqs[id];
   if (pr && (pr.skills.length > 0 || pr.anyOf.length > 0)) {
-    const char = makeChar("Fighter 4", { lineage: "Human", add: [p.name] });
+    const char = makeChar("Peasant 4", { lineage: "Human", add: [p.name] });
     const res = validate(char);
     const hasIssue = res.prereqs.issues.some((issue) => {
       const issueClean = issue.item.replace(/\s*-\s*\d+\s*BP$/i, "").trim();
@@ -71,8 +72,8 @@ for (const s of skills) {
     const isCasterRequirement = [...pr.levels, ...pr.other].some(
       (r) => r.includes("non-casting") || r.includes("Armor"),
     );
-    // below lvl 10, below base classes requirement etc.
-    const char = makeChar(isCasterRequirement ? "Mage 4" : "Fighter 4", { lineage: "Human", add: [item] });
+    // Construct a character sheet missing the prerequisites.
+    const char = makeChar("Peasant 4", { lineage: "Human", add: [item] });
     const res = validate(char);
     if (res.valid) {
       reportGap(
