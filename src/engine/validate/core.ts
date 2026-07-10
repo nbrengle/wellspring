@@ -10,7 +10,7 @@ import {
   CLASSES,
 } from "../data.js";
 import { cleanItemName, bareSkill, getClasses } from "../resolver.js";
-import type { CharacterState } from "../types.js";
+import type { CharacterState, ProgressionRow } from "../types.js";
 import { sourceClass, Entity } from "../types.js";
 
 import { MAX_LBP, MAX_FLAW_BP, BACKSTORY_BP, MAX_DOMAINS, DEFAULT_WEALTH, LEVEL_CAP } from "../config.js";
@@ -101,15 +101,17 @@ export function countPicksForClass(
 }
 
 export function maxProgressionLevel(cls: string) {
-  const levels = Object.keys(CLASS_PROGRESSION[cls] || {})
+  const levels = Object.keys((CLASS_PROGRESSION as Record<string, Record<number, unknown>>)[cls] || {})
     .map(Number)
     .filter((n) => n > 0);
   return levels.length ? Math.max(...levels) : 4;
 }
 
-export function progressionRow(cls: string, level: number) {
+// progressionRow definition moved to types.ts
+
+export function progressionRow(cls: string, level: number): ProgressionRow {
   const prog = CLASS_PROGRESSION[cls] || {};
-  return prog[level] || prog[Math.min(level, maxProgressionLevel(cls))] || CLASS_POWER_SLOTS[cls];
+  return prog[level] || prog[Math.min(level, maxProgressionLevel(cls))] || CLASS_POWER_SLOTS[cls] || {};
 }
 
 // ─── Grant cluster ──────────────────────────────────────────────────────────

@@ -14,7 +14,15 @@
 //   'spell'   — pick a spell from `pool` at `tiers` (added to Known Spells).
 //   'rep'     — Lost Life: rep another lineage's challenge for its LBP.
 //   'flavor'  — free pick, no mechanical effect (carries a display `label`).
-export const LINEAGE_CHOICE_SPECS = {
+export interface ChoiceSpec {
+  kind: string;
+  pool?: string[];
+  tiers?: string[];
+  label?: string;
+  optionsKey?: string;
+}
+
+export const LINEAGE_CHOICE_SPECS: Record<string, ChoiceSpec> = {
   "Divine Magic": { kind: "cantrip", pool: ["Divine"] },
   "Psionic Cantrip": { kind: "cantrip", pool: ["Arcane", "Divine"] },
   // Arcane Aptitude: a Cantrip OR Novice spell from any Base arcane class → adds it
@@ -29,7 +37,7 @@ export const LINEAGE_CHOICE_SPECS = {
   "Elemental Expression": { kind: "flavor", label: "Accent" },
   "Favored Gem": { kind: "flavor", label: "Gemstone" },
 };
-export function lineageChoiceSpec(item) {
+export function lineageChoiceSpec(item: { baseName?: string; name?: string } | null | undefined): ChoiceSpec | null {
   const base = item?.baseName || item?.name;
   return base ? LINEAGE_CHOICE_SPECS[base] || null : null;
 }
@@ -42,11 +50,11 @@ export function lineageChoiceSpec(item) {
 //     pool = report.arcaneSecretsOptions (see arcaneSecretsSpellOptions in slots.js).
 //   'Weird Wanderings' (Artisan Basic power) — choose one Basic power from any
 //     non-Artisan Base Class; pool = report.weirdWanderingsOptions (slots.js).
-export const POWER_SPELL_CHOICE_SPECS = {
+export const POWER_SPELL_CHOICE_SPECS: Record<string, ChoiceSpec> = {
   "Arcane Secrets": { kind: "spell", label: "Choose a Spell", optionsKey: "arcaneSecretsOptions" },
   "Weird Wanderings": { kind: "power", label: "Choose a Power", optionsKey: "weirdWanderingsOptions" },
 };
-export function powerSpellChoiceSpec(item) {
+export function powerSpellChoiceSpec(item: { baseName?: string; name?: string } | null | undefined): ChoiceSpec | null {
   const base = item?.baseName || item?.name;
   return base ? POWER_SPELL_CHOICE_SPECS[base] || null : null;
 }

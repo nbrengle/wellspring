@@ -47,22 +47,22 @@ function mentionsOfType(entityType: string | null | undefined, name: string, pre
 // The three player-facing axes. `defenses` (Counter/Protect/Resist) are a flavor of
 // effect, so they fold into the Effect verb. Order within each is mention order
 // (roughly importance); we de-dup but keep first-seen order.
-const dedup = (arr) => [...new Set(arr)];
+const dedup = (arr: string[]) => [...new Set(arr)];
 
-export function effectVerbs(entityType, name) {
+export function effectVerbs(entityType: string | null | undefined, name: string) {
   return dedup(mentionsOfType(entityType, name, ["effects", "defenses"]));
 }
-export function damageTypes(entityType, name) {
+export function damageTypes(entityType: string | null | undefined, name: string) {
   return dedup(mentionsOfType(entityType, name, ["accents"]));
 }
-export function conditionsInflicted(entityType, name) {
+export function conditionsInflicted(entityType: string | null | undefined, name: string) {
   return dedup(mentionsOfType(entityType, name, ["conditions"]));
 }
 
 // Bundle of all facets for a candidate, used by the picker. `keys(axis)` returns the
 // buckets this item belongs to under that axis (possibly several → multi-bucket), or
 // [] when the item has no facet on that axis (callers drop those from facet axes).
-export function gameEffectFacets(entityType, name) {
+export function gameEffectFacets(entityType: string | null | undefined, name: string) {
   return {
     effect: effectVerbs(entityType, name),
     damage: damageTypes(entityType, name),

@@ -37,7 +37,7 @@ interface CraftTree {
 }
 
 // Helper to normalize resource names
-export function normalizeResourceName(name) {
+export function normalizeResourceName(name: string) {
   name = name.trim().replace(/\s+/g, " ");
   // Strip parentheticals
   name = name.replace(/\([^)]*\)/g, "").trim();
@@ -82,7 +82,7 @@ export function normalizeResourceName(name) {
 }
 
 // Parse a single simple component (e.g. "3 Night Prizes", "1+ Ritual Powder")
-export function parseSingleComponent(part) {
+export function parseSingleComponent(part: string) {
   part = part.trim();
   if (!part) return null;
   const match = part.match(/^(\d+|\+?\[[a-zA-Z]\]|\d+\+)\s*(.*)$/);
@@ -100,7 +100,7 @@ export function parseSingleComponent(part) {
 }
 
 // Parse a materials/components string into an array of alternative requirement sets
-export function parseRequirements(str) {
+export function parseRequirements(str: string) {
   if (!str) return [];
   str = str.trim();
 
@@ -109,8 +109,8 @@ export function parseRequirements(str) {
     const bracketMatches = [...str.matchAll(/\[([^\]]+)\]/g)].map((m) => m[1]);
     if (bracketMatches.length > 0) {
       return bracketMatches.map((groupStr) => {
-        const reqs = {};
-        groupStr.split(/,(?![^(]*\))/).forEach((p) => {
+        const reqs: Record<string, number> = {};
+        groupStr.split(/,(?![^(]*\))/).forEach((p: string) => {
           const parsed = parseSingleComponent(p);
           if (parsed) reqs[parsed.name] = (reqs[parsed.name] || 0) + parsed.qty;
         });
@@ -126,11 +126,11 @@ export function parseRequirements(str) {
   if (lowerStr.includes(" or ") && !lowerStr.includes(" and ")) {
     const parts = str
       .split(/(?:,(?![^(]*\))|\s+or\s+|\s+OR\s+)+/i)
-      .map((p) => p.trim())
+      .map((p: string) => p.trim())
       .filter(Boolean);
-    const parsedParts = parts.map((p) => parseSingleComponent(p)).filter(Boolean);
+    const parsedParts = parts.map((p: string) => parseSingleComponent(p)).filter(Boolean);
     if (parsedParts.length === parts.length) {
-      return parsedParts.map((p) => ({ [p.name]: p.qty }));
+      return parsedParts.map((p: { name: string; qty: number } | null) => (p ? { [p.name]: p.qty } : {}));
     }
   }
 
@@ -140,8 +140,8 @@ export function parseRequirements(str) {
   if (bracketOrMatch) {
     const baseStr = bracketOrMatch[1];
     const choicesStr = bracketOrMatch[2];
-    const baseReqs = {};
-    baseStr.split(/,(?![^(]*\))/).forEach((p) => {
+    const baseReqs: Record<string, number> = {};
+    baseStr.split(/,(?![^(]*\))/).forEach((p: string) => {
       const parsed = parseSingleComponent(p);
       if (parsed) baseReqs[parsed.name] = (baseReqs[parsed.name] || 0) + parsed.qty;
     });
@@ -149,20 +149,23 @@ export function parseRequirements(str) {
     // Parse choices
     const choices = choicesStr
       .split(/\s+or\s+/i)
-      .map((c) => parseSingleComponent(c))
+      .map((c: string) => parseSingleComponent(c))
       .filter(Boolean);
     if (choices.length > 0) {
-      return choices.map((c) => ({
-        ...baseReqs,
-        [c.name]: (baseReqs[c.name] || 0) + c.qty,
-      }));
+      return choices.map((c: { name: string; qty: number } | null) => {
+        if (!c) return baseReqs;
+        return {
+          ...baseReqs,
+          [c.name]: (baseReqs[c.name] || 0) + c.qty,
+        };
+      });
     }
   }
 
   // 4. Default simple split
   const parts = str.split(/,(?![^(]*\))/);
-  const reqs = {};
-  parts.forEach((p) => {
+  const reqs: Record<string, number> = {};
+  parts.forEach((p: string) => {
     const parsed = parseSingleComponent(p);
     if (parsed) reqs[parsed.name] = (reqs[parsed.name] || 0) + parsed.qty;
   });
@@ -170,7 +173,7 @@ export function parseRequirements(str) {
 }
 
 // Parse batch yield from text
-function parseYield(recipe) {
+function parseYield(recipe: { usesPerBatch?: string | number; yield?: string | number }) {
   const str = String(recipe.usesPerBatch || recipe.yield || "1")
     .toLowerCase()
     .trim();
@@ -216,7 +219,7 @@ for (const r of RITUALS || []) {
 //      recipe. (The data also contains fused artifacts like "Essence Infusion -
 //      Thought 5 Hide"; the leading-recipe match still works and we don't crash.)
 // Returns the recipe object from RECIPES, or null when the name is a raw resource.
-export function resolveRecipe(name) {
+export function resolveRecipe(name: string) {
   if (!name) return null;
   const want = name.trim().toLowerCase();
   let key = Array.from(RECIPES.keys()).find((k) => k.toLowerCase() === want);
@@ -235,7 +238,7 @@ export function resolveRecipe(name) {
 
 // Classify an ingredient as a raw resource (gathered) or a crafted intermediate
 // (made from a recipe). `recipe` is the resolved recipe for crafted ingredients.
-export function classifyIngredient(name) {
+export function classifyIngredient(name: string) {
   const recipe = resolveRecipe(name);
   return recipe
     ? { kind: "crafted", recipe, canonical: recipe.name }
@@ -405,7 +408,7 @@ export function buildCraftTree(
 
 // Calculate details for a target recipe that cannot be made
 // (Shows exactly what materials are missing and how much is available/needed)
-export function getRecipeDeficit(recipe, inventory) {
+export function getRecipeDeficit(recipe: { requirements: Record<string, number>[] }, inventory: Inventory) {
   let closestDeficit: Shortfall[] | null = null;
   let minMissingCount = Infinity;
 
