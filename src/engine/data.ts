@@ -58,8 +58,8 @@ export const EVENTS_TABLE = eventsTableJson;
 export const META = {
   ...metaJson,
   appVersion:
-    (typeof (import.meta as unknown as { env?: { VITE_APP_VERSION?: string } }).env !== "undefined" && 
-     (import.meta as unknown as { env?: { VITE_APP_VERSION?: string } }).env?.VITE_APP_VERSION) ||
+    (typeof (import.meta as unknown as { env?: { VITE_APP_VERSION?: string } }).env !== "undefined" &&
+      (import.meta as unknown as { env?: { VITE_APP_VERSION?: string } }).env?.VITE_APP_VERSION) ||
     metaJson.appVersion,
 };
 
@@ -354,7 +354,7 @@ export function lineageRepOptions() {
 // recorded as "<Lineage> - <Advantage>" so the graph can resolve it cross-lineage
 // and apply its full effects (with prereqs still enforced).
 export function pickAndChooseOptions() {
-  const out: {name: string, group: string, description: string, advId: string}[] = [];
+  const out: { name: string; group: string; description: string; advId: string }[] = [];
   for (const [lineage, lin] of Object.entries(LINEAGES)) {
     if (lineage === "Lost") continue;
     for (const a of lin.advantages || []) {
@@ -362,7 +362,8 @@ export function pickAndChooseOptions() {
       out.push({
         name,
         group: lineage,
-        description: ("description" in a ? (a as {description?: string}).description : (a as {desc?: string}).desc) || "",
+        description:
+          ("description" in a ? (a as { description?: string }).description : (a as { desc?: string }).desc) || "",
         advId: `${lineage} - ${name}`,
       });
     }
@@ -447,11 +448,11 @@ function idNameLocal(id) {
   return i >= 0 ? id.slice(i + 1) : id;
 }
 
-export function lineageCantripChoices(character): {item: string, cantrip: string}[] {
+export function lineageCantripChoices(character): { item: string; cantrip: string }[] {
   const choices = character?.advantageChoices || {};
   const lin = character?.lineage && LINEAGES[character.lineage];
   if (!lin) return [];
-  const out: {item: string, cantrip: string}[] = [];
+  const out: { item: string; cantrip: string }[] = [];
   for (const it of [...(lin.challenges || []), ...(lin.advantages || [])]) {
     const base = it.baseName || it.name;
     const spec = LINEAGE_CHOICE_SPECS[base];
