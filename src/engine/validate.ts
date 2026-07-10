@@ -86,7 +86,7 @@ import { resolveCharacterGraph, grantedAbilities } from "./graph.js";
 import { characterPools } from "./pool-registry.js";
 export { grantedAbilities };
 
-import { lookupCost, costKey } from "./validate/cost-key.js";
+import { costKey } from "./validate/cost-key.js";
 
 export { prereqStatus, checkLevelConstraint } from "./validate/prereqs.js";
 import { CRAFT_DISCIPLINES, CRAFTING_TIERS } from "./config.js";
@@ -392,7 +392,7 @@ export function validate(character) {
   // UI reads `row.cost` directly instead of reconstructing a ledger key per row.
   for (const bucket of ["skills", "perks", "classPowers", "domainPowers", "flaws", "innatePowers"]) {
     for (const row of owned[bucket]) {
-      row.cost = spend.byItem[costKey(row)] || lookupCost(spend.byItem, row.field, row.name, row.index);
+      row.cost = spend.byItem[costKey(row)];
     }
   }
   const activeSelections = computeActiveSelections(graph, lbp);

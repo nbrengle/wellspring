@@ -7,7 +7,6 @@ import { CLASSES, DOMAINS, lookupEntity } from "../../engine/data.js";
 import { getMaxRanks, agileLearnerCapacity } from "../../engine/validate.js";
 import { bareSkill, getClasses, cleanItemName } from "../../engine/resolver.js";
 import { sourceClass } from "../../engine/types.js";
-import { lookupCost } from "../../engine/validate/cost-key.js";
 import { STARTING_CHOICES_CONFIG, reconcileStartingChoices } from "../../engine/starting-choices.js";
 import { UNLIMITED_SKILLS } from "../../engine/data.js";
 import InspectableRow from "./InspectableRow.jsx";
