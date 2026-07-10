@@ -22,6 +22,7 @@ export interface SlotGrant {
 export interface ChoiceOption {
   text: string;
   grants?: string[];
+  grantsSkills?: string[];
   grantsSkill?: boolean;
 }
 
@@ -71,6 +72,9 @@ export interface BaseEntity {
   grantedSelections?: Record<string, unknown>[];
   highestSlot?: number;
   magicType?: string;
+  wealthIncome?: { n: number; kind?: string };
+  levelDiscounts?: { atLevel: number; skill: string; amount: number }[];
+  chooseOne?: ChooseOneConfig;
   bp?: number | string; // For flawed abilities that grant bp
   effect?: string;
   call?: string;
@@ -116,15 +120,31 @@ export interface Flaw extends BaseEntity {
 
 export interface Class extends BaseEntity {
   type: "class";
-  innate?: { name: string; requiredLevel?: number }[];
+  innate?: { id?: string; name: string; requiredLevel?: number }[];
   spellcaster?: boolean;
+  utility?: { id?: string; name: string }[];
+  basic?: { id?: string; name: string }[];
+  advanced?: { id?: string; name: string }[];
+  veteran?: { id?: string; name: string }[];
+  classSkills?: { id?: string; name: string }[];
+  rightHandPowers?: { id?: string; name: string }[];
+}
+
+export interface Advantage extends BaseEntity {
+  type: "advantage";
+  lineage: string;
+}
+
+export interface Challenge extends BaseEntity {
+  type: "challenge";
+  lineage: string;
 }
 
 /**
  * A discriminated union of all possible entities that can be returned by the data layer.
  * Allows the engine to narrow the type via `if (ent.type === 'spell') { ... }`.
  */
-export type Entity = Skill | Power | Spell | Perk | Flaw | Class;
+export type Entity = Skill | Power | Spell | Perk | Flaw | Class | Advantage | Challenge;
 
 // ─── 2. Ontological Character State ────────────────────────────────────
 
