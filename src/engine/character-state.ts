@@ -122,9 +122,6 @@ export function loadArchetype(archetype) {
       }
     }
   }
-  if (archetype.grants) c.grants = archetype.grants;
-  if (archetype.effectiveBP) c.effectiveBP = archetype.effectiveBP;
-  if (archetype.ranks) c.ranks = archetype.ranks;
   // Normalize classes to the canonical array form [{name, level}] that getClasses +
   // the class handlers use. Archetypes store it as an object map ({ Cleric: 4 }); the
   // copy loop above would carry that raw shape, so overwrite with the normalized form.

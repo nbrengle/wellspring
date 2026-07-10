@@ -128,33 +128,6 @@ const parseBPSuffix = (s) => {
   return m ? parseInt(m[1], 10) : null;
 };
 
-// The bookkeeping notes aren't just clutter — they're the hand-authored grant
-// model. "(from Linked Armor Utility Power)" means the item is granted by that
-// power and so costs no BP; "(1 BP refunded from Poisoner)" is a discount.
-// Parse the first such note on a line into structured provenance so the
-// validator can model grants/discounts instead of guessing from prose.
-//   kind: 'grant'   — fully free, granted by source (free from / from / starting)
-//         'discount'— partial refund (N BP refunded / discounted from)
-//   amount: BP refunded for discounts (null for full grants)
-//   source: the granting entity text ("Linked Armor", "Poisoner"), best-effort
-const NOTE_DETAIL = /\((?:(-?\d+)\s*BP\s+)?(free\s+from|discounted\s+from|refunded\s+from|from|starting)\s*([^()]*)\)/i;
-function parseProvenance(s) {
-  const m = s.match(NOTE_DETAIL);
-  if (!m) return null;
-  const [, amt, verb, rest] = m;
-  const v = verb.toLowerCase();
-  const kind = (v === 'refunded from' || v === 'discounted from' || amt) ? 'discount' : 'grant';
-  // The note may name the source's ROLE ("Utility Power", "innate Power", "Perk").
-  // Capture it (when stated) so the UI can say what kind of thing granted this,
-  // then strip it from `source` so that's just the entity name. Role isn't always
-  // present ("from The Learned One") — the UI can fall back to entity lookup.
-  const roleMatch = rest.match(/\b((?:utility|innate|basic|class|advanced|veteran)?\s*power|perk|skill|class\s+feature)\b/i);
-  const sourceRole = roleMatch ? roleMatch[1].replace(/\s+/g, ' ').trim().toLowerCase() : null;
-  const source = rest.replace(/\b(utility|innate|basic|class|advanced|veteran)?\s*power\b/i, '')
-                     .replace(/\bperk\b/i, '').replace(/\bskill\b/i, '').replace(/\bclass\s+feature\b/i, '')
-                     .replace(/\s+/g, ' ').trim() || null;
-  return { kind, amount: amt ? Math.abs(parseInt(amt, 10)) : null, source, sourceRole };
-}
 
 // Rank multiplier: "Foo x2" / "Foo x2 (your choice)" means take Foo twice. We
 // keep ONE row and record the count in a `ranks` sidecar; the name is stripped of
@@ -255,28 +228,23 @@ function parseArchetype(start, end) {
 
   let currentList = null;   // when truthy, subsequent unlabeled text lines append here
   let currentField = null;  // field name backing currentList, for the BP sidecar
-  // effectiveBP[field] and grants[field] are index-aligned with archetype[field]:
-  // the author's stated per-build cost and grant provenance for each item (null
-  // when none was written).
+  // effectiveBP[field] / ranks[field] are index-aligned with archetype[field]: the
+  // author's stated per-build cost + rank for each item (null when none was written).
   archetype.effectiveBP = {};
-  archetype.grants = {};
   archetype.ranks = {};
 
-  // Append a raw item line to the current section list, splitting off the
-  // trailing "- N BP" cost, the "(from X)" provenance note, and the "xN" rank
-  // multiplier into index-aligned sidecars before storing the cleaned name.
+  // Append a raw item line to the current section list, splitting off the trailing
+  // "- N BP" cost and the "xN" rank multiplier into index-aligned sidecars before
+  // storing the cleaned name.
   //
   // For UNLIMITED-ranks skills (Lore, Bookcaster, …), "xN" means N SEPARATE
   // instances, not rank N — so expand into N distinct rows, each with its own
   // concrete subject. Per-instance cost is left to the validator to DERIVE (base
-  // minus any discount source the character owns), so we store effectiveBP: null
-  // and drop the authored discount note (the engine applies it once per instance —
-  // keeping the note too would double-count). Genuine ranked skills keep one row
-  // with ranks: N and their authored cost.
-  const pushOne = (name, bp, grant, rank) => {
+  // minus any discount source the character owns), so we store effectiveBP: null.
+  // Genuine ranked skills keep one row with ranks: N and their authored cost.
+  const pushOne = (name, bp, rank) => {
     currentList.push(name);
     (archetype.effectiveBP[currentField] ||= []).push(bp);
-    (archetype.grants[currentField] ||= []).push(grant);
     (archetype.ranks[currentField] ||= []).push(rank);
   };
   const pushItem = (rawLine) => {
@@ -294,11 +262,11 @@ function parseArchetype(start, end) {
           const d = CHOICE_DEFAULTS[base];
           name = `${name} (${d[k % d.length]})`;
         }
-        pushOne(name, null, null, 1);  // derive cost per instance
+        pushOne(name, null, 1);  // derive cost per instance
       }
       return;
     }
-    pushOne(stripNotes(rawLine), parseBPSuffix(rawLine), parseProvenance(rawLine), count);
+    pushOne(stripNotes(rawLine), parseBPSuffix(rawLine), count);
   };
 
   while (i < end) {
@@ -331,7 +299,6 @@ function parseArchetype(start, end) {
         } else {
           archetype[sectionField] = [stripNotes(value)];
           archetype.effectiveBP[sectionField] = [parseBPSuffix(value)];
-          archetype.grants[sectionField] = [parseProvenance(value)];
         }
       }
       currentList = null;
@@ -400,8 +367,6 @@ function parseArchetype(start, end) {
   // archetypes without authored costs / grants stay clean.
   const anyBP = Object.values(archetype.effectiveBP).some((arr) => arr.some((v) => v !== null));
   if (!anyBP) delete archetype.effectiveBP;
-  const anyGrant = Object.values(archetype.grants).some((arr) => arr.some((v) => v !== null));
-  if (!anyGrant) delete archetype.grants;
   const anyRank = Object.values(archetype.ranks).some((arr) => arr.some((v) => v > 1));
   if (!anyRank) delete archetype.ranks;
 
