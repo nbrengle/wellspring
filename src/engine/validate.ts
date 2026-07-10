@@ -398,7 +398,10 @@ export function validate(character) {
   // UI reads `row.cost` directly instead of reconstructing a ledger key per row.
   for (const bucket of ["skills", "perks", "classPowers", "domainPowers", "flaws", "innatePowers"]) {
     for (const row of owned[bucket]) {
-      row.cost = spend.byItem[costKey(row)];
+      const key = costKey(row);
+      if (key) {
+        row.cost = spend.byItem[key];
+      }
     }
   }
   const activeSelections = computeActiveSelections(graph, lbp);
