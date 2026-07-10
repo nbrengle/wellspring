@@ -1,48 +1,70 @@
 #!/usr/bin/env node
-// tsc-ratchet.mjs — a RATCHET gate for `tsc --noEmit`.
+// tsc-ratchet.mjs — RATCHET gates for `tsc --noEmit`.
 //
-// The engine still carries pre-existing untyped-TS debt (mostly `any`/`never` in
-// graph.ts and the validators). The north star is zero, but until then this gate
-// enforces the ratchet: the type-error count must never EXCEED the baseline below,
-// and when it drops the baseline should be lowered to match (same discipline as the
-// eslint --max-warnings ratchet). New code can't add type errors; every migration
-// step only ratchets it down.
+// Two gates run here, both with the same discipline (mirror the eslint
+// --max-warnings ratchet): the error count must never EXCEED its baseline, and
+// when it drops the baseline should be lowered to match. New code can't add
+// errors; every migration step only ratchets down.
 //
-// Lower BASELINE whenever the real count drops. Goal: 0, then flip this to a hard
-// `tsc --noEmit` (any error fails) and delete the ratchet.
+//   STRICT gate      — plain `tsc --noEmit` (tsconfig as-is). Baseline 0: a hard
+//                       gate. Any error fails the build.
+//   NO-IMPLICIT-ANY  — `tsc --noEmit --noImplicitAny`. tsconfig ships with
+//   gate               noImplicitAny:false, so the untyped-param / untyped-index
+//                       debt (TS7006 / TS7053, all in src/engine/*) is invisible
+//                       to the strict gate. This second gate makes that debt
+//                       count and forces it down. See issue #177.
+//
+// Goal: drive NO_IMPLICIT_ANY_BASELINE to 0, then flip `noImplicitAny: true` in
+// tsconfig.json, delete this second gate, and the strict gate covers everything.
 
 import { execSync } from "node:child_process";
 
-const BASELINE = 0;
-
-let out = "";
-try {
-  execSync("npx tsc --noEmit", { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
-} catch (e) {
-  out = `${e.stdout || ""}${e.stderr || ""}`;
+function tscErrorCount(cmd) {
+  let out = "";
+  try {
+    execSync(cmd, { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
+  } catch (e) {
+    out = `${e.stdout || ""}${e.stderr || ""}`;
+  }
+  return { count: (out.match(/error TS\d+/g) || []).length, out };
 }
 
-const count = (out.match(/error TS\d+/g) || []).length;
+// A single ratchet check. Returns true on regression (caller exits non-zero).
+function gate(label, cmd, baseline) {
+  const { count, out } = tscErrorCount(cmd);
 
-if (count > BASELINE) {
-  console.error(`✗ tsc: ${count} type errors — ABOVE the ratchet baseline of ${BASELINE}.`);
-  console.error("  New type errors were introduced. Fix them (or, if intentional, they");
-  console.error("  belong to pre-existing debt you should be reducing, not growing).");
-  console.error(
-    "\n" +
-      out
-        .split("\n")
-        .filter((l) => /error TS/.test(l))
-        .slice(0, 40)
-        .join("\n"),
-  );
-  process.exit(1);
+  if (count > baseline) {
+    console.error(`✗ ${label}: ${count} type errors — ABOVE the ratchet baseline of ${baseline}.`);
+    console.error("  New type errors were introduced. Fix them (or, if intentional, they");
+    console.error("  belong to pre-existing debt you should be reducing, not growing).");
+    console.error(
+      "\n" +
+        out
+          .split("\n")
+          .filter((l) => /error TS/.test(l))
+          .slice(0, 40)
+          .join("\n"),
+    );
+    return true;
+  }
+
+  if (count < baseline) {
+    console.error(`✓ ${label}: ${count} type errors — BELOW the baseline of ${baseline}.`);
+    console.error(`  Nice — lower the baseline in scripts/tsc-ratchet.mjs to ${count} to lock the gain in.`);
+    return true;
+  }
+
+  console.log(`✓ ${label}: ${count} type errors — at the ratchet baseline (${baseline}). No regression.`);
+  return false;
 }
 
-if (count < BASELINE) {
-  console.error(`✓ tsc: ${count} type errors — BELOW the baseline of ${BASELINE}.`);
-  console.error(`  Nice — lower BASELINE in scripts/tsc-ratchet.mjs to ${count} to lock the gain in.`);
-  process.exit(1);
-}
+// STRICT gate — hard: tsconfig as-is must be clean.
+const STRICT_BASELINE = 0;
+// NO-IMPLICIT-ANY gate — untyped-param / untyped-index debt (issue #177). Lower as it drops.
+const NO_IMPLICIT_ANY_BASELINE = 296;
 
-console.log(`✓ tsc: ${count} type errors — at the ratchet baseline (${BASELINE}). No regression.`);
+const regressed =
+  gate("tsc (strict)", "npx tsc --noEmit", STRICT_BASELINE) |
+  gate("tsc (--noImplicitAny)", "npx tsc --noEmit --noImplicitAny", NO_IMPLICIT_ANY_BASELINE);
+
+if (regressed) process.exit(1);
