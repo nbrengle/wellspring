@@ -128,7 +128,7 @@ for (const s of skills) {
   }
   const char = makeChar("Fighter 4", { lineage: "Human", add: purchased });
   const res = validate(char);
-  const itemCostObj = res.spend.byItem[`purchasedSkills:${item}`];
+  const itemCostObj = res.spend.byItem[`skills:${item}`];
   if (itemCostObj) {
     const expected = s.cost;
     const actual = itemCostObj.cost;
