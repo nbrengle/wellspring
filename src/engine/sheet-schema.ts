@@ -106,14 +106,19 @@ const ITEM_AWARD = /\(\+(\d+)\s*BP\)/i;
 
 // Split an annotated item into its canonical name + parsed annotations:
 //   { name, bp, grant }  where grant is {kind:'grant'|'discount', amount, source}.
-export function cleanItem(raw) {
+interface ItemGrant {
+  kind: "grant" | "discount";
+  amount: number | null;
+  source: string;
+}
+export function cleanItem(raw: string) {
   const refundM = raw.match(ITEM_REFUND);
   const awardM = raw.match(ITEM_AWARD);
   const grantM = !refundM && raw.match(ITEM_GRANT);
   const bpM = !refundM && !awardM && raw.match(ITEM_BP);
   const name = raw.replace(ITEM_REFUND, "").replace(ITEM_AWARD, "").replace(ITEM_GRANT, "").replace(ITEM_BP, "").trim();
 
-  let grant = null;
+  let grant: ItemGrant | null = null;
   if (refundM) {
     if (refundM[1] !== undefined) {
       // old format: (2 BP refunded from Rogue)

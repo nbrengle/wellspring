@@ -1,5 +1,41 @@
 import { CRAFTING, RITUALS } from "./data.js";
 
+// ─── Crafting-solver shapes ─────────────────────────────────────────────────
+/** An inventory: resource name → quantity on hand. */
+type Inventory = Record<string, number>;
+/** One step of a crafting plan: craft `qty` of `item` (in `batches`), or consume it
+ *  from inventory (`source: 'inventory'`). */
+interface CraftStep {
+  item: string;
+  qty: number;
+  batches?: number;
+  source: string;
+  discipline?: string;
+  tier?: string;
+}
+/** The result of solving a craft: either success (with the resulting inventory + the
+ *  ordered steps) or failure. A discriminated union on `success`. */
+type CraftResult = { success: true; inventory: Inventory; steps: CraftStep[] } | { success: false };
+/** A missing-ingredient report row for buildCraftTree's shortfall list. */
+interface Shortfall {
+  name: string;
+  required: number;
+  available: number;
+  missing: number;
+}
+/** A node in the craft dependency tree: what's needed, how much is on hand vs still
+ *  needed, and (for a crafted node) the recipe + its child ingredient trees. */
+interface CraftTree {
+  name: string;
+  qty: number;
+  kind: "have" | "raw" | "crafted";
+  have: number;
+  need: number;
+  children: CraftTree[];
+  recipe?: unknown;
+  batches?: number;
+}
+
 // Helper to normalize resource names
 export function normalizeResourceName(name) {
   name = name.trim().replace(/\s+/g, " ");
@@ -224,7 +260,12 @@ for (const recipe of RECIPES.values()) {
 }
 
 // Recursive solver to check if we can craft target item
-export function solveCrafting(targetName, targetQty, inventory, path = []) {
+export function solveCrafting(
+  targetName: string,
+  targetQty: number,
+  inventory: Inventory,
+  path: string[] = [],
+): CraftResult {
   const currentInv = { ...inventory };
   const targetLower = targetName.toLowerCase();
 
@@ -265,9 +306,9 @@ export function solveCrafting(targetName, targetQty, inventory, path = []) {
   for (const reqSet of recipe.requirements) {
     let success = true;
     let tempInv = { ...currentInv };
-    const subSteps = [];
+    const subSteps: CraftStep[] = [];
 
-    for (const [reqName, reqQty] of Object.entries(reqSet)) {
+    for (const [reqName, reqQty] of Object.entries(reqSet as Record<string, number>)) {
       const totalReqQty = reqQty * batches;
       const subResult = solveCrafting(reqName, totalReqQty, tempInv, [...path, recipe.name]);
       if (subResult.success) {
@@ -319,7 +360,13 @@ export function solveCrafting(targetName, targetQty, inventory, path = []) {
 //         'crafted' — an intermediate that must be crafted (children expanded)
 // `inventory` is consumed greedily as the tree is walked so a resource shared by
 // two branches isn't double-counted. Cycles are guarded via `path`.
-export function buildCraftTree(name, qty, inventory, path = [], inv = null) {
+export function buildCraftTree(
+  name: string,
+  qty: number,
+  inventory: Inventory,
+  path: string[] = [],
+  inv: Inventory | null = null,
+): CraftTree {
   const stock = inv || { ...inventory };
   const invKey = Object.keys(stock).find((k) => k.toLowerCase() === name.toLowerCase());
   const available = invKey ? stock[invKey] : 0;
@@ -341,7 +388,7 @@ export function buildCraftTree(name, qty, inventory, path = [], inv = null) {
   const batchYield = recipe.yield === 9999 ? need : recipe.yield;
   const batches = recipe.yield === 9999 ? 1 : Math.ceil(need / batchYield);
   const reqSet = recipe.requirements[0] || {};
-  const children = Object.entries(reqSet).map(([reqName, reqQty]) =>
+  const children = Object.entries(reqSet as Record<string, number>).map(([reqName, reqQty]) =>
     buildCraftTree(reqName, reqQty * batches, stock, [...path, recipe.name], stock),
   );
   return {
@@ -359,14 +406,14 @@ export function buildCraftTree(name, qty, inventory, path = [], inv = null) {
 // Calculate details for a target recipe that cannot be made
 // (Shows exactly what materials are missing and how much is available/needed)
 export function getRecipeDeficit(recipe, inventory) {
-  let closestDeficit = null;
+  let closestDeficit: Shortfall[] | null = null;
   let minMissingCount = Infinity;
 
   for (const reqSet of recipe.requirements) {
-    const deficitItems = [];
+    const deficitItems: Shortfall[] = [];
     let missingCount = 0;
 
-    for (const [name, reqQty] of Object.entries(reqSet)) {
+    for (const [name, reqQty] of Object.entries(reqSet as Record<string, number>)) {
       const targetLower = name.toLowerCase();
       // Look up availability in inventory, or see if it can be crafted
       const invKey = Object.keys(inventory).find((k) => k.toLowerCase() === targetLower);

@@ -11,7 +11,7 @@
 import { CLASSES } from "../data.js";
 import { getClasses } from "../resolver.js";
 import { characterLevel } from "./core.js";
-import { spellSlots } from "./slots.js";
+import { spellSlots, type SpellPool } from "./slots.js";
 import { resolveCharacterGraph } from "../graph.js";
 
 // Whether a character meets the prereqs for a single entity id — used by the
@@ -73,9 +73,19 @@ export function checkLevelConstraint(character, constraintStr, owned) {
   m = constraintStr.match(/^(\d+)\s+(Apprentice|Journeyman|Greater|Master)\s+spell-slots?/i);
   if (m) {
     const count = parseInt(m[1], 10);
-    const tier = m[2];
+    // Constraint tier names ("Apprentice"/"Journeyman"/"Greater"/"Master") map onto
+    // the pool's novice/adept/greater buckets. NOTE: this mapping was previously
+    // absent — the raw tier string never matched a pool key, so this prereq path
+    // always read 0. See wellspring-prereq-tier-map.
+    const POOL_KEY: Record<string, keyof SpellPool> = {
+      Apprentice: "novice",
+      Journeyman: "adept",
+      Greater: "greater",
+      Master: "greater",
+    };
+    const key = POOL_KEY[m[2]];
     const slots = spellSlots(character);
-    const have = Object.values(slots).reduce((s, c) => s + (c[tier] || 0), 0);
+    const have = key && slots ? Object.values(slots).reduce((s, c) => s + (c[key] || 0), 0) : 0;
     return have >= count;
   }
   // 6. "N Ranks of Profession"

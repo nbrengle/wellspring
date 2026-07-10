@@ -14,6 +14,41 @@ import classesJson from "../data/classes.json";
 import { lookupEntity, ALL_SKILLS } from "./data.js";
 import { bareSkill, cleanItemName, getClasses } from "../engine/resolver.js";
 import { Source, isStarting } from "./types.js";
+import type { CharacterChoice } from "./types.js";
+
+// ─── Structured shapes for a class's starting-skill data ────────────────────
+/** One parsed skill token from a starting-skills line: the skill name + its rank
+ *  (default 1; "xN" multiplies). */
+interface SkillToken {
+  name: string;
+  rank: number;
+}
+/** A FIXED starting-skills block (granted outright, no choice), e.g. "The Most Basic
+ *  Training: Basic Martial Weapons, Basic Shields". */
+interface StartingBlock {
+  label: string;
+  skills: SkillToken[];
+}
+/** One option of a "Choose one of the following" block: its display text + the skills
+ *  it would grant. */
+interface ChoiceOption {
+  label: string;
+  skills: SkillToken[];
+}
+/** A CHOICE block: the player picks one option. `id` is the deterministic slug used
+ *  to key the selection. */
+interface ChoiceConfig {
+  id: string;
+  label: string;
+  options: ChoiceOption[];
+}
+/** A materialized starting skill: name + rank + the choice-block label it came from
+ *  (`specialty` null for the class's fixed base grants). */
+interface ExpectedSkill {
+  name: string;
+  rank: number;
+  specialty: string | null;
+}
 
 // ─── STARTING SKILLS, DERIVED FROM THE PARSED MEGADOC ──────────────────────────
 // The MegaDoc is the single source of truth. The parser already captures each
@@ -59,7 +94,7 @@ function choiceLabel(line) {
 // bracketed params, and keeps only tokens that resolve to a real skill (via the
 // alias layer) — prose noise ("A Good Defense") is dropped.
 function parseSkillTokens(text) {
-  const out = [];
+  const out: SkillToken[] = [];
   // Strip a leading "Block Title - " / "Block Title: " provenance prefix, but only
   // when doing so leaves a resolvable first skill (skill names also contain " - ",
   // e.g. "Extended Capacity - Novice", so a blind strip would corrupt them).
@@ -150,7 +185,7 @@ function canonicalSkill(raw) {
 // ("Arcane Lore: …  Historical Lore: …"). Lore is a single parameterized skill;
 // enumerating its areas here gives "Choose a Lore Skill" a real multi-option UI
 // dropdown without stashing a hand-typed copy — the areas come from the doc.
-let _loreOptions = null;
+let _loreOptions: ChoiceOption[] | null = null;
 function loreAreaOptions() {
   if (_loreOptions) return _loreOptions;
   const lore = ALL_SKILLS.find((s) => s.name === "Lore");
@@ -162,8 +197,8 @@ function loreAreaOptions() {
 // Expand an INLINE "Choose a <category> Skill" into concrete options from the skill
 // list. Returns { options, fixed } — fixed = non-choice skills sharing the line.
 function expandInlineChoice(line) {
-  const fixed = [];
-  let options = [];
+  const fixed: SkillToken[] = [];
+  let options: ChoiceOption[] = [];
   if (/choose\s+a\s+lore\s+skill/i.test(line)) {
     // Lore areas enumerated from the Lore skill's description (see loreAreaOptions).
     options = loreAreaOptions();
@@ -199,7 +234,7 @@ function extractEmbeddedChoice(line) {
     const options = m[1]
       .split(/\s*,\s*|\bor\b/i)
       .map((s) => canonicalSkill(s))
-      .filter(Boolean)
+      .filter((t): t is SkillToken => t !== null)
       .map((t) => ({ label: t.name, skills: [t] }));
     if (options.length) return { fixedText: line.replace(m[0], ""), options };
   }
@@ -207,7 +242,7 @@ function extractEmbeddedChoice(line) {
   if (m) {
     const options = [m[1], m[2]]
       .map((s) => canonicalSkill(s))
-      .filter(Boolean)
+      .filter((t): t is SkillToken => t !== null)
       .map((t) => ({ label: t.name, skills: [t] }));
     if (options.length >= 2) return { fixedText: line.replace(m[0], ""), options };
   }
@@ -226,11 +261,11 @@ function expandOptionLine(line, baseToks) {
   const br = line.match(/\b(Apprentice|Journeyman|Greater|Master)\b[^[]*\[([^\]]*)\]/i);
   if (br) {
     const tier = br[1];
-    const opts = [];
+    const opts: ChoiceOption[] = [];
     for (const raw of br[2].split(/\s*,\s*|\bor\b/i)) {
       const inner = raw.replace(/[()]/g, " ").replace(/\bAND\b/gi, ",");
       // An alternative may itself be a combo ("Ritual Magic AND Ritual Lore").
-      const skills = [];
+      const skills: SkillToken[] = [];
       for (const piece of inner.split(/\s*,\s*/)) {
         // Try the tier-prefixed form ("Apprentice Alchemy") first, then the bare
         // piece ("Ritual Lore" → Lore (Ritual)) — both via the canonical resolver.
@@ -244,7 +279,7 @@ function expandOptionLine(line, baseToks) {
   // "<fixed> and one of [a, b, c]" → one option per bracket item, each plus fixed.
   const oneOf = line.match(/\bone of\s*\[([^\]]*)\]/i);
   if (oneOf) {
-    const opts = [];
+    const opts: ChoiceOption[] = [];
     for (const raw of oneOf[1].split(/\s*,\s*|\bor\b/i)) {
       const tok = canonicalSkill(raw);
       if (tok) opts.push({ label: [...baseToks.map((t) => t.name), tok.name].join(", "), skills: [...baseToks, tok] });
@@ -276,8 +311,8 @@ function expandOptionLine(line, baseToks) {
 // Structure one class's raw startingSkills lines into { fixed, choices }.
 function deriveStartingSkills(className) {
   const cls = classesJson.find((c) => c.name === className);
-  const fixed = [];
-  const choices = [];
+  const fixed: SkillToken[] = [];
+  const choices: ChoiceConfig[] = [];
   if (!cls?.startingSkills) return { fixed, choices };
   // The Jun 26 MegaDoc reformatted choices to "X - Choose one of the following:"
   // headers followed by flat option lines (instead of inline "[a, b, c]"). But the
@@ -290,9 +325,9 @@ function deriveStartingSkills(className) {
   // SKIP the flat option lines that follow until the sub-choice's own skills are
   // exhausted or a delimiter (Note:, or a new same-block option) appears. See
   // PARSER_SOURCE_FEEDBACK.md #1/#2: real list indentation would delete this.
-  let current = null; // open choice block awaiting option lines
+  let current: ChoiceConfig | null = null; // open choice block awaiting option lines
   let subChoice = false; // inside a NESTED sub-choice's literal option lines
-  let subChoiceFixed = []; // fixed skills shared by every option of that sub-choice
+  let subChoiceFixed: SkillToken[] = []; // fixed skills shared by every option of that sub-choice
 
   const lines = cls.startingSkills;
   for (let i = 0; i < lines.length; i++) {
@@ -487,7 +522,7 @@ export function reconcileStartingChoices(character, className) {
 
   // Need-counts for one option, keyed by canonical skill key.
   const optionNeed = (opt) => {
-    const need = {};
+    const need: Record<string, number> = {};
     for (const s of optionSkills(opt)) {
       const b = skillMatchKey(s.name);
       need[b] = (need[b] || 0) + (s.rank || 1);
@@ -496,7 +531,7 @@ export function reconcileStartingChoices(character, className) {
   };
   // Can `need` be drawn from the remaining `pool`? Returns the post-draw pool, or
   // null if not fully satisfiable.
-  const draw = (pool, need) => {
+  const draw = (pool: Record<string, number>, need: Record<string, number>) => {
     const next = { ...pool };
     for (const [b, n] of Object.entries(need)) {
       if ((next[b] || 0) < n) return null;
@@ -549,7 +584,7 @@ function expectedStartingSkills(primaryClassName, choices) {
       ? { name: s, rank: 1, specialty: null }
       : { name: s.name, rank: s.rank || 1, specialty: null },
   );
-  const out = [...fixed];
+  const out: ExpectedSkill[] = [...fixed];
   for (const conf of STARTING_CHOICES_CONFIG[primaryClassName] || []) {
     const chosenVal = choices?.[conf.id];
     const opt = chosenVal && conf.options.find((o) => o.label === chosenVal);
@@ -607,7 +642,11 @@ export function startingSkillGrants(character) {
 // Provenance (which block granted each skill) and the free-rank floor are NOT
 // persisted on the character — they're derived on read by startingSkillGrants, so
 // they can't be lost on import / round-trip.
-export function rebuildStartingSkills(character, primaryClassName, updatedChoices = null) {
+export function rebuildStartingSkills(
+  character,
+  primaryClassName: string,
+  updatedChoices: Record<string, string> | null = null,
+) {
   const choices = updatedChoices || character.startingChoices || {};
 
   const expectedList = expectedStartingSkills(primaryClassName, choices);
@@ -616,7 +655,7 @@ export function rebuildStartingSkills(character, primaryClassName, updatedChoice
   // Group expected entries by canonical match-key so we can match current items
   // (which may carry a chosen parameter or an alias spelling) against the right
   // template in order.
-  const expectedByBase = {};
+  const expectedByBase: Record<string, ExpectedSkill[]> = {};
   for (const item of expectedList) {
     const base = skillMatchKey(item.name);
     (expectedByBase[base] = expectedByBase[base] || []).push(item);
@@ -643,7 +682,7 @@ export function rebuildStartingSkills(character, primaryClassName, updatedChoice
   const currentStarting = allSkills.filter((s) => isStarting(s.source));
   const otherSkills = allSkills.filter((s) => !isStarting(s.source));
 
-  const nextStarting = [];
+  const nextStarting: CharacterChoice[] = [];
   const keptCounts = {};
   const pushItem = (name, rank) =>
     nextStarting.push({ entityId: name, source: Source.starting(primaryClassName), ranks: rank || 1 });

@@ -1,5 +1,6 @@
 import { getClasses, cleanItemName } from "./resolver.js";
 import { getAllEntities } from "./data.js";
+import type { CharacterState } from "./types.js";
 import {
   STARTING_CHOICES_CONFIG,
   hasStartingChoices,
@@ -56,7 +57,7 @@ function reconcileBuildChoices(character) {
 // character owns is a CharacterChoice in one of the buckets — there are no flat
 // name-arrays. applyClassStartingAbilities seeds starting skills when a class is
 // chosen; the reducers (addToCharacter) add the rest.
-export const EMPTY_CHARACTER = {
+export const EMPTY_CHARACTER: CharacterState = {
   name: "",
   archetypeName: null, // which archetype this was loaded from (for the badge)
   specialization: null, // "Mystic" / "Crafter" / "Artificer" — only for Artisan

@@ -9,15 +9,30 @@ import { bareSkill, cleanItemName, getClasses } from "../engine/resolver.js";
 import { ARCHETYPES, UNLIMITED_SKILLS, BASE_CLASSES } from "./data.js";
 import { lookupCost } from "./validate/cost-key.js";
 import type { BuildReport } from "./validate.js";
-import type { CharacterChoice, CharacterState } from "./types.js";
+import type { CharacterChoice, CharacterState, BPLedgerEntry } from "./types.js";
 import { isPurchased, isStarting } from "./types.js";
 import { choiceFromParsed, bucketForField } from "./character-add.js";
+import type { ParsedItem } from "./character-add.js";
+
+/** A character plus the display-only fields the formatter reads (computed stats the
+ *  sheet may carry, and the archetype tagline). All optional — the report supplies
+ *  the authoritative stats; these are fallbacks / passthroughs. */
+type SheetCharacter = CharacterState & {
+  tagline?: string;
+  specialization?: string;
+  lifePoints?: number;
+  armorPoints?: number;
+  spikes?: number;
+  currentEvent?: number;
+  devotionAccents?: string[];
+  devotionWarning?: string;
+};
 
 /** The mutable accumulator the sheet IMPORTER builds up as it walks the text: a
  *  partial character whose buckets are filled — in one pass after parsing — from the
- *  parsed section items. Local to the importer; the returned value is a real
- *  character (buckets populated, scalars set). */
-type ParsedSheet = Partial<CharacterState>;
+ *  parsed section items. The index signature covers the dynamic `character[field] =`
+ *  scalar writes the text walk does; the returned value is a real character. */
+type ParsedSheet = Partial<SheetCharacter> & { [field: string]: unknown };
 import {
   SCALAR_FIELDS,
   ITEM_FIELDS,
@@ -34,12 +49,13 @@ import {
 // flaws) round-trips. Returns '' when the item has no cost/grant of note.
 function bpSuffix(name: string, field: string, report: BuildReport) {
   if (!report?.spend?.byItem) return "";
-  let e = null;
+  let e: BPLedgerEntry | undefined;
   const cleanN = cleanItemName(name);
   if (report._graph) {
     const node = Array.from(report._graph).filter(
       (n) =>
-        n.field === field.replace(/^(purchased|starting)/, "").toLowerCase() && cleanItemName(n.rawString) === cleanN,
+        n.field === field.replace(/^(purchased|starting)/, "").toLowerCase() &&
+        cleanItemName(n.rawString || n.name) === cleanN,
     )[0];
     if (node) e = report.spend.byItem[node.id];
   }
@@ -65,17 +81,17 @@ function bpSuffix(name: string, field: string, report: BuildReport) {
 
 // Join a list of item names into the "item, item" form used per section, adding
 // each item's BP suffix when a field/report is given.
-function joinItems(items: any, field: string, report: BuildReport) {
+function joinItems(items: string[] | undefined, field?: string, report?: BuildReport) {
   if (!items || !items.length) return "None";
   return items
-    .map((n, i) => {
-      const costInfo = lookupCost(report?.spend.byItem, field, n, i);
+    .map((n: string, i: number) => {
+      const costInfo = field ? lookupCost(report?.spend?.byItem, field, n, i) : undefined;
       const rank = costInfo?.rank || 1;
       const baseName = bareSkill(cleanItemName(n));
       const showRank = rank > 1 && !UNLIMITED_SKILLS.has(baseName);
       const nameCleaned = n.replace(/\s*x\s*\d+\b/i, "");
       const nameWithRank = showRank ? `${nameCleaned} x${rank}` : nameCleaned;
-      return `${nameWithRank}${field ? bpSuffix(n, field, report) : ""}`;
+      return `${nameWithRank}${field && report ? bpSuffix(n, field, report) : ""}`;
     })
     .join(", ");
 }
@@ -102,7 +118,7 @@ const POWER_SECTIONS = [
   ["formPowers", "Form Powers"],
 ];
 
-export function formatCharacterSheet(character: any, report: BuildReport) {
+export function formatCharacterSheet(character: SheetCharacter, report: BuildReport) {
   // Powers + spells are read straight from their buckets — each section is the
   // entries whose costField matches (basicPowers/cantrips/…). No flat reconstruction.
   const bucketFor = (field: string): CharacterChoice[] =>
@@ -111,16 +127,17 @@ export function formatCharacterSheet(character: any, report: BuildReport) {
     bucketFor(field)
       .filter((s: CharacterChoice) => s.costField === field)
       .map((s) => s.entityId);
-  const lines = [];
+  const lines: string[] = [];
   const classes = getClasses(character);
   const title = character.name?.trim() || character.archetypeName || "Unnamed Character";
-  const line = (label, value) => lines.push(`${label}: ${value}`);
+  const line = (label: string, value: unknown) => lines.push(`${label}: ${value}`);
 
   // ── Header: name + tagline (matches the archetype H1 + subtitle) ──
   lines.push(title);
   const tagline =
     character.tagline ||
-    (character.archetypeName && ARCHETYPES.find((a) => a.name === character.archetypeName)?.tagline);
+    (character.archetypeName &&
+      (ARCHETYPES.find((a) => a.name === character.archetypeName) as { tagline?: string } | undefined)?.tagline);
   if (tagline) lines.push(tagline);
 
   // ── Identity block ──
@@ -139,24 +156,31 @@ export function formatCharacterSheet(character: any, report: BuildReport) {
   if (character.specialization) line("Specialization", character.specialization);
   if (character.devotion) line("Devotion", character.devotion);
   if (character.currentEvent) line("Active Event", character.currentEvent);
-  line("Flaws", joinItems(character.flaws, "flaws", report));
+  line(
+    "Flaws",
+    joinItems(
+      (character.flaws || []).map((f) => f.entityId),
+      "flaws",
+      report,
+    ),
+  );
 
   // ── Skills / perks ── skills (starting + purchased) are CharacterChoice[] in
   // the skills[] bucket; the BP ledger keys starting under startingSkills:<i>: and
   // purchased under skills:.
   const startingSkillNames = (character.skills || [])
     .filter((s) => typeof s !== "string" && isStarting(s.source))
-    .map((s) => s.entityId || s.name);
+    .map((s) => s.entityId);
   line("Starting Skills (free)", joinItems(startingSkillNames, "startingSkills", report));
   if (character.divineDomains?.length) line("Divine Domains", joinItems(character.divineDomains));
   if (character.devotionAccents?.length) line("Available Devotion Accents", joinItems(character.devotionAccents));
   const purchasedSkillNames = (character.skills || [])
     .filter((s) => typeof s !== "string" && isPurchased(s.source))
-    .map((s) => s.entityId || s.name);
+    .map((s) => s.entityId);
   line("Purchased Skills", joinItems(purchasedSkillNames, "skills", report));
   const purchasedPerkNames = (character.perks || [])
     .filter((s) => typeof s !== "string" && isPurchased(s.source))
-    .map((s) => s.entityId || s.name);
+    .map((s) => s.entityId);
   line("Purchased Perks", joinItems(purchasedPerkNames, "purchasedPerks", report));
 
   // ── Powers / spells ── each section reads its bucket by costField (domain/class
@@ -169,13 +193,14 @@ export function formatCharacterSheet(character: any, report: BuildReport) {
             .filter((ip) => typeof ip === "string" || ip.field !== "synthetic")
             .map((ip) => ip.name || ip)
         : powerSectionNames(field);
-    if (items?.length) line(label, joinItems(items, field, report));
+    if (items?.length) line(label, joinItems(items as string[], field, report));
   }
 
   // ── Spell slots (casters), shown like the source's "Novice Spell-slots: N" ──
   if (report.spellSlots) {
-    for (const [magicType, slots] of Object.entries(report.spellSlots)) {
-      const prefix = Object.keys(report.spellSlots).length > 1 ? `${magicType} ` : "";
+    const spellSlots = report.spellSlots as Record<string, { novice?: number; adept?: number; greater?: number }>;
+    for (const [magicType, slots] of Object.entries(spellSlots)) {
+      const prefix = Object.keys(spellSlots).length > 1 ? `${magicType} ` : "";
       if (slots.novice) line(`${prefix}Novice Spell-slots`, slots.novice);
       if (slots.adept) line(`${prefix}Adept Spell-slots`, slots.adept);
       if (slots.greater) line(`${prefix}Greater Spell-slots`, slots.greater);
@@ -191,7 +216,7 @@ export function formatCharacterSheet(character: any, report: BuildReport) {
   lines.push(
     `Build Points: ${spend.net} / ${budget}` +
       (spend.awarded > 0 ? ` (+${spend.awarded} from flaws)` : "") +
-      (character.extraMaxBP > 0 ? ` (+${character.extraMaxBP} extra BP)` : "") +
+      ((character.extraMaxBP ?? 0) > 0 ? ` (+${character.extraMaxBP} extra BP)` : "") +
       (report.usesBonus ? ` (+${report.bonusUsed} bonus BP)` : ""),
   );
 
@@ -217,13 +242,13 @@ function labelOf(line) {
 
 // Parse already-normalized plain text in the "Label: value" sheet shape. Internal
 // — callers use parseCharacterSheet, which handles format detection first.
-function parseSheetText(text) {
+function parseSheetText(text: string) {
   const raw = String(text).replace(/\r/g, "");
   const rows = raw.split("\n").map((l) => l.trim());
-  const character = { name: "", archetypeName: "Imported Character" };
+  const character: ParsedSheet = { name: "", archetypeName: "Imported Character" };
   // Parsed section items, accumulated during the walk and turned into bucket entries
   // in one pass AFTER parsing (so the class — needed for the source — is known).
-  const parsedItems = [];
+  const parsedItems: ParsedItem[] = [];
 
   // First non-empty line = name; an immediately following non-"Label:" line that
   // isn't a known field is the tagline.
@@ -292,7 +317,7 @@ function parseSheetText(text) {
     // skill/power on its own line). Stop at the next blank line or any line with a
     // colon — that's either the next section label or a footer ("Build Points:"),
     // never an item. This prevents the export footer leaking into the last section.
-    const extra = [];
+    const extra: string[] = [];
     let j = i + 1;
     for (; j < rows.length; j++) {
       if (!rows[j]) break;
@@ -303,7 +328,7 @@ function parseSheetText(text) {
     i = j - 1;
   }
   if (character.currentEvent) {
-    character.currentEvent = parseInt(character.currentEvent, 10) || 1;
+    character.currentEvent = parseInt(String(character.currentEvent), 10) || 1;
   }
   // Build every parsed section into its bucket through the SAME choiceFromParsed the
   // archetype parser uses (the shared build step) — skills, perks, powers, spells,
@@ -318,7 +343,8 @@ function parseSheetText(text) {
   ch.flaws ||= [];
   const primaryClass = getClasses(ch)[0]?.name || "";
   for (const item of parsedItems) {
-    ch[bucketForField(item.field)].push(choiceFromParsed(item, primaryClass));
+    const bucket = ch[bucketForField(item.field)] as CharacterChoice[];
+    bucket.push(choiceFromParsed(item, primaryClass));
   }
   reconcileDevotion(character);
   return character;
@@ -331,7 +357,7 @@ function parseSheetText(text) {
 // imported character resolves its devotion the same way an archetype does.
 function reconcileDevotion(character) {
   // All skills live in the skills[] bucket; find the Worship entry among them.
-  const skills = (character.skills || []).filter((s) => typeof s !== "string").map((s) => s.entityId || s.name);
+  const skills = (character.skills || []).filter((s) => typeof s !== "string").map((s) => s.entityId);
   const worship = skills.map((s) => s.match(/^Worship\s*[-–—:]\s*(.+)$/i)).find(Boolean);
   const worshipDevotion = worship ? worship[1].trim() : null;
   if (worshipDevotion && character.devotion && character.devotion !== worshipDevotion) {

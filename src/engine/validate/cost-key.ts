@@ -1,4 +1,6 @@
-export function costKey(nodeOrId) {
+import type { GraphItem, BPLedgerEntry } from "../types.js";
+
+export function costKey(nodeOrId: GraphItem | string | null | undefined): string | undefined {
   if (typeof nodeOrId === "string") return nodeOrId;
   const node = nodeOrId;
   if (!node) return undefined;
@@ -27,7 +29,13 @@ export function costKey(nodeOrId) {
   return `${node.field}:${node.rawString || node.name}`;
 }
 
-export function lookupCost(byItem, choiceIdOrField, name, index) {
+type ByItem = Record<string, BPLedgerEntry>;
+export function lookupCost(
+  byItem: ByItem | undefined,
+  choiceIdOrField: string,
+  name?: string,
+  index?: number,
+): BPLedgerEntry | undefined {
   if (arguments.length > 2) {
     // Field-keyed lookup: `${field}:${name}` (or `${field}:${index}:${name}`).
     let key = `${choiceIdOrField}:${name}`;

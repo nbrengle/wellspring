@@ -107,9 +107,14 @@ import { CRAFT_DISCIPLINES, CRAFTING_TIERS } from "./config.js";
 // which entries are ACTIVE given the character's level in that power's gating class
 // (auto-granted, no BP, no error — higher tiers are simply still locked). Returns
 // [{ power, gateClass, benefits: [{ level, text, active }] }].
-export function activePowerBenefits(character) {
+interface PowerBenefit {
+  power: string;
+  gateClass: string;
+  benefits: { level: number; text: string; active: boolean }[];
+}
+export function activePowerBenefits(character): PowerBenefit[] {
   const levelByClass = Object.fromEntries(getClasses(character).map((c) => [c.name, c.level]));
-  const out = [];
+  const out: PowerBenefit[] = [];
   for (const item of character.powers || []) {
     const ent = lookupEntity(`powers:${cleanItemName(item.entityId || item.name || "")}`);
     if (!ent?.levelBenefits) continue;
@@ -252,7 +257,12 @@ export function craftingCapability(character) {
     return best; // 0 = none
   };
 
-  const crafting = [];
+  const crafting: {
+    discipline: string;
+    tier: string | undefined;
+    count: number;
+    recipes: { name: string; tier: string }[];
+  }[] = [];
   for (const [discipline, stem] of Object.entries(CRAFT_DISCIPLINES)) {
     const rank = topTier(stem);
     if (!rank) continue;
@@ -265,7 +275,7 @@ export function craftingCapability(character) {
   }
 
   const ritualRank = topTier("Ritual Magic");
-  let rituals = null;
+  let rituals: { tier: string | undefined; count: number; recipes: { name: string; tier: string }[] } | null = null;
   if (ritualRank) {
     const tier = Object.keys(CRAFT_TIER_RANK).find((t) => CRAFT_TIER_RANK[t] === ritualRank);
     const recipes = RITUALS.filter((r) => CRAFT_TIER_RANK[r.tier] <= ritualRank).map((r) => ({
@@ -298,8 +308,10 @@ export function bonusBudgetFor(level) {
 }
 
 export function computeActiveSelections(graph, lbp) {
-  const active = [];
-  const check = (name) => {
+  // A granted "choose one" selection surfaced for the UI, tagged with the entity that
+  // granted it. `gs` is parser-shaped (open), so we widen it and add sourceName.
+  const active: (Record<string, unknown> & { sourceName: string })[] = [];
+  const check = (name: string) => {
     const ent = lookupEntity(name);
     if (ent?.grantedSelections) {
       for (const gs of ent.grantedSelections) {
@@ -460,9 +472,9 @@ export function validate(character) {
  *  annotate their `report` params with it instead of `any`. */
 export type BuildReport = ReturnType<typeof validate>;
 
-export function validityReasons(report) {
+export function validityReasons(report: BuildReport | null | undefined) {
   if (!report) return [];
-  const out = [];
+  const out: string[] = [];
   if (report.belowFloor) out.push(`Below the level-${report.legalMinLevel} minimum`);
   if (report.aboveCap) out.push(`Above the level-${report.levelCap} cap (Advanced Classes pending)`);
   if (report.overBudget) out.push(`Over budget by ${report.spend.net - report.budget} BP`);
