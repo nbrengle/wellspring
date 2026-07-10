@@ -24,7 +24,6 @@ export function buildBucketedView(graph: CharacterGraphModel): BucketedView {
     if (node.field === "synthetic" || node.field === "lineageAdvantages" || node.field === "lineageChallenges")
       continue;
 
-
     if (node.field === "flaws") {
       view.flaws.push(createViewEntry(node) as unknown as FlawView);
       continue;
@@ -42,7 +41,8 @@ export function buildBucketedView(graph: CharacterGraphModel): BucketedView {
       else if (tier === "Advanced") view.advancedPowers.push(createViewEntry(node) as unknown as PowerView);
       else if (tier === "Veteran") view.veteranPowers.push(createViewEntry(node) as unknown as PowerView);
       else if (tier === "Utility") view.utilityPowers.push(createViewEntry(node) as unknown as PowerView);
-      else if (tier === "Class" || node.field === "classPowers") view.classPowers.push(createViewEntry(node) as unknown as PowerView);
+      else if (tier === "Class" || node.field === "classPowers")
+        view.classPowers.push(createViewEntry(node) as unknown as PowerView);
       else if (node.field === "domainPowers") view.domainPowers.push(createViewEntry(node) as unknown as PowerView);
       else view.classPowers.push(createViewEntry(node) as unknown as PowerView);
     } else if (t === "perk") {
@@ -56,10 +56,13 @@ export function buildBucketedView(graph: CharacterGraphModel): BucketedView {
 }
 
 function createViewEntry(node: GraphItem) {
-  const isFree = node.sourceType === "grant" || node.sourceType === "innate" || (node.effects && node.effects.some((e) => e.type === "REFUND_GRANT"));
+  const isFree =
+    node.sourceType === "grant" ||
+    node.sourceType === "innate" ||
+    (node.effects && node.effects.some((e) => e.type === "REFUND_GRANT"));
   const paramValue = node.param ?? (node.entity?.parameter || undefined);
   const displayName = paramValue && !node.name.includes(paramValue) ? `${node.name} (${paramValue})` : node.name;
-  
+
   let grantedBy = node.grantedBy;
   if (node.sourceType === "grant" && !grantedBy) {
     const refundEff = node.effects?.find((e) => e.type === "REFUND_GRANT");
