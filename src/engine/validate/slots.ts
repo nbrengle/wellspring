@@ -396,7 +396,7 @@ export function bookcasterSpellOptions(character) {
   }
   // Spells the character actually knows (their spells-known picks). A known spell
   // is offered even if its tier later falls out of `accessible` — you still know it.
-  // Spells-known are V2 CharacterChoice[] in `spells`, keyed by their tier costField.
+  // Spells-known are CharacterChoice[] in `spells`, keyed by their tier costField.
   const knownSet = new Set();
   const knownFields = new Set(KNOWN_SPELL_FIELDS);
   for (const choice of (character.spells || [])) {

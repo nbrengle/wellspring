@@ -108,7 +108,7 @@ export interface Class extends BaseEntity {
 export type Entity = Skill | Power | Spell | Perk | Flaw | Class;
 
 
-// ─── 2. Ontological Character State (V2) ────────────────────────────────────
+// ─── 2. Ontological Character State ────────────────────────────────────
 
 /**
  * Represents where a capability was acquired — a STRUCTURED discriminated union on
@@ -187,7 +187,7 @@ export interface CharacterChoice {
   costField?: string;
 }
 
-export interface CharacterStateV2 {
+export interface CharacterState {
   name?: string;
   archetypeName?: string;
   backstoryApproved?: boolean;
@@ -206,7 +206,7 @@ export interface CharacterStateV2 {
   devotion?: string;
   devotions: CharacterChoice[];
 
-  // The ontological buckets — the engine's single (V2) shape. Every producer (UI
+  // The ontological buckets — the engine's single shape. Every producer (UI
   // reducers, loadArchetype, the sheet importer, the test factory) writes these
   // directly via addToCharacter.
   skills: CharacterChoice[];
@@ -339,7 +339,7 @@ export interface BucketedView {
 }
 
 export interface CharacterGraph {
-  character: CharacterStateV2;
+  character: CharacterState;
   items: GraphItem[];
   characterLevel: number;
   classes: { name: string; level: number }[];

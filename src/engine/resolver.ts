@@ -1,4 +1,4 @@
-import type { CharacterStateV2, CharacterChoice } from './types.js';
+import type { CharacterState, CharacterChoice } from './types.js';
 
 /**
  * Normalizes a character's class/level info into an array of {name, level}.
@@ -18,7 +18,7 @@ export function getClasses(character: any): { name: string; level: number }[] {
 /**
  * The character's PRIMARY (first) class.
  */
-export function primaryClass(character: CharacterStateV2): string | null {
+export function primaryClass(character: CharacterState): string | null {
   return getClasses(character)[0]?.name || null;
 }
 

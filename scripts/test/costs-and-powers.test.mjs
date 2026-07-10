@@ -182,7 +182,7 @@ test('shared powers are mechanically equivalent unless level-scaled', () => {
 });
 
 // ─── xN on unlimited-ranks skills → distinct instances, not rank N ────────────
-// Purchased skills import into the V2 skills[] bucket (source 'Purchased').
+// Purchased skills import into the skills[] bucket (source 'Purchased').
 const importedPurchased = (c) => (c.skills || []).filter((s) => isPurchased(s.source)).map((s) => s.entityId);
 test('import expands "Lore x2" into two distinct Lore instances', () => {
   const c = parseCharacterSheet('M\nClass Levels: Mage 4\nPurchased Skills: Lore x2');

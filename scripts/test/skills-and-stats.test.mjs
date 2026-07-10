@@ -145,7 +145,7 @@ test('export/import: round-tripping with ranks and instances preserves rank & pa
   ok(sheet.includes('Bookcaster (Mageskin) - 1 BP'), 'Prints Bookcaster (Mageskin)');
 
   const rt = parseCharacterSheet(sheet);
-  // Round-trip parses back into the V2 skills[] bucket (source 'Purchased').
+  // Round-trip parses back into the skills[] bucket (source 'Purchased').
   const rtPurchased = (rt.skills || []).filter(s => isPurchased(s.source));
   eq(rtPurchased.length, 3, 'rt three purchased skills');
   ok(rtPurchased.some(s => s.entityId === 'Spell-Scholar'), 'rt includes bare Spell-Scholar');

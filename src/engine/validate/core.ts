@@ -2,7 +2,7 @@
 
 import { LEVEL_TABLE, lookupEntity, CLASS_POWERS, CLASS_PROGRESSION, CLASS_POWER_SLOTS, EVENTS_TABLE, CLASSES } from '../data.js';
 import { cleanItemName, bareSkill, getClasses } from '../resolver.js';
-import type { CharacterStateV2 } from '../types.js';
+import type { CharacterState } from '../types.js';
 import { sourceClass } from '../types.js';
 
 import {
@@ -28,13 +28,13 @@ export {
 
 // ─── Class / level primitives ───────────────────────────────────────────────
 
-export function characterLevel(character: CharacterStateV2) {
+export function characterLevel(character: CharacterState) {
   const classes = getClasses(character);
   if (!classes.length) return 4;
   return classes.reduce((sum, c) => sum + (c.level || 0), 0);
 }
 
-export function getLegalMinLevel(character: CharacterStateV2) {
+export function getLegalMinLevel(character: CharacterState) {
   const evtNum = character?.currentEvent || 1;
   const evt = EVENTS_TABLE.find(e => e.event === evtNum);
   return evt ? evt.level : 4;
@@ -74,7 +74,7 @@ export { sourceClass };
 // do not: they're the granting entity's own pool, not the class's slots, even when
 // they share the novice/adept/greater tiers.
 export function countPicksForClass(
-  state: CharacterStateV2,
+  state: CharacterState,
   category: 'powers' | 'spells',
   cls: string,
   tierFilter?: string | string[],
@@ -108,8 +108,8 @@ export function progressionRow(cls: string, level: number) {
 // ─── Grant cluster ──────────────────────────────────────────────────────────
 
 // Active innate powers for the character: class-innate powers whose level
-// requirements are met. (In CharacterStateV2, user-added innates are just in `powers` with source `GrantedBy:Innate`)
-export function activeInnatePowers(character: CharacterStateV2) {
+// requirements are met. (In CharacterState, user-added innates are just in `powers` with source `GrantedBy:Innate`)
+export function activeInnatePowers(character: CharacterState) {
   const list: any[] = [];
   const seen = new Set();
 
@@ -128,7 +128,7 @@ export function activeInnatePowers(character: CharacterStateV2) {
 }
 
 // Multiclass grants
-export function multiclassGrants(character: CharacterStateV2) {
+export function multiclassGrants(character: CharacterState) {
   const classes = getClasses(character);
   const skills: any[] = [];
   const freeBPItems: any[] = [];

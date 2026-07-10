@@ -9,7 +9,7 @@ import { bareSkill, cleanItemName, getClasses } from '../engine/resolver.js';
 import { ARCHETYPES, UNLIMITED_SKILLS, BASE_CLASSES } from './data.js';
 import { lookupCost } from './validate/cost-key.js';
 import type { BuildReport } from './validate.js';
-import type { CharacterChoice, CharacterStateV2 } from './types.js';
+import type { CharacterChoice, CharacterState } from './types.js';
 import { isPurchased, isStarting } from './types.js';
 import { choiceFromParsed, bucketForField } from './character-add.js';
 
@@ -17,7 +17,7 @@ import { choiceFromParsed, bucketForField } from './character-add.js';
  *  partial character whose buckets are filled — in one pass after parsing — from the
  *  parsed section items. Local to the importer; the returned value is a real
  *  character (buckets populated, scalars set). */
-type ParsedSheet = Partial<CharacterStateV2>;
+type ParsedSheet = Partial<CharacterState>;
 import { SCALAR_FIELDS, ITEM_FIELDS, fieldForLabel, cleanItem, splitItems,
   expandInstances, CHOICE_DEFAULTS,
 } from './sheet-schema.js';
@@ -92,7 +92,7 @@ const POWER_SECTIONS = [
 ];
 
 export function formatCharacterSheet(character: any, report: BuildReport) {
-  // Powers + spells are read straight from their V2 buckets — each section is the
+  // Powers + spells are read straight from their buckets — each section is the
   // entries whose costField matches (basicPowers/cantrips/…). No flat reconstruction.
   const bucketFor = (field: string): CharacterChoice[] =>
     (SPELL_SECTION_FIELDS.has(field) ? character.spells : character.powers) || [];
@@ -126,7 +126,7 @@ export function formatCharacterSheet(character: any, report: BuildReport) {
   if (character.currentEvent) line('Active Event', character.currentEvent);
   line('Flaws', joinItems(character.flaws, 'flaws', report));
 
-  // ── Skills / perks ── skills (starting + purchased) are V2 CharacterChoice[] in
+  // ── Skills / perks ── skills (starting + purchased) are CharacterChoice[] in
   // the skills[] bucket; the BP ledger keys starting under startingSkills:<i>: and
   // purchased under skills:.
   const startingSkillNames = (character.skills || [])
@@ -300,7 +300,7 @@ function parseSheetText(text) {
 // fills in when no Worship skill is present. Mirrors the build-time parser so an
 // imported character resolves its devotion the same way an archetype does.
 function reconcileDevotion(character) {
-  // All skills live in the V2 skills[] bucket; find the Worship entry among them.
+  // All skills live in the skills[] bucket; find the Worship entry among them.
   const skills = (character.skills || [])
     .filter((s) => typeof s !== 'string')
     .map((s) => s.entityId || s.name);

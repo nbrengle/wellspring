@@ -82,7 +82,7 @@ export function activePowerBenefits(character) {
 
 
 // Whether the character has the Worship skill (lets them follow a devotion and
-// access its domains). Reads the V2 skills bucket (entityId), any source. Any
+// access its domains). Reads the skills bucket (entityId), any source. Any
 // class can take it; "Worship - <Devotion>" matches the prefix.
 export function hasWorship(character) {
   return (character?.skills || []).some((s) => /^worship\b/i.test(s.entityId || s.name || ''));
@@ -125,7 +125,7 @@ export function devotionState(character) {
   };
 }
 
-// Whether the character owns the Divine Substitution Class power (in the V2
+// Whether the character owns the Divine Substitution Class power (in the
 // powers bucket).
 function ownsDivineSubstitution(character) {
   return (character.powers || []).some((p) => /^Divine Substitution\b/.test(cleanItemName(p.entityId || p.name || '')));

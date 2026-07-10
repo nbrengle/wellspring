@@ -23,7 +23,7 @@ export function useIdentityHandlers({ character, setCharacter, setPicking }) {
       onChoose: (name) => {
         const dev = DEVOTIONS.find((d) => d.name === name);
         setCharacter((c) => {
-          // All skills (starting + purchased) live in the V2 `skills` bucket; patch
+          // All skills (starting + purchased) live in the skills bucket; patch
           // the Worship entry's entityId wherever it sits.
           const updateWorshipSkills = (skills) =>
             (skills || []).map((sk) =>

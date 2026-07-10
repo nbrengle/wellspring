@@ -1,7 +1,7 @@
 // reducers.test.mjs — coverage for the pure character-state reducers
 // (src/engine/reducers.ts), the character write path.
 //
-// PURCHASED SKILLS are V2-native: the reducers push/patch/remove CharacterChoice
+// PURCHASED SKILLS are: the reducers push/patch/remove CharacterChoice
 // entries in `character.skills` (source 'Purchased'), addressed positionally
 // among the purchased entries — no flat `purchasedSkills`, no id. Other fields
 // (perks/powers/spells) still use the flat parallel-array path until their slice.
@@ -112,7 +112,7 @@ test("setChoice clears when option is null", () => {
   ok(!("pow1" in c.choices), "null clears the choice");
 });
 
-// ─── slot pick / clear (V2 powers bucket) ───────────────────────────────────
+// ─── slot pick / clear (powers bucket) ───────────────────────────────────
 // Slot powers are CharacterChoice[] in powers[], costField = the slot field, and
 // sourced Source.class(<grantingClass>) — the class lives IN the source, not a
 // parallel powerClass map. Addressing is positional among a field's entries.
@@ -154,7 +154,7 @@ test("addEntity routes classPowers to the powers bucket (purchased)", () => {
   eq(e[0].costField, "classPowers", "costField preserved");
 });
 
-// ─── slot pick / clear (V2 spells bucket) ───────────────────────────────────
+// ─── slot pick / clear (spells bucket) ───────────────────────────────────
 // Caster slot picks (cantrips / spells-known tier fields) route to the SPELLS
 // bucket, not powers — same setSlotPick/clearSlot, bucket chosen by the field.
 const spellEntries = (c, field) => (c.spells || []).filter((p) => p.costField === field);
@@ -203,7 +203,7 @@ test("updateParameter clears devotion state when a Worship skill loses its param
     ...mkPurchased("Worship (Some Deity)"),
     devotion: "Some Deity",
     divineDomains: ["War"],
-    // Domain powers are V2-native: CharacterChoice[] in `powers`, costField 'domainPowers'.
+    // Domain powers are: CharacterChoice[] in `powers`, costField 'domainPowers'.
     powers: [{ entityId: "Smite", source: Source.purchased(), ranks: 1, costField: "domainPowers" }],
   };
   const c = updateParameter(c0, "skills", "Worship (Some Deity)", "Worship", 0);

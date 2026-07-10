@@ -7,7 +7,7 @@ import { cleanItemName, bareSkill, getClasses } from './resolver.js';
 import { characterLevel, getMaxRanks } from './validate/core.js';
 import { paramInfo, paramReusable } from './param-domain.js';
 import { spellSlots } from './validate/slots.js';
-import type { CharacterStateV2, GraphItem, CharacterGraph, Effect, EntitySource, BucketedView, BPLedger, BPLedgerEntry } from './types.js';
+import type { CharacterState, GraphItem, CharacterGraph, Effect, EntitySource, BucketedView, BPLedger, BPLedgerEntry } from './types.js';
 import { Source, isPurchased, isStarting } from './types.js';
 
 const idName = (id: string) => id.split(':')[1] || id;
@@ -51,7 +51,7 @@ export class CharacterGraphModel implements CharacterGraph {
   }
 
   constructor(
-    public character: CharacterStateV2,
+    public character: CharacterState,
     private _items: GraphItem[],
     public characterLevel: number,
     public classes: { name: string; level: number }[]
@@ -993,7 +993,7 @@ function checkLevelConstraint(character: any, constraintStr: string, owned: Set<
 // entry — so everything past resolveCharacterGraph sees a complete character.
 // Idempotent: re-running never double-seeds (innates dedupe by name, the devotion
 // entry is added only when absent).
-function normalizeV2(character: CharacterStateV2): CharacterStateV2 {
+function normalizeCharacter(character: CharacterState): CharacterState {
   const classes = getClasses(character);
   const powers = [...(character.powers || [])];
   // Class-granted innate powers (level-gated) are DERIVED from the class list, not
@@ -1019,11 +1019,11 @@ function normalizeV2(character: CharacterStateV2): CharacterStateV2 {
   return { ...character, classes, powers, devotions };
 }
 
-export function resolveCharacterGraph(charInput: CharacterStateV2): CharacterGraphModel {
-  // The character is born V2 (UI reducers, loadArchetype, the sheet importer, and
-  // the test factory all produce V2 buckets). At the boundary we only DERIVE the
+export function resolveCharacterGraph(charInput: CharacterState): CharacterGraphModel {
+  // The character is born from the buckets (UI reducers, loadArchetype, the sheet importer, and
+  // the test factory all produce buckets). At the boundary we only DERIVE the
   // two facts that aren't stored — class innate powers + the devotion entry.
-  const character = normalizeV2(charInput);
+  const character = normalizeCharacter(charInput);
 
   const items: GraphItem[] = [];
   const charLevel = characterLevel(character);
@@ -1078,7 +1078,7 @@ export function resolveCharacterGraph(charInput: CharacterStateV2): CharacterGra
     // Node id is the PARAMETER-PRESERVING instance key used for the BP ledger,
     // prereq issue ids, and dedupe — NOT ent.id (the param-stripped BASE). Its
     // prefix is the ORIGINATING character field: flat-path buckets carry it as
-    // `choice.costField` (e.g. 'classPowers'); V2-native skills have none, so they
+    // `choice.costField` (e.g. 'classPowers'); native skills have none, so they
     // key under their entity collection ('skills'). Falls back to the raw entityId.
     const idPrefixName = (choice as any).costField || (ent?.type ? idPrefix(ent) : null);
     const nodeId = idPrefixName ? `${idPrefixName}:${cleanName}` : entityId;
