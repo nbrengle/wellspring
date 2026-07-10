@@ -28,7 +28,7 @@ import type {
   BPLedger,
   BPLedgerEntry,
 } from "./types.js";
-import { Source, isPurchased, isStarting } from "./types.js";
+import { Source, isPurchased, isStarting, sourceClass } from "./types.js";
 
 const idName = (id: string) => id.split(":")[1] || id;
 
@@ -74,7 +74,7 @@ export class CharacterGraphModel implements CharacterGraph {
 
   constructor(
     public character: CharacterState,
-    private _items: GraphItem[],
+    public items: GraphItem[],
     public characterLevel: number,
     public classes: { name: string; level: number }[],
   ) {}
@@ -119,25 +119,25 @@ export class CharacterGraphModel implements CharacterGraph {
   }
 
   hasEntity(entityId: string): boolean {
-    return this._items.some((i) => i.id === entityId || i.entity?.id === entityId);
+    return this.items.some((i) => i.id === entityId || i.entity?.id === entityId);
   }
 
   *[Symbol.iterator](): IterableIterator<GraphItem> {
-    for (const node of this._items) {
+    for (const node of this.items) {
       yield node;
     }
   }
 
   find(predicate: (node: GraphItem) => boolean): GraphItem | undefined {
-    return this._items.find(predicate);
+    return this.items.find(predicate);
   }
 
   filter(predicate: (node: GraphItem) => boolean): GraphItem[] {
-    return this._items.filter(predicate);
+    return this.items.filter(predicate);
   }
 
   some(predicate: (node: GraphItem) => boolean): boolean {
-    return this._items.some(predicate);
+    return this.items.some(predicate);
   }
 
   private computeStats() {
@@ -158,7 +158,7 @@ export class CharacterGraphModel implements CharacterGraph {
       }
     };
 
-    for (const node of this._items) {
+    for (const node of this.items) {
       for (const eff of node.effects) {
         if (eff.type === "STAT") {
           mods[eff.stat] = (mods[eff.stat] || 0) + eff.amount;
@@ -219,7 +219,7 @@ export class CharacterGraphModel implements CharacterGraph {
       view.classes.push({ name: cls, level: clsLevel, type: "class" });
     }
 
-    for (const node of this._items) {
+    for (const node of this.items) {
       if (node.field === "synthetic" || node.field === "lineageAdvantages" || node.field === "lineageChallenges")
         continue;
 
@@ -297,7 +297,7 @@ export class CharacterGraphModel implements CharacterGraph {
   // _ownedIds and prereqs.
   private computeGrantedAbilitiesList(): any[] {
     const list: any[] = [];
-    for (const node of this._items) {
+    for (const node of this.items) {
       for (const eff of node.effects) {
         if (eff.type !== "GRANT_SOURCE") continue;
         for (const ability of eff.grants) {
@@ -324,13 +324,13 @@ export class CharacterGraphModel implements CharacterGraph {
   // (powers:/perks:/skills:, full or bare name) resolves.
   private computeOwnedIds(): Set<string> {
     const owned = new Set<string>();
-    for (const node of this._items) {
+    for (const node of this.items) {
       if (node.field === "flaws" || node.field === "synthetic") continue;
       if (node.id) {
         owned.add(node.id);
         if (node.id.includes("|")) owned.add(node.id.split("|")[0] + "|any");
       }
-      const clean = cleanItemName(node.rawString);
+      const clean = cleanItemName(node.rawString || node.name);
       const bare = bareSkill(clean);
       const candidates = [
         `${node.field}:${bare}`,
@@ -348,7 +348,7 @@ export class CharacterGraphModel implements CharacterGraph {
           owned.add(`${idPrefix(e)}:${bareSkill(e.name)}`);
         }
       }
-      if (node.entity) {
+      if (node.entity?.id) {
         owned.add(node.entity.id);
         owned.add(`${idPrefix(node.entity)}:${bareSkill(node.entity.name)}`);
       }
@@ -405,7 +405,7 @@ export class CharacterGraphModel implements CharacterGraph {
     const charClasses = this.classes;
     const character = this.character;
 
-    for (const node of this._items) {
+    for (const node of this.items) {
       if (node.field === "flaws" || node.field === "synthetic") continue;
       const id = node.id;
       if (seen.has(id)) continue;
@@ -494,7 +494,7 @@ export class CharacterGraphModel implements CharacterGraph {
     // generic replacement for the old Weapon-Spec-specific check: it covers Weapon
     // Specialization (cap 1, two weapon types), a duplicate same-area Lore, a 5th
     // Extended Capacity, etc., from one rule.
-    for (const node of this._items) {
+    for (const node of this.items) {
       const overCap = node.effects?.find((e) => e.type === "OVER_CAP");
       if (!overCap) continue;
       issues.push({
@@ -582,7 +582,7 @@ export class CharacterGraphModel implements CharacterGraph {
     const excludes = REFS.excludes || {};
     if (Object.keys(excludes).length) {
       const ownedExcl = new Set<string>();
-      for (const node of this._items) {
+      for (const node of this.items) {
         if (node.field === "purchasedPerks" || node.field === "flaws" || node.field === "innatePerks") {
           if (node.id) ownedExcl.add(node.id);
         }
@@ -631,7 +631,7 @@ export class CharacterGraphModel implements CharacterGraph {
       return lookupEntity(`powers:${name}`);
     };
 
-    for (const node of this._items) {
+    for (const node of this.items) {
       if (node.entity?.type !== "power") continue;
       const name = cleanItemName(node.name);
       const field = node.field;
@@ -669,7 +669,7 @@ export class CharacterGraphModel implements CharacterGraph {
     }
 
     const powerCounts = new Map<string, number>();
-    for (const node of this._items) {
+    for (const node of this.items) {
       if (node.entity?.type !== "power" || node.sourceType !== "purchased") continue;
       const name = cleanItemName(node.name);
       if (!name) continue;
@@ -694,9 +694,9 @@ export class CharacterGraphModel implements CharacterGraph {
   private checkRepeatableCaps(): { issues: any[]; notes: any[] } {
     const issues: any[] = [];
     const elemAffinities: string[] = [];
-    for (const node of this._items) {
+    for (const node of this.items) {
       if (bareSkill(cleanItemName(node.name)) === "Elemental Affinity") {
-        elemAffinities.push(node.rawString);
+        elemAffinities.push(node.rawString || node.name);
       }
     }
     if (elemAffinities.length) {
@@ -721,8 +721,8 @@ export class CharacterGraphModel implements CharacterGraph {
     }
 
     const bloodlines: string[] = [];
-    for (const node of this._items) {
-      if (node.entity?.category === "Bloodline") bloodlines.push(node.rawString);
+    for (const node of this.items) {
+      if (node.entity?.category === "Bloodline") bloodlines.push(node.rawString || node.name);
     }
     if (bloodlines.length > 1) {
       issues.push({
@@ -816,10 +816,10 @@ export class CharacterGraphModel implements CharacterGraph {
     };
 
     // The graph already extracted all WEALTH effects (including the synthetic Tax Evasion)
-    for (const node of this._items) {
+    for (const node of this.items) {
       for (const eff of node.effects) {
         if (eff.type === "WEALTH") {
-          add(node.name, eff.amount, eff.note);
+          add(node.name, eff.amount, eff.note || "");
         }
       }
     }
@@ -845,7 +845,7 @@ export class CharacterGraphModel implements CharacterGraph {
     };
     const grantIndex: any = {};
     const grantParamIndex: any = {};
-    for (const node of this._items) {
+    for (const node of this.items) {
       for (const eff of node.effects) {
         if (eff.type === "GRANT_SOURCE") {
           eff.grants.forEach((g: string) => {
@@ -872,7 +872,7 @@ export class CharacterGraphModel implements CharacterGraph {
       node.costEntry = entry;
     };
 
-    for (const node of this._items) {
+    for (const node of this.items) {
       if (node.field === "flaws") {
         setEntry(node, { cost: node.baseCost, base: node.baseCost, grant: null });
         rawAwarded += -node.baseCost;
@@ -979,7 +979,7 @@ export class CharacterGraphModel implements CharacterGraph {
 
     // Phase 2: Apply Discounts
     const discountSources: any[] = [];
-    for (const node of this._items) {
+    for (const node of this.items) {
       for (const eff of node.effects) {
         if (eff.type === "DISCOUNT_SOURCE") {
           discountSources.push({ ...eff.discount, id: node.id, name: node.name });
@@ -992,13 +992,13 @@ export class CharacterGraphModel implements CharacterGraph {
     let discountFreeBP = 0;
     const discountsApplied: any[] = [];
 
-    for (const node of this._items) {
+    for (const node of this.items) {
       if (node.field !== "skills" && node.field !== "perks") continue;
 
       const eff = node.costEntry;
       if (!eff || eff.authored) continue;
 
-      const catKey = node.entity?.category || cleanItemName(node.rawString).split(" ")[0];
+      const catKey = node.entity?.category || cleanItemName(node.rawString || node.name).split(" ")[0];
       const pos = catCount.get(catKey) || 0;
       catCount.set(catKey, pos + 1);
 
@@ -1012,7 +1012,7 @@ export class CharacterGraphModel implements CharacterGraph {
         const cut = Math.min(src.amount, reducible, room);
 
         if (cut <= 0) {
-          if (eff.cost === 0 && (eff.grant?.kind === "grant" || eff.freeRanks > 0) && src.refundIfFree) {
+          if (eff.cost === 0 && (eff.grant?.kind === "grant" || (eff.freeRanks || 0) > 0) && src.refundIfFree) {
             const refund = Math.min(src.amount, room);
             discountFreeBP += refund;
             used.set(src.id, (used.get(src.id) || 0) + refund);
@@ -1032,7 +1032,7 @@ export class CharacterGraphModel implements CharacterGraph {
     // Phase 3: Total Summation — read the you-pay cost straight off each node's
     // entry (flaws carry a negative "cost" that feeds rawAwarded, not spend).
     let spent = 0;
-    for (const node of this._items) {
+    for (const node of this.items) {
       if (node.field === "flaws") continue;
       const eff = node.costEntry;
       if (eff && eff.cost > 0) spent += eff.cost;
@@ -1041,8 +1041,9 @@ export class CharacterGraphModel implements CharacterGraph {
     // Derived name-keyed projection for external/UI consumers (sheet, validate rows).
     // Not the engine's source of truth — that's node.costEntry. Later readers move
     // to reading cost off the resolved row and this can go.
-    for (const node of this._items) {
-      if (node.costEntry) byItem[costKey(node)] = node.costEntry;
+    for (const node of this.items) {
+      const k = costKey(node);
+      if (node.costEntry && k) byItem[k] = node.costEntry;
     }
 
     const awarded = Math.min(rawAwarded, MAX_FLAW_BP);
@@ -1091,7 +1092,7 @@ function discountApplies(src: any, itemNode: any, pos: number): boolean {
     const pr = REFS.prereqs?.[ent?.id];
     const target = `perks:${src.scope.value}`;
     return (
-      !!pr && (pr.skills?.includes(target) || pr.other?.some((o: string) => new RegExp(src.scope.value, "i").test(o)))
+      !!pr && (pr.skills?.includes(target) || !!pr.other?.some((o: string) => new RegExp(src.scope.value, "i").test(o)))
     );
   }
   if (src.scope.kind === "giftEligible") {
@@ -1155,7 +1156,7 @@ function checkLevelConstraint(character: any, constraintStr: string, owned: Set<
     const count = parseInt(m[1], 10);
     const tier = m[2];
     const slots = spellSlots(character);
-    const have = Object.values(slots).reduce((s: number, c: any) => s + (c[tier] || 0), 0);
+    const have = Object.values(slots || {}).reduce((s: number, c: any) => s + (c[tier] || 0), 0);
     return have >= count;
   }
   // 6. "N Ranks of Profession"
@@ -1277,6 +1278,7 @@ export function resolveCharacterGraph(charInput: CharacterState): CharacterGraph
       param: extractParam(rawName),
       field,
       sourceType,
+      cls: sourceClass(src),
       rank: choice.ranks || 1,
       index: choice.originalIndex,
       baseCost: baseCost,
@@ -1306,7 +1308,17 @@ export function resolveCharacterGraph(charInput: CharacterState): CharacterGraph
     }
   }
   for (const choice of character.perks || []) addItem(choice);
-  for (const choice of character.powers || []) addItem(choice);
+
+  const powerIdxByField: Record<string, number> = {};
+  for (const choice of character.powers || []) {
+    if (isPurchased(choice.source) && choice.costField) {
+      const idx = powerIdxByField[choice.costField] || 0;
+      powerIdxByField[choice.costField] = idx + 1;
+      addItem({ ...choice, originalIndex: idx });
+    } else {
+      addItem(choice);
+    }
+  }
   for (const choice of character.spells || []) addItem(choice);
   for (const choice of character.devotions || []) addItem(choice);
 
@@ -1344,6 +1356,7 @@ export function resolveCharacterGraph(charInput: CharacterState): CharacterGraph
       param: extractParam(rawName),
       field: "flaws",
       sourceType: "flaw",
+      index: character.flaws?.indexOf(choice),
       rank: 1,
       baseCost: -bp,
       entity: ent,
@@ -1454,6 +1467,7 @@ export function resolveCharacterGraph(charInput: CharacterState): CharacterGraph
           sourceType: "grant",
           grantedBy: node.name,
           grantKind: node.sourceType,
+          cls: node.cls ?? node.entity?.parentClass ?? null,
           rank: 1,
           baseCost: 0,
           entity: ent,

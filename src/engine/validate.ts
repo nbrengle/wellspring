@@ -86,7 +86,7 @@ import { resolveCharacterGraph, grantedAbilities } from "./graph.js";
 import { characterPools } from "./pool-registry.js";
 export { grantedAbilities };
 
-import { lookupCost } from "./validate/cost-key.js";
+import { costKey } from "./validate/cost-key.js";
 
 export { prereqStatus, checkLevelConstraint } from "./validate/prereqs.js";
 import { CRAFT_DISCIPLINES, CRAFTING_TIERS } from "./config.js";
@@ -198,18 +198,26 @@ export function classifyOwnedItems(character) {
   // veteran/utility/class/domain) collapse into one classPowers list for the UI.
   const g = resolveCharacterGraph(character);
   const b = g.uiBuckets;
-  const classPowers = [
-    ...b.basicPowers,
-    ...b.advancedPowers,
-    ...b.veteranPowers,
-    ...b.utilityPowers,
-    ...b.classPowers,
-    ...b.domainPowers,
-  ];
+  const classPowers = [...b.basicPowers, ...b.advancedPowers, ...b.veteranPowers, ...b.utilityPowers, ...b.classPowers];
+  const skills = [...b.skills];
+  const mcGrants = multiclassGrants(character).skills;
+  for (const mc of mcGrants) {
+    skills.push({
+      name: mc.name,
+      field: "skills",
+      sourceType: "multiclass",
+      cls: mc.source,
+      index: -1,
+      rank: 1,
+    } as any);
+  }
+
   return {
-    skills: b.skills,
+    skills,
     perks: b.perks,
     classPowers,
+    domainPowers: b.domainPowers,
+    flaws: b.flaws,
     innatePowers: b.innatePowers,
     misfiled: {},
   };
@@ -388,9 +396,12 @@ export function validate(character) {
   );
   // Attach each classified row's computed cost record (from the BP ledger) so the
   // UI reads `row.cost` directly instead of reconstructing a ledger key per row.
-  for (const bucket of ["skills", "perks", "classPowers"]) {
+  for (const bucket of ["skills", "perks", "classPowers", "domainPowers", "flaws", "innatePowers"]) {
     for (const row of owned[bucket]) {
-      row.cost = lookupCost(spend.byItem, row.field, row.name, row.index);
+      const key = costKey(row);
+      if (key) {
+        row.cost = spend.byItem[key];
+      }
     }
   }
   const activeSelections = computeActiveSelections(graph, lbp);

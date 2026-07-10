@@ -8,7 +8,6 @@ import {
   CraftingSection,
   SlotBlock,
   ClassifiedRows,
-  EditableRows,
 } from "./build-sheet/MainContent.jsx";
 import { ARCHETYPES } from "../engine/data.js";
 import { getClasses } from "../engine/resolver.js";
@@ -87,12 +86,7 @@ export default function BuildSheet() {
           onAdd={report.devotion.worship ? () => onOpenAdd("domainPower") : undefined}
         >
           {!report.devotion.worship && <p className="b-empty">Take the Worship skill to purchase domain powers.</p>}
-          <EditableRows
-            items={(character.powers || []).filter((p) => p.costField === "domainPowers").map((p) => p.entityId)}
-            field="domainPowers"
-            resolveType="powers"
-            removable={() => true}
-          />
+          <ClassifiedRows rows={owned.domainPowers} resolveType="powers" />
         </Section>
       )}
 
@@ -118,7 +112,7 @@ export default function BuildSheet() {
       )}
 
       <Section title="Flaws" tone="red" onAdd={() => onOpenAdd("flaw")}>
-        <EditableRows items={character.flaws} field="flaws" resolveType="flaws" removable={() => true} />
+        <ClassifiedRows rows={owned.flaws} resolveType="flaws" />
       </Section>
 
       {report.crafting?.any && <CraftingSection crafting={report.crafting} onInspect={onInspect} />}

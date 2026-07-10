@@ -7,7 +7,6 @@ import { CLASSES, DOMAINS, lookupEntity } from "../../engine/data.js";
 import { getMaxRanks, agileLearnerCapacity } from "../../engine/validate.js";
 import { bareSkill, getClasses, cleanItemName } from "../../engine/resolver.js";
 import { sourceClass } from "../../engine/types.js";
-import { lookupCost } from "../../engine/validate/cost-key.js";
 import { STARTING_CHOICES_CONFIG, reconcileStartingChoices } from "../../engine/starting-choices.js";
 import { UNLIMITED_SKILLS } from "../../engine/data.js";
 import InspectableRow from "./InspectableRow.jsx";
@@ -461,7 +460,7 @@ export function SlotBlock({ slot }) {
 }
 
 export function ClassifiedRows({ rows, resolveType, showClass }) {
-  const { character } = useBuilderState();
+  const { character, report } = useBuilderState();
   const { onRemoveEntity: onRemove, onSetRank } = useBuilderActions();
   if (!rows || rows.length === 0) return <p className="b-empty">none</p>;
   return (
@@ -471,17 +470,23 @@ export function ClassifiedRows({ rows, resolveType, showClass }) {
         // Cost is attached to the row by validate() (from the BP ledger).
         const cost = row.cost;
         const refundEff = row.effects?.find((e) => e.type === "REFUND_GRANT");
-        const refundedBy = refundEff?.source;
-        const refundedBP = refundEff ? cost?.base || 0 : 0;
+        const mcRefund = report?.multiclassGrants?.freeBPItems?.find((f) => f.skill === bareSkill(cleanItemName(name)));
+        const refundedBy = refundEff?.source || mcRefund?.source;
+        const refundedBP = refundEff ? cost?.base || 0 : mcRefund?.bp || 0;
 
-        const canRemove = sourceType === "purchased" && index >= 0;
+        const canRemove =
+          (sourceType === "purchased" || sourceType === "flaw") && index >= 0 && !refundEff && !mcRefund;
         const rank = cost?.rank || (index >= 0 ? character.ranks?.[field]?.[index] : null) || 1;
 
         const baseName = bareSkill(cleanItemName(name));
         const maxR = getMaxRanks(name, field, character);
         const grantedFloor = floor || 0;
         const isGranted =
-          sourceType === "grant" || sourceType === "class" || sourceType === "innate" || sourceType === "lineage";
+          sourceType === "grant" ||
+          sourceType === "class" ||
+          sourceType === "innate" ||
+          sourceType === "lineage" ||
+          sourceType === "multiclass";
 
         const canBuyUp = isGranted && grantedFloor > 0 && maxR > grantedFloor && !UNLIMITED_SKILLS.has(baseName);
         const rankFloor = canBuyUp ? grantedFloor : 1;
@@ -533,23 +538,29 @@ export function ClassifiedRows({ rows, resolveType, showClass }) {
                     title = `Granted free by your ${src} class`;
                   }
 
+                  const toneKey = cls || grantedBy || src;
+                  const toneClass = CLASS_TONES[toneKey] ? `b-tag-${CLASS_TONES[toneKey]}` : "b-badge-granted";
+                  let label = src?.toUpperCase() || "";
+                  if (cls && grantedBy && cls !== grantedBy) {
+                    label = `${cls.toUpperCase()} · ${grantedBy.toUpperCase()}`;
+                  }
+
+                  if (!src) {
+                    label = sourceType.toUpperCase();
+                  }
+
                   return (
                     <>
-                      {src && (
-                        <span
-                          className={`b-row-badge ${CLASS_TONES[src] ? `b-tag-${CLASS_TONES[src]}` : "b-badge-granted"}`}
-                          title={title}
-                        >
-                          {src.toUpperCase()}
-                          {specialty && <span className="b-badge-spec"> · {specialty}</span>}
-                        </span>
-                      )}
+                      <span className={`b-row-badge ${toneClass}`} title={title}>
+                        {label}
+                        {specialty && <span className="b-badge-spec"> · {specialty}</span>}
+                      </span>
                       {canBuyUp && cost?.paidRanks > 0 && <CostBadge cost={cost} />}
                     </>
                   );
                 })()
-              : cost && !refundEff && <CostBadge cost={cost} />}
-            {refundEff && (
+              : cost && !(refundEff || mcRefund) && <CostBadge cost={cost} />}
+            {(refundEff || mcRefund) && (
               <span
                 className="b-row-badge b-badge-refund"
                 title={`BP spent on this item was refunded because you received it for free from ${refundedBy}`}
@@ -584,68 +595,6 @@ export function ClassifiedRows({ rows, resolveType, showClass }) {
                 title="Remove"
                 aria-label={`Remove ${name}`}
                 onClick={() => onRemove(field, index)}
-              >
-                ×
-              </button>
-            )}
-          </InspectableRow>
-        );
-      })}
-    </ul>
-  );
-}
-
-export function EditableRows({ items, field, resolveType, removable }) {
-  const { character, report } = useBuilderState();
-  const { onRemoveEntity } = useBuilderActions();
-  if (!items || items.length === 0) {
-    return <p className="b-empty">none</p>;
-  }
-  return (
-    <ul className="b-rows">
-      {items.map((item, i) => {
-        const cost = lookupCost(report?.spend.byItem, field, item, i);
-        const canRemove = removable ? removable(i) : false;
-        const rank = cost?.rank || 1;
-
-        const baseName = bareSkill(cleanItemName(item));
-        const maxR = getMaxRanks(item, field, character);
-        const hasRanks = canRemove && maxR > 1 && !UNLIMITED_SKILLS.has(baseName);
-
-        const ent =
-          lookupEntity(resolveType ? `${resolveType}:${baseName}` : baseName) ||
-          lookupEntity(resolveType ? `${resolveType}:${item}` : item);
-        const tags = ent?.tags || [];
-
-        return (
-          <InspectableRow
-            key={`${field}-${i}-${item}`}
-            item={item}
-            field={field}
-            resolveType={resolveType}
-            index={i}
-            label={
-              <>
-                {item}
-                {rank > 1 && !hasRanks && <span className="b-row-rank">×{rank}</span>}
-              </>
-            }
-          >
-            {tags.map((t) => {
-              const tone = CLASS_TONES[t];
-              return (
-                <span key={t} className={`b-picker-row-tag ${tone ? `b-tag-${tone}` : "b-data"}`}>
-                  {t}
-                </span>
-              );
-            })}
-            <CostBadge cost={cost} />
-            {canRemove && (
-              <button
-                className="b-row-remove"
-                title="Remove"
-                aria-label={`Remove ${item}`}
-                onClick={() => onRemoveEntity(field, i)}
               >
                 ×
               </button>
