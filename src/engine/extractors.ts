@@ -133,7 +133,13 @@ function extractLevelDiscounts(ent: Entity | null | undefined, character: Charac
       clsDef.veteran,
       clsDef.classSkills,
       clsDef.rightHandPowers,
-    ].some((list: any) => list?.some((p: any) => (p.id || p.name) === ent?.name || p.id === id || p.name === ent?.name));
+    ].some((list) =>
+      list?.some((p) => {
+        const pId = typeof p === "string" ? undefined : p.id;
+        const pName = typeof p === "string" ? p : p.name;
+        return (pId || pName) === ent?.name || pId === id || pName === ent?.name;
+      }),
+    );
 
     if (offers && c.level > maxRelevantLevel) {
       maxRelevantLevel = c.level;
