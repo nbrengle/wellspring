@@ -117,13 +117,13 @@ export interface Class extends BaseEntity {
   innate?: { id?: string; name: string; requiredLevel?: number }[];
   spellcaster?: boolean;
   magicType?: string;
-  cantrips?: ({ id?: string; name: string } | string)[];
-  utility?: ({ id?: string; name: string } | string)[];
-  basic?: ({ id?: string; name: string } | string)[];
-  advanced?: ({ id?: string; name: string } | string)[];
-  veteran?: ({ id?: string; name: string } | string)[];
-  classSkills?: ({ id?: string; name: string } | string)[];
-  rightHandPowers?: ({ id?: string; name: string } | string)[];
+  cantrips?: { id?: string; name: string; requiredLevel?: number }[];
+  utility?: { id?: string; name: string; requiredLevel?: number }[];
+  basic?: { id?: string; name: string; requiredLevel?: number }[];
+  advanced?: { id?: string; name: string; requiredLevel?: number }[];
+  veteran?: { id?: string; name: string; requiredLevel?: number }[];
+  classSkills?: { id?: string; name: string; requiredLevel?: number }[];
+  rightHandPowers?: { id?: string; name: string; requiredLevel?: number }[];
 }
 
 /**
