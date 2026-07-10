@@ -1,4 +1,4 @@
-import type { BucketedView } from "../types.js";
+import type { BucketedView, FlawView, PowerView, SpellView, PerkView, SkillView, GraphItem } from "../types.js";
 import type { CharacterGraphModel } from "./model.js";
 export function buildBucketedView(graph: CharacterGraphModel): BucketedView {
   const view: BucketedView = {
