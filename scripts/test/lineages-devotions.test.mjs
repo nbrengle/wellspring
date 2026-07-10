@@ -459,3 +459,39 @@ test("import: inline Devotion alone is honored when no Worship skill", () => {
   eq(c.devotion, "The Mother", "inline fallback");
   ok(!c.devotionWarning, "no warning when only inline");
 });
+
+test("domainPowers: legacy saves (domain power in powers[]) migrate to the domainPowers bucket", () => {
+  // Pre-bucket saves stored domain powers in `powers` tagged costField 'domainPowers'.
+  // resolveCharacterGraph (via normalizeCharacter) must lift them into their own bucket.
+  const legacy = {
+    ...makeChar({ classes: [{ name: "Cleric", level: 4 }] }),
+    powers: [
+      { entityId: "Smite", source: Source.purchased(), ranks: 1, costField: "domainPowers" },
+      { entityId: "Shield Bash", source: Source.purchased(), ranks: 1, costField: "classPowers" },
+    ],
+  };
+  const v2 = toV2(legacy);
+  eq((v2.domainPowers || []).length, 1, "domain power lifted into domainPowers bucket");
+  eq(v2.domainPowers[0].entityId, "Smite", "the right entry moved");
+  ok(
+    !(v2.powers || []).some((p) => p.costField === "domainPowers"),
+    "no domain powers left stranded in the powers array",
+  );
+  ok(
+    (v2.powers || []).some((p) => p.entityId === "Shield Bash"),
+    "class powers stay in the powers array",
+  );
+});
+
+test("domainPowers: a domain power that defines a pool (Balance Pool) resolves the pool", () => {
+  // The Balance of Life is a DOMAIN power that defines the Balance Pool. Before
+  // domain powers fed pool resolution, the pool never appeared. Now it does.
+  const c = {
+    ...makeChar({ classes: [{ name: "Cleric", level: 6 }] }),
+    domainPowers: [
+      { entityId: "The Balance of Life", source: Source.purchased(), ranks: 1, costField: "domainPowers" },
+    ],
+  };
+  const pool = (validate(c).pools || []).find((p) => p.name === "Balance Pool");
+  ok(pool, "Balance Pool resolves from the owned domain power");
+});

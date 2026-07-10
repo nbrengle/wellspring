@@ -389,7 +389,13 @@ export function validate(character) {
   // Class "pools" (Healing Touch Pool, Living Iron Pool, …): derived from the
   // owned set + class levels. Only pools whose defining power is owned appear.
   // Read-layer-shaped record the identity rail + a Pool facet consume directly.
-  const ownedFlat = [...owned.skills, ...owned.perks, ...owned.classPowers, ...owned.innatePowers];
+  const ownedFlat = [
+    ...owned.skills,
+    ...owned.perks,
+    ...owned.classPowers,
+    ...owned.domainPowers,
+    ...owned.innatePowers,
+  ];
   const classLevelOf = (className) => getClasses(resolved).find((c) => c.name === className)?.level ?? 0;
   const pools = characterPools(ownedFlat, classLevelOf);
   // Class-choice grants (Extensive Combat Training / Extensive Training /

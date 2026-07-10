@@ -1261,7 +1261,15 @@ function normalizeCharacter(character: CharacterState): CharacterState {
     devotions.push({ entityId: `devotions:${character.devotion}`, source: Source.purchased() });
   }
 
-  return { ...character, classes, powers, devotions };
+  // Migrate legacy saves: domain powers used to live in `powers` tagged
+  // costField:'domainPowers'. They now have their own bucket — lift any stragglers
+  // out of `powers` and merge with domainPowers (dedupe by entityId). Idempotent.
+  const strayDomain = powers.filter((p) => p.costField === "domainPowers");
+  const powersClean = strayDomain.length ? powers.filter((p) => p.costField !== "domainPowers") : powers;
+  const domainSeen = new Set((character.domainPowers || []).map((p) => p.entityId));
+  const domainPowers = [...(character.domainPowers || []), ...strayDomain.filter((p) => !domainSeen.has(p.entityId))];
+
+  return { ...character, classes, powers: powersClean, domainPowers, devotions };
 }
 
 export function resolveCharacterGraph(charInput: CharacterState): CharacterGraphModel {
@@ -1373,7 +1381,7 @@ export function resolveCharacterGraph(charInput: CharacterState): CharacterGraph
   for (const choice of character.perks || []) addItem(choice);
 
   const powerIdxByField: Record<string, number> = {};
-  for (const choice of character.powers || []) {
+  const addPurchasablePower = (choice: CharacterChoice) => {
     if (isPurchased(choice.source) && choice.costField) {
       const idx = powerIdxByField[choice.costField] || 0;
       powerIdxByField[choice.costField] = idx + 1;
@@ -1381,7 +1389,11 @@ export function resolveCharacterGraph(charInput: CharacterState): CharacterGraph
     } else {
       addItem(choice);
     }
-  }
+  };
+  for (const choice of character.powers || []) addPurchasablePower(choice);
+  // Domain powers are their own bucket now, but materialize the same way (purchased,
+  // positional among their costField) so the view routes them into view.domainPowers.
+  for (const choice of character.domainPowers || []) addPurchasablePower(choice);
   for (const choice of character.spells || []) addItem(choice);
   for (const choice of character.devotions || []) addItem(choice);
 

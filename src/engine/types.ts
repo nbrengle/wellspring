@@ -234,6 +234,10 @@ export interface CharacterState {
   perks: CharacterChoice[];
   flaws: CharacterChoice[];
   powers: CharacterChoice[];
+  /** Divine domain powers — their OWN bucket, not class powers. Purchased under a
+   *  chosen domain; pruned when that domain is dropped. Kept separate from `powers`
+   *  so nothing conflates a domain power with a class power. */
+  domainPowers: CharacterChoice[];
   spells: CharacterChoice[];
 
   /** Per-stat overrides read by lineage checks (e.g. The Fractured). */

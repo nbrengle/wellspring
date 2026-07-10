@@ -154,15 +154,15 @@ export function sourceForField(field: string, primaryClass: string): EntitySourc
 
 // Which bucket a parsed SECTION field lands in (routes by field, the section's
 // authority — not by looking the entity up).
-const FIELD_BUCKET: Record<string, keyof Pick<CharacterState, "skills" | "perks" | "powers" | "spells" | "flaws">> = {
+type PowerBucket = keyof Pick<CharacterState, "skills" | "perks" | "powers" | "domainPowers" | "spells" | "flaws">;
+const FIELD_BUCKET: Record<string, PowerBucket> = {
   startingSkills: "skills",
   purchasedSkills: "skills",
   purchasedPerks: "perks",
   flaws: "flaws",
+  domainPowers: "domainPowers",
 };
-export function bucketForField(
-  field: string,
-): keyof Pick<CharacterState, "skills" | "perks" | "powers" | "spells" | "flaws"> {
+export function bucketForField(field: string): PowerBucket {
   return FIELD_BUCKET[field] ?? (SPELL_FIELDS.has(field) ? "spells" : "powers");
 }
 
