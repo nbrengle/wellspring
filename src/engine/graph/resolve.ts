@@ -1,34 +1,18 @@
-import {
-    ALLERGEN_AWARDS,
-    allergenAward,
-    lookupEntity
-} from "../../engine/data.js";
+import { ALLERGEN_AWARDS, allergenAward, lookupEntity } from "../../engine/data.js";
 import { EFFECT_EXTRACTORS } from "../extractors.js";
 import { paramInfo, paramReusable } from "../param-domain.js";
 import { bareSkill, cleanItemName, getClasses } from "../resolver.js";
 import { startingSkillGrants } from "../starting-choices.js";
-import type {
-    CharacterChoice,
-    CharacterState,
-    Effect,
-    Entity,
-    EntitySource,
-    GraphItem
-} from "../types.js";
-import {
-    Source,
-    isPurchased,
-    isStarting,
-    sourceClass
-} from "../types.js";
+import type { CharacterChoice, CharacterState, Effect, Entity, EntitySource, GraphItem } from "../types.js";
+import { Source, isPurchased, isStarting, sourceClass } from "../types.js";
 import { characterLevel, getMaxRanks } from "../validate/core.js";
 import { CharacterGraphModel, extractParam, idPrefix } from "./model.js";
 
 export function normalizeCharacter(character: CharacterState): CharacterState {
-    const classes = getClasses(character);
-    const powers = [...(character.powers || [])];
-    const owned = new Set(powers.map((p) => p.entityId));
-    for (const c of classes) {
+  const classes = getClasses(character);
+  const powers = [...(character.powers || [])];
+  const owned = new Set(powers.map((p) => p.entityId));
+  for (const c of classes) {
     const clsDef = lookupEntity(`classes:${c.name}`);
     for (const p of (clsDef?.type === "class" ? clsDef.innate : []) || []) {
       if (c.level >= (p.requiredLevel || 1) && !owned.has(p.name)) {
@@ -36,103 +20,103 @@ export function normalizeCharacter(character: CharacterState): CharacterState {
         powers.push({ entityId: p.name, source: Source.innate(), ranks: 1, costField: "innatePowers" });
       }
     }
-    }
+  }
 
-    const devotions = [...(character.devotions || [])];
-    if (character.devotion && !devotions.some((d) => d.entityId === `devotions:${character.devotion}`)) {
+  const devotions = [...(character.devotions || [])];
+  if (character.devotion && !devotions.some((d) => d.entityId === `devotions:${character.devotion}`)) {
     devotions.push({ entityId: `devotions:${character.devotion}`, source: Source.purchased() });
-    }
+  }
 
-    return { ...character, classes, powers, devotions };
+  return { ...character, classes, powers, devotions };
 }
 
 export function resolveCharacterGraph(charInput: CharacterState): CharacterGraphModel {
-    const character = normalizeCharacter(charInput);
-    const items: GraphItem[] = [];
-    const charLevel = characterLevel(character);
-    const classes = getClasses(character);
-    const addItem = (choice: CharacterChoice) => {
-            let ent = lookupEntity(choice.entityId);
-            // Remove the collection prefix (e.g. "skills:") for the display name
-            const rawName = choice.entityId.replace(/^[a-z]+:/i, "");
-            const cleanName = cleanItemName(rawName);
-            const bareName = bareSkill(cleanName);
+  const character = normalizeCharacter(charInput);
+  const items: GraphItem[] = [];
+  const charLevel = characterLevel(character);
+  const classes = getClasses(character);
+  const addItem = (choice: CharacterChoice) => {
+    let ent = lookupEntity(choice.entityId);
+    // Remove the collection prefix (e.g. "skills:") for the display name
+    const rawName = choice.entityId.replace(/^[a-z]+:/i, "");
+    const cleanName = cleanItemName(rawName);
+    const bareName = bareSkill(cleanName);
 
-            // Fallback if entityId wasn't fully qualified
-            if (!ent) {
-              ent =
-                lookupEntity(`skills:${bareName}`) || lookupEntity(`perks:${cleanName}`) || lookupEntity(`powers:${cleanName}`);
-            }
+    // Fallback if entityId wasn't fully qualified
+    if (!ent) {
+      ent =
+        lookupEntity(`skills:${bareName}`) || lookupEntity(`perks:${cleanName}`) || lookupEntity(`powers:${cleanName}`);
+    }
 
-            const rank = choice.ranks || 1;
-            const effects: Effect[] = [];
+    const rank = choice.ranks || 1;
+    const effects: Effect[] = [];
 
-            // Extract Base Cost
-            let baseCost = 0;
-            if (Array.isArray(ent?.tiers) && ent.tiers.length) {
-              const n = Math.min(rank, ent.tiers.length);
-              baseCost = ent.tiers.slice(0, n).reduce((s, t) => s + (t.cost || 0), 0);
-            } else {
-              baseCost = (typeof ent?.cost === "number" ? ent.cost : ent?.lbp || 0) * rank;
-            }
+    // Extract Base Cost
+    let baseCost = 0;
+    if (Array.isArray(ent?.tiers) && ent.tiers.length) {
+      const n = Math.min(rank, ent.tiers.length);
+      baseCost = ent.tiers.slice(0, n).reduce((s, t) => s + (t.cost || 0), 0);
+    } else {
+      baseCost = (typeof ent?.cost === "number" ? ent.cost : ent?.lbp || 0) * rank;
+    }
 
-            const entityId = ent?.id || choice.entityId;
-            for (const extractor of EFFECT_EXTRACTORS) {
-              effects.push(...extractor(ent, character, entityId));
-            }
+    const entityId = ent?.id || choice.entityId;
+    for (const extractor of EFFECT_EXTRACTORS) {
+      effects.push(...extractor(ent, character, entityId));
+    }
 
-            // The node model's internal sourceType string, derived from the structured
-            // source's `type`. `starting` maps to 'class' (a starting skill was the old
-            // 'Class:Starting' string → sourceType 'class'); `granted` → 'grant'.
-            const src: EntitySource = choice.source || Source.purchased();
-            const SOURCE_TYPE: Record<EntitySource["type"], string> = {
-              purchased: "purchased",
-              class: "class",
-              starting: "class",
-              innate: "innate",
-              granted: "grant",
-              lineage: "lineage",
-              flaw: "flaw",
-            };
-            const sourceType = SOURCE_TYPE[src.type] || "purchased";
+    // The node model's internal sourceType string, derived from the structured
+    // source's `type`. `starting` maps to 'class' (a starting skill was the old
+    // 'Class:Starting' string → sourceType 'class'); `granted` → 'grant'.
+    const src: EntitySource = choice.source || Source.purchased();
+    const SOURCE_TYPE: Record<EntitySource["type"], string> = {
+      purchased: "purchased",
+      class: "class",
+      starting: "class",
+      innate: "innate",
+      granted: "grant",
+      lineage: "lineage",
+      flaw: "flaw",
+    };
+    const sourceType = SOURCE_TYPE[src.type] || "purchased";
 
-            // Determine the field based on the entity prefix or fallback
-            let field = choice.entityId.split(":")[0];
-            if (["skills", "perks", "powers", "flaws"].indexOf(field) === -1) {
-              if (ent?.id) field = ent.id.split(":")[0];
-              else field = "unknown";
-            }
+    // Determine the field based on the entity prefix or fallback
+    let field = choice.entityId.split(":")[0];
+    if (["skills", "perks", "powers", "flaws"].indexOf(field) === -1) {
+      if (ent?.id) field = ent.id.split(":")[0];
+      else field = "unknown";
+    }
 
-            // Node id is the PARAMETER-PRESERVING instance key used for the BP ledger,
-            // prereq issue ids, and dedupe — NOT ent.id (the param-stripped BASE). Its
-            // prefix is the ORIGINATING character field: flat-path buckets carry it as
-            // `choice.costField` (e.g. 'classPowers'); native skills have none, so they
-            // key under their entity collection ('skills'). Falls back to the raw entityId.
-            const idPrefixName = choice.costField || (ent?.type ? idPrefix(ent) : null);
-            const nodeId = idPrefixName ? `${idPrefixName}:${cleanName}` : entityId;
-            items.push({
-              id: nodeId,
-              entityId: entityId,
-              name: ent?.name || cleanName,
-              rawString: choice.entityId,
-              param: extractParam(rawName),
-              field,
-              sourceType,
-              cls: sourceClass(src),
-              rank: choice.ranks || 1,
-              index: choice.originalIndex,
-              baseCost: baseCost,
-              authoredCost: choice.costOverride,
-              entity: ent,
-              effects,
-              specialty: null,
-              floor: 0,
-              choiceData: choice,
-            });
-          };
-    let purchasedSkillIdx = 0;
-    let startingSkillIdx = 0;
-    for (const choice of character.skills || []) {
+    // Node id is the PARAMETER-PRESERVING instance key used for the BP ledger,
+    // prereq issue ids, and dedupe — NOT ent.id (the param-stripped BASE). Its
+    // prefix is the ORIGINATING character field: flat-path buckets carry it as
+    // `choice.costField` (e.g. 'classPowers'); native skills have none, so they
+    // key under their entity collection ('skills'). Falls back to the raw entityId.
+    const idPrefixName = choice.costField || (ent?.type ? idPrefix(ent) : null);
+    const nodeId = idPrefixName ? `${idPrefixName}:${cleanName}` : entityId;
+    items.push({
+      id: nodeId,
+      entityId: entityId,
+      name: ent?.name || cleanName,
+      rawString: choice.entityId,
+      param: extractParam(rawName),
+      field,
+      sourceType,
+      cls: sourceClass(src),
+      rank: choice.ranks || 1,
+      index: choice.originalIndex,
+      baseCost: baseCost,
+      authoredCost: choice.costOverride,
+      entity: ent,
+      effects,
+      specialty: null,
+      floor: 0,
+      choiceData: choice,
+    });
+  };
+  let purchasedSkillIdx = 0;
+  let startingSkillIdx = 0;
+  for (const choice of character.skills || []) {
     if (isPurchased(choice.source)) {
       addItem({ ...choice, originalIndex: choice.originalIndex ?? purchasedSkillIdx++ });
     } else if (isStarting(choice.source)) {
@@ -140,24 +124,24 @@ export function resolveCharacterGraph(charInput: CharacterState): CharacterGraph
     } else {
       addItem(choice);
     }
-    }
+  }
 
-    for (const choice of character.perks || []) addItem(choice);
-    const powerIdxByField: Record<string, number> = {};
-    const addPurchasablePower = (choice: CharacterChoice) => {
-            if (isPurchased(choice.source) && choice.costField) {
-              const idx = powerIdxByField[choice.costField] || 0;
-              powerIdxByField[choice.costField] = idx + 1;
-              addItem({ ...choice, originalIndex: idx });
-            } else {
-              addItem(choice);
-            }
-          };
-    for (const choice of character.powers || []) addPurchasablePower(choice);
-    for (const choice of character.domainPowers || []) addPurchasablePower(choice);
-    for (const choice of character.spells || []) addItem(choice);
-    for (const choice of character.devotions || []) addItem(choice);
-    for (const field of ["lineageAdvantages", "lineageChallenges"] as const) {
+  for (const choice of character.perks || []) addItem(choice);
+  const powerIdxByField: Record<string, number> = {};
+  const addPurchasablePower = (choice: CharacterChoice) => {
+    if (isPurchased(choice.source) && choice.costField) {
+      const idx = powerIdxByField[choice.costField] || 0;
+      powerIdxByField[choice.costField] = idx + 1;
+      addItem({ ...choice, originalIndex: idx });
+    } else {
+      addItem(choice);
+    }
+  };
+  for (const choice of character.powers || []) addPurchasablePower(choice);
+  for (const choice of character.domainPowers || []) addPurchasablePower(choice);
+  for (const choice of character.spells || []) addItem(choice);
+  for (const choice of character.devotions || []) addItem(choice);
+  for (const field of ["lineageAdvantages", "lineageChallenges"] as const) {
     for (const name of character[field] || []) {
       const type = field === "lineageAdvantages" ? "advantages" : "challenges";
       let entityId = `${type}:${name}`;
@@ -167,9 +151,9 @@ export function resolveCharacterGraph(charInput: CharacterState): CharacterGraph
       const choice = { entityId, ranks: 1, source: Source.lineage() };
       addItem(choice);
     }
-    }
+  }
 
-    for (const choice of character.flaws || []) {
+  for (const choice of character.flaws || []) {
     const rawName = choice.entityId.replace(/^flaws:/i, "");
     const cleanName = cleanItemName(rawName);
     const ent = lookupEntity(`flaws:${cleanName}`);
@@ -197,42 +181,42 @@ export function resolveCharacterGraph(charInput: CharacterState): CharacterGraph
       effects: [{ type: "FLAW_AWARD", amount: bp }],
       choiceData: choice,
     });
-    }
+  }
 
-    const getIdentity = (rawName: string, ent: Entity | null | undefined, param?: string | null) => {
-            const clean = cleanItemName(rawName);
-            const entityId = ent?.id || rawName;
-            const cap = getMaxRanks(entityId);
-            const info = paramInfo(ent);
-            const reusable = paramReusable(ent, entityId);
-            const baseName = (ent?.baseName || ent?.name || bareSkill(clean)).toLowerCase();
+  const getIdentity = (rawName: string, ent: Entity | null | undefined, param?: string | null) => {
+    const clean = cleanItemName(rawName);
+    const entityId = ent?.id || rawName;
+    const cap = getMaxRanks(entityId);
+    const info = paramInfo(ent);
+    const reusable = paramReusable(ent, entityId);
+    const baseName = (ent?.baseName || ent?.name || bareSkill(clean)).toLowerCase();
 
-            // Take-once entities (cap 1) have ONE identity regardless of parameter — the
-            // param is flavor on the single instance, not a distinguisher. e.g. Weapon
-            // Specialization (Swords) and (Axes) are the SAME identity, so a second one is
-            // redundant (free BP). Without this, a parameterized cap-1 entity keyed by
-            // base|param wrongly kept both. (Param distinguishes only when cap > 1.)
-            if (cap <= 1) return { key: baseName, cap };
+    // Take-once entities (cap 1) have ONE identity regardless of parameter — the
+    // param is flavor on the single instance, not a distinguisher. e.g. Weapon
+    // Specialization (Swords) and (Axes) are the SAME identity, so a second one is
+    // redundant (free BP). Without this, a parameterized cap-1 entity keyed by
+    // base|param wrongly kept both. (Param distinguishes only when cap > 1.)
+    if (cap <= 1) return { key: baseName, cap };
 
-            // No param, or param is payload (reusable) → identity is the base; the cap
-            // governs how many total takings are kept.
-            if (!info || reusable) return { key: baseName, cap };
+    // No param, or param is payload (reusable) → identity is the base; the cap
+    // governs how many total takings are kept.
+    if (!info || reusable) return { key: baseName, cap };
 
-            // Parameterized, multi-rank, not reusable (Lore, …) → param distinguishes
-            // distinct instances, each capped at one. Read the structured node.param,
-            // falling back to the entity's param label only if absent.
-            const paramValue = (param ?? ent?.parameter ?? "unknown").toLowerCase();
-            return { key: `${baseName}|${paramValue}`, cap: 1 };
-          };
-    const itemIdentities = new Map<string, { cap: number; nodes: GraphItem[] }>();
-    for (const it of items) {
+    // Parameterized, multi-rank, not reusable (Lore, …) → param distinguishes
+    // distinct instances, each capped at one. Read the structured node.param,
+    // falling back to the entity's param label only if absent.
+    const paramValue = (param ?? ent?.parameter ?? "unknown").toLowerCase();
+    return { key: `${baseName}|${paramValue}`, cap: 1 };
+  };
+  const itemIdentities = new Map<string, { cap: number; nodes: GraphItem[] }>();
+  for (const it of items) {
     if (it.sourceType === "lineage") continue;
     const { key, cap } = getIdentity(it.rawString || it.name, it.entity, it.param);
     if (!itemIdentities.has(key)) itemIdentities.set(key, { cap, nodes: [] });
     itemIdentities.get(key)!.nodes.push(it);
-    }
+  }
 
-    for (const group of itemIdentities.values()) {
+  for (const group of itemIdentities.values()) {
     const purchases = group.nodes.filter((n) => n.sourceType === "purchased");
     if (purchases.length > group.cap) {
       for (const surplus of purchases.slice(group.cap)) {
@@ -240,9 +224,9 @@ export function resolveCharacterGraph(charInput: CharacterState): CharacterGraph
         surplus.effects.push({ type: "OVER_CAP", cap: group.cap });
       }
     }
-    }
+  }
 
-    for (const node of [...items]) {
+  for (const node of [...items]) {
     for (const eff of node.effects) {
       if (eff.type !== "GRANT_SOURCE") continue;
       for (const gid of eff.grants) {
@@ -307,10 +291,10 @@ export function resolveCharacterGraph(charInput: CharacterState): CharacterGraph
         group.nodes.push(newGrant);
       }
     }
-    }
+  }
 
-    const hasTaxEvasion = items.some((i) => i.name === "Tax Evasion");
-    if (hasTaxEvasion) {
+  const hasTaxEvasion = items.some((i) => i.name === "Tax Evasion");
+  if (hasTaxEvasion) {
     const profRanks = items.filter((i) => /^\bProfession\b/i.test(i.name)).length;
     let bonus = profRanks * 3;
     if (items.some((i) => i.name === "Manse")) bonus += 2;
@@ -327,17 +311,17 @@ export function resolveCharacterGraph(charInput: CharacterState): CharacterGraph
         effects: [{ type: "WEALTH", amount: bonus, note: "from Profession/Manse/Income" }],
       });
     }
-    }
+  }
 
-    const grants = startingSkillGrants(character);
-    let startingNodeIdx = 0;
-    for (const node of items) {
+  const grants = startingSkillGrants(character);
+  let startingNodeIdx = 0;
+  for (const node of items) {
     if (node.field === "skills" && node.sourceType === "class") {
       if (grants.specialty[startingNodeIdx] != null) node.specialty = grants.specialty[startingNodeIdx];
       if (grants.floor[startingNodeIdx] != null) node.floor = grants.floor[startingNodeIdx];
       startingNodeIdx++;
     }
-    }
+  }
 
-    return new CharacterGraphModel(character, items, charLevel, classes);
+  return new CharacterGraphModel(character, items, charLevel, classes);
 }
