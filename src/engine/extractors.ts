@@ -133,7 +133,7 @@ function extractLevelDiscounts(ent: Entity | null | undefined, character: Charac
       clsDef.veteran,
       clsDef.classSkills,
       clsDef.rightHandPowers,
-    ].some((list) => list?.some((p) => (p.id || p.name) === ent?.name || p.id === id || p.name === ent?.name));
+    ].some((list) => list?.some((p) => p.name === ent?.name));
 
     if (offers && c.level > maxRelevantLevel) {
       maxRelevantLevel = c.level;

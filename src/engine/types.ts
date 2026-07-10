@@ -114,16 +114,16 @@ export interface Flaw extends BaseEntity {
 
 export interface Class extends BaseEntity {
   type: "class";
-  innate?: { id?: string; name: string; requiredLevel?: number }[];
+  innate?: { name: string; requiredLevel?: number }[];
   spellcaster?: boolean;
   magicType?: string;
-  cantrips?: { id?: string; name: string; requiredLevel?: number }[];
-  utility?: { id?: string; name: string; requiredLevel?: number }[];
-  basic?: { id?: string; name: string; requiredLevel?: number }[];
-  advanced?: { id?: string; name: string; requiredLevel?: number }[];
-  veteran?: { id?: string; name: string; requiredLevel?: number }[];
-  classSkills?: { id?: string; name: string; requiredLevel?: number }[];
-  rightHandPowers?: { id?: string; name: string; requiredLevel?: number }[];
+  cantrips?: { name: string; requiredLevel?: number }[];
+  utility?: { name: string; requiredLevel?: number }[];
+  basic?: { name: string; requiredLevel?: number }[];
+  advanced?: { name: string; requiredLevel?: number }[];
+  veteran?: { name: string; requiredLevel?: number }[];
+  classSkills?: { name: string; requiredLevel?: number }[];
+  rightHandPowers?: { name: string; requiredLevel?: number }[];
 }
 
 /**
