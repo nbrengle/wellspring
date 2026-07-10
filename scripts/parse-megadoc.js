@@ -529,7 +529,7 @@ function parsePowersInRange(start, end) {
         accent: fields["accent"] ?? null,
         effect: fields["effect"] ?? null,
         requirement: fields["requirement"] ?? null,
-        prerequisites: fields["prerequisite"] ?? fields["prerequisites"] ?? null,
+        prerequisites: fields["prerequisite"] || fields["prerequisites"] ? [fields["prerequisite"] ?? fields["prerequisites"]] : [],
         skillsAndOptions: fields["skills_and_option"] ?? null,
         description,
       });
@@ -2492,8 +2492,8 @@ function parseCoreRules() {
     const end = secEnd === -1 ? glossaryH1 : Math.min(secEnd, glossaryH1);
 
     sections.push({
-      heading: n.text,
-      content: bodyBetween(i + 1, end),
+      name: n.text,
+      description: bodyBetween(i + 1, end),
       nodeStart: i,
       nodeEnd: end,
     });
@@ -2509,8 +2509,8 @@ function parseCoreRules() {
     if (n.type === "heading") break;
     if (n.type === "text") {
       const m = n.text.match(/^([A-Z][A-Za-z '\/\-]{1,40}?):\s+(.+)$/);
-      if (m) glossary.push({ term: m[1].trim(), definition: m[2].trim() });
-      else if (glossary.length) glossary[glossary.length - 1].definition += " " + n.text;
+      if (m) glossary.push({ name: m[1].trim(), description: m[2].trim() });
+      else if (glossary.length) glossary[glossary.length - 1].description += " " + n.text;
     }
     j++;
   }
@@ -2521,7 +2521,7 @@ function parseCoreRules() {
 const coreRules = parseCoreRules();
 write(
   "core-rules.json",
-  coreRules.sections.map((s) => ({ heading: s.heading, content: s.content })),
+  coreRules.sections.map((s) => ({ name: s.name, description: s.description })),
 );
 write("glossary.json", coreRules.glossary);
 
@@ -2537,8 +2537,8 @@ function collectExtraSections() {
     const end = findHeading(endHeading, 1, start);
     if (end === -1) return;
     extras.push({
-      heading: startHeading,
-      content: bodyBetween(start + 1, end),
+      name: startHeading,
+      description: bodyBetween(start + 1, end),
       nodeStart: start,
       nodeEnd: end,
     });
@@ -2642,16 +2642,16 @@ function parseSubConcepts(sections) {
   };
 
   for (const section of sections) {
-    if (SKIP_SECTIONS.has(section.heading)) continue;
-    if (ALREADY_EXTRACTED.has(section.heading)) continue;
+    if (SKIP_SECTIONS.has(section.name)) continue;
+    if (ALREADY_EXTRACTED.has(section.name)) continue;
 
     const { nodeStart, nodeEnd } = section;
-    const bucket = slugify(section.heading);
+    const bucket = slugify(section.name);
 
     // Enter at the next existing deeper heading level (skips missing levels —
     // e.g. an H1 with H3 children but no H2).
     const childLevel = nextHeadingLevel(nodeStart, nodeEnd, 1);
-    const entries = childLevel !== null ? walkHeadings(nodeStart + 1, nodeEnd, childLevel, section.heading) : [];
+    const entries = childLevel !== null ? walkHeadings(nodeStart + 1, nodeEnd, childLevel, section.name) : [];
     if (entries.length) {
       entries.forEach((e) => push(bucket, e));
       continue;
@@ -2661,7 +2661,7 @@ function parseSubConcepts(sections) {
     // provided it has meaningful body prose.
     const prose = bodyBetween(nodeStart + 1, nodeEnd);
     if (prose.trim()) {
-      push(bucket, { name: section.heading, section: section.heading, description: prose });
+      push(bucket, { name: section.name, section: section.name, description: prose });
     }
   }
   return buckets;

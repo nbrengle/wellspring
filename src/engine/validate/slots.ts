@@ -362,10 +362,10 @@ export function spellSlots(character: CharacterState): Record<string, SpellPool>
   }
   if (character.lineage) {
     const lineageName = typeof character.lineage === "string" ? character.lineage : character.lineage.name;
-    const lin = (LINEAGES as Record<string, { advantages?: { name: string; baseName?: string; slotGrants?: import("../types.js").SlotGrant[]; highestSlot?: number }[] }>)[lineageName];
+    const lin = (LINEAGES as Record<string, { advantages?: { name: string; baseName?: string; slotGrants?: import("../types.js").SlotGrant[]; highestSlot?: boolean }[] }>)[lineageName];
     for (const name of character.lineageAdvantages || []) {
-      const adv = (lin?.advantages || []).find((x: { name: string; baseName?: string; slotGrants?: import("../types.js").SlotGrant[]; highestSlot?: number }) => x.name === name || x.baseName === name);
-      applySpellGrants(adv, 1, name);
+      const adv = (lin?.advantages || []).find((x: { name: string; baseName?: string; slotGrants?: import("../types.js").SlotGrant[]; highestSlot?: boolean }) => x.name === name || x.baseName === name);
+      applySpellGrants(adv ? { ...adv, highestSlot: adv.highestSlot ? 1 : 0 } : undefined, 1, name);
     }
   }
 

@@ -16,6 +16,7 @@ import domainsJson from "../data/domains.json";
 import craftingJson from "../data/crafting-recipes.json";
 import ritualsJson from "../data/ritual-recipes.json";
 import archetypesJson from "../data/archetypes.json";
+import charCreationJson from "../data/character-creation.json";
 import refsJson from "../data/refs.json";
 // Choice/parameter spec registries — kept in their own module (see re-export below).
 import { LINEAGE_CHOICE_SPECS, lineageChoiceSpec } from "./choice-specs.js";
@@ -237,15 +238,48 @@ export interface PowerEntry {
   requiresEntity: string[];
 }
 
-function powerEntry(p: any): PowerEntry {
+export interface ParsedItem {
+  name: string;
+  description?: string;
+  refresh?: string | null;
+  prerequisites?: string[] | null;
+  requirement?: string | null;
+  cost?: number | string | null;
+  tier?: string | null;
+  tags?: string[];
+  call?: string | null;
+  effect?: string | null;
+  incantation?: string | null;
+  ranks?: number | string | null;
+  statMods?: import("./types.js").StatMod[];
+  statModNotes?: { stat: string; [k: string]: unknown }[];
+  wealthIncome?: unknown;
+  slotGrants?: import("./types.js").SlotGrant[];
+  highestSlot?: boolean;
+  levelDiscounts?: unknown[];
+  sharedWith?: string[];
+  requiredLevel?: number;
+  requiredClass?: string | null;
+  requiresEntity?: string[] | null;
+
+  repped?: boolean | null;
+  required?: boolean | null;
+  sublineage?: string | null;
+  lbp?: number | null;
+  subConcepts?: ParsedItem[];
+
+  [key: string]: unknown;
+}
+
+function powerEntry(p: ParsedItem): PowerEntry {
   return {
     name: p.name,
-    desc: p.description,
+    desc: p.description || "",
     refresh: p.refresh ?? null,
-    prereq: p.prerequisites ?? null,
+    prereq: p.prerequisites?.[0] ?? null,
     requirement: p.requirement ?? null,
     cost: p.cost ?? null,
-    tier: p.tier,
+    tier: p.tier || "",
     tags: p.tags ?? [],
     call: p.call ?? null,
     effect: p.effect ?? null,
@@ -437,7 +471,7 @@ const STAT_LABELS: Record<string, string> = {
   naturalArmor: "Natural Armor",
   wealth: "Wealth",
 };
-export function lineageItemImpact(item: any, lineage?: string | null) {
+export function lineageItemImpact(item: ParsedItem, lineage?: string | null) {
   const spec = lineageChoiceSpec(item);
   if (spec?.kind === "cantrip") return ["grants a chosen cantrip (+slot to cast it)"];
   if (spec?.kind === "rep") return ["reps another lineage’s challenge for its LBP"];
@@ -450,16 +484,17 @@ export function lineageItemImpact(item: any, lineage?: string | null) {
   const out: string[] = [];
   for (const m of item.statMods || []) {
     const label = STAT_LABELS[m.stat] || m.stat;
-    out.push(`${m.amount >= 0 ? "+" : ""}${m.amount} ${label}`);
+    out.push(`${Number(m.amount) >= 0 ? "+" : ""}${m.amount} ${label}`);
   }
   for (const note of item.statModNotes || []) {
-    if (note?.text) out.push(note.text);
+    if (note?.text) out.push(String(note.text));
   }
   for (const g of item.slotGrants || []) {
     out.push(`+${g.n} ${g.cat} slot${g.n === 1 ? "" : "s"}`);
   }
   if (item.highestSlot) out.push("+1 highest spell-slot");
-  if (item.wealthIncome?.n) out.push(`+${item.wealthIncome.n} Wealth`);
+  const wi = item.wealthIncome as { n?: number };
+  if (wi?.n) out.push(`+${wi.n} Wealth`);
   // Fixed grants (Telekinesis Power, Magical Resilience perk, …).
   const base = item.baseName || item.name;
   const gid = lineage ? `advantages:${lineage} - ${base}` : null;
@@ -475,9 +510,10 @@ function idNameLocal(id: string) {
   return i >= 0 ? id.slice(i + 1) : id;
 }
 
-export function lineageCantripChoices(character: any): { item: string; cantrip: string }[] {
+export function lineageCantripChoices(character: import("./types.js").CharacterState): { item: string; cantrip: string }[] {
   const choices = character?.advantageChoices || {};
-  const lin = character?.lineage && LINEAGES[character.lineage];
+  const linName = typeof character?.lineage === "string" ? character.lineage : character?.lineage?.name;
+  const lin = linName && LINEAGES[linName];
   if (!lin) return [];
   const out: { item: string; cantrip: string }[] = [];
   for (const it of [...(lin.challenges || []), ...(lin.advantages || [])]) {
@@ -543,7 +579,7 @@ export const CLASS_PROGRESSION: Record<string, Record<number, ProgressionRow>> =
 // names carry the [Repped]/[Required] tags and sublineage hints, matching the
 // old inline format. We reconstruct those from the parsed flags.
 
-function lineageItemName(it: any) {
+function lineageItemName(it: ParsedItem) {
   let n = it.name;
   if (it.repped) n += " [Repped]";
   if (it.required) n += " [Required]";
@@ -551,13 +587,14 @@ function lineageItemName(it: any) {
   return n;
 }
 
-const lineageItem = (it: any) => ({
+const lineageItem = (it: ParsedItem) => ({
   name: lineageItemName(it),
   baseName: it.name,
   lbp: it.lbp ?? 0,
-  required: it.required,
-  repped: it.repped,
-  sublineage: it.sublineage,
+  required: it.required ?? undefined,
+  repped: it.repped ?? undefined,
+  tags: [] as string[],
+  sublineage: it.sublineage || undefined,
   desc: it.description,
   statMods: it.statMods ?? [],
   statModNotes: it.statModNotes ?? [],
@@ -728,7 +765,7 @@ for (const c of classesJson) {
     "greaterSpells",
   ];
   for (const t of TIERS)
-    for (const p of (c as unknown as Record<string, any[]>)[t] || []) {
+    for (const p of (c as unknown as Record<string, ParsedItem[]>)[t] || []) {
       ENTITY_INDEX.set(`powers:${p.name}`, {
         tier: t,
         ...p,
@@ -767,11 +804,11 @@ for (const lin of lineagesJson) {
 // normalize each entry to { name, description }. Multiple source files map to the
 // same linker type (e.g. rules-concepts is spread across core-rules, combat-rules,
 // power-words); they're merged into one type bucket.
-const indexConcepts = (items: any[], type: string, { nameKey = "name", descKey = "description" } = {}) => {
+const indexConcepts = (items: ParsedItem[], type: string) => {
   for (const e of items || []) {
-    const name = e[nameKey] ?? e.name ?? e.term ?? e.heading;
+    const name = e.name;
     if (!name) continue;
-    const description = e[descKey] ?? e.description ?? e.definition ?? e.content ?? "";
+    const description = e.description ?? "";
     const id = `${type}:${name}`;
     // Don't clobber a richer earlier entry (e.g. a real skill) with a concept.
     if (!ENTITY_INDEX.has(id)) {
@@ -782,14 +819,18 @@ const indexConcepts = (items: any[], type: string, { nameKey = "name", descKey =
     // sub-concept resolve too.
     if (Array.isArray(e.subConcepts)) {
       indexConcepts(
-        e.subConcepts.map((s: any) => (typeof s === "string" ? { name: s, description: "" } : s)),
+        e.subConcepts.map((s: string | ParsedItem) => (typeof s === "string" ? ({ name: s, description: "" } as ParsedItem) : s)),
         type,
       );
     }
   }
 };
 
-indexConcepts(glossaryJson, "terms", { nameKey: "term", descKey: "definition" });
+indexConcepts(glossaryJson, "terms");
+indexConcepts(
+  eventsTableJson.map((e) => ({ name: String(e.level), description: String(e.event) } as ParsedItem)),
+  "game-events",
+);
 indexConcepts(effectsJson, "effects");
 indexConcepts(accentsJson, "accents");
 indexConcepts(resourcesJson, "resources");
@@ -819,8 +860,9 @@ for (const src of [
   devotionsBeingsJson,
   introductionJson,
 ]) {
-  indexConcepts(src, "rules-concepts", { nameKey: "name", descKey: "description" });
+  indexConcepts(src, "rules-concepts");
 }
+indexConcepts(charCreationJson, "rules-concepts");
 
 // Canonical-name fallback: the linker's type prefix doesn't always match where
 // the content actually lives (e.g. it emits `terms:Long Rest` but the entry is
