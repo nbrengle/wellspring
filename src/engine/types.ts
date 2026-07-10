@@ -238,6 +238,66 @@ export interface CharacterState {
   lineageAdvantages?: string[];
 }
 
+export interface GrantedAbility {
+  ability: string;
+  abilityName: string;
+  abilityType: string;
+  source: string;
+  sourceId: string;
+  sourceKind: string;
+}
+
+export interface WealthReport {
+  base: number;
+  income: number;
+  total: number;
+  sources: { source: string; amount: number; note?: string }[];
+}
+
+export interface ResolvedStats {
+  baseLifePoints: number;
+  baseSpikes: number;
+  lifePoints: number;
+  spikes: number;
+  armor: number;
+  naturalArmor: number;
+  mods: {
+    lifePoints?: number;
+    spikes?: number;
+    armor?: number;
+    naturalArmor?: number;
+    sources: { name: string; stat: string; n: number }[];
+    notes: { name: string; stat: string; [k: string]: unknown }[];
+  };
+}
+
+export interface PrereqIssue {
+  id: string;
+  item: string;
+  field: string;
+  text?: string;
+  tierLevel?: number;
+  tier?: number;
+  missing?: { id: string; name: string }[];
+  anyOf?: { id: string; name: string }[][];
+  requiresEntity?: string;
+  duplicate?: number;
+  excludes?: string;
+}
+
+export interface PrereqNote {
+  id: string;
+  item: string;
+  field: string;
+  kind?: string;
+  text: string;
+}
+
+export interface PrereqReport {
+  issues: PrereqIssue[];
+  notes: PrereqNote[];
+}
+
 // ─── 3. Graph Types ─────────────────────────────────────────────────────────
 
 /** Why an item is free/discounted (grant provenance) in the BP ledger. */
@@ -311,7 +371,7 @@ export interface GraphItem {
   authoredCost?: number;
   entity?: Entity | null;
   effects: Effect[];
-  specialty?: any;
+  specialty?: string | null;
   floor?: number;
   choiceData?: CharacterChoice;
   index?: number;
@@ -339,7 +399,7 @@ export type ViewState = {
   rawString?: string;
   field: string;
   choiceData?: CharacterChoice;
-  specialty?: any;
+  specialty?: string | null;
   floor?: number;
 };
 
