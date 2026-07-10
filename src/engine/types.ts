@@ -25,6 +25,7 @@ export interface ChooseOneConfig {
 export interface StatMod {
   stat: string;
   amount: number | string;
+  n?: number;
 }
 
 // ─── Discriminated Union for Entities ───────────────────────────────────────
@@ -63,7 +64,9 @@ export interface BaseEntity {
   grantedSelections?: Record<string, unknown>[];
   highestSlot?: number;
   magicType?: string;
-  bp?: number | string; // For flawed abilities that grant bp
+  bp?: number | string;
+  cost?: number | string;
+  lbp?: number;
   effect?: string;
   call?: string;
 }
@@ -362,6 +365,21 @@ export type Effect =
   | { type: "OVER_CAP"; cap: number }
   | { type: "REFUND_GRANT"; source: string };
 
+export interface ClassState {
+  level: number;
+  subclass?: string;
+}
+
+export interface SpellPool {
+  cantrips?: number;
+  spellsKnown?: number;
+  slots?: number;
+  utility?: number;
+  basic?: number;
+  advanced?: number;
+  veteran?: number;
+}
+
 export interface GraphItem {
   id: string;
   name: string;
@@ -392,8 +410,9 @@ export interface GraphItem {
   cls?: string | null;
 }
 
-export type ViewState = {
+export interface BaseItemView {
   id: string;
+  name: string;
   entityId: string;
   param?: string;
   sourceType: string;
@@ -408,13 +427,14 @@ export type ViewState = {
   choiceData?: CharacterChoice;
   specialty?: string | null;
   floor?: number;
-};
+}
 
-export type SkillView = Skill & ViewState;
-export type PowerView = Power & ViewState;
-export type SpellView = Spell & ViewState;
-export type PerkView = Perk & ViewState;
-export type FlawView = Flaw & ViewState;
+export type FlawView = Omit<Partial<Flaw>, keyof BaseItemView> & BaseItemView;
+export type PowerView = Omit<Partial<Power>, keyof BaseItemView> & BaseItemView;
+export type SpellView = Omit<Partial<Spell>, keyof BaseItemView> & BaseItemView;
+export type PerkView = Omit<Partial<Perk>, keyof BaseItemView> & BaseItemView;
+export type SkillView = Omit<Partial<Skill>, keyof BaseItemView> & BaseItemView;
+
 export type ClassView = Class & { level: number };
 
 export interface BucketedView {
