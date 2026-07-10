@@ -474,7 +474,7 @@ export function ClassifiedRows({ rows, resolveType, showClass }) {
         const refundedBy = refundEff?.source || mcRefund?.source;
         const refundedBP = refundEff ? cost?.base || 0 : mcRefund?.bp || 0;
 
-        const canRemove = (sourceType === "purchased" || sourceType === "flaw") && index >= 0;
+        const canRemove = (sourceType === "purchased" || sourceType === "flaw") && index >= 0 && !refundEff && !mcRefund;
         const rank = cost?.rank || (index >= 0 ? character.ranks?.[field]?.[index] : null) || 1;
 
         const baseName = bareSkill(cleanItemName(name));
