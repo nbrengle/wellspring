@@ -1,5 +1,5 @@
 export function costKey(nodeOrId) {
-  if (typeof nodeOrId === 'string') return nodeOrId;
+  if (typeof nodeOrId === "string") return nodeOrId;
   const node = nodeOrId;
   if (!node) return undefined;
 
@@ -9,20 +9,20 @@ export function costKey(nodeOrId) {
   // otherwise return without the index the ledger key needs.
   //   - purchased → `skills:<name>`              (positional)
   //   - starting  → `startingSkills:<i>:<name>`  (indexed, still flat-path)
-  if (node.field === 'skills') {
-    if (node.sourceType === 'purchased') return `skills:${node.rawString || node.name}`;
-    if (node.sourceType === 'class' || node.sourceType === 'grant' || node.sourceType === 'lineage') {
+  if (node.field === "skills") {
+    if (node.sourceType === "purchased") return `skills:${node.rawString || node.name}`;
+    if (node.sourceType === "class" || node.sourceType === "grant" || node.sourceType === "lineage") {
       return `startingSkills:${node.index ?? 0}:${node.rawString || node.name}`;
     }
   }
 
   // Perks key under the character field `purchasedPerks:` (not the entity-type id
   // `perks:`), so map before the node.id short-circuit below.
-  if (node.field === 'perks') {
+  if (node.field === "perks") {
     return `purchasedPerks:${node.rawString || node.name}`;
   }
 
-  if (node.id && node.id.includes(':')) return node.id;
+  if (node.id && node.id.includes(":")) return node.id;
 
   return `${node.field}:${node.rawString || node.name}`;
 }

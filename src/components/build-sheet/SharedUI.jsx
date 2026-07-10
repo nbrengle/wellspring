@@ -11,7 +11,17 @@ export function Stat({ label, value, title }) {
   );
 }
 
-export function StatWithSources({ label, value, title, base, baseLabel = "base", sources = [], onInspect, sublabel, extra }) {
+export function StatWithSources({
+  label,
+  value,
+  title,
+  base,
+  baseLabel = "base",
+  sources = [],
+  onInspect,
+  sublabel,
+  extra,
+}) {
   const [open, setOpen] = useState(false);
   const btnRef = useRef(null);
   // The breakdown is reachable whenever there's ANYTHING to explain — a base
@@ -23,15 +33,23 @@ export function StatWithSources({ label, value, title, base, baseLabel = "base",
   if (!hasBreakdown) return <Stat label={label} value={value} title={title} />;
   return (
     <div className={`b-stat b-stat-interactive ${open ? "is-open" : ""}`}>
-      <button ref={btnRef} className="b-stat-btn" onClick={() => setOpen((o) => !o)}
-              title={title} aria-expanded={open} aria-label={`${label} breakdown`}>
+      <button
+        ref={btnRef}
+        className="b-stat-btn"
+        onClick={() => setOpen((o) => !o)}
+        title={title}
+        aria-expanded={open}
+        aria-label={`${label} breakdown`}
+      >
         <span className="b-stat-val">{value}</span>
         <span className="b-stat-label">{label}</span>
         {sublabel && <span className="b-stat-sublabel">{sublabel}</span>}
       </button>
       {open && (
         <StatPopover anchorRef={btnRef} label={label} onClose={() => setOpen(false)}>
-          <button className="b-stat-pop-x" aria-label="Close" onClick={() => setOpen(false)}>×</button>
+          <button className="b-stat-pop-x" aria-label="Close" onClick={() => setOpen(false)}>
+            ×
+          </button>
           <h4 className="b-stat-pop-title">{label} breakdown</h4>
           {(base != null || sources.length > 0) && (
             <ul className="b-stat-pop-list">
@@ -43,15 +61,30 @@ export function StatWithSources({ label, value, title, base, baseLabel = "base",
               )}
               {sources.map((s, i) => (
                 <li key={`${s.name}-${i}`} className="b-stat-pop-row">
-                  {s.type && onInspect
-                    ? <button className="b-stat-pop-link" onClick={() => { onInspect(s.name, null, s.type); setOpen(false); }}>{s.name}</button>
-                    : <span className="b-stat-pop-name">{s.name}</span>}
-                  <span className="b-stat-pop-n">{s.n >= 0 ? `+${s.n}` : s.n}{s.note ? <span className="b-stat-pop-note"> {s.note}</span> : null}</span>
+                  {s.type && onInspect ? (
+                    <button
+                      className="b-stat-pop-link"
+                      onClick={() => {
+                        onInspect(s.name, null, s.type);
+                        setOpen(false);
+                      }}
+                    >
+                      {s.name}
+                    </button>
+                  ) : (
+                    <span className="b-stat-pop-name">{s.name}</span>
+                  )}
+                  <span className="b-stat-pop-n">
+                    {s.n >= 0 ? `+${s.n}` : s.n}
+                    {s.note ? <span className="b-stat-pop-note"> {s.note}</span> : null}
+                  </span>
                 </li>
               ))}
             </ul>
           )}
-          {extra && <div className="b-stat-pop-extra">{typeof extra === "function" ? extra(() => setOpen(false)) : extra}</div>}
+          {extra && (
+            <div className="b-stat-pop-extra">{typeof extra === "function" ? extra(() => setOpen(false)) : extra}</div>
+          )}
         </StatPopover>
       )}
     </div>
@@ -92,7 +125,9 @@ function StatPopover({ anchorRef, label, onClose, children }) {
       if (popRef.current?.contains(e.target) || anchorRef.current?.contains(e.target)) return;
       onClose();
     };
-    const onKey = (e) => { if (e.key === "Escape") onClose(); };
+    const onKey = (e) => {
+      if (e.key === "Escape") onClose();
+    };
     document.addEventListener("mousedown", onDown);
     document.addEventListener("keydown", onKey);
     return () => {
@@ -105,7 +140,9 @@ function StatPopover({ anchorRef, label, onClose, children }) {
   // builder's CSS custom properties (--b-panel etc.) — on <body> those vars are
   // undefined, leaving the popover transparent so the page bleeds through. .b-root
   // has no overflow clip, so the popover still escapes the identity rail's clip.
-  const host = (typeof document !== "undefined" && document.querySelector(".b-root")) || (typeof document !== "undefined" ? document.body : null);
+  const host =
+    (typeof document !== "undefined" && document.querySelector(".b-root")) ||
+    (typeof document !== "undefined" ? document.body : null);
   if (!host) return null;
   return createPortal(
     <div
@@ -126,7 +163,11 @@ export function Section({ title, tone = "amber", onAdd, children }) {
     <section className="b-section">
       <h2 className={`b-section-title b-section-${tone}`}>
         {title}
-        {onAdd && <button className="b-section-add" onClick={onAdd} title={`Add ${title.toLowerCase()}`}>+ add</button>}
+        {onAdd && (
+          <button className="b-section-add" onClick={onAdd} title={`Add ${title.toLowerCase()}`}>
+            + add
+          </button>
+        )}
       </h2>
       <div className="b-section-body">{children}</div>
     </section>
@@ -141,20 +182,28 @@ export function CostBadge({ cost }) {
     const role = grantSourceRole(cost.grant);
     return (
       <span className="b-row-bp is-free" title={`Granted by ${cost.grant.source}${role ? ` (${role})` : ""}`}>
-        free · {cost.grant.source}{role && <span className="b-row-role"> ({role})</span>}
+        free · {cost.grant.source}
+        {role && <span className="b-row-role"> ({role})</span>}
       </span>
     );
   }
   if (cost.discount) {
     return (
-      <span className="b-row-bp is-discounted"
-            title={`${cost.base} BP, discounted ${cost.discount.amount} by ${cost.discount.source}`}>
-        <span className="b-row-final-cost">{cost.cost} BP</span> 
-        <span className="b-row-disc"> (base {cost.base}, −{cost.discount.amount} {cost.discount.source})</span>
+      <span
+        className="b-row-bp is-discounted"
+        title={`${cost.base} BP, discounted ${cost.discount.amount} by ${cost.discount.source}`}
+      >
+        <span className="b-row-final-cost">{cost.cost} BP</span>
+        <span className="b-row-disc">
+          {" "}
+          (base {cost.base}, −{cost.discount.amount} {cost.discount.source})
+        </span>
       </span>
     );
   }
-  return <span className={`b-row-bp ${cost.cost === 0 ? "is-free" : ""}`}>{cost.cost === 0 ? "free" : `${cost.cost} BP`}</span>;
+  return (
+    <span className={`b-row-bp ${cost.cost === 0 ? "is-free" : ""}`}>
+      {cost.cost === 0 ? "free" : `${cost.cost} BP`}
+    </span>
+  );
 }
-
-

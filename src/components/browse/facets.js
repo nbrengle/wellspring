@@ -37,23 +37,23 @@ const one = (v) => (v == null || v === "" ? [] : [v]);
 // the raw type. It's a no-op in single-type surfaces (the picker), where it has one
 // value and so is auto-hidden by the 2+ rule.
 export const FACETS = [
-  { id: "type",       label: "Type",       values: (e) => one(e.typeLabel || e.type) },
-  { id: "kind",       label: "Kind",       values: (e) => one(kindOf(e)) },
-  { id: "cls",        label: "Class",      values: (e) => one(classOf(e)) },
-  { id: "lineage",    label: "Lineage",    values: (e) => one(e.lineage) },
+  { id: "type", label: "Type", values: (e) => one(e.typeLabel || e.type) },
+  { id: "kind", label: "Kind", values: (e) => one(kindOf(e)) },
+  { id: "cls", label: "Class", values: (e) => one(classOf(e)) },
+  { id: "lineage", label: "Lineage", values: (e) => one(e.lineage) },
   { id: "sublineage", label: "Sublineage", values: (e) => one(realSublineage(e.sublineage)) },
-  { id: "repped",     label: "Repped",     values: (e) => (e.repped ? ["Repped"] : []) },
-  { id: "required",   label: "Required",   values: (e) => (e.required ? ["Required"] : []) },
-  { id: "tier",       label: "Tier",       values: (e) => one(e.tier) },
-  { id: "refresh",    label: "Refresh",    values: (e) => (e.refresh && e.refresh !== "None" ? [e.refresh] : []) },
-  { id: "tags",       label: "Tags",       values: (e) => e.tags || [] },
-  { id: "damage",     label: "Damage",     values: (e) => gameEffectFacets(e.type, facetName(e)).damage },
-  { id: "effect",     label: "Effect",     values: (e) => gameEffectFacets(e.type, facetName(e)).effect },
-  { id: "condition",  label: "Condition",  values: (e) => gameEffectFacets(e.type, facetName(e)).condition },
+  { id: "repped", label: "Repped", values: (e) => (e.repped ? ["Repped"] : []) },
+  { id: "required", label: "Required", values: (e) => (e.required ? ["Required"] : []) },
+  { id: "tier", label: "Tier", values: (e) => one(e.tier) },
+  { id: "refresh", label: "Refresh", values: (e) => (e.refresh && e.refresh !== "None" ? [e.refresh] : []) },
+  { id: "tags", label: "Tags", values: (e) => e.tags || [] },
+  { id: "damage", label: "Damage", values: (e) => gameEffectFacets(e.type, facetName(e)).damage },
+  { id: "effect", label: "Effect", values: (e) => gameEffectFacets(e.type, facetName(e)).effect },
+  { id: "condition", label: "Condition", values: (e) => gameEffectFacets(e.type, facetName(e)).condition },
   // Class Pool: which pool(s) this entity defines / augments / spends from / refills.
   // Lets you browse every power that touches e.g. the Healing Touch Pool. Derived
   // from the entity's prose (pool-registry), tolerant of source spelling variants.
-  { id: "pool",       label: "Pool",       values: (e) => poolsReferenced(e).map((id) => POOL_NAME[id] || id) },
+  { id: "pool", label: "Pool", values: (e) => poolsReferenced(e).map((id) => POOL_NAME[id] || id) },
 ];
 export const FACET_BY_ID = Object.fromEntries(FACETS.map((f) => [f.id, f]));
 
@@ -103,8 +103,7 @@ export function passesFacetsExcept(e, sel, exceptId) {
   });
 }
 
-export const activeFacetCount = (sel) =>
-  Object.values(sel).reduce((n, s) => n + (s?.size || 0), 0);
+export const activeFacetCount = (sel) => Object.values(sel).reduce((n, s) => n + (s?.size || 0), 0);
 
 // Toggle one value of a facet in a selection map (immutably).
 export function toggleFacetValue(sel, id, v) {

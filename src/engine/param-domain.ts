@@ -24,15 +24,15 @@
 // shrink KNOWN_POOLS / DECLARED toward zero by making the parser/source emit the
 // pool inline. Each hardcoded entry is marked `TODO(derive)`.
 
-import { getMaxRanks } from './validate/core.js';
-import accentsJson from '../data/accents.json';
+import { getMaxRanks } from "./validate/core.js";
+import accentsJson from "../data/accents.json";
 
-export type ParamKind = 'pool' | 'distinct';
+export type ParamKind = "pool" | "distinct";
 export interface ParamInfo {
-  type: string;          // the parameter's name/type ("Craft", "Sphere", …)
+  type: string; // the parameter's name/type ("Craft", "Sphere", …)
   kind: ParamKind;
-  size: number;          // pool size; Infinity for distinct/open-ended
-  source: 'inline' | 'known-pool' | 'dynamic' | 'open' | 'declared';
+  size: number; // pool size; Infinity for distinct/open-ended
+  source: "inline" | "known-pool" | "dynamic" | "open" | "declared";
 }
 
 // ── Declared fallbacks (TECH DEBT — shrink toward zero) ──────────────────────
@@ -52,11 +52,11 @@ const KNOWN_POOLS: Record<string, number> = {
 // TODO(derive): make the source list these inline (or tag them) so these vanish.
 const DECLARED: Record<string, { type: string; kind: ParamKind; size: number }> = {
   // "choose from the substitution list below" — an external table, distinct picks.
-  'Accent Substantiation': { type: 'Accent Substitution', kind: 'distinct', size: Infinity },
+  "Accent Substantiation": { type: "Accent Substitution", kind: "distinct", size: Infinity },
   // "choose any element they desire … one at a time" — a pool, phrased loosely.
-  'Elemental Affinity': { type: 'Element', kind: 'pool', size: 0 /* set below */ },
+  "Elemental Affinity": { type: "Element", kind: "pool", size: 0 /* set below */ },
 };
-DECLARED['Elemental Affinity'].size = KNOWN_POOLS.Element;
+DECLARED["Elemental Affinity"].size = KNOWN_POOLS.Element;
 
 // ── Derivation from prose ────────────────────────────────────────────────────
 
@@ -67,7 +67,7 @@ const INLINE_LIST =
 // you assemble; never the same thing twice → per-param, size irrelevant.
 const FROM_A_LIST = /from (?:their|your|a|an)\b[^.]*\b(?:list|class|spell-list|deck)\b/i;
 // A [Placeholder]-style open param (Lore area, profession) → distinct, open-ended.
-const OPEN_PARAM_TYPES = new Set(['Area of Lore', 'Specific Profession']);
+const OPEN_PARAM_TYPES = new Set(["Area of Lore", "Specific Profession"]);
 
 /** Derive full parameter info for an entity, or null if it takes no resolvable
  *  parameter. Order: declared override → inline list → known pool → from-a-list
@@ -75,27 +75,30 @@ const OPEN_PARAM_TYPES = new Set(['Area of Lore', 'Specific Profession']);
 export function paramInfo(entity: any): ParamInfo | null {
   if (!entity) return null;
   const name = entity.baseName || entity.name;
-  const desc = String(entity.description ?? '');
+  const desc = String(entity.description ?? "");
 
   const declared = DECLARED[name];
-  if (declared) return { ...declared, source: 'declared' };
+  if (declared) return { ...declared, source: "declared" };
 
   const inline = desc.match(INLINE_LIST);
   if (inline) {
-    const size = inline[1].split(/,|\bor\b/).map((s) => s.trim()).filter(Boolean).length;
-    return { type: entity.parameter || name, kind: 'pool', size, source: 'inline' };
+    const size = inline[1]
+      .split(/,|\bor\b/)
+      .map((s) => s.trim())
+      .filter(Boolean).length;
+    return { type: entity.parameter || name, kind: "pool", size, source: "inline" };
   }
 
   if (entity.parameter && entity.parameter in KNOWN_POOLS) {
-    return { type: entity.parameter, kind: 'pool', size: KNOWN_POOLS[entity.parameter], source: 'known-pool' };
+    return { type: entity.parameter, kind: "pool", size: KNOWN_POOLS[entity.parameter], source: "known-pool" };
   }
 
   if (FROM_A_LIST.test(desc)) {
-    return { type: entity.parameter || name, kind: 'distinct', size: Infinity, source: 'dynamic' };
+    return { type: entity.parameter || name, kind: "distinct", size: Infinity, source: "dynamic" };
   }
 
   if (entity.parameter && OPEN_PARAM_TYPES.has(entity.parameter)) {
-    return { type: entity.parameter, kind: 'distinct', size: Infinity, source: 'open' };
+    return { type: entity.parameter, kind: "distinct", size: Infinity, source: "open" };
   }
 
   return null; // no parameter the derivation can resolve
@@ -105,7 +108,7 @@ export function paramInfo(entity: any): ParamInfo | null {
  *  pool → cap > poolSize; distinct → never. */
 export function paramReusable(entity: any, entityId: string): boolean {
   const info = paramInfo(entity);
-  if (!info || info.kind !== 'pool') return false;
+  if (!info || info.kind !== "pool") return false;
   return getMaxRanks(entityId) > info.size;
 }
 
@@ -118,8 +121,8 @@ export function paramIsIdentity(entity: any, entityId: string): boolean {
 
 const capOf = (e: any): number => {
   const r = e?.ranks;
-  if (r === 'unlimited') return Infinity;
-  if (typeof r === 'number') return r;
+  if (r === "unlimited") return Infinity;
+  if (typeof r === "number") return r;
   return 1;
 };
 
@@ -135,14 +138,15 @@ const CHOOSE_PARAM_PROSE = /\bchoose (one|a|an|from)\b|\bone of the following\b/
  *  build's job. Feed RAW entities (with `parameter`/`ranks`/`description`). */
 export function unresolvedParamDomains(
   entities: any[],
-): Array<{ name: string; cap: number; reason: 'has-param-field' | 'prose-param' }> {
-  const out: Array<{ name: string; cap: number; reason: 'has-param-field' | 'prose-param' }> = [];
+): Array<{ name: string; cap: number; reason: "has-param-field" | "prose-param" }> {
+  const out: Array<{ name: string; cap: number; reason: "has-param-field" | "prose-param" }> = [];
   for (const e of entities) {
     const cap = capOf(e);
     if (cap <= 1) continue; // cap 1 → param can't repeat; moot
     if (paramInfo(e)) continue; // resolved — fine
-    if (e.parameter) out.push({ name: e.name, cap, reason: 'has-param-field' });
-    else if (CHOOSE_PARAM_PROSE.test(String(e.description ?? ''))) out.push({ name: e.name, cap, reason: 'prose-param' });
+    if (e.parameter) out.push({ name: e.name, cap, reason: "has-param-field" });
+    else if (CHOOSE_PARAM_PROSE.test(String(e.description ?? "")))
+      out.push({ name: e.name, cap, reason: "prose-param" });
   }
   return out;
 }

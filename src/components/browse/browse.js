@@ -18,7 +18,11 @@ import { gameEffectFacets } from "../../engine/game-effects.js";
 export function gameEffectAxes(getType, nameOf = (it) => it.name) {
   const facets = (item, facet) => gameEffectFacets(getType(item), nameOf(item))[facet];
   const axis = (id, label, facet, placeholder) => ({
-    id, label, multi: true, facet, placeholder,
+    id,
+    label,
+    multi: true,
+    facet,
+    placeholder,
     keys: (item) => facets(item, facet),
   });
   return [

@@ -3,7 +3,11 @@
 import { CraftTreeNode, IngredientKind } from "./shared.jsx";
 
 export default function CalculatorTab({
-  recipeSearchList, selectedCalcRecipe, setSelectedCalcRecipe, targetCalculation, onInspect,
+  recipeSearchList,
+  selectedCalcRecipe,
+  setSelectedCalcRecipe,
+  targetCalculation,
+  onInspect,
 }) {
   return (
     <div className="b-recipe-scrollable-content">
@@ -15,8 +19,10 @@ export default function CalculatorTab({
           className="b-parameter-input b-calc-select"
         >
           <option value="">-- Choose target recipe --</option>
-          {recipeSearchList.map(name => (
-            <option key={name} value={name}>{name}</option>
+          {recipeSearchList.map((name) => (
+            <option key={name} value={name}>
+              {name}
+            </option>
           ))}
         </select>
       </div>
@@ -68,9 +74,11 @@ export default function CalculatorTab({
                   </tr>
                 </thead>
                 <tbody>
-                  {targetCalculation.deficit.items.map(item => (
+                  {targetCalculation.deficit.items.map((item) => (
                     <tr key={item.name} className={item.missing > 0 ? "row-missing" : "row-ok"}>
-                      <td>{item.name} <IngredientKind name={item.name} onJump={onInspect} /></td>
+                      <td>
+                        {item.name} <IngredientKind name={item.name} onJump={onInspect} />
+                      </td>
                       <td>{item.required}</td>
                       <td>{item.available}</td>
                       <td>
@@ -93,7 +101,9 @@ export default function CalculatorTab({
           </button>
         </div>
       ) : (
-        <p className="b-recipe-empty-msg">Select a recipe from the dropdown above to calculate the crafting sequence and deficit tree.</p>
+        <p className="b-recipe-empty-msg">
+          Select a recipe from the dropdown above to calculate the crafting sequence and deficit tree.
+        </p>
       )}
     </div>
   );

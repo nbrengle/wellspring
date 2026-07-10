@@ -17,15 +17,22 @@ let passed = 0;
 const failures = [];
 
 export function test(name, fn) {
-  try { fn(); passed++; }
-  catch (e) { failures.push(`${name}: ${e.message}\n${e.stack}`); }
+  try {
+    fn();
+    passed++;
+  } catch (e) {
+    failures.push(`${name}: ${e.message}\n${e.stack}`);
+  }
 }
 
-export function eq(actual, expected, msg = '') {
-  if (actual !== expected) throw new Error(`${msg} expected ${JSON.stringify(expected)}, got ${JSON.stringify(actual)}`);
+export function eq(actual, expected, msg = "") {
+  if (actual !== expected)
+    throw new Error(`${msg} expected ${JSON.stringify(expected)}, got ${JSON.stringify(actual)}`);
 }
 
-export function ok(cond, msg = '') { if (!cond) throw new Error(msg || 'expected truthy'); }
+export function ok(cond, msg = "") {
+  if (!cond) throw new Error(msg || "expected truthy");
+}
 
 // Build the skills bucket (source 'Purchased') from skill names (or
 // {name,ranks}). Purchased skills are native (CharacterChoice[]), so a test
@@ -35,9 +42,10 @@ export function ok(cond, msg = '') { if (!cond) throw new Error(msg || 'expected
 export function pSkills(names) {
   return {
     skills: names.map((n) =>
-      typeof n === 'string'
+      typeof n === "string"
         ? { entityId: n, source: Source.purchased(), ranks: 1 }
-        : { entityId: n.name, source: Source.purchased(), ranks: n.ranks ?? 1 }),
+        : { entityId: n.name, source: Source.purchased(), ranks: n.ranks ?? 1 },
+    ),
   };
 }
 
@@ -47,9 +55,10 @@ export function pSkills(names) {
 export function pPerks(names) {
   return {
     perks: names.map((n) =>
-      typeof n === 'string'
+      typeof n === "string"
         ? { entityId: n, source: Source.purchased(), ranks: 1 }
-        : { entityId: n.name, source: Source.purchased(), ranks: n.ranks ?? 1 }),
+        : { entityId: n.name, source: Source.purchased(), ranks: n.ranks ?? 1 },
+    ),
   };
 }
 
@@ -60,5 +69,5 @@ export function report() {
     for (const f of failures) console.log(`  ✗ ${f}`);
     process.exit(1);
   }
-  console.log('✓ all green');
+  console.log("✓ all green");
 }

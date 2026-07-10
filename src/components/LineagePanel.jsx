@@ -7,13 +7,13 @@ import LineageDetail from "./lineage/LineageDetail.jsx";
 // "Lost Life (Horns)" / "Mana Lines [Repped]" matches its data entry. Exported
 // because the lineage choice components compare against it.
 export const cleanChallengeName = (s) => {
-  const firstOpen = s.indexOf('(');
-  const lastClose = s.lastIndexOf(')');
+  const firstOpen = s.indexOf("(");
+  const lastClose = s.lastIndexOf(")");
   let clean = s;
   if (firstOpen !== -1 && lastClose > firstOpen) {
     clean = (s.slice(0, firstOpen) + s.slice(lastClose + 1)).trim();
   }
-  return clean.replace(/\s*\[[^\]]+\]/g, '').trim();
+  return clean.replace(/\s*\[[^\]]+\]/g, "").trim();
 };
 
 // The lineage experience — a discovery-first, widened workspace. Step 1: browse the
@@ -23,24 +23,41 @@ export const cleanChallengeName = (s) => {
 // lives in engine selectors, and the sub-choice handling is generalized (one
 // onSetChoice path, no per-item special cases).
 export default function LineagePanel({
-  character, report, onSetLineage, onSetSublineage, onToggle, onSetRep,
-  onInspect, onClose, onSetAdvantageChoice,
+  character,
+  report,
+  onSetLineage,
+  onSetSublineage,
+  onToggle,
+  onSetRep,
+  onInspect,
+  onClose,
+  onSetAdvantageChoice,
 }) {
   const lbp = report.lbp;
   const lineage = character.lineage;
   const lin = lineage ? LINEAGES[lineage] : null;
 
   return (
-    <Overlay onClose={onClose} overlayClassName="b-overlay-dock"
-             panelClassName="b-picker b-picker-dock b-lin-panel" modal={false} ariaLabel="Lineage">
+    <Overlay
+      onClose={onClose}
+      overlayClassName="b-overlay-dock"
+      panelClassName="b-picker b-picker-dock b-lin-panel"
+      modal={false}
+      ariaLabel="Lineage"
+    >
       {/* The focus view (LineageDetail) owns its own header, so we don't render the
           generic picker-head there — that double bar was the clutter. Only the
           gallery shows the "Lineage" picker-head. */}
       {lin ? (
         <>
-          <button className="b-lin-close" aria-label="Close" onClick={onClose}>×</button>
+          <button className="b-lin-close" aria-label="Close" onClick={onClose}>
+            ×
+          </button>
           <LineageDetail
-            lineage={lineage} lin={lin} character={character} lbp={lbp}
+            lineage={lineage}
+            lin={lin}
+            character={character}
+            lbp={lbp}
             onBack={() => onSetLineage("")}
             onSetSublineage={onSetSublineage}
             onToggle={onToggle}
@@ -56,7 +73,9 @@ export default function LineagePanel({
               <h2 className="b-picker-title">Lineage</h2>
               <p className="b-picker-sub">Discover your ancestry — what each lineage is, does, and costs</p>
             </div>
-            <button className="b-picker-x" aria-label="Close" onClick={onClose}>×</button>
+            <button className="b-picker-x" aria-label="Close" onClick={onClose}>
+              ×
+            </button>
           </header>
           <LineageGallery onPick={onSetLineage} />
         </>

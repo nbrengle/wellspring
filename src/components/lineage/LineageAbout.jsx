@@ -8,9 +8,7 @@ export default function LineageAbout({ name, description, costume }) {
   // Strip the "Costuming Challenge: …" sentence from the lore — we render the
   // costuming requirement separately (structured, below), so leaving it in the
   // description showed the text twice (e.g. Chimera).
-  const lore = (description || "")
-    .replace(/\s*Costuming Challenge:[\s\S]*$/i, "")
-    .trim();
+  const lore = (description || "").replace(/\s*Costuming Challenge:[\s\S]*$/i, "").trim();
   if (!lore && !costume) return null;
   const peek = lore.replace(/\s+/g, " ").slice(0, 80);
 

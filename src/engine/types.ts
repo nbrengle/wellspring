@@ -18,7 +18,7 @@ export interface ChoiceOption {
 }
 
 export interface ChooseOneConfig {
-  kind: 'build' | 'play';
+  kind: "build" | "play";
   options: ChoiceOption[];
 }
 
@@ -57,7 +57,7 @@ export interface BaseEntity {
 }
 
 export interface Skill extends BaseEntity {
-  type: 'skill';
+  type: "skill";
   cost: number | string;
   ranks?: number;
   category?: string; // e.g. "Martial", "Crafting"
@@ -67,46 +67,45 @@ export interface Skill extends BaseEntity {
 }
 
 export interface Power extends BaseEntity {
-  type: 'power';
-  tier: 'Basic' | 'Advanced' | 'Veteran' | 'Utility' | 'Class';
+  type: "power";
+  tier: "Basic" | "Advanced" | "Veteran" | "Utility" | "Class";
   parentClass?: string;
   parameter?: string; // E.g. (Swords)
   highestSlot?: number;
 }
 
 export interface Spell extends BaseEntity {
-  type: 'spell';
-  tier: 'Cantrip' | 'Novice' | 'Adept' | 'Greater';
+  type: "spell";
+  tier: "Cantrip" | "Novice" | "Adept" | "Greater";
   sphere: string; // e.g. "Arcane", "Divine"
-  magicType?: string; 
+  magicType?: string;
 }
 
 export interface Perk extends BaseEntity {
-  type: 'perk';
+  type: "perk";
   cost: number | string;
   ranks?: number;
   category?: string;
 }
 
 export interface Flaw extends BaseEntity {
-  type: 'flaw';
+  type: "flaw";
   award: number | string;
   category?: string;
 }
 
 export interface Class extends BaseEntity {
-  type: 'class';
+  type: "class";
   innate?: { name: string; requiredLevel?: number }[];
   spellcaster?: boolean;
   magicType?: string;
 }
 
-/** 
- * A discriminated union of all possible entities that can be returned by the data layer. 
+/**
+ * A discriminated union of all possible entities that can be returned by the data layer.
  * Allows the engine to narrow the type via `if (ent.type === 'spell') { ... }`.
  */
 export type Entity = Skill | Power | Spell | Perk | Flaw | Class;
-
 
 // ─── 2. Ontological Character State ────────────────────────────────────
 
@@ -126,59 +125,59 @@ export type Entity = Skill | Power | Spell | Perk | Flaw | Class;
  *  - flaw      : a flaw (awards BP).
  */
 export type EntitySource =
-  | { type: 'purchased' }
-  | { type: 'class'; name: string }
-  | { type: 'starting'; class: string }
-  | { type: 'innate'; class?: string }
-  | { type: 'granted'; by: string }
-  | { type: 'lineage' }
-  | { type: 'flaw' };
+  | { type: "purchased" }
+  | { type: "class"; name: string }
+  | { type: "starting"; class: string }
+  | { type: "innate"; class?: string }
+  | { type: "granted"; by: string }
+  | { type: "lineage" }
+  | { type: "flaw" };
 
 // ─── EntitySource constructors + readers ────────────────────────────────────
 // Constructors keep source-object creation in one place; readers let call-sites
 // ask a structural question instead of switching on `type` inline.
 
 export const Source = {
-  purchased: (): EntitySource => ({ type: 'purchased' }),
-  class: (name: string): EntitySource => ({ type: 'class', name }),
-  starting: (cls: string): EntitySource => ({ type: 'starting', class: cls }),
-  innate: (cls?: string): EntitySource => ({ type: 'innate', ...(cls ? { class: cls } : {}) }),
-  granted: (by: string): EntitySource => ({ type: 'granted', by }),
-  lineage: (): EntitySource => ({ type: 'lineage' }),
-  flaw: (): EntitySource => ({ type: 'flaw' }),
+  purchased: (): EntitySource => ({ type: "purchased" }),
+  class: (name: string): EntitySource => ({ type: "class", name }),
+  starting: (cls: string): EntitySource => ({ type: "starting", class: cls }),
+  innate: (cls?: string): EntitySource => ({ type: "innate", ...(cls ? { class: cls } : {}) }),
+  granted: (by: string): EntitySource => ({ type: "granted", by }),
+  lineage: (): EntitySource => ({ type: "lineage" }),
+  flaw: (): EntitySource => ({ type: "flaw" }),
 };
 
-export const isPurchased = (s: EntitySource | undefined): boolean => s?.type === 'purchased';
-export const isStarting = (s: EntitySource | undefined): boolean => s?.type === 'starting';
-export const isInnate = (s: EntitySource | undefined): boolean => s?.type === 'innate';
-export const isFlaw = (s: EntitySource | undefined): boolean => s?.type === 'flaw';
+export const isPurchased = (s: EntitySource | undefined): boolean => s?.type === "purchased";
+export const isStarting = (s: EntitySource | undefined): boolean => s?.type === "starting";
+export const isInnate = (s: EntitySource | undefined): boolean => s?.type === "innate";
+export const isFlaw = (s: EntitySource | undefined): boolean => s?.type === "flaw";
 
 /** The class a choice belongs to, when its source names one (class-slot, starting,
  *  or innate power). null otherwise. Replaces the old sourceClass('Class:X') parse. */
 export function sourceClass(s: EntitySource | undefined): string | null {
   if (!s) return null;
-  if (s.type === 'class') return s.name;
-  if (s.type === 'starting') return s.class;
-  if (s.type === 'innate') return s.class ?? null;
+  if (s.type === "class") return s.name;
+  if (s.type === "starting") return s.class;
+  if (s.type === "innate") return s.class ?? null;
   return null;
 }
 
 /** The granting entity when the source is a grant (else null). */
 export function grantedBy(s: EntitySource | undefined): string | null {
-  return s?.type === 'granted' ? s.by : null;
+  return s?.type === "granted" ? s.by : null;
 }
 
 /**
  * A choice made by the player to add an entity to their sheet.
  */
 export interface CharacterChoice {
-  entityId: string;       // The canonical name/key of the entity in the rules database
-  source: EntitySource;   // Where this capability came from
+  entityId: string; // The canonical name/key of the entity in the rules database
+  source: EntitySource; // Where this capability came from
 
   // Overrides & Metadata
-  costOverride?: number;  // E.g. from Apprentice Alchemy discount (-1)
-  parameter?: string;     // If the choice requires a parameter (e.g. Weapon Specialization - Swords)
-  ranks?: number;         // For multi-rank purchases like Agile Learner
+  costOverride?: number; // E.g. from Apprentice Alchemy discount (-1)
+  parameter?: string; // If the choice requires a parameter (e.g. Weapon Specialization - Swords)
+  ranks?: number; // For multi-rank purchases like Agile Learner
   // originalIndex bridges the still-flat startingSkills path (index-based floor/cost
   // keys); it's deleted with those flat fields in the startingSkills slice.
   originalIndex?: number;
@@ -232,16 +231,16 @@ export interface CharacterState {
 
 /** Why an item is free/discounted (grant provenance) in the BP ledger. */
 export interface BPGrant {
-  kind: string;               // 'grant' | …
-  source?: string;            // the granting entity/class name
+  kind: string; // 'grant' | …
+  source?: string; // the granting entity/class name
   derived?: boolean;
   amount?: number;
 }
 
 /** Per-item BP accounting entry (graph.spend.byItem[id]). */
 export interface BPLedgerEntry {
-  cost: number;               // BP actually charged (negative = award/refund)
-  base: number;               // the item's base cost before grants/discounts
+  cost: number; // BP actually charged (negative = award/refund)
+  base: number; // the item's base cost before grants/discounts
   grant: BPGrant | null;
   rank?: number;
   authored?: boolean;
@@ -254,12 +253,12 @@ export interface BPLedgerEntry {
  *  breakdown. (Accounting intermediates like `refunded`/`discountFreeBP` stay
  *  local to computeSpend; they only feed `net`.) */
 export interface BPLedger {
-  spent: number;              // gross BP spent on purchases
-  awarded: number;            // flaw BP awarded (capped at MAX_FLAW_BP)
-  rawAwarded: number;         // flaw BP before the cap
-  flawCapped: boolean;        // true when rawAwarded exceeded the cap
+  spent: number; // gross BP spent on purchases
+  awarded: number; // flaw BP awarded (capped at MAX_FLAW_BP)
+  rawAwarded: number; // flaw BP before the cap
+  flawCapped: boolean; // true when rawAwarded exceeded the cap
   discountsApplied: { key: string; source: string; amount: number }[];
-  net: number;                // the bottom line: spent − refunds − discounts
+  net: number; // the bottom line: spent − refunds − discounts
   byItem: Record<string, BPLedgerEntry>;
 }
 
@@ -298,7 +297,6 @@ export interface GraphItem {
   cls?: string | null;
 }
 
-
 export type ViewState = {
   id: string;
   entityId: string;
@@ -324,18 +322,18 @@ export type FlawView = Flaw & ViewState;
 export type ClassView = Class & { level: number };
 
 export interface BucketedView {
-  classes:       ClassView[];
-  innatePowers:  PowerView[];
-  basicPowers:   PowerView[];
-  advancedPowers:PowerView[];
+  classes: ClassView[];
+  innatePowers: PowerView[];
+  basicPowers: PowerView[];
+  advancedPowers: PowerView[];
   veteranPowers: PowerView[];
   utilityPowers: PowerView[];
-  classPowers:   PowerView[];
-  domainPowers:  PowerView[];
-  skills:        SkillView[];
-  perks:         PerkView[];
-  flaws:         FlawView[];
-  knownSpells:   SpellView[];
+  classPowers: PowerView[];
+  domainPowers: PowerView[];
+  skills: SkillView[];
+  perks: PerkView[];
+  flaws: FlawView[];
+  knownSpells: SpellView[];
 }
 
 export interface CharacterGraph {

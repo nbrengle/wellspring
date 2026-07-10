@@ -1,8 +1,5 @@
 import { useCallback } from "react";
-import {
-  CLASS_POWER_SLOTS,
-  CLASSES,
-} from "../engine/data.js";
+import { CLASS_POWER_SLOTS, CLASSES } from "../engine/data.js";
 import { EVENTS_TABLE } from "../engine/validate.js";
 import { getClasses } from "../engine/resolver.js";
 import { EMPTY_CHARACTER, applyClassStartingAbilities, loadArchetype } from "../engine/character-state.js";
@@ -23,13 +20,15 @@ export function useBuilderHandlers({
   setHistory,
   setLineageOpen: _setLineageOpen,
 }) {
-
-  const handlePickArchetype = useCallback((archetype) => {
-    setCharacter(loadArchetype(archetype));
-    setView(null);
-    setChase(null);
-    setHistory([]);
-  }, [setCharacter, setView, setChase, setHistory]);
+  const handlePickArchetype = useCallback(
+    (archetype) => {
+      setCharacter(loadArchetype(archetype));
+      setView(null);
+      setChase(null);
+      setHistory([]);
+    },
+    [setCharacter, setView, setChase, setHistory],
+  );
 
   const identityHandlers = useIdentityHandlers({ character, setCharacter, setPicking });
 
@@ -39,27 +38,33 @@ export function useBuilderHandlers({
   const handleClearDevotion = identityHandlers.handleClearDevotion;
   const handleToggleBackstory = identityHandlers.handleToggleBackstory;
 
-  const handleSetEvent = useCallback((eventNum) => {
-    setCharacter((c) => {
-      const next = { ...c, currentEvent: eventNum };
-      const levelFloor = EVENTS_TABLE.find((e) => e.event === eventNum)?.level || 4;
-      const classes = getClasses(next);
-      if (classes.length === 1) {
-        const primary = classes[0];
-        if (primary.level < levelFloor) {
-          const nextClasses = [{ name: primary.name, level: levelFloor }];
-          let updated = { ...next, classes: nextClasses };
-          updated = applyClassStartingAbilities(updated, primary.name, levelFloor);
-          return updated;
+  const handleSetEvent = useCallback(
+    (eventNum) => {
+      setCharacter((c) => {
+        const next = { ...c, currentEvent: eventNum };
+        const levelFloor = EVENTS_TABLE.find((e) => e.event === eventNum)?.level || 4;
+        const classes = getClasses(next);
+        if (classes.length === 1) {
+          const primary = classes[0];
+          if (primary.level < levelFloor) {
+            const nextClasses = [{ name: primary.name, level: levelFloor }];
+            let updated = { ...next, classes: nextClasses };
+            updated = applyClassStartingAbilities(updated, primary.name, levelFloor);
+            return updated;
+          }
         }
-      }
-      return next;
-    });
-  }, [setCharacter]);
+        return next;
+      });
+    },
+    [setCharacter],
+  );
 
-  const handleSetExtraBP = useCallback((bp) => {
-    setCharacter((c) => ({ ...c, extraMaxBP: bp }));
-  }, [setCharacter]);
+  const handleSetExtraBP = useCallback(
+    (bp) => {
+      setCharacter((c) => ({ ...c, extraMaxBP: bp }));
+    },
+    [setCharacter],
+  );
 
   // ─── LINEAGE ─────────────────────────────────────────────────────────────
   const lineageHandlers = useLineageHandlers({ setCharacter });
@@ -102,20 +107,26 @@ export function useBuilderHandlers({
   // skills/powers, with its search / sort / filter / group. Callers pass a lightweight
   // descriptor; we shape it into an entityPickerSpec. `options` is a list of names or
   // { name, desc, cat, cost, … } candidates; `onChoose(name)` records the pick.
-  const handleOpenChoicePicker = useCallback(({ title, subtitle, entityType = "powers", options, taken, onChoose }) => {
-    const candidates = (options || []).map((o) => (typeof o === "string" ? { name: o } : o));
-    setPicking(
-      entityPickerSpec({
-        kind: "choice",
-        entityType,
-        candidates,
-        title,
-        subtitle,
-        taken: taken instanceof Set ? taken : new Set(taken || []),
-        onChoose: (name) => { onChoose?.(name); setPicking(null); },
-      }),
-    );
-  }, [setPicking]);
+  const handleOpenChoicePicker = useCallback(
+    ({ title, subtitle, entityType = "powers", options, taken, onChoose }) => {
+      const candidates = (options || []).map((o) => (typeof o === "string" ? { name: o } : o));
+      setPicking(
+        entityPickerSpec({
+          kind: "choice",
+          entityType,
+          candidates,
+          title,
+          subtitle,
+          taken: taken instanceof Set ? taken : new Set(taken || []),
+          onChoose: (name) => {
+            onChoose?.(name);
+            setPicking(null);
+          },
+        }),
+      );
+    },
+    [setPicking],
+  );
 
   // Primary gesture: clicking an owned item → expand its detail INLINE under the row.
   // Re-clicking the same item closes it. Moving to a DIFFERENT row (or closing) means
@@ -184,14 +195,14 @@ export function useBuilderHandlers({
   const _handleAddClass = classHandlers.handleAddClass;
   const _handleRemoveClass = classHandlers.handleRemoveClass;
 
-  const handleAddClass = useCallback((name) => {
-    _handleAddClass(name);
-    setPicking(null);
-  }, [_handleAddClass, setPicking]);
-  const handleRemoveClass = useCallback(
-    (name) => _handleRemoveClass(name),
-    [_handleRemoveClass]
+  const handleAddClass = useCallback(
+    (name) => {
+      _handleAddClass(name);
+      setPicking(null);
+    },
+    [_handleAddClass, setPicking],
   );
+  const handleRemoveClass = useCallback((name) => _handleRemoveClass(name), [_handleRemoveClass]);
 
   const { handleOpenClassPicker, handleOpenAdd } = usePickers({
     character,
@@ -251,7 +262,6 @@ export function useBuilderHandlers({
     },
     [character, handleChase],
   );
-
 
   return {
     handlePickArchetype,

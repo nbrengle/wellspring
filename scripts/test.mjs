@@ -13,18 +13,18 @@
 //   - level / slot math, xN rank multipliers, spell-tier routing, per-class slots
 //   - grants / discounts / starting choices / referential integrity
 
-import { report } from './test/harness.mjs';
+import { report } from "./test/harness.mjs";
 
-import './test/bp-and-levels.test.mjs';
-import './test/grants-and-classes.test.mjs';
-import './test/lineages-devotions.test.mjs';
-import './test/costs-and-powers.test.mjs';
-import './test/skills-and-stats.test.mjs';
-import './test/param-domain.test.mjs';
-import './test/pool-registry.test.mjs';
-import './test/starting-choices.test.mjs';
-import './test/validation-coverage.test.mjs';
-import './test/reducers.test.mjs';
-import './test/character-add.test.mjs';
+import "./test/bp-and-levels.test.mjs";
+import "./test/grants-and-classes.test.mjs";
+import "./test/lineages-devotions.test.mjs";
+import "./test/costs-and-powers.test.mjs";
+import "./test/skills-and-stats.test.mjs";
+import "./test/param-domain.test.mjs";
+import "./test/pool-registry.test.mjs";
+import "./test/starting-choices.test.mjs";
+import "./test/validation-coverage.test.mjs";
+import "./test/reducers.test.mjs";
+import "./test/character-add.test.mjs";
 
 report();

@@ -18,9 +18,7 @@ const BuilderActionsContext = createContext(null);
 export function BuilderProvider({ state, actions, children }) {
   return (
     <BuilderActionsContext.Provider value={actions}>
-      <BuilderStateContext.Provider value={state}>
-        {children}
-      </BuilderStateContext.Provider>
+      <BuilderStateContext.Provider value={state}>{children}</BuilderStateContext.Provider>
     </BuilderActionsContext.Provider>
   );
 }

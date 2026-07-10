@@ -7,9 +7,9 @@
 //
 // One source of truth for both the picker's "Group by" axes and the per-row
 // "also: …" badges, so grouping and labelling never drift apart.
-import { REFS } from './data.js';
+import { REFS } from "./data.js";
 
-const stripType = (t) => t.slice(t.indexOf(':') + 1);
+const stripType = (t) => t.slice(t.indexOf(":") + 1);
 
 // The mention keys for an item, in resolution order. A lineage challenge keys under
 // `challenges:`/`advantages:` but also overlaps `perks:`/`flaws:`; a power under
@@ -19,7 +19,7 @@ const stripType = (t) => t.slice(t.indexOf(':') + 1);
 function mentionRefs(entityType, name) {
   const order = [];
   if (entityType) order.push(`${entityType}:${name}`);
-  for (const t of ['powers', 'perks', 'flaws', 'skills', 'challenges', 'advantages']) {
+  for (const t of ["powers", "perks", "flaws", "skills", "challenges", "advantages"]) {
     const k = `${t}:${name}`;
     if (!order.includes(k)) order.push(k);
   }
@@ -35,7 +35,10 @@ function mentionsOfType(entityType, name, prefixes) {
   const out = [];
   for (const t of refs) {
     for (const p of prefixes) {
-      if (t.startsWith(`${p}:`)) { out.push(stripType(t)); break; }
+      if (t.startsWith(`${p}:`)) {
+        out.push(stripType(t));
+        break;
+      }
     }
   }
   return out;
@@ -47,13 +50,13 @@ function mentionsOfType(entityType, name, prefixes) {
 const dedup = (arr) => [...new Set(arr)];
 
 export function effectVerbs(entityType, name) {
-  return dedup(mentionsOfType(entityType, name, ['effects', 'defenses']));
+  return dedup(mentionsOfType(entityType, name, ["effects", "defenses"]));
 }
 export function damageTypes(entityType, name) {
-  return dedup(mentionsOfType(entityType, name, ['accents']));
+  return dedup(mentionsOfType(entityType, name, ["accents"]));
 }
 export function conditionsInflicted(entityType, name) {
-  return dedup(mentionsOfType(entityType, name, ['conditions']));
+  return dedup(mentionsOfType(entityType, name, ["conditions"]));
 }
 
 // Bundle of all facets for a candidate, used by the picker. `keys(axis)` returns the

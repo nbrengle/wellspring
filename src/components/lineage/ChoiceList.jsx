@@ -121,7 +121,8 @@ export default function ChoiceList({
   const compare = (a, b, s) => {
     if (s === "az") return itemName(a).localeCompare(itemName(b));
     if (s === "effect") {
-      const ea = lineageItemImpact(a, lineage).length, eb = lineageItemImpact(b, lineage).length;
+      const ea = lineageItemImpact(a, lineage).length,
+        eb = lineageItemImpact(b, lineage).length;
       if (ea !== eb) return eb - ea; // items WITH effects first
       return itemName(a).localeCompare(itemName(b));
     }
@@ -136,18 +137,24 @@ export default function ChoiceList({
     const sign = kind === "challenge" ? "+" : "−";
     const native = [
       {
-        id: "band", label: "Cost band",
+        id: "band",
+        label: "Cost band",
         key: (it) => (typeof it.lbp === "number" ? `${sign}${it.lbp} LBP` : "Variable"),
         // High LBP band first (ascending order on negated value); "Variable" last.
         order: (label) => (label === "Variable" ? Infinity : -parseInt(String(label).replace(/[^\d]/g, ""), 10)),
       },
       {
-        id: "buildeffect", label: "Build effect",
-        key: (it) => { const imp = lineageItemImpact(it, lineage); return imp.length ? imp[0] : OTHER_EFFECT_LABEL; },
+        id: "buildeffect",
+        label: "Build effect",
+        key: (it) => {
+          const imp = lineageItemImpact(it, lineage);
+          return imp.length ? imp[0] : OTHER_EFFECT_LABEL;
+        },
         order: (label) => (label === OTHER_EFFECT_LABEL ? 1 : 0),
       },
       {
-        id: "sublineage", label: "Sublineage",
+        id: "sublineage",
+        label: "Sublineage",
         key: (it) => (subInfo(it).general ? "General" : subInfo(it).label),
         order: (label) => (label === "General" ? -1 : 0),
       },
@@ -171,7 +178,11 @@ export default function ChoiceList({
     let visible = (list || []).filter((it) => matches(it, field));
     if (hideLocked) visible = visible.filter((it) => !subInfo(it).offSublineage);
     const { groups } = browse({
-      items: visible, axes: axesFor(kind), groupBy, sort, compare,
+      items: visible,
+      axes: axesFor(kind),
+      groupBy,
+      sort,
+      compare,
     });
     return (
       <div className={`b-lin-col b-lin-col-${kind === "challenge" ? "earn" : "spend"}`}>

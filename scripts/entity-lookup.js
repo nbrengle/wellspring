@@ -87,12 +87,13 @@ import { cleanItemName, bareSkill } from "../src/engine/resolver.js";
 // multipliers, trailing roman-numeral instance counters. Idempotent — runs
 // the rules to fixpoint so they compose in any input order.
 export function stripDecorations(item) {
-  let out = item, prev;
+  let out = item,
+    prev;
   do {
     prev = out;
     out = cleanItemName(bareSkill(out))
-      .replace(/\s+x\d+\s*$/i, "")                     // " x2" rank multiplier
-      .replace(/\s+(I+|IV|VI*|IX|XI*|XV*)\s*$/, "")    // trailing roman instance counter
+      .replace(/\s+x\d+\s*$/i, "") // " x2" rank multiplier
+      .replace(/\s+(I+|IV|VI*|IX|XI*|XV*)\s*$/, "") // trailing roman instance counter
       .trim();
   } while (out !== prev);
   return out;

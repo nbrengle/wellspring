@@ -15,23 +15,23 @@
 //   'rep'     — Lost Life: rep another lineage's challenge for its LBP.
 //   'flavor'  — free pick, no mechanical effect (carries a display `label`).
 export const LINEAGE_CHOICE_SPECS = {
-  'Divine Magic':        { kind: 'cantrip', pool: ['Divine'] },
-  'Psionic Cantrip':     { kind: 'cantrip', pool: ['Arcane', 'Divine'] },
+  "Divine Magic": { kind: "cantrip", pool: ["Divine"] },
+  "Psionic Cantrip": { kind: "cantrip", pool: ["Arcane", "Divine"] },
   // Arcane Aptitude: a Cantrip OR Novice spell from any Base arcane class → adds it
   // to Known Spells. `spell` kind = a spell pick over the given magic-type + tiers.
-  'Arcane Aptitude':     { kind: 'spell', pool: ['Arcane'], tiers: ['cantrip', 'novice'] },
-  'Lost Life':           { kind: 'rep' },
-  'Additional Lost Life':{ kind: 'rep' },
+  "Arcane Aptitude": { kind: "spell", pool: ["Arcane"], tiers: ["cantrip", "novice"] },
+  "Lost Life": { kind: "rep" },
+  "Additional Lost Life": { kind: "rep" },
   // Pick and Choose (Lost/Fractured): purchase ONE advantage from another lineage.
   // `advantage` kind = a cross-lineage advantage pick (recorded as "<Lineage> -
   // <Advantage>"); the engine resolves + applies its full effects.
-  'Pick and Choose':     { kind: 'advantage' },
-  'Elemental Expression':{ kind: 'flavor', label: 'Accent' },
-  'Favored Gem':         { kind: 'flavor', label: 'Gemstone' },
+  "Pick and Choose": { kind: "advantage" },
+  "Elemental Expression": { kind: "flavor", label: "Accent" },
+  "Favored Gem": { kind: "flavor", label: "Gemstone" },
 };
 export function lineageChoiceSpec(item) {
   const base = item?.baseName || item?.name;
-  return base ? (LINEAGE_CHOICE_SPECS[base] || null) : null;
+  return base ? LINEAGE_CHOICE_SPECS[base] || null : null;
 }
 
 // Powers that, when owned, let the character CHOOSE another spell/power to gain.
@@ -43,10 +43,10 @@ export function lineageChoiceSpec(item) {
 //   'Weird Wanderings' (Artisan Basic power) — choose one Basic power from any
 //     non-Artisan Base Class; pool = report.weirdWanderingsOptions (slots.js).
 export const POWER_SPELL_CHOICE_SPECS = {
-  'Arcane Secrets':   { kind: 'spell', label: 'Choose a Spell',  optionsKey: 'arcaneSecretsOptions' },
-  'Weird Wanderings': { kind: 'power', label: 'Choose a Power',  optionsKey: 'weirdWanderingsOptions' },
+  "Arcane Secrets": { kind: "spell", label: "Choose a Spell", optionsKey: "arcaneSecretsOptions" },
+  "Weird Wanderings": { kind: "power", label: "Choose a Power", optionsKey: "weirdWanderingsOptions" },
 };
 export function powerSpellChoiceSpec(item) {
   const base = item?.baseName || item?.name;
-  return base ? (POWER_SPELL_CHOICE_SPECS[base] || null) : null;
+  return base ? POWER_SPELL_CHOICE_SPECS[base] || null : null;
 }

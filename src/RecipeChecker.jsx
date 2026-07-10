@@ -6,7 +6,7 @@ import {
   getRecipeDeficit,
   normalizeResourceName,
   classifyIngredient,
-  buildCraftTree
+  buildCraftTree,
 } from "./engine/recipe-solver.js";
 import "./RecipeChecker.css";
 import { STANDARD_RESOURCES } from "./components/recipe/shared.jsx";
@@ -24,7 +24,9 @@ export default function RecipeChecker({ onClose }) {
   // Inventory: maps name to quantity
   const [inventory, setInventory] = useState(() => {
     const initial = {};
-    STANDARD_RESOURCES.forEach(r => { initial[r] = 0; });
+    STANDARD_RESOURCES.forEach((r) => {
+      initial[r] = 0;
+    });
     return initial;
   });
 
@@ -47,7 +49,7 @@ export default function RecipeChecker({ onClose }) {
 
   // ─── INVENTORY HANDLERS ───────────────────────────────────────────────────
   const handleQtyChange = (name, delta) => {
-    setInventory(prev => {
+    setInventory((prev) => {
       const current = prev[name] || 0;
       return { ...prev, [name]: Math.max(0, current + delta) };
     });
@@ -55,19 +57,19 @@ export default function RecipeChecker({ onClose }) {
 
   const handleQtySet = (name, value) => {
     const val = Math.max(0, parseInt(value, 10) || 0);
-    setInventory(prev => ({ ...prev, [name]: val }));
+    setInventory((prev) => ({ ...prev, [name]: val }));
   };
 
   const handleAddCustomItem = (e) => {
     e.preventDefault();
     const clean = normalizeResourceName(customItemInput);
     if (!clean) return;
-    setInventory(prev => (prev[clean] !== undefined ? prev : { ...prev, [clean]: 0 }));
+    setInventory((prev) => (prev[clean] !== undefined ? prev : { ...prev, [clean]: 0 }));
     setCustomItemInput("");
   };
 
   const handleDeleteCustomItem = (name) => {
-    setInventory(prev => {
+    setInventory((prev) => {
       const next = { ...prev };
       delete next[name];
       return next;
@@ -81,7 +83,7 @@ export default function RecipeChecker({ onClose }) {
     const recipe = RECIPES.get(recipeName);
     if (!recipe) return;
     const add = recipe.yield && recipe.yield !== 9999 ? recipe.yield : 1;
-    setInventory(prev => ({ ...prev, [recipe.name]: (prev[recipe.name] || 0) + add }));
+    setInventory((prev) => ({ ...prev, [recipe.name]: (prev[recipe.name] || 0) + add }));
   };
 
   // ─── DERIVED ──────────────────────────────────────────────────────────────
@@ -91,7 +93,7 @@ export default function RecipeChecker({ onClose }) {
     const raw = [];
     const crafted = [];
     for (const name of Object.keys(inventory)) {
-      (classifyIngredient(name).kind === 'crafted' ? crafted : raw).push(name);
+      (classifyIngredient(name).kind === "crafted" ? crafted : raw).push(name);
     }
     raw.sort((a, b) => {
       const aStd = STANDARD_RESOURCES.includes(a);
@@ -128,9 +130,9 @@ export default function RecipeChecker({ onClose }) {
       return discMatch && tierMatch;
     };
     return {
-      craftable: solvedRecipes.craftable.filter(x => matchesFilter(x.recipe)),
-      close: solvedRecipes.close.filter(x => matchesFilter(x.recipe)),
-      others: solvedRecipes.others.filter(x => matchesFilter(x.recipe))
+      craftable: solvedRecipes.craftable.filter((x) => matchesFilter(x.recipe)),
+      close: solvedRecipes.close.filter((x) => matchesFilter(x.recipe)),
+      others: solvedRecipes.others.filter((x) => matchesFilter(x.recipe)),
     };
   }, [solvedRecipes, filterDiscipline, filterTier]);
 
@@ -144,7 +146,7 @@ export default function RecipeChecker({ onClose }) {
       success: solverResult.success,
       steps: solverResult.steps || [],
       deficit: getRecipeDeficit(recipe, inventory),
-      tree: buildCraftTree(recipe.name, 1, inventory)
+      tree: buildCraftTree(recipe.name, 1, inventory),
     };
   }, [selectedCalcRecipe, inventory]);
 
@@ -160,7 +162,9 @@ export default function RecipeChecker({ onClose }) {
       <div className="b-explorer-header">
         <div className="b-explorer-header-left">
           <h2 className="b-explorer-title">Recipe Explorer & Calculator</h2>
-          <p className="b-explorer-subtitle">Verify craftability, track missing components, and explore ingredient trees</p>
+          <p className="b-explorer-subtitle">
+            Verify craftability, track missing components, and explore ingredient trees
+          </p>
         </div>
         <button className="b-explorer-close-btn" onClick={onClose} aria-label="Return to character creator">
           ✕ Return
@@ -183,13 +187,22 @@ export default function RecipeChecker({ onClose }) {
         {/* CENTER: tabbed workspace */}
         <div className="b-recipes-workspace">
           <div className="b-recipe-tabs">
-            <button className={`b-recipe-tab ${subTab === "makeable" ? "is-active" : ""}`} onClick={() => setSubTab("makeable")}>
+            <button
+              className={`b-recipe-tab ${subTab === "makeable" ? "is-active" : ""}`}
+              onClick={() => setSubTab("makeable")}
+            >
               What Can I Make?
             </button>
-            <button className={`b-recipe-tab ${subTab === "calculator" ? "is-active" : ""}`} onClick={() => setSubTab("calculator")}>
+            <button
+              className={`b-recipe-tab ${subTab === "calculator" ? "is-active" : ""}`}
+              onClick={() => setSubTab("calculator")}
+            >
               Target Calculator
             </button>
-            <button className={`b-recipe-tab ${subTab === "reverse" ? "is-active" : ""}`} onClick={() => setSubTab("reverse")}>
+            <button
+              className={`b-recipe-tab ${subTab === "reverse" ? "is-active" : ""}`}
+              onClick={() => setSubTab("reverse")}
+            >
               Reverse Lookup
             </button>
           </div>
@@ -198,24 +211,32 @@ export default function RecipeChecker({ onClose }) {
             {subTab === "makeable" && (
               <MakeableTab
                 filteredRecipes={filteredRecipes}
-                filterDiscipline={filterDiscipline} setFilterDiscipline={setFilterDiscipline}
-                filterTier={filterTier} setFilterTier={setFilterTier}
-                hideUncraftable={hideUncraftable} setHideUncraftable={setHideUncraftable}
-                inspectedRecipeName={inspectedRecipeName} onInspect={setInspectedRecipeName}
+                filterDiscipline={filterDiscipline}
+                setFilterDiscipline={setFilterDiscipline}
+                filterTier={filterTier}
+                setFilterTier={setFilterTier}
+                hideUncraftable={hideUncraftable}
+                setHideUncraftable={setHideUncraftable}
+                inspectedRecipeName={inspectedRecipeName}
+                onInspect={setInspectedRecipeName}
               />
             )}
             {subTab === "calculator" && (
               <CalculatorTab
                 recipeSearchList={recipeSearchList}
-                selectedCalcRecipe={selectedCalcRecipe} setSelectedCalcRecipe={setSelectedCalcRecipe}
-                targetCalculation={targetCalculation} onInspect={setInspectedRecipeName}
+                selectedCalcRecipe={selectedCalcRecipe}
+                setSelectedCalcRecipe={setSelectedCalcRecipe}
+                targetCalculation={targetCalculation}
+                onInspect={setInspectedRecipeName}
               />
             )}
             {subTab === "reverse" && (
               <ReverseLookupTab
-                selectedReverseResource={selectedReverseResource} setSelectedReverseResource={setSelectedReverseResource}
+                selectedReverseResource={selectedReverseResource}
+                setSelectedReverseResource={setSelectedReverseResource}
                 reverseLookupRecipes={reverseLookupRecipes}
-                inspectedRecipeName={inspectedRecipeName} onInspect={setInspectedRecipeName}
+                inspectedRecipeName={inspectedRecipeName}
+                onInspect={setInspectedRecipeName}
               />
             )}
           </div>

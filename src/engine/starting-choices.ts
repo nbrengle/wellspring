@@ -10,10 +10,10 @@
 // the implicit choice shows as selected and stays editable — the same control a
 // from-scratch build gets.
 
-import classesJson from '../data/classes.json';
-import { lookupEntity, ALL_SKILLS } from './data.js';
-import { bareSkill, cleanItemName, getClasses } from '../engine/resolver.js';
-import { Source, isStarting } from './types.js';
+import classesJson from "../data/classes.json";
+import { lookupEntity, ALL_SKILLS } from "./data.js";
+import { bareSkill, cleanItemName, getClasses } from "../engine/resolver.js";
+import { Source, isStarting } from "./types.js";
 
 // ─── STARTING SKILLS, DERIVED FROM THE PARSED MEGADOC ──────────────────────────
 // The MegaDoc is the single source of truth. The parser already captures each
@@ -30,7 +30,12 @@ import { Source, isStarting } from './types.js';
 
 // Deterministic, label-derived block id — no hand-typed ids (there are no saved
 // characters, so id stability across edits doesn't matter).
-const slugId = (label) => 'choice-' + String(label).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+const slugId = (label) =>
+  "choice-" +
+  String(label)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
 
 // A CHOICE HEADER asks the player to choose and ends with ":" (options follow on
 // later lines). A mid-line "Choose a Lore Skill (2)" is an INLINE choice instead.
@@ -46,7 +51,7 @@ function choiceLabel(line) {
   if (m) return m[1].trim();
   m = line.match(/^([^:]+):/);
   if (m && !/\bchoose\b/i.test(m[1])) return m[1].trim();
-  return 'Choose';
+  return "Choose";
 }
 
 // Parse SKILL TOKENS out of line text into [{ name, rank }]: drops "(cost)", reads
@@ -65,20 +70,31 @@ function parseSkillTokens(text) {
   // → "Apprentice Profession, Journeyman Profession" (each aliases to "Profession
   // - <Tier>").
   let body = text
-    .replace(/\b(Apprentice|Journeyman|Greater|Master)\s*&\s*(Apprentice|Journeyman|Greater|Master)\s+(\w+)/gi,
-      (_, a, b, base) => `${a} ${base}, ${b} ${base}`)
-    .replace(/\b(\w+):\s*(Apprentice|Journeyman|Greater|Master)\s*&\s*(Apprentice|Journeyman|Greater|Master)\b/gi,
-      (_, base, a, b) => `${a} ${base}, ${b} ${base}`);
+    .replace(
+      /\b(Apprentice|Journeyman|Greater|Master)\s*&\s*(Apprentice|Journeyman|Greater|Master)\s+(\w+)/gi,
+      (_, a, b, base) => `${a} ${base}, ${b} ${base}`,
+    )
+    .replace(
+      /\b(\w+):\s*(Apprentice|Journeyman|Greater|Master)\s*&\s*(Apprentice|Journeyman|Greater|Master)\b/gi,
+      (_, base, a, b) => `${a} ${base}, ${b} ${base}`,
+    );
   // Strip a leading "Block Title - " / "Block Title: " provenance prefix, but only
   // when doing so leaves a resolvable first skill (skill names also contain " - ").
   const pm = body.match(/^(.+?)\s*[-–:]\s+(.+)$/);
   if (pm) {
-    const firstRaw = (s) => s.split(/\s*,\s*|\s*&\s*/)[0].replace(/x\s*\d+/ig, '').replace(/\(\d+\)/g, '').replace(/\[[^\]]*\]/g, '').trim();
+    const firstRaw = (s) =>
+      s
+        .split(/\s*,\s*|\s*&\s*/)[0]
+        .replace(/x\s*\d+/gi, "")
+        .replace(/\(\d+\)/g, "")
+        .replace(/\[[^\]]*\]/g, "")
+        .trim();
     if (resolveSkill(firstRaw(pm[2])) && !resolveSkill(firstRaw(body))) body = pm[2];
   }
   const parts = body
-    .replace(/\band either\b/gi, ',').replace(/\beither\b/gi, ' ')
-    .replace(/\bone of\b/gi, ',')
+    .replace(/\band either\b/gi, ",")
+    .replace(/\beither\b/gi, " ")
+    .replace(/\bone of\b/gi, ",")
     // NB: do NOT split on bare "&" — tier-distribution ("Apprentice & Journeyman")
     // was already expanded to commas above, so a remaining "&" is part of a skill/
     // perk NAME ("Bits & Pieces"). Splitting it would shatter the name into nonsense.
@@ -101,13 +117,18 @@ function canonicalSkill(raw) {
   const xm = raw.match(/x\s*(\d+)/i);
   const rank = xm ? parseInt(xm[1], 10) : 1;
   const paramM = raw.match(/(?::\s*|\(|\[)\s*([A-Za-z][A-Za-z ]+?)\s*[)\]]?\s*(?:\(\d+\)|x\s*\d+|$)/);
-  let name = raw.replace(/x\s*\d+/ig, '').replace(/\(\d+\)/g, '').replace(/\[[^\]]*\]/g, '')
-    .replace(/\bAND\b/g, ' ').replace(/[()]/g, ' ')
-    .replace(/[:;]+\s*$/, '')      // trailing "Journeyman Profession:" colon
-    .replace(/\s+/g, ' ').trim();
+  let name = raw
+    .replace(/x\s*\d+/gi, "")
+    .replace(/\(\d+\)/g, "")
+    .replace(/\[[^\]]*\]/g, "")
+    .replace(/\bAND\b/g, " ")
+    .replace(/[()]/g, " ")
+    .replace(/[:;]+\s*$/, "") // trailing "Journeyman Profession:" colon
+    .replace(/\s+/g, " ")
+    .trim();
   let ent = resolveSkill(name);
   if (!ent) {
-    const normalized = name.replace(/\s*-\s*/g, ' - ');
+    const normalized = name.replace(/\s*-\s*/g, " - ");
     if ((ent = resolveSkill(normalized))) name = normalized;
   }
   if (!ent) return null;
@@ -132,8 +153,8 @@ function canonicalSkill(raw) {
 let _loreOptions = null;
 function loreAreaOptions() {
   if (_loreOptions) return _loreOptions;
-  const lore = ALL_SKILLS.find((s) => s.name === 'Lore');
-  const areas = lore ? [...String(lore.desc || '').matchAll(/([A-Z][a-z]+)\s+Lore:/g)].map((m) => m[1]) : [];
+  const lore = ALL_SKILLS.find((s) => s.name === "Lore");
+  const areas = lore ? [...String(lore.desc || "").matchAll(/([A-Z][a-z]+)\s+Lore:/g)].map((m) => m[1]) : [];
   _loreOptions = [...new Set(areas)].map((a) => ({ label: a, skills: [{ name: `Lore (${a})`, rank: 1 }] }));
   return _loreOptions;
 }
@@ -147,15 +168,19 @@ function expandInlineChoice(line) {
     // Lore areas enumerated from the Lore skill's description (see loreAreaOptions).
     options = loreAreaOptions();
   } else if (/choose\s+a\s+gathering\s+skill/i.test(line)) {
-    options = ALL_SKILLS.filter((s) => s.cat === 'Gathering' && /\bI\b/.test(s.name))
-      .map((s) => ({ label: s.name, skills: [{ name: s.name, rank: 1 }] }));
+    options = ALL_SKILLS.filter((s) => s.cat === "Gathering" && /\bI\b/.test(s.name)).map((s) => ({
+      label: s.name,
+      skills: [{ name: s.name, rank: 1 }],
+    }));
   } else if (/apprentice\s+crafting/i.test(line)) {
-    options = ALL_SKILLS.filter((s) => /^Apprentice /.test(s.name) && s.cat === 'Crafting')
-      .map((s) => ({ label: s.name, skills: [{ name: s.name, rank: 1 }] }));
+    options = ALL_SKILLS.filter((s) => /^Apprentice /.test(s.name) && s.cat === "Crafting").map((s) => ({
+      label: s.name,
+      skills: [{ name: s.name, rank: 1 }],
+    }));
   }
   // Fixed skills riding along after the choice clause (Mage: "…Choose a Lore Skill
   // (2), Library Use (1), Bookcaster x2"). Drop the bracketed option list first.
-  const tail = line.replace(/\[[^\]]*\]/g, '').replace(/.*choose\b[^,]*?(?:skill|crafting)?\s*(?::|,|$)/i, '');
+  const tail = line.replace(/\[[^\]]*\]/g, "").replace(/.*choose\b[^,]*?(?:skill|crafting)?\s*(?::|,|$)/i, "");
   for (const tok of parseSkillTokens(tail)) {
     if (!options.some((o) => o.skills.some((s) => s.name === tok.name))) fixed.push(tok);
   }
@@ -171,17 +196,20 @@ function expandInlineChoice(line) {
 function extractEmbeddedChoice(line) {
   let m = line.match(/\b(?:and\s+)?one of\s*\[([^\]]*)\]/i);
   if (m) {
-    const options = m[1].split(/\s*,\s*|\bor\b/i)
-      .map((s) => canonicalSkill(s)).filter(Boolean)
+    const options = m[1]
+      .split(/\s*,\s*|\bor\b/i)
+      .map((s) => canonicalSkill(s))
+      .filter(Boolean)
       .map((t) => ({ label: t.name, skills: [t] }));
-    if (options.length) return { fixedText: line.replace(m[0], ''), options };
+    if (options.length) return { fixedText: line.replace(m[0], ""), options };
   }
   m = line.match(/\b(?:and\s+)?either\s+(.+?)\s+or\s+(.+?)(?:$|,)/i);
   if (m) {
     const options = [m[1], m[2]]
-      .map((s) => canonicalSkill(s)).filter(Boolean)
+      .map((s) => canonicalSkill(s))
+      .filter(Boolean)
       .map((t) => ({ label: t.name, skills: [t] }));
-    if (options.length >= 2) return { fixedText: line.replace(m[0], ''), options };
+    if (options.length >= 2) return { fixedText: line.replace(m[0], ""), options };
   }
   return { fixedText: line, options: [] };
 }
@@ -200,7 +228,7 @@ function expandOptionLine(line, baseToks) {
     const tier = br[1];
     const opts = [];
     for (const raw of br[2].split(/\s*,\s*|\bor\b/i)) {
-      const inner = raw.replace(/[()]/g, ' ').replace(/\bAND\b/gi, ',');
+      const inner = raw.replace(/[()]/g, " ").replace(/\bAND\b/gi, ",");
       // An alternative may itself be a combo ("Ritual Magic AND Ritual Lore").
       const skills = [];
       for (const piece of inner.split(/\s*,\s*/)) {
@@ -209,7 +237,7 @@ function expandOptionLine(line, baseToks) {
         const tok = canonicalSkill(`${tier} ${piece.trim()}`) || canonicalSkill(piece.trim());
         if (tok) skills.push(tok);
       }
-      if (skills.length) opts.push({ label: skills.map((s) => s.name).join(', '), skills });
+      if (skills.length) opts.push({ label: skills.map((s) => s.name).join(", "), skills });
     }
     if (opts.length) return opts;
   }
@@ -219,8 +247,7 @@ function expandOptionLine(line, baseToks) {
     const opts = [];
     for (const raw of oneOf[1].split(/\s*,\s*|\bor\b/i)) {
       const tok = canonicalSkill(raw);
-      if (tok) opts.push({ label: [...baseToks.map((t) => t.name), tok.name].join(', '),
-        skills: [...baseToks, tok] });
+      if (tok) opts.push({ label: [...baseToks.map((t) => t.name), tok.name].join(", "), skills: [...baseToks, tok] });
     }
     if (opts.length) return opts;
   }
@@ -238,12 +265,12 @@ function expandOptionLine(line, baseToks) {
     if (leftToks.length && altTok) {
       const lastLeft = leftToks[leftToks.length - 1];
       const common = [...leftToks.slice(0, -1), ...sharedToks];
-      const mk = (alt) => ({ label: [...common, alt].map((t) => t.name).join(', '), skills: [...common, alt] });
+      const mk = (alt) => ({ label: [...common, alt].map((t) => t.name).join(", "), skills: [...common, alt] });
       return [mk(lastLeft), mk(altTok)];
     }
   }
   // Plain option: its parsed tokens are the one option.
-  return [{ label: baseToks.map((t) => t.name).join(', '), skills: baseToks }];
+  return [{ label: baseToks.map((t) => t.name).join(", "), skills: baseToks }];
 }
 
 // Structure one class's raw startingSkills lines into { fixed, choices }.
@@ -263,14 +290,17 @@ function deriveStartingSkills(className) {
   // SKIP the flat option lines that follow until the sub-choice's own skills are
   // exhausted or a delimiter (Note:, or a new same-block option) appears. See
   // PARSER_SOURCE_FEEDBACK.md #1/#2: real list indentation would delete this.
-  let current = null;        // open choice block awaiting option lines
-  let subChoice = false;     // inside a NESTED sub-choice's literal option lines
-  let subChoiceFixed = [];   // fixed skills shared by every option of that sub-choice
+  let current = null; // open choice block awaiting option lines
+  let subChoice = false; // inside a NESTED sub-choice's literal option lines
+  let subChoiceFixed = []; // fixed skills shared by every option of that sub-choice
 
   const lines = cls.startingSkills;
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
-    if (/^Note:/i.test(line.trim())) { subChoice = false; continue; }
+    if (/^Note:/i.test(line.trim())) {
+      subChoice = false;
+      continue;
+    }
 
     // A choice header. Two shapes in the Jun 26 doc, told apart by the separator:
     //   TOP-LEVEL: "<Flavor> - Choose one of the following:"  (a " - " before Choose)
@@ -288,17 +318,18 @@ function deriveStartingSkills(className) {
         // "Basic Medicine (2), Choose one of the following:"). Add those to EVERY
         // following option as shared skills.
         subChoice = true;
-        subChoiceFixed = parseSkillTokens(line.replace(/,?\s*choose[^:]*:\s*$/i, ''));
+        subChoiceFixed = parseSkillTokens(line.replace(/,?\s*choose[^:]*:\s*$/i, ""));
         continue;
       }
       // A top-level header may carry FIXED skills before the "Choose…" clause, e.g.
       // Druid "Natural Survival: Basic Martial Weapons (1), Profession - Apprentice
       // (1), Choose one of the following:". Those are granted regardless of the pick.
-      const headFixed = parseSkillTokens(line.replace(/,?\s*choose[^:]*:\s*$/i, ''));
+      const headFixed = parseSkillTokens(line.replace(/,?\s*choose[^:]*:\s*$/i, ""));
       fixed.push(...headFixed);
       current = { id: slugId(choiceLabel(line)), label: choiceLabel(line), options: [] };
       choices.push(current);
-      subChoice = false; subChoiceFixed = [];
+      subChoice = false;
+      subChoiceFixed = [];
       continue;
     }
 
@@ -306,7 +337,8 @@ function deriveStartingSkills(className) {
       const { options, fixed: tail } = expandInlineChoice(line);
       if (options.length) choices.push({ id: slugId(choiceLabel(line)), label: choiceLabel(line), options });
       fixed.push(...tail);
-      current = null; subChoice = false;
+      current = null;
+      subChoice = false;
       continue;
     }
 
@@ -319,18 +351,20 @@ function deriveStartingSkills(className) {
     // Everywhere:"). An option whose text merely contains a skill-parameter colon
     // ("Apprentice & Journeyman Profession: [Your Choice]", "…, Lore: Nature (2)")
     // has a prefix that DOES resolve (or carries a "(cost)"), so it's not a title.
-    const firstColon = line.indexOf(':');
-    const prefix = firstColon > 0 ? line.slice(0, firstColon) : '';
-    const isTitledLine = !!prefix && !isChoiceHeader(line)
-      && !/\(\d+\)/.test(prefix)
-      && parseSkillTokens(prefix).length === 0;  // prose prefix → a fresh fixed line
-    if (isTitledLine) { current = null; subChoice = false; }
+    const firstColon = line.indexOf(":");
+    const prefix = firstColon > 0 ? line.slice(0, firstColon) : "";
+    const isTitledLine =
+      !!prefix && !isChoiceHeader(line) && !/\(\d+\)/.test(prefix) && parseSkillTokens(prefix).length === 0; // prose prefix → a fresh fixed line
+    if (isTitledLine) {
+      current = null;
+      subChoice = false;
+    }
 
     // A literal option line of an open nested sub-choice → one option of the current
     // block, carrying the sub-choice's shared fixed skills (if any).
     if (subChoice && current && toks.length && !isTitledLine) {
       const all = [...subChoiceFixed, ...toks];
-      current.options.push({ label: all.map((t) => t.name).join(', '), skills: all });
+      current.options.push({ label: all.map((t) => t.name).join(", "), skills: all });
       continue;
     }
 
@@ -341,7 +375,7 @@ function deriveStartingSkills(className) {
     } else {
       fixed.push(...toks);
       if (embedded.length) {
-        const label = choiceLabel(line) === 'Choose' ? 'Gathering Choice' : choiceLabel(line);
+        const label = choiceLabel(line) === "Choose" ? "Gathering Choice" : choiceLabel(line);
         choices.push({ id: slugId(label), label, options: embedded });
       }
     }
@@ -350,20 +384,16 @@ function deriveStartingSkills(className) {
 }
 
 const DERIVED = Object.fromEntries(
-  classesJson.filter((c) => c.startingSkills).map((c) => [c.name, deriveStartingSkills(c.name)])
+  classesJson.filter((c) => c.startingSkills).map((c) => [c.name, deriveStartingSkills(c.name)]),
 );
 
 // The class's fixed starting skills (granted regardless of choice blocks), derived
 // from the parsed MegaDoc. Shape: [{ name, rank }].
-export const BASE_STARTING_SKILLS = Object.fromEntries(
-  Object.entries(DERIVED).map(([cls, d]) => [cls, d.fixed])
-);
+export const BASE_STARTING_SKILLS = Object.fromEntries(Object.entries(DERIVED).map(([cls, d]) => [cls, d.fixed]));
 
 // Per-class "choose one" blocks, derived from the parsed MegaDoc. Each block:
 // { id, label, options:[{ label, skills:[{name,rank}] }] }.
-export const STARTING_CHOICES_CONFIG = Object.fromEntries(
-  Object.entries(DERIVED).map(([cls, d]) => [cls, d.choices])
-);
+export const STARTING_CHOICES_CONFIG = Object.fromEntries(Object.entries(DERIVED).map(([cls, d]) => [cls, d.choices]));
 
 // Does this class have any starting-choice blocks?
 export function hasStartingChoices(className) {
@@ -386,7 +416,8 @@ function hasParameter(name) {
 // Normalize an option's skills entry to { name, rank }.
 export function optionSkills(opt) {
   return (opt?.skills || []).map((s) =>
-    typeof s === 'string' ? { name: s, rank: 1 } : { name: s.name, rank: s.rank || 1 });
+    typeof s === "string" ? { name: s, rank: 1 } : { name: s.name, rank: s.rank || 1 },
+  );
 }
 
 // Resolve a starting-skill name to its backing entity (skill / perk / power), or
@@ -395,10 +426,12 @@ export function optionSkills(opt) {
 // resolution path shared by reconciliation, match-keying, and the config-integrity
 // test — so the test can't drift from how the runtime actually resolves names.
 export function resolveSkill(name) {
-  return lookupEntity(`skills:${cleanItemName(name)}`)
-    || lookupEntity(`perks:${cleanItemName(name)}`)
-    || lookupEntity(`powers:${cleanItemName(name)}`)
-    || null;
+  return (
+    lookupEntity(`skills:${cleanItemName(name)}`) ||
+    lookupEntity(`perks:${cleanItemName(name)}`) ||
+    lookupEntity(`powers:${cleanItemName(name)}`) ||
+    null
+  );
 }
 
 // Canonical match-key for a skill name, used to compare a character's starting
@@ -407,7 +440,7 @@ export function resolveSkill(name) {
 // resolves. Lower-cased so case never matters.
 function skillMatchKey(name) {
   const ent = resolveSkill(name);
-  const base = ent ? (ent.baseName || ent.name) : bareSkill(cleanItemName(name));
+  const base = ent ? ent.baseName || ent.name : bareSkill(cleanItemName(name));
   return base.toLowerCase();
 }
 
@@ -416,7 +449,9 @@ function skillMatchKey(name) {
 // left to the validator's richer parseTrailingRank. Lets reconciliation tell a
 // shipped "Foo x2" apart from a single "Foo".
 function parseStartingRank(name) {
-  const m = String(name || '').trim().match(/\sx\s*(\d+)$/i);
+  const m = String(name || "")
+    .trim()
+    .match(/\sx\s*(\d+)$/i);
   return m ? parseInt(m[1], 10) : 1;
 }
 
@@ -478,7 +513,10 @@ export function reconcileStartingChoices(character, className) {
   let bestScore = -1;
   const search = (i, pool, assign, score) => {
     if (i === configs.length) {
-      if (score > bestScore) { bestScore = score; bestAssign = { ...assign }; }
+      if (score > bestScore) {
+        bestScore = score;
+        bestAssign = { ...assign };
+      }
       return;
     }
     const conf = configs[i];
@@ -507,7 +545,10 @@ export function reconcileStartingChoices(character, className) {
 // and startingSkillGrants (derive-on-read).
 function expectedStartingSkills(primaryClassName, choices) {
   const fixed = (BASE_STARTING_SKILLS[primaryClassName] || []).map((s) =>
-    typeof s === 'string' ? { name: s, rank: 1, specialty: null } : { name: s.name, rank: s.rank || 1, specialty: null });
+    typeof s === "string"
+      ? { name: s, rank: 1, specialty: null }
+      : { name: s.name, rank: s.rank || 1, specialty: null },
+  );
   const out = [...fixed];
   for (const conf of STARTING_CHOICES_CONFIG[primaryClassName] || []) {
     const chosenVal = choices?.[conf.id];
@@ -531,9 +572,10 @@ export function startingSkillGrants(character) {
   const specialty = {};
   const floor = {};
   if (!primary || !hasStartingChoices(primary)) return { specialty, floor };
-  const choices = (character.startingChoices && Object.keys(character.startingChoices).length)
-    ? character.startingChoices
-    : reconcileStartingChoices(character, primary);
+  const choices =
+    character.startingChoices && Object.keys(character.startingChoices).length
+      ? character.startingChoices
+      : reconcileStartingChoices(character, primary);
   const expected = expectedStartingSkills(primary, choices);
   const byBase = {};
   for (const t of expected) (byBase[skillMatchKey(t.name)] = byBase[skillMatchKey(t.name)] || []).push(t);
@@ -549,7 +591,7 @@ export function startingSkillGrants(character) {
     if (k < templates.length) {
       const t = templates[k];
       if (t.specialty) specialty[idx] = t.specialty;
-      floor[idx] = t.rank || 1;       // floor exists even for fixed grants (their full rank is free)
+      floor[idx] = t.rank || 1; // floor exists even for fixed grants (their full rank is free)
       kept[base] = k + 1;
     }
   });
@@ -692,18 +734,18 @@ export function sourceStartingSkillKeys(className) {
     for (const k of resolvableWindows(line)) keys.add(k);
 
     // Also look for combinations of any tier word in the line with any other words in the line
-    const tiers = [...line.matchAll(/\b(Apprentice|Journeyman|Greater|Master)\b/gi)].map(m => m[1]);
+    const tiers = [...line.matchAll(/\b(Apprentice|Journeyman|Greater|Master)\b/gi)].map((m) => m[1]);
     if (tiers.length > 0) {
       const cleanLine = line
-        .replace(/\b(Apprentice|Journeyman|Greater|Master)\b/gi, ' ')
-        .replace(/\(\d+\)/g, ' ')
-        .replace(/x\s*\d+/ig, ' ')
-        .replace(/[,&:[\]()]/g, ' ')
-        .replace(/\bAND\b/g, ' ');
+        .replace(/\b(Apprentice|Journeyman|Greater|Master)\b/gi, " ")
+        .replace(/\(\d+\)/g, " ")
+        .replace(/x\s*\d+/gi, " ")
+        .replace(/[,&:[\]()]/g, " ")
+        .replace(/\bAND\b/g, " ");
       const words = cleanLine.split(/\s+/).filter(Boolean);
       for (let i = 0; i < words.length; i++) {
         for (let len = 1; len <= 3 && i + len <= words.length; len++) {
-          const phrase = words.slice(i, i + len).join(' ');
+          const phrase = words.slice(i, i + len).join(" ");
           for (const tier of tiers) {
             for (const combo of [`${tier} ${phrase}`, `${phrase} ${tier}`]) {
               if (resolveSkill(combo)) keys.add(skillKey(combo));
@@ -719,7 +761,7 @@ export function sourceStartingSkillKeys(className) {
     const br = line.match(/\b(Apprentice|Journeyman|Greater|Master)\b[^[]*\[([^\]]*)\]/i);
     if (br) {
       for (const opt of br[2].split(/,|\bor\b|\bAND\b/i)) {
-        const o = opt.replace(/[()]/g, '').trim();
+        const o = opt.replace(/[()]/g, "").trim();
         for (const combo of [`${br[1]} ${o}`, `${o} ${br[1]}`]) {
           if (o && resolveSkill(combo)) keys.add(skillKey(combo));
         }
@@ -735,13 +777,16 @@ export function sourceStartingSkillKeys(className) {
 function resolvableWindows(line) {
   const out = new Set();
   const words = line
-    .replace(/\(\d+\)/g, '').replace(/x\s*\d+/ig, '')
-    .replace(/\s*&\s*/g, ' and ')
-    .replace(/[,:[\]()]/g, ' ').replace(/\bAND\b/g, ' ')
-    .split(/\s+/).filter(Boolean);
+    .replace(/\(\d+\)/g, "")
+    .replace(/x\s*\d+/gi, "")
+    .replace(/\s*&\s*/g, " and ")
+    .replace(/[,:[\]()]/g, " ")
+    .replace(/\bAND\b/g, " ")
+    .split(/\s+/)
+    .filter(Boolean);
   for (let i = 0; i < words.length; i++) {
     for (let len = 1; len <= 5 && i + len <= words.length; len++) {
-      const phrase = words.slice(i, i + len).join(' ');
+      const phrase = words.slice(i, i + len).join(" ");
       if (resolveSkill(phrase)) out.add(skillKey(phrase));
     }
   }

@@ -1,7 +1,5 @@
 import { useMemo } from "react";
-import {
-  lookupEntity, REFS, allergenAward, powerSpellChoiceSpec
-} from '../engine/data.js';
+import { lookupEntity, REFS, allergenAward, powerSpellChoiceSpec } from "../engine/data.js";
 import { PARAMETER_SUGGESTIONS, TYPEABLE_PARAMS } from "./parameter-suggestions.js";
 import SubSelect from "./SubSelect.jsx";
 import { formatParameterizedName } from "../engine/resolver.js";
@@ -9,21 +7,54 @@ import { formatParameterizedName } from "../engine/resolver.js";
 // in the engine where it's unit-tested.
 export { formatParameterizedName };
 
-
-export default function DetailPane({ view, report, choices, onSetChoice, onOpenChoicePicker, onUpdateParameter, onInspect, onBack, onClose }) {
+export default function DetailPane({
+  view,
+  report,
+  choices,
+  onSetChoice,
+  onOpenChoicePicker,
+  onUpdateParameter,
+  onInspect,
+  onBack,
+  onClose,
+}) {
   if (!view) {
     return (
       <aside className="b-rail b-rail-right is-empty">
         <div className="b-detail-empty">
-          <p className="b-detail-hint">Click any item to see what it does, or click an empty power slot to choose one.</p>
+          <p className="b-detail-hint">
+            Click any item to see what it does, or click an empty power slot to choose one.
+          </p>
         </div>
       </aside>
     );
   }
-  return <EntityDetail view={view} report={report} choices={choices} onSetChoice={onSetChoice} onOpenChoicePicker={onOpenChoicePicker} onUpdateParameter={onUpdateParameter} onInspect={onInspect} onBack={onBack} onClose={onClose} />;
+  return (
+    <EntityDetail
+      view={view}
+      report={report}
+      choices={choices}
+      onSetChoice={onSetChoice}
+      onOpenChoicePicker={onOpenChoicePicker}
+      onUpdateParameter={onUpdateParameter}
+      onInspect={onInspect}
+      onBack={onBack}
+      onClose={onClose}
+    />
+  );
 }
 
-function EntityDetail({ view, report, choices, onSetChoice, onOpenChoicePicker, onUpdateParameter, onInspect, onBack, onClose }) {
+function EntityDetail({
+  view,
+  report,
+  choices,
+  onSetChoice,
+  onOpenChoicePicker,
+  onUpdateParameter,
+  onInspect,
+  onBack,
+  onClose,
+}) {
   const entity = useResolvedEntity(view.item, view.field, view.resolveType);
   const { item, resolveType } = view;
 
@@ -31,16 +62,31 @@ function EntityDetail({ view, report, choices, onSetChoice, onOpenChoicePicker, 
     <aside className="b-rail b-rail-right">
       <header className="b-detail-header">
         <div className="b-detail-nav">
-          {onBack
-            ? <button className="b-detail-back" onClick={onBack}>‹ back</button>
-            : <span />}
-          <button className="b-detail-close" aria-label="Close" onClick={onClose}>×</button>
+          {onBack ? (
+            <button className="b-detail-back" onClick={onBack}>
+              ‹ back
+            </button>
+          ) : (
+            <span />
+          )}
+          <button className="b-detail-close" aria-label="Close" onClick={onClose}>
+            ×
+          </button>
         </div>
         <h2 className="b-detail-title">{entity?.name || item}</h2>
         <p className="b-detail-type">{entity?.type || resolveType}</p>
       </header>
       <div className="b-detail-body">
-        <EntityBody entity={entity} view={view} report={report} choices={choices} onSetChoice={onSetChoice} onOpenChoicePicker={onOpenChoicePicker} onUpdateParameter={onUpdateParameter} onInspect={onInspect} />
+        <EntityBody
+          entity={entity}
+          view={view}
+          report={report}
+          choices={choices}
+          onSetChoice={onSetChoice}
+          onOpenChoicePicker={onOpenChoicePicker}
+          onUpdateParameter={onUpdateParameter}
+          onInspect={onInspect}
+        />
       </div>
     </aside>
   );
@@ -50,8 +96,8 @@ function conceptTerms(entity) {
   if (!entity?.id) return [];
   const ids = new Set([
     ...(REFS.mentions[entity.id] || []),
-    ...((REFS.prereqs[entity.id]?.skills) || []),
-    ...((REFS.prereqs[entity.id]?.anyOf || []).flat()),
+    ...(REFS.prereqs[entity.id]?.skills || []),
+    ...(REFS.prereqs[entity.id]?.anyOf || []).flat(),
     ...(REFS.unlocks[entity.id] || []),
   ]);
   const terms = [];
@@ -66,7 +112,10 @@ function conceptTerms(entity) {
   const seen = new Set();
   return terms
     .sort((a, b) => b.name.length - a.name.length)
-    .filter((t) => { const k = t.name.toLowerCase(); return seen.has(k) ? false : seen.add(k); });
+    .filter((t) => {
+      const k = t.name.toLowerCase();
+      return seen.has(k) ? false : seen.add(k);
+    });
 }
 
 function linkifyConcepts(text, terms, onInspect, keyPrefix) {
@@ -76,7 +125,9 @@ function linkifyConcepts(text, terms, onInspect, keyPrefix) {
   const byName = new Map(terms.map((t) => [t.name.toLowerCase(), t]));
   const linked = new Set();
   const out = [];
-  let last = 0, m, n = 0;
+  let last = 0,
+    m,
+    n = 0;
   while ((m = re.exec(text))) {
     const term = byName.get(m[0].toLowerCase());
     if (!term) continue;
@@ -86,11 +137,14 @@ function linkifyConcepts(text, terms, onInspect, keyPrefix) {
     } else {
       linked.add(term.name.toLowerCase());
       out.push(
-        <button key={`${keyPrefix}-${n++}`} className="b-concept"
-                title={term.summary ? `${term.name} — ${term.summary}` : term.name}
-                onClick={() => onInspect(term.name, null, term.type)}>
+        <button
+          key={`${keyPrefix}-${n++}`}
+          className="b-concept"
+          title={term.summary ? `${term.name} — ${term.summary}` : term.name}
+          onClick={() => onInspect(term.name, null, term.type)}
+        >
           {m[0]}
-        </button>
+        </button>,
       );
     }
     last = m.index + m[0].length;
@@ -104,19 +158,25 @@ function DescriptionBlock({ text, terms = [], onInspect }) {
   const bullets = bulletParts.map((b) => b.trim()).filter(Boolean);
   const paras = lead
     .split(/(?=\b(?:Note|Enhancement|Spike|Special|Cost|Restriction|Requirement|Prerequisite)s?:)/)
-    .map((s) => s.trim()).filter(Boolean);
+    .map((s) => s.trim())
+    .filter(Boolean);
   return (
     <div className="b-detail-desc">
-      {paras.map((p, i) => <p key={i} className="b-detail-para">{linkifyConcepts(p, terms, onInspect, `p${i}`)}</p>)}
+      {paras.map((p, i) => (
+        <p key={i} className="b-detail-para">
+          {linkifyConcepts(p, terms, onInspect, `p${i}`)}
+        </p>
+      ))}
       {bullets.length > 0 && (
         <ul className="b-detail-bullets">
-          {bullets.map((b, i) => <li key={i}>{linkifyConcepts(b, terms, onInspect, `b${i}`)}</li>)}
+          {bullets.map((b, i) => (
+            <li key={i}>{linkifyConcepts(b, terms, onInspect, `b${i}`)}</li>
+          ))}
         </ul>
       )}
     </div>
   );
 }
-
 
 // A devotion's detail: its lore (the narrative "description"), tenets/guiding
 // principles, structured facts, and clickable domains. The data lives in the
@@ -125,7 +185,9 @@ function DescriptionBlock({ text, terms = [], onInspect }) {
 function DevotionBody({ entity, terms, onInspect }) {
   // The parser leaves a trailing "Example Sigil:" label where the (now-dropped)
   // sigil image was — strip it so it doesn't show as stray text.
-  const lore = String(entity.lore || "").replace(/\s*Example Sigil:\s*$/i, "").trim();
+  const lore = String(entity.lore || "")
+    .replace(/\s*Example Sigil:\s*$/i, "")
+    .trim();
   const tenets = entity.tenets || [];
   const facts = [
     ["Locality", entity.locality],
@@ -135,14 +197,18 @@ function DevotionBody({ entity, terms, onInspect }) {
   const domainIds = (entity.domains || []).map((d) => `domains:${d}`);
   return (
     <>
-      {lore
-        ? <DescriptionBlock text={lore} terms={terms} onInspect={onInspect} />
-        : <p className="b-detail-missing">No lore on record.</p>}
+      {lore ? (
+        <DescriptionBlock text={lore} terms={terms} onInspect={onInspect} />
+      ) : (
+        <p className="b-detail-missing">No lore on record.</p>
+      )}
       {tenets.length > 0 && (
         <div className="b-detail-section">
           <h3 className="b-detail-section-title">Tenets</h3>
           <ul className="b-detail-bullets">
-            {tenets.map((t, i) => <li key={i}>{t}</li>)}
+            {tenets.map((t, i) => (
+              <li key={i}>{t}</li>
+            ))}
           </ul>
         </div>
       )}
@@ -156,28 +222,25 @@ function DevotionBody({ entity, terms, onInspect }) {
           ))}
         </dl>
       )}
-      {domainIds.length > 0 && (
-        <LinkList title="Domains" tone="purple" ids={domainIds} onInspect={onInspect} />
-      )}
+      {domainIds.length > 0 && <LinkList title="Domains" tone="purple" ids={domainIds} onInspect={onInspect} />}
     </>
   );
 }
 
 function ParameterEditor({ baseName, entity, view, suggestions: suggestionsProp, groups, onUpdateParameter }) {
-  const chosenParam = entity.baseName ? (entity.parameter || "") : "";
+  const chosenParam = entity.baseName ? entity.parameter || "" : "";
 
   const isSpellChoice = baseName === "Bookcaster" || baseName === "Basic Arcane" || baseName === "Basic Faith";
   const flat = suggestionsProp || PARAMETER_SUGGESTIONS[baseName] || [];
   // SubSelect takes flat options OR grouped [{label, options}].
-  const options = (groups && groups.length) ? groups : flat;
+  const options = groups && groups.length ? groups : flat;
   const hasOptions = options.length > 0;
   const allowCustom = TYPEABLE_PARAMS.has(baseName);
 
-  const sectionLabel = baseName === "Lore" ? "Customize Area"
-    : isSpellChoice ? "Choose a Spell" : "Choose";
+  const sectionLabel = baseName === "Lore" ? "Customize Area" : isSpellChoice ? "Choose a Spell" : "Choose";
 
   const choose = (opt) => {
-    const newName = opt ? formatParameterizedName(baseName, opt, entity.name) : (entity.baseName || baseName);
+    const newName = opt ? formatParameterizedName(baseName, opt, entity.name) : entity.baseName || baseName;
     onUpdateParameter(view.field, entity.name, newName, view.index);
   };
 
@@ -186,7 +249,9 @@ function ParameterEditor({ baseName, entity, view, suggestions: suggestionsProp,
       {isSpellChoice && !hasOptions ? (
         <>
           <h3 className="b-detail-section-title">{sectionLabel}</h3>
-          <p className="b-detail-hint">No accessible spell lists yet — gain spell-slots (or a caster class) to bookcast.</p>
+          <p className="b-detail-hint">
+            No accessible spell lists yet — gain spell-slots (or a caster class) to bookcast.
+          </p>
         </>
       ) : (
         <SubSelect
@@ -202,23 +267,30 @@ function ParameterEditor({ baseName, entity, view, suggestions: suggestionsProp,
   );
 }
 
-export function EntityBody({ entity, view, report, choices, onSetChoice, onOpenChoicePicker, onUpdateParameter, onInspect }) {
+export function EntityBody({
+  entity,
+  view,
+  report,
+  choices,
+  onSetChoice,
+  onOpenChoicePicker,
+  onUpdateParameter,
+  onInspect,
+}) {
   // Hooks must run unconditionally and in the same order every render — so this
   // useMemo is hoisted ABOVE the early `!entity` return (it already guards on
   // entity?.id internally). Calling it after the return tripped rules-of-hooks.
   const grantedSubPowers = useMemo(() => {
     if (!entity?.id) return [];
     const targets = REFS.grants?.[entity.id] || [];
-    return targets
-      .map((id) => lookupEntity(id))
-      .filter((sub) => sub && sub.tier === "SubPower");
+    return targets.map((id) => lookupEntity(id)).filter((sub) => sub && sub.tier === "SubPower");
   }, [entity]);
   if (!entity) {
     return <p className="b-detail-missing">No detail available — this item may be unresolved.</p>;
   }
-  const domainPowers = entity.type === "domains" ? (entity.powers || []) : null;
+  const domainPowers = entity.type === "domains" ? entity.powers || [] : null;
   const activeBenefits = entity.levelBenefits
-    ? (report?.powerBenefits?.find((b) => b.power === entity.name)?.benefits || entity.levelBenefits)
+    ? report?.powerBenefits?.find((b) => b.power === entity.name)?.benefits || entity.levelBenefits
     : null;
   const terms = conceptTerms(entity);
   const baseName = entity.baseName || entity.name;
@@ -243,9 +315,12 @@ export function EntityBody({ entity, view, report, choices, onSetChoice, onOpenC
   } else {
     paramSuggestions = PARAMETER_SUGGESTIONS[baseName] || null;
   }
-  const isParamEditable = !!(onUpdateParameter && view?.field && view.field !== "multiclassGrant"
-    && (paramSuggestions?.length || paramGroups?.length || baseName === "Bookcaster"
-        || TYPEABLE_PARAMS.has(baseName)));  // typeable params are editable even with no suggestions
+  const isParamEditable = !!(
+    onUpdateParameter &&
+    view?.field &&
+    view.field !== "multiclassGrant" &&
+    (paramSuggestions?.length || paramGroups?.length || baseName === "Bookcaster" || TYPEABLE_PARAMS.has(baseName))
+  ); // typeable params are editable even with no suggestions
   // A devotion's "description" lives in lore + tenets (not a `description` field),
   // plus structured facts (color, iconography, locality, domains). Render those
   // instead of falling through to the blank "No description on record".
@@ -255,11 +330,16 @@ export function EntityBody({ entity, view, report, choices, onSetChoice, onOpenC
 
   return (
     <>
-      {entity.description
-        ? <DescriptionBlock text={entity.description} terms={terms} onInspect={onInspect} />
-        : domainPowers
-          ? <p className="b-detail-desc">A divine domain{entity.accent ? ` (${entity.accent} accent)` : ""} granting {domainPowers.length} power{domainPowers.length === 1 ? "" : "s"}.</p>
-          : <p className="b-detail-missing">No description on record.</p>}
+      {entity.description ? (
+        <DescriptionBlock text={entity.description} terms={terms} onInspect={onInspect} />
+      ) : domainPowers ? (
+        <p className="b-detail-desc">
+          A divine domain{entity.accent ? ` (${entity.accent} accent)` : ""} granting {domainPowers.length} power
+          {domainPowers.length === 1 ? "" : "s"}.
+        </p>
+      ) : (
+        <p className="b-detail-missing">No description on record.</p>
+      )}
       <DetailFacts entity={entity} isEditable={isParamEditable} />
       {isParamEditable && (
         <ParameterEditor
@@ -276,7 +356,10 @@ export function EntityBody({ entity, view, report, choices, onSetChoice, onOpenC
           <h3 className="b-detail-section-title">Benefits by {entity.levelBenefitClass || "class"} level</h3>
           <ul className="b-level-benefits">
             {activeBenefits.map((b) => (
-              <li key={b.level} className={`b-level-benefit ${b.active === false ? "is-locked" : b.active ? "is-active" : ""}`}>
+              <li
+                key={b.level}
+                className={`b-level-benefit ${b.active === false ? "is-locked" : b.active ? "is-active" : ""}`}
+              >
                 <span className="b-level-tag">Lv {b.level}</span>
                 <span className="b-level-text">{b.text}</span>
                 {b.active === false && <span className="b-level-locked">locked</span>}
@@ -285,45 +368,47 @@ export function EntityBody({ entity, view, report, choices, onSetChoice, onOpenC
           </ul>
         </div>
       )}
-      {entity.chooseOne && (() => {
-        const co = entity.chooseOne;
-        const powerId = `powers:${entity.name}`;
-        const chosen = choices?.[powerId];
-        const build = co.kind === "build";
-        // A build choose-one (Way of the Blade, Expert Craft) is a real selection —
-        // render the shared chip control with its "Choose"/free affordances. An
-        // in-play "choose one when used" is informational, so it stays a plain list.
-        if (build && onSetChoice) {
-          // Match the stored value whether it's the option text or a granted skill name.
-          const value = co.options.find((o) =>
-            o.text === chosen || (o.grants || o.grantsSkills || []).includes(chosen))?.text || null;
+      {entity.chooseOne &&
+        (() => {
+          const co = entity.chooseOne;
+          const powerId = `powers:${entity.name}`;
+          const chosen = choices?.[powerId];
+          const build = co.kind === "build";
+          // A build choose-one (Way of the Blade, Expert Craft) is a real selection —
+          // render the shared chip control with its "Choose"/free affordances. An
+          // in-play "choose one when used" is informational, so it stays a plain list.
+          if (build && onSetChoice) {
+            // Match the stored value whether it's the option text or a granted skill name.
+            const value =
+              co.options.find((o) => o.text === chosen || (o.grants || o.grantsSkills || []).includes(chosen))?.text ||
+              null;
+            return (
+              <div className="b-detail-section">
+                <SubSelect
+                  prompt="Choose one (free)"
+                  value={value}
+                  onChange={(v) => onSetChoice(powerId, v)}
+                  options={co.options.map((o) => ({
+                    value: o.text,
+                    free: (o.grants || o.grantsSkills || []).length > 0,
+                  }))}
+                />
+              </div>
+            );
+          }
           return (
             <div className="b-detail-section">
-              <SubSelect
-                prompt="Choose one (free)"
-                value={value}
-                onChange={(v) => onSetChoice(powerId, v)}
-                options={co.options.map((o) => ({
-                  value: o.text,
-                  free: (o.grants || o.grantsSkills || []).length > 0,
-                }))}
-              />
+              <h3 className="b-detail-section-title">Choose one when used</h3>
+              <ul className="b-choose-list">
+                {co.options.map((o, i) => (
+                  <li key={i} className="b-choose-opt">
+                    <span className="b-choose-text">• {o.text}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
           );
-        }
-        return (
-          <div className="b-detail-section">
-            <h3 className="b-detail-section-title">Choose one when used</h3>
-            <ul className="b-choose-list">
-              {co.options.map((o, i) => (
-                <li key={i} className="b-choose-opt">
-                  <span className="b-choose-text">• {o.text}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        );
-      })()}
+        })()}
       {(() => {
         // A power that grants a chosen spell/power (Arcane Secrets, Weird Wanderings)
         // — pick one; the engine grants it. Opens the SHARED PickerOverlay (search /
@@ -340,11 +425,17 @@ export function EntityBody({ entity, view, report, choices, onSetChoice, onOpenC
             {pool.length ? (
               <button
                 className="b-lin-subchoice-btn"
-                onClick={() => onOpenChoicePicker?.({
-                  title: label, entityType: "powers", options: pool,
-                  onChoose: (name) => onSetChoice(powerId, name),
-                })}>
-                {chosen || `${label}…`}<span className="b-lin-subchoice-btn-caret">⌄</span>
+                onClick={() =>
+                  onOpenChoicePicker?.({
+                    title: label,
+                    entityType: "powers",
+                    options: pool,
+                    onChoose: (name) => onSetChoice(powerId, name),
+                  })
+                }
+              >
+                {chosen || `${label}…`}
+                <span className="b-lin-subchoice-btn-caret">⌄</span>
               </button>
             ) : (
               <p className="b-detail-hint">No options available yet.</p>
@@ -359,31 +450,39 @@ export function EntityBody({ entity, view, report, choices, onSetChoice, onOpenC
         if (!/^Studied Focus\b/.test(entity.baseName || entity.name) || !onSetChoice) return null;
         const sf = report?.studiedFocus;
         if (!sf) return null;
-        const tag = choices?.['powers:Studied Focus'] || null;
+        const tag = choices?.["powers:Studied Focus"] || null;
         return (
           <div className="b-detail-section">
             <SubSelect
               prompt="Specialty Tag"
               value={tag}
-              onChange={(v) => onSetChoice('powers:Studied Focus', v || "")}
+              onChange={(v) => onSetChoice("powers:Studied Focus", v || "")}
               options={sf.tags.map((t) => ({ value: t }))}
             />
-            {tag && [1, 2].map((slot) => {
-              const key = `powers:Studied Focus:${slot}`;
-              const pick = choices?.[key] || null;
-              return (
-                <div key={slot} className="b-detail-subpick">
-                  <span className="b-lin-subchoice-label">Power {slot}</span>
-                  <button className="b-lin-subchoice-btn"
-                          onClick={() => onOpenChoicePicker?.({
-                            title: `Power ${slot} (${tag})`, entityType: "powers", options: sf.options,
-                            onChoose: (name) => onSetChoice(key, name),
-                          })}>
-                    {pick || "Choose a Power…"}<span className="b-lin-subchoice-btn-caret">⌄</span>
-                  </button>
-                </div>
-              );
-            })}
+            {tag &&
+              [1, 2].map((slot) => {
+                const key = `powers:Studied Focus:${slot}`;
+                const pick = choices?.[key] || null;
+                return (
+                  <div key={slot} className="b-detail-subpick">
+                    <span className="b-lin-subchoice-label">Power {slot}</span>
+                    <button
+                      className="b-lin-subchoice-btn"
+                      onClick={() =>
+                        onOpenChoicePicker?.({
+                          title: `Power ${slot} (${tag})`,
+                          entityType: "powers",
+                          options: sf.options,
+                          onChoose: (name) => onSetChoice(key, name),
+                        })
+                      }
+                    >
+                      {pick || "Choose a Power…"}
+                      <span className="b-lin-subchoice-btn-caret">⌄</span>
+                    </button>
+                  </div>
+                );
+              })}
           </div>
         );
       })()}
@@ -399,22 +498,35 @@ export function EntityBody({ entity, view, report, choices, onSetChoice, onOpenC
           <div className="b-detail-section">
             <h3 className="b-detail-section-title">Choose a Domain</h3>
             {pool.length ? (
-              <button className="b-lin-subchoice-btn"
-                      onClick={() => onOpenChoicePicker?.({
-                        title: "Choose a Domain", entityType: "domains", options: pool,
-                        onChoose: (name) => onSetChoice(powerId, name),
-                      })}>
-                {chosen || "Choose a Domain…"}<span className="b-lin-subchoice-btn-caret">⌄</span>
+              <button
+                className="b-lin-subchoice-btn"
+                onClick={() =>
+                  onOpenChoicePicker?.({
+                    title: "Choose a Domain",
+                    entityType: "domains",
+                    options: pool,
+                    onChoose: (name) => onSetChoice(powerId, name),
+                  })
+                }
+              >
+                {chosen || "Choose a Domain…"}
+                <span className="b-lin-subchoice-btn-caret">⌄</span>
               </button>
             ) : (
-              <p className="b-detail-hint">Pick a Devotion first — the eligible domains depend on its standard (and opposed) domains.</p>
+              <p className="b-detail-hint">
+                Pick a Devotion first — the eligible domains depend on its standard (and opposed) domains.
+              </p>
             )}
           </div>
         );
       })()}
       {domainPowers && domainPowers.length > 0 && (
-        <LinkList title="Domain powers" tone="purple" onInspect={onInspect}
-                  ids={domainPowers.map((p) => `powers:${p.name}`)} />
+        <LinkList
+          title="Domain powers"
+          tone="purple"
+          onInspect={onInspect}
+          ids={domainPowers.map((p) => `powers:${p.name}`)}
+        />
       )}
       {grantedSubPowers.length > 0 && (
         <div className="b-detail-subpowers">
@@ -424,9 +536,7 @@ export function EntityBody({ entity, view, report, choices, onSetChoice, onOpenC
               <div key={sub.id} className="b-detail-section b-detail-subpower-inline">
                 <h3 className="b-detail-section-title">Granted Power: {sub.name}</h3>
                 <DetailFacts entity={sub} isEditable={false} />
-                {sub.description && (
-                  <DescriptionBlock text={sub.description} terms={subTerms} onInspect={onInspect} />
-                )}
+                {sub.description && <DescriptionBlock text={sub.description} terms={subTerms} onInspect={onInspect} />}
               </div>
             );
           })}
@@ -481,8 +591,14 @@ function DetailFacts({ entity, isEditable }) {
 function LinkList({ title, ids, tone, onInspect }) {
   const links = useMemo(() => {
     const seen = new Set();
-    return (ids || []).filter((id) => !seen.has(id) && seen.add(id))
-      .map((id) => ({ id, ent: lookupEntity(id), type: id.slice(0, id.indexOf(":")), name: id.slice(id.indexOf(":") + 1) }))
+    return (ids || [])
+      .filter((id) => !seen.has(id) && seen.add(id))
+      .map((id) => ({
+        id,
+        ent: lookupEntity(id),
+        type: id.slice(0, id.indexOf(":")),
+        name: id.slice(id.indexOf(":") + 1),
+      }))
       .filter((l) => l.ent);
   }, [ids]);
   if (links.length === 0) return null;
@@ -505,7 +621,7 @@ function LinkList({ title, ids, tone, onInspect }) {
 
 function ForwardLinks({ entity, onInspect }) {
   const pr = REFS.prereqs[entity.id];
-  const prereqIds = pr ? [...(pr.skills || []), ...((pr.anyOf || []).flat())] : [];
+  const prereqIds = pr ? [...(pr.skills || []), ...(pr.anyOf || []).flat()] : [];
   const unlockIds = REFS.unlocks[entity.id] || [];
   const mentionIds = REFS.mentions[entity.id] || [];
   // Mutually-exclusive perks/flaws — "cannot be taken along with" each other.
@@ -531,13 +647,19 @@ function BackLinks({ entity, onInspect }) {
         <div className="b-links">
           <h3 className="b-links-title b-links-dim">Picked by archetypes</h3>
           <ul className="b-links-list">
-            {archetypes.map((id) => <li key={id} className="b-link-static">{id.slice("archetypes:".length)}</li>)}
+            {archetypes.map((id) => (
+              <li key={id} className="b-link-static">
+                {id.slice("archetypes:".length)}
+              </li>
+            ))}
           </ul>
         </div>
       )}
       {others.length > 0 && (
         <details className="b-mentioned">
-          <summary className="b-mentioned-summary">Mentioned by {others.length} other{others.length > 1 ? "s" : ""}</summary>
+          <summary className="b-mentioned-summary">
+            Mentioned by {others.length} other{others.length > 1 ? "s" : ""}
+          </summary>
           <LinkList ids={others} tone="dim" onInspect={onInspect} />
         </details>
       )}
@@ -550,10 +672,10 @@ export function useResolvedEntity(item, field, resolveType) {
     if (!item) return null;
     let type = resolveType;
     if (!type && field) {
-      if (field === 'flaws') type = 'flaws';
-      else if (field.endsWith('Skills')) type = 'skills';
-      else if (field.endsWith('Perks')) type = 'perks';
-      else type = 'powers';
+      if (field === "flaws") type = "flaws";
+      else if (field.endsWith("Skills")) type = "skills";
+      else if (field.endsWith("Perks")) type = "perks";
+      else type = "powers";
     }
     const resolved = type ? lookupEntity(`${type}:${item}`) : null;
     if (resolved) {

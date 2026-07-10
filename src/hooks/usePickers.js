@@ -1,6 +1,14 @@
 import { useCallback } from "react";
 import { getClasses, bareSkill, cleanItemName } from "../engine/resolver.js";
-import { eligiblePowers, CLASS_POWER_SLOTS, CLASSES, ALL_SKILLS, ALL_PERKS, ALL_FLAWS, UNLIMITED_SKILLS } from "../engine/data.js";
+import {
+  eligiblePowers,
+  CLASS_POWER_SLOTS,
+  CLASSES,
+  ALL_SKILLS,
+  ALL_PERKS,
+  ALL_FLAWS,
+  UNLIMITED_SKILLS,
+} from "../engine/data.js";
 import { getMaxRanks } from "../engine/validate.js";
 
 const SLOT_FIELD = {
@@ -24,13 +32,12 @@ export function powerPickerSpec(slot, character) {
   // Cantrips and spells-known are both spell categories (bucket: spells); martial
   // power categories use the powers bucket. spells-known spans three tier fields.
   const isSpells = category === "spellsKnown" || category === "cantrips";
-  const takenFields = category === "spellsKnown"
-    ? ["noviceSpells", "adeptSpells", "greaterSpells"] : [field];
+  const takenFields = category === "spellsKnown" ? ["noviceSpells", "adeptSpells", "greaterSpells"] : [field];
   const taken = new Set();
   const counts = {};
   // Existing picks are native CharacterChoice[] in the powers/spells bucket,
   // keyed by costField (the slot field).
-  const bucket = isSpells ? (character.spells || []) : (character.powers || []);
+  const bucket = isSpells ? character.spells || [] : character.powers || [];
   for (const f of takenFields) {
     for (const choice of bucket.filter((p) => p.costField === f)) {
       const powerName = choice.entityId;
@@ -46,7 +53,8 @@ export function powerPickerSpec(slot, character) {
     }
   }
   return {
-    kind: "power", entityType: "powers",
+    kind: "power",
+    entityType: "powers",
     title: `Choose a ${label} power`,
     subtitle: `${candidates.length} options for ${cls}`,
     candidates,
@@ -57,10 +65,13 @@ export function powerPickerSpec(slot, character) {
 
 export function entityPickerSpec({ kind, entityType, candidates, title, subtitle, taken, onChoose }) {
   return {
-    kind, entityType, title,
+    kind,
+    entityType,
+    title,
     subtitle: subtitle || `${candidates.length} options`,
     candidates,
-    taken, onChoose,
+    taken,
+    onChoose,
   };
 }
 
@@ -68,53 +79,105 @@ export function usePickers({ character, report, setPicking, handleAddClass, hand
   const handleOpenClassPicker = useCallback(() => {
     const taken = new Set(getClasses(character).map((c) => c.name));
     const candidates = Object.keys(CLASS_POWER_SLOTS).map((name) => ({
-      name, desc: CLASSES[name]?.description || "", cat: CLASSES[name]?.type || "Class",
+      name,
+      desc: CLASSES[name]?.description || "",
+      cat: CLASSES[name]?.type || "Class",
     }));
-    setPicking(entityPickerSpec({
-      kind: "class", entityType: "classes", candidates,
-      title: "Add a class", taken, onChoose: handleAddClass,
-    }));
+    setPicking(
+      entityPickerSpec({
+        kind: "class",
+        entityType: "classes",
+        candidates,
+        title: "Add a class",
+        taken,
+        onChoose: handleAddClass,
+      }),
+    );
   }, [character, handleAddClass, setPicking]);
 
-  const handleOpenAdd = useCallback((kind) => {
-    if (kind === "domainPower") {
-      const eligible = (report.devotion?.eligiblePowers || []).map((p) => ({
-        name: p.name, desc: p.description || p.desc || "", cat: p.domain, cost: p.cost,
-      }));
-      setPicking(entityPickerSpec({
-        kind: "domainPower", entityType: "powers", candidates: eligible, title: "Add a domain power",
-        taken: new Set((character.powers || []).filter((p) => p.costField === "domainPowers").map((p) => p.entityId)),
-        onChoose: (name) => handleAddEntity("domainPowers", name),
-      }));
-      return;
-    }
-    if (kind === "classPower") {
-      const eligible = getClasses(character).flatMap((c) =>
-        (eligiblePowers(c.name, "classSkills") || []).map((p) => ({
-          name: p.name, desc: p.description || p.desc || "", cat: c.name,
-          cost: p.cost, refresh: p.refresh,
-        })));
-      setPicking(entityPickerSpec({
-        kind: "classPower", entityType: "powers", candidates: eligible, title: "Add a class power",
-        taken: new Set((report.owned?.classPowers || []).map((r) => r.name)),
-        onChoose: (name) => handleAddEntity("classPowers", name),
-      }));
-      return;
-    }
-    const config = {
-      skill: { field: "purchasedSkills", entityType: "skills", candidates: ALL_SKILLS, title: "Add a skill",
-               taken: (report.owned?.skills || []).map((r) => r.name).filter(name => !UNLIMITED_SKILLS.has(bareSkill(cleanItemName(name)))) },
-      perk:  { field: "purchasedPerks", entityType: "perks", candidates: ALL_PERKS, title: "Add a perk",
-               taken: (report.owned?.perks || []).map((r) => r.name) },
-      flaw:  { field: "flaws", entityType: "flaws", candidates: ALL_FLAWS, title: "Add a flaw",
-               taken: (character.flaws || []) },
-    }[kind];
-    setPicking(entityPickerSpec({
-      kind, entityType: config.entityType, candidates: config.candidates, title: config.title,
-      taken: new Set(config.taken),
-      onChoose: (name) => handleAddEntity(config.field, name),
-    }));
-  }, [character, handleAddEntity, report.devotion, report.owned, setPicking]);
+  const handleOpenAdd = useCallback(
+    (kind) => {
+      if (kind === "domainPower") {
+        const eligible = (report.devotion?.eligiblePowers || []).map((p) => ({
+          name: p.name,
+          desc: p.description || p.desc || "",
+          cat: p.domain,
+          cost: p.cost,
+        }));
+        setPicking(
+          entityPickerSpec({
+            kind: "domainPower",
+            entityType: "powers",
+            candidates: eligible,
+            title: "Add a domain power",
+            taken: new Set(
+              (character.powers || []).filter((p) => p.costField === "domainPowers").map((p) => p.entityId),
+            ),
+            onChoose: (name) => handleAddEntity("domainPowers", name),
+          }),
+        );
+        return;
+      }
+      if (kind === "classPower") {
+        const eligible = getClasses(character).flatMap((c) =>
+          (eligiblePowers(c.name, "classSkills") || []).map((p) => ({
+            name: p.name,
+            desc: p.description || p.desc || "",
+            cat: c.name,
+            cost: p.cost,
+            refresh: p.refresh,
+          })),
+        );
+        setPicking(
+          entityPickerSpec({
+            kind: "classPower",
+            entityType: "powers",
+            candidates: eligible,
+            title: "Add a class power",
+            taken: new Set((report.owned?.classPowers || []).map((r) => r.name)),
+            onChoose: (name) => handleAddEntity("classPowers", name),
+          }),
+        );
+        return;
+      }
+      const config = {
+        skill: {
+          field: "purchasedSkills",
+          entityType: "skills",
+          candidates: ALL_SKILLS,
+          title: "Add a skill",
+          taken: (report.owned?.skills || [])
+            .map((r) => r.name)
+            .filter((name) => !UNLIMITED_SKILLS.has(bareSkill(cleanItemName(name)))),
+        },
+        perk: {
+          field: "purchasedPerks",
+          entityType: "perks",
+          candidates: ALL_PERKS,
+          title: "Add a perk",
+          taken: (report.owned?.perks || []).map((r) => r.name),
+        },
+        flaw: {
+          field: "flaws",
+          entityType: "flaws",
+          candidates: ALL_FLAWS,
+          title: "Add a flaw",
+          taken: character.flaws || [],
+        },
+      }[kind];
+      setPicking(
+        entityPickerSpec({
+          kind,
+          entityType: config.entityType,
+          candidates: config.candidates,
+          title: config.title,
+          taken: new Set(config.taken),
+          onChoose: (name) => handleAddEntity(config.field, name),
+        }),
+      );
+    },
+    [character, handleAddEntity, report.devotion, report.owned, setPicking],
+  );
 
   return { handleOpenClassPicker, handleOpenAdd };
 }
