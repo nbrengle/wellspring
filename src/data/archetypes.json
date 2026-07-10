@@ -1,9 +1,12 @@
 [
   {
     "name": "Defensive Sword + Shield Fighter",
-    "classes": {
-      "Fighter": 4
-    },
+    "classes": [
+      {
+        "name": "Fighter",
+        "level": 4
+      }
+    ],
     "skills": [
       {
         "entityId": "Basic Armor",
@@ -163,9 +166,12 @@
   },
   {
     "name": "Great Weapon Fighter",
-    "classes": {
-      "Fighter": 4
-    },
+    "classes": [
+      {
+        "name": "Fighter",
+        "level": 4
+      }
+    ],
     "skills": [
       {
         "entityId": "Basic Armor",
@@ -301,9 +307,12 @@
   },
   {
     "name": "Archer Fighter",
-    "classes": {
-      "Fighter": 4
-    },
+    "classes": [
+      {
+        "name": "Fighter",
+        "level": 4
+      }
+    ],
     "skills": [
       {
         "entityId": "Basic Armor",
@@ -455,9 +464,12 @@
   },
   {
     "name": "Balanced Cleric",
-    "classes": {
-      "Cleric": 4
-    },
+    "classes": [
+      {
+        "name": "Cleric",
+        "level": 4
+      }
+    ],
     "skills": [
       {
         "entityId": "Basic Faith",
@@ -650,9 +662,12 @@
   },
   {
     "name": "Form Fighter Druid",
-    "classes": {
-      "Druid": 4
-    },
+    "classes": [
+      {
+        "name": "Druid",
+        "level": 4
+      }
+    ],
     "skills": [
       {
         "entityId": "Basic Martial Weapons",
@@ -821,9 +836,12 @@
   },
   {
     "name": "Healer Druid",
-    "classes": {
-      "Druid": 4
-    },
+    "classes": [
+      {
+        "name": "Druid",
+        "level": 4
+      }
+    ],
     "skills": [
       {
         "entityId": "Basic Martial Weapons",
@@ -1016,9 +1034,12 @@
   },
   {
     "name": "Utility Mage",
-    "classes": {
-      "Mage": 4
-    },
+    "classes": [
+      {
+        "name": "Mage",
+        "level": 4
+      }
+    ],
     "skills": [
       {
         "entityId": "Basic Arcane",
@@ -1226,9 +1247,12 @@
   },
   {
     "name": "Ranged Rogue",
-    "classes": {
-      "Rogue": 4
-    },
+    "classes": [
+      {
+        "name": "Rogue",
+        "level": 4
+      }
+    ],
     "skills": [
       {
         "entityId": "Basic Armor",
@@ -1371,9 +1395,12 @@
   },
   {
     "name": "Skirmisher Rogue",
-    "classes": {
-      "Rogue": 4
-    },
+    "classes": [
+      {
+        "name": "Rogue",
+        "level": 4
+      }
+    ],
     "skills": [
       {
         "entityId": "Basic Armor",
@@ -1557,9 +1584,12 @@
   },
   {
     "name": "Support Socialite",
-    "classes": {
-      "Socialite": 4
-    },
+    "classes": [
+      {
+        "name": "Socialite",
+        "level": 4
+      }
+    ],
     "skills": [
       {
         "entityId": "Basic Martial Weapons",
@@ -1759,9 +1789,12 @@
   },
   {
     "name": "Blaster Sourcerer",
-    "classes": {
-      "Sourcerer": 4
-    },
+    "classes": [
+      {
+        "name": "Sourcerer",
+        "level": 4
+      }
+    ],
     "skills": [
       {
         "entityId": "Basic Arcane",
@@ -1889,9 +1922,12 @@
   },
   {
     "name": "Artificer Artisan",
-    "classes": {
-      "Artisan": 4
-    },
+    "classes": [
+      {
+        "name": "Artisan",
+        "level": 4
+      }
+    ],
     "skills": [
       {
         "entityId": "Basic Martial Weapons",
@@ -2053,9 +2089,12 @@
   },
   {
     "name": "Crafter Artisan",
-    "classes": {
-      "Artisan": 4
-    },
+    "classes": [
+      {
+        "name": "Artisan",
+        "level": 4
+      }
+    ],
     "skills": [
       {
         "entityId": "Basic Martial Weapons",
@@ -2217,9 +2256,12 @@
   },
   {
     "name": "Mystic Artisan",
-    "classes": {
-      "Artisan": 4
-    },
+    "classes": [
+      {
+        "name": "Artisan",
+        "level": 4
+      }
+    ],
     "skills": [
       {
         "entityId": "Basic Martial Weapons",

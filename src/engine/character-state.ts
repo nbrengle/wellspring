@@ -96,25 +96,6 @@ export function applyClassStartingAbilities(character, className, _level = 1) {
   return nextCharacter;
 }
 
-// Normalize any class representation to the canonical array [{name, level}]:
-//   { Cleric: 4 }            (archetype object map)
-//   [{ name, level }]        (already canonical)
-//   "Cleric 4" / "Cleric 4, Fighter 2"  (legacy classLevels string)
-function normalizeClasses(value) {
-  if (!value) return [];
-  if (Array.isArray(value)) return value;
-  if (typeof value === "string") {
-    return value.split(",").map((part) => {
-      const m = part.trim().match(/^(.+?)\s+(\d+)$/);
-      return m ? { name: m[1], level: parseInt(m[2], 10) } : { name: part.trim(), level: 1 };
-    });
-  }
-  if (typeof value === "object") {
-    return Object.entries(value).map(([name, level]) => ({ name: String(name), level: Number(level) || 1 }));
-  }
-  return [];
-}
-
 export function loadArchetype(archetype) {
   const c = { ...EMPTY_CHARACTER, archetypeName: archetype.name };
   for (const k of Object.keys(EMPTY_CHARACTER)) {
@@ -128,15 +109,8 @@ export function loadArchetype(archetype) {
       }
     }
   }
-  // Normalize classes to the canonical array form [{name, level}] that getClasses +
-  // the class handlers use. Archetypes store it as an object map ({ Cleric: 4 }); the
-  // copy loop above would carry that raw shape, so overwrite with the normalized form.
-  // (Also accept a "Cleric 4" string defensively from older data.)
-  if (archetype.classes !== undefined) {
-    c.classes = normalizeClasses(archetype.classes);
-  } else if (archetype.classLevels) {
-    c.classes = normalizeClasses(archetype.classLevels);
-  }
+  // archetype.classes is already the canonical [{name, level}] array (the copy loop
+  // above carried it), so no normalization step is needed.
   const primary = getClasses(c)[0]?.name;
   let out = c;
   if (primary && hasStartingChoices(primary)) {

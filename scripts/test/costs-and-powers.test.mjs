@@ -21,7 +21,6 @@ import {
   basicSpellOptions,
 } from "../../src/engine/testing.js";
 import { bareSkill, cleanItemName, getClasses, formatParameterizedName } from "../../src/engine/resolver.js";
-import { formatCharacterSheet, parseCharacterSheet } from "../../src/engine/sheet.js";
 import {
   solveCrafting,
   RECIPES,
@@ -279,10 +278,10 @@ test("shared powers are mechanically equivalent unless level-scaled", () => {
 
 // ─── xN on unlimited-ranks skills → distinct instances, not rank N ────────────
 // Purchased skills import into the skills[] bucket (source 'Purchased').
-const importedPurchased = (c) => (c.skills || []).filter((s) => isPurchased(s.source)).map((s) => s.entityId);
-test('import expands "Lore x2" into two distinct Lore instances', () => {
-  const c = parseCharacterSheet("M\nClass Levels: Mage 4\nPurchased Skills: Lore x2");
-  const p = importedPurchased(c);
+const purchasedSkills = (c) => (c.skills || []).filter((s) => isPurchased(s.source)).map((s) => s.entityId);
+test("two distinct parameterized Lores are two separate purchased rows", () => {
+  const c = makeChar("Mage 4", { add: ["Lore (Historical)", "Lore (Arcane)"] });
+  const p = purchasedSkills(c);
   eq(p.length, 2, "two rows");
   ok(p[0] !== p[1], "distinct subjects");
   ok(
@@ -290,22 +289,16 @@ test('import expands "Lore x2" into two distinct Lore instances', () => {
     "both parameterized Lore",
   );
 });
-test('import expands "Bookcaster x3" into three distinct instances', () => {
-  const c = parseCharacterSheet("M\nClass Levels: Mage 4\nPurchased Skills: Bookcaster x3");
-  const p = importedPurchased(c);
-  eq(p.length, 3, "three rows");
-  eq(new Set(p).size, 3, "all distinct");
-});
 test("two Lores under Sharp Mind cost 1 each (per-instance discount), net 2", () => {
-  const c = parseCharacterSheet("M\nClass Levels: Mage 4\nPurchased Perks: Sharp Mind\nPurchased Skills: Lore x2");
+  const c = makeChar("Mage 4", { add: ["Sharp Mind", "Lore (Historical)", "Lore (Arcane)"] });
   const s = computeSpend(c);
   const lores = Object.keys(s.byItem).filter((k) => /skills:Lore/.test(k));
   eq(lores.length, 2, "two distinct byItem keys");
   lores.forEach((k) => eq(s.byItem[k].cost, 1, `${k} discounted to 1`));
 });
-test('finite-ranks "Extended Capacity - Novice x2" stays one rank-2 row (not expanded)', () => {
-  const c = parseCharacterSheet("M\nClass Levels: Mage 4\nPurchased Skills: Extended Capacity - Novice x2");
-  eq(importedPurchased(c).length, 1, "single row");
+test('finite-ranks "Extended Capacity - Novice" at rank 2 stays one row', () => {
+  const c = makeChar("Mage 4", { add: [{ name: "Extended Capacity - Novice", ranks: 2 }] });
+  eq(purchasedSkills(c).length, 1, "single row");
 });
 
 // ─── tiered perks: cumulative cost + hard-enforced per-tier level gate ────────

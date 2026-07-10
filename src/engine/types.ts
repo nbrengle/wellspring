@@ -214,8 +214,8 @@ export interface CharacterState extends CharacterBuckets {
   wealth?: string | number | null;
   resources?: string | null;
 
-  /** Classes the character has as {name, level}. getClasses also understands the
-   *  legacy `classLevels` string and `{Name: level}` map on raw input. */
+  /** Classes the character has, as {name, level}[] — the one shape every producer
+   *  emits (archetypes, sheet importer, reducers). */
   classes: { name: string; level: number }[];
   lineage?: string | { name: string; choices: string[] } | null;
   sublineage?: string | null;

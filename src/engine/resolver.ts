@@ -1,12 +1,11 @@
 import type { CharacterState, CharacterChoice } from "./types.js";
 
 /**
- * Normalizes a character's class/level info into an array of {name, level}.
+ * The character's classes as {name, level}[]. classes IS that array (the one shape
+ * every producer emits — archetypes, the reducers), so this is just a null-safe read.
  */
 export function getClasses(character: Partial<CharacterState> | null | undefined): { name: string; level: number }[] {
-  if (!character?.classes) return [];
-  if (Array.isArray(character.classes)) return character.classes;
-  return Object.entries(character.classes).map(([name, level]) => ({ name: String(name), level: Number(level) }));
+  return character?.classes ?? [];
 }
 
 /**
@@ -26,7 +25,8 @@ export const bareSkill = (s: string): string =>
     .trim();
 
 /**
- * Legacy cleanItemName for the text exporter/importer.
+ * A choice's canonical name: its entityId, or a name string with any trailing
+ * " - N BP" cost suffix stripped.
  */
 export function cleanItemName(item: string | CharacterChoice): string {
   if (typeof item !== "string") return item.entityId || "";

@@ -14,9 +14,8 @@ export function useClassHandlers({ setCharacter }) {
     return { ...c, classes };
   };
 
-  // The single-class level +/- buttons set the PRIMARY class's level:
-  // patch the classes array (no flat classLevels string), then re-seed starting
-  // abilities for the new level.
+  // The single-class level +/- buttons set the PRIMARY class's level: patch the
+  // classes array, then re-seed starting abilities for the new level.
   const handleLevelChange = useCallback(
     (next) => {
       const level = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, next));

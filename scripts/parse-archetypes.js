@@ -15,7 +15,7 @@ import { fileURLToPath } from "url";
 import { Source } from "../src/engine/types.js";
 import { choiceFromParsed, bucketForField } from "../src/engine/character-add.js";
 import { emptyBuckets } from "../src/engine/config.js";
-import { LABEL_FIELD, CHOICE_DEFAULTS } from "../src/engine/sheet-schema.js";
+import { LABEL_FIELD, CHOICE_DEFAULTS } from "./archetype-schema.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, "..");
@@ -450,21 +450,20 @@ function buildCharacter(raw) {
     // code reads a.name uniformly. (The CHARACTER built from it carries the
     // provenance separately as `archetypeName`; loadArchetype sets that.)
     name: raw.name,
-    classes: {},
+    classes: [],
     ...emptyBuckets(),
     devotions: [],
     wealth: raw.wealth || "None",
   };
 
-  // 1. Classes
+  // 1. Classes — emit the canonical {name, level}[] shape (the same one
+  // CharacterState.classes is typed as), so no reader has to normalize a map.
   if (raw.classLevels) {
     const classMatch = raw.classLevels.match(/^([A-Z][a-zA-Z]+)\s+(\d+)/);
-    if (classMatch) {
-      character.classes[classMatch[1]] = parseInt(classMatch[2], 10);
-    } else {
-      // Fallback for edge cases
-      character.classes[raw.classLevels.split(" ")[0]] = parseInt(raw.classLevels.split(" ")[1], 10) || 1;
-    }
+    const [name, level] = classMatch
+      ? [classMatch[1], parseInt(classMatch[2], 10)]
+      : [raw.classLevels.split(" ")[0], parseInt(raw.classLevels.split(" ")[1], 10) || 1];
+    character.classes.push({ name, level });
   }
 
   // 2. Lineage
@@ -494,7 +493,7 @@ function buildCharacter(raw) {
   // (choiceFromParsed): the section field decides bucket + source + costField; the
   // parsed line carries name / authored BP / rank. One loop over every parseable
   // field, in output order — no per-field addChoice, no parallel-array zip.
-  const primaryClass = Object.keys(character.classes)[0] || "";
+  const primaryClass = character.classes[0]?.name || "";
   const SECTION_ORDER = [
     "startingSkills",
     "purchasedSkills",

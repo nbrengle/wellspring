@@ -21,7 +21,6 @@ import {
   basicSpellOptions,
 } from "../../src/engine/testing.js";
 import { bareSkill, cleanItemName, getClasses, formatParameterizedName } from "../../src/engine/resolver.js";
-import { formatCharacterSheet, parseCharacterSheet } from "../../src/engine/sheet.js";
 import {
   solveCrafting,
   RECIPES,

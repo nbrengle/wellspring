@@ -23,7 +23,6 @@ import {
   basicSpellOptions,
 } from "../../src/engine/testing.js";
 import { bareSkill, cleanItemName, getClasses, formatParameterizedName } from "../../src/engine/resolver.js";
-import { formatCharacterSheet, parseCharacterSheet } from "../../src/engine/sheet.js";
 import {
   solveCrafting,
   RECIPES,
@@ -50,7 +49,7 @@ import {
   pickAndChooseOptions,
 } from "../../src/engine/data.js";
 import { resolveCharacterGraph } from "../../src/engine/graph.js";
-const toV2 = (c) => resolveCharacterGraph(c).character;
+const resolved = (c) => resolveCharacterGraph(c).character;
 import {
   hasStartingChoices,
   reconcileStartingChoices,
@@ -360,7 +359,7 @@ test("all 18 devotions carry domains", () => {
   for (const d of DEVOTIONS) ok(d.domains.length >= 2, `${d.name} has domains`);
 });
 test("devotionState resolves The Mother → Life/Creation/Protection", () => {
-  const ds = devotionState(toV2({ devotion: "The Mother", divineDomains: ["Life", "Protection"] }));
+  const ds = devotionState(resolved({ devotion: "The Mother", divineDomains: ["Life", "Protection"] }));
   ok(ds, "devotionState non-null");
   eq(ds.available.join(","), "Life,Creation,Protection", "available domains");
   eq(ds.chosen.join(","), "Life,Protection", "chosen domains");
@@ -435,29 +434,6 @@ test("≥99% of reference links resolve", () => {
       if (lookupEntity(ref)) resolved++;
     }
   ok(resolved / total >= 0.99, `resolved ${resolved}/${total}`);
-});
-
-// ─── devotion: Worship skill is canonical, inline is the fallback ─────────────
-test("import derives devotion from Worship skill when no inline line", () => {
-  const c = parseCharacterSheet(
-    ["Cleric Test", "Class Levels: Cleric 4", "Purchased Skills:", "Worship - The Mother"].join("\n"),
-  );
-  eq(c.devotion, "The Mother", "devotion from Worship");
-  ok(!c.devotionWarning, "no warning when only Worship");
-});
-test("import: Worship wins over a mismatched inline Devotion, with a warning", () => {
-  const c = parseCharacterSheet(
-    ["Cleric Test", "Class Levels: Cleric 4", "Devotion: The Father", "Purchased Skills:", "Worship - The Mother"].join(
-      "\n",
-    ),
-  );
-  eq(c.devotion, "The Mother", "Worship is canonical");
-  ok(c.devotionWarning, "mismatch warns");
-});
-test("import: inline Devotion alone is honored when no Worship skill", () => {
-  const c = parseCharacterSheet(["Cleric Test", "Class Levels: Cleric 4", "Devotion: The Mother"].join("\n"));
-  eq(c.devotion, "The Mother", "inline fallback");
-  ok(!c.devotionWarning, "no warning when only inline");
 });
 
 test("domainPowers: a domain power that defines a pool (Balance Pool) resolves the pool", () => {
