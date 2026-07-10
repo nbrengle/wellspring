@@ -24,17 +24,7 @@ export function buildBucketedView(graph: CharacterGraphModel): BucketedView {
     if (node.field === "synthetic" || node.field === "lineageAdvantages" || node.field === "lineageChallenges")
       continue;
 
-    // Use the structured node.param (parsed once at creation); fall back to the
-    // entity's param label only for display when the node carries no value.
-    const paramValue = node.param ?? (node.entity?.parameter || undefined);
-    const displayName = paramValue && !node.name.includes(paramValue) ? `${node.name} (${paramValue})` : node.name;
 
-    let grantedBy = node.grantedBy;
-    if (node.sourceType === "grant" && !grantedBy) {
-      const refundEff = node.effects?.find((e) => e.type === "REFUND_GRANT");
-      if (refundEff) grantedBy = refundEff.source;
-    }
-    
     if (node.field === "flaws") {
       view.flaws.push(createViewEntry(node) as unknown as FlawView);
       continue;
@@ -70,13 +60,19 @@ function createViewEntry(node: GraphItem) {
   const paramValue = node.param ?? (node.entity?.parameter || undefined);
   const displayName = paramValue && !node.name.includes(paramValue) ? `${node.name} (${paramValue})` : node.name;
   
+  let grantedBy = node.grantedBy;
+  if (node.sourceType === "grant" && !grantedBy) {
+    const refundEff = node.effects?.find((e) => e.type === "REFUND_GRANT");
+    if (refundEff) grantedBy = refundEff.source;
+  }
+
   return {
     ...(node.entity || { name: displayName, type: "unknown" }),
     id: node.id,
     entityId: node.entity?.id || node.id,
     name: displayName,
     sourceType: node.sourceType,
-    grantedBy: node.grantedBy,
+    grantedBy,
     free: isFree,
     cost: isFree ? 0 : (node.authoredCost ?? node.baseCost),
     rank: node.rank,
