@@ -199,7 +199,6 @@ export function classifyOwnedItems(character) {
     ...b.veteranPowers,
     ...b.utilityPowers,
     ...b.classPowers,
-    ...b.domainPowers,
   ];
   const skills = [...b.skills];
   const mcGrants = multiclassGrants(character).skills;
@@ -218,6 +217,8 @@ export function classifyOwnedItems(character) {
     skills,
     perks: b.perks,
     classPowers,
+    domainPowers: b.domainPowers,
+    flaws: b.flaws,
     innatePowers: b.innatePowers,
     misfiled: {},
   };
@@ -389,7 +390,7 @@ export function validate(character) {
   );
   // Attach each classified row's computed cost record (from the BP ledger) so the
   // UI reads `row.cost` directly instead of reconstructing a ledger key per row.
-  for (const bucket of ["skills", "perks", "classPowers"]) {
+  for (const bucket of ["skills", "perks", "classPowers", "domainPowers", "flaws", "innatePowers"]) {
     for (const row of owned[bucket]) {
       row.cost = lookupCost(spend.byItem, row.field, row.name, row.index);
     }

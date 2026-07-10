@@ -1307,7 +1307,17 @@ export function resolveCharacterGraph(charInput: CharacterState): CharacterGraph
     }
   }
   for (const choice of character.perks || []) addItem(choice);
-  for (const choice of character.powers || []) addItem(choice);
+  
+  const powerIdxByField: Record<string, number> = {};
+  for (const choice of character.powers || []) {
+    if (isPurchased(choice.source) && choice.costField) {
+      const idx = powerIdxByField[choice.costField] || 0;
+      powerIdxByField[choice.costField] = idx + 1;
+      addItem({ ...choice, originalIndex: idx });
+    } else {
+      addItem(choice);
+    }
+  }
   for (const choice of character.spells || []) addItem(choice);
   for (const choice of character.devotions || []) addItem(choice);
 
@@ -1345,6 +1355,7 @@ export function resolveCharacterGraph(charInput: CharacterState): CharacterGraph
       param: extractParam(rawName),
       field: "flaws",
       sourceType: "flaw",
+      index: character.flaws?.indexOf(choice),
       rank: 1,
       baseCost: -bp,
       entity: ent,

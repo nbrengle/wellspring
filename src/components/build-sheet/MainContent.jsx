@@ -475,7 +475,7 @@ export function ClassifiedRows({ rows, resolveType, showClass }) {
         const refundedBy = refundEff?.source || mcRefund?.source;
         const refundedBP = refundEff ? cost?.base || 0 : mcRefund?.bp || 0;
 
-        const canRemove = sourceType === "purchased" && index >= 0;
+        const canRemove = (sourceType === "purchased" || sourceType === "flaw") && index >= 0;
         const rank = cost?.rank || (index >= 0 ? character.ranks?.[field]?.[index] : null) || 1;
 
         const baseName = bareSkill(cleanItemName(name));
@@ -595,68 +595,6 @@ export function ClassifiedRows({ rows, resolveType, showClass }) {
                 title="Remove"
                 aria-label={`Remove ${name}`}
                 onClick={() => onRemove(field, index)}
-              >
-                ×
-              </button>
-            )}
-          </InspectableRow>
-        );
-      })}
-    </ul>
-  );
-}
-
-export function EditableRows({ items, field, resolveType, removable }) {
-  const { character, report } = useBuilderState();
-  const { onRemoveEntity } = useBuilderActions();
-  if (!items || items.length === 0) {
-    return <p className="b-empty">none</p>;
-  }
-  return (
-    <ul className="b-rows">
-      {items.map((item, i) => {
-        const cost = lookupCost(report?.spend.byItem, field, item, i);
-        const canRemove = removable ? removable(i) : false;
-        const rank = cost?.rank || 1;
-
-        const baseName = bareSkill(cleanItemName(item));
-        const maxR = getMaxRanks(item, field, character);
-        const hasRanks = canRemove && maxR > 1 && !UNLIMITED_SKILLS.has(baseName);
-
-        const ent =
-          lookupEntity(resolveType ? `${resolveType}:${baseName}` : baseName) ||
-          lookupEntity(resolveType ? `${resolveType}:${item}` : item);
-        const tags = ent?.tags || [];
-
-        return (
-          <InspectableRow
-            key={`${field}-${i}-${item}`}
-            item={item}
-            field={field}
-            resolveType={resolveType}
-            index={i}
-            label={
-              <>
-                {item}
-                {rank > 1 && !hasRanks && <span className="b-row-rank">×{rank}</span>}
-              </>
-            }
-          >
-            {tags.map((t) => {
-              const tone = CLASS_TONES[t];
-              return (
-                <span key={t} className={`b-picker-row-tag ${tone ? `b-tag-${tone}` : "b-data"}`}>
-                  {t}
-                </span>
-              );
-            })}
-            <CostBadge cost={cost} />
-            {canRemove && (
-              <button
-                className="b-row-remove"
-                title="Remove"
-                aria-label={`Remove ${item}`}
-                onClick={() => onRemoveEntity(field, i)}
               >
                 ×
               </button>
