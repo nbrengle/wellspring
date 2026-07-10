@@ -3,13 +3,7 @@ import type { CharacterState, CharacterChoice } from "./types.js";
 /**
  * Normalizes a character's class/level info into an array of {name, level}.
  */
-export function getClasses(character: any): { name: string; level: number }[] {
-  if (character?.classLevels && !character?.classes) {
-    return character.classLevels.split(",").map((c) => {
-      const match = c.trim().match(/^(.+?)\s+(\d+)$/);
-      return match ? { name: match[1], level: parseInt(match[2], 10) } : { name: c.trim(), level: 1 };
-    });
-  }
+export function getClasses(character: Partial<CharacterState> | null | undefined): { name: string; level: number }[] {
   if (!character?.classes) return [];
   if (Array.isArray(character.classes)) return character.classes;
   return Object.entries(character.classes).map(([name, level]) => ({ name: String(name), level: Number(level) }));

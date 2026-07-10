@@ -28,7 +28,18 @@ import type {
   BPLedger,
   BPLedgerEntry,
 } from "./types.js";
-import { Source, isPurchased, isStarting, sourceClass } from "./types.js";
+import {
+  Source,
+  isPurchased,
+  isStarting,
+  sourceClass,
+  ResolvedStats,
+  GrantedAbility,
+  PrereqReport,
+  WealthReport,
+  PrereqIssue,
+  PrereqNote,
+} from "./types.js";
 
 const idName = (id: string) => id.split(":")[1] || id;
 
@@ -82,19 +93,19 @@ export class CharacterGraphModel implements CharacterGraph {
   get uiBuckets(): BucketedView {
     return this.memo("uiBuckets", () => this.buildBucketedView());
   }
-  get stats(): import("./types.js").ResolvedStats {
+  get stats(): ResolvedStats {
     return this.memo("stats", () => this.computeStats());
   }
-  private get _grantedAbilitiesList(): import("./types.js").GrantedAbility[] {
+  private get _grantedAbilitiesList(): GrantedAbility[] {
     return this.memo("granted", () => this.computeGrantedAbilitiesList());
   }
   private get _ownedIds(): Set<string> {
     return this.memo("ownedIds", () => this.computeOwnedIds());
   }
-  get prereqs(): import("./types.js").PrereqReport {
+  get prereqs(): PrereqReport {
     return this.memo("prereqs", () => this.computePrereqs());
   }
-  get wealth(): import("./types.js").WealthReport {
+  get wealth(): WealthReport {
     return this.memo("wealth", () => this.computeWealth());
   }
   get spend(): BPLedger {
@@ -295,8 +306,8 @@ export class CharacterGraphModel implements CharacterGraph {
   // Walks every GRANT_SOURCE effect in the graph to build { ability, abilityName,
   // abilityType, source, sourceId, sourceKind } rows. Computed once, reused by
   // _ownedIds and prereqs.
-  private computeGrantedAbilitiesList(): import("./types.js").GrantedAbility[] {
-    const list: import("./types.js").GrantedAbility[] = [];
+  private computeGrantedAbilitiesList(): GrantedAbility[] {
+    const list: GrantedAbility[] = [];
     for (const node of this.items) {
       for (const eff of node.effects) {
         if (eff.type !== "GRANT_SOURCE") continue;
@@ -344,7 +355,7 @@ export class CharacterGraphModel implements CharacterGraph {
       for (const cand of candidates) {
         const e = lookupEntity(cand);
         if (e) {
-          owned.add(e.id);
+          if (e.id) owned.add(e.id);
           owned.add(`${idPrefix(e)}:${bareSkill(e.name)}`);
         }
       }
@@ -401,10 +412,10 @@ export class CharacterGraphModel implements CharacterGraph {
   // against ownership and become hard `issues` when unmet. Level/other prereqs are
   // free-text. Level constraints are parsed and hard-enforced as issues, while
   // unrecognized/other constraints surface as `notes` (manual verification).
-  private computePrereqs(): import("./types.js").PrereqReport {
+  private computePrereqs(): PrereqReport {
     const owned = this._ownedIds;
-    const issues: import("./types.js").PrereqIssue[] = [];
-    const notes: import("./types.js").PrereqNote[] = [];
+    const issues: PrereqIssue[] = [];
+    const notes: PrereqNote[] = [];
     const seen = new Set<string>();
     const charLevel = this.characterLevel;
     const charClasses = this.classes;
@@ -537,10 +548,10 @@ export class CharacterGraphModel implements CharacterGraph {
   // Advanced-class legality: base level ≥ 10 to take any, ≤ 2 advanced classes, and
   // each advanced class ≤ 5 levels.
   private checkAdvancedClasses(): {
-    issues: import("./types.js").PrereqIssue[];
-    notes: import("./types.js").PrereqNote[];
+    issues: PrereqIssue[];
+    notes: PrereqNote[];
   } {
-    const issues: import("./types.js").PrereqIssue[] = [];
+    const issues: PrereqIssue[] = [];
     const charClasses = this.classes;
     const advancedClasses = charClasses.filter((c) => !BASE_CLASSES.has(c.name));
     const baseLevel = charClasses.filter((c) => BASE_CLASSES.has(c.name)).reduce((sum, c) => sum + c.level, 0);
@@ -576,10 +587,10 @@ export class CharacterGraphModel implements CharacterGraph {
 
   // Perks that must be taken at character creation (Draconic Heritage) → a note.
   private checkCreationOnlyPerks(): {
-    issues: import("./types.js").PrereqIssue[];
-    notes: import("./types.js").PrereqNote[];
+    issues: PrereqIssue[];
+    notes: PrereqNote[];
   } {
-    const notes: import("./types.js").PrereqNote[] = [];
+    const notes: PrereqNote[] = [];
     if ([...this._ownedIds].some((id) => id.startsWith("perks:Draconic Heritage"))) {
       notes.push({
         id: "perks:Draconic Heritage",
@@ -594,10 +605,10 @@ export class CharacterGraphModel implements CharacterGraph {
 
   // Mutually-exclusive perks/flaws ("cannot be taken along with" each other).
   private checkMutualExclusions(): {
-    issues: import("./types.js").PrereqIssue[];
-    notes: import("./types.js").PrereqNote[];
+    issues: PrereqIssue[];
+    notes: PrereqNote[];
   } {
-    const issues: import("./types.js").PrereqIssue[] = [];
+    const issues: PrereqIssue[] = [];
     const excludes = REFS.excludes || {};
     if (Object.keys(excludes).length) {
       const ownedExcl = new Set<string>();
@@ -632,10 +643,10 @@ export class CharacterGraphModel implements CharacterGraph {
   // Parser-extracted power requirements: requiredLevel (per class), requiresEntity,
   // and a take-once duplicate guard on purchased powers.
   private checkPowerRequirements(): {
-    issues: import("./types.js").PrereqIssue[];
-    notes: import("./types.js").PrereqNote[];
+    issues: PrereqIssue[];
+    notes: PrereqNote[];
   } {
-    const issues: import("./types.js").PrereqIssue[] = [];
+    const issues: PrereqIssue[] = [];
     const owned = this._ownedIds;
     const charClasses = this.classes;
     const charLevel = this.characterLevel;
@@ -714,10 +725,10 @@ export class CharacterGraphModel implements CharacterGraph {
   // Caps on repeatable perks where the parameter must differ (Elemental Affinity:
   // ≤2, distinct elements) or that are mutually exclusive as a group (Bloodlines: 1).
   private checkRepeatableCaps(): {
-    issues: import("./types.js").PrereqIssue[];
-    notes: import("./types.js").PrereqNote[];
+    issues: PrereqIssue[];
+    notes: PrereqNote[];
   } {
-    const issues: import("./types.js").PrereqIssue[] = [];
+    const issues: PrereqIssue[] = [];
     const elemAffinities: string[] = [];
     for (const node of this.items) {
       if (bareSkill(cleanItemName(node.name)) === "Elemental Affinity") {
@@ -762,10 +773,10 @@ export class CharacterGraphModel implements CharacterGraph {
 
   // Lineage-challenge constraints (Hot Blooded, Anti-magic, The Fractured, …).
   private checkLineageConstraints(): {
-    issues: import("./types.js").PrereqIssue[];
-    notes: import("./types.js").PrereqNote[];
+    issues: PrereqIssue[];
+    notes: PrereqNote[];
   } {
-    const issues: import("./types.js").PrereqIssue[] = [];
+    const issues: PrereqIssue[] = [];
     const character = this.character;
     const sublineages = character.sublineages || {};
     const hasFlaw = (name: string) => (character.flaws || []).some((f) => f.entityId === name);
@@ -825,7 +836,7 @@ export class CharacterGraphModel implements CharacterGraph {
 
   // ─── Wealth ───────────────────────────────────────────────────────────────
   // Walk the graph for WEALTH effects and combine with the character's base wealth.
-  private computeWealth(): import("./types.js").WealthReport {
+  private computeWealth(): WealthReport {
     const DEFAULT_WEALTH = 8;
     const characterWealth = this.character.wealth;
     const base =
@@ -1212,7 +1223,7 @@ function normalizeCharacter(character: CharacterState): CharacterState {
   const owned = new Set(powers.map((p) => p.entityId));
   for (const c of classes) {
     const clsDef = lookupEntity(`classes:${c.name}`);
-    for (const p of clsDef?.innate || []) {
+    for (const p of (clsDef?.type === "class" ? clsDef.innate : []) || []) {
       if (c.level >= (p.requiredLevel || 1) && !owned.has(p.name)) {
         owned.add(p.name);
         powers.push({ entityId: p.name, source: Source.innate(), ranks: 1, costField: "innatePowers" });
