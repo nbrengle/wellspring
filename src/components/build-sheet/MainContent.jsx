@@ -378,14 +378,17 @@ export function ClassifiedRows({ rows, resolveType, showClass }) {
         const { name, field, index, source, grantedBy, cls, refundedBP, specialty, floor } = row;
         // Cost is attached to the row by validate() (from the BP ledger).
         const cost = row.cost;
-        const fromClass = source === "class";
-        const canRemove = !fromClass && index >= 0;
+        const sourceType = row.sourceType || row.source;
+        const canRemove = sourceType === "purchased" && index >= 0;
         const rank = cost?.rank || (index >= 0 ? character.ranks?.[field]?.[index] : null) || 1;
 
         const baseName = bareSkill(cleanItemName(name));
         const maxR = getMaxRanks(name, field, character);
         const grantedFloor = floor || 0;
-        const canBuyUp = fromClass && grantedFloor > 0 && maxR > grantedFloor
+        
+        const isGranted = sourceType === 'grant' || sourceType === 'class' || sourceType === 'innate' || sourceType === 'lineage';
+        
+        const canBuyUp = isGranted && grantedFloor > 0 && maxR > grantedFloor
           && !UNLIMITED_SKILLS.has(baseName);
         const rankFloor = canBuyUp ? grantedFloor : 1;
         const hasRanks = (canRemove || canBuyUp) && maxR > 1 && !UNLIMITED_SKILLS.has(baseName);
@@ -401,26 +404,35 @@ export function ClassifiedRows({ rows, resolveType, showClass }) {
               const tone = CLASS_TONES[t];
               return <span key={t} className={`b-picker-row-tag ${tone ? `b-tag-${tone}` : "b-data"}`}>{t}</span>;
             })}
-            {showClass && cls && !fromClass && (
+            {showClass && cls && !isGranted && (
               <span className={`b-row-badge ${CLASS_TONES[cls] ? `b-tag-${CLASS_TONES[cls]}` : "b-badge-class"}`}>
                 {cls.toUpperCase()}
               </span>
             )}
-            {fromClass
+            {isGranted
               ? (() => {
                   const src = grantedBy || cls;
+                  let title = "Granted free";
+                  if (sourceType === 'lineage') {
+                    title = "Granted free by your lineage";
+                  } else if (sourceType === 'grant' && grantedBy) {
+                    title = `Granted free by ${grantedBy}`;
+                  } else if (specialty) {
+                    title = `Granted free by your ${src}'s "${specialty}" starting choice`;
+                  } else {
+                    title = `Granted free by your ${src} class`;
+                  }
+                  
                   return (
                     <>
                       {src && (
                         <span className={`b-row-badge ${CLASS_TONES[src] ? `b-tag-${CLASS_TONES[src]}` : "b-badge-granted"}`}
-                              title={specialty ? `Granted free by your ${src}'s "${specialty}" starting choice`
-                                : grantedBy ? `Granted free by your ${grantedBy} multi-class`
-                                : `Granted free by your ${src} class`}>
+                              title={title}>
                           {src.toUpperCase()}{specialty && <span className="b-badge-spec"> · {specialty}</span>}
                         </span>
                       )}
                       {refundedBP ? (
-                        <span className="b-row-badge b-badge-refund" title="BP spent on this item was refunded because your class grants it for free">
+                        <span className="b-row-badge b-badge-refund" title="BP spent on this item was refunded because you received it for free">
                           +{refundedBP} BP REFUNDED
                         </span>
                       ) : null}
