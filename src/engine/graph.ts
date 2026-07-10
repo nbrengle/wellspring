@@ -17,7 +17,7 @@ import { costKey } from "./validate/cost-key.js";
 import { cleanItemName, bareSkill, getClasses } from "./resolver.js";
 import { characterLevel, getMaxRanks } from "./validate/core.js";
 import { paramInfo, paramReusable } from "./param-domain.js";
-import { spellSlots } from "./validate/slots.js";
+import { spellSlots, type SpellPool } from "./validate/slots.js";
 import type {
   CharacterState,
   GraphItem,
@@ -27,6 +27,11 @@ import type {
   BucketedView,
   BPLedger,
   BPLedgerEntry,
+  BaseEntity,
+  Entity,
+  CharacterChoice,
+  DiscountSpec,
+  WealthReport,
 } from "./types.js";
 import {
   Source,
@@ -36,7 +41,6 @@ import {
   ResolvedStats,
   GrantedAbility,
   PrereqReport,
-  WealthReport,
   PrereqIssue,
   PrereqNote,
 } from "./types.js";
@@ -156,12 +160,12 @@ export class CharacterGraphModel implements CharacterGraph {
     const sources: { name: string; stat: string; n: number }[] = [];
     const notes: { name: string; stat: string; [k: string]: unknown }[] = [];
 
-    const apply = (name: string, ent: any) => {
+    const apply = (name: string, ent: Pick<BaseEntity, "statMods" | "statModNotes"> | undefined) => {
       if (!ent) return;
-      for (const { stat, n } of ent.statMods || []) {
-        if (n !== 0) {
-          mods[stat] = (mods[stat] || 0) + n;
-          sources.push({ name, stat, n });
+      for (const { stat, amount } of ent.statMods || []) {
+        if (amount !== 0) {
+          mods[stat] = (mods[stat] || 0) + amount;
+          sources.push({ name, stat, n: amount });
         }
       }
       for (const note of ent.statModNotes || []) {
@@ -194,7 +198,7 @@ export class CharacterGraphModel implements CharacterGraph {
     const minRow = LEVEL_TABLE[0] || { level: 4, lp: 3, spikes: 0 };
     const maxRow = LEVEL_TABLE[LEVEL_TABLE.length - 1] || minRow;
 
-    const row = LEVEL_TABLE.find((r: any) => r.level === level) || (level < minRow.level ? minRow : maxRow);
+    const row = LEVEL_TABLE.find((r) => r.level === level) || (level < minRow.level ? minRow : maxRow);
 
     const baseLp = row.lp ?? 0;
     const baseSp = row.spikes ?? 0;
@@ -269,6 +273,11 @@ export class CharacterGraphModel implements CharacterGraph {
         choiceData: node.choiceData,
         specialty: node.specialty,
         floor: node.floor,
+        // One object literal is routed at runtime into 12 differently-typed buckets
+        // (SkillView | PowerView | …), and the fallback branch has no real Entity
+        // (`type: "unknown"`), so it can't statically satisfy any single variant. The
+        // routing below IS the discriminator; this is the one honest escape hatch.
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } as any;
 
       if (node.field === "flaws") {
@@ -278,7 +287,7 @@ export class CharacterGraphModel implements CharacterGraph {
 
       // Entity types are PLURAL ('skills' / 'perks' / 'powers' / 'spell'); route by them.
       const t = node.entity?.type;
-      const tier = (node.entity as any)?.tier;
+      const tier = node.entity?.tier;
 
       if (node.sourceType === "innate") {
         view.innatePowers.push(viewEntry);
@@ -312,7 +321,7 @@ export class CharacterGraphModel implements CharacterGraph {
       for (const eff of node.effects) {
         if (eff.type !== "GRANT_SOURCE") continue;
         for (const ability of eff.grants) {
-          const ent = lookupEntity(ability) as any;
+          const ent = lookupEntity(ability);
           list.push({
             ability,
             abilityName: ent?.name || ability.split(":")[1],
@@ -651,14 +660,19 @@ export class CharacterGraphModel implements CharacterGraph {
     const charClasses = this.classes;
     const charLevel = this.characterLevel;
     const charClassLevels = new Map(charClasses.map((c) => [c.name, c.level]));
-    const powerInContext = (name: string) => {
+    // A power's parser-extracted requirements — the only fields this check reads,
+    // whether the power came from the class-power tables or the entity index.
+    type PowerReq = Pick<BaseEntity, "requiredLevel" | "requiredClass" | "requiresEntity"> & {
+      __contextClass?: string;
+    };
+    const powerInContext = (name: string): PowerReq | null => {
       for (const { name: cls } of charClasses) {
-        const tiers = (CLASS_POWERS as any)[cls];
+        const tiers = CLASS_POWERS[cls];
         if (!tiers) continue;
         for (const list of Object.values(tiers)) {
           if (!Array.isArray(list)) continue;
-          const hit = list.find((p: any) => p.name === name);
-          if (hit) return { ...hit, __contextClass: cls };
+          const hit = list.find((p) => p.name === name);
+          if (hit) return { ...(hit as PowerReq), __contextClass: cls };
         }
       }
       return lookupEntity(`powers:${name}`);
@@ -668,18 +682,19 @@ export class CharacterGraphModel implements CharacterGraph {
       if (node.entity?.type !== "power") continue;
       const name = cleanItemName(node.name);
       const field = node.field;
-      const ent = powerInContext(name) as any;
+      const ent = powerInContext(name);
       if (!ent) continue;
 
-      if (ent.requiredLevel > 0) {
+      const requiredLevel = ent.requiredLevel ?? 0;
+      if (requiredLevel > 0) {
         const reqClass = ent.requiredClass || ent.__contextClass;
         const have = reqClass ? charClassLevels.get(reqClass) || 0 : charLevel;
-        if (have < ent.requiredLevel) {
+        if (have < requiredLevel) {
           issues.push({
             id: `powers:${name}`,
             item: name,
             field,
-            text: `Requires ${reqClass ? `${reqClass} ` : ""}Level ${ent.requiredLevel}`,
+            text: `Requires ${reqClass ? `${reqClass} ` : ""}Level ${requiredLevel}`,
           });
         }
       }
@@ -844,13 +859,13 @@ export class CharacterGraphModel implements CharacterGraph {
         ? parseInt(String(characterWealth), 10) || DEFAULT_WEALTH
         : DEFAULT_WEALTH;
 
-    const sources: any[] = [];
+    const sources: WealthReport["sources"] = [];
     let income = 0;
 
-    const add = (name: string, n: number, note: string) => {
-      if (n > 0) {
-        income += n;
-        sources.push({ name, n, note });
+    const add = (source: string, amount: number, note: string) => {
+      if (amount > 0) {
+        income += amount;
+        sources.push({ source, amount, note });
       }
     };
 
@@ -870,8 +885,8 @@ export class CharacterGraphModel implements CharacterGraph {
   // Full BP ledger: base costs, grants, discounts, and totals. Computed once.
   private computeSpend(): BPLedger {
     // Build index of things granted by the character's owned items.
-    const paramKey = (typedName: any) => {
-      const c = typeof typedName === "string" && typedName.includes(":") ? typedName : `:${typedName}`;
+    const paramKey = (typedName: string) => {
+      const c = typedName.includes(":") ? typedName : `:${typedName}`;
       let type = c.slice(0, c.indexOf(":"));
       const rest = c.slice(c.indexOf(":") + 1);
       if (type === "purchasedSkills" || type === "startingSkills") type = "skills";
@@ -882,12 +897,12 @@ export class CharacterGraphModel implements CharacterGraph {
       if (!m) return null;
       return `${type}:${m[1].trim()}|${m[2].trim().toLowerCase()}`;
     };
-    const grantIndex: any = {};
-    const grantParamIndex: any = {};
+    const grantIndex: Record<string, string> = {};
+    const grantParamIndex: Record<string, string> = {};
     for (const node of this.items) {
       for (const eff of node.effects) {
         if (eff.type === "GRANT_SOURCE") {
-          eff.grants.forEach((g: string) => {
+          eff.grants.forEach((g) => {
             if (!grantIndex[g]) grantIndex[g] = node.name;
             const pk = paramKey(g);
             if (pk && !grantParamIndex[pk]) grantParamIndex[pk] = node.name;
@@ -919,7 +934,7 @@ export class CharacterGraphModel implements CharacterGraph {
       }
 
       let isGranted = false;
-      let grantSrc: any = null;
+      let grantSrc: string | undefined;
       let isDerived = false;
       const nId = node.entityId || node.id;
       // Build the grant-matching key from the node's STRUCTURED param (parsed once
@@ -1017,7 +1032,7 @@ export class CharacterGraphModel implements CharacterGraph {
     }
 
     // Phase 2: Apply Discounts
-    const discountSources: any[] = [];
+    const discountSources: (DiscountSpec & { id: string; name: string })[] = [];
     for (const node of this.items) {
       for (const eff of node.effects) {
         if (eff.type === "DISCOUNT_SOURCE") {
@@ -1026,10 +1041,10 @@ export class CharacterGraphModel implements CharacterGraph {
       }
     }
 
-    const used = new Map();
-    const catCount = new Map();
+    const used = new Map<string, number>();
+    const catCount = new Map<string, number>();
     let discountFreeBP = 0;
-    const discountsApplied: any[] = [];
+    const discountsApplied: BPLedger["discountsApplied"] = [];
 
     for (const node of this.items) {
       if (node.field !== "skills" && node.field !== "perks") continue;
@@ -1055,7 +1070,7 @@ export class CharacterGraphModel implements CharacterGraph {
             const refund = Math.min(src.amount, room);
             discountFreeBP += refund;
             used.set(src.id, (used.get(src.id) || 0) + refund);
-            discountsApplied.push({ key: node.id, source: src.name, amount: refund, asFreeBP: true });
+            discountsApplied.push({ key: node.id, source: src.name, amount: refund });
           }
           continue;
         }
@@ -1102,11 +1117,13 @@ export class CharacterGraphModel implements CharacterGraph {
 }
 
 // Determine if a discount source applies to a specific graph item
-function discountApplies(src: any, itemNode: any, pos: number): boolean {
+function discountApplies(src: DiscountSpec & { id: string; name: string }, itemNode: GraphItem, pos: number): boolean {
   const ent = itemNode.entity;
   const itemName = itemNode.name;
+  const scopeValue = String(src.scope.value);
 
-  if (src.exclusions?.includes(ent?.id) || src.exclusions?.includes(`perks:${cleanItemName(itemName)}`)) return false;
+  if ((ent?.id && src.exclusions?.includes(ent.id)) || src.exclusions?.includes(`perks:${cleanItemName(itemName)}`))
+    return false;
 
   const cat = ent?.category;
   if (src.scope.kind === "category") {
@@ -1117,28 +1134,27 @@ function discountApplies(src: any, itemNode: any, pos: number): boolean {
   }
   if (src.scope.kind === "firstN") {
     return (
-      new RegExp(`^${src.scope.value}\\b`, "i").test(cleanItemName(itemName)) &&
-      (src.scope.n == null || pos < src.scope.n)
+      new RegExp(`^${scopeValue}\\b`, "i").test(cleanItemName(itemName)) && (src.scope.n == null || pos < src.scope.n)
     );
   }
   if (src.scope.kind === "skillRanks") {
-    return new RegExp(`^${src.scope.value}\\b`, "i").test(cleanItemName(itemName));
+    return new RegExp(`^${scopeValue}\\b`, "i").test(cleanItemName(itemName));
   }
   if (src.scope.kind === "namedSkill") {
-    return bareSkill(cleanItemName(itemName)) === src.scope.value;
+    return bareSkill(cleanItemName(itemName)) === scopeValue;
   }
   if (src.scope.kind === "prereq") {
-    const pr = REFS.prereqs?.[ent?.id];
-    const target = `perks:${src.scope.value}`;
+    const pr = ent?.id ? REFS.prereqs?.[ent.id] : undefined;
+    const target = `perks:${scopeValue}`;
     return (
-      !!pr && (pr.skills?.includes(target) || !!pr.other?.some((o: string) => new RegExp(src.scope.value, "i").test(o)))
+      !!pr && (pr.skills?.includes(target) || !!pr.other?.some((o: string) => new RegExp(scopeValue, "i").test(o)))
     );
   }
   if (src.scope.kind === "giftEligible") {
     if (!ent || ent.id?.startsWith("skills:")) return false;
-    if (ent.id === `perks:${src.scope.value}`) return false;
-    const prereqText = String(ent.prereq || ent.prerequisites || "");
-    if (new RegExp(`\\b${src.scope.value}\\b`, "i").test(prereqText)) return false;
+    if (ent.id === `perks:${scopeValue}`) return false;
+    const prereqText = String(ent.prereq || "");
+    if (new RegExp(`\\b${scopeValue}\\b`, "i").test(prereqText)) return false;
     return true;
   }
   return false;
@@ -1149,7 +1165,7 @@ function discountApplies(src: any, itemNode: any, pos: number): boolean {
 //   true  if the constraint is parsed and met.
 //   false if the constraint is parsed and failed.
 //   null  if the constraint format is unrecognized.
-function checkLevelConstraint(character: any, constraintStr: string, owned: Set<string>): boolean | null {
+function checkLevelConstraint(character: CharacterState, constraintStr: string, owned: Set<string>): boolean | null {
   const charLevel = characterLevel(character);
   const charClasses = getClasses(character);
 
@@ -1158,7 +1174,7 @@ function checkLevelConstraint(character: any, constraintStr: string, owned: Set<
   if (m) {
     const required = parseInt(m[1], 10);
     const martial = charClasses
-      .filter((c) => (CLASSES as any)[c.name]?.tags?.includes("Martial"))
+      .filter((c) => CLASSES[c.name]?.tags?.includes("Martial"))
       .reduce((sum, c) => sum + c.level, 0);
     return martial >= required;
   }
@@ -1171,7 +1187,7 @@ function checkLevelConstraint(character: any, constraintStr: string, owned: Set<
     // Spellcaster meta-class
     if (classStr === "spellcaster" || classStr === "spellcaster class") {
       const highestSpellcasterLevel = charClasses
-        .filter((c) => (CLASSES as any)[c.name]?.spellcaster)
+        .filter((c) => CLASSES[c.name]?.spellcaster)
         .reduce((max, c) => Math.max(max, c.level), 0);
       return highestSpellcasterLevel >= requiredLevel;
     }
@@ -1193,9 +1209,17 @@ function checkLevelConstraint(character: any, constraintStr: string, owned: Set<
   m = constraintStr.match(/^(\d+)\s+(Apprentice|Journeyman|Greater|Master)\s+spell-slots?/i);
   if (m) {
     const count = parseInt(m[1], 10);
-    const tier = m[2];
-    const slots = spellSlots(character);
-    const have = Object.values(slots || {}).reduce((s: number, c: any) => s + (c[tier] || 0), 0);
+    // The constraint names rulebook spell tiers; the SpellPool models three
+    // (novice/adept/greater). Map the tier word onto the pool key it reads.
+    const POOL_KEY: Record<string, keyof SpellPool> = {
+      apprentice: "novice",
+      journeyman: "adept",
+      greater: "greater",
+      master: "greater",
+    };
+    const key = POOL_KEY[m[2].toLowerCase()];
+    const slots = spellSlots(character) || {};
+    const have = Object.values(slots).reduce((s, c) => s + (c[key] || 0), 0);
     return have >= count;
   }
   // 6. "N Ranks of Profession"
@@ -1250,8 +1274,8 @@ export function resolveCharacterGraph(charInput: CharacterState): CharacterGraph
   const charLevel = characterLevel(character);
   const classes = getClasses(character);
 
-  const addItem = (choice: any) => {
-    let ent = lookupEntity(choice.entityId) as any;
+  const addItem = (choice: CharacterChoice) => {
+    let ent = lookupEntity(choice.entityId);
     // Remove the collection prefix (e.g. "skills:") for the display name
     const rawName = choice.entityId.replace(/^[a-z]+:/i, "");
     const cleanName = cleanItemName(rawName);
@@ -1270,7 +1294,7 @@ export function resolveCharacterGraph(charInput: CharacterState): CharacterGraph
     let baseCost = 0;
     if (Array.isArray(ent?.tiers) && ent.tiers.length) {
       const n = Math.min(rank, ent.tiers.length);
-      baseCost = ent.tiers.slice(0, n).reduce((s: number, t: any) => s + (t.cost || 0), 0);
+      baseCost = ent.tiers.slice(0, n).reduce((s, t) => s + (t.cost || 0), 0);
     } else {
       baseCost = (typeof ent?.cost === "number" ? ent.cost : ent?.lbp || 0) * rank;
     }
@@ -1283,7 +1307,7 @@ export function resolveCharacterGraph(charInput: CharacterState): CharacterGraph
     // The node model's internal sourceType string, derived from the structured
     // source's `type`. `starting` maps to 'class' (a starting skill was the old
     // 'Class:Starting' string → sourceType 'class'); `granted` → 'grant'.
-    const src: EntitySource = (choice.source as EntitySource) || Source.purchased();
+    const src: EntitySource = choice.source || Source.purchased();
     const SOURCE_TYPE: Record<EntitySource["type"], string> = {
       purchased: "purchased",
       class: "class",
@@ -1307,7 +1331,7 @@ export function resolveCharacterGraph(charInput: CharacterState): CharacterGraph
     // prefix is the ORIGINATING character field: flat-path buckets carry it as
     // `choice.costField` (e.g. 'classPowers'); native skills have none, so they
     // key under their entity collection ('skills'). Falls back to the raw entityId.
-    const idPrefixName = (choice as any).costField || (ent?.type ? idPrefix(ent) : null);
+    const idPrefixName = choice.costField || (ent?.type ? idPrefix(ent) : null);
     const nodeId = idPrefixName ? `${idPrefixName}:${cleanName}` : entityId;
     items.push({
       id: nodeId,
@@ -1361,8 +1385,8 @@ export function resolveCharacterGraph(charInput: CharacterState): CharacterGraph
   for (const choice of character.spells || []) addItem(choice);
   for (const choice of character.devotions || []) addItem(choice);
 
-  for (const field of ["lineageAdvantages", "lineageChallenges"]) {
-    for (const name of (character as any)[field] || []) {
+  for (const field of ["lineageAdvantages", "lineageChallenges"] as const) {
+    for (const name of character[field] || []) {
       const type = field === "lineageAdvantages" ? "advantages" : "challenges";
       let entityId = `${type}:${name}`;
       if (name === "Pick and Choose" && character.advantageChoices?.["Pick and Choose"]) {
@@ -1375,12 +1399,12 @@ export function resolveCharacterGraph(charInput: CharacterState): CharacterGraph
 
   // Process Flaws
   for (const choice of character.flaws || []) {
-    const rawName = (choice as any).entityId.replace(/^flaws:/i, "");
+    const rawName = choice.entityId.replace(/^flaws:/i, "");
     const cleanName = cleanItemName(rawName);
-    const ent = lookupEntity(`flaws:${cleanName}`) as any;
+    const ent = lookupEntity(`flaws:${cleanName}`);
     let bp = 0;
     if (ent) {
-      const allergenTable = ALLERGEN_AWARDS[ent.baseName];
+      const allergenTable = ent.baseName ? ALLERGEN_AWARDS[ent.baseName] : undefined;
       if (allergenTable) {
         const chosen = allergenAward(ent.baseName, ent.parameter);
         bp = chosen != null ? chosen : Math.min(...Object.values(allergenTable));
@@ -1391,7 +1415,7 @@ export function resolveCharacterGraph(charInput: CharacterState): CharacterGraph
     items.push({
       id: ent?.id || `flaws:${cleanName}`,
       name: ent?.name || cleanName,
-      rawString: (choice as any).entityId,
+      rawString: choice.entityId,
       param: extractParam(rawName),
       field: "flaws",
       sourceType: "flaw",
@@ -1400,12 +1424,12 @@ export function resolveCharacterGraph(charInput: CharacterState): CharacterGraph
       baseCost: -bp,
       entity: ent,
       effects: [{ type: "FLAW_AWARD", amount: bp }],
-      choiceData: choice as any,
+      choiceData: choice,
     });
   }
 
   // Generate Synthesized Granted Items & Deduplicate
-  const getIdentity = (rawName: string, ent: any, param?: string | null) => {
+  const getIdentity = (rawName: string, ent: Entity | null | undefined, param?: string | null) => {
     const clean = cleanItemName(rawName);
     const entityId = ent?.id || rawName;
     const cap = getMaxRanks(entityId);
@@ -1431,7 +1455,7 @@ export function resolveCharacterGraph(charInput: CharacterState): CharacterGraph
     return { key: `${baseName}|${paramValue}`, cap: 1 };
   };
 
-  const itemIdentities = new Map<string, { cap: number; nodes: any[] }>();
+  const itemIdentities = new Map<string, { cap: number; nodes: GraphItem[] }>();
   for (const it of items) {
     if (it.sourceType === "lineage") continue;
     const { key, cap } = getIdentity(it.rawString || it.name, it.entity, it.param);
@@ -1458,7 +1482,7 @@ export function resolveCharacterGraph(charInput: CharacterState): CharacterGraph
     for (const eff of node.effects) {
       if (eff.type !== "GRANT_SOURCE") continue;
       for (const gid of eff.grants) {
-        let ent = lookupEntity(gid) as any;
+        let ent = lookupEntity(gid);
         const gType = gid.slice(0, gid.indexOf(":"));
         const rawGidName = gid.slice(gid.indexOf(":") + 1);
         if (!ent) {
@@ -1497,7 +1521,7 @@ export function resolveCharacterGraph(charInput: CharacterState): CharacterGraph
           continue;
         }
 
-        const newGrant = {
+        const newGrant: GraphItem = {
           id: ent?.id || gid,
           name: gName,
           rawString: gName,
@@ -1561,13 +1585,13 @@ export function resolveCharacterGraph(charInput: CharacterState): CharacterGraph
   return new CharacterGraphModel(character, items, charLevel, classes);
 }
 
-export function grantedAbilities(character: any) {
+export function grantedAbilities(character: CharacterState) {
   const graph = resolveCharacterGraph(character);
-  const list: any[] = [];
-  const bySource: Record<string, any> = {};
+  const list: GrantedAbility[] = [];
+  const bySource: Record<string, { source: string; sourceKind: string; abilities: GrantedAbility[] }> = {};
 
   const addRow = (ability: string, sourceName: string, sourceId: string, sourceKind: string) => {
-    const ent = lookupEntity(ability) as any;
+    const ent = lookupEntity(ability);
     const row = {
       ability,
       abilityName: ent?.name || ability.split(":")[1],

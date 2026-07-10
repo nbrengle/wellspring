@@ -24,7 +24,7 @@ export interface ChooseOneConfig {
 
 export interface StatMod {
   stat: string;
-  amount: number | string;
+  amount: number;
 }
 
 // ─── Discriminated Union for Entities ───────────────────────────────────────
@@ -66,6 +66,11 @@ export interface BaseEntity {
   bp?: number | string; // For flawed abilities that grant bp
   effect?: string;
   call?: string;
+  /** BP cost, when the entity carries one directly (skills/perks; also lineage
+   *  entities via `lbp`). Skill/Perk redeclare `cost` as required. */
+  cost?: number | string;
+  /** Lineage BP cost — attached to advantage/challenge entities by the data layer. */
+  lbp?: number;
 }
 
 export interface Skill extends BaseEntity {
@@ -343,7 +348,7 @@ export interface BPLedger {
  *  the spend phase. `scope.value` is the parameter the discount is keyed to (e.g. a
  *  skill name); null-cap means uncapped. */
 export interface DiscountSpec {
-  scope: { kind: string; value: string | string[] };
+  scope: { kind: string; value: string | string[]; n?: number };
   amount: number;
   min?: number | null;
   cap?: number | null;

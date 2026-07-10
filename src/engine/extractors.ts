@@ -48,7 +48,7 @@ function extractWealth(ent, _character, _id) {
 
 function extractStatMods(ent, _character, _id) {
   if (ent?.statMods) {
-    return ent.statMods.map((mod) => ({ type: "STAT", stat: mod.stat, amount: mod.n }));
+    return ent.statMods.map((mod) => ({ type: "STAT", stat: mod.stat, amount: mod.amount }));
   }
   return [];
 }

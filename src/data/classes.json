@@ -2109,7 +2109,7 @@
         "statMods": [
           {
             "stat": "lifePoints",
-            "n": 1
+            "amount": 1
           }
         ]
       },
@@ -4725,7 +4725,7 @@
         "statMods": [
           {
             "stat": "lifePoints",
-            "n": 1
+            "amount": 1
           }
         ]
       },
@@ -4745,7 +4745,7 @@
         "statMods": [
           {
             "stat": "armor",
-            "n": 1
+            "amount": 1
           }
         ]
       },
@@ -4786,7 +4786,7 @@
         "statMods": [
           {
             "stat": "spikes",
-            "n": 1
+            "amount": 1
           }
         ]
       },
@@ -4922,15 +4922,15 @@
         "statMods": [
           {
             "stat": "lifePoints",
-            "n": 1
+            "amount": 1
           },
           {
             "stat": "naturalArmor",
-            "n": 1
+            "amount": 1
           },
           {
             "stat": "armor",
-            "n": 1
+            "amount": 1
           }
         ],
         "requiredLevel": 10,
@@ -4959,7 +4959,7 @@
         "statMods": [
           {
             "stat": "armor",
-            "n": 4
+            "amount": 4
           }
         ],
         "requiredLevel": 1,
@@ -6036,7 +6036,7 @@
         "statMods": [
           {
             "stat": "lifePoints",
-            "n": 1
+            "amount": 1
           }
         ],
         "requiredLevel": 6,
@@ -7486,7 +7486,7 @@
         "statMods": [
           {
             "stat": "spikes",
-            "n": 1
+            "amount": 1
           }
         ]
       },
@@ -7534,7 +7534,7 @@
         "statMods": [
           {
             "stat": "spikes",
-            "n": 1
+            "amount": 1
           }
         ]
       },
@@ -10546,7 +10546,7 @@
         "statMods": [
           {
             "stat": "spikes",
-            "n": 1
+            "amount": 1
           }
         ]
       },

@@ -423,7 +423,7 @@ export function lineageItemImpact(item, lineage) {
   const out: string[] = [];
   for (const m of item.statMods || []) {
     const label = STAT_LABELS[m.stat] || m.stat;
-    out.push(`${m.n >= 0 ? "+" : ""}${m.n} ${label}`);
+    out.push(`${m.amount >= 0 ? "+" : ""}${m.amount} ${label}`);
   }
   for (const note of item.statModNotes || []) {
     if (note?.text) out.push(note.text);

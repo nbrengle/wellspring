@@ -787,7 +787,7 @@ function extractPowerBenefits(power) {
 // ─── STAT-MOD EXTRACTION (prose → structured) ──────────────────────────────────
 // Permanent build-stat boosts (max Life Points / Armor / Spikes / Health / Natural
 // Armor) are stated in entity descriptions. We extract them HERE, at parse time,
-// next to the prose — emitting entity.statMods = [{ stat, n }] — so the validator
+// next to the prose — emitting entity.statMods = [{ stat, amount }] — so the validator
 // reads a structured field instead of re-regexing descriptions at character-build
 // time. One extraction site, close to the doc, diffable against it.
 const STAT_MOD_PATTERNS = [
@@ -845,8 +845,8 @@ const STAT_MOD_PATTERNS = [
 const STAT_WORD_N = { one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8 };
 const statNum = (w) => (/^\d+$/.test(String(w)) ? parseInt(w, 10) : STAT_WORD_N[String(w).toLowerCase()] || 0);
 
-// Core extractor: prose → [{ stat, n }]. One boost per stat (alternate phrasings
-// of the same boost don't double-count). Returns { mods, variableNaturalArmor }.
+// Core extractor: prose → [{ stat, amount }]. One boost per stat (alternate
+// phrasings of the same boost don't double-count). Returns { mods, variableNaturalArmor }.
 function statModsFromText(text) {
   const mods = [];
   const seen = new Set();
@@ -855,7 +855,7 @@ function statModsFromText(text) {
   for (const match of text.matchAll(/Grants?\s*(?:a\s+)?\+?(\d+)\s+(?:to\s+)?(Life|Armor)/gi)) {
     const stat = match[2].toLowerCase() === "life" ? "lifePoints" : "armor";
     if (!seen.has(stat)) {
-      mods.push({ stat, n: parseInt(match[1]) });
+      mods.push({ stat, amount: parseInt(match[1]) });
       seen.add(stat);
     }
   }
@@ -867,7 +867,7 @@ function statModsFromText(text) {
       val = words[match[1].toLowerCase()];
     }
     if (!seen.has("armor")) {
-      mods.push({ stat: "armor", n: val });
+      mods.push({ stat: "armor", amount: val });
       seen.add("armor");
     }
   }
@@ -890,9 +890,9 @@ function statModsFromText(text) {
     // a TEMPORARY buff — the doc reserves "Base" for permanent stat changes.
     if (/\bBonus\s+Maximum\b/i.test(m[0]) || /\bfor the duration\b/i.test(before)) continue;
     const w = m[1] || (m[0].match(/\b(one|two|three|four|five|six|seven|eight)\b/i) || [])[1] || "0";
-    const n = statNum(w) * sign;
-    if (n !== 0) {
-      mods.push({ stat, n });
+    const amount = statNum(w) * sign;
+    if (amount !== 0) {
+      mods.push({ stat, amount });
       seen.add(stat);
     }
   }

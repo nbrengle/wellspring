@@ -150,7 +150,12 @@ export function IdentityRail() {
               value={w.income > 0 ? `${w.total}` : w.base}
               base={w.base}
               baseLabel="starting"
-              sources={w.sources.map((s) => ({ name: s.name, n: s.n, note: s.note, type: sourceType(s.name) }))}
+              sources={w.sources.map((s) => ({
+                name: s.source,
+                n: s.amount,
+                note: s.note,
+                type: sourceType(s.source),
+              }))}
               onInspect={onInspect}
             />
           );
