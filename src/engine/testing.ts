@@ -1,4 +1,5 @@
 import { resolveCharacterGraph } from "./graph.js";
+import type { CharacterState } from "./types.js";
 
 export { budgetFor, bonusBudgetFor, devotionState } from "./validate.js";
 export {
@@ -16,6 +17,6 @@ export { prereqStatus, checkLevelConstraint } from "./validate/prereqs.js";
 export { LEVEL_CAP, LEGAL_MIN_LEVEL, getMaxRanks } from "./validate/core.js";
 export { grantedAbilities } from "./graph.js";
 
-export function computeSpend(character) {
+export function computeSpend(character: CharacterState) {
   return resolveCharacterGraph(character).spend;
 }

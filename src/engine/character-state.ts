@@ -15,12 +15,12 @@ import {
 // can't be changed/cleaned. This is the read-side counterpart: if an owned skill
 // matches one of a build choose-one's options' granted skills, that option was chosen.
 // Mirrors reconcileStartingChoices (derive choices from the resolved character).
-function reconcileBuildChoices(character) {
+function reconcileBuildChoices(character: CharacterState) {
   // Options differ only by their PARAMETERIZED grant ("Weapon Specialization -
   // Swords" vs "- Daggers"), so match on the full param-aware key, not the bare
   // skill (which would make every option look matched). Normalize both the dash
   // form ("Foo - Swords") and the parens form ("Foo (Swords)") to "foo|swords".
-  const key = (name) => {
+  const key = (name: string) => {
     const clean = cleanItemName(name);
     const m = clean.match(/^(.*?)\s*\(([^()]*)\)\s*$/);
     if (m && !/^\d+$/.test(m[2].trim())) return `${m[1].trim().toLowerCase()}|${m[2].trim().toLowerCase()}`;
@@ -30,8 +30,8 @@ function reconcileBuildChoices(character) {
   };
   // All owned skills (starting + purchased) live in the skills[] bucket.
   const ownedSkillNames = (character.skills || [])
-    .filter((s) => typeof s !== "string")
-    .map((s) => s.entityId || s.name);
+    .filter((s: { entityId?: string, name: string } | string) => typeof s !== "string")
+    .map((s: { entityId?: string, name: string } | string) => typeof s !== "string" ? s.entityId || s.name : s);
   const owned = new Set(ownedSkillNames.map(key));
   const choices = { ...(character.choices || {}) };
   for (const ent of getAllEntities()) {
@@ -42,9 +42,9 @@ function reconcileBuildChoices(character) {
       const grants = opt.grants || opt.grantsSkills || [];
       // The option's DISTINGUISHING grant is its parameterized one; require that it's
       // owned (shared grants like "Two Weapon Style" can't tell options apart).
-      const distinguishing = grants.filter((g) => key(g).includes("|"));
+      const distinguishing = grants.filter((g: string) => key(g).includes("|"));
       const probe = distinguishing.length ? distinguishing : grants;
-      if (probe.length && probe.every((g) => owned.has(key(g)))) {
+      if (probe.length && probe.every((g: string) => owned.has(key(g)))) {
         choices[choiceKey] = opt.text;
         break;
       }
@@ -79,7 +79,7 @@ export const EMPTY_CHARACTER: CharacterState = {
 };
 
 // ─── PURE STATE MODIFIERS ───────────────────────────────────────────────────
-export function applyClassStartingAbilities(character, className, _level = 1) {
+export function applyClassStartingAbilities(character: CharacterState, className: string, _level = 1) {
   const isPrimary = getClasses(character)[0]?.name === className;
 
   let nextCharacter = { ...character };
@@ -96,8 +96,8 @@ export function applyClassStartingAbilities(character, className, _level = 1) {
   return nextCharacter;
 }
 
-export function loadArchetype(archetype) {
-  const c = { ...EMPTY_CHARACTER, archetypeName: archetype.name };
+export function loadArchetype(archetype: Record<string, unknown>) {
+  const c: Record<string, unknown> = { ...EMPTY_CHARACTER, archetypeName: archetype.name };
   for (const k of Object.keys(EMPTY_CHARACTER)) {
     if (k === "archetypeName") continue;
     if (archetype[k] !== undefined) {

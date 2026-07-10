@@ -101,15 +101,15 @@ export function countPicksForClass(
 }
 
 export function maxProgressionLevel(cls: string) {
-  const levels = Object.keys(CLASS_PROGRESSION[cls] || {})
+  const levels = Object.keys((CLASS_PROGRESSION as Record<string, Record<number, unknown>>)[cls] || {})
     .map(Number)
     .filter((n) => n > 0);
   return levels.length ? Math.max(...levels) : 4;
 }
 
 export function progressionRow(cls: string, level: number) {
-  const prog = CLASS_PROGRESSION[cls] || {};
-  return prog[level] || prog[Math.min(level, maxProgressionLevel(cls))] || CLASS_POWER_SLOTS[cls];
+  const prog = (CLASS_PROGRESSION as Record<string, Record<number, unknown>>)[cls] || {};
+  return prog[level] || prog[Math.min(level, maxProgressionLevel(cls))] || (CLASS_POWER_SLOTS as Record<string, unknown>)[cls];
 }
 
 // ─── Grant cluster ──────────────────────────────────────────────────────────
