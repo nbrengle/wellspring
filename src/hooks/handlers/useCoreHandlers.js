@@ -21,10 +21,13 @@ export function useCoreHandlers({ character, setCharacter, setPicking, setView }
     [setCharacter],
   );
 
+  // Set the parameter of an owned row (field + index) to a raw value. Param is a
+  // FIELD — no old/new name, no id-string rebuild. `displayName` is the row's new
+  // display form, only so the open detail pane stays pointed at it.
   const handleUpdateParameter = useCallback(
-    (field, oldName, newName, index = null) => {
-      setCharacter((c) => reducers.updateParameter(c, field, oldName, newName, index));
-      setView((v) => (v ? { ...v, item: newName } : null));
+    (field, index, value, displayName) => {
+      setCharacter((c) => reducers.setParameter(c, field, index, value));
+      setView((v) => (v ? { ...v, item: displayName } : null));
     },
     [setCharacter, setView],
   );

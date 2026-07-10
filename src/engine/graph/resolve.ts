@@ -36,8 +36,11 @@ export function resolveCharacterGraph(charInput: CharacterState): CharacterGraph
   const charLevel = characterLevel(character);
   const classes = getClasses(character);
   const addItem = (choice: CharacterChoice) => {
+    // The ENTITY is choice.entityId (bare — "Lore", never "Lore (Historical)"): all
+    // rules data (REFS grants/prereqs/discounts, cost) is keyed on the bare id, so we
+    // look THAT up. The `parameter` FIELD is used only to (a) build the display name
+    // and (b) distinguish instances for dedupe — never to resolve the entity.
     let ent = lookupEntity(choice.entityId);
-    // Remove the collection prefix (e.g. "skills:") for the display name
     const rawName = choice.entityId.replace(/^[a-z]+:/i, "");
     const cleanName = cleanItemName(rawName);
     const bareName = bareSkill(cleanName);
@@ -47,6 +50,17 @@ export function resolveCharacterGraph(charInput: CharacterState): CharacterGraph
       ent =
         lookupEntity(`skills:${bareName}`) || lookupEntity(`perks:${cleanName}`) || lookupEntity(`powers:${cleanName}`);
     }
+
+    // Display form = the entity's name + the chosen parameter (the FIELD). Derived
+    // for the row's label / instance key; NOT an entity lookup key. Only a real
+    // stored `choice.parameter` reconstructs the name — we must NOT re-append a param
+    // scraped from the id string, or a name that merely contains " - " (e.g. a
+    // lineage-qualified "Underkin - Iron Touch") would be mangled. `param` (used for
+    // dedup) still falls back to extractParam for any legacy inline-param data.
+    const baseDisplay = ent?.name || cleanName;
+    const displayName =
+      choice.parameter && !/\(/.test(baseDisplay) ? `${baseDisplay} (${choice.parameter})` : baseDisplay;
+    const param = choice.parameter ?? extractParam(rawName);
 
     const rank = choice.ranks || 1;
     const effects: Effect[] = [];
@@ -88,18 +102,19 @@ export function resolveCharacterGraph(charInput: CharacterState): CharacterGraph
     }
 
     // Node id is the PARAMETER-PRESERVING instance key used for the BP ledger,
-    // prereq issue ids, and dedupe — NOT ent.id (the param-stripped BASE). Its
-    // prefix is the ORIGINATING character field: flat-path buckets carry it as
-    // `choice.costField` (e.g. 'classPowers'); native skills have none, so they
-    // key under their entity collection ('skills'). Falls back to the raw entityId.
+    // prereq issue ids, and dedupe — NOT ent.id (the param-stripped BASE), so it keys
+    // off the display form (base + param) to keep two Lores distinct. Its prefix is
+    // the ORIGINATING character field: flat-path buckets carry it as `choice.costField`
+    // (e.g. 'classPowers'); native skills have none, so they key under their entity
+    // collection ('skills'). Falls back to the entity id.
     const idPrefixName = choice.costField || (ent?.type ? idPrefix(ent) : null);
-    const nodeId = idPrefixName ? `${idPrefixName}:${cleanName}` : entityId;
+    const nodeId = idPrefixName ? `${idPrefixName}:${displayName}` : entityId;
     items.push({
       id: nodeId,
       entityId: entityId,
-      name: ent?.name || cleanName,
-      rawString: choice.entityId,
-      param: extractParam(rawName),
+      name: displayName,
+      rawString: displayName,
+      param,
       field,
       sourceType,
       cls: sourceClass(src),
@@ -157,11 +172,15 @@ export function resolveCharacterGraph(charInput: CharacterState): CharacterGraph
     const rawName = choice.entityId.replace(/^flaws:/i, "");
     const cleanName = cleanItemName(rawName);
     const ent = lookupEntity(`flaws:${cleanName}`);
+    // Param is the FIELD (fallback to any inline "(value)" in legacy data). The award
+    // for a parameterized flaw (Mild Allergy → substance) is keyed on the chosen value.
+    const param = choice.parameter ?? extractParam(rawName);
     let bp = 0;
     if (ent) {
-      const allergenTable = ent.baseName ? ALLERGEN_AWARDS[ent.baseName] : undefined;
+      const allergenBase = ent.baseName || ent.name;
+      const allergenTable = allergenBase ? ALLERGEN_AWARDS[allergenBase] : undefined;
       if (allergenTable) {
-        const chosen = allergenAward(ent.baseName, ent.parameter);
+        const chosen = allergenAward(allergenBase, param);
         bp = chosen != null ? chosen : Math.min(...Object.values(allergenTable));
       } else {
         bp = typeof ent.bp === "number" ? ent.bp : parseInt(String(ent.bp), 10) || 0;
@@ -169,9 +188,9 @@ export function resolveCharacterGraph(charInput: CharacterState): CharacterGraph
     }
     items.push({
       id: ent?.id || `flaws:${cleanName}`,
-      name: ent?.name || cleanName,
-      rawString: choice.entityId,
-      param: extractParam(rawName),
+      name: param && ent?.name && !/\(/.test(ent.name) ? `${ent.name} (${param})` : ent?.name || cleanName,
+      rawString: param && ent?.name ? `${ent.name} (${param})` : choice.entityId,
+      param,
       field: "flaws",
       sourceType: "flaw",
       index: character.flaws?.indexOf(choice),
