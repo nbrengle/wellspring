@@ -3,8 +3,15 @@
 import { DISCIPLINE_LABELS } from "./shared.jsx";
 
 export default function MakeableTab({
-  filteredRecipes, filterDiscipline, setFilterDiscipline, filterTier, setFilterTier,
-  hideUncraftable, setHideUncraftable, inspectedRecipeName, onInspect,
+  filteredRecipes,
+  filterDiscipline,
+  setFilterDiscipline,
+  filterTier,
+  setFilterTier,
+  hideUncraftable,
+  setHideUncraftable,
+  inspectedRecipeName,
+  onInspect,
 }) {
   return (
     <div className="b-recipe-scrollable-content">
@@ -12,16 +19,24 @@ export default function MakeableTab({
           sortlabel/sortsel/toggle) so the recipe filters read like every other
           pane's group/sort controls. */}
       <div className="b-picker-sortrow">
-        <label className="b-picker-sortlabel">Discipline
-          <select className="b-picker-sortsel" value={filterDiscipline} onChange={(e) => setFilterDiscipline(e.target.value)}>
+        <label className="b-picker-sortlabel">
+          Discipline
+          <select
+            className="b-picker-sortsel"
+            value={filterDiscipline}
+            onChange={(e) => setFilterDiscipline(e.target.value)}
+          >
             <option value="all">All Crafts</option>
             {Object.entries(DISCIPLINE_LABELS).map(([k, v]) => (
-              <option key={k} value={k}>{v}</option>
+              <option key={k} value={k}>
+                {v}
+              </option>
             ))}
           </select>
         </label>
 
-        <label className="b-picker-sortlabel">Tier
+        <label className="b-picker-sortlabel">
+          Tier
           <select className="b-picker-sortsel" value={filterTier} onChange={(e) => setFilterTier(e.target.value)}>
             <option value="all">All Tiers</option>
             <option value="apprentice">Apprentice</option>
@@ -51,7 +66,9 @@ export default function MakeableTab({
               >
                 <span className="b-recipe-card-header">
                   <span className="b-recipe-card-name">{recipe.name}</span>
-                  <span className="b-recipe-card-badge">{recipe.discipline} • {recipe.tier}</span>
+                  <span className="b-recipe-card-badge">
+                    {recipe.discipline} • {recipe.tier}
+                  </span>
                 </span>
                 <span className="b-recipe-card-materials">Cost: {recipe.materialsStr}</span>
                 <span className="b-recipe-card-action">Click to inspect</span>
@@ -64,7 +81,9 @@ export default function MakeableTab({
       {/* Section: Close to Craftable */}
       {!hideUncraftable && (
         <div className="b-recipe-section">
-          <h4 className="b-recipe-section-title">Close to Craftable (Missing ≤ 2 Items) ({filteredRecipes.close.length})</h4>
+          <h4 className="b-recipe-section-title">
+            Close to Craftable (Missing ≤ 2 Items) ({filteredRecipes.close.length})
+          </h4>
           {filteredRecipes.close.length === 0 ? (
             <p className="b-recipe-empty-msg">No near-craftable recipes match.</p>
           ) : (
@@ -77,10 +96,16 @@ export default function MakeableTab({
                 >
                   <span className="b-recipe-card-header">
                     <span className="b-recipe-card-name">{recipe.name}</span>
-                    <span className="b-recipe-card-badge">{recipe.discipline} • {recipe.tier}</span>
+                    <span className="b-recipe-card-badge">
+                      {recipe.discipline} • {recipe.tier}
+                    </span>
                   </span>
                   <span className="b-recipe-card-deficit-alert">
-                    Missing: {deficit.items.filter(i => i.missing > 0).map(i => `${i.missing} ${i.name}`).join(", ")}
+                    Missing:{" "}
+                    {deficit.items
+                      .filter((i) => i.missing > 0)
+                      .map((i) => `${i.missing} ${i.name}`)
+                      .join(", ")}
                   </span>
                   <span className="b-recipe-card-materials">Cost: {recipe.materialsStr}</span>
                 </button>

@@ -34,24 +34,24 @@ reusable = cap > |paramDomain|
 ```
 
 - If the cap exceeds the number of legal parameter values, distinct-per-rank is impossible →
-  reuse is forced (param is *payload*; count to cap).
+  reuse is forced (param is _payload_; count to cap).
 - If there are always enough distinct values to cover the cap, each rank takes a fresh value →
-  param is *identity* (a repeat of the same value is redundant).
+  param is _identity_ (a repeat of the same value is redundant).
 
 ### Validation against all 13 parameterized multi-rank entities
 
-| Entity | cap | param domain | \|domain\| | cap>\|domain\| → reusable | ruling |
-|---|---|---|---|---|---|
-| Studied Process | 3 | Alchemy, Enchanting, Tinkering | 3 | no | distinct (per-param) — "once for each Craft" ✓ |
-| Batch Process | 4 | Alchemy, Ritual, Enchanting, Tinkering | 4 | no | distinct (per-param) ✓ |
-| Extended Capacity ×3 | 4/4/3 | Sphere = {Arcane, Divine} | 2 | yes | reusable (stacking) ✓ |
-| Lore | ∞ | areas (open-ended) | ∞ | no | distinct (per-param) ✓ |
-| Additional Cantrip | 4 | class cantrip list | large | no | distinct (per-param) ✓ |
-| Chronic Hobbyist | 3 | professions | large | no | distinct (per-param) ✓ |
-| Accent Substantiation | 8 | substitution list | ≥8 | no | distinct (per-param) ✓ |
-| Elemental Affinity | 2 | Flame/Ice/Lightning/Acid | 4 | no | distinct — "one at a time", 2nd is an alt ✓ |
-| Extensive Combat Training ×2 | 2 | non-casting class powers | large | no | distinct (per-param) ✓ |
-| Extensive Training | 2 | non-casting utility powers | large | no | distinct (per-param) ✓ |
+| Entity                       | cap   | param domain                           | \|domain\| | cap>\|domain\| → reusable | ruling                                         |
+| ---------------------------- | ----- | -------------------------------------- | ---------- | ------------------------- | ---------------------------------------------- |
+| Studied Process              | 3     | Alchemy, Enchanting, Tinkering         | 3          | no                        | distinct (per-param) — "once for each Craft" ✓ |
+| Batch Process                | 4     | Alchemy, Ritual, Enchanting, Tinkering | 4          | no                        | distinct (per-param) ✓                         |
+| Extended Capacity ×3         | 4/4/3 | Sphere = {Arcane, Divine}              | 2          | yes                       | reusable (stacking) ✓                          |
+| Lore                         | ∞     | areas (open-ended)                     | ∞          | no                        | distinct (per-param) ✓                         |
+| Additional Cantrip           | 4     | class cantrip list                     | large      | no                        | distinct (per-param) ✓                         |
+| Chronic Hobbyist             | 3     | professions                            | large      | no                        | distinct (per-param) ✓                         |
+| Accent Substantiation        | 8     | substitution list                      | ≥8         | no                        | distinct (per-param) ✓                         |
+| Elemental Affinity           | 2     | Flame/Ice/Lightning/Acid               | 4          | no                        | distinct — "one at a time", 2nd is an alt ✓    |
+| Extensive Combat Training ×2 | 2     | non-casting class powers               | large      | no                        | distinct (per-param) ✓                         |
+| Extensive Training           | 2     | non-casting utility powers             | large      | no                        | distinct (per-param) ✓                         |
 
 `reusable = cap > |domain|` reproduces **every** ruling, including Elemental Affinity (which a
 prose reading first mis-classified). The rule is the model, not a heuristic.
@@ -84,7 +84,7 @@ is the one parser addition (§4).
 
 > Note: the 44 non-parameterized multi-rank entities (Quality Control, Thick Skin, etc.) need
 > **no special handling** for identity — `identityKey = baseName`, `perKeyCap = cap`. Whether
-> their per-rank effects escalate is an *effects/rendering* concern, orthogonal to identity.
+> their per-rank effects escalate is an _effects/rendering_ concern, orthogonal to identity.
 
 ---
 
@@ -105,7 +105,7 @@ grant + purchase share a key at cap:
 This is the rulebook's **Redundant Skills** rule ("gain a skill/perk you already have → free BP
 equal to its cost; gain a discount you already have → free BP equal to the discount"). Dedupe is
 **never** a deletion; surplus converts to free BP. The purchase/grant asymmetry is the key: you
-can't *buy* over cap, but a *grant* can push you over and is absorbed as free BP.
+can't _buy_ over cap, but a _grant_ can push you over and is absorbed as free BP.
 
 **Ordering must be deterministic:** grants reconcile against the owned/purchased set, so "already
 have it" is well-defined and not order-of-iteration luck (the failure mode of #145's `bareKey`
@@ -122,18 +122,18 @@ This is the buildable, non-rotting part. It is the real content of task #50.
    - class powers store it as `maxRanks`,
    - and class-power `(N)` notation in the MegaDoc is sometimes **dropped** or **misread as
      `cost`** in grant-list context (`scripts/parse-megadoc.js` ~line 278 vs ~426).
-   The parser must emit a single normalized cap field for every entity, recovering class-power
-   `(N)`. (Counts: 57 entities have cap>1 once both fields are read; only 3 used `maxRanks` and
-   were invisible to every `ranks`-only check.)
+     The parser must emit a single normalized cap field for every entity, recovering class-power
+     `(N)`. (Counts: 57 entities have cap>1 once both fields are read; only 3 used `maxRanks` and
+     were invisible to every `ranks`-only check.)
 
 2. **Extract parameter DOMAIN, not just the label.** Today `parameter` is a label ("Sphere",
    "Area of Lore"). We need the **legal value set's size** (or an ∞ flag):
    - "Choose one Craft: Alchemy, Enchanting, or Tinkering" → enumerate → size 3.
-   - "Sphere" → resolve against the known Sphere set → size 2 (Arcane, Divine). *(Confirm: are
-     there more spheres? If elemental spheres exist, this number changes — verify.)*
+   - "Sphere" → resolve against the known Sphere set → size 2 (Arcane, Divine). _(Confirm: are
+     there more spheres? If elemental spheres exist, this number changes — verify.)_
    - "list of suggested areas of study" / "any element they desire" → open-ended → ∞.
-   The "Choose one X: a, b, or c" pattern is regular and parser-extractable, same class of work
-   the parser already does for tiers/costs.
+     The "Choose one X: a, b, or c" pattern is regular and parser-extractable, same class of work
+     the parser already does for tiers/costs.
 
 3. **Derive `reusable = cap > paramDomainSize`** at build/resolve time. No human ruling.
 
@@ -156,12 +156,12 @@ never silently allows an illegal duplicate).
 
 ## 5. Buckets are a SEPARATE pass (physical, not semantic)
 
-Dedupe decides *what exists*; bucketing decides *where it renders*. Keep them distinct:
+Dedupe decides _what exists_; bucketing decides _where it renders_. Keep them distinct:
 
 - **Dedupe** (§2–3): identity + cap + free-BP. Mechanical/semantic. Inputs: `cap`, `param`,
   `paramDomainSize`.
 - **Bucket** (separate): place each surviving item into `{classes, innatePowers, basicPowers,
-  skills, perks, classPowers, ...}` by **entity type + source** (granted-innate vs purchased).
+skills, perks, classPowers, ...}` by **entity type + source** (granted-innate vs purchased).
   This is #145's grant-routing-by-type, already ~80% right — it becomes the bucket-placement
   pass. It does **not** re-derive identity (the bug in #145's `classifyOwnedItems`).
 
@@ -182,7 +182,7 @@ The user's raw choices are transient input to the single `resolve()`; nothing is
    keep/refund rule. Reads normalized cap + `paramDomainSize`. Deterministic grant/purchase order.
 5. **Bucket placement** — the read-layer pass (extends #145's grant-by-type routing).
    Independent of 2–4; can proceed in parallel.
-6. **Validation** — block over-cap *purchases* at buy time (UI/validator).
+6. **Validation** — block over-cap _purchases_ at buy time (UI/validator).
 
 Steps 1–2 are pure data/parser (no engine collision). 4–5 are the engine lane.
 
@@ -190,16 +190,16 @@ Steps 1–2 are pure data/parser (no engine collision). 4–5 are the engine lan
 
 ## Appendix A — canonical cases the implementation must pass
 
-| Case | Setup | Expected |
-|---|---|---|
-| Weapon Spec (cap 1, param) | own (Sword); granted (Axe) | keep Sword; Axe → FREE_BP; param Axe discarded |
-| Lore (∞, distinct) | (Arcane), (Religion), 2nd (Arcane) | keep Arcane+Religion; 2nd Arcane → FREE_BP |
-| Extended Capacity (cap 4, reusable) | 4× Arcane | all 4 kept |
-| Extended Capacity over cap | 5× Arcane | keep 4; 5th purchase = ERROR / 5th grant = FREE_BP |
-| Studied Process (cap 3 = domain 3) | Alchemy, Enchanting, Tinkering | all 3 kept; 2nd Alchemy → FREE_BP |
-| Scavenge II (cap 1, no param) | ×2 | keep 1; 2nd → FREE_BP |
-| Grant-on-purchase (Lessons from Scars) | buy Lore (Arcane), then granted | one node, marked free-via-grant; purchase BP refunds |
-| Arcane Secrets grant | power grants a spell | routes to Known Spells bucket, not classPowers |
+| Case                                   | Setup                              | Expected                                             |
+| -------------------------------------- | ---------------------------------- | ---------------------------------------------------- |
+| Weapon Spec (cap 1, param)             | own (Sword); granted (Axe)         | keep Sword; Axe → FREE_BP; param Axe discarded       |
+| Lore (∞, distinct)                     | (Arcane), (Religion), 2nd (Arcane) | keep Arcane+Religion; 2nd Arcane → FREE_BP           |
+| Extended Capacity (cap 4, reusable)    | 4× Arcane                          | all 4 kept                                           |
+| Extended Capacity over cap             | 5× Arcane                          | keep 4; 5th purchase = ERROR / 5th grant = FREE_BP   |
+| Studied Process (cap 3 = domain 3)     | Alchemy, Enchanting, Tinkering     | all 3 kept; 2nd Alchemy → FREE_BP                    |
+| Scavenge II (cap 1, no param)          | ×2                                 | keep 1; 2nd → FREE_BP                                |
+| Grant-on-purchase (Lessons from Scars) | buy Lore (Arcane), then granted    | one node, marked free-via-grant; purchase BP refunds |
+| Arcane Secrets grant                   | power grants a spell               | routes to Known Spells bucket, not classPowers       |
 
 ---
 
@@ -217,7 +217,7 @@ content Wellspring will keep absorbing. These break assumptions in the current
 
 2. **Runtime call placeholders are NOT build-time identity params — must be ignored.**
    e.g. `"[Name or Description] ..."`, `"Faithcast [Spell or Cantrip Name]"`,
-   `"Subtle [X] by Ingested Poison"`. These are chosen each time the power is *used*,
+   `"Subtle [X] by Ingested Poison"`. These are chosen each time the power is _used_,
    not at character build, so they have nothing to do with dedupe identity. **Danger:**
    a parser that scrapes every `[...]` as an identity param would corrupt dedupe (e.g.
    treat `Garrote (2)`'s two ranks as distinguished by `[Agony/Force]` when they're

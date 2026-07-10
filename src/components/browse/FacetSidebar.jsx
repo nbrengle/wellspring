@@ -62,7 +62,13 @@ export default function FacetSidebar({
             <div className="b-facetbar-head" onClick={() => setCollapsed((c) => ({ ...c, [f.id]: !c[f.id] }))}>
               <span className="b-facetbar-label">{f.label}</span>
               {nSel > 0 && (
-                <button className="b-facetbar-clear" onClick={(e) => { e.stopPropagation(); clearFacet(f.id); }}>
+                <button
+                  className="b-facetbar-clear"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    clearFacet(f.id);
+                  }}
+                >
                   clear {nSel}
                 </button>
               )}
@@ -97,10 +103,14 @@ export function ActiveFilterBar({ sel, onChange, facetLabel }) {
       {chips.map(([id, v]) => (
         <span key={`${id}:${v}`} className="b-facetbar-chip">
           {facetLabel ? `${facetLabel(id)}: ${v}` : v}
-          <button onClick={() => onChange(toggleFacetValue(sel, id, v))} aria-label={`Remove ${v}`}>×</button>
+          <button onClick={() => onChange(toggleFacetValue(sel, id, v))} aria-label={`Remove ${v}`}>
+            ×
+          </button>
         </span>
       ))}
-      <button className="b-facetbar-clearall" onClick={() => onChange({})}>clear all</button>
+      <button className="b-facetbar-clearall" onClick={() => onChange({})}>
+        clear all
+      </button>
     </div>
   );
 }

@@ -85,12 +85,20 @@ export function updateParameter(
     const cur = purchasedEntries(c, bucket);
     const idx = index !== null && index >= 0 ? index : cur.findIndex((s) => s.entityId === oldName);
     if (idx < 0 || idx >= cur.length) return c;
-    nextChar = withPurchased(c, bucket, cur.map((s, i) => (i === idx ? { ...s, entityId: newName } : s)));
+    nextChar = withPurchased(
+      c,
+      bucket,
+      cur.map((s, i) => (i === idx ? { ...s, entityId: newName } : s)),
+    );
   } else {
     const cur = fieldEntries(c, field);
     const idx = index !== null && index >= 0 ? index : cur.findIndex((s) => s.entityId === oldName);
     if (idx < 0 || idx >= cur.length) return c;
-    nextChar = withField(c, field, cur.map((s, i) => (i === idx ? { ...s, entityId: newName } : s)));
+    nextChar = withField(
+      c,
+      field,
+      cur.map((s, i) => (i === idx ? { ...s, entityId: newName } : s)),
+    );
   }
 
   const { baseName, paramVal } = splitParameterizedName(newName);
@@ -127,7 +135,8 @@ export function updateParameter(
           remainingDomains.some((dn) => {
             const dom = DOMAINS.find((x) => x.name === dn);
             return dom?.powers.some((x) => x.name === basePower || x.name === full);
-          }));
+          }),
+        );
       }
     }
   }
@@ -147,14 +156,13 @@ export function updateParameter(
 
 // The bucket a slot field lives in — spell fields route to `spells`, all others to
 // `powers`. (Devotion/domain aside, every slot field is one or the other.)
-const SPELL_FIELDS = new Set(['cantrips', 'spellsKnown', 'noviceSpells', 'adeptSpells', 'greaterSpells', 'bookSpells']);
-const bucketOfField = (field: string): 'spells' | 'powers' =>
-  SPELL_FIELDS.has(field) ? 'spells' : 'powers';
+const SPELL_FIELDS = new Set(["cantrips", "spellsKnown", "noviceSpells", "adeptSpells", "greaterSpells", "bookSpells"]);
+const bucketOfField = (field: string): "spells" | "powers" => (SPELL_FIELDS.has(field) ? "spells" : "powers");
 
 // Power fields added via the plain "Add a …" picker (handleAddEntity) rather than
 // a class slot: these COST BP and route to the powers bucket with a purchased
 // source, addressed positionally among their costField like purchased skills.
-const PURCHASED_POWER_FIELDS = new Set(['classPowers', 'domainPowers']);
+const PURCHASED_POWER_FIELDS = new Set(["classPowers", "domainPowers"]);
 
 const fieldEntries = (c: Char, field: string): CharacterChoice[] =>
   (c[bucketOfField(field)] || []).filter((p) => p.costField === field);
@@ -182,7 +190,11 @@ export function setSlotPick(c: Char, field: string, flatIndex: number, name: str
 export function clearSlot(c: Char, field: string, flatIndex: number): Char {
   const cur = fieldEntries(c, field);
   if (flatIndex < 0 || flatIndex >= cur.length) return c;
-  return withField(c, field, cur.filter((_, i) => i !== flatIndex));
+  return withField(
+    c,
+    field,
+    cur.filter((_, i) => i !== flatIndex),
+  );
 }
 
 /** Add a named entity to `field`, appending a rank of 1. No-op if the name is
@@ -214,12 +226,20 @@ export function removeEntity(c: Char, field: string, index: number): Char {
   if (bucket) {
     const cur = purchasedEntries(c, bucket);
     if (index < 0 || index >= cur.length) return c;
-    return withPurchased(c, bucket, cur.filter((_, i) => i !== index));
+    return withPurchased(
+      c,
+      bucket,
+      cur.filter((_, i) => i !== index),
+    );
   }
   if (PURCHASED_POWER_FIELDS.has(field)) {
     const cur = fieldEntries(c, field);
     if (index < 0 || index >= cur.length) return c;
-    return withField(c, field, cur.filter((_, i) => i !== index));
+    return withField(
+      c,
+      field,
+      cur.filter((_, i) => i !== index),
+    );
   }
   if (field === "flaws") {
     const cur = c.flaws || [];
@@ -236,7 +256,11 @@ export function setRank(c: Char, field: string, index: number, nextRank: number)
   if (bucket) {
     const cur = purchasedEntries(c, bucket);
     if (index < 0 || index >= cur.length) return c;
-    return withPurchased(c, bucket, cur.map((s, i) => (i === index ? { ...s, ranks: nextRank } : s)));
+    return withPurchased(
+      c,
+      bucket,
+      cur.map((s, i) => (i === index ? { ...s, ranks: nextRank } : s)),
+    );
   }
   return c;
 }

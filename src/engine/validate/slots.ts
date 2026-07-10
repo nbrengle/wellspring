@@ -6,13 +6,19 @@
 // spell-slot capacity (spellSlots), and the Bookcaster spell options. Re-exported
 // by the validate.js barrel.
 
-import { lookupEntity, CLASS_POWERS, CLASS_PROGRESSION, CLASS_POWER_SLOTS, CLASSES, BASE_CLASSES, LINEAGES, lineageCantripChoices } from '../data.js';
-import { cleanItemName, getClasses } from '../resolver.js';
-import { SPELL_TIERS, SLOT_CATS, BOOKCASTER_TIER_FIELD, KNOWN_SPELL_FIELDS } from '../config.js';
 import {
-  countPicksForClass, progressionRow, sourceClass,
-  activeInnatePowers
-} from './core.js';
+  lookupEntity,
+  CLASS_POWERS,
+  CLASS_PROGRESSION,
+  CLASS_POWER_SLOTS,
+  CLASSES,
+  BASE_CLASSES,
+  LINEAGES,
+  lineageCantripChoices,
+} from "../data.js";
+import { cleanItemName, getClasses } from "../resolver.js";
+import { SPELL_TIERS, SLOT_CATS, BOOKCASTER_TIER_FIELD, KNOWN_SPELL_FIELDS } from "../config.js";
+import { countPicksForClass, progressionRow, sourceClass, activeInnatePowers } from "./core.js";
 
 // Skills whose grant is scoped to a CLASS the player must choose — and the choice
 // is gated by the classes they actually have levels in (the rules: "from a
@@ -25,11 +31,11 @@ import {
 //   spellCasting — Spell-Scholar: pick a spell-casting class you have a Known Spell
 //                 in → +1 spells-known there.
 export const CLASS_CHOICE_SKILLS = {
-  'Extensive Combat Training - Basic':    { kind: 'nonCasting' },
-  'Extensive Combat Training - Advanced': { kind: 'nonCasting' },
-  'Extensive Combat Training - Veteran':  { kind: 'nonCasting' },
-  'Extensive Training':                   { kind: 'nonCasting' },
-  'Spell-Scholar':                        { kind: 'spellCasting' },
+  "Extensive Combat Training - Basic": { kind: "nonCasting" },
+  "Extensive Combat Training - Advanced": { kind: "nonCasting" },
+  "Extensive Combat Training - Veteran": { kind: "nonCasting" },
+  "Extensive Training": { kind: "nonCasting" },
+  "Spell-Scholar": { kind: "spellCasting" },
 };
 
 // The classes a character may choose for a given class-choice skill: their own
@@ -42,7 +48,7 @@ export function eligibleClassChoices(character, baseName) {
     .map((c) => c.name)
     .filter((name) => {
       const isCaster = !!CLASSES[name]?.spellcaster;
-      return spec.kind === 'spellCasting' ? isCaster : !isCaster;
+      return spec.kind === "spellCasting" ? isCaster : !isCaster;
     });
 }
 
@@ -67,7 +73,7 @@ export function slotGrants(character, sources = null) {
   const casterClass = classes.find((c) => CLASSES[c.name]?.spellcaster)?.name;
   const martialClass = classes.find((c) => !CLASSES[c.name]?.spellcaster)?.name;
   // Route a category to the class whose slot it belongs to.
-  const classFor = (cat) => (cat === 'cantrips' || cat === 'spellsKnown') ? casterClass : martialClass;
+  const classFor = (cat) => (cat === "cantrips" || cat === "spellsKnown" ? casterClass : martialClass);
 
   // 1. Purchased / starting skills that grant slots (Additional Cantrip,
   //    Extended Capacity, Spell-Scholar). The grants are parser-extracted
@@ -75,9 +81,9 @@ export function slotGrants(character, sources = null) {
   //    item's rank ("Extended Capacity - Novice x2" → +2). innatePowers is excluded
   //    (GENERIC_POWER_FIELDS) — innate slot grants are handled by the
   //    activeInnatePowers() loop below; iterating them here too would double-count.
-  for (const field of ['skills', 'powers']) {
+  for (const field of ["skills", "powers"]) {
     (character[field] || []).forEach((item: any) => {
-      const clean = cleanItemName(item.entityId.replace(/^(skills|powers):/, ''));
+      const clean = cleanItemName(item.entityId.replace(/^(skills|powers):/, ""));
       const ent = lookupEntity(item.entityId) as any;
       const rank = item.ranks || 1;
 
@@ -89,24 +95,24 @@ export function slotGrants(character, sources = null) {
         }
       }
 
-      if (!targetCls && ent && ent.id && ent.id.startsWith('powers:')) {
-         // Find which class has this power
-         for (const c of classes) {
-           const byTier = CLASS_POWERS[c.name];
-           if (byTier) {
-             for (const t of Object.values(byTier)) {
-               if (t.some(p => p.name === ent.name)) {
-                 targetCls = c.name;
-                 break;
-               }
-             }
-           }
-           if (targetCls) break;
-         }
+      if (!targetCls && ent && ent.id && ent.id.startsWith("powers:")) {
+        // Find which class has this power
+        for (const c of classes) {
+          const byTier = CLASS_POWERS[c.name];
+          if (byTier) {
+            for (const t of Object.values(byTier)) {
+              if (t.some((p) => p.name === ent.name)) {
+                targetCls = c.name;
+                break;
+              }
+            }
+          }
+          if (targetCls) break;
+        }
       }
 
-      for (const { cat, n } of (ent?.slotGrants || [])) {
-         addTo(targetCls || classFor(cat), cat, n * rank, ent?.baseName || ent?.name || cleanItemName(item));
+      for (const { cat, n } of ent?.slotGrants || []) {
+        addTo(targetCls || classFor(cat), cat, n * rank, ent?.baseName || ent?.name || cleanItemName(item));
       }
     });
   }
@@ -117,7 +123,7 @@ export function slotGrants(character, sources = null) {
   // locked cantrip, handled by innateBonusCantrips(), so it never bumps the cap.
   for (const ip of activeInnatePowers(character)) {
     if (ip.cls && ip.entity?.slotGrants) {
-      for (const { cat, n } of (ip.entity.slotGrants || [])) addTo(ip.cls, cat, n, ip.entity.name || ip.name);
+      for (const { cat, n } of ip.entity.slotGrants || []) addTo(ip.cls, cat, n, ip.entity.name || ip.name);
     }
   }
 
@@ -136,7 +142,7 @@ export function innateBonusCantrips(character) {
     for (let lvl = 1; lvl <= clsLevel; lvl++) {
       // Parser-extracted innate-cantrip names from the progression bonus column;
       // keep only those that are real cantrips of this class.
-      for (const nm of (progression[lvl]?.innateCantrips || [])) {
+      for (const nm of progression[lvl]?.innateCantrips || []) {
         if (!classCantrips.has(nm)) continue;
         const key = `${cls}:${nm}`;
         if (seen.has(key)) continue;
@@ -164,7 +170,7 @@ export function innateBonusCantrips(character) {
 // more trade). 0 when the skill isn't owned.
 export function agileLearnerCapacity(character: any): number {
   return (character.skills || []).reduce((n: number, s: any) => {
-    if (cleanItemName(s.entityId.replace('skills:', '')) === 'Agile Learner') return n + (s.ranks || 1);
+    if (cleanItemName(s.entityId.replace("skills:", "")) === "Agile Learner") return n + (s.ranks || 1);
     return n;
   }, 0);
 }
@@ -183,7 +189,10 @@ function clampAgileTrades(character, classes) {
     if (want <= 0) continue;
     const basics = progressionRow(cls, level).basic ?? 0;
     const allowed = Math.min(want, basics, capacity - used);
-    if (allowed > 0) { out[cls] = allowed; used += allowed; }
+    if (allowed > 0) {
+      out[cls] = allowed;
+      used += allowed;
+    }
   }
   return out;
 }
@@ -211,37 +220,49 @@ export function computeSlots(character) {
     const mkRow = (category, label, used, baseVal) => {
       let b = bonus[`${cls}:${category}`] || 0;
       if (!isCaster) {
-        if (category === 'basic') b -= (agileTrades[cls] || 0);
-        if (category === 'advanced') b += (agileTrades[cls] || 0);
+        if (category === "basic") b -= agileTrades[cls] || 0;
+        if (category === "advanced") b += agileTrades[cls] || 0;
       }
       return {
-        cls, category, label: multi ? `${cls} ${label}` : label,
-        used, base: baseVal, bonus: b, allowed: baseVal + b,
+        cls,
+        category,
+        label: multi ? `${cls} ${label}` : label,
+        used,
+        base: baseVal,
+        bonus: b,
+        allowed: baseVal + b,
         // Which skill(s) granted the bonus slot(s) on this row — for the UI to show
         // "+1 from Extensive Training" so a granted slot is auditable.
         bonusFrom: bonusSources[`${cls}:${category}`] || [],
       };
     };
     if (isCaster) {
-      const granted = grantedCantrips.filter((g) => g.cls === cls || g.cls === 'ALL').map((g) => g.name);
+      const granted = grantedCantrips.filter((g) => g.cls === cls || g.cls === "ALL").map((g) => g.name);
       // A granted (innate) cantrip never consumes a choosable slot, even if it
       // appears in the character's cantrip pick list. Exclude it from `used`.
       const used = (character.spells || []).reduce((n: number, choice: any) => {
         if (sourceClass(choice.source) !== cls) return n;
         const ent = lookupEntity(choice.entityId) as any;
-        if (ent?.tier?.toLowerCase() !== 'cantrip') return n;
-        if (granted.includes(cleanItemName(choice.entityId.replace('spells:', '')))) return n;
+        if (ent?.tier?.toLowerCase() !== "cantrip") return n;
+        if (granted.includes(cleanItemName(choice.entityId.replace("spells:", "")))) return n;
         return n + (choice.ranks || 1);
       }, 0);
-      const cantripRow = mkRow('cantrips', 'Cantrips', used, prog.cantrips ?? 0);
+      const cantripRow = mkRow("cantrips", "Cantrips", used, prog.cantrips ?? 0);
       cantripRow.granted = granted;
       rows.push(cantripRow);
-      const known = countPicksForClass(character, 'spells', cls, ['novice', 'adept', 'greater']);
-      rows.push(mkRow('spellsKnown', 'Spells Known', known, prog.spellsKnown ?? 0));
+      const known = countPicksForClass(character, "spells", cls, ["novice", "adept", "greater"]);
+      rows.push(mkRow("spellsKnown", "Spells Known", known, prog.spellsKnown ?? 0));
     } else {
-      const cats = ['utility', 'basic', 'advanced', 'veteran'];
+      const cats = ["utility", "basic", "advanced", "veteran"];
       for (const cat of cats) {
-        rows.push(mkRow(cat, cat[0].toUpperCase() + cat.slice(1), countPicksForClass(character, 'powers', cls, cat), prog[cat] ?? 0));
+        rows.push(
+          mkRow(
+            cat,
+            cat[0].toUpperCase() + cat.slice(1),
+            countPicksForClass(character, "powers", cls, cat),
+            prog[cat] ?? 0,
+          ),
+        );
       }
     }
   }
@@ -260,12 +281,12 @@ export function spellSlots(character) {
 
   // Sum each caster class's progression "N/N/N" slots at its own level.
   for (const { name, level } of casters) {
-    const magicType = CLASSES[name]?.magicType || 'Unknown';
+    const magicType = CLASSES[name]?.magicType || "Unknown";
     if (!pools[magicType]) pools[magicType] = { novice: 0, adept: 0, greater: 0 };
 
     const str = progressionRow(name, level)?.slots;
-    if (typeof str === 'string') {
-      const [n = 0, a = 0, g = 0] = str.split('/').map((x) => parseInt(x, 10) || 0);
+    if (typeof str === "string") {
+      const [n = 0, a = 0, g = 0] = str.split("/").map((x) => parseInt(x, 10) || 0);
       pools[magicType].novice += n - (agileTrades[name] || 0);
       pools[magicType].adept += a + (agileTrades[name] || 0);
       pools[magicType].greater += g;
@@ -276,18 +297,18 @@ export function spellSlots(character) {
   // parser-extracted (ent.slotGrants for novice/adept/greater; ent.highestSlot for
   // a floating "highest-level" slot).
   // We apply these general grants to the primary caster's magic type pool.
-  const primaryType = CLASSES[casters[0].name]?.magicType || 'Unknown';
+  const primaryType = CLASSES[casters[0].name]?.magicType || "Unknown";
   if (!pools[primaryType]) pools[primaryType] = { novice: 0, adept: 0, greater: 0 };
 
   const highestSlots = []; // array of target pool strings
   const applySpellGrants = (ent, rank = 1, itemName = null) => {
     if (!ent) return;
-    
+
     let targetPool = primaryType;
     const paramMatch = itemName?.match(/\((.*?)\)/);
     if (paramMatch) {
       const p = paramMatch[1].trim();
-      if (p === 'Arcane' || p === 'Divine') {
+      if (p === "Arcane" || p === "Divine") {
         targetPool = p;
       } else if (CLASSES[p]?.magicType) {
         targetPool = CLASSES[p].magicType;
@@ -296,7 +317,7 @@ export function spellSlots(character) {
 
     if (!pools[targetPool]) pools[targetPool] = { novice: 0, adept: 0, greater: 0 };
 
-    for (const { cat, n } of (ent.slotGrants || [])) {
+    for (const { cat, n } of ent.slotGrants || []) {
       if (SPELL_TIERS.has(cat)) pools[targetPool][cat] += n * rank;
     }
     if (ent.highestSlot) {
@@ -304,16 +325,20 @@ export function spellSlots(character) {
     }
   };
 
-  for (const item of (character.skills || [])) {
+  for (const item of character.skills || []) {
     applySpellGrants(lookupEntity(item.entityId), item.ranks || 1, item.entityId);
   }
-  for (const item of (character.perks || [])) {
+  for (const item of character.perks || []) {
     applySpellGrants(lookupEntity(item.entityId), item.ranks || 1, item.entityId);
   }
   if (character.lineage) {
     const lin = LINEAGES[character.lineage];
-    for (const name of (character.lineageAdvantages || [])) {
-      applySpellGrants((lin?.advantages || []).find((x) => x.name === name || x.baseName === name), 1, name);
+    for (const name of character.lineageAdvantages || []) {
+      applySpellGrants(
+        (lin?.advantages || []).find((x) => x.name === name || x.baseName === name),
+        1,
+        name,
+      );
     }
   }
 
@@ -359,7 +384,7 @@ export function basicSpellOptions(character, magicType) {
     const byTier = CLASS_POWERS[cls];
     if (!byTier) continue;
     for (const field of KNOWN_SPELL_FIELDS) {
-      for (const sp of (byTier[field] || [])) {
+      for (const sp of byTier[field] || []) {
         if (sp?.name && !/^(Adept|Greater)\s+\w+\s+Power$/i.test(sp.name)) spells.add(sp.name);
       }
     }
@@ -368,7 +393,7 @@ export function basicSpellOptions(character, magicType) {
 }
 
 // The magic type each Basic-spell skill draws from.
-export const BASIC_SPELL_SKILLS = { 'Basic Arcane': 'Arcane', 'Basic Faith': 'Divine' };
+export const BASIC_SPELL_SKILLS = { "Basic Arcane": "Arcane", "Basic Faith": "Divine" };
 
 // Spells a Bookcaster can select, split into { known, other } for the picker.
 
@@ -383,12 +408,12 @@ export function bookcasterSpellOptions(character) {
   for (const { name: cls } of casters) {
     const byTier = CLASS_POWERS[cls];
     if (!byTier) continue;
-    const magicType = CLASSES[cls]?.magicType || 'Unknown';
+    const magicType = CLASSES[cls]?.magicType || "Unknown";
     const slots = pools[magicType] || { novice: 0, adept: 0, greater: 0 };
     const accessibleTiers = Object.keys(BOOKCASTER_TIER_FIELD).filter((t) => (slots[t] || 0) > 0);
 
     for (const tier of accessibleTiers) {
-      for (const sp of (byTier[BOOKCASTER_TIER_FIELD[tier]] || [])) {
+      for (const sp of byTier[BOOKCASTER_TIER_FIELD[tier]] || []) {
         // Skip placeholder rows the parser emits for undocumented tiers.
         if (sp?.name && !/^(Adept|Greater)\s+\w+\s+Power$/i.test(sp.name)) accessible.add(sp.name);
       }
@@ -399,7 +424,7 @@ export function bookcasterSpellOptions(character) {
   // Spells-known are CharacterChoice[] in `spells`, keyed by their tier costField.
   const knownSet = new Set();
   const knownFields = new Set(KNOWN_SPELL_FIELDS);
-  for (const choice of (character.spells || [])) {
+  for (const choice of character.spells || []) {
     if (knownFields.has(choice.costField)) knownSet.add(cleanItemName(choice.entityId));
   }
 
@@ -418,10 +443,15 @@ export function bookcasterSpellOptions(character) {
 //     caster could cast based on total level, UP TO ADEPT": cantrip/novice/adept.
 // (The "cast once per long rest without a slot" part is in-play, not a build pick.)
 // Returns a sorted, de-duped list of arcane spell names — the pickable pool.
-const ARCANE_TIER_FIELD = { cantrip: 'cantrips', novice: 'noviceSpells', adept: 'adeptSpells', greater: 'greaterSpells' };
+const ARCANE_TIER_FIELD = {
+  cantrip: "cantrips",
+  novice: "noviceSpells",
+  adept: "adeptSpells",
+  greater: "greaterSpells",
+};
 export function arcaneSecretsSpellOptions(character) {
   const arcaneClasses = Object.keys(CLASSES).filter(
-    (n) => CLASSES[n]?.spellcaster && CLASSES[n]?.magicType === 'Arcane',
+    (n) => CLASSES[n]?.spellcaster && CLASSES[n]?.magicType === "Arcane",
   );
   const hasKnownSpells = (character.spells?.length || 0) > 0;
 
@@ -429,10 +459,10 @@ export function arcaneSecretsSpellOptions(character) {
   if (hasKnownSpells) {
     // Cantrips are always castable; higher tiers gated by Arcane spell-slots held.
     const arcaneSlots = (spellSlots(character) || {}).Arcane || { novice: 0, adept: 0, greater: 0 };
-    tiers = ['cantrip', ...['novice', 'adept', 'greater'].filter((t) => (arcaneSlots[t] || 0) > 0)];
+    tiers = ["cantrip", ...["novice", "adept", "greater"].filter((t) => (arcaneSlots[t] || 0) > 0)];
   } else {
     // No Known Spells → capped at Adept regardless of slots.
-    tiers = ['cantrip', 'novice', 'adept'];
+    tiers = ["cantrip", "novice", "adept"];
   }
 
   const spells = new Set();
@@ -440,7 +470,7 @@ export function arcaneSecretsSpellOptions(character) {
     const byTier = CLASS_POWERS[cls];
     if (!byTier) continue;
     for (const tier of tiers) {
-      for (const sp of (byTier[ARCANE_TIER_FIELD[tier]] || [])) {
+      for (const sp of byTier[ARCANE_TIER_FIELD[tier]] || []) {
         if (sp?.name && !/^(Adept|Greater)\s+\w+\s+Power$/i.test(sp.name)) spells.add(sp.name);
       }
     }
@@ -456,18 +486,18 @@ export function arcaneSecretsSpellOptions(character) {
 export function weirdWanderingsOptions() {
   const out = new Set();
   for (const cls of BASE_CLASSES) {
-    if (cls === 'Artisan') continue;
-    for (const p of (CLASS_POWERS[cls]?.basic || [])) {
-      if (p?.name && !/^spell$/i.test(p.refresh || '')) out.add(p.name);
+    if (cls === "Artisan") continue;
+    for (const p of CLASS_POWERS[cls]?.basic || []) {
+      if (p?.name && !/^spell$/i.test(p.refresh || "")) out.add(p.name);
     }
   }
   return [...out].sort((a, b) => a.localeCompare(b));
 }
 
 // The Specialty Tags an Artisan Basic power can carry (Artificer / Crafter / Mystic).
-export const ARTISAN_SPECIALTY_TAGS = [...new Set(
-  (CLASS_POWERS.Artisan?.basic || []).flatMap((p) => p.tags || []),
-)].sort();
+export const ARTISAN_SPECIALTY_TAGS = [
+  ...new Set((CLASS_POWERS.Artisan?.basic || []).flatMap((p) => p.tags || [])),
+].sort();
 
 // Studied Focus (Artisan Advanced power): "instead of an Advanced Power, choose TWO
 // Basic Artisan Powers with the SAME Specialty Tag." Returns the Basic Artisan

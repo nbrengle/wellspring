@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback } from "react";
-import { getAllEntities, lookupEntity } from './engine/data.js';
+import { getAllEntities, lookupEntity } from "./engine/data.js";
 import { cleanItemName } from "./engine/resolver.js";
 import { EntityBody } from "./components/DetailPane.jsx";
 import { browse, gameEffectAxes, axisApplies } from "./components/browse/browse.js";
@@ -22,8 +22,15 @@ const GROUP_TYPES = {
   powers: ["powers"],
   crafting: ["recipes", "rituals", "crafting-concepts", "ritual-concepts"],
   rules: [
-    "rules-concepts", "terms", "effects", "accents", "resources", 
-    "modifiers", "conditions", "defenses", "creature-types"
+    "rules-concepts",
+    "terms",
+    "effects",
+    "accents",
+    "resources",
+    "modifiers",
+    "conditions",
+    "defenses",
+    "creature-types",
   ],
 };
 
@@ -54,7 +61,7 @@ const TYPE_LABELS = {
 // game-effect axes — so browsing the rules can group powers/effects by what they DO
 // in play (Effect / Damage type / Condition), exactly like the power picker.
 const EXPLORER_AXES = [
-  { id: "type", label: "By Type", key: (e) => TYPE_LABELS[e.type] || e.type, order: (l) => l, },
+  { id: "type", label: "By Type", key: (e) => TYPE_LABELS[e.type] || e.type, order: (l) => l },
   { id: "alphabetical", label: "A–Z", key: (e) => (e.name[0] || "#").toUpperCase() },
   { id: "none", label: "Ungrouped", key: () => "Results" },
   ...gameEffectAxes((e) => e.type),
@@ -64,13 +71,13 @@ export default function RulesExplorer({ onClose: _onClose }) {
   const [query, setQuery] = useState("");
   const [activeGroup, setActiveGroup] = useState("all");
   const [facetSel, setFacetSel] = useState({}); // facet id -> Set of selected values
-  
+
   // Navigation stack for back button support
   const [history, setHistory] = useState([]);
-  
+
   // Selected entity ID
   const [selectedId, setSelectedId] = useState("rules-concepts:Introduction");
-  
+
   // Sort and Group controls
   const [sortMode, setSortMode] = useState("name"); // "name" | "type"
   const [groupMode, setGroupMode] = useState("type"); // "none" | "type" | "alphabetical"
@@ -88,20 +95,24 @@ export default function RulesExplorer({ onClose: _onClose }) {
   };
 
   // Navigation handlers
-  const handleInspect = useCallback((name, field, type) => {
-    // Resolve the clean name / entity
-    const cleanName = cleanItemName(name);
-    const resolved = lookupEntity(`${type}:${cleanName}`) 
-      || lookupEntity(`skills:${cleanName}`)
-      || lookupEntity(`perks:${cleanName}`)
-      || lookupEntity(`powers:${cleanName}`)
-      || lookupEntity(`rules-concepts:${cleanName}`);
-      
-    if (resolved) {
-      setHistory((prev) => [...prev, selectedId]);
-      setSelectedId(resolved.id);
-    }
-  }, [selectedId]);
+  const handleInspect = useCallback(
+    (name, field, type) => {
+      // Resolve the clean name / entity
+      const cleanName = cleanItemName(name);
+      const resolved =
+        lookupEntity(`${type}:${cleanName}`) ||
+        lookupEntity(`skills:${cleanName}`) ||
+        lookupEntity(`perks:${cleanName}`) ||
+        lookupEntity(`powers:${cleanName}`) ||
+        lookupEntity(`rules-concepts:${cleanName}`);
+
+      if (resolved) {
+        setHistory((prev) => [...prev, selectedId]);
+        setSelectedId(resolved.id);
+      }
+    },
+    [selectedId],
+  );
 
   const handleBack = () => {
     setHistory((prev) => {
@@ -134,28 +145,26 @@ export default function RulesExplorer({ onClose: _onClose }) {
     (e.summary || "").toLowerCase().includes(q);
 
   // Only offer a game-effect group axis when some visible entity carries that facet.
-  const availableAxes = useMemo(
-    () => EXPLORER_AXES.filter((a) => axisApplies(a, candidates)),
-    [candidates],
-  );
+  const availableAxes = useMemo(() => EXPLORER_AXES.filter((a) => axisApplies(a, candidates)), [candidates]);
 
   const { groups: groupedEntities } = useMemo(
-    () => browse({
-      items: candidates,
-      axes: availableAxes,
-      groupBy: groupMode,
-      query,
-      matches: (e, q) =>
-        e.name.toLowerCase().includes(q) ||
-        (e.description || "").toLowerCase().includes(q) ||
-        (e.summary || "").toLowerCase().includes(q),
-      sort: sortMode,
-      compare: (a, b, s) =>
-        s === "type"
-          ? (TYPE_LABELS[a.type] || a.type).localeCompare(TYPE_LABELS[b.type] || b.type) ||
-            a.name.localeCompare(b.name)
-          : a.name.localeCompare(b.name),
-    }),
+    () =>
+      browse({
+        items: candidates,
+        axes: availableAxes,
+        groupBy: groupMode,
+        query,
+        matches: (e, q) =>
+          e.name.toLowerCase().includes(q) ||
+          (e.description || "").toLowerCase().includes(q) ||
+          (e.summary || "").toLowerCase().includes(q),
+        sort: sortMode,
+        compare: (a, b, s) =>
+          s === "type"
+            ? (TYPE_LABELS[a.type] || a.type).localeCompare(TYPE_LABELS[b.type] || b.type) ||
+              a.name.localeCompare(b.name)
+            : a.name.localeCompare(b.name),
+      }),
     [candidates, availableAxes, groupMode, query, sortMode],
   );
 
@@ -168,7 +177,6 @@ export default function RulesExplorer({ onClose: _onClose }) {
     <div className="b-explorer">
       {/* Search and Navigation Panel */}
       <div className="b-explorer-layout">
-        
         {/* SIDEBAR: Filters */}
         <aside className="b-explorer-sidebar">
           <div className="b-sidebar-section">
@@ -201,23 +209,19 @@ export default function RulesExplorer({ onClose: _onClose }) {
           <div className="b-sidebar-section">
             <h3 className="b-sidebar-title">Display Options</h3>
             <div className="b-explorer-sortrow">
-              <label className="b-explorer-sortlabel">Group
-                <select
-                  className="b-explorer-sortsel"
-                  value={groupMode}
-                  onChange={(e) => setGroupMode(e.target.value)}
-                >
+              <label className="b-explorer-sortlabel">
+                Group
+                <select className="b-explorer-sortsel" value={groupMode} onChange={(e) => setGroupMode(e.target.value)}>
                   {availableAxes.map((a) => (
-                    <option key={a.id} value={a.id}>{a.label}</option>
+                    <option key={a.id} value={a.id}>
+                      {a.label}
+                    </option>
                   ))}
                 </select>
               </label>
-              <label className="b-explorer-sortlabel">Sort
-                <select
-                  className="b-explorer-sortsel"
-                  value={sortMode}
-                  onChange={(e) => setSortMode(e.target.value)}
-                >
+              <label className="b-explorer-sortlabel">
+                Sort
+                <select className="b-explorer-sortsel" value={sortMode} onChange={(e) => setSortMode(e.target.value)}>
                   <option value="name">Alphabetical</option>
                   <option value="type">By Type</option>
                 </select>
@@ -238,12 +242,13 @@ export default function RulesExplorer({ onClose: _onClose }) {
               autoFocus
             />
             {query && (
-              <button className="b-search-clear" onClick={() => setQuery("")}>×</button>
+              <button className="b-search-clear" onClick={() => setQuery("")}>
+                ×
+              </button>
             )}
           </div>
 
-          <ActiveFilterBar sel={facetSel} onChange={setFacetSel}
-                           facetLabel={(id) => FACET_LABELS[id] || id} />
+          <ActiveFilterBar sel={facetSel} onChange={setFacetSel} facetLabel={(id) => FACET_LABELS[id] || id} />
 
           <div className="b-explorer-list-container">
             {groupedEntities.length === 0 && (
@@ -289,9 +294,7 @@ export default function RulesExplorer({ onClose: _onClose }) {
                   <span className="b-explorer-detail-type-badge">
                     {TYPE_LABELS[currentEntity.type] || currentEntity.type}
                   </span>
-                  {currentEntity.tier && (
-                    <span className="b-explorer-detail-tier-badge">{currentEntity.tier}</span>
-                  )}
+                  {currentEntity.tier && <span className="b-explorer-detail-tier-badge">{currentEntity.tier}</span>}
                 </div>
               </header>
               <div className="b-explorer-detail-body">
@@ -312,7 +315,6 @@ export default function RulesExplorer({ onClose: _onClose }) {
             </div>
           )}
         </div>
-
       </div>
     </div>
   );

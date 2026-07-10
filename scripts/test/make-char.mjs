@@ -15,20 +15,28 @@
 // authored cost). Everything else on the options bag is a scalar the character
 // carries as-is (lineage, devotion, choices, sublineage, agileLearnerTrades, …).
 
-import { addToCharacter } from '../../src/engine/character-add.js';
-import { applyClassStartingAbilities } from '../../src/engine/character-state.js';
+import { addToCharacter } from "../../src/engine/character-add.js";
+import { applyClassStartingAbilities } from "../../src/engine/character-state.js";
 
 // Parse "Fighter 4" / "Cleric 6, Mage 4" / [{name,level}] → canonical [{name,level}].
 function parseClasses(spec) {
   if (Array.isArray(spec)) return spec;
-  return String(spec).split(',').map((part) => {
-    const m = part.trim().match(/^(.+?)\s+(\d+)$/);
-    return m ? { name: m[1].trim(), level: parseInt(m[2], 10) } : { name: part.trim(), level: 1 };
-  });
+  return String(spec)
+    .split(",")
+    .map((part) => {
+      const m = part.trim().match(/^(.+?)\s+(\d+)$/);
+      return m ? { name: m[1].trim(), level: parseInt(m[2], 10) } : { name: part.trim(), level: 1 };
+    });
 }
 
 const EMPTY = () => ({
-  classes: [], skills: [], perks: [], powers: [], spells: [], flaws: [], devotions: [],
+  classes: [],
+  skills: [],
+  perks: [],
+  powers: [],
+  spells: [],
+  flaws: [],
+  devotions: [],
 });
 
 /**
@@ -50,7 +58,7 @@ export function makeChar(classSpec, opts = {}) {
 
   // Funnel every intent item through the one real add API.
   for (const item of add) {
-    const { name, ...addOpts } = typeof item === 'string' ? { name: item } : item;
+    const { name, ...addOpts } = typeof item === "string" ? { name: item } : item;
     c = addToCharacter(c, name, addOpts);
   }
   return c;

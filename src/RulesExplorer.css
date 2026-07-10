@@ -433,7 +433,9 @@
   gap: 0.1rem;
 }
 
-.b-facetbar-group { margin-bottom: 0.6rem; }
+.b-facetbar-group {
+  margin-bottom: 0.6rem;
+}
 
 .b-facetbar-head {
   display: flex;
@@ -476,7 +478,9 @@
   color: var(--b-text, #e8dcc8);
 }
 
-.b-facetbar-opt.is-on { color: var(--b-amber, #d6a956); }
+.b-facetbar-opt.is-on {
+  color: var(--b-amber, #d6a956);
+}
 
 .b-facetbar-opt.is-zero {
   color: var(--b-dim, #5e564b);
@@ -496,7 +500,9 @@
   font-variant-numeric: tabular-nums;
 }
 
-.b-facetbar-opt.is-zero .b-facetbar-c { color: var(--b-dim, #5e564b); }
+.b-facetbar-opt.is-zero .b-facetbar-c {
+  color: var(--b-dim, #5e564b);
+}
 
 .b-facetbar-more {
   background: none;

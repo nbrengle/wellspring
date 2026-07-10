@@ -26,7 +26,7 @@ export default function RecipeDetail({ recipe, onInspect, onAddCrafted }) {
       <div className="b-recipe-detail-facts">
         <div className="b-fact-row">
           <span className="b-fact-label">Type</span>
-          <span className="b-fact-value">{recipe.type === 'crafting' ? 'Crafting Recipe' : 'Ritual'}</span>
+          <span className="b-fact-value">{recipe.type === "crafting" ? "Crafting Recipe" : "Ritual"}</span>
         </div>
         <div className="b-fact-row">
           <span className="b-fact-label">Craft/Discipline</span>
@@ -38,17 +38,19 @@ export default function RecipeDetail({ recipe, onInspect, onAddCrafted }) {
         </div>
         <div className="b-fact-row">
           <span className="b-fact-label">Yield per Batch</span>
-          <span className="b-fact-value">{recipe.yield === 9999 ? 'Unlimited' : recipe.yield}</span>
+          <span className="b-fact-value">{recipe.yield === 9999 ? "Unlimited" : recipe.yield}</span>
         </div>
       </div>
 
       <div className="b-recipe-detail-section">
         <h4 className="b-recipe-detail-section-title">Ingredients List</h4>
         <p className="b-recipe-detail-materials">{recipe.materialsStr}</p>
-        {(recipe.requirements?.[0]) && (
+        {recipe.requirements?.[0] && (
           <ul className="b-ingredient-badges">
             {recipe.requirements.length > 1 && (
-              <li className="b-ingredient-alt-note">(showing the first of {recipe.requirements.length} alternatives)</li>
+              <li className="b-ingredient-alt-note">
+                (showing the first of {recipe.requirements.length} alternatives)
+              </li>
             )}
             {Object.entries(recipe.requirements[0]).map(([ing, qty]) => (
               <li key={ing} className="b-ingredient-row">

@@ -10,41 +10,86 @@
 // unit-testable. The input is a CharacterState; resolveCharacterGraph derives the
 // class innates + devotion entry, and everything downstream reads the resolved graph.
 
-import { LEVEL_TABLE, lookupEntity, CLASS_POWER_SLOTS, DEVOTIONS, DOMAINS, CRAFTING, RITUALS, divineSubstitutionOptions } from '../engine/data.js';
-import { cleanItemName, bareSkill, getClasses, primaryClass } from './resolver.js';
+import {
+  LEVEL_TABLE,
+  lookupEntity,
+  CLASS_POWER_SLOTS,
+  DEVOTIONS,
+  DOMAINS,
+  CRAFTING,
+  RITUALS,
+  divineSubstitutionOptions,
+} from "../engine/data.js";
+import { cleanItemName, bareSkill, getClasses, primaryClass } from "./resolver.js";
 
 // Shared primitives now live in validate/core.js (hotspot split). Import the ones
 // this module still uses internally, and re-export the public surface from the
 // barrel so existing imports (`from './data/validate.js'`) keep working unchanged.
 import {
-  MAX_LBP, MAX_FLAW_BP, BACKSTORY_BP, MAX_DOMAINS, DEFAULT_WEALTH,
-  LEGAL_MIN_LEVEL, LEVEL_CAP, subKey,
-  characterLevel, getLegalMinLevel, getMaxRanks,
+  MAX_LBP,
+  MAX_FLAW_BP,
+  BACKSTORY_BP,
+  MAX_DOMAINS,
+  DEFAULT_WEALTH,
+  LEGAL_MIN_LEVEL,
+  LEVEL_CAP,
+  subKey,
+  characterLevel,
+  getLegalMinLevel,
+  getMaxRanks,
   maxProgressionLevel,
-} from './validate/core.js';
+} from "./validate/core.js";
 export {
-  MAX_LBP, MAX_FLAW_BP, BACKSTORY_BP, MAX_DOMAINS, DEFAULT_WEALTH,
-  LEGAL_MIN_LEVEL, LEVEL_CAP, subKey,
-  getClasses, primaryClass, characterLevel, getLegalMinLevel,
-  getMaxRanks, };
-export { EVENTS_TABLE } from './validate/core.js';
-import { lbpState } from './validate/lbp.js';
+  MAX_LBP,
+  MAX_FLAW_BP,
+  BACKSTORY_BP,
+  MAX_DOMAINS,
+  DEFAULT_WEALTH,
+  LEGAL_MIN_LEVEL,
+  LEVEL_CAP,
+  subKey,
+  getClasses,
+  primaryClass,
+  characterLevel,
+  getLegalMinLevel,
+  getMaxRanks,
+};
+export { EVENTS_TABLE } from "./validate/core.js";
+import { lbpState } from "./validate/lbp.js";
 export { lbpState };
 
 // Slot/spell-slot accounting (validate/slots.js) and prerequisite checking
 // (validate/prereqs.js) — extracted leaves. Import the ones the orchestrator calls
 // internally; re-export the public surface so the barrel keeps its API.
-import { computeSlots, spellSlots, bookcasterSpellOptions, arcaneSecretsSpellOptions, weirdWanderingsOptions as weirdWanderingsPool, studiedFocusOptions as studiedFocusPool, ARTISAN_SPECIALTY_TAGS, eligibleClassChoices, CLASS_CHOICE_SKILLS, basicSpellOptions, BASIC_SPELL_SKILLS } from './validate/slots.js';
-export { innateBonusCantrips, eligibleClassChoices, CLASS_CHOICE_SKILLS, agileLearnerCapacity, basicSpellOptions, BASIC_SPELL_SKILLS } from './validate/slots.js';
-import { resolveCharacterGraph, grantedAbilities } from './graph.js';
-import { characterPools } from './pool-registry.js';
+import {
+  computeSlots,
+  spellSlots,
+  bookcasterSpellOptions,
+  arcaneSecretsSpellOptions,
+  weirdWanderingsOptions as weirdWanderingsPool,
+  studiedFocusOptions as studiedFocusPool,
+  ARTISAN_SPECIALTY_TAGS,
+  eligibleClassChoices,
+  CLASS_CHOICE_SKILLS,
+  basicSpellOptions,
+  BASIC_SPELL_SKILLS,
+} from "./validate/slots.js";
+export {
+  innateBonusCantrips,
+  eligibleClassChoices,
+  CLASS_CHOICE_SKILLS,
+  agileLearnerCapacity,
+  basicSpellOptions,
+  BASIC_SPELL_SKILLS,
+} from "./validate/slots.js";
+import { resolveCharacterGraph, grantedAbilities } from "./graph.js";
+import { characterPools } from "./pool-registry.js";
 export { grantedAbilities };
 
-import { lookupCost } from './validate/cost-key.js';
+import { lookupCost } from "./validate/cost-key.js";
 
-
-export { prereqStatus, checkLevelConstraint } from './validate/prereqs.js';
-import { CRAFT_DISCIPLINES, CRAFTING_TIERS } from './config.js';
+export { prereqStatus, checkLevelConstraint } from "./validate/prereqs.js";
+import { CRAFT_DISCIPLINES, CRAFTING_TIERS } from "./config.js";
 
 // Wellspring has three distinct "consequence" kinds, kept separate by design:
 //   1. GRANT-OF-ENTITY — a source gives you a named Perk/Power/Skill for free
@@ -56,8 +101,6 @@ import { CRAFT_DISCIPLINES, CRAFTING_TIERS } from './config.js';
 //      Edge: REFS.discounts. Handled by discountSources/applyDiscounts.
 // (We use one word — "grant" — for #1; an earlier draft called it "bestowal".)
 
-
-
 // Per-level power benefits (kind: per-level tiers). Some powers gain benefits as a
 // CLASS LEVEL rises — "at various Artisan Levels: Level 1 …, Level 3 …" — parsed
 // into `levelBenefits` at build time. For each such power the character owns, mark
@@ -67,8 +110,8 @@ import { CRAFT_DISCIPLINES, CRAFTING_TIERS } from './config.js';
 export function activePowerBenefits(character) {
   const levelByClass = Object.fromEntries(getClasses(character).map((c) => [c.name, c.level]));
   const out = [];
-  for (const item of (character.powers || [])) {
-    const ent = lookupEntity(`powers:${cleanItemName(item.entityId || item.name || '')}`);
+  for (const item of character.powers || []) {
+    const ent = lookupEntity(`powers:${cleanItemName(item.entityId || item.name || "")}`);
     if (!ent?.levelBenefits) continue;
     const lvl = levelByClass[ent.levelBenefitClass] ?? characterLevel(character);
     out.push({
@@ -80,12 +123,11 @@ export function activePowerBenefits(character) {
   return out;
 }
 
-
 // Whether the character has the Worship skill (lets them follow a devotion and
 // access its domains). Reads the skills bucket (entityId), any source. Any
 // class can take it; "Worship - <Devotion>" matches the prefix.
 export function hasWorship(character) {
-  return (character?.skills || []).some((s) => /^worship\b/i.test(s.entityId || s.name || ''));
+  return (character?.skills || []).some((s) => /^worship\b/i.test(s.entityId || s.name || ""));
 }
 
 // Devotion / domain state for the UI: the chosen devotion, the domains it grants,
@@ -105,20 +147,22 @@ export function devotionState(character) {
   // bought. ownsSubstitution gates the UI picker.
   const ownsSubstitution = ownsDivineSubstitution(character);
   const substitutionOptions = ownsSubstitution ? divineSubstitutionOptions(standard) : [];
-  const subPick = character.choices?.['powers:Divine Substitution'];
+  const subPick = character.choices?.["powers:Divine Substitution"];
   const substituted = ownsSubstitution && subPick && substitutionOptions.includes(subPick) ? subPick : null;
 
   const available = substituted ? [...standard, substituted] : standard;
   const chosen = (character.divineDomains || []).filter((d) => available.includes(d)).slice(0, MAX_DOMAINS);
   // Domain powers purchasable from the chosen domains.
   const powers = chosen.flatMap((dn) => {
-    const baseName = dn.split(':')[0].trim();
+    const baseName = dn.split(":")[0].trim();
     const dom = DOMAINS.find((x) => x.name === baseName);
     return (dom?.powers || []).map((p) => ({ ...p, domain: dn }));
   });
   return {
     devotion: dev || { name: devName, domains: [] },
-    available, standard, chosen,
+    available,
+    standard,
+    chosen,
     worship: hasWorship(character),
     eligiblePowers: powers,
     substitution: ownsSubstitution ? { options: substitutionOptions, chosen: substituted } : null,
@@ -128,25 +172,18 @@ export function devotionState(character) {
 // Whether the character owns the Divine Substitution Class power (in the
 // powers bucket).
 function ownsDivineSubstitution(character) {
-  return (character.powers || []).some((p) => /^Divine Substitution\b/.test(cleanItemName(p.entityId || p.name || '')));
+  return (character.powers || []).some((p) => /^Divine Substitution\b/.test(cleanItemName(p.entityId || p.name || "")));
 }
 
-
-
-
-
 // Normalization functions getClasses and primaryClass are now imported from ./resolver.js
-
-
 
 // bareSkill helper is now imported from ./resolver.js
 
 // multiclassGrants moved to validate/core.js (the graph emits its `skills` as
 // owned items; validate() consumes its `freeBP` as a budget derivation). Import
 // for internal use and re-export to preserve the public API.
-import { multiclassGrants } from './validate/core.js';
+import { multiclassGrants } from "./validate/core.js";
 export { multiclassGrants };
-
 
 export function classifyOwnedItems(character) {
   // The single resolution site is the CharacterGraph: project its bucketed read
@@ -157,8 +194,12 @@ export function classifyOwnedItems(character) {
   const g = resolveCharacterGraph(character);
   const b = g.uiBuckets;
   const classPowers = [
-    ...b.basicPowers, ...b.advancedPowers, ...b.veteranPowers,
-    ...b.utilityPowers, ...b.classPowers, ...b.domainPowers,
+    ...b.basicPowers,
+    ...b.advancedPowers,
+    ...b.veteranPowers,
+    ...b.utilityPowers,
+    ...b.classPowers,
+    ...b.domainPowers,
   ];
   return {
     skills: b.skills,
@@ -183,7 +224,7 @@ export function ownedSkillNames(character) {
   const skillNames = (character.skills || []).map((s) => s.entityId);
   const names = new Set(skillNames.map(bareSkill));
   for (const g of grantedAbilities(character).list) {
-    if (g.abilityType === 'skills') names.add(bareSkill(g.abilityName));
+    if (g.abilityType === "skills") names.add(bareSkill(g.abilityName));
   }
   // Multiclass auto-granted skills count too.
   for (const s of multiclassGrants(character).skills) names.add(bareSkill(s.name));
@@ -208,28 +249,26 @@ export function craftingCapability(character) {
     const rank = topTier(stem);
     if (!rank) continue;
     const tier = Object.keys(CRAFT_TIER_RANK).find((t) => CRAFT_TIER_RANK[t] === rank);
-    const recipes = CRAFTING.filter((r) => r.discipline === discipline
-      && CRAFT_TIER_RANK[r.tier] <= rank)
-      .map((r) => ({ name: r.name, tier: r.tier }));
+    const recipes = CRAFTING.filter((r) => r.discipline === discipline && CRAFT_TIER_RANK[r.tier] <= rank).map((r) => ({
+      name: r.name,
+      tier: r.tier,
+    }));
     crafting.push({ discipline, tier, count: recipes.length, recipes });
   }
 
-  const ritualRank = topTier('Ritual Magic');
+  const ritualRank = topTier("Ritual Magic");
   let rituals = null;
   if (ritualRank) {
     const tier = Object.keys(CRAFT_TIER_RANK).find((t) => CRAFT_TIER_RANK[t] === ritualRank);
-    const recipes = RITUALS.filter((r) => CRAFT_TIER_RANK[r.tier] <= ritualRank)
-      .map((r) => ({ name: r.name, tier: r.tier }));
+    const recipes = RITUALS.filter((r) => CRAFT_TIER_RANK[r.tier] <= ritualRank).map((r) => ({
+      name: r.name,
+      tier: r.tier,
+    }));
     rituals = { tier, count: recipes.length, recipes };
   }
 
   return { crafting, rituals, any: crafting.length > 0 || !!rituals };
 }
-
-
-
-
-
 
 // Base Build Points from the level table (9 at level 4). Below the table's floor
 // the rule is "2 BP per level", so we extrapolate down (L3=7, L2=5, L1=3) rather
@@ -250,7 +289,6 @@ export function bonusBudgetFor(level) {
   return level;
 }
 
-
 export function computeActiveSelections(graph, lbp) {
   const active = [];
   const check = (name) => {
@@ -262,7 +300,7 @@ export function computeActiveSelections(graph, lbp) {
     }
   };
   for (const item of graph) {
-    if (item.field !== 'synthetic') {
+    if (item.field !== "synthetic") {
       check(item.name || item.rawString);
     }
   }
@@ -308,8 +346,8 @@ export function validate(character) {
   // Artisan powers it lets you pick (both must share the tag).
   const studiedFocus = {
     tags: ARTISAN_SPECIALTY_TAGS,
-    tag: resolved.choices?.['powers:Studied Focus'] || null,
-    options: studiedFocusPool(resolved.choices?.['powers:Studied Focus'] || null),
+    tag: resolved.choices?.["powers:Studied Focus"] || null,
+    options: studiedFocusPool(resolved.choices?.["powers:Studied Focus"] || null),
   };
   // Basic Arcane / Basic Faith pickable spell pools (sphere-gated; non-casters get
   // any base class of that sphere). Keyed by skill base name for the UI picker.
@@ -338,7 +376,7 @@ export function validate(character) {
   );
   // Attach each classified row's computed cost record (from the BP ledger) so the
   // UI reads `row.cost` directly instead of reconstructing a ledger key per row.
-  for (const bucket of ['skills', 'perks', 'classPowers']) {
+  for (const bucket of ["skills", "perks", "classPowers"]) {
     for (const row of owned[bucket]) {
       row.cost = lookupCost(spend.byItem, row.field, row.name, row.index);
     }
@@ -363,8 +401,9 @@ export function validate(character) {
   const aboveCap = level > LEVEL_CAP;
   // Any class past its documented progression (base classes cap at 10; 11+ is
   // Advanced Classes, not yet published). Slots/stats are frozen at the top row.
-  const beyondProgression = getClasses(character)
-    .some((c) => CLASS_POWER_SLOTS[c.name] && c.level > maxProgressionLevel(c.name));
+  const beyondProgression = getClasses(character).some(
+    (c) => CLASS_POWER_SLOTS[c.name] && c.level > maxProgressionLevel(c.name),
+  );
   return {
     level,
     budget,
@@ -375,10 +414,10 @@ export function validate(character) {
     maxBudget,
     _graph: graph,
     spend,
-    remaining: budget - spend.net,                   // vs. base (may be negative)
+    remaining: budget - spend.net, // vs. base (may be negative)
     bonusUsed,
     overBudget,
-    usesBonus: bonusUsed > 0 && !overBudget,         // legal, but dips into bonus
+    usesBonus: bonusUsed > 0 && !overBudget, // legal, but dips into bonus
     slots,
     slotsOver,
     spellSlots: spellSlotCounts,
@@ -404,8 +443,7 @@ export function validate(character) {
     beyondProgression,
     legalMinLevel,
     levelCap: LEVEL_CAP,
-    valid: !prereqs.issues.length && !overBudget && !slotsOver && !belowFloor
-      && (!lbp || lbp.valid),
+    valid: !prereqs.issues.length && !overBudget && !slotsOver && !belowFloor && (!lbp || lbp.valid),
   };
 }
 
@@ -424,7 +462,10 @@ export function validityReasons(report) {
     if (s.over) out.push(`${s.label}: ${s.used}/${s.allowed} (over by ${s.used - s.allowed})`);
   }
   for (const iss of report.prereqs?.issues || []) {
-    if (iss.text && !iss.missing) { out.push(`${iss.item}: ${iss.text}`); continue; }
+    if (iss.text && !iss.missing) {
+      out.push(`${iss.item}: ${iss.text}`);
+      continue;
+    }
     const need = [
       ...(iss.missing || []).map((m) => m.name),
       ...(iss.anyOf || []).map((g) => g.map((m) => m.name).join(" or ")),
@@ -435,8 +476,10 @@ export function validityReasons(report) {
   if (lbp) {
     if (lbp.overspent) out.push(`Lineage: ${lbp.spent - lbp.awarded} LBP overspent`);
     if (lbp.mixedSublineage) out.push("Lineage: items from more than one sublineage");
-    if (lbp.needsSublineage) out.push(`Lineage: select the ${lbp.requiredSublineages.join("/")} sublineage to take its items`);
-    if (lbp.missingRequired?.length) out.push(`Lineage: missing required ${lbp.missingRequired.map((c) => c.baseName).join(", ")}`);
+    if (lbp.needsSublineage)
+      out.push(`Lineage: select the ${lbp.requiredSublineages.join("/")} sublineage to take its items`);
+    if (lbp.missingRequired?.length)
+      out.push(`Lineage: missing required ${lbp.missingRequired.map((c) => c.baseName).join(", ")}`);
   }
   for (const n of report.prereqs?.notes || []) {
     out.push(`Note (${n.item}): ${n.text}`);

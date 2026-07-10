@@ -3,8 +3,11 @@ import { REVERSE_LOOKUP } from "../../engine/recipe-solver.js";
 import { STANDARD_RESOURCES } from "./shared.jsx";
 
 export default function ReverseLookupTab({
-  selectedReverseResource, setSelectedReverseResource, reverseLookupRecipes,
-  inspectedRecipeName, onInspect,
+  selectedReverseResource,
+  setSelectedReverseResource,
+  reverseLookupRecipes,
+  inspectedRecipeName,
+  onInspect,
 }) {
   return (
     <div className="b-recipe-scrollable-content">
@@ -16,16 +19,20 @@ export default function ReverseLookupTab({
           onChange={(e) => setSelectedReverseResource(e.target.value)}
         >
           <optgroup label="Standard Resources">
-            {STANDARD_RESOURCES.map(r => (
-              <option key={r} value={r}>{r}</option>
+            {STANDARD_RESOURCES.map((r) => (
+              <option key={r} value={r}>
+                {r}
+              </option>
             ))}
           </optgroup>
           <optgroup label="All Ingredients">
             {Array.from(REVERSE_LOOKUP.keys())
-              .filter(r => !STANDARD_RESOURCES.includes(r))
+              .filter((r) => !STANDARD_RESOURCES.includes(r))
               .sort()
-              .map(r => (
-                <option key={r} value={r}>{r}</option>
+              .map((r) => (
+                <option key={r} value={r}>
+                  {r}
+                </option>
               ))}
           </optgroup>
         </select>
@@ -42,7 +49,7 @@ export default function ReverseLookupTab({
           </p>
         ) : (
           <div className="b-recipe-cards-grid">
-            {reverseLookupRecipes.map(recipe => (
+            {reverseLookupRecipes.map((recipe) => (
               <button
                 key={recipe.name}
                 className={`b-recipe-summary-card ${inspectedRecipeName === recipe.name ? "is-selected" : ""}`}
@@ -50,7 +57,9 @@ export default function ReverseLookupTab({
               >
                 <span className="b-recipe-card-header">
                   <span className="b-recipe-card-name">{recipe.name}</span>
-                  <span className="b-recipe-card-badge">{recipe.discipline} • {recipe.tier}</span>
+                  <span className="b-recipe-card-badge">
+                    {recipe.discipline} • {recipe.tier}
+                  </span>
                 </span>
                 <span className="b-recipe-card-materials">Cost: {recipe.materialsStr}</span>
               </button>

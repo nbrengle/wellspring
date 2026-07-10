@@ -2,14 +2,8 @@
 // Decomposed into modular subcomponents in src/components/ directory.
 
 import { useState, useEffect, useMemo } from "react";
-import {
-  META,
-  LEVEL_TABLE,
-} from "./engine/data.js";
-import {
-  characterLevel,
-  validityReasons,
-} from "./engine/validate.js";
+import { META, LEVEL_TABLE } from "./engine/data.js";
+import { characterLevel, validityReasons } from "./engine/validate.js";
 import { useCharacterState } from "./hooks/useCharacterState.js";
 import { useBuilderHandlers } from "./hooks/useBuilderHandlers.js";
 import RulesExplorer from "./RulesExplorer.jsx";
@@ -168,7 +162,16 @@ function SiteFooter() {
       <span className="b-footer-ver">v{META.appVersion}</span>
       <span className="b-footer-sep">·</span>
       <span className="b-footer-sync">
-        Rules data synced from the <a href="https://docs.google.com/document/d/1lh8WAAWPk2ELo4_djuQg0fBTdt6Y5Oqp3a124qvtUrM/" target="_blank" rel="noreferrer" style={{ color: "inherit" }}>{META.sourceDoc}</a> ({META.sourceVersion}) on {META.sourceSyncedLabel}
+        Rules data synced from the{" "}
+        <a
+          href="https://docs.google.com/document/d/1lh8WAAWPk2ELo4_djuQg0fBTdt6Y5Oqp3a124qvtUrM/"
+          target="_blank"
+          rel="noreferrer"
+          style={{ color: "inherit" }}
+        >
+          {META.sourceDoc}
+        </a>{" "}
+        ({META.sourceVersion}) on {META.sourceSyncedLabel}
       </span>
       <span className="b-footer-sep">·</span>
       <span className="b-footer-note">Unofficial fan tool — verify against the current rules.</span>
@@ -187,7 +190,15 @@ function BTopBar({ mode, setMode, character, report, onLevelChange }) {
   return (
     <header className="b-topbar">
       <div className="b-topbar-brand">
-        <a href="https://www.wellspringlarp.org/" target="_blank" rel="noreferrer" className="b-topbar-title" style={{ textDecoration: "none" }}>Wellspring</a>
+        <a
+          href="https://www.wellspringlarp.org/"
+          target="_blank"
+          rel="noreferrer"
+          className="b-topbar-title"
+          style={{ textDecoration: "none" }}
+        >
+          Wellspring
+        </a>
         <span className="b-topbar-sub">
           {mode === "explorer" ? "Rules Explorer" : mode === "recipes" ? "Recipe Explorer" : "Character Builder"}
         </span>

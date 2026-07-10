@@ -20,7 +20,19 @@ const refs = read("refs.json");
 const skills = read("skills.json");
 
 // Build entity name registry (same set the linker sees).
-const POWER_TIERS = ["innate", "utility", "basic", "advanced", "veteran", "classSkills", "rightHandPowers", "cantrips", "noviceSpells", "adeptSpells", "greaterSpells"];
+const POWER_TIERS = [
+  "innate",
+  "utility",
+  "basic",
+  "advanced",
+  "veteran",
+  "classSkills",
+  "rightHandPowers",
+  "cantrips",
+  "noviceSpells",
+  "adeptSpells",
+  "greaterSpells",
+];
 const entityNames = [
   ...skills.map((s) => s.name),
   ...read("perks.json").map((p) => p.name),
@@ -50,10 +62,14 @@ for (const [skillId, p] of Object.entries(refs.prereqs)) {
   for (const frag of p.other) {
     const fragN = norm(frag);
     const matches = uniqueNames
-      .map((n) => ({ n, similarity: norm(n) === fragN ? 1 : (fragN.includes(norm(n)) && norm(n).length > 6 ? 0.8 : 0) }))
+      .map((n) => ({ n, similarity: norm(n) === fragN ? 1 : fragN.includes(norm(n)) && norm(n).length > 6 ? 0.8 : 0 }))
       .filter((m) => m.similarity > 0);
     if (matches.length) {
-      fuzzyPrereqMisses.push({ skill: skillId.replace("skill:", ""), fragment: frag, fuzzyMatch: matches.map((m) => m.n) });
+      fuzzyPrereqMisses.push({
+        skill: skillId.replace("skill:", ""),
+        fragment: frag,
+        fuzzyMatch: matches.map((m) => m.n),
+      });
     }
   }
 }
@@ -71,11 +87,20 @@ function gatherBodies() {
 const TITLE_CASE = /\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+){1,3}\b/g;
 const knownLower = new Set(uniqueNames.flatMap((n) => inflect(n).map((f) => f.toLowerCase())));
 [...STOP_WORDS].forEach((w) => knownLower.add(w.toLowerCase()));
-Object.values(CURATED).flat().forEach((f) => knownLower.add(f.toLowerCase()));
+Object.values(CURATED)
+  .flat()
+  .forEach((f) => knownLower.add(f.toLowerCase()));
 // Common stop phrases that look title-case but aren't entities.
 const PHRASE_IGNORE = new Set([
-  "long rest", "short rest", "spell slot", "spell slots", "spike damage",
-  "dark territory", "build points", "life points", "armor points",
+  "long rest",
+  "short rest",
+  "spell slot",
+  "spell slots",
+  "spike damage",
+  "dark territory",
+  "build points",
+  "life points",
+  "armor points",
 ]);
 
 const unlinkedTitleCase = new Map();
@@ -120,7 +145,8 @@ const top = [...unlinkedTitleCase.entries()].sort((a, b) => b[1].count - a[1].co
 for (const [phrase, rec] of top) {
   console.log(`    ${String(rec.count).padStart(3)}x  ${phrase}`);
 }
-if (unlinkedTitleCase.size > top.length) console.log(`    ... and ${unlinkedTitleCase.size - top.length} more (showing top 20)`);
+if (unlinkedTitleCase.size > top.length)
+  console.log(`    ... and ${unlinkedTitleCase.size - top.length} more (showing top 20)`);
 
 console.log(`\n(3) Stop-word suppression impact (links we are intentionally NOT making):`);
 for (const { word, hits } of stopWordImpact.slice(0, 15)) {
@@ -128,4 +154,6 @@ for (const { word, hits } of stopWordImpact.slice(0, 15)) {
 }
 if (stopWordImpact.length > 15) console.log(`    ... and ${stopWordImpact.length - 15} more stop-words`);
 
-console.log(`\nDone. Promote fuzzy-misses (1) into CURATED aliases; review (2) for missed entities; (3) is informational.`);
+console.log(
+  `\nDone. Promote fuzzy-misses (1) into CURATED aliases; review (2) for missed entities; (3) is informational.`,
+);

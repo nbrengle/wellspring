@@ -41,7 +41,13 @@ test("addEntity accepts the resolved 'skills' field too (row field)", () => {
 test("addEntity appends multiple purchased skills in order", () => {
   let c = addEntity({}, "purchasedSkills", "Athletics");
   c = addEntity(c, "purchasedSkills", "Stealth");
-  eq(purchased(c).map((s) => s.entityId).join(","), "Athletics,Stealth", "both, in order");
+  eq(
+    purchased(c)
+      .map((s) => s.entityId)
+      .join(","),
+    "Athletics,Stealth",
+    "both, in order",
+  );
 });
 test("addEntity is a no-op for a duplicate (non-unlimited) name", () => {
   const c0 = addEntity({}, "purchasedSkills", "Athletics");
@@ -72,8 +78,20 @@ test("removeEntity removes the purchased skill at the given position", () => {
     ],
   };
   const c = removeEntity(c0, "skills", 1);
-  eq(purchased(c).map((s) => s.entityId).join(","), "A,C", "B removed by position");
-  eq(purchased(c).map((s) => s.ranks).join(","), "1,3", "surviving ranks intact");
+  eq(
+    purchased(c)
+      .map((s) => s.entityId)
+      .join(","),
+    "A,C",
+    "B removed by position",
+  );
+  eq(
+    purchased(c)
+      .map((s) => s.ranks)
+      .join(","),
+    "1,3",
+    "surviving ranks intact",
+  );
 });
 test("removeEntity is a no-op for an out-of-range position", () => {
   const c0 = { skills: [{ entityId: "A", source: Source.purchased(), ranks: 1 }] };
@@ -128,7 +146,13 @@ test("setSlotPick places a power sourced to the granting class", () => {
 test("setSlotPick with flatIndex < 0 appends", () => {
   const c0 = setSlotPick({}, "basicPowers", 0, "Battlemind", "Fighter");
   const c = setSlotPick(c0, "basicPowers", -1, "Disengage", "Fighter");
-  eq(slotEntries(c, "basicPowers").map((p) => p.entityId).join(","), "Battlemind,Disengage", "appended at end");
+  eq(
+    slotEntries(c, "basicPowers")
+      .map((p) => p.entityId)
+      .join(","),
+    "Battlemind,Disengage",
+    "appended at end",
+  );
 });
 test("setSlotPick keeps other-field power entries untouched", () => {
   const c0 = setSlotPick({}, "utilityPowers", 0, "Bowyer", "Fighter");
@@ -140,7 +164,13 @@ test("clearSlot removes the pick at the given position", () => {
   let c = setSlotPick({}, "basicPowers", 0, "Battlemind", "Fighter");
   c = setSlotPick(c, "basicPowers", -1, "Disengage", "Fighter");
   c = clearSlot(c, "basicPowers", 0);
-  eq(slotEntries(c, "basicPowers").map((p) => p.entityId).join(","), "Disengage", "first pick removed");
+  eq(
+    slotEntries(c, "basicPowers")
+      .map((p) => p.entityId)
+      .join(","),
+    "Disengage",
+    "first pick removed",
+  );
 });
 test("clearSlot is a no-op for an out-of-range position", () => {
   const c0 = setSlotPick({}, "basicPowers", 0, "Battlemind", "Fighter");

@@ -2,14 +2,14 @@
 // parse-megadoc.js — reads WellspringMegaDoc.html, writes structured JSON to src/data/
 // Run: node scripts/parse-megadoc.js
 
-import { readFileSync, writeFileSync, mkdirSync } from 'fs';
-import { join, dirname } from 'path';
-import { fileURLToPath } from 'url';
+import { readFileSync, writeFileSync, mkdirSync } from "fs";
+import { join, dirname } from "path";
+import { fileURLToPath } from "url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const ROOT = join(__dirname, '..');
-const DOC = join(ROOT, 'WellspringMegaDoc.html');
-const OUT = join(ROOT, 'src', 'data');
+const ROOT = join(__dirname, "..");
+const DOC = join(ROOT, "WellspringMegaDoc.html");
+const OUT = join(ROOT, "src", "data");
 
 mkdirSync(OUT, { recursive: true });
 
@@ -17,29 +17,29 @@ mkdirSync(OUT, { recursive: true });
 // Parse the HTML into a flat list of nodes: { type: 'heading'|'text'|'list', level?, text, items? }
 // We don't need a full DOM — just heading levels and text content in order.
 
-const raw = readFileSync(DOC, 'utf8');
+const raw = readFileSync(DOC, "utf8");
 
 // Decode common HTML entities.
 function decode(s) {
   return s
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&nbsp;/g, ' ')
-    .replace(/&rsquo;/g, '’')
-    .replace(/&lsquo;/g, '‘')
-    .replace(/&ldquo;/g, '“')
-    .replace(/&rdquo;/g, '”')
-    .replace(/&hellip;/g, '…')
-    .replace(/&ndash;/g, '–')
-    .replace(/&mdash;/g, '—')
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&rsquo;/g, "’")
+    .replace(/&lsquo;/g, "‘")
+    .replace(/&ldquo;/g, "“")
+    .replace(/&rdquo;/g, "”")
+    .replace(/&hellip;/g, "…")
+    .replace(/&ndash;/g, "–")
+    .replace(/&mdash;/g, "—")
     .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(+n))
     .replace(/&#x([0-9a-f]+);/gi, (_, h) => String.fromCharCode(parseInt(h, 16)))
-    .replace(/&[a-z]+;/gi, '');
+    .replace(/&[a-z]+;/gi, "");
 }
 
 function stripTags(s) {
-  return decode(s.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ')).trim();
+  return decode(s.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ")).trim();
 }
 
 // Walk the raw HTML once, emitting nodes in document order.
@@ -59,31 +59,36 @@ function parseHTML() {
   // Match tags we care about. Everything else is consumed as inter-tag text.
   const TAG = /<(\/?)([a-zA-Z][a-zA-Z0-9]*)[^>]*>/g;
   let pos = 0;
-  let inTag = null;      // current open block tag being accumulated (non-cell)
-  let inCell = null;     // 'td' | 'th' when inside a table cell (overrides inTag)
-  let cellBuf = '';      // full raw buffer of the current cell (→ flat `text`)
-  let cellParts = [];    // inner-<p> segments of the current cell, in order
+  let inTag = null; // current open block tag being accumulated (non-cell)
+  let inCell = null; // 'td' | 'th' when inside a table cell (overrides inTag)
+  let cellBuf = ""; // full raw buffer of the current cell (→ flat `text`)
+  let cellParts = []; // inner-<p> segments of the current cell, in order
   let inList = false;
   let listItems = [];
 
   const flushList = () => {
-    if (listItems.length) { nodes.push({ type: 'list', items: [...listItems] }); listItems = []; }
+    if (listItems.length) {
+      nodes.push({ type: "list", items: [...listItems] });
+      listItems = [];
+    }
     inList = false;
   };
 
   // We collect text content between tags into a buffer when inside a known block.
-  let buf = '';
-  const BLOCK_TAGS = new Set(['p','li','td','th','h1','h2','h3','h4','h5','h6']);
+  let buf = "";
+  const BLOCK_TAGS = new Set(["p", "li", "td", "th", "h1", "h2", "h3", "h4", "h5", "h6"]);
 
   let match;
   TAG.lastIndex = 0;
   while ((match = TAG.exec(raw)) !== null) {
     const between = raw.slice(pos, match.index);
-    if (inCell) { cellBuf += between; buf += between; }
-    else if (inTag) buf += between;
+    if (inCell) {
+      cellBuf += between;
+      buf += between;
+    } else if (inTag) buf += between;
     pos = match.index + match[0].length;
 
-    const closing = match[1] === '/';
+    const closing = match[1] === "/";
     const tag = match[2].toLowerCase();
 
     // ── Inside a table cell: buffer everything until </td>/</th>; ignore the
@@ -96,51 +101,51 @@ function parseHTML() {
       if (closing && tag === inCell) {
         const seg = stripTags(buf).trim();
         if (seg) cellParts.push(seg);
-        nodes.push({ type: 'cell', text: stripTags(cellBuf).trim(), parts: cellParts });  // keep empty cells (real columns)
-        buf = '';
-        cellBuf = '';
+        nodes.push({ type: "cell", text: stripTags(cellBuf).trim(), parts: cellParts }); // keep empty cells (real columns)
+        buf = "";
+        cellBuf = "";
         cellParts = [];
         inCell = null;
-      } else if (closing && tag === 'p') {
+      } else if (closing && tag === "p") {
         // End of an inner paragraph: snapshot it as one cell part, reset the
         // per-<p> buffer (cellBuf keeps accumulating for the flat `text`).
         const seg = stripTags(buf).trim();
         if (seg) cellParts.push(seg);
-        buf = '';
+        buf = "";
       }
       continue;
     }
 
-    if (!closing && (tag === 'td' || tag === 'th')) {
+    if (!closing && (tag === "td" || tag === "th")) {
       if (listItems.length) flushList();
-      buf = '';
-      cellBuf = '';
+      buf = "";
+      cellBuf = "";
       cellParts = [];
       inCell = tag;
-    } else if (closing && tag === 'tr') {
-      nodes.push({ type: 'rowEnd' });
+    } else if (closing && tag === "tr") {
+      nodes.push({ type: "rowEnd" });
     } else if (!closing && BLOCK_TAGS.has(tag)) {
-      buf = '';
+      buf = "";
       inTag = tag;
     } else if (closing && inTag === tag) {
       const text = stripTags(buf).trim();
-      buf = '';
+      buf = "";
       inTag = null;
       if (!text) continue;
 
-      if (tag === 'li') {
+      if (tag === "li") {
         listItems.push(text);
       } else {
-        if (listItems.length && tag !== 'li') flushList();
+        if (listItems.length && tag !== "li") flushList();
         if (/^h[1-6]$/.test(tag)) {
-          nodes.push({ type: 'heading', level: +tag[1], text });
+          nodes.push({ type: "heading", level: +tag[1], text });
         } else {
-          nodes.push({ type: 'text', text });
+          nodes.push({ type: "text", text });
         }
       }
-    } else if (!closing && tag === 'ul' || !closing && tag === 'ol') {
+    } else if ((!closing && tag === "ul") || (!closing && tag === "ol")) {
       inList = true;
-    } else if (closing && (tag === 'ul' || tag === 'ol')) {
+    } else if (closing && (tag === "ul" || tag === "ol")) {
       flushList();
     }
   }
@@ -174,10 +179,10 @@ const nodes = parseHTML();
 // H2 in the export.
 for (let i = 0; i < nodes.length; i++) {
   const n = nodes[i];
-  if (n.type !== 'heading' || !n.text) continue;
+  if (n.type !== "heading" || !n.text) continue;
   if (n.level !== 2 && n.level !== 3) continue;
   const looksLikeProse = n.text.length > 80 && /[.!?]\s*$/.test(n.text);
-  if (looksLikeProse) nodes[i] = { type: 'text', text: n.text };
+  if (looksLikeProse) nodes[i] = { type: "text", text: n.text };
 }
 
 const POWER_STAT_FIELD = /^(Incantation|Incant|Call|Target|Refresh|Cost|Requirements?|Prerequisites?):\s/;
@@ -186,27 +191,32 @@ const POWER_STAT_FIELD = /^(Incantation|Incant|Call|Target|Refresh|Cost|Requirem
 // alone isn't enough to decide (domain powers may carry [Adept], [Greater],
 // etc.) — we also check whether the demoted entry sits inside the Divine
 // Domains section.
-const DEMOTED_POWER_TIERED = /^.{2,80}\[(Utility|Basic|Advanced|Veteran|Cantrip|Novice|Adept|Greater|Innate|Class|Form|Right Hand)\]/;
+const DEMOTED_POWER_TIERED =
+  /^.{2,80}\[(Utility|Basic|Advanced|Veteran|Cantrip|Novice|Adept|Greater|Innate|Class|Form|Right Hand)\]/;
 const DEMOTED_POWER_DOMAIN = /^[A-Z][^[\n]{1,60}-\s*\d+\s*BP\s*$/;
 // Find the H1 range of "Divine Domains" so we can tell which demoted entries
 // belong to a domain (→ H3) vs. a class (→ H4).
-const divineDomainsIdx = nodes.findIndex((m) => m.type === 'heading' && m.level === 1 && m.text === 'Divine Domains');
-const divineDomainsEndIdx = nodes.findIndex((m, j) => j > divineDomainsIdx && m.type === 'heading' && m.level === 1);
-const inDivineDomains = (idx) => divineDomainsIdx !== -1 && idx > divineDomainsIdx && (divineDomainsEndIdx === -1 || idx < divineDomainsEndIdx);
+const divineDomainsIdx = nodes.findIndex((m) => m.type === "heading" && m.level === 1 && m.text === "Divine Domains");
+const divineDomainsEndIdx = nodes.findIndex((m, j) => j > divineDomainsIdx && m.type === "heading" && m.level === 1);
+const inDivineDomains = (idx) =>
+  divineDomainsIdx !== -1 && idx > divineDomainsIdx && (divineDomainsEndIdx === -1 || idx < divineDomainsEndIdx);
 
 for (let i = 0; i < nodes.length; i++) {
   const n = nodes[i];
-  if (n.type !== 'text') continue;
+  if (n.type !== "text") continue;
   if (!DEMOTED_POWER_TIERED.test(n.text) && !DEMOTED_POWER_DOMAIN.test(n.text)) continue;
   // Confirm the next text node is a power stat-block field.
   let next = null;
   for (let j = i + 1; j < Math.min(nodes.length, i + 4); j++) {
-    if (nodes[j].type === 'text') { next = nodes[j]; break; }
+    if (nodes[j].type === "text") {
+      next = nodes[j];
+      break;
+    }
   }
   if (!next || !POWER_STAT_FIELD.test(next.text)) continue;
   // Domain powers (H3) when inside Divine Domains; class powers (H4) otherwise.
   const level = inDivineDomains(i) ? 3 : 4;
-  nodes[i] = { type: 'heading', level, text: n.text };
+  nodes[i] = { type: "heading", level, text: n.text };
 }
 
 function write(filename, data) {
@@ -221,38 +231,34 @@ function write(filename, data) {
 // Find the index of the first heading matching text (exact) at a given level,
 // optionally starting after `after`.
 function findHeading(text, level = null, after = 0) {
-  return nodes.findIndex((n, i) =>
-    i >= after &&
-    n.type === 'heading' &&
-    (level === null || n.level === level) &&
-    n.text === text
+  return nodes.findIndex(
+    (n, i) => i >= after && n.type === "heading" && (level === null || n.level === level) && n.text === text,
   );
 }
 
 // Find first heading whose text matches a regex, optionally at a given level.
 function findHeadingRe(re, level = null, after = 0) {
-  return nodes.findIndex((n, i) =>
-    i >= after &&
-    n.type === 'heading' &&
-    (level === null || n.level === level) &&
-    re.test(n.text)
+  return nodes.findIndex(
+    (n, i) => i >= after && n.type === "heading" && (level === null || n.level === level) && re.test(n.text),
   );
 }
 
 // Return all text content between two node indices as a single joined string.
 function textBetween(start, end) {
-  return nodes.slice(start, end)
-    .filter(n => n.type === 'text')
-    .map(n => n.text)
-    .join(' ');
+  return nodes
+    .slice(start, end)
+    .filter((n) => n.type === "text")
+    .map((n) => n.text)
+    .join(" ");
 }
 
 // Return all text+list content between two node indices.
 function bodyBetween(start, end) {
-  return nodes.slice(start, end)
-    .filter(n => n.type === 'text' || n.type === 'list')
-    .map(n => n.type === 'list' ? n.items.join(' ') : n.text)
-    .join(' ');
+  return nodes
+    .slice(start, end)
+    .filter((n) => n.type === "text" || n.type === "list")
+    .map((n) => (n.type === "list" ? n.items.join(" ") : n.text))
+    .join(" ");
 }
 
 // Parse the multiclass-skill bullet lines into a clean default granted-skill list.
@@ -273,11 +279,19 @@ function parseMulticlassSkills(blobs) {
   const out = [];
   const tokensOf = (text) => {
     // "<Header>: " flavor prefix → drop it; then split the rest into "Name (cost)".
-    const body = text.replace(/^[^:]+:\s*/, '').replace(/Choose one of the following:\s*$/i, '').trim();
-    return body.split(',').map((s) => s.trim()).filter(Boolean).map((part) => {
-      const costM = part.match(/\((\d+)\)\s*$/);
-      return { name: part.replace(/\s*\(\d+\)\s*$/, '').trim(), cost: costM ? parseInt(costM[1], 10) : null };
-    }).filter((t) => t.name);
+    const body = text
+      .replace(/^[^:]+:\s*/, "")
+      .replace(/Choose one of the following:\s*$/i, "")
+      .trim();
+    return body
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean)
+      .map((part) => {
+        const costM = part.match(/\((\d+)\)\s*$/);
+        return { name: part.replace(/\s*\(\d+\)\s*$/, "").trim(), cost: costM ? parseInt(costM[1], 10) : null };
+      })
+      .filter((t) => t.name);
   };
 
   // When a line opens a choice ("…the following:"), the subsequent bare-skill lines
@@ -292,7 +306,13 @@ function parseMulticlassSkills(blobs) {
     const isBareOption = !opensChoice && !/^[^:]+:/.test(line);
 
     if (inOptions && isBareOption) {
-      if (!tookDefault) { const t = tokensOf(blob); if (t.length) { out.push(t[0]); tookDefault = true; } }
+      if (!tookDefault) {
+        const t = tokensOf(blob);
+        if (t.length) {
+          out.push(t[0]);
+          tookDefault = true;
+        }
+      }
       continue; // skip non-default options
     }
     // Header / fixed line: emit its fixed skills; (re)open or close the option run.
@@ -306,7 +326,7 @@ function parseMulticlassSkills(blobs) {
 // Find the next heading at or above `level` starting after `after`.
 // Used to bound a section: "end of this H2 is the next H2 or H1".
 function nextHeadingAtOrAbove(level, after) {
-  return nodes.findIndex((n, i) => i > after && n.type === 'heading' && n.level <= level);
+  return nodes.findIndex((n, i) => i > after && n.type === "heading" && n.level <= level);
 }
 
 // Collect all direct children of a heading node (nodes between it and the next
@@ -320,9 +340,7 @@ function sectionBetween(startIdx, endIdx) {
 // The stat-block fields follow as text nodes before the description prose.
 
 const TIER_PATTERN = /\[(Utility|Basic|Advanced|Veteran|Cantrip|Novice|Adept|Greater|Innate|Class|Form|Right Hand)\]/;
-const POWER_HEADER = new RegExp(
-  TIER_PATTERN.source + String.raw`(\s*\[[^\]]+\])*\s*(-\s*\d+\s*BP)?\s*(\(\d+\))?\s*$`
-);
+const POWER_HEADER = new RegExp(TIER_PATTERN.source + String.raw`(\s*\[[^\]]+\])*\s*(-\s*\d+\s*BP)?\s*(\(\d+\))?\s*$`);
 
 // SUB-POWERS: some powers grant a named sub-power ("Grant Power: Curious Balm",
 // "the Holy Rest Power below") that has its OWN H4/H5 heading + stat block but NO
@@ -334,25 +352,35 @@ function subPowerNames() {
   if (_subPowerNames) return _subPowerNames;
   _subPowerNames = new Set();
   // Include cell text — some power descriptions live inside table cells now.
-  const text = nodes.filter((n) => n.type === 'text' || n.type === 'cell').map((n) => n.text).join(' ');
+  const text = nodes
+    .filter((n) => n.type === "text" || n.type === "cell")
+    .map((n) => n.text)
+    .join(" ");
   for (const m of text.matchAll(/Grant Power:\s*([A-Z][\w’' ]+?)\s*(?:[”"”,]|$)/g)) _subPowerNames.add(m[1].trim());
   for (const m of text.matchAll(/\bthe\s+([A-Z][\w’' ]+?)\s+Power\s+below\b/g)) _subPowerNames.add(m[1].trim());
   return _subPowerNames;
 }
 
-const STAT_FIELD = /^(Incantation|Incant|Call|Target|Duration|Delivery|Refresh|Accent|Effect|Requirements?|Prerequisites?|Skills and Options):\s*(.*)$/;
+const STAT_FIELD =
+  /^(Incantation|Incant|Call|Target|Duration|Delivery|Refresh|Accent|Effect|Requirements?|Prerequisites?|Skills and Options):\s*(.*)$/;
 // Same field labels, unanchored — used to find where a stat block starts within a
 // run-on string (sub-power cells glue the power NAME onto the first field label).
-const STAT_LABEL = /(Incantation|Incant|Call|Target|Duration|Delivery|Refresh|Accent|Effect|Requirements?|Prerequisites?|Skills and Options):/;
+const STAT_LABEL =
+  /(Incantation|Incant|Call|Target|Duration|Delivery|Refresh|Accent|Effect|Requirements?|Prerequisites?|Skills and Options):/;
 const STAT_TWO = /^(Target|Delivery|Accent):\s*(.+?)\s{2,}(Duration|Refresh|Effect):\s*(.+)$/;
-const statKey = l => l.toLowerCase().replace(/^incant$/, 'incantation').replace(/\s+/g, '_').replace(/s$/, '');
+const statKey = (l) =>
+  l
+    .toLowerCase()
+    .replace(/^incant$/, "incantation")
+    .replace(/\s+/g, "_")
+    .replace(/s$/, "");
 
 function parsePowerNodes(powerNodes) {
   // powerNodes: text + list nodes belonging to one power (after its heading node).
   // A `list` node's items are flattened to bullet lines ("• …") so a power's
   // level/benefit list survives into the description instead of being dropped.
   const lines = powerNodes
-    .flatMap(n => n.type === 'list' ? n.items.map(it => `• ${it}`) : [n.text])
+    .flatMap((n) => (n.type === "list" ? n.items.map((it) => `• ${it}`) : [n.text]))
     .filter(Boolean);
   const fields = {};
   let descStart = 0;
@@ -377,7 +405,7 @@ function parsePowerNodes(powerNodes) {
 
   return {
     fields,
-    description: lines.slice(descStart).join(' '),
+    description: lines.slice(descStart).join(" "),
   };
 }
 
@@ -390,7 +418,7 @@ function parsePowerNodes(powerNodes) {
 // the first part is the name, the rest are stat-field lines + trailing description.
 // Returns a power object (tier 'SubPower') or null if `cell` isn't a sub-power def.
 function parseSubPowerCell(cell, subNames) {
-  if (!cell || cell.type !== 'cell' || !Array.isArray(cell.parts) || cell.parts.length < 2) return null;
+  if (!cell || cell.type !== "cell" || !Array.isArray(cell.parts) || cell.parts.length < 2) return null;
   // The name is glued to the first stat field inside the leading <p>
   // ("Curious BalmIncantation: Quick 100"). Split at the first stat-field label.
   const first = cell.parts[0];
@@ -399,30 +427,37 @@ function parseSubPowerCell(cell, subNames) {
   const name = first.slice(0, labelAt).trim();
   if (!subNames.has(name)) return null;
   // Re-attach the trailing stat field as the first body line, then parse the rest.
-  const bodyNodes = [{ type: 'text', text: first.slice(labelAt) }, ...cell.parts.slice(1).map(text => ({ type: 'text', text }))];
+  const bodyNodes = [
+    { type: "text", text: first.slice(labelAt) },
+    ...cell.parts.slice(1).map((text) => ({ type: "text", text })),
+  ];
   const { fields, description } = parsePowerNodes(bodyNodes);
   return {
-    name, tier: 'SubPower', tags: [], ranks: 1, cost: null,
-    incantation: fields['incantation'] ?? null,
-    call: fields['call'] ?? null,
-    target: fields['target'] ?? null,
-    duration: fields['duration'] ?? null,
-    delivery: fields['delivery'] ?? null,
-    refresh: fields['refresh'] ?? null,
-    accent: fields['accent'] ?? null,
-    effect: fields['effect'] ?? null,
-    requirement: fields['requirement'] ?? null,
-    prerequisites: fields['prerequisite'] ?? fields['prerequisites'] ?? null,
-    skillsAndOptions: fields['skills_and_option'] ?? null,
+    name,
+    tier: "SubPower",
+    tags: [],
+    ranks: 1,
+    cost: null,
+    incantation: fields["incantation"] ?? null,
+    call: fields["call"] ?? null,
+    target: fields["target"] ?? null,
+    duration: fields["duration"] ?? null,
+    delivery: fields["delivery"] ?? null,
+    refresh: fields["refresh"] ?? null,
+    accent: fields["accent"] ?? null,
+    effect: fields["effect"] ?? null,
+    requirement: fields["requirement"] ?? null,
+    prerequisites: fields["prerequisite"] ?? fields["prerequisites"] ?? null,
+    skillsAndOptions: fields["skills_and_option"] ?? null,
     description,
   };
 }
 
 function parsePowerHeading(text) {
-  const name = text.replace(/\s*(\[|-\s*\d+\s*BP).*$/, '').trim();
+  const name = text.replace(/\s*(\[|-\s*\d+\s*BP).*$/, "").trim();
   const tierMatch = text.match(TIER_PATTERN);
-  const tier = tierMatch ? tierMatch[1] : 'Unknown';
-  const tags = [...text.matchAll(/\[([^\]]+)\]/g)].map(m => m[1]).filter(t => t !== tier);
+  const tier = tierMatch ? tierMatch[1] : "Unknown";
+  const tags = [...text.matchAll(/\[([^\]]+)\]/g)].map((m) => m[1]).filter((t) => t !== tier);
   const ranksMatch = text.match(/\((\d+)\)\s*$/);
   // Ranks = how many times this power can be taken (the "(N)" suffix). Same concept
   // and field name as skills/perks — NOT a separate "maxRanks" — so the dedupe/cap
@@ -443,16 +478,23 @@ function parsePowersInRange(start, end) {
     const n = nodes[i];
     // A power heading is either tier-tagged (POWER_HEADER) OR a granted SUB-POWER
     // whose bare name appears in a "Grant Power: X" / "X Power below" reference.
-    const isSub = n.type === 'heading' && (n.level === 4 || n.level === 5)
-      && !POWER_HEADER.test(n.text) && subNames.has(n.text.trim());
-    if (n.type === 'heading' && (n.level === 4 || n.level === 5) && (POWER_HEADER.test(n.text) || isSub)) {
+    const isSub =
+      n.type === "heading" &&
+      (n.level === 4 || n.level === 5) &&
+      !POWER_HEADER.test(n.text) &&
+      subNames.has(n.text.trim());
+    if (n.type === "heading" && (n.level === 4 || n.level === 5) && (POWER_HEADER.test(n.text) || isSub)) {
       // A power's body ends at the next REAL heading. Some source paragraphs are
       // mis-styled as <h4> (a long sentence, no [Tier] tag, not a sub-power) — e.g.
       // Arcane Charge's whole description. Don't let those bound the body; treat
       // them as prose so the description isn't lost.
-      const isProseHeading = (m) => m.type === 'heading' && !POWER_HEADER.test(m.text)
-        && !subNames.has(m.text.trim()) && m.text.length > 60 && /[.”]$/.test(m.text);
-      const bodyEnd = nodes.findIndex((m, j) => j > i && m.type === 'heading' && !isProseHeading(m));
+      const isProseHeading = (m) =>
+        m.type === "heading" &&
+        !POWER_HEADER.test(m.text) &&
+        !subNames.has(m.text.trim()) &&
+        m.text.length > 60 &&
+        /[.”]$/.test(m.text);
+      const bodyEnd = nodes.findIndex((m, j) => j > i && m.type === "heading" && !isProseHeading(m));
       // Keep `list` nodes alongside `text`: a power's benefits often follow a
       // "…at various Levels:" colon as a <ul> (Adept Ritualist, Druid Forms). They
       // are separate nodes the walker captured; dropping them here is what left
@@ -460,31 +502,35 @@ function parsePowersInRange(start, end) {
       const bodyTo = bodyEnd === -1 ? end : Math.min(bodyEnd, end);
       const bodyRange = nodes.slice(i + 1, bodyTo);
       const bodyNodes = bodyRange
-        .filter(m => m.type === 'text' || m.type === 'list' || isProseHeading(m))
-        .map(m => isProseHeading(m) ? { type: 'text', text: m.text } : m);
+        .filter((m) => m.type === "text" || m.type === "list" || isProseHeading(m))
+        .map((m) => (isProseHeading(m) ? { type: "text", text: m.text } : m));
       // A granted sub-power's stat block lives in a table cell INSIDE the granting
       // power's body (between this heading and the next). Emit those as their own
       // SubPower entries; they're filtered out of `bodyNodes` above so they don't
       // pollute the parent's description.
-      const subCells = bodyRange.map(m => parseSubPowerCell(m, subNames)).filter(Boolean);
+      const subCells = bodyRange.map((m) => parseSubPowerCell(m, subNames)).filter(Boolean);
       // Sub-powers have no tier tag; mark them so they're identifiable + parseable.
       const parsed = parsePowerHeading(n.text);
       const { name, tags, ranks, cost } = parsed;
-      const tier = isSub ? 'SubPower' : parsed.tier;
+      const tier = isSub ? "SubPower" : parsed.tier;
       const { fields, description } = parsePowerNodes(bodyNodes);
       powers.push({
-        name, tier, tags, ranks, cost,
-        incantation: fields['incantation'] ?? null,
-        call: fields['call'] ?? null,
-        target: fields['target'] ?? null,
-        duration: fields['duration'] ?? null,
-        delivery: fields['delivery'] ?? null,
-        refresh: fields['refresh'] ?? null,
-        accent: fields['accent'] ?? null,
-        effect: fields['effect'] ?? null,
-        requirement: fields['requirement'] ?? null,
-        prerequisites: fields['prerequisite'] ?? fields['prerequisites'] ?? null,
-        skillsAndOptions: fields['skills_and_option'] ?? null,
+        name,
+        tier,
+        tags,
+        ranks,
+        cost,
+        incantation: fields["incantation"] ?? null,
+        call: fields["call"] ?? null,
+        target: fields["target"] ?? null,
+        duration: fields["duration"] ?? null,
+        delivery: fields["delivery"] ?? null,
+        refresh: fields["refresh"] ?? null,
+        accent: fields["accent"] ?? null,
+        effect: fields["effect"] ?? null,
+        requirement: fields["requirement"] ?? null,
+        prerequisites: fields["prerequisite"] ?? fields["prerequisites"] ?? null,
+        skillsAndOptions: fields["skills_and_option"] ?? null,
         description,
       });
       powers.push(...subCells);
@@ -498,44 +544,50 @@ function parsePowersInRange(start, end) {
 
 // ─── CLASSES ──────────────────────────────────────────────────────────────────
 
-console.log('\nParsing classes...');
+console.log("\nParsing classes...");
 
 function parseClasses() {
-  const classesStart = findHeading('Base Classes (All)');
-  const classesEnd = findHeading('Lineages (All)');
+  const classesStart = findHeading("Base Classes (All)");
+  const classesEnd = findHeading("Lineages (All)");
   const classes = [];
 
   // Each class is an H1 "Name: Base Class" between those bounds.
   let i = classesStart + 1;
   while (i < classesEnd) {
     const n = nodes[i];
-    if (n.type !== 'heading' || n.level !== 1 || !/^(.+):\s*Base Class$/.test(n.text)) { i++; continue; }
+    if (n.type !== "heading" || n.level !== 1 || !/^(.+):\s*Base Class$/.test(n.text)) {
+      i++;
+      continue;
+    }
 
-    const clsName = n.text.replace(/:\s*Base Class$/, '').trim();
+    const clsName = n.text.replace(/:\s*Base Class$/, "").trim();
     const clsStart = i;
     // Class ends at the next H1
-    const clsEnd = nodes.findIndex((m, j) => j > clsStart && m.type === 'heading' && m.level === 1);
+    const clsEnd = nodes.findIndex((m, j) => j > clsStart && m.type === "heading" && m.level === 1);
     const end = clsEnd === -1 ? classesEnd : Math.min(clsEnd, classesEnd);
 
     // H2 sections within the class
     const h2 = (text) => {
-      const idx = nodes.findIndex((m, j) => j > clsStart && j < end && m.type === 'heading' && m.level === 2 && m.text === text);
+      const idx = nodes.findIndex(
+        (m, j) => j > clsStart && j < end && m.type === "heading" && m.level === 2 && m.text === text,
+      );
       if (idx === -1) return -1;
-      const next = nodes.findIndex((m, j) => j > idx && m.type === 'heading' && m.level <= 2);
+      const next = nodes.findIndex((m, j) => j > idx && m.type === "heading" && m.level <= 2);
       return { start: idx, end: next === -1 ? end : Math.min(next, end) };
     };
 
     // Description: text between class H1 and first H2
-    const firstH2 = nodes.findIndex((m, j) => j > clsStart && j < end && m.type === 'heading' && m.level === 2);
+    const firstH2 = nodes.findIndex((m, j) => j > clsStart && j < end && m.type === "heading" && m.level === 2);
     const description = textBetween(clsStart + 1, firstH2 === -1 ? end : firstH2);
 
     // Starting / multiclass skills: list nodes under those H2s
     const skillList = (sectionText) => {
       const sec = h2(sectionText);
       if (!sec) return [];
-      return nodes.slice(sec.start + 1, sec.end)
-        .filter(m => m.type === 'list')
-        .flatMap(m => m.items);
+      return nodes
+        .slice(sec.start + 1, sec.end)
+        .filter((m) => m.type === "list")
+        .flatMap((m) => m.items);
     };
 
     // Class progression table: cells under "Class Progression Table" H2
@@ -543,21 +595,24 @@ function parseClasses() {
 
     // Specializations: H3 entries under the "Specializations" H2 (e.g. Artisan
     // → Artificer / Crafter / Mystic). Some classes don't have any.
-    const specSec = h2('Specializations');
-    const specializations = specSec === -1 ? [] : (() => {
-      const out = [];
-      let j = specSec.start + 1;
-      while (j < specSec.end) {
-        const m = nodes[j];
-        if (m.type === 'heading' && m.level === 3 && m.text) {
-          const specEnd = nodes.findIndex((x, k) => k > j && x.type === 'heading' && x.level <= 3);
-          const sEnd = specEnd === -1 ? specSec.end : Math.min(specEnd, specSec.end);
-          out.push({ name: m.text, description: textBetween(j + 1, sEnd) });
-          j = sEnd;
-        } else j++;
-      }
-      return out;
-    })();
+    const specSec = h2("Specializations");
+    const specializations =
+      specSec === -1
+        ? []
+        : (() => {
+            const out = [];
+            let j = specSec.start + 1;
+            while (j < specSec.end) {
+              const m = nodes[j];
+              if (m.type === "heading" && m.level === 3 && m.text) {
+                const specEnd = nodes.findIndex((x, k) => k > j && x.type === "heading" && x.level <= 3);
+                const sEnd = specEnd === -1 ? specSec.end : Math.min(specEnd, specSec.end);
+                out.push({ name: m.text, description: textBetween(j + 1, sEnd) });
+                j = sEnd;
+              } else j++;
+            }
+            return out;
+          })();
 
     // Power sections: each is an H2 like "Artisan Innate Powers", "Artisan Basic Powers" etc.
     // We collect all H4/H5 power nodes under each matching H2.
@@ -566,8 +621,8 @@ function parseClasses() {
       let j = clsStart + 1;
       while (j < end) {
         const m = nodes[j];
-        if (m.type === 'heading' && m.level === 2 && h2Pattern.test(m.text)) {
-          const secEnd = nodes.findIndex((x, k) => k > j && x.type === 'heading' && x.level <= 2);
+        if (m.type === "heading" && m.level === 2 && h2Pattern.test(m.text)) {
+          const secEnd = nodes.findIndex((x, k) => k > j && x.type === "heading" && x.level <= 2);
           results.push(...parsePowersInRange(j + 1, secEnd === -1 ? end : Math.min(secEnd, end)));
         }
         j++;
@@ -575,13 +630,15 @@ function parseClasses() {
       return results;
     };
 
-    const isCaster = ['Cleric', 'Druid', 'Mage', 'Sourcerer'].includes(clsName);
+    const isCaster = ["Cleric", "Druid", "Mage", "Sourcerer"].includes(clsName);
     // Divine vs Arcane is derived from the class's own text: Divine casters draw on
     // Faith/Worship, Arcane casters on Arcane. Emitted as a structured field so the
     // data layer reads class.magicType instead of hand-maintaining a class→type map.
-    const magicType = !isCaster ? null
-      : /\barcane\b/i.test([description, ...(skillList('Starting Skills') || [])].join(' ')) ? 'Arcane'
-      : 'Divine';
+    const magicType = !isCaster
+      ? null
+      : /\barcane\b/i.test([description, ...(skillList("Starting Skills") || [])].join(" "))
+        ? "Arcane"
+        : "Divine";
 
     // Annotate Extended Capacity references in this class's skill lists with the
     // class's Sphere ("Extended Capacity - Novice" → "...[Divine]"/"[Arcane]"). The
@@ -589,32 +646,32 @@ function parseClasses() {
     // caster's magicType — so we DERIVE it here (was a manual patch, PR #116) and the
     // builder can route the granted slot to the right pool. Only touch the bare ref;
     // leave a count suffix "(3)" / "x2" intact.
-    const withSphere = (s) => (magicType
-      ? s.replace(/\bExtended Capacity\s*-?\s*(Novice|Adept|Greater)\b(?!\s*\[)/g,
-          (m) => `${m} [${magicType}]`)
-      : s);
+    const withSphere = (s) =>
+      magicType
+        ? s.replace(/\bExtended Capacity\s*-?\s*(Novice|Adept|Greater)\b(?!\s*\[)/g, (m) => `${m} [${magicType}]`)
+        : s;
     const annotateSkills = (list) => (list || []).map(withSphere);
 
     classes.push({
       name: clsName,
-      type: isCaster ? 'Spellcaster' : 'Martial',
+      type: isCaster ? "Spellcaster" : "Martial",
       magicType,
       description,
-      startingSkills:   annotateSkills(skillList('Starting Skills')),
-      multiclassSkills: annotateSkills(skillList('Multiclass Skills')),
-      multiclassGrants: parseMulticlassSkills(skillList('Multiclass Skills')),
+      startingSkills: annotateSkills(skillList("Starting Skills")),
+      multiclassSkills: annotateSkills(skillList("Multiclass Skills")),
+      multiclassGrants: parseMulticlassSkills(skillList("Multiclass Skills")),
       progression,
       specializations,
-      innate:       powers(new RegExp(`^${clsName} Innate Powers$`)),
-      utility:      powers(new RegExp(`^${clsName} Utility Powers$`)),
-      basic:        powers(new RegExp(`^(${clsName} Basic Powers|Basic ${clsName} Powers)$`)),
-      advanced:     powers(new RegExp(`^${clsName} Advanced Powers$`)),
-      veteran:      powers(new RegExp(`^${clsName} Veteran Powers$`)),
-      classSkills:  powers(new RegExp(`^${clsName} (Class )?Skills$`)),
+      innate: powers(new RegExp(`^${clsName} Innate Powers$`)),
+      utility: powers(new RegExp(`^${clsName} Utility Powers$`)),
+      basic: powers(new RegExp(`^(${clsName} Basic Powers|Basic ${clsName} Powers)$`)),
+      advanced: powers(new RegExp(`^${clsName} Advanced Powers$`)),
+      veteran: powers(new RegExp(`^${clsName} Veteran Powers$`)),
+      classSkills: powers(new RegExp(`^${clsName} (Class )?Skills$`)),
       rightHandPowers: powers(new RegExp(`^${clsName} Right Hand Powers$`)),
-      cantrips:     powers(new RegExp(`^${clsName} Cantrips?$`)),
+      cantrips: powers(new RegExp(`^${clsName} Cantrips?$`)),
       noviceSpells: powers(new RegExp(`^${clsName} (Novice( Form)? Spells?)$`)),
-      adeptSpells:  powers(new RegExp(`^${clsName} (Adept( Form)? Spells?)$`)),
+      adeptSpells: powers(new RegExp(`^${clsName} (Adept( Form)? Spells?)$`)),
       greaterSpells: powers(new RegExp(`^${clsName} (Greater( Form)? Spells?)$`)),
     });
 
@@ -630,11 +687,12 @@ function parseClasses() {
 // (Martial tables carry a leading empty "Class" column; we key off the Level column
 // by finding the first numeric cell, so the leading column doesn't matter.)
 function parseProgressionTable(clsStart, clsEnd) {
-  const tableIdx = nodes.findIndex((n, i) =>
-    i > clsStart && i < clsEnd && n.type === 'heading' && n.level === 2 && n.text === 'Class Progression Table'
+  const tableIdx = nodes.findIndex(
+    (n, i) =>
+      i > clsStart && i < clsEnd && n.type === "heading" && n.level === 2 && n.text === "Class Progression Table",
   );
   if (tableIdx === -1) return {};
-  const tableEnd = nodes.findIndex((n, i) => i > tableIdx && n.type === 'heading' && n.level <= 2);
+  const tableEnd = nodes.findIndex((n, i) => i > tableIdx && n.type === "heading" && n.level <= 2);
   const end = tableEnd === -1 ? clsEnd : Math.min(tableEnd, clsEnd);
 
   // Gather rows: arrays of cell texts split on 'rowEnd'.
@@ -642,30 +700,36 @@ function parseProgressionTable(clsStart, clsEnd) {
   let cur = [];
   for (let i = tableIdx + 1; i < end; i++) {
     const n = nodes[i];
-    if (n.type === 'rowEnd') { if (cur.length) rows.push(cur); cur = []; }
-    else if (n.type === 'cell') cur.push(n.text);
+    if (n.type === "rowEnd") {
+      if (cur.length) rows.push(cur);
+      cur = [];
+    } else if (n.type === "cell") cur.push(n.text);
   }
   if (cur.length) rows.push(cur);
   if (!rows.length) return {};
 
-  const HEADER = /^(Class|Level|Utility ?Powers|Basic ?Powers|Advanced ?Powers|Veteran ?Powers|Cantrips?|Spells? Known|Spell ?Slots?|Class Bonuses?)$/i;
-  const isCaster = rows.flat().some(v => /cantrip|spell/i.test(v));
-  const num = v => parseInt(v) || 0;
-  const orNull = v => (!v || v === '-' ? null : v);
+  const HEADER =
+    /^(Class|Level|Utility ?Powers|Basic ?Powers|Advanced ?Powers|Veteran ?Powers|Cantrips?|Spells? Known|Spell ?Slots?|Class Bonuses?)$/i;
+  const isCaster = rows.flat().some((v) => /cantrip|spell/i.test(v));
+  const num = (v) => parseInt(v) || 0;
+  const orNull = (v) => (!v || v === "-" ? null : v);
 
   const progression = {};
   for (const cells of rows) {
     // Header rows: every cell matches a known header label. Skip.
-    if (cells.every(c => !c || HEADER.test(c))) continue;
+    if (cells.every((c) => !c || HEADER.test(c))) continue;
     // The level is the first purely-numeric cell; data columns follow it, the
     // Class Bonuses cell is last. (A leading empty "Class" cell is skipped.)
-    const lvlIdx = cells.findIndex(c => /^\d+$/.test(c));
+    const lvlIdx = cells.findIndex((c) => /^\d+$/.test(c));
     if (lvlIdx === -1) continue;
     const level = parseInt(cells[lvlIdx], 10);
     if (level < 1 || level > 20) continue;
     const cols = cells.slice(lvlIdx + 1, lvlIdx + 1 + (isCaster ? 3 : 4));
-    const bonusRaw = cells.slice(lvlIdx + 1 + (isCaster ? 3 : 4)).join(' ').trim();
-    const bonus = bonusRaw && bonusRaw !== '-' ? bonusRaw.replace(/,\s*$/, '') : null;
+    const bonusRaw = cells
+      .slice(lvlIdx + 1 + (isCaster ? 3 : 4))
+      .join(" ")
+      .trim();
+    const bonus = bonusRaw && bonusRaw !== "-" ? bonusRaw.replace(/,\s*$/, "") : null;
 
     // The "Class Bonuses" cell states permanent stat boosts as prose ("+1 Base
     // Maximum Life Points" at Fighter L2). Extract them structurally so the
@@ -676,13 +740,23 @@ function parseProgressionTable(clsStart, clsEnd) {
     // "Innate Bonus Cantrip: <name>[, <name>]" → structured list.
     const icm = bonus && bonus.match(/innate\s+bonus\s+cantrip:\s*(.+)$/i);
     if (icm) {
-      const names = icm[1].split(/[,\n]/).map(s => s.trim()).filter(Boolean);
+      const names = icm[1]
+        .split(/[,\n]/)
+        .map((s) => s.trim())
+        .filter(Boolean);
       if (names.length) row.innateCantrips = names;
     }
     if (isCaster) {
       progression[level] = { cantrips: num(cols[0]), spellsKnown: num(cols[1]), slots: orNull(cols[2]), bonus, ...row };
     } else {
-      progression[level] = { utility: num(cols[0]), basic: num(cols[1]), advanced: num(cols[2]), veteran: num(cols[3]), bonus, ...row };
+      progression[level] = {
+        utility: num(cols[0]),
+        basic: num(cols[1]),
+        advanced: num(cols[2]),
+        veteran: num(cols[3]),
+        bonus,
+        ...row,
+      };
     }
   }
   return progression;
@@ -695,7 +769,7 @@ function parseProgressionTable(clsStart, clsEnd) {
 // no BP). The gating class is named in the lead-in ("various Artisan Levels").
 const LEVEL_BENEFIT = /•?\s*Level\s+(\d+)\s*[-–—]\s*([^•]+)/g;
 function extractPowerBenefits(power) {
-  const d = power.description || '';
+  const d = power.description || "";
   if (!/Level\s+\d+\s*[-–—]/.test(d)) return;
   const gate = d.match(/at\s+various\s+([A-Z][\w]+)\s+Levels/i);
   const benefits = [];
@@ -706,7 +780,7 @@ function extractPowerBenefits(power) {
   }
   if (benefits.length) {
     power.levelBenefits = benefits;
-    power.levelBenefitClass = gate ? gate[1] : null;   // gate on this class's level
+    power.levelBenefitClass = gate ? gate[1] : null; // gate on this class's level
   }
 }
 
@@ -719,32 +793,57 @@ function extractPowerBenefits(power) {
 const STAT_MOD_PATTERNS = [
   // Decrements first ("N fewer maximum Life Point" — Fragile Form), so the generic
   // "N maximum Life Points" increment below doesn't mis-read it as +N. sign:-1.
-  { stat: 'lifePoints', sign: -1, re: /(?:has\s+)?(?:\+?(\d+)|\bone|two|three)\s+fewer\s+(?:Base\s+)?maximum\s+Life\s+Points?/i },
-  { stat: 'lifePoints', re: /(?:additional\s+)?(?:\+?(\d+)|\bone)\s+(?:Base\s+)?maximum\s+Life\s+Points?/i },
-  { stat: 'lifePoints', re: /(?:adds?|gains?)\s+(?:\+?(\d+)|\bone)\s+Life\s+Points?\s+to\s+(?:their\s+)?max(?:imum)?/i },
-  { stat: 'lifePoints', re: /\+\s*(\d+)\s+(?:Base\s+)?Maximum\s+Life\s+Points?/i },
-  { stat: 'lifePoints', re: /(?:Base\s+)?Maximum\s+Life\s+Points?\s+(?:is|are)\s+increased\s+by\s+(?:\+?(\d+)|\bone|two|three)\b/i },
-  { stat: 'lifePoints', re: /(?:\+?(\d+)|\bone)\s+Maximum\s+Health\b/i },
+  {
+    stat: "lifePoints",
+    sign: -1,
+    re: /(?:has\s+)?(?:\+?(\d+)|\bone|two|three)\s+fewer\s+(?:Base\s+)?maximum\s+Life\s+Points?/i,
+  },
+  { stat: "lifePoints", re: /(?:additional\s+)?(?:\+?(\d+)|\bone)\s+(?:Base\s+)?maximum\s+Life\s+Points?/i },
+  {
+    stat: "lifePoints",
+    re: /(?:adds?|gains?)\s+(?:\+?(\d+)|\bone)\s+Life\s+Points?\s+to\s+(?:their\s+)?max(?:imum)?/i,
+  },
+  { stat: "lifePoints", re: /\+\s*(\d+)\s+(?:Base\s+)?Maximum\s+Life\s+Points?/i },
+  {
+    stat: "lifePoints",
+    re: /(?:Base\s+)?Maximum\s+Life\s+Points?\s+(?:is|are)\s+increased\s+by\s+(?:\+?(\d+)|\bone|two|three)\b/i,
+  },
+  { stat: "lifePoints", re: /(?:\+?(\d+)|\bone)\s+Maximum\s+Health\b/i },
   // Allows an optional pronoun after the verb ("granting them three points …") and
   // word-numbers (one–eight), so e.g. Chimera's Tough Hide ("granting them three
   // points of Natural Armor") is extracted, not just "grants 3 Natural Armor".
-  { stat: 'naturalArmor', re: /(?:gains?|grant(?:ing|s)?)\s+(?:them|it|the\s+character)?\s*(?:\+?(\d+)|\b(?:one|two|three|four|five|six|seven|eight))\s+(?:points?\s+of\s+)?Natural\s+Armor/i },
-  { stat: 'naturalArmor', re: /(?:\+?(\d+)|\b(?:one|two|three|four|five|six|seven|eight))\s+points?\s+of\s+Natural\s+Armor/i },
+  {
+    stat: "naturalArmor",
+    re: /(?:gains?|grant(?:ing|s)?)\s+(?:them|it|the\s+character)?\s*(?:\+?(\d+)|\b(?:one|two|three|four|five|six|seven|eight))\s+(?:points?\s+of\s+)?Natural\s+Armor/i,
+  },
+  {
+    stat: "naturalArmor",
+    re: /(?:\+?(\d+)|\b(?:one|two|three|four|five|six|seven|eight))\s+points?\s+of\s+Natural\s+Armor/i,
+  },
   // "natural armor … increases to N" (Chimera's Armored Carapace upgrades Tough Hide).
-  { stat: 'naturalArmor', re: /Natural\s+Armor[^.]*?increases?\s+to\s+(?:\+?(\d+)|\b(?:one|two|three|four|five|six|seven|eight))/i },
-  { stat: 'naturalArmor', re: /\+?(\d+)\s+Maximum\s+Health,?\s+physical\s+Armor\s+Points?,?\s+and\s+Natural\s+Armor\s+Points?/i },
+  {
+    stat: "naturalArmor",
+    re: /Natural\s+Armor[^.]*?increases?\s+to\s+(?:\+?(\d+)|\b(?:one|two|three|four|five|six|seven|eight))/i,
+  },
+  {
+    stat: "naturalArmor",
+    re: /\+?(\d+)\s+Maximum\s+Health,?\s+physical\s+Armor\s+Points?,?\s+and\s+Natural\s+Armor\s+Points?/i,
+  },
   // "+N physical Armor Point" AND "one additional point to ... (Base) Maximum
   // Armor Points" (Armor Expertise / Studded Leather — the conditional-on-wearing
   // phrasing the old runtime regex missed).
-  { stat: 'armor', re: /\+?(\d+)\s+(?:Maximum\s+Health,?\s+)?(?:physical\s+)?Armor\s+Points?/i },
-  { stat: 'armor', re: /(?:\+?(\d+)|\bone)\s+additional\s+points?\s+to\s+(?:her|their|his|the)\s+(?:physical\s+)?Base\s+Maximum\s+Armor\s+Points?/i },
-  { stat: 'armor', re: /benefit\s+from\s+up\s+to\s+(two|four|six|eight|\d+)\s+Armor\s+Points/i },
-  { stat: 'spikes', re: /(?:\+?(\d+)|\bone)\s+(?:(?:Base|Bonus)\s+)?Maximum\s+Spikes?\b/i },
-  { stat: 'spikes', re: /(?:Base\s+)?Maximum\s+Spikes?\s+(?:is|are)\s+increased\s+by\s+(?:\+?(\d+)|\bone)/i },
-  { stat: 'spikes', re: /gains?\s+(?:\+?(\d+)|\bone|two|three)\s+additional\s+Spikes?/i },
+  { stat: "armor", re: /\+?(\d+)\s+(?:Maximum\s+Health,?\s+)?(?:physical\s+)?Armor\s+Points?/i },
+  {
+    stat: "armor",
+    re: /(?:\+?(\d+)|\bone)\s+additional\s+points?\s+to\s+(?:her|their|his|the)\s+(?:physical\s+)?Base\s+Maximum\s+Armor\s+Points?/i,
+  },
+  { stat: "armor", re: /benefit\s+from\s+up\s+to\s+(two|four|six|eight|\d+)\s+Armor\s+Points/i },
+  { stat: "spikes", re: /(?:\+?(\d+)|\bone)\s+(?:(?:Base|Bonus)\s+)?Maximum\s+Spikes?\b/i },
+  { stat: "spikes", re: /(?:Base\s+)?Maximum\s+Spikes?\s+(?:is|are)\s+increased\s+by\s+(?:\+?(\d+)|\bone)/i },
+  { stat: "spikes", re: /gains?\s+(?:\+?(\d+)|\bone|two|three)\s+additional\s+Spikes?/i },
 ];
 const STAT_WORD_N = { one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8 };
-const statNum = (w) => /^\d+$/.test(String(w)) ? parseInt(w, 10) : (STAT_WORD_N[String(w).toLowerCase()] || 0);
+const statNum = (w) => (/^\d+$/.test(String(w)) ? parseInt(w, 10) : STAT_WORD_N[String(w).toLowerCase()] || 0);
 
 // Core extractor: prose → [{ stat, n }]. One boost per stat (alternate phrasings
 // of the same boost don't double-count). Returns { mods, variableNaturalArmor }.
@@ -754,17 +853,23 @@ function statModsFromText(text) {
   if (!text) return { mods, variableNaturalArmor: false };
 
   for (const match of text.matchAll(/Grants?\s*(?:a\s+)?\+?(\d+)\s+(?:to\s+)?(Life|Armor)/gi)) {
-    const stat = match[2].toLowerCase() === 'life' ? 'lifePoints' : 'armor';
-    if (!seen.has(stat)) { mods.push({ stat, n: parseInt(match[1]) }); seen.add(stat); }
+    const stat = match[2].toLowerCase() === "life" ? "lifePoints" : "armor";
+    if (!seen.has(stat)) {
+      mods.push({ stat, n: parseInt(match[1]) });
+      seen.add(stat);
+    }
   }
 
   for (const match of text.matchAll(/benefit from up to (two|four|six|eight|\d+) Armor Points/gi)) {
     let val = parseInt(match[1]);
     if (isNaN(val)) {
-      const words = { 'two': 2, 'four': 4, 'six': 6, 'eight': 8 };
+      const words = { two: 2, four: 4, six: 6, eight: 8 };
       val = words[match[1].toLowerCase()];
     }
-    if (!seen.has('armor')) { mods.push({ stat: 'armor', n: val }); seen.add('armor'); }
+    if (!seen.has("armor")) {
+      mods.push({ stat: "armor", n: val });
+      seen.add("armor");
+    }
   }
 
   for (const { stat, re, sign = 1 } of STAT_MOD_PATTERNS) {
@@ -784,13 +889,16 @@ function statModsFromText(text) {
     // "Bonus Maximum" (vs "Base Maximum") and a nearby "for the duration" both mark
     // a TEMPORARY buff — the doc reserves "Base" for permanent stat changes.
     if (/\bBonus\s+Maximum\b/i.test(m[0]) || /\bfor the duration\b/i.test(before)) continue;
-    const w = m[1] || (m[0].match(/\b(one|two|three|four|five|six|seven|eight)\b/i) || [])[1] || '0';
+    const w = m[1] || (m[0].match(/\b(one|two|three|four|five|six|seven|eight)\b/i) || [])[1] || "0";
     const n = statNum(w) * sign;
-    if (n !== 0) { mods.push({ stat, n }); seen.add(stat); }
+    if (n !== 0) {
+      mods.push({ stat, n });
+      seen.add(stat);
+    }
   }
   // Variable/contextual Natural Armor with no fixed number (Gift of Unbreakable
   // Flesh: "Gains Natural Armor from Patron").
-  const variableNaturalArmor = !seen.has('naturalArmor') && /\bgains?\b[^.]*\bNatural Armor\b/i.test(text);
+  const variableNaturalArmor = !seen.has("naturalArmor") && /\bgains?\b[^.]*\bNatural Armor\b/i.test(text);
   return { mods, variableNaturalArmor };
 }
 
@@ -798,12 +906,12 @@ function statModsFromText(text) {
 // description. `tags` lets Druid Form powers (temporary while-transformed boosts)
 // opt out — those are not permanent build stats.
 function extractStatMods(entity) {
-  if ((entity.tags || []).includes('Form')) return;
+  if ((entity.tags || []).includes("Form")) return;
   // Skip tactical spells and rituals — only durable build stats belong on the character sheet
-  if (/\b(?:Spell|Spell-?Slot|Ritual)\b/i.test(entity.refresh || '')) return;
-  const { mods, variableNaturalArmor } = statModsFromText(entity.description || entity.desc || '');
+  if (/\b(?:Spell|Spell-?Slot|Ritual)\b/i.test(entity.refresh || "")) return;
+  const { mods, variableNaturalArmor } = statModsFromText(entity.description || entity.desc || "");
   if (mods.length) entity.statMods = mods;
-  if (variableNaturalArmor) (entity.statModNotes ||= []).push({ stat: 'naturalArmor', text: 'variable' });
+  if (variableNaturalArmor) (entity.statModNotes ||= []).push({ stat: "naturalArmor", text: "variable" });
 }
 
 // ─── WEALTH INCOME (prose → structured) ────────────────────────────────────────
@@ -814,19 +922,20 @@ function extractStatMods(entity) {
 function wealthIncomeFromText(name, text) {
   if (!text) return null;
   const recurring = text.match(/(\d+)\s*Wealth\s+(?:at the beginning of (?:each|every)\s+(?:game|event)|per\s+Event)/i);
-  if (recurring) return { n: parseInt(recurring[1], 10), kind: 'recurring' };
-  if (/\bManse\b/i.test(name || '')) {
+  if (recurring) return { n: parseInt(recurring[1], 10), kind: "recurring" };
+  if (/\bManse\b/i.test(name || "")) {
     const alt = text.match(/Alternatively,?\s*(\d+)\s*Wealth/i);
-    if (alt) return { n: parseInt(alt[1], 10), kind: 'manse' };
+    if (alt) return { n: parseInt(alt[1], 10), kind: "manse" };
   }
   // One-time sums that land AT the first event count toward the point-in-time total.
-  const firstEvent = text.match(/(\d+)\s*Wealth\s+at the beginning of (?:their\s+)?first\s+Event/i)
-    || text.match(/one-time\s+sum[^.]*?(\d+)\s*Wealth/i);
-  if (firstEvent) return { n: parseInt(firstEvent[1], 10), kind: 'firstEvent' };
+  const firstEvent =
+    text.match(/(\d+)\s*Wealth\s+at the beginning of (?:their\s+)?first\s+Event/i) ||
+    text.match(/one-time\s+sum[^.]*?(\d+)\s*Wealth/i);
+  if (firstEvent) return { n: parseInt(firstEvent[1], 10), kind: "firstEvent" };
   return null;
 }
 function extractWealthIncome(entity) {
-  const w = wealthIncomeFromText(entity.name, entity.description || entity.desc || '');
+  const w = wealthIncomeFromText(entity.name, entity.description || entity.desc || "");
   if (w) entity.wealthIncome = w;
 }
 
@@ -838,8 +947,13 @@ function extractWealthIncome(entity) {
 // the slot category: cantrips | spellsKnown | utility|basic|advanced|veteran |
 // novice|adept|greater.
 const SLOT_TIER_TO_CAT = {
-  novice: 'novice', adept: 'adept', greater: 'greater',
-  utility: 'utility', basic: 'basic', advanced: 'advanced', veteran: 'veteran',
+  novice: "novice",
+  adept: "adept",
+  greater: "greater",
+  utility: "utility",
+  basic: "basic",
+  advanced: "advanced",
+  veteran: "veteran",
 };
 function slotGrantsFromText(name, text) {
   const grants = [];
@@ -848,10 +962,15 @@ function slotGrantsFromText(name, text) {
   // Extensive Combat Training - <Tier>: the NAME's tier word is authoritative (its
   // prose says "Adept Tier Power" for the "- Advanced" variant — a doc mismatch, so
   // trust the name). Keep this name-keyed rule in the parser, next to the data.
-  const ect = (name || '').match(/Extensive Combat Training\s*-\s*(Basic|Advanced|Veteran)/i);
-  if (ect) { grants.push({ cat: ect[1].toLowerCase(), n: 1 }); return { grants, highest }; }
-  if (/\badditional\s+cantrip\b/i.test(text)) grants.push({ cat: 'cantrips', n: 1 });
-  const tier = text.match(/\badditional\s+(Novice|Adept|Greater|Utility|Basic|Advanced|Veteran)\s+(?:Tier\s+)?(?:spell-?\s*slot|slot|power)/i);
+  const ect = (name || "").match(/Extensive Combat Training\s*-\s*(Basic|Advanced|Veteran)/i);
+  if (ect) {
+    grants.push({ cat: ect[1].toLowerCase(), n: 1 });
+    return { grants, highest };
+  }
+  if (/\badditional\s+cantrip\b/i.test(text)) grants.push({ cat: "cantrips", n: 1 });
+  const tier = text.match(
+    /\badditional\s+(Novice|Adept|Greater|Utility|Basic|Advanced|Veteran)\s+(?:Tier\s+)?(?:spell-?\s*slot|slot|power)/i,
+  );
   if (tier) {
     const cat = SLOT_TIER_TO_CAT[tier[1].toLowerCase()];
     if (cat) {
@@ -860,10 +979,12 @@ function slotGrantsFromText(name, text) {
     }
   }
   const known = text.match(/\badds?\s+(\d+)\s+to\s+the\s+number\s+of\s+Known\s+Spells/i);
-  if (known) grants.push({ cat: 'spellsKnown', n: parseInt(known[1], 10) });
+  if (known) grants.push({ cat: "spellsKnown", n: parseInt(known[1], 10) });
   if (/additional\s+spell-?slot\s+of\s+their\s+highest[- ]level/i.test(text)) highest = true;
 
-  const chooseTier = text.match(/\bchoose\s+(two|three|one|four|\d+)\s+(Novice|Adept|Greater|Utility|Basic|Advanced|Veteran)(?:-tier)?\s+Powers?/i);
+  const chooseTier = text.match(
+    /\bchoose\s+(two|three|one|four|\d+)\s+(Novice|Adept|Greater|Utility|Basic|Advanced|Veteran)(?:-tier)?\s+Powers?/i,
+  );
   if (chooseTier) {
     const numWords = { one: 1, two: 2, three: 3, four: 4 };
     const n = numWords[chooseTier[1].toLowerCase()] || parseInt(chooseTier[1], 10) || 1;
@@ -875,26 +996,32 @@ function slotGrantsFromText(name, text) {
 }
 
 function extractOptionsList(entity) {
-  const text = entity.description || entity.desc || '';
+  const text = entity.description || entity.desc || "";
   if (!text) return;
   // Look for "Choose one Craft: X, Y, or Z."
   let m = text.match(/Choose one Craft:\s*([^.]+)\./i);
   if (m) {
-    const opts = m[1].split(/,(?:\s*or\s+)?|\s+or\s+/i).map(x => x.trim()).filter(Boolean);
+    const opts = m[1]
+      .split(/,(?:\s*or\s+)?|\s+or\s+/i)
+      .map((x) => x.trim())
+      .filter(Boolean);
     entity.options = opts;
     return;
   }
   // Look for Specialty Tag options e.g. "Specialty Tag (ie: Artificer, Crafter, Mystic)"
   m = text.match(/Specialty Tag\s*\(i\.?e\.?:\s*([^)]+)\)/i);
   if (m) {
-    const opts = m[1].split(/,\s*/i).map(x => x.trim()).filter(Boolean);
+    const opts = m[1]
+      .split(/,\s*/i)
+      .map((x) => x.trim())
+      .filter(Boolean);
     entity.options = opts;
     return;
   }
 }
 
 function extractSlotGrants(entity) {
-  const { grants, highest } = slotGrantsFromText(entity.name, entity.description || entity.desc || '');
+  const { grants, highest } = slotGrantsFromText(entity.name, entity.description || entity.desc || "");
   if (grants.length) entity.slotGrants = grants;
   if (highest) entity.highestSlot = true;
   extractOptionsList(entity);
@@ -909,10 +1036,11 @@ function extractSlotGrants(entity) {
 // Anchored on the doc's exact phrasing "…Nth level <Class>… for one fewer Build
 // Point", which matches ONLY genuine level-gated discounts (not effect-scaling).
 function extractLevelDiscounts(entity) {
-  const text = entity.description || entity.desc || '';
+  const text = entity.description || entity.desc || "";
   if (!/fewer\s+Build\s+Point/i.test(text)) return;
   const out = [];
-  const re = /(?:once\s+(?:they|the\s+\w+)\s+(?:achieve|reach(?:es)?)\s+)?(\d+)(?:st|nd|rd|th)\s+level\s+\w+,?\s+(?:they\s+can\s+)?purchase\s+(.+?)\s+(?:skill\s+)?for\s+(\d+|one)\s+fewer\s+Build\s+Point/gi;
+  const re =
+    /(?:once\s+(?:they|the\s+\w+)\s+(?:achieve|reach(?:es)?)\s+)?(\d+)(?:st|nd|rd|th)\s+level\s+\w+,?\s+(?:they\s+can\s+)?purchase\s+(.+?)\s+(?:skill\s+)?for\s+(\d+|one)\s+fewer\s+Build\s+Point/gi;
   let m;
   while ((m = re.exec(text))) {
     const amount = /^\d+$/.test(m[3]) ? parseInt(m[3], 10) : 1;
@@ -954,7 +1082,7 @@ function extractGrantedSelections(entity) {
       tier: m[1].charAt(0).toUpperCase() + m[1].slice(1).toLowerCase(),
       source: "BaseClasses",
       excludeClass: m[2],
-      bypassPrereqs: ["class", "level"]
+      bypassPrereqs: ["class", "level"],
     });
   }
 
@@ -966,7 +1094,7 @@ function extractGrantedSelections(entity) {
       type: "spell",
       sphere: m[1].charAt(0).toUpperCase() + m[1].slice(1).toLowerCase(),
       maxTier: "HighestAccessible",
-      bypassPrereqs: ["class"]
+      bypassPrereqs: ["class"],
     });
   }
 
@@ -978,7 +1106,7 @@ function extractGrantedSelections(entity) {
       type: "spell",
       tier: "Cantrip",
       sphere: m[1].charAt(0).toUpperCase() + m[1].slice(1).toLowerCase(),
-      bypassPrereqs: ["class"]
+      bypassPrereqs: ["class"],
     });
   }
 
@@ -986,7 +1114,7 @@ function extractGrantedSelections(entity) {
   if (text.match(/choose one Devotion Accent/i)) {
     selections.push({
       id: "intervened_accent",
-      type: "devotionAccent"
+      type: "devotionAccent",
     });
   }
 
@@ -1007,10 +1135,11 @@ function extractGrantedSelections(entity) {
 const REQ_CLASS_LEVEL = /^(Artisan|Cleric|Druid|Fighter|Mage|Rogue|Socialite|Sourcerer)\s+Level\s+(\d+)/i;
 function extractRequirement(entity) {
   const raw = entity.requirement;
-  let requiredLevel = 0, requiredClass = null;
+  let requiredLevel = 0,
+    requiredClass = null;
   const requiresEntity = [];
   if (raw) {
-    for (let part of String(raw).split(',')) {
+    for (let part of String(raw).split(",")) {
       part = part.trim();
       if (!part) continue;
       const m = part.match(REQ_CLASS_LEVEL);
@@ -1021,7 +1150,7 @@ function extractRequirement(entity) {
         requiredClass = m[1];
       } else {
         // A named prerequisite entity. Strip a trailing " skill" noise word.
-        const nm = part.replace(/\s+skill$/i, '').trim();
+        const nm = part.replace(/\s+skill$/i, "").trim();
         if (nm && !/^level\b/i.test(nm)) requiresEntity.push(nm);
       }
     }
@@ -1030,12 +1159,15 @@ function extractRequirement(entity) {
   // Implicit tier-based level requirements for class powers.
   if (!requiredLevel && entity.tier) {
     const t = entity.tier.toLowerCase();
-    if (t === 'adept' || t === 'advanced') requiredLevel = 5;
-    else if (t === 'greater' || t === 'veteran') requiredLevel = 7;
-    else if (t === 'novice' || t === 'basic' || t === 'utility' || t === 'cantrip') requiredLevel = 1;
+    if (t === "adept" || t === "advanced") requiredLevel = 5;
+    else if (t === "greater" || t === "veteran") requiredLevel = 7;
+    else if (t === "novice" || t === "basic" || t === "utility" || t === "cantrip") requiredLevel = 1;
   }
 
-  if (requiredLevel) { entity.requiredLevel = requiredLevel; entity.requiredClass = requiredClass; }
+  if (requiredLevel) {
+    entity.requiredLevel = requiredLevel;
+    entity.requiredClass = requiredClass;
+  }
   if (requiresEntity.length) entity.requiresEntity = requiresEntity;
 }
 
@@ -1049,7 +1181,7 @@ function extractRequirement(entity) {
 // Lead-in: "…one of (the following|three) <benefits|ways|boons|…>…:" then bullets.
 const CHOOSE_LEAD = /\bone\s+of\s+(?:the\s+following|three|the)\b([^:]*):\s*(.+)$/i;
 function extractChooseOne(power) {
-  const d = power.description || '';
+  const d = power.description || "";
   const m = d.match(CHOOSE_LEAD);
   if (!m) return;
   // "(ie: …)" / "(e.g. …)" after the lead-in is an EXAMPLE, not the real option list
@@ -1059,27 +1191,30 @@ function extractChooseOne(power) {
   if (/^\s*\(\s*(?:ie|i\.e\.|e\.g\.|eg)\b/i.test(m[2])) return;
   // Options are the "• …" bullets after the lead-in
   let opts = [...m[2].matchAll(/•\s*([^•]+?)(?=\s*•|$)/g)].map((x) => x[1].trim()).filter(Boolean);
-  
+
   // If no bullets, try inline comma-separated list (e.g. "Swords, Thrown Weapons, or Daggers.")
   if (opts.length === 0) {
-    const inline = m[2].replace(/\.$/, ''); // strip trailing period
-    opts = inline.split(/,(?:\s*or\s+)?|\s+or\s+/i).map((x) => x.trim()).filter(Boolean);
+    const inline = m[2].replace(/\.$/, ""); // strip trailing period
+    opts = inline
+      .split(/,(?:\s*or\s+)?|\s+or\s+/i)
+      .map((x) => x.trim())
+      .filter(Boolean);
   }
   if (opts.length < 2) return;
-  
+
   const build = /one of the following for free|gains? .*in one of the following/i.test(d);
-  
+
   // Look for skills granted BEFORE the choice (e.g. "gains Two Weapon Style (2) and Weapon Specialization (4) in...")
   const prefixText = d.slice(0, m.index);
   const prefixSkills = [...prefixText.matchAll(/([A-Z][\w’' ]+?)\s*\(\d+\)/g)].map((x) => x[1].trim());
 
   power.chooseOne = {
-    kind: build ? 'build' : 'play',
+    kind: build ? "build" : "play",
     options: opts.map((text) => {
       // Direct skill mention: "Greater Alchemy (5)"
       const sk = build && text.match(/^([A-Z][\w’' ]+?)\s*\(\d+\)/);
       if (sk) return { text, grants: [sk[1].trim()] };
-      
+
       // Parameterized skill mention from prefix
       if (build && prefixSkills.length > 0) {
         const grants = prefixSkills.map((s) => {
@@ -1090,7 +1225,7 @@ function extractChooseOne(power) {
         });
         return { text, grants };
       }
-      
+
       return { text };
     }),
   };
@@ -1099,7 +1234,13 @@ function extractChooseOne(power) {
 const CLASSES_OUT = parseClasses();
 for (const c of CLASSES_OUT) {
   for (const arr of Object.values(c)) {
-    if (Array.isArray(arr)) for (const p of arr) if (p && p.description) { extractPowerBenefits(p); extractChooseOne(p); enrichMechanics(p); }
+    if (Array.isArray(arr))
+      for (const p of arr)
+        if (p && p.description) {
+          extractPowerBenefits(p);
+          extractChooseOne(p);
+          enrichMechanics(p);
+        }
   }
 }
 // Cross-class pass: a power offered by more than one class is the SAME shared power
@@ -1107,59 +1248,76 @@ for (const c of CLASSES_OUT) {
 // (entity index merge, guard test) can treat them as one ability. Only true power
 // tiers count — multiclassGrants lists skill NAMES, not power entities.
 {
-  const POWER_TIERS = ['innate','utility','basic','advanced','veteran','classSkills','rightHandPowers','cantrips','noviceSpells','adeptSpells','greaterSpells'];
+  const POWER_TIERS = [
+    "innate",
+    "utility",
+    "basic",
+    "advanced",
+    "veteran",
+    "classSkills",
+    "rightHandPowers",
+    "cantrips",
+    "noviceSpells",
+    "adeptSpells",
+    "greaterSpells",
+  ];
   const offeredBy = {}; // power name -> Set(class names)
-  for (const c of CLASSES_OUT) for (const t of POWER_TIERS) for (const p of (c[t] || [])) {
-    if (p?.name) (offeredBy[p.name] ||= new Set()).add(c.name);
-  }
-  for (const c of CLASSES_OUT) for (const t of POWER_TIERS) for (const p of (c[t] || [])) {
-    const classes = p?.name && offeredBy[p.name];
-    if (classes && classes.size > 1) p.sharedWith = [...classes];
-  }
+  for (const c of CLASSES_OUT)
+    for (const t of POWER_TIERS)
+      for (const p of c[t] || []) {
+        if (p?.name) (offeredBy[p.name] ||= new Set()).add(c.name);
+      }
+  for (const c of CLASSES_OUT)
+    for (const t of POWER_TIERS)
+      for (const p of c[t] || []) {
+        const classes = p?.name && offeredBy[p.name];
+        if (classes && classes.size > 1) p.sharedWith = [...classes];
+      }
 }
 // MANUAL PATCH: Way of the Blade (complex multi-skill chooseOne)
 for (const cls of CLASSES_OUT) {
   if (cls.name === "Rogue" && cls.utility) {
-    const wotb = cls.utility.find(p => p.name === "Way of the Blade");
+    const wotb = cls.utility.find((p) => p.name === "Way of the Blade");
     if (wotb) {
       wotb.chooseOne = {
         kind: "build",
         options: [
           { text: "Swords", grants: ["Weapon Specialization - Swords", "Two Weapon Style"] },
           { text: "Thrown Weapons", grants: ["Weapon Specialization - Thrown Weapons", "Two Weapon Style"] },
-          { text: "Daggers", grants: ["Weapon Specialization - Daggers", "Two Weapon Style"] }
-        ]
+          { text: "Daggers", grants: ["Weapon Specialization - Daggers", "Two Weapon Style"] },
+        ],
       };
     }
   }
 }
 
-write('classes.json', CLASSES_OUT);
+write("classes.json", CLASSES_OUT);
 
 // ─── SKILLS ───────────────────────────────────────────────────────────────────
 // H1: "Base Skills, Perks, and Flaws" → H1: "Skills" → H2: "Skill Descriptions"
 // Skills are H4 entries; category is the nearest H3 ancestor.
 
-console.log('\nParsing skills...');
+console.log("\nParsing skills...");
 
 function parseSkills() {
-  const skillsH1 = findHeading('Skills', 1);
-  const descH2 = findHeading('Skill Descriptions', 2, skillsH1);
+  const skillsH1 = findHeading("Skills", 1);
+  const descH2 = findHeading("Skill Descriptions", 2, skillsH1);
   const descEnd = nextHeadingAtOrAbove(1, descH2);
   const end = descEnd === -1 ? nodes.length : descEnd;
 
   const skills = [];
-  let currentCat = 'Martial';
+  let currentCat = "Martial";
   let i = descH2 + 1;
 
   while (i < end) {
     const n = nodes[i];
-    if (n.type === 'heading' && n.level === 3) {
+    if (n.type === "heading" && n.level === 3) {
       // H3 = category (e.g. "Martial Skills")
-      currentCat = n.text.replace(/\s+Skills$/, '');
-      i++; continue;
+      currentCat = n.text.replace(/\s+Skills$/, "");
+      i++;
+      continue;
     }
-    if (n.type === 'heading' && n.level === 4) {
+    if (n.type === "heading" && n.level === 4) {
       // H4 = skill entry. The heading text may carry annotations that are
       // structural metadata, not part of the canonical name:
       //   "(N)"          — finite max ranks  (parsed as numeric ranks)
@@ -1173,46 +1331,57 @@ function parseSkills() {
       const ranksMatch = raw.match(/\((\d+|Unlimited)\)\s*$/i);
       const paramMatch = raw.match(/\s\[([^\]]+)\]/);
       const name = raw
-        .replace(/\s*\((?:\d+|Unlimited)\)\s*$/i, '')
-        .replace(/\s\[[^\]]+\]/, '')
+        .replace(/\s*\((?:\d+|Unlimited)\)\s*$/i, "")
+        .replace(/\s\[[^\]]+\]/, "")
         .trim();
-      const parsedRanks = !ranksMatch ? null
-        : /unlimited/i.test(ranksMatch[1]) ? 'unlimited'
-        : parseInt(ranksMatch[1]);
+      const parsedRanks = !ranksMatch ? null : /unlimited/i.test(ranksMatch[1]) ? "unlimited" : parseInt(ranksMatch[1]);
       const parameter = paramMatch ? paramMatch[1].trim() : null;
 
       // Collect text nodes until next H3/H4
-      const bodyEnd = nodes.findIndex((m, j) => j > i && m.type === 'heading' && m.level <= 4);
+      const bodyEnd = nodes.findIndex((m, j) => j > i && m.type === "heading" && m.level <= 4);
       const bodyNodes = nodes.slice(i + 1, bodyEnd === -1 ? end : Math.min(bodyEnd, end));
 
-      let cost = null, prereq = null, ranks = parsedRanks;
+      let cost = null,
+        prereq = null,
+        ranks = parsedRanks;
       const descParts = [];
 
       for (const bn of bodyNodes) {
         // Flatten <ul> list nodes into bullet lines so a skill's trailing list
         // (Bowmaster's "additional effects by aiming: • …") isn't dropped.
-        if (bn.type === 'list') { for (const it of bn.items) descParts.push(`• ${it}`); continue; }
-        if (bn.type !== 'text') continue;
+        if (bn.type === "list") {
+          for (const it of bn.items) descParts.push(`• ${it}`);
+          continue;
+        }
+        if (bn.type !== "text") continue;
         const t = bn.text;
         const cm = t.match(/^Cost:\s*(\d+)/);
-        if (cm) { cost = parseInt(cm[1]); continue; }
+        if (cm) {
+          cost = parseInt(cm[1]);
+          continue;
+        }
         const pm = t.match(/^Prerequisites?:\s*(.+)/);
-        if (pm) { prereq = pm[1].trim(); continue; }
+        if (pm) {
+          prereq = pm[1].trim();
+          continue;
+        }
         const rm = t.match(/^Ranks?:\s*(\d+)/);
-        if (rm) { ranks = parseInt(rm[1]); continue; }
+        if (rm) {
+          ranks = parseInt(rm[1]);
+          continue;
+        }
         descParts.push(t);
       }
 
       if (cost !== null) {
-        const description = descParts.join(' ');
+        const description = descParts.join(" ");
         const entry = { name, cost, prereq, ranks, category: currentCat, description };
         // Parameter: either an explicit "[Placeholder]" in the name, OR — for skills
         // whose body says the player picks something — derived from that prose. The
         // Extended Capacity skills read "The character chooses one Sphere of magic",
         // so they carry a Sphere parameter even though the name has no bracket. This
         // keeps the parameter DERIVED (was a manual post-parse patch, PR #116).
-        const derivedParam = !parameter && /\bchooses?\s+one\s+Sphere\b/i.test(description)
-          ? 'Sphere' : null;
+        const derivedParam = !parameter && /\bchooses?\s+one\s+Sphere\b/i.test(description) ? "Sphere" : null;
         const finalParam = parameter || derivedParam;
         if (finalParam) entry.parameter = finalParam;
         skills.push(entry);
@@ -1226,20 +1395,22 @@ function parseSkills() {
 }
 
 // Enrich a flat entity list (skills/perks/flaws) with parsed stat mods, in place.
-const withMechanics = (list) => { for (const e of list) enrichMechanics(e); return list; };
+const withMechanics = (list) => {
+  for (const e of list) enrichMechanics(e);
+  return list;
+};
 
 const SKILLS_OUT = withMechanics(parseSkills());
 
 // MANUAL PATCH: Armor Points (missing statMods extraction)
 
-
-write('skills.json', SKILLS_OUT);
+write("skills.json", SKILLS_OUT);
 
 // ─── PERKS & FLAWS ────────────────────────────────────────────────────────────
 // Under "Character Options" H1. Perks/Flaws are H3 entries with Cost/Award, Ranks,
 // Prerequisites, Description as text nodes. Category is the H2 ancestor.
 
-console.log('\nParsing perks & flaws...');
+console.log("\nParsing perks & flaws...");
 
 function parsePerkFlaw(h1Text, valueKey) {
   const h1 = findHeading(h1Text, null);
@@ -1248,37 +1419,57 @@ function parsePerkFlaw(h1Text, valueKey) {
   const end = h1End === -1 ? nodes.length : h1End;
 
   const results = [];
-  let currentCat = '';
+  let currentCat = "";
   let i = h1 + 1;
 
   while (i < end) {
     const n = nodes[i];
-    if (n.type === 'heading' && n.level === 2) {
-      currentCat = n.text.replace(/\s+(Perks|Flaws)$/, '');
-      i++; continue;
+    if (n.type === "heading" && n.level === 2) {
+      currentCat = n.text.replace(/\s+(Perks|Flaws)$/, "");
+      i++;
+      continue;
     }
-    if (n.type === 'heading' && n.level === 3) {
+    if (n.type === "heading" && n.level === 3) {
       const name = n.text;
-      const bodyEnd = nodes.findIndex((m, j) => j > i && m.type === 'heading' && m.level <= 3);
+      const bodyEnd = nodes.findIndex((m, j) => j > i && m.type === "heading" && m.level <= 3);
       const bodyNodes = nodes.slice(i + 1, bodyEnd === -1 ? end : Math.min(bodyEnd, end));
 
-      let value = null, ranks = null, prereq = null;
+      let value = null,
+        ranks = null,
+        prereq = null;
       const descParts = [];
 
       for (const bn of bodyNodes) {
-        if (bn.type !== 'text') continue;
+        if (bn.type !== "text") continue;
         const t = bn.text;
         const cm = t.match(/^(?:Cost|Award):\s*(.+)/i);
-        if (cm) { const v = cm[1].trim(); value = /^\d+$/.test(v) ? parseInt(v) : v; continue; }
+        if (cm) {
+          const v = cm[1].trim();
+          value = /^\d+$/.test(v) ? parseInt(v) : v;
+          continue;
+        }
         const rm = t.match(/^Ranks?:\s*(\d+)/i);
-        if (rm) { ranks = parseInt(rm[1]); continue; }
+        if (rm) {
+          ranks = parseInt(rm[1]);
+          continue;
+        }
         const pm = t.match(/^(?:Pre-?requisites?|Prerequisites?):\s*(.+)/i);
-        if (pm) { prereq = pm[1].trim(); continue; }
+        if (pm) {
+          prereq = pm[1].trim();
+          continue;
+        }
         descParts.push(t);
       }
 
       if (value !== null) {
-        results.push({ name, [valueKey]: value, ranks, prereq, category: currentCat, description: descParts.join(' ') });
+        results.push({
+          name,
+          [valueKey]: value,
+          ranks,
+          prereq,
+          category: currentCat,
+          description: descParts.join(" "),
+        });
       }
       i = bodyEnd === -1 ? end : Math.min(bodyEnd, end);
     } else {
@@ -1289,51 +1480,74 @@ function parsePerkFlaw(h1Text, valueKey) {
 }
 
 // Perks and Flaws are both under "Character Options" as H2 sections.
-const charOptionsH1 = findHeading('Character Options', 1);
+const charOptionsH1 = findHeading("Character Options", 1);
 const charOptionsEnd = nextHeadingAtOrAbove(1, charOptionsH1);
 
 function parsePerkFlawSection(sectionName, valueKey) {
-  const h2 = nodes.findIndex((n, i) =>
-    i > charOptionsH1 && i < charOptionsEnd &&
-    n.type === 'heading' && n.level === 2 &&
-    new RegExp(sectionName, 'i').test(n.text)
+  const h2 = nodes.findIndex(
+    (n, i) =>
+      i > charOptionsH1 &&
+      i < charOptionsEnd &&
+      n.type === "heading" &&
+      n.level === 2 &&
+      new RegExp(sectionName, "i").test(n.text),
   );
   if (h2 === -1) return [];
-  const secEnd = nodes.findIndex((n, i) => i > h2 && n.type === 'heading' && n.level <= 2);
+  const secEnd = nodes.findIndex((n, i) => i > h2 && n.type === "heading" && n.level <= 2);
   const end = secEnd === -1 ? charOptionsEnd : Math.min(secEnd, charOptionsEnd);
 
   const results = [];
-  let currentCat = '';
+  let currentCat = "";
   let i = h2 + 1;
 
   while (i < end) {
     const n = nodes[i];
-    if (n.type === 'heading' && n.level === 3) {
-      currentCat = n.text.replace(/\s+(Perks|Flaws)$/, '');
-      i++; continue;
+    if (n.type === "heading" && n.level === 3) {
+      currentCat = n.text.replace(/\s+(Perks|Flaws)$/, "");
+      i++;
+      continue;
     }
-    if (n.type === 'heading' && n.level === 4) {
+    if (n.type === "heading" && n.level === 4) {
       const name = n.text;
-      const bodyEnd = nodes.findIndex((m, j) => j > i && m.type === 'heading' && m.level <= 4);
+      const bodyEnd = nodes.findIndex((m, j) => j > i && m.type === "heading" && m.level <= 4);
       const bodyNodes = nodes.slice(i + 1, bodyEnd === -1 ? end : Math.min(bodyEnd, end));
 
-      let value = null, ranks = null, prereq = null;
+      let value = null,
+        ranks = null,
+        prereq = null;
       const descParts = [];
 
       for (const bn of bodyNodes) {
-        if (bn.type !== 'text') continue;
+        if (bn.type !== "text") continue;
         const t = bn.text;
         const cm = t.match(/^(?:Cost|Award):\s*(.+)/i);
-        if (cm) { const v = cm[1].trim(); value = /^\d+$/.test(v) ? parseInt(v) : v; continue; }
+        if (cm) {
+          const v = cm[1].trim();
+          value = /^\d+$/.test(v) ? parseInt(v) : v;
+          continue;
+        }
         const rm = t.match(/^Ranks?:\s*(\d+)/i);
-        if (rm) { ranks = parseInt(rm[1]); continue; }
+        if (rm) {
+          ranks = parseInt(rm[1]);
+          continue;
+        }
         const pm = t.match(/^(?:Pre-?requisites?|Prerequisites?):\s*(.+)/i);
-        if (pm) { prereq = pm[1].trim(); continue; }
+        if (pm) {
+          prereq = pm[1].trim();
+          continue;
+        }
         descParts.push(t);
       }
 
       if (value !== null) {
-        results.push({ name, [valueKey]: value, ranks, prereq, category: currentCat, description: descParts.join(' ') });
+        results.push({
+          name,
+          [valueKey]: value,
+          ranks,
+          prereq,
+          category: currentCat,
+          description: descParts.join(" "),
+        });
       }
       i = bodyEnd === -1 ? end : Math.min(bodyEnd, end);
     } else {
@@ -1350,16 +1564,15 @@ function parsePerkFlawSection(sectionName, valueKey) {
 const PERK_HEADER = /^(Name|Cost|Award|Ranks?|Pre-?requisites?|Prerequisites?|Description)$/i;
 
 function parsePerkFlawList(listH2Text, valueKey) {
-  const h2 = nodes.findIndex((n, i) =>
-    i > charOptionsH1 && i < charOptionsEnd &&
-    n.type === 'heading' && n.level === 2 && n.text === listH2Text
+  const h2 = nodes.findIndex(
+    (n, i) => i > charOptionsH1 && i < charOptionsEnd && n.type === "heading" && n.level === 2 && n.text === listH2Text,
   );
   if (h2 === -1) return [];
-  const secEnd = nodes.findIndex((n, i) => i > h2 && n.type === 'heading' && n.level <= 2);
+  const secEnd = nodes.findIndex((n, i) => i > h2 && n.type === "heading" && n.level <= 2);
   const end = secEnd === -1 ? charOptionsEnd : Math.min(secEnd, charOptionsEnd);
 
   const results = [];
-  let currentCat = '';
+  let currentCat = "";
   let cells = [];
 
   const flushRow = () => {
@@ -1370,10 +1583,10 @@ function parsePerkFlawList(listH2Text, valueKey) {
       results.push({
         name: cells[0],
         [valueKey]: value,
-        ranks: cells[2] && cells[2] !== '-' ? parseInt(cells[2]) || null : null,
-        prereq: cells[3] && cells[3] !== '-' ? cells[3] : null,
+        ranks: cells[2] && cells[2] !== "-" ? parseInt(cells[2]) || null : null,
+        prereq: cells[3] && cells[3] !== "-" ? cells[3] : null,
         category: currentCat,
-        description: cells[4] || '',
+        description: cells[4] || "",
       });
     }
     cells = [];
@@ -1381,19 +1594,19 @@ function parsePerkFlawList(listH2Text, valueKey) {
 
   for (let i = h2 + 1; i < end; i++) {
     const n = nodes[i];
-    if (n.type === 'heading' && n.level === 3) {
+    if (n.type === "heading" && n.level === 3) {
       flushRow();
-      currentCat = n.text.replace(/\s+(Perks|Flaws)$/, '');
-    } else if (n.type === 'heading' && n.level <= 2) {
+      currentCat = n.text.replace(/\s+(Perks|Flaws)$/, "");
+    } else if (n.type === "heading" && n.level <= 2) {
       break;
-    } else if (n.type === 'rowEnd') {
+    } else if (n.type === "rowEnd") {
       flushRow();
-    } else if (n.type === 'cell') {
+    } else if (n.type === "cell") {
       cells.push(n.text);
     }
   }
   flushRow();
-  return results.filter(r => r.name && !PERK_HEADER.test(r.name));
+  return results.filter((r) => r.name && !PERK_HEADER.test(r.name));
 }
 
 // Some perks carry their authoritative rules in a DETAIL sub-section (an H4 whose
@@ -1405,22 +1618,23 @@ function parsePerkFlawList(listH2Text, valueKey) {
 // any such detail prose into the matching perk's description. Scoped to Character
 // Options H4s, matched by exact name, appended only when it adds new text.
 function enrichWithDetailSections(results) {
-  const byName = new Map(results.map(r => [r.name, r]));
+  const byName = new Map(results.map((r) => [r.name, r]));
   for (let i = charOptionsH1 + 1; i < charOptionsEnd; i++) {
     const n = nodes[i];
-    if (!(n.type === 'heading' && n.level === 4)) continue;
-    const cleanHeading = n.text.replace(/\s*\(\d+\)\s*$/, '').trim();
+    if (!(n.type === "heading" && n.level === 4)) continue;
+    const cleanHeading = n.text.replace(/\s*\(\d+\)\s*$/, "").trim();
     const target = byName.get(cleanHeading);
     if (!target) continue;
-    const secEnd = nodes.findIndex((m, j) => j > i && m.type === 'heading' && m.level <= 4);
+    const secEnd = nodes.findIndex((m, j) => j > i && m.type === "heading" && m.level <= 4);
     // Gather text + table cells + list items: preserve paragraphs by joining with \n\n.
     // Detect list items in disguise (like "Cloth - 2 BP") and format them with bullets.
-    const prose = nodes.slice(i + 1, secEnd === -1 ? charOptionsEnd : secEnd)
+    const prose = nodes
+      .slice(i + 1, secEnd === -1 ? charOptionsEnd : secEnd)
       .map((m) => {
-        if (m.type === 'list') {
-          return m.items.map(item => `• ${item}`).join('\n');
+        if (m.type === "list") {
+          return m.items.map((item) => `• ${item}`).join("\n");
         }
-        if (m.type === 'text' || m.type === 'cell') {
+        if (m.type === "text" || m.type === "cell") {
           const t = m.text.trim();
           // Detect pseudo-lists to render as bullet points
           if (/^.+?\s*-\s*\d+\s*BP$/i.test(t)) {
@@ -1428,17 +1642,15 @@ function enrichWithDetailSections(results) {
           }
           return t;
         }
-        return '';
+        return "";
       })
       .filter(Boolean)
-      .join('\n\n')
+      .join("\n\n")
       .trim();
     // Append only the parts not already in the (summary) description, so we don't
     // duplicate the cell text the detail section may restate.
     if (prose && !target.description.includes(prose)) {
-      target.description = target.description
-        ? `${target.description}\n\n${prose}`.trim()
-        : prose;
+      target.description = target.description ? `${target.description}\n\n${prose}`.trim() : prose;
     }
   }
   return results;
@@ -1458,49 +1670,57 @@ function extractTiers(results) {
   for (const r of results) {
     // Try generic table idiom first: "Cost" followed by headers, then rows of values
     if (r.description) {
-      const lines = r.description.split(/\n+/).map(l => l.trim()).filter(Boolean);
-      const costIdx = lines.indexOf('Cost');
+      const lines = r.description
+        .split(/\n+/)
+        .map((l) => l.trim())
+        .filter(Boolean);
+      const costIdx = lines.indexOf("Cost");
       if (costIdx !== -1) {
         let firstDigitIdx = -1;
         for (let i = costIdx + 1; i < lines.length; i++) {
-          if (/^\d+$/.test(lines[i])) { firstDigitIdx = i; break; }
+          if (/^\d+$/.test(lines[i])) {
+            firstDigitIdx = i;
+            break;
+          }
         }
         if (firstDigitIdx !== -1) {
           const numColumns = firstDigitIdx - costIdx;
           if (numColumns >= 2 && numColumns <= 4) {
             const headers = lines.slice(costIdx, firstDigitIdx);
-            
-            // Standard tiered tables (Cost, Character Level, Ability) are NOT cumulative 
+
+            // Standard tiered tables (Cost, Character Level, Ability) are NOT cumulative
             // and should be handled by the legacy dedicated parser below.
-            if (!headers.some(h => /Character\s+Level/i.test(h))) {
-              const keys = headers.map(h => {
-                const k = h.replace(/(?:^\w|[A-Z]|\b\w)/g, (w, i) => i === 0 ? w.toLowerCase() : w.toUpperCase()).replace(/[^a-zA-Z0-9]/g, '');
-                return k === 'byMyVoiceDmg' ? 'byMyVoiceDmg' : k;
+            if (!headers.some((h) => /Character\s+Level/i.test(h))) {
+              const keys = headers.map((h) => {
+                const k = h
+                  .replace(/(?:^\w|[A-Z]|\b\w)/g, (w, i) => (i === 0 ? w.toLowerCase() : w.toUpperCase()))
+                  .replace(/[^a-zA-Z0-9]/g, "");
+                return k === "byMyVoiceDmg" ? "byMyVoiceDmg" : k;
               });
-            const tiers = [];
-            let prevCost = 0;
-            let i = firstDigitIdx;
-            for (; i < lines.length; i += numColumns) {
-              if (!/^\d+$/.test(lines[i])) break; // end of table
-              const tier = {};
-              const cumulativeCost = parseInt(lines[i], 10);
-              tier[keys[0]] = cumulativeCost - prevCost;
-              prevCost = cumulativeCost;
-              for (let j = 1; j < numColumns; j++) {
-                let val = lines[i + j];
-                if (val === '-' || val === undefined) continue;
-                if (/^\d+$/.test(val)) val = parseInt(val, 10);
-                tier[keys[j]] = val;
+              const tiers = [];
+              let prevCost = 0;
+              let i = firstDigitIdx;
+              for (; i < lines.length; i += numColumns) {
+                if (!/^\d+$/.test(lines[i])) break; // end of table
+                const tier = {};
+                const cumulativeCost = parseInt(lines[i], 10);
+                tier[keys[0]] = cumulativeCost - prevCost;
+                prevCost = cumulativeCost;
+                for (let j = 1; j < numColumns; j++) {
+                  let val = lines[i + j];
+                  if (val === "-" || val === undefined) continue;
+                  if (/^\d+$/.test(val)) val = parseInt(val, 10);
+                  tier[keys[j]] = val;
+                }
+                tiers.push(tier);
               }
-              tiers.push(tier);
-            }
-            if (tiers.length > 0) {
-              // Only override if we actually got rows
-              r.tiers = tiers;
-              r.cost = tiers[0].cost;
-              r.ranks = tiers.length;
-              continue;
-            }
+              if (tiers.length > 0) {
+                // Only override if we actually got rows
+                r.tiers = tiers;
+                r.cost = tiers[0].cost;
+                r.ranks = tiers.length;
+                continue;
+              }
             } // Close if (!headers.some(...))
           }
         }
@@ -1535,7 +1755,7 @@ function extractTiers(results) {
 // the table (new allergen / changed award) flows through on the next parse.
 function extractAllergens(results) {
   for (const r of results) {
-    const m = (r.description || '').match(/Standard Allergens and Awards:\s*(.+)$/s);
+    const m = (r.description || "").match(/Standard Allergens and Awards:\s*(.+)$/s);
     if (!m) continue;
     const allergens = {};
     for (const row of m[1].matchAll(/•\s*([^-•\n]+?)\s*-\s*(\d+)\s*BP/g)) {
@@ -1546,13 +1766,13 @@ function extractAllergens(results) {
   return results;
 }
 
-write('perks.json', withMechanics(extractTiers(enrichWithDetailSections(parsePerkFlawList('Perks List', 'cost')))));
-write('flaws.json', withMechanics(extractAllergens(enrichWithDetailSections(parsePerkFlawList('Flaws List', 'bp')))));
+write("perks.json", withMechanics(extractTiers(enrichWithDetailSections(parsePerkFlawList("Perks List", "cost")))));
+write("flaws.json", withMechanics(extractAllergens(enrichWithDetailSections(parsePerkFlawList("Flaws List", "bp")))));
 
 // ─── DEVOTIONS ────────────────────────────────────────────────────────────────
 // Each devotion is an H1. Content is text nodes with bullet lists for tenets.
 
-console.log('\nParsing devotions...');
+console.log("\nParsing devotions...");
 
 // The Divine Domains section opens with a table mapping each Devotion to its
 // divine domains: header "God|Devotion | Locality | Domain 1 … Domain 4", then a
@@ -1562,22 +1782,26 @@ console.log('\nParsing devotions...');
 // boundaries: each known devotion name begins a row, the next token is its
 // locality, and the remaining tokens (until the next devotion name) are domains.
 // `devNames` is the set of canonical devotion names (base, before any comma).
-const normDevName = (s) => s.toLowerCase().replace(/[^a-z]/g, '');
+const normDevName = (s) => s.toLowerCase().replace(/[^a-z]/g, "");
 function parseDevotionDomains(devNames) {
   const known = new Set(devNames.map(normDevName));
   // The devotion→domain mapping is a real table. Locate its header cell ("God" or
   // "Devotion") and read the cells that follow, split into rows by 'rowEnd'. Each
   // data row is [Name, Locality, Domain, Domain, …].
-  const hdr = nodes.findIndex((n) => n.type === 'cell' && /^(God|Devotion)$/i.test(n.text));
+  const hdr = nodes.findIndex((n) => n.type === "cell" && /^(God|Devotion)$/i.test(n.text));
   if (hdr === -1) return {};
   const rows = [];
   let cur = [];
   for (let j = hdr; j < nodes.length; j++) {
     const n = nodes[j];
-    if (n.type === 'rowEnd') { if (cur.length) rows.push(cur); cur = []; continue; }
-    if (n.type !== 'cell') {
+    if (n.type === "rowEnd") {
+      if (cur.length) rows.push(cur);
+      cur = [];
+      continue;
+    }
+    if (n.type !== "cell") {
       // Leaving the table (a heading or the trailing note ends it).
-      if (n.type === 'heading' || /^See the Devotions/i.test(n.text || '')) break;
+      if (n.type === "heading" || /^See the Devotions/i.test(n.text || "")) break;
       continue;
     }
     cur.push(n.text.trim());
@@ -1587,23 +1811,23 @@ function parseDevotionDomains(devNames) {
   const map = {};
   for (const cells of rows) {
     const [name, locality, ...domains] = cells.filter(Boolean);
-    if (!name || !known.has(normDevName(name))) continue;   // skip header / stray rows
+    if (!name || !known.has(normDevName(name))) continue; // skip header / stray rows
     map[normDevName(name)] = { name, locality: locality || null, domains: domains.filter(Boolean) };
   }
   return map;
 }
 
 function parseDevotions() {
-  const divDomainsIdx = findHeading('Divine Domains', 1);
+  const divDomainsIdx = findHeading("Divine Domains", 1);
 
   // Collect all H1s between "Devotions & Divine Beings" and "Divine Domains"
-  const devotionsStart = findHeading('Devotions & Divine Beings', 1);
+  const devotionsStart = findHeading("Devotions & Divine Beings", 1);
   // First pass: gather the devotion names so the domain-table splitter knows the
   // row boundaries.
   const names = [];
   for (let j = devotionsStart + 1; j < divDomainsIdx; j++) {
     const n = nodes[j];
-    if (n.type === 'heading' && n.level === 1 && n.text) names.push(n.text.split(',')[0]);
+    if (n.type === "heading" && n.level === 1 && n.text) names.push(n.text.split(",")[0]);
   }
   const domainMap = parseDevotionDomains(names);
   const results = [];
@@ -1611,48 +1835,72 @@ function parseDevotions() {
   let i = devotionsStart + 1;
   while (i < divDomainsIdx) {
     const n = nodes[i];
-    if (n.type !== 'heading' || n.level !== 1 || !n.text) { i++; continue; }
+    if (n.type !== "heading" || n.level !== 1 || !n.text) {
+      i++;
+      continue;
+    }
 
     const name = n.text;
-    const devEnd = nodes.findIndex((m, j) => j > i && m.type === 'heading' && m.level === 1);
+    const devEnd = nodes.findIndex((m, j) => j > i && m.type === "heading" && m.level === 1);
     const end = devEnd === -1 ? divDomainsIdx : Math.min(devEnd, divDomainsIdx);
 
     const bodyNodes = nodes.slice(i + 1, end);
     const tenets = [];
     const loreParts = [];
-    let colorScheme = '', iconography = '';
+    let colorScheme = "",
+      iconography = "";
 
     for (const bn of bodyNodes) {
-      if (bn.type === 'list') { tenets.push(...bn.items); continue; }
-      if (bn.type !== 'text') continue;
+      if (bn.type === "list") {
+        tenets.push(...bn.items);
+        continue;
+      }
+      if (bn.type !== "text") continue;
       const t = bn.text;
       const cs = t.match(/^Devotion Color Scheme:\s*(.+)/i);
-      if (cs) { colorScheme = cs[1].trim(); continue; }
+      if (cs) {
+        colorScheme = cs[1].trim();
+        continue;
+      }
       const ic = t.match(/^Common Iconography:\s*(.+)/i);
-      if (ic) { iconography = ic[1].trim(); continue; }
-      if (/^(Example Sigil:|The Truth|Truths|Divine Truths|Divine Demands|Guiding Principles|Guiding Beliefs|Laws|Lessons|Edicts|Codex|Church Principles):/.test(t)) continue;
+      if (ic) {
+        iconography = ic[1].trim();
+        continue;
+      }
+      if (
+        /^(Example Sigil:|The Truth|Truths|Divine Truths|Divine Demands|Guiding Principles|Guiding Beliefs|Laws|Lessons|Edicts|Codex|Church Principles):/.test(
+          t,
+        )
+      )
+        continue;
       loreParts.push(t);
     }
 
     // Match this devotion to its row in the domain table by base name (the table
     // uses short names like "Senri"; the H1 may be "Senri, Voice of Mercy").
-    const base = name.split(',')[0];
+    const base = name.split(",")[0];
     const dm = domainMap[normDevName(base)] || domainMap[normDevName(name)] || {};
     results.push({
-      name, epithet: '', lore: loreParts.join(' '), tenets, colorScheme, iconography,
-      domains: dm.domains || [], locality: dm.locality || '',
+      name,
+      epithet: "",
+      lore: loreParts.join(" "),
+      tenets,
+      colorScheme,
+      iconography,
+      domains: dm.domains || [],
+      locality: dm.locality || "",
     });
     i = end;
   }
   return results;
 }
 
-write('devotions.json', parseDevotions());
+write("devotions.json", parseDevotions());
 
 // ─── DIVINE DOMAINS ───────────────────────────────────────────────────────────
 // H1: "Divine Domains" → H2s for each domain. Powers are H3 entries "Name - N BP".
 
-console.log('\nParsing divine domains...');
+console.log("\nParsing divine domains...");
 
 // Opposed-domain pairs, from the "Opposed Domains:" table the Jun 26 MegaDoc added
 // under the Divine Substitution power (Chaos↔Order, Death↔Life, …). Symmetric:
@@ -1662,17 +1910,35 @@ console.log('\nParsing divine domains...');
 function parseOpposedDomains() {
   const opp = {};
   // The label sits in a text/cell node; the pairs follow as two-cell rows. Find it.
-  const labelIdx = nodes.findIndex((n) => (n.type === 'text' || n.type === 'cell') && /Opposed Domains:/i.test(n.text || ''));
+  const labelIdx = nodes.findIndex(
+    (n) => (n.type === "text" || n.type === "cell") && /Opposed Domains:/i.test(n.text || ""),
+  );
   if (labelIdx === -1) return opp;
   // Collect cell nodes after the label until a clear break (a heading); pair them up.
   const cells = [];
   for (let i = labelIdx; i < nodes.length && cells.length < 16; i++) {
     const n = nodes[i];
-    if (n.type === 'heading' && i > labelIdx) break;
-    if (n.type === 'cell') cells.push(n.text.replace(/Opposed Domains:\s*/i, '').trim());
+    if (n.type === "heading" && i > labelIdx) break;
+    if (n.type === "cell") cells.push(n.text.replace(/Opposed Domains:\s*/i, "").trim());
   }
-  const known = new Set(['Chaos', 'Order', 'Creation', 'Destruction', 'Expression', 'Manipulation',
-    'Life', 'Death', 'Light', 'Shadow', 'Peace', 'War', 'Energy', 'Knowledge', 'Nature', 'Protection']);
+  const known = new Set([
+    "Chaos",
+    "Order",
+    "Creation",
+    "Destruction",
+    "Expression",
+    "Manipulation",
+    "Life",
+    "Death",
+    "Light",
+    "Shadow",
+    "Peace",
+    "War",
+    "Energy",
+    "Knowledge",
+    "Nature",
+    "Protection",
+  ]);
   const clean = cells.filter((c) => known.has(c));
   for (let i = 0; i + 1 < clean.length; i += 2) {
     opp[clean[i]] = clean[i + 1];
@@ -1682,17 +1948,21 @@ function parseOpposedDomains() {
 }
 
 function parseDivineDomains() {
-  const start = findHeading('Divine Domains', 1);
-  const end = findHeading('Wellspring Economy Overview', 1, start);
+  const start = findHeading("Divine Domains", 1);
+  const end = findHeading("Wellspring Economy Overview", 1, start);
   const opposed = parseOpposedDomains();
 
   // Devotion accents table: H2 "Devotion Accents" → cell pairs
   const accents = {};
-  const accH2 = nodes.findIndex((n, i) => i > start && i < end && n.type === 'heading' && n.level === 2 && n.text === 'Devotion Accents');
+  const accH2 = nodes.findIndex(
+    (n, i) => i > start && i < end && n.type === "heading" && n.level === 2 && n.text === "Devotion Accents",
+  );
   if (accH2 !== -1) {
-    const accEnd = nodes.findIndex((n, i) => i > accH2 && n.type === 'heading' && n.level <= 2);
-    const cells = nodes.slice(accH2 + 1, accEnd === -1 ? end : Math.min(accEnd, end))
-      .filter(n => n.type === 'cell').map(n => n.text);
+    const accEnd = nodes.findIndex((n, i) => i > accH2 && n.type === "heading" && n.level <= 2);
+    const cells = nodes
+      .slice(accH2 + 1, accEnd === -1 ? end : Math.min(accEnd, end))
+      .filter((n) => n.type === "cell")
+      .map((n) => n.text);
     for (let i = 0; i + 1 < cells.length; i += 2) accents[cells[i]] = cells[i + 1];
   }
 
@@ -1700,47 +1970,53 @@ function parseDivineDomains() {
   let i = start + 1;
   while (i < end) {
     const n = nodes[i];
-    if (n.type !== 'heading' || n.level !== 2 || !n.text || n.text === 'Devotion Accents') { i++; continue; }
+    if (n.type !== "heading" || n.level !== 2 || !n.text || n.text === "Devotion Accents") {
+      i++;
+      continue;
+    }
 
     const rawName = n.text;
     // "Energy: [Acid, Flame, Ice, or Lightning]" → name "Energy"
-    const name = rawName.replace(/^Energy:.*$/, 'Energy').trim();
-    const domEnd = nodes.findIndex((m, j) => j > i && m.type === 'heading' && m.level <= 2);
+    const name = rawName.replace(/^Energy:.*$/, "Energy").trim();
+    const domEnd = nodes.findIndex((m, j) => j > i && m.type === "heading" && m.level <= 2);
     const dEnd = domEnd === -1 ? end : Math.min(domEnd, end);
 
     // Powers: H3 or bold text "Name - N BP" pattern
     const DOMAIN_PWR = /-\s*\d+\s*BP\s*$/i;
-    const isPwr = (x) => (x.type === 'heading' && x.level <= 4 && DOMAIN_PWR.test(x.text)) || 
-                         (x.type === 'text' && DOMAIN_PWR.test(x.text) && x.text.length < 100);
+    const isPwr = (x) =>
+      (x.type === "heading" && x.level <= 4 && DOMAIN_PWR.test(x.text)) ||
+      (x.type === "text" && DOMAIN_PWR.test(x.text) && x.text.length < 100);
 
     const powers = [];
     let j = i + 1;
     while (j < dEnd) {
       const m = nodes[j];
       if (isPwr(m)) {
-        const pwrEnd = nodes.findIndex((x, k) => k > j && (
-          (x.type === 'heading' && x.level <= 2) || isPwr(x)
-        ));
-        const bodyNodes = nodes.slice(j + 1, pwrEnd === -1 ? dEnd : Math.min(pwrEnd, dEnd))
-          .filter(x => x.type === 'text');
+        const pwrEnd = nodes.findIndex((x, k) => k > j && ((x.type === "heading" && x.level <= 2) || isPwr(x)));
+        const bodyNodes = nodes
+          .slice(j + 1, pwrEnd === -1 ? dEnd : Math.min(pwrEnd, dEnd))
+          .filter((x) => x.type === "text");
         const header = m.text;
         const tierMatch = header.match(/\[(\w+)\]/);
         const costMatch = header.match(/-\s*(\d+)\s*BP\s*$/);
-        const pwrName = header.replace(/\[\w+\]/, '').replace(/-\s*\d+\s*BP\s*$/, '').trim();
+        const pwrName = header
+          .replace(/\[\w+\]/, "")
+          .replace(/-\s*\d+\s*BP\s*$/, "")
+          .trim();
         const { fields, description } = parsePowerNodes(bodyNodes);
         powers.push({
           name: pwrName,
           tier: tierMatch ? tierMatch[1] : null,
           cost: costMatch ? parseInt(costMatch[1]) : null,
-          incantation: fields['incantation'] ?? null,
-          call: fields['call'] ?? null,
-          target: fields['target'] ?? null,
-          duration: fields['duration'] ?? null,
-          delivery: fields['delivery'] ?? null,
-          refresh: fields['refresh'] ?? null,
-          accent: fields['accent'] ?? null,
-          effect: fields['effect'] ?? null,
-          prerequisites: fields['prerequisite'] ?? fields['prerequisites'] ?? null,
+          incantation: fields["incantation"] ?? null,
+          call: fields["call"] ?? null,
+          target: fields["target"] ?? null,
+          duration: fields["duration"] ?? null,
+          delivery: fields["delivery"] ?? null,
+          refresh: fields["refresh"] ?? null,
+          accent: fields["accent"] ?? null,
+          effect: fields["effect"] ?? null,
+          prerequisites: fields["prerequisite"] ?? fields["prerequisites"] ?? null,
           description,
         });
         j = pwrEnd === -1 ? dEnd : Math.min(pwrEnd, dEnd);
@@ -1749,99 +2025,119 @@ function parseDivineDomains() {
       }
     }
 
-    domains.push({ name, label: rawName, accent: accents[name] ?? accents[rawName] ?? null,
-      opposedBy: opposed[name] ?? null, powers });
+    domains.push({
+      name,
+      label: rawName,
+      accent: accents[name] ?? accents[rawName] ?? null,
+      opposedBy: opposed[name] ?? null,
+      powers,
+    });
     i = dEnd;
   }
   return domains;
 }
 
-write('domains.json', parseDivineDomains());
+write("domains.json", parseDivineDomains());
 
 // ─── LINEAGES ─────────────────────────────────────────────────────────────────
 // Each lineage is an H1. Challenges and Advantages are H2s; sub-lineages are H3s;
 // individual items are H4s.
 
-console.log('\nParsing lineages...');
+console.log("\nParsing lineages...");
 
 // Extract the structured costuming requirement from a lineage description's
 // "Costuming Challenge: <difficulty> - <text>" sentence. Returns
 // { difficulty, minRepped, mustInclude, mustIncludeIf, text } or null. The UI
 // (costumeStatus + the budget-bar chip) reads minRepped/mustInclude live.
 function parseCostume(description) {
-  const m = (description || '').match(/Costuming Challenge:\s*(Easy|Medium|Hard)\s*[-–—]\s*([^]*?\.(?:\s*[^.]*\.)?)/i);
+  const m = (description || "").match(/Costuming Challenge:\s*(Easy|Medium|Hard)\s*[-–—]\s*([^]*?\.(?:\s*[^.]*\.)?)/i);
   if (!m) return null;
   const difficulty = m[1];
-  const text = m[2].replace(/\s+/g, ' ').trim();
+  const text = m[2].replace(/\s+/g, " ").trim();
   // "at least N [Repped]" → minimum; "do not require any" → 0.
   const numM = text.match(/at least (\d+)\s*\[?Repped/i);
   const minRepped = numM ? parseInt(numM[1], 10) : 0;
   // "one of which must be X" (unconditional) or "If <cond>, one … must be X".
-  let mustInclude = null, mustIncludeIf = null;
+  let mustInclude = null,
+    mustIncludeIf = null;
   const condM = text.match(/If the character is ([^,]+),\s*one of these Challenges must be ([^.(]+)/i);
   const uncondM = text.match(/one of which must be ([^.(]+)/i);
-  if (condM) { mustIncludeIf = condM[1].trim(); mustInclude = condM[2].trim(); }
-  else if (uncondM) { mustInclude = uncondM[1].trim(); }
+  if (condM) {
+    mustIncludeIf = condM[1].trim();
+    mustInclude = condM[2].trim();
+  } else if (uncondM) {
+    mustInclude = uncondM[1].trim();
+  }
   return { difficulty, minRepped, mustInclude, mustIncludeIf, text };
 }
 
 function parseLineages() {
-  const start = findHeading('Lineages (All)', 1);
-  const end = findHeading('Base Skills, Perks, and Flaws', 1, start);
+  const start = findHeading("Lineages (All)", 1);
+  const end = findHeading("Base Skills, Perks, and Flaws", 1, start);
 
   const lineages = [];
   let i = start + 1;
 
   while (i < end) {
     const n = nodes[i];
-    if (n.type !== 'heading' || n.level !== 1 || !n.text) { i++; continue; }
+    if (n.type !== "heading" || n.level !== 1 || !n.text) {
+      i++;
+      continue;
+    }
 
     const name = n.text;
-    const linEnd = nodes.findIndex((m, j) => j > i && m.type === 'heading' && m.level === 1);
+    const linEnd = nodes.findIndex((m, j) => j > i && m.type === "heading" && m.level === 1);
     const lEnd = linEnd === -1 ? end : Math.min(linEnd, end);
 
     // Description: text under H2 "Description" before any H3
-    const descH2 = nodes.findIndex((m, j) => j > i && j < lEnd && m.type === 'heading' && m.level === 2 && m.text === 'Description');
-    const descEnd = descH2 === -1 ? i : nodes.findIndex((m, j) => j > descH2 && m.type === 'heading' && m.level <= 2);
-    const description = descH2 === -1 ? '' : textBetween(descH2 + 1, descEnd === -1 ? lEnd : Math.min(descEnd, lEnd));
+    const descH2 = nodes.findIndex(
+      (m, j) => j > i && j < lEnd && m.type === "heading" && m.level === 2 && m.text === "Description",
+    );
+    const descEnd = descH2 === -1 ? i : nodes.findIndex((m, j) => j > descH2 && m.type === "heading" && m.level <= 2);
+    const description = descH2 === -1 ? "" : textBetween(descH2 + 1, descEnd === -1 ? lEnd : Math.min(descEnd, lEnd));
 
     // Parse challenges/advantages from an H2 section.
     // Each entry is a single text node: "Name [Tag] [Tag] (Cost): Description"
     // Sublineage groups are H3 headings under the H2.
     const ITEM_LINE = /^(.+?)((?:\s*\[[^\]]+\])*)\s*\((\d+|Variable)\)\s*[:\-]\s*(.+)$/;
     const parseItems = (sectionName) => {
-      const h2 = nodes.findIndex((m, j) => j > i && j < lEnd && m.type === 'heading' && m.level === 2 && m.text === sectionName);
+      const h2 = nodes.findIndex(
+        (m, j) => j > i && j < lEnd && m.type === "heading" && m.level === 2 && m.text === sectionName,
+      );
       if (h2 === -1) return [];
-      const secEnd = nodes.findIndex((m, j) => j > h2 && m.type === 'heading' && m.level <= 2);
+      const secEnd = nodes.findIndex((m, j) => j > h2 && m.type === "heading" && m.level <= 2);
       const sEnd = secEnd === -1 ? lEnd : Math.min(secEnd, lEnd);
       const items = [];
-      let currentGroup = 'General';
+      let currentGroup = "General";
       for (let j = h2 + 1; j < sEnd; j++) {
         const m = nodes[j];
-        if (m.type === 'heading' && m.level === 3) { currentGroup = m.text; continue; }
-        if (m.type !== 'text') continue;
+        if (m.type === "heading" && m.level === 3) {
+          currentGroup = m.text;
+          continue;
+        }
+        if (m.type !== "text") continue;
         const lm = m.text.match(ITEM_LINE);
         if (!lm) continue;
         const [, rawName, tagsStr, costStr, desc] = lm;
-        const tags = [...tagsStr.matchAll(/\[([^\]]+)\]/g)].map(t => t[1]);
-        const required = tags.some(t => /^required$/i.test(t));
-        const repped = tags.some(t => /^repped$/i.test(t));
-        const lbp = costStr === 'Variable' ? null : parseInt(costStr);
+        const tags = [...tagsStr.matchAll(/\[([^\]]+)\]/g)].map((t) => t[1]);
+        const required = tags.some((t) => /^required$/i.test(t));
+        const repped = tags.some((t) => /^repped$/i.test(t));
+        const lbp = costStr === "Variable" ? null : parseInt(costStr);
         let fullDesc = desc.trim();
         let k = j + 1;
         while (k < sEnd) {
           const nxt = nodes[k];
-          if (nxt.type === 'heading' && nxt.level <= 3) break;
-          if (nxt.type === 'text' && ITEM_LINE.test(nxt.text)) break;
+          if (nxt.type === "heading" && nxt.level <= 3) break;
+          if (nxt.type === "text" && ITEM_LINE.test(nxt.text)) break;
           if (nxt.text) {
             let txt = nxt.text.trim();
             // Inject newlines before standard power fields to fix squashed text nodes
-            txt = txt.replace(/(Call:|Target:|Delivery:|Accent:|Duration:|Refresh:|Effect:)/g, '\n$1');
+            txt = txt.replace(/(Call:|Target:|Delivery:|Accent:|Duration:|Refresh:|Effect:)/g, "\n$1");
             // Clean up missing space before Call if it got squashed
-            txt = txt.replace(/\]Call:/g, ']\nCall:');
+            txt = txt.replace(/\]Call:/g, "]\nCall:");
             // Remove huge blocks of spaces (like between Self and Duration)
-            txt = txt.replace(/ {5,}/g, ' ');
-            fullDesc += '\n\n' + txt;
+            txt = txt.replace(/ {5,}/g, " ");
+            fullDesc += "\n\n" + txt;
           }
           k++;
         }
@@ -1852,7 +2148,7 @@ function parseLineages() {
           lbp,
           required,
           repped,
-          tags: tags.filter(t => !/^(required|repped)$/i.test(t)),
+          tags: tags.filter((t) => !/^(required|repped)$/i.test(t)),
           sublineage: currentGroup,
           description: fullDesc,
         });
@@ -1860,8 +2156,8 @@ function parseLineages() {
       return items;
     };
 
-    const challenges = parseItems('Challenges');
-    const advantages = parseItems('Advantages');
+    const challenges = parseItems("Challenges");
+    const advantages = parseItems("Advantages");
     // Enrich BOTH — challenges can carry permanent stat penalties too (e.g. Lost's
     // Fragile Form: "1 fewer maximum Life Point"), not just advantages.
     for (const it of [...challenges, ...advantages]) enrichMechanics(it);
@@ -1869,123 +2165,157 @@ function parseLineages() {
     // Derive sub-lineages from distinct non-General groups
     const byName = new Map();
     for (const it of [...challenges, ...advantages]) {
-      if (it.sublineage === 'General') continue;
+      if (it.sublineage === "General") continue;
       const m = it.sublineage.match(/^([^(]+?)(?:\s*\((.+)\))?$/);
-      const sub = { name: (m ? m[1] : it.sublineage).trim(), note: m?.[2]?.trim() ?? '' };
+      const sub = { name: (m ? m[1] : it.sublineage).trim(), note: m?.[2]?.trim() ?? "" };
       if (!byName.has(sub.name) || (!byName.get(sub.name).note && sub.note)) byName.set(sub.name, sub);
     }
 
-    lineages.push({ name, description, costume: parseCostume(description), sublineages: [...byName.values()], challenges, advantages });
+    lineages.push({
+      name,
+      description,
+      costume: parseCostume(description),
+      sublineages: [...byName.values()],
+      challenges,
+      advantages,
+    });
     i = lEnd;
   }
   return lineages;
 }
 
-write('lineages.json', parseLineages());
+write("lineages.json", parseLineages());
 
 // ─── LEVEL TABLE ──────────────────────────────────────────────────────────────
 
-console.log('\nParsing level table...');
+console.log("\nParsing level table...");
 
 function parseLevelTable() {
   // Under "Advancement" H1 → "Level Progression Table" H2
-  const advH1 = findHeading('Advancement', 1);
-  const tableH = nodes.findIndex((n, i) =>
-    i > advH1 && n.type === 'heading' && n.level === 2 && n.text === 'Level Progression Table'
+  const advH1 = findHeading("Advancement", 1);
+  const tableH = nodes.findIndex(
+    (n, i) => i > advH1 && n.type === "heading" && n.level === 2 && n.text === "Level Progression Table",
   );
   if (tableH === -1) return [];
-  const tableEnd = nodes.findIndex((n, i) => i > tableH && n.type === 'heading' && n.level <= 2);
+  const tableEnd = nodes.findIndex((n, i) => i > tableH && n.type === "heading" && n.level <= 2);
   // Real table: read the cell values (5 numeric columns per row).
-  const cells = nodes.slice(tableH + 1, tableEnd === -1 ? nodes.length : tableEnd)
-    .filter(n => n.type === 'cell').map(n => n.text);
+  const cells = nodes
+    .slice(tableH + 1, tableEnd === -1 ? nodes.length : tableEnd)
+    .filter((n) => n.type === "cell")
+    .map((n) => n.text);
 
   const HEADER = /^(Character Level|Total XP|Base BP|LP|Spikes|Level|XP|BP)$/i;
-  const nums = cells.filter(v => /^\d+$/.test(v) && !HEADER.test(v)).map(Number);
+  const nums = cells.filter((v) => /^\d+$/.test(v) && !HEADER.test(v)).map(Number);
   const rows = [];
   for (let i = 0; i + 4 < nums.length; i += 5) {
-    rows.push({ level: nums[i], xp: nums[i+1], bp: nums[i+2], lp: nums[i+3], spikes: nums[i+4] });
+    rows.push({ level: nums[i], xp: nums[i + 1], bp: nums[i + 2], lp: nums[i + 3], spikes: nums[i + 4] });
   }
   return rows;
 }
 
-write('level-table.json', parseLevelTable());
+write("level-table.json", parseLevelTable());
 
-console.log('\nParsing events table...');
+console.log("\nParsing events table...");
 
 function parseEventsTable() {
   // Under "Advancement" H1 → "Level Floor" H2
-  const advH1 = findHeading('Advancement', 1);
-  const tableH = nodes.findIndex((n, i) =>
-    i > advH1 && n.type === 'heading' && n.level === 2 && n.text === 'Level Floor'
+  const advH1 = findHeading("Advancement", 1);
+  const tableH = nodes.findIndex(
+    (n, i) => i > advH1 && n.type === "heading" && n.level === 2 && n.text === "Level Floor",
   );
   if (tableH === -1) return [];
-  const tableEnd = nodes.findIndex((n, i) => i > tableH && n.type === 'heading' && n.level <= 2);
-  const cells = nodes.slice(tableH + 1, tableEnd === -1 ? nodes.length : tableEnd)
-    .filter(n => n.type === 'cell').map(n => n.text);
+  const tableEnd = nodes.findIndex((n, i) => i > tableH && n.type === "heading" && n.level <= 2);
+  const cells = nodes
+    .slice(tableH + 1, tableEnd === -1 ? nodes.length : tableEnd)
+    .filter((n) => n.type === "cell")
+    .map((n) => n.text);
 
   const HEADER = /^(Event Number|Level Floor|Starting BP)$/i;
-  const nums = cells.filter(v => /^\d+$/.test(v) && !HEADER.test(v)).map(Number);
+  const nums = cells.filter((v) => /^\d+$/.test(v) && !HEADER.test(v)).map(Number);
   const rows = [];
   for (let i = 0; i + 2 < nums.length; i += 3) {
-    rows.push({ event: nums[i], level: nums[i+1], bp: nums[i+2] });
+    rows.push({ event: nums[i], level: nums[i + 1], bp: nums[i + 2] });
   }
   return rows;
 }
 
-write('events-table.json', parseEventsTable());
-
+write("events-table.json", parseEventsTable());
 
 // ─── CRAFTING RECIPES ─────────────────────────────────────────────────────────
 // Each recipe is an H3 "Name [Tier Discipline Recipe/Formula/Schematic]".
 // Fields are text nodes following the heading.
 
-console.log('\nParsing crafting recipes...');
+console.log("\nParsing crafting recipes...");
 
-const RECIPE_HEADER = /^(.+?)\s*\[(Apprentice|Journeyman|Greater)\s+(Alchemy|Enchanting|Tinkering)\s+(Recipe|Formula|Schematic)\]((?:\s*\[[^\]]+\])*)\s*$/;
-const RECIPE_FIELD = /^(Crafting Materials(?: Needed)?|Uses per Batch|Expiration|Application|Type|Ritualists|Total Participants|Dark Territory Required|Dark Territory Suit|Reality Tear|Requirements|Crafting Process|Description|Effect|Note|IMPORTANT|Circle of Sacrifice|Circle of Empowerment|Circle of Assignment|Rune Circle):\s*(.*)$/;
+const RECIPE_HEADER =
+  /^(.+?)\s*\[(Apprentice|Journeyman|Greater)\s+(Alchemy|Enchanting|Tinkering)\s+(Recipe|Formula|Schematic)\]((?:\s*\[[^\]]+\])*)\s*$/;
+const RECIPE_FIELD =
+  /^(Crafting Materials(?: Needed)?|Uses per Batch|Expiration|Application|Type|Ritualists|Total Participants|Dark Territory Required|Dark Territory Suit|Reality Tear|Requirements|Crafting Process|Description|Effect|Note|IMPORTANT|Circle of Sacrifice|Circle of Empowerment|Circle of Assignment|Rune Circle):\s*(.*)$/;
 const FIELD_KEY = {
-  'Crafting Materials Needed': 'materials', 'Crafting Materials': 'materials',
-  'Uses per Batch': 'usesPerBatch', 'Expiration': 'expiration',
-  'Application': 'application', 'Type': 'type',
-  'Crafting Process': 'process', 'Description': 'description', 'Effect': 'effect',
+  "Crafting Materials Needed": "materials",
+  "Crafting Materials": "materials",
+  "Uses per Batch": "usesPerBatch",
+  Expiration: "expiration",
+  Application: "application",
+  Type: "type",
+  "Crafting Process": "process",
+  Description: "description",
+  Effect: "effect",
 };
 
 function parseCraftingRecipes() {
-  const craftingH1 = findHeading('Crafting (all)', 1);
-  const ritualH1 = findHeading('Rituals', 1, craftingH1);
+  const craftingH1 = findHeading("Crafting (all)", 1);
+  const ritualH1 = findHeading("Rituals", 1, craftingH1);
   const recipes = [];
 
   let i = craftingH1 + 1;
   while (i < ritualH1) {
     const n = nodes[i];
-    if (n.type === 'heading' && n.level === 3 && RECIPE_HEADER.test(n.text)) {
+    if (n.type === "heading" && n.level === 3 && RECIPE_HEADER.test(n.text)) {
       const h = n.text.match(RECIPE_HEADER);
-      const extraTags = [...(h[5] || '').matchAll(/\[([^\]]+)\]/g)].map(m => m[1].trim());
+      const extraTags = [...(h[5] || "").matchAll(/\[([^\]]+)\]/g)].map((m) => m[1].trim());
       const recipe = {
-        name: h[1].trim(), discipline: h[3], tier: h[2], tags: extraTags,
-        materials: null, usesPerBatch: null, expiration: null, application: null,
-        type: null, process: '', description: '', effect: '', fields: {},
+        name: h[1].trim(),
+        discipline: h[3],
+        tier: h[2],
+        tags: extraTags,
+        materials: null,
+        usesPerBatch: null,
+        expiration: null,
+        application: null,
+        type: null,
+        process: "",
+        description: "",
+        effect: "",
+        fields: {},
       };
 
-      const recEnd = nodes.findIndex((m, j) => j > i && m.type === 'heading' && m.level <= 3);
+      const recEnd = nodes.findIndex((m, j) => j > i && m.type === "heading" && m.level <= 3);
       const rEnd = recEnd === -1 ? ritualH1 : Math.min(recEnd, ritualH1);
-      const bodyNodes = nodes.slice(i + 1, rEnd).filter(m => m.type === 'text');
+      const bodyNodes = nodes.slice(i + 1, rEnd).filter((m) => m.type === "text");
 
-      let curKey = null, curLabel = null, inProcess = false;
-      const addTo = (key, text) => { recipe[key] = recipe[key] ? recipe[key] + ' ' + text : text; };
-      const append = (label, text) => { recipe.fields[label] = (recipe.fields[label] ? recipe.fields[label] + ' ' : '') + text; };
+      let curKey = null,
+        curLabel = null,
+        inProcess = false;
+      const addTo = (key, text) => {
+        recipe[key] = recipe[key] ? recipe[key] + " " + text : text;
+      };
+      const append = (label, text) => {
+        recipe.fields[label] = (recipe.fields[label] ? recipe.fields[label] + " " : "") + text;
+      };
 
       for (const bn of bodyNodes) {
         const m = bn.text.match(RECIPE_FIELD);
         if (m) {
-          curLabel = m[1]; curKey = FIELD_KEY[m[1]] ?? null;
-          if (m[1] === 'Crafting Process') inProcess = true;
-          else if (m[1] === 'Description' || m[1] === 'Effect') inProcess = false;
+          curLabel = m[1];
+          curKey = FIELD_KEY[m[1]] ?? null;
+          if (m[1] === "Crafting Process") inProcess = true;
+          else if (m[1] === "Description" || m[1] === "Effect") inProcess = false;
           const val = m[2].trim();
           if (curKey && curKey in recipe) addTo(curKey, val);
           if (val) append(m[1], val);
         } else if (curLabel) {
-          if (inProcess && curKey !== 'process') addTo('process', bn.text);
+          if (inProcess && curKey !== "process") addTo("process", bn.text);
           else if (curKey && curKey in recipe) addTo(curKey, bn.text);
           append(curLabel, bn.text);
         }
@@ -1993,9 +2323,10 @@ function parseCraftingRecipes() {
 
       // Assemble Enchanting process from sub-steps when no explicit process field
       if (!recipe.process) {
-        const steps = ['Circle of Sacrifice','Circle of Empowerment','Circle of Assignment','Rune Circle']
-          .filter(k => recipe.fields[k]).map(k => `${k}: ${recipe.fields[k]}`);
-        if (steps.length) recipe.process = steps.join(' ');
+        const steps = ["Circle of Sacrifice", "Circle of Empowerment", "Circle of Assignment", "Rune Circle"]
+          .filter((k) => recipe.fields[k])
+          .map((k) => `${k}: ${recipe.fields[k]}`);
+        if (steps.length) recipe.process = steps.join(" ");
       }
 
       recipes.push(recipe);
@@ -2007,29 +2338,37 @@ function parseCraftingRecipes() {
   return recipes;
 }
 
-write('crafting-recipes.json', parseCraftingRecipes());
+write("crafting-recipes.json", parseCraftingRecipes());
 
 // ─── RITUALS ──────────────────────────────────────────────────────────────────
 // H1: "Rituals" (second occurrence — actual ritual list, not concepts preamble)
 // Ritual entries are H3 "Name [Tier Ritual]".
 
-console.log('\nParsing rituals...');
+console.log("\nParsing rituals...");
 
 const RITUAL_HEADER = /^(.+?)\s*\[(Apprentice|Journeyman|Greater)\s+Ritual\]\s*$/;
-const RITUAL_FIELD = /^(Summary|Required Components|Ritualists|Total Participants|Expiration|Targets?|Tools Used|Location|Other Requirements|Dark Territory Marshal Required|Dark Territory Suit|Category|Effect|Ritual Process|Note):\s*(.*)$/;
+const RITUAL_FIELD =
+  /^(Summary|Required Components|Ritualists|Total Participants|Expiration|Targets?|Tools Used|Location|Other Requirements|Dark Territory Marshal Required|Dark Territory Suit|Category|Effect|Ritual Process|Note):\s*(.*)$/;
 const RITUAL_KEY = {
-  'Summary': 'summary', 'Required Components': 'components', 'Ritualists': 'ritualists',
-  'Total Participants': 'totalParticipants', 'Expiration': 'expiration',
-  'Target': 'targets', 'Targets': 'targets', 'Tools Used': 'tools',
-  'Location': 'location', 'Other Requirements': 'otherRequirements',
-  'Dark Territory Marshal Required': 'darkTerritoryMarshal',
-  'Dark Territory Suit': 'darkTerritorySuit',
-  'Effect': 'effect', 'Ritual Process': 'process',
+  Summary: "summary",
+  "Required Components": "components",
+  Ritualists: "ritualists",
+  "Total Participants": "totalParticipants",
+  Expiration: "expiration",
+  Target: "targets",
+  Targets: "targets",
+  "Tools Used": "tools",
+  Location: "location",
+  "Other Requirements": "otherRequirements",
+  "Dark Territory Marshal Required": "darkTerritoryMarshal",
+  "Dark Territory Suit": "darkTerritorySuit",
+  Effect: "effect",
+  "Ritual Process": "process",
 };
 
 function parseRituals() {
   // The actual ritual list is under "Ritual Magic" H1
-  const ritualMagicH1 = findHeading('Ritual Magic', 1);
+  const ritualMagicH1 = findHeading("Ritual Magic", 1);
   const ritualEnd = nextHeadingAtOrAbove(1, ritualMagicH1);
   const end = ritualEnd === -1 ? nodes.length : ritualEnd;
   const rituals = [];
@@ -2037,28 +2376,38 @@ function parseRituals() {
   let i = ritualMagicH1 + 1;
   while (i < end) {
     const n = nodes[i];
-    if (n.type === 'heading' && n.level === 3 && RITUAL_HEADER.test(n.text)) {
+    if (n.type === "heading" && n.level === 3 && RITUAL_HEADER.test(n.text)) {
       const h = n.text.match(RITUAL_HEADER);
       const rec = {
-        name: h[1].trim(), tier: h[2],
-        summary: '', components: null, ritualists: null, totalParticipants: null,
-        expiration: null, targets: null, tools: null, location: null,
-        otherRequirements: null, darkTerritoryMarshal: null, darkTerritorySuit: null,
-        effect: '', process: '',
+        name: h[1].trim(),
+        tier: h[2],
+        summary: "",
+        components: null,
+        ritualists: null,
+        totalParticipants: null,
+        expiration: null,
+        targets: null,
+        tools: null,
+        location: null,
+        otherRequirements: null,
+        darkTerritoryMarshal: null,
+        darkTerritorySuit: null,
+        effect: "",
+        process: "",
       };
 
-      const recEnd = nodes.findIndex((m, j) => j > i && m.type === 'heading' && m.level <= 3);
+      const recEnd = nodes.findIndex((m, j) => j > i && m.type === "heading" && m.level <= 3);
       const rEnd = recEnd === -1 ? end : Math.min(recEnd, end);
-      const bodyNodes = nodes.slice(i + 1, rEnd).filter(m => m.type === 'text');
+      const bodyNodes = nodes.slice(i + 1, rEnd).filter((m) => m.type === "text");
 
       let curKey = null;
       for (const bn of bodyNodes) {
         const m = bn.text.match(RITUAL_FIELD);
         if (m) {
           curKey = RITUAL_KEY[m[1]] ?? null;
-          if (curKey) rec[curKey] = rec[curKey] ? rec[curKey] + ' ' + m[2].trim() : m[2].trim();
+          if (curKey) rec[curKey] = rec[curKey] ? rec[curKey] + " " + m[2].trim() : m[2].trim();
         } else if (curKey) {
-          rec[curKey] = rec[curKey] ? rec[curKey] + ' ' + bn.text : bn.text;
+          rec[curKey] = rec[curKey] ? rec[curKey] + " " + bn.text : bn.text;
         }
       }
       rituals.push(rec);
@@ -2070,7 +2419,7 @@ function parseRituals() {
   return rituals;
 }
 
-write('ritual-recipes.json', parseRituals());
+write("ritual-recipes.json", parseRituals());
 
 // ─── CORE RULES ───────────────────────────────────────────────────────────────
 // The heading hierarchy directly encodes the section structure.
@@ -2081,20 +2430,28 @@ write('ritual-recipes.json', parseRituals());
 //      derived recursively from each H1's named children at any depth. The
 //      bucket name is derived from the parent H1 heading.
 
-console.log('\nParsing core rules...');
+console.log("\nParsing core rules...");
 
 // Sections to skip entirely (policy/etiquette, not navigable game mechanics).
 const SKIP_SECTIONS = new Set([
-  'Code of Conduct', 'Wellspring Code of Conduct',
-  'Consent and Calibration', 'Combat Etiquette', 'Roleplay Etiquette',
-  'Wellspring Setting Start Guide',
+  "Code of Conduct",
+  "Wellspring Code of Conduct",
+  "Consent and Calibration",
+  "Combat Etiquette",
+  "Roleplay Etiquette",
+  "Wellspring Setting Start Guide",
 ]);
 
 // Sections whose H2/H3 children are already extracted better elsewhere.
 // Their concepts are not emitted as sub-concepts.
 const ALREADY_EXTRACTED = new Set([
-  'Effects', 'Conditions', 'Types', 'Defense Calls', 'Modifiers',
-  'Stacking Effects', 'Items',
+  "Effects",
+  "Conditions",
+  "Types",
+  "Defense Calls",
+  "Modifiers",
+  "Stacking Effects",
+  "Items",
 ]);
 
 // Names that look like sub-concept headings but are actually stat-block field
@@ -2102,15 +2459,19 @@ const ALREADY_EXTRACTED = new Set([
 // them prevents an "Effect" entity (255 false matches) and "Description"
 // entity from clobbering real game terms.
 const STATBLOCK_LABEL_NAMES = new Set([
-  'Description', 'Effect', 'Recipes/Formulae/Schematics',
-  'Crafting Resources List', 'Auros Starting Wealth', 'Typical Merchant Prices',
-  'Item Cards',
+  "Description",
+  "Effect",
+  "Recipes/Formulae/Schematics",
+  "Crafting Resources List",
+  "Auros Starting Wealth",
+  "Typical Merchant Prices",
+  "Item Cards",
 ]);
 
 function parseCoreRules() {
-  const crStart = findHeading('Wellspring Core Rules', 1);
-  const glossaryH1 = findHeading('Glossary/Index', 1, crStart);
-  const settingH1 = findHeading('Wellspring Setting Start Guide', 1, glossaryH1);
+  const crStart = findHeading("Wellspring Core Rules", 1);
+  const glossaryH1 = findHeading("Glossary/Index", 1, crStart);
+  const settingH1 = findHeading("Wellspring Setting Start Guide", 1, glossaryH1);
   const crEnd = settingH1 === -1 ? nodes.length : settingH1;
 
   // (1) Top-level sections: each H1 between crStart and glossaryH1
@@ -2118,10 +2479,16 @@ function parseCoreRules() {
   let i = crStart + 1;
   while (i < glossaryH1) {
     const n = nodes[i];
-    if (n.type !== 'heading' || n.level !== 1) { i++; continue; }
-    if (!n.text) { i++; continue; }
+    if (n.type !== "heading" || n.level !== 1) {
+      i++;
+      continue;
+    }
+    if (!n.text) {
+      i++;
+      continue;
+    }
 
-    const secEnd = nodes.findIndex((m, j) => j > i && m.type === 'heading' && m.level === 1);
+    const secEnd = nodes.findIndex((m, j) => j > i && m.type === "heading" && m.level === 1);
     const end = secEnd === -1 ? glossaryH1 : Math.min(secEnd, glossaryH1);
 
     sections.push({
@@ -2139,11 +2506,11 @@ function parseCoreRules() {
   let j = glossaryH1 + 1;
   while (j < glossEnd) {
     const n = nodes[j];
-    if (n.type === 'heading') break;
-    if (n.type === 'text') {
+    if (n.type === "heading") break;
+    if (n.type === "text") {
       const m = n.text.match(/^([A-Z][A-Za-z '\/\-]{1,40}?):\s+(.+)$/);
       if (m) glossary.push({ term: m[1].trim(), definition: m[2].trim() });
-      else if (glossary.length) glossary[glossary.length - 1].definition += ' ' + n.text;
+      else if (glossary.length) glossary[glossary.length - 1].definition += " " + n.text;
     }
     j++;
   }
@@ -2152,8 +2519,11 @@ function parseCoreRules() {
 }
 
 const coreRules = parseCoreRules();
-write('core-rules.json', coreRules.sections.map(s => ({ heading: s.heading, content: s.content })));
-write('glossary.json', coreRules.glossary);
+write(
+  "core-rules.json",
+  coreRules.sections.map((s) => ({ heading: s.heading, content: s.content })),
+);
+write("glossary.json", coreRules.glossary);
 
 // Additional H1 blocks outside the Core Rules range whose H2/H3/H4/H5 children
 // are referenced heavily from other entity bodies and so are worth extracting.
@@ -2174,14 +2544,14 @@ function collectExtraSections() {
     });
   };
   // Wealth lives between "Wealth" H1 and the next "Crafting (all)" H1.
-  tryRange('Wealth', 'Crafting (all)');
+  tryRange("Wealth", "Crafting (all)");
   // The Crafting Introduction lives between "Crafting (all)" and the first
   // crafting-discipline H1 ("Alchemy").
-  tryRange('Crafting (all)', 'Alchemy');
+  tryRange("Crafting (all)", "Alchemy");
   // Devotions & Divine Beings — the H1 intro (before the per-deity H1s) is
   // the only place "Devotion" as a concept is defined. We pull the intro prose
   // up to the first deity H1 ("The Mother").
-  tryRange('Devotions & Divine Beings', 'The Mother');
+  tryRange("Devotions & Divine Beings", "The Mother");
   return extras;
 }
 const extraSections = collectExtraSections();
@@ -2196,10 +2566,13 @@ const extraSections = collectExtraSections();
 // STATBLOCK_LABEL_NAMES (e.g. "Description", "Effect") are skipped as entries
 // but still descended into.
 
-console.log('\nParsing core rules sub-concepts...');
+console.log("\nParsing core rules sub-concepts...");
 
 function slugify(s) {
-  return s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  return s
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
 }
 
 // Pick the lowest (smallest) heading level present in (start, end). Returns
@@ -2210,7 +2583,7 @@ function nextHeadingLevel(start, end, above) {
   let lvl = null;
   for (let i = start; i < end; i++) {
     const n = nodes[i];
-    if (n.type === 'heading' && n.text && n.level > above) {
+    if (n.type === "heading" && n.text && n.level > above) {
       if (lvl === null || n.level < lvl) lvl = n.level;
     }
   }
@@ -2225,9 +2598,12 @@ function walkHeadings(start, end, level, sectionName) {
   let i = start;
   while (i < end) {
     const n = nodes[i];
-    if (n.type !== 'heading' || n.level !== level || !n.text) { i++; continue; }
+    if (n.type !== "heading" || n.level !== level || !n.text) {
+      i++;
+      continue;
+    }
 
-    const headingEnd = nodes.findIndex((m, j) => j > i && m.type === 'heading' && m.level <= level);
+    const headingEnd = nodes.findIndex((m, j) => j > i && m.type === "heading" && m.level <= level);
     const eEnd = headingEnd === -1 ? end : Math.min(headingEnd, end);
 
     if (STATBLOCK_LABEL_NAMES.has(n.text)) {
@@ -2240,15 +2616,13 @@ function walkHeadings(start, end, level, sectionName) {
     }
 
     // Description: prose nodes between this heading and the first deeper heading.
-    const firstChild = nodes.findIndex((m, j) => j > i && j < eEnd && m.type === 'heading' && m.level > level);
+    const firstChild = nodes.findIndex((m, j) => j > i && j < eEnd && m.type === "heading" && m.level > level);
     const proseEnd = firstChild === -1 ? eEnd : firstChild;
     const description = bodyBetween(i + 1, proseEnd);
 
     // Recurse into the next existing deeper level (not necessarily level+1).
     const childLevel = nextHeadingLevel(i + 1, eEnd, level);
-    const subConcepts = childLevel !== null
-      ? walkHeadings(i + 1, eEnd, childLevel, n.text)
-      : [];
+    const subConcepts = childLevel !== null ? walkHeadings(i + 1, eEnd, childLevel, n.text) : [];
 
     entries.push({
       name: n.text,
@@ -2263,7 +2637,9 @@ function walkHeadings(start, end, level, sectionName) {
 
 function parseSubConcepts(sections) {
   const buckets = {};
-  const push = (bucket, entry) => { (buckets[bucket] ??= []).push(entry); };
+  const push = (bucket, entry) => {
+    (buckets[bucket] ??= []).push(entry);
+  };
 
   for (const section of sections) {
     if (SKIP_SECTIONS.has(section.heading)) continue;
@@ -2275,11 +2651,9 @@ function parseSubConcepts(sections) {
     // Enter at the next existing deeper heading level (skips missing levels —
     // e.g. an H1 with H3 children but no H2).
     const childLevel = nextHeadingLevel(nodeStart, nodeEnd, 1);
-    const entries = childLevel !== null
-      ? walkHeadings(nodeStart + 1, nodeEnd, childLevel, section.heading)
-      : [];
+    const entries = childLevel !== null ? walkHeadings(nodeStart + 1, nodeEnd, childLevel, section.heading) : [];
     if (entries.length) {
-      entries.forEach(e => push(bucket, e));
+      entries.forEach((e) => push(bucket, e));
       continue;
     }
     // No child headings at all (e.g. Wealth, whose only H2s are stat-block
@@ -2317,11 +2691,14 @@ function splitDemotedHeadings(entries) {
           const before = out.description.slice(0, dupStart).trim();
           const splitOff = out.description.slice(dupStart + term.length + 1).trim();
           out.description = before;
-          out.subConcepts = [...(out.subConcepts || []), {
-            name: term,
-            section: e.section,
-            description: splitOff,
-          }];
+          out.subConcepts = [
+            ...(out.subConcepts || []),
+            {
+              name: term,
+              section: e.section,
+              description: splitOff,
+            },
+          ];
         }
       }
     }
@@ -2338,46 +2715,53 @@ for (const [bucket, entries] of Object.entries(subConcepts).sort(([a], [b]) => a
 // H1 sections with no heading children. Content is keyword\nprose pairs.
 // We parse the text nodes directly.
 
-console.log('\nParsing effects / conditions / types...');
+console.log("\nParsing effects / conditions / types...");
 
 function parseKeywordSection(headingText, endHeadingText) {
-  const crStart = findHeading('Wellspring Core Rules', 1);
+  const crStart = findHeading("Wellspring Core Rules", 1);
   // Search without level restriction — Effects/Conditions/Types are H1,
   // Defense Calls/Modifiers are H2. Always search from within core rules.
-  const start = nodes.findIndex((n, i) =>
-    i > crStart && n.type === 'heading' && n.text === headingText
-  );
+  const start = nodes.findIndex((n, i) => i > crStart && n.type === "heading" && n.text === headingText);
   if (start === -1) return [];
   const startLevel = nodes[start].level;
   const endNode = endHeadingText ? findHeading(endHeadingText, null, start) : -1;
-  const end = endNode !== -1
-    ? endNode
-    : nodes.findIndex((n, i) => i > start && n.type === 'heading' && n.level <= startLevel);
+  const end =
+    endNode !== -1 ? endNode : nodes.findIndex((n, i) => i > start && n.type === "heading" && n.level <= startLevel);
 
-  const textNodes = nodes.slice(start + 1, end === -1 ? nodes.length : end)
-    .filter(n => n.type === 'text' || n.type === 'list');
+  const textNodes = nodes
+    .slice(start + 1, end === -1 ? nodes.length : end)
+    .filter((n) => n.type === "text" || n.type === "list");
 
   // Keyword line: short, title-case, no terminal punctuation.
-  const isKeyword = t =>
-    t.length <= 50 && /^[A-Z\[]/.test(t) && !/[.!?,):]\s*$/.test(t) && !/^The\s/.test(t);
+  const isKeyword = (t) => t.length <= 50 && /^[A-Z\[]/.test(t) && !/[.!?,):]\s*$/.test(t) && !/^The\s/.test(t);
 
   const byName = new Map();
   let i = 0;
   // Skip intro sentence (ends with period)
-  while (i < textNodes.length && textNodes[i].type === 'text' && /[.!?]$/.test(textNodes[i].text)) i++;
+  while (i < textNodes.length && textNodes[i].type === "text" && /[.!?]$/.test(textNodes[i].text)) i++;
 
   while (i < textNodes.length) {
     const n = textNodes[i];
-    if (n.type === 'list') { i++; continue; }
+    if (n.type === "list") {
+      i++;
+      continue;
+    }
     const keyword = n.text;
-    if (!isKeyword(keyword)) { i++; continue; }
+    if (!isKeyword(keyword)) {
+      i++;
+      continue;
+    }
     i++;
 
     // Definition: following text nodes until next keyword
     const def = [];
     while (i < textNodes.length) {
       const m = textNodes[i];
-      if (m.type === 'list') { def.push(m.items.join(' ')); i++; continue; }
+      if (m.type === "list") {
+        def.push(m.items.join(" "));
+        i++;
+        continue;
+      }
       if (isKeyword(m.text)) break;
       def.push(m.text);
       i++;
@@ -2385,17 +2769,18 @@ function parseKeywordSection(headingText, endHeadingText) {
     if (!def.length) continue;
 
     // Stem: strip leading/trailing bracketed params and connective words
-    const stem = keyword
-      .replace(/^\[[^\]]+\]\s*/, '')
-      .replace(/\s*\[.*$/, '')
-      .replace(/\s+(to|or|vs\.?|Plus)\s*$/i, '')
-      .trim() || keyword;
+    const stem =
+      keyword
+        .replace(/^\[[^\]]+\]\s*/, "")
+        .replace(/\s*\[.*$/, "")
+        .replace(/\s+(to|or|vs\.?|Plus)\s*$/i, "")
+        .trim() || keyword;
 
     if (!byName.has(stem)) {
-      byName.set(stem, { name: stem, variants: [], description: def.join(' ') });
+      byName.set(stem, { name: stem, variants: [], description: def.join(" ") });
     }
     const entry = byName.get(stem);
-    if (keyword !== stem) entry.variants.push({ form: keyword, description: def.join(' ') });
+    if (keyword !== stem) entry.variants.push({ form: keyword, description: def.join(" ") });
   }
 
   for (const entry of byName.values()) {
@@ -2406,23 +2791,26 @@ function parseKeywordSection(headingText, endHeadingText) {
   return [...byName.values()];
 }
 
-write('effects.json',    parseKeywordSection('Effects', 'Stacking Effects'));
-write('conditions.json', parseKeywordSection('Conditions', 'Types'));
-write('types.json',      parseKeywordSection('Types', 'Items'));
+write("effects.json", parseKeywordSection("Effects", "Stacking Effects"));
+write("conditions.json", parseKeywordSection("Conditions", "Types"));
+write("types.json", parseKeywordSection("Types", "Items"));
 // Defense Calls and Modifiers are H2s with H3 children — parse structurally.
 function parseH3Concepts(headingText) {
-  const crStart = findHeading('Wellspring Core Rules', 1);
-  const h2 = nodes.findIndex((n, i) => i > crStart && n.type === 'heading' && n.text === headingText);
+  const crStart = findHeading("Wellspring Core Rules", 1);
+  const h2 = nodes.findIndex((n, i) => i > crStart && n.type === "heading" && n.text === headingText);
   if (h2 === -1) return [];
   const h2Level = nodes[h2].level;
-  const h2End = nodes.findIndex((n, i) => i > h2 && n.type === 'heading' && n.level <= h2Level);
+  const h2End = nodes.findIndex((n, i) => i > h2 && n.type === "heading" && n.level <= h2Level);
   const end = h2End === -1 ? nodes.length : h2End;
   const out = [];
   let i = h2 + 1;
   while (i < end) {
     const n = nodes[i];
-    if (n.type !== 'heading' || n.level !== h2Level + 1 || !n.text) { i++; continue; }
-    const entryEnd = nodes.findIndex((m, j) => j > i && m.type === 'heading' && m.level <= n.level);
+    if (n.type !== "heading" || n.level !== h2Level + 1 || !n.text) {
+      i++;
+      continue;
+    }
+    const entryEnd = nodes.findIndex((m, j) => j > i && m.type === "heading" && m.level <= n.level);
     const eEnd = entryEnd === -1 ? end : Math.min(entryEnd, end);
     const description = bodyBetween(i + 1, eEnd);
     out.push({ name: n.text, variants: [], description });
@@ -2430,27 +2818,27 @@ function parseH3Concepts(headingText) {
   }
   return out;
 }
-write('defense-calls.json', parseH3Concepts('Defense Calls'));
-write('modifiers.json',  parseH3Concepts('Modifiers'));
+write("defense-calls.json", parseH3Concepts("Defense Calls"));
+write("modifiers.json", parseH3Concepts("Modifiers"));
 
 // ─── ACCENTS ─────────────────────────────────────────────────────────────────
 // Under the "Accent" H2 within Core Rules. Each line: "Name [Elemental] - desc"
 
-console.log('\nParsing accents...');
+console.log("\nParsing accents...");
 
 function parseAccents() {
-  const crStart = findHeading('Wellspring Core Rules', 1);
-  const accentH2 = nodes.findIndex((n, i) =>
-    i > crStart && n.type === 'heading' && n.level === 2 && n.text === 'Accent'
+  const crStart = findHeading("Wellspring Core Rules", 1);
+  const accentH2 = nodes.findIndex(
+    (n, i) => i > crStart && n.type === "heading" && n.level === 2 && n.text === "Accent",
   );
   if (accentH2 === -1) return [];
-  const accentEnd = nodes.findIndex((n, i) => i > accentH2 && n.type === 'heading' && n.level <= 2);
+  const accentEnd = nodes.findIndex((n, i) => i > accentH2 && n.type === "heading" && n.level <= 2);
   const end = accentEnd === -1 ? nodes.length : accentEnd;
 
   const out = [];
   for (let i = accentH2 + 1; i < end; i++) {
     const n = nodes[i];
-    if (n.type !== 'text') continue;
+    if (n.type !== "text") continue;
     // "Agony - Wracking pain..." or "Acid [Elemental] - Caustic..."
     const m = n.text.match(/^(.+?)(?:\s*(\[Elemental\]))?\s+-\s+(.+)$/);
     if (!m) continue;
@@ -2459,42 +2847,43 @@ function parseAccents() {
   return out;
 }
 
-write('accents.json', parseAccents());
+write("accents.json", parseAccents());
 
 // ─── CRAFTING RESOURCES ───────────────────────────────────────────────────────
 // H2 "Crafting Resources List" under Crafting (all). Entries: H3 "Name (Tier)"
 // or inline "Name (Tier)\nDescription" text.
 
-console.log('\nParsing crafting resources...');
+console.log("\nParsing crafting resources...");
 
 function parseResources() {
-  const craftingH1 = findHeading('Crafting (all)', 1);
-  const resourcesH2 = nodes.findIndex((n, i) =>
-    i > craftingH1 && n.type === 'heading' && n.level === 2 && n.text === 'Crafting Resources List'
+  const craftingH1 = findHeading("Crafting (all)", 1);
+  const resourcesH2 = nodes.findIndex(
+    (n, i) => i > craftingH1 && n.type === "heading" && n.level === 2 && n.text === "Crafting Resources List",
   );
   if (resourcesH2 === -1) return [];
-  const resourcesEnd = nodes.findIndex((n, i) => i > resourcesH2 && n.type === 'heading' && n.level <= 2);
+  const resourcesEnd = nodes.findIndex((n, i) => i > resourcesH2 && n.type === "heading" && n.level <= 2);
   const end = resourcesEnd === -1 ? nodes.length : resourcesEnd;
 
   const out = [];
   for (let i = resourcesH2 + 1; i < end; i++) {
     const n = nodes[i];
-    if (n.type !== 'text') continue;
+    if (n.type !== "text") continue;
     // Resources export as "Name (Tier)Description" concatenated in one text node.
     // Split on the (Tier) boundary.
     const m = n.text.match(/^(.+?)\s*\((Basic|Uncommon|Advanced)\)\s*(.*)$/);
     if (!m) continue;
-    const name = m[1].trim(), tier = m[2];
+    const name = m[1].trim(),
+      tier = m[2];
     let description = m[3].trim();
     // Continuation nodes follow until the next resource or heading
     let j = i + 1;
     while (j < end) {
       const next = nodes[j];
-      if (next.type === 'heading') break;
-      if (next.type === 'text') {
+      if (next.type === "heading") break;
+      if (next.type === "text") {
         if (/\((Basic|Uncommon|Advanced)\)/.test(next.text)) break;
         if (/^Named Resources/i.test(next.text)) break;
-        description += (description ? ' ' : '') + next.text;
+        description += (description ? " " : "") + next.text;
       }
       j++;
     }
@@ -2506,64 +2895,86 @@ function parseResources() {
   out.push({
     name: "Mote of Power",
     tier: "Named",
-    description: "A rare, unique named resource required for Greater Enchanting. May not be substituted."
+    description: "A rare, unique named resource required for Greater Enchanting. May not be substituted.",
   });
 
   return out;
 }
 
-write('resources.json', parseResources());
+write("resources.json", parseResources());
 
 // ─── CRAFTING CONCEPTS ────────────────────────────────────────────────────────
 // H2 sections under each discipline H1 (Alchemy/Enchanting/Tinkering), before
 // the recipe list H2s. The discipline name is the parent H1 text.
 
-console.log('\nParsing crafting concepts...');
+console.log("\nParsing crafting concepts...");
 
-const RECIPE_SECTION_RE = /^(Apprentice|Journeyman|Greater)\s+(Alchemy Recipes|Enchanting Formulae|Tinkering Schematics)$/;
+const RECIPE_SECTION_RE =
+  /^(Apprentice|Journeyman|Greater)\s+(Alchemy Recipes|Enchanting Formulae|Tinkering Schematics)$/;
 const RECIPE_FIELD_NOISE = new Set([
-  'Application', 'Quaff', 'Topical', 'Ingest', 'Component',
-  'Crafting Materials', 'Uses Per Batch', 'Expiration', 'Crafting Process',
-  'Description', 'Effect', 'Recipes/Formulae/Schematics', 'Introduction',
-  'Turn of the Hourglass', 'Item Cards', 'Ashbin', 'Dark Territory',
-  'Crafting Resources List', 'Named Resources', 'Alchemy', 'Enchanting', 'Tinkering',
+  "Application",
+  "Quaff",
+  "Topical",
+  "Ingest",
+  "Component",
+  "Crafting Materials",
+  "Uses Per Batch",
+  "Expiration",
+  "Crafting Process",
+  "Description",
+  "Effect",
+  "Recipes/Formulae/Schematics",
+  "Introduction",
+  "Turn of the Hourglass",
+  "Item Cards",
+  "Ashbin",
+  "Dark Territory",
+  "Crafting Resources List",
+  "Named Resources",
+  "Alchemy",
+  "Enchanting",
+  "Tinkering",
 ]);
 
 function parseCraftingConcepts() {
-  const craftingH1 = findHeading('Crafting (all)', 1);
-  const ritualH1 = findHeading('Rituals', 1, craftingH1);
+  const craftingH1 = findHeading("Crafting (all)", 1);
+  const ritualH1 = findHeading("Rituals", 1, craftingH1);
   const out = [];
 
-  const disciplines = ['Alchemy', 'Enchanting', 'Tinkering'];
+  const disciplines = ["Alchemy", "Enchanting", "Tinkering"];
   for (const disc of disciplines) {
     const discH1 = findHeading(disc, 1, craftingH1);
     if (discH1 === -1 || discH1 >= ritualH1) continue;
-    const discEnd = nodes.findIndex((n, i) =>
-      i > discH1 && n.type === 'heading' && n.level === 1
-    );
+    const discEnd = nodes.findIndex((n, i) => i > discH1 && n.type === "heading" && n.level === 1);
     const dEnd = discEnd === -1 ? ritualH1 : Math.min(discEnd, ritualH1);
 
     // Concept H2s are those before the first recipe-list H2
-    const firstRecipeH2 = nodes.findIndex((n, i) =>
-      i > discH1 && i < dEnd && n.type === 'heading' && n.level === 2 && RECIPE_SECTION_RE.test(n.text)
+    const firstRecipeH2 = nodes.findIndex(
+      (n, i) => i > discH1 && i < dEnd && n.type === "heading" && n.level === 2 && RECIPE_SECTION_RE.test(n.text),
     );
     const conceptEnd = firstRecipeH2 === -1 ? dEnd : firstRecipeH2;
 
     let i = discH1 + 1;
     while (i < conceptEnd) {
       const n = nodes[i];
-      if (n.type !== 'heading' || n.level !== 2 || !n.text || RECIPE_FIELD_NOISE.has(n.text)) { i++; continue; }
+      if (n.type !== "heading" || n.level !== 2 || !n.text || RECIPE_FIELD_NOISE.has(n.text)) {
+        i++;
+        continue;
+      }
 
-      const conceptH2End = nodes.findIndex((m, j) => j > i && m.type === 'heading' && m.level <= 2);
+      const conceptH2End = nodes.findIndex((m, j) => j > i && m.type === "heading" && m.level <= 2);
       const cEnd = conceptH2End === -1 ? conceptEnd : Math.min(conceptH2End, conceptEnd);
 
       const subNodes = nodes.slice(i + 1, cEnd);
-      const prose = subNodes.filter(m => m.type === 'text').map(m => m.text).join(' ');
-      const tools = subNodes.filter(m => m.type === 'list').flatMap(m => m.items);
+      const prose = subNodes
+        .filter((m) => m.type === "text")
+        .map((m) => m.text)
+        .join(" ");
+      const tools = subNodes.filter((m) => m.type === "list").flatMap((m) => m.items);
 
       // Fold the list into the description so the detail pane reads complete (the
       // list usually follows a "…the following:" colon). Keep `tools` for structure.
-      const description = tools.length ? `${prose} ${tools.map((t) => `• ${t}`).join(' ')}`.trim() : prose;
+      const description = tools.length ? `${prose} ${tools.map((t) => `• ${t}`).join(" ")}`.trim() : prose;
       const concept = { name: n.text, discipline: disc, description };
       if (tools.length) concept.tools = tools;
       out.push(concept);
@@ -2573,55 +2984,73 @@ function parseCraftingConcepts() {
   return out;
 }
 
-write('crafting-concepts.json', parseCraftingConcepts());
+write("crafting-concepts.json", parseCraftingConcepts());
 
 // ─── RITUAL CONCEPTS ──────────────────────────────────────────────────────────
 // H3/H4 concepts under the "Rituals" H1 preamble (before "Ritual Magic" H1).
 
-console.log('\nParsing ritual concepts...');
+console.log("\nParsing ritual concepts...");
 
 function parseRitualConcepts() {
-  const ritualsH1 = findHeading('Rituals', 1);
-  const ritualMagicH1 = findHeading('Ritual Magic', 1, ritualsH1);
+  const ritualsH1 = findHeading("Rituals", 1);
+  const ritualMagicH1 = findHeading("Ritual Magic", 1, ritualsH1);
   const end = ritualMagicH1 === -1 ? nodes.length : ritualMagicH1;
 
   const RITUAL_FIELD_NOISE = new Set([
-    'Expiration', 'Target', 'Required Components', 'Tools Used',
-    'Other Requirements', 'Location', 'Effect', 'Ritual Process',
-    'Dark Territory', 'Dark Territory Suit', 'Dark Territory Marshal Required',
+    "Expiration",
+    "Target",
+    "Required Components",
+    "Tools Used",
+    "Other Requirements",
+    "Location",
+    "Effect",
+    "Ritual Process",
+    "Dark Territory",
+    "Dark Territory Suit",
+    "Dark Territory Marshal Required",
   ]);
 
   const out = [];
   let i = ritualsH1 + 1;
   while (i < end) {
     const n = nodes[i];
-    if (n.type !== 'heading' || (n.level !== 3 && n.level !== 4) || !n.text || RITUAL_FIELD_NOISE.has(n.text)) { i++; continue; }
+    if (n.type !== "heading" || (n.level !== 3 && n.level !== 4) || !n.text || RITUAL_FIELD_NOISE.has(n.text)) {
+      i++;
+      continue;
+    }
 
-    const conceptEnd = nodes.findIndex((m, j) => j > i && m.type === 'heading' && m.level <= n.level);
+    const conceptEnd = nodes.findIndex((m, j) => j > i && m.type === "heading" && m.level <= n.level);
     const cEnd = conceptEnd === -1 ? end : Math.min(conceptEnd, end);
 
     // Description = prose between this heading and its first deeper child
     // (so children like H4 "Primary Ritualist" under H3 "Ritualists" aren't
     // swallowed into the parent's description).
-    const firstChild = nodes.findIndex((m, j) => j > i && j < cEnd && m.type === 'heading' && m.level > n.level);
+    const firstChild = nodes.findIndex((m, j) => j > i && j < cEnd && m.type === "heading" && m.level > n.level);
     const proseEnd = firstChild === -1 ? cEnd : firstChild;
     const proseNodes = nodes.slice(i + 1, proseEnd);
     // A concept's body may include a small table (e.g. Ritual Point Options): fold
     // 'cell' text into the prose alongside 'text' nodes so it isn't lost.
-    const prose = proseNodes.filter(m => m.type === 'text' || m.type === 'cell').map(m => m.text).join(' ');
-    const bullets = proseNodes.filter(m => m.type === 'list').flatMap(m => m.items);
+    const prose = proseNodes
+      .filter((m) => m.type === "text" || m.type === "cell")
+      .map((m) => m.text)
+      .join(" ");
+    const bullets = proseNodes.filter((m) => m.type === "list").flatMap((m) => m.items);
 
     // Sub-concepts: deeper headings inside this concept's range.
     const subConcepts = [];
     let k = firstChild === -1 ? cEnd : firstChild;
     while (k < cEnd) {
       const m = nodes[k];
-      if (m.type === 'heading' && m.level > n.level && m.text && !RITUAL_FIELD_NOISE.has(m.text)) {
-        const subEnd = nodes.findIndex((x, l) => l > k && x.type === 'heading' && x.level <= m.level);
+      if (m.type === "heading" && m.level > n.level && m.text && !RITUAL_FIELD_NOISE.has(m.text)) {
+        const subEnd = nodes.findIndex((x, l) => l > k && x.type === "heading" && x.level <= m.level);
         const sEnd = subEnd === -1 ? cEnd : Math.min(subEnd, cEnd);
         subConcepts.push({
           name: m.text,
-          description: nodes.slice(k + 1, sEnd).filter(x => x.type === 'text' || x.type === 'cell').map(x => x.text).join(' '),
+          description: nodes
+            .slice(k + 1, sEnd)
+            .filter((x) => x.type === "text" || x.type === "cell")
+            .map((x) => x.text)
+            .join(" "),
         });
         k = sEnd;
       } else {
@@ -2632,9 +3061,7 @@ function parseRitualConcepts() {
     // Fold the bullet list into the description so the detail pane reads complete
     // (the list often follows a "…below:" colon). Keep `bullets` too for any
     // structured use.
-    const fullDesc = bullets.length
-      ? `${prose} ${bullets.map((b) => `• ${b}`).join(' ')}`.trim()
-      : prose;
+    const fullDesc = bullets.length ? `${prose} ${bullets.map((b) => `• ${b}`).join(" ")}`.trim() : prose;
     const concept = { name: n.text, description: fullDesc };
     if (bullets.length) concept.bullets = bullets;
     if (subConcepts.length) concept.subConcepts = subConcepts;
@@ -2644,6 +3071,6 @@ function parseRitualConcepts() {
   return out;
 }
 
-write('ritual-concepts.json', parseRitualConcepts());
+write("ritual-concepts.json", parseRitualConcepts());
 
-console.log('\nDone.');
+console.log("\nDone.");

@@ -1,46 +1,46 @@
-import { CRAFTING, RITUALS } from './data.js';
+import { CRAFTING, RITUALS } from "./data.js";
 
 // Helper to normalize resource names
 export function normalizeResourceName(name) {
-  name = name.trim().replace(/\s+/g, ' ');
+  name = name.trim().replace(/\s+/g, " ");
   // Strip parentheticals
-  name = name.replace(/\([^)]*\)/g, '').trim();
+  name = name.replace(/\([^)]*\)/g, "").trim();
   // Strip annotations like "Optional:", "per Participant", "and Six Basic Resources", etc.
-  name = name.replace(/^(Optional:)\s*/i, '');
-  name = name.replace(/\s+per\s+.*$/i, '');
-  name = name.replace(/\s+worth\s+.*$/i, '');
+  name = name.replace(/^(Optional:)\s*/i, "");
+  name = name.replace(/\s+per\s+.*$/i, "");
+  name = name.replace(/\s+worth\s+.*$/i, "");
   // Strip volume units that aren't part of the resource name
-  name = name.replace(/^(?:bags?\s+of|blocks?\s+of)\s+/i, '');
-  
+  name = name.replace(/^(?:bags?\s+of|blocks?\s+of)\s+/i, "");
+
   // Plurals to singular
-  if (name.toLowerCase() === 'blooms') name = 'Bloom';
-  if (name.toLowerCase() === 'hides') name = 'Hide';
-  if (name.toLowerCase() === 'ingots') name = 'Ingot';
-  if (name.toLowerCase() === 'night prizes') name = 'Night Prize';
-  if (name.toLowerCase() === 'rare minerals') name = 'Rare Mineral';
-  if (name.toLowerCase() === 'ritual powders') name = 'Ritual Powder';
-  if (name.toLowerCase() === 'ritual wands') name = 'Ritual Wand';
-  if (name.toLowerCase() === 'life points') name = 'Life Point';
-  if (name.toLowerCase() === 'wealth') name = 'Wealth';
-  if (name.toLowerCase() === 'motes of power') name = 'Mote of Power';
+  if (name.toLowerCase() === "blooms") name = "Bloom";
+  if (name.toLowerCase() === "hides") name = "Hide";
+  if (name.toLowerCase() === "ingots") name = "Ingot";
+  if (name.toLowerCase() === "night prizes") name = "Night Prize";
+  if (name.toLowerCase() === "rare minerals") name = "Rare Mineral";
+  if (name.toLowerCase() === "ritual powders") name = "Ritual Powder";
+  if (name.toLowerCase() === "ritual wands") name = "Ritual Wand";
+  if (name.toLowerCase() === "life points") name = "Life Point";
+  if (name.toLowerCase() === "wealth") name = "Wealth";
+  if (name.toLowerCase() === "motes of power") name = "Mote of Power";
 
   // Normalize casing for known resources
   const lower = name.toLowerCase();
-  if (lower === 'bloom') return 'Bloom';
-  if (lower === 'hide') return 'Hide';
-  if (lower === 'ingot') return 'Ingot';
-  if (lower === 'night prize') return 'Night Prize';
-  if (lower === 'harvest') return 'Harvest';
-  if (lower === 'rare mineral') return 'Rare Mineral';
-  if (lower === 'golden blossom') return 'Golden Blossom';
-  if (lower === 'raw scale') return 'Raw Scale';
-  if (lower === 'mithril bar') return 'Mithril Bar';
-  if (lower === 'enchanted hyperium') return 'Enchanted Hyperium';
-  if (lower === 'life point') return 'Life Point';
-  if (lower === 'wealth') return 'Wealth';
-  if (lower === 'ritual powder') return 'Ritual Powder';
-  if (lower === 'ritual wand') return 'Ritual Wand';
-  if (lower === 'mote of power') return 'Mote of Power';
+  if (lower === "bloom") return "Bloom";
+  if (lower === "hide") return "Hide";
+  if (lower === "ingot") return "Ingot";
+  if (lower === "night prize") return "Night Prize";
+  if (lower === "harvest") return "Harvest";
+  if (lower === "rare mineral") return "Rare Mineral";
+  if (lower === "golden blossom") return "Golden Blossom";
+  if (lower === "raw scale") return "Raw Scale";
+  if (lower === "mithril bar") return "Mithril Bar";
+  if (lower === "enchanted hyperium") return "Enchanted Hyperium";
+  if (lower === "life point") return "Life Point";
+  if (lower === "wealth") return "Wealth";
+  if (lower === "ritual powder") return "Ritual Powder";
+  if (lower === "ritual wand") return "Ritual Wand";
+  if (lower === "mote of power") return "Mote of Power";
 
   return name;
 }
@@ -51,7 +51,7 @@ export function parseSingleComponent(part) {
   if (!part) return null;
   const match = part.match(/^(\d+|\+?\[[a-zA-Z]\]|\d+\+)\s*(.*)$/);
   if (match) {
-    const qtyStr = match[1].replace('+', '');
+    const qtyStr = match[1].replace("+", "");
     let qty = parseInt(qtyStr, 10);
     if (isNaN(qty)) qty = 1;
     const name = normalizeResourceName(match[2]);
@@ -67,14 +67,14 @@ export function parseSingleComponent(part) {
 export function parseRequirements(str) {
   if (!str) return [];
   str = str.trim();
-  
+
   // 1. Bracketed or-groups: e.g. "[3 Bloom, 1 Harvest] or [6 Bloom, 2 Harvest]"
-  if (str.includes('[') && str.toLowerCase().includes('or')) {
-    const bracketMatches = [...str.matchAll(/\[([^\]]+)\]/g)].map(m => m[1]);
+  if (str.includes("[") && str.toLowerCase().includes("or")) {
+    const bracketMatches = [...str.matchAll(/\[([^\]]+)\]/g)].map((m) => m[1]);
     if (bracketMatches.length > 0) {
-      return bracketMatches.map(groupStr => {
+      return bracketMatches.map((groupStr) => {
         const reqs = {};
-        groupStr.split(/,(?![^(]*\))/).forEach(p => {
+        groupStr.split(/,(?![^(]*\))/).forEach((p) => {
           const parsed = parseSingleComponent(p);
           if (parsed) reqs[parsed.name] = (reqs[parsed.name] || 0) + parsed.qty;
         });
@@ -87,11 +87,14 @@ export function parseRequirements(str) {
 
   // 2. Clear lists of single-item alternatives:
   // e.g. "1 Bloom, 1 Night Prize, or 1 Harvest" or "1 Ingot or 1 Hide"
-  if (lowerStr.includes(' or ') && !lowerStr.includes(' and ')) {
-    const parts = str.split(/(?:,(?![^(]*\))|\s+or\s+|\s+OR\s+)+/i).map(p => p.trim()).filter(Boolean);
-    const parsedParts = parts.map(p => parseSingleComponent(p)).filter(Boolean);
+  if (lowerStr.includes(" or ") && !lowerStr.includes(" and ")) {
+    const parts = str
+      .split(/(?:,(?![^(]*\))|\s+or\s+|\s+OR\s+)+/i)
+      .map((p) => p.trim())
+      .filter(Boolean);
+    const parsedParts = parts.map((p) => parseSingleComponent(p)).filter(Boolean);
     if (parsedParts.length === parts.length) {
-      return parsedParts.map(p => ({ [p.name]: p.qty }));
+      return parsedParts.map((p) => ({ [p.name]: p.qty }));
     }
   }
 
@@ -102,17 +105,20 @@ export function parseRequirements(str) {
     const baseStr = bracketOrMatch[1];
     const choicesStr = bracketOrMatch[2];
     const baseReqs = {};
-    baseStr.split(/,(?![^(]*\))/).forEach(p => {
+    baseStr.split(/,(?![^(]*\))/).forEach((p) => {
       const parsed = parseSingleComponent(p);
       if (parsed) baseReqs[parsed.name] = (baseReqs[parsed.name] || 0) + parsed.qty;
     });
-    
+
     // Parse choices
-    const choices = choicesStr.split(/\s+or\s+/i).map(c => parseSingleComponent(c)).filter(Boolean);
+    const choices = choicesStr
+      .split(/\s+or\s+/i)
+      .map((c) => parseSingleComponent(c))
+      .filter(Boolean);
     if (choices.length > 0) {
-      return choices.map(c => ({
+      return choices.map((c) => ({
         ...baseReqs,
-        [c.name]: (baseReqs[c.name] || 0) + c.qty
+        [c.name]: (baseReqs[c.name] || 0) + c.qty,
       }));
     }
   }
@@ -120,7 +126,7 @@ export function parseRequirements(str) {
   // 4. Default simple split
   const parts = str.split(/,(?![^(]*\))/);
   const reqs = {};
-  parts.forEach(p => {
+  parts.forEach((p) => {
     const parsed = parseSingleComponent(p);
     if (parsed) reqs[parsed.name] = (reqs[parsed.name] || 0) + parsed.qty;
   });
@@ -129,8 +135,10 @@ export function parseRequirements(str) {
 
 // Parse batch yield from text
 function parseYield(recipe) {
-  const str = String(recipe.usesPerBatch || recipe.yield || '1').toLowerCase().trim();
-  if (str.includes('unlimited')) return 9999;
+  const str = String(recipe.usesPerBatch || recipe.yield || "1")
+    .toLowerCase()
+    .trim();
+  if (str.includes("unlimited")) return 9999;
   const match = str.match(/^(\d+)/);
   if (match) return parseInt(match[1], 10);
   return 1;
@@ -142,26 +150,26 @@ export const RECIPES = new Map();
 for (const r of CRAFTING || []) {
   RECIPES.set(r.name, {
     name: r.name,
-    type: 'crafting',
+    type: "crafting",
     discipline: r.discipline,
     tier: r.tier,
     yield: parseYield(r),
     materialsStr: r.materials,
     requirements: parseRequirements(r.materials),
-    raw: r
+    raw: r,
   });
 }
 
 for (const r of RITUALS || []) {
   RECIPES.set(r.name, {
     name: r.name,
-    type: 'ritual',
-    discipline: 'Ritual Magic',
+    type: "ritual",
+    discipline: "Ritual Magic",
     tier: r.tier,
     yield: 1,
     materialsStr: r.components,
     requirements: parseRequirements(r.components),
-    raw: r
+    raw: r,
   });
 }
 
@@ -178,7 +186,10 @@ export function resolveRecipe(name) {
   let key = Array.from(RECIPES.keys()).find((k) => k.toLowerCase() === want);
   if (key) return RECIPES.get(key);
   // Parameterized form: take the segment before the first " - " / " – " dash.
-  const base = name.split(/\s+[-–]\s+/)[0].trim().toLowerCase();
+  const base = name
+    .split(/\s+[-–]\s+/)[0]
+    .trim()
+    .toLowerCase();
   if (base && base !== want) {
     key = Array.from(RECIPES.keys()).find((k) => k.toLowerCase() === base);
     if (key) return RECIPES.get(key);
@@ -191,8 +202,8 @@ export function resolveRecipe(name) {
 export function classifyIngredient(name) {
   const recipe = resolveRecipe(name);
   return recipe
-    ? { kind: 'crafted', recipe, canonical: recipe.name }
-    : { kind: 'raw', recipe: null, canonical: normalizeResourceName(name) };
+    ? { kind: "crafted", recipe, canonical: recipe.name }
+    : { kind: "raw", recipe: null, canonical: normalizeResourceName(name) };
 }
 
 // Build list of reverse lookups (which recipes use each resource as an ingredient)
@@ -216,23 +227,23 @@ for (const recipe of RECIPES.values()) {
 export function solveCrafting(targetName, targetQty, inventory, path = []) {
   const currentInv = { ...inventory };
   const targetLower = targetName.toLowerCase();
-  
+
   // Find matching key in inventory (case insensitive)
-  const invKey = Object.keys(currentInv).find(k => k.toLowerCase() === targetLower);
+  const invKey = Object.keys(currentInv).find((k) => k.toLowerCase() === targetLower);
   const available = invKey ? currentInv[invKey] : 0;
-  
+
   if (available >= targetQty) {
     if (invKey) currentInv[invKey] -= targetQty;
     return {
       success: true,
       inventory: currentInv,
-      steps: [{ item: targetName, qty: targetQty, source: 'inventory' }]
+      steps: [{ item: targetName, qty: targetQty, source: "inventory" }],
     };
   }
-  
+
   // We need to craft the remaining quantity
   const needed = targetQty - available;
-  
+
   // Find recipe for target (exact OR a parameterized "- variant" form, so an
   // ingredient like "Essence Infusion - Energy" recurses into its recipe).
   const recipe = resolveRecipe(targetName);
@@ -240,22 +251,22 @@ export function solveCrafting(targetName, targetQty, inventory, path = []) {
   if (!recipe || path.includes(recipe.name)) {
     return { success: false };
   }
-  
+
   // Deduct whatever was available from inventory first
   if (invKey && available > 0) {
     currentInv[invKey] = 0;
   }
-  
+
   // We need Math.ceil(needed / yield) batches
   const batchYield = recipe.yield;
   const batches = batchYield === 9999 ? 1 : Math.ceil(needed / batchYield);
-  
+
   // Try each alternative requirement set
   for (const reqSet of recipe.requirements) {
     let success = true;
     let tempInv = { ...currentInv };
     const subSteps = [];
-    
+
     for (const [reqName, reqQty] of Object.entries(reqSet)) {
       const totalReqQty = reqQty * batches;
       const subResult = solveCrafting(reqName, totalReqQty, tempInv, [...path, recipe.name]);
@@ -267,7 +278,7 @@ export function solveCrafting(targetName, targetQty, inventory, path = []) {
         break;
       }
     }
-    
+
     if (success) {
       // Crafting succeeded! Add leftover yield to inventory
       const totalCreated = batchYield === 9999 ? needed : batches * batchYield;
@@ -275,18 +286,25 @@ export function solveCrafting(targetName, targetQty, inventory, path = []) {
       if (leftover > 0) {
         tempInv[recipe.name] = (tempInv[recipe.name] || 0) + leftover;
       }
-      
+
       return {
         success: true,
         inventory: tempInv,
         steps: [
           ...subSteps,
-          { item: recipe.name, qty: needed, batches, source: 'crafting', discipline: recipe.discipline, tier: recipe.tier }
-        ]
+          {
+            item: recipe.name,
+            qty: needed,
+            batches,
+            source: "crafting",
+            discipline: recipe.discipline,
+            tier: recipe.tier,
+          },
+        ],
       };
     }
   }
-  
+
   return { success: false };
 }
 
@@ -311,24 +329,30 @@ export function buildCraftTree(name, qty, inventory, path = [], inv = null) {
 
   // Fully covered by inventory.
   if (need <= 0) {
-    return { name, qty, kind: 'have', have: qty, need: 0, children: [] };
+    return { name, qty, kind: "have", have: qty, need: 0, children: [] };
   }
 
   const recipe = resolveRecipe(name);
   if (!recipe || path.includes(recipe.name)) {
     // Raw resource (or an unresolvable / cyclic recipe): a leaf shortfall.
-    return { name, qty, kind: 'raw', have: fromStock, need, children: [] };
+    return { name, qty, kind: "raw", have: fromStock, need, children: [] };
   }
 
   const batchYield = recipe.yield === 9999 ? need : recipe.yield;
   const batches = recipe.yield === 9999 ? 1 : Math.ceil(need / batchYield);
   const reqSet = recipe.requirements[0] || {};
   const children = Object.entries(reqSet).map(([reqName, reqQty]) =>
-    buildCraftTree(reqName, reqQty * batches, stock, [...path, recipe.name], stock)
+    buildCraftTree(reqName, reqQty * batches, stock, [...path, recipe.name], stock),
   );
   return {
-    name, qty, kind: 'crafted', recipe, batches,
-    have: fromStock, need, children,
+    name,
+    qty,
+    kind: "crafted",
+    recipe,
+    batches,
+    have: fromStock,
+    need,
+    children,
   };
 }
 
@@ -345,9 +369,9 @@ export function getRecipeDeficit(recipe, inventory) {
     for (const [name, reqQty] of Object.entries(reqSet)) {
       const targetLower = name.toLowerCase();
       // Look up availability in inventory, or see if it can be crafted
-      const invKey = Object.keys(inventory).find(k => k.toLowerCase() === targetLower);
+      const invKey = Object.keys(inventory).find((k) => k.toLowerCase() === targetLower);
       const available = invKey ? inventory[invKey] : 0;
-      
+
       if (available < reqQty) {
         const missing = reqQty - available;
         missingCount += missing;
@@ -355,14 +379,14 @@ export function getRecipeDeficit(recipe, inventory) {
           name,
           required: reqQty,
           available,
-          missing
+          missing,
         });
       } else {
         deficitItems.push({
           name,
           required: reqQty,
           available,
-          missing: 0
+          missing: 0,
         });
       }
     }
@@ -375,6 +399,6 @@ export function getRecipeDeficit(recipe, inventory) {
 
   return {
     missingCount: minMissingCount,
-    items: closestDeficit || []
+    items: closestDeficit || [],
   };
 }

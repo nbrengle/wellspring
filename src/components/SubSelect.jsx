@@ -62,9 +62,13 @@ export default function SubSelect({
   const Chip = (o) => {
     const isOn = chosen === o.value;
     return (
-      <button key={o.value} type="button" aria-pressed={isOn}
+      <button
+        key={o.value}
+        type="button"
+        aria-pressed={isOn}
         className={`b-subselect-chip ${isOn ? "is-on" : ""}`}
-        onClick={() => onChange(isOn && allowClear ? null : o.value)}>
+        onClick={() => onChange(isOn && allowClear ? null : o.value)}
+      >
         {o.label ?? o.value}
         {o.free && <span className="b-subselect-free">free</span>}
         {o.hint && <span className="b-subselect-hint">{o.hint}</span>}
@@ -77,15 +81,22 @@ export default function SubSelect({
       {prompt && (
         <div className="b-subselect-prompt">
           <span>{prompt}</span>
-          {showBadge && (chosen
-            ? <span className="b-subselect-made">✓ chosen</span>
-            : <span className="b-subselect-badge">Choose</span>)}
+          {showBadge &&
+            (chosen ? (
+              <span className="b-subselect-made">✓ chosen</span>
+            ) : (
+              <span className="b-subselect-badge">Choose</span>
+            ))}
         </div>
       )}
       {searchable && (
-        <input className="b-subselect-search" type="text"
+        <input
+          className="b-subselect-search"
+          type="text"
           placeholder={chosen ? `${chosen} — search to change…` : `Search ${total} options…`}
-          value={q} onChange={(e) => setQ(e.target.value)} />
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+        />
       )}
       <div className={`b-subselect-chips ${searchable ? "is-scroll" : ""}`}>
         {groups.map((g, gi) => {
@@ -103,20 +114,33 @@ export default function SubSelect({
         {customChosen && Chip({ value: chosen, label: chosen })}
 
         {/* "Type your own" — a chip that opens an inline input. */}
-        {allowCustom && (customOpen ? (
-          <input className="b-subselect-custom-input" type="text" autoFocus
-            placeholder={customLabel}
-            defaultValue={customChosen ? chosen : ""}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") { const v = e.target.value.trim(); if (v) onChange(v); setCustomOpen(false); }
-              if (e.key === "Escape") setCustomOpen(false);
-            }}
-            onBlur={(e) => { const v = e.target.value.trim(); if (v) onChange(v); setCustomOpen(false); }} />
-        ) : (
-          <button type="button" className="b-subselect-chip is-custom" onClick={() => setCustomOpen(true)}>
-            ✎ {customLabel}
-          </button>
-        ))}
+        {allowCustom &&
+          (customOpen ? (
+            <input
+              className="b-subselect-custom-input"
+              type="text"
+              autoFocus
+              placeholder={customLabel}
+              defaultValue={customChosen ? chosen : ""}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  const v = e.target.value.trim();
+                  if (v) onChange(v);
+                  setCustomOpen(false);
+                }
+                if (e.key === "Escape") setCustomOpen(false);
+              }}
+              onBlur={(e) => {
+                const v = e.target.value.trim();
+                if (v) onChange(v);
+                setCustomOpen(false);
+              }}
+            />
+          ) : (
+            <button type="button" className="b-subselect-chip is-custom" onClick={() => setCustomOpen(true)}>
+              ✎ {customLabel}
+            </button>
+          ))}
       </div>
     </div>
   );

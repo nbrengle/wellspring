@@ -63,7 +63,7 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: npm run format -- --check
+      - run: npm run format:check
   test-unit:
     runs-on: ubuntu-latest
     steps:
@@ -121,7 +121,19 @@ jobs:
       - run: npm run build
 
   build:
-    needs: [actionlint, lint-js, lint-css, type-check, format-check, test-unit, check-data, test-rules, test-browser, vite-build]
+    needs:
+      [
+        actionlint,
+        lint-js,
+        lint-css,
+        type-check,
+        format-check,
+        test-unit,
+        check-data,
+        test-rules,
+        test-browser,
+        vite-build,
+      ]
     runs-on: ubuntu-latest
     steps:
       - run: echo "All checks passed!"

@@ -1,6 +1,6 @@
-const fs = require('fs');
+const fs = require("fs");
 
-const code = fs.readFileSync('src/hooks/useBuilderHandlers.js', 'utf-8');
+const code = fs.readFileSync("src/hooks/useBuilderHandlers.js", "utf-8");
 
 // I'll extract these manually by using AST parser?
 // Wait, I already have write_to_file. I will just finish extracting identity, lineage, classes, core, UI into smaller files using a quick script.

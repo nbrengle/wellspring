@@ -45,26 +45,35 @@ export default function RepPicker({ title = "Rep a challenge", subtitle, value, 
       .filter(([, cs]) => cs.length > 0);
   }, [lineages, query]);
 
-  const selectedChallenge = useMemo(
-    () => all.find((c) => nameOf(c) === selected) || null,
-    [all, selected],
-  );
+  const selectedChallenge = useMemo(() => all.find((c) => nameOf(c) === selected) || null, [all, selected]);
 
   return (
     <Overlay onClose={onClose} panelClassName="b-picker" ariaLabel={title}>
       <header className="b-picker-head">
         <div>
           <h2 className="b-picker-title">{title}</h2>
-          <p className="b-picker-sub">{subtitle || "Choose a [Repped] physical challenge from another lineage — you earn its Lineage Build Points."}</p>
+          <p className="b-picker-sub">
+            {subtitle ||
+              "Choose a [Repped] physical challenge from another lineage — you earn its Lineage Build Points."}
+          </p>
         </div>
-        <button className="b-picker-x" aria-label="Close" onClick={onClose}>×</button>
+        <button className="b-picker-x" aria-label="Close" onClick={onClose}>
+          ×
+        </button>
       </header>
 
       <div className="b-picker-cols">
         <div className="b-picker-browse">
           <div className="b-picker-controls">
-            <input className="b-picker-search" type="text" aria-label="Search" placeholder="Search challenges…"
-                   value={query} onChange={(e) => setQuery(e.target.value)} autoFocus />
+            <input
+              className="b-picker-search"
+              type="text"
+              aria-label="Search"
+              placeholder="Search challenges…"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              autoFocus
+            />
           </div>
           <div className="b-picker-groups">
             {groups.length === 0 && <p className="b-detail-missing">Nothing matches.</p>}
@@ -78,7 +87,8 @@ export default function RepPicker({ title = "Rep a challenge", subtitle, value, 
                       <li key={`${lin}:${name}`}>
                         <button
                           className={`b-picker-row ${selected === name ? "is-selected" : ""}`}
-                          onClick={() => setSelected(name)}>
+                          onClick={() => setSelected(name)}
+                        >
                           <span className="b-picker-row-name">{name}</span>
                           {subOf(c) && <span className="b-picker-row-tag">{subOf(c)}</span>}
                           <span className="b-picker-row-cost is-award">+{c.lbp} LBP</span>

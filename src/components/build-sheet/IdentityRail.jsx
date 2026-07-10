@@ -9,16 +9,8 @@ const DEFAULT_WEALTH = 8;
 
 export function IdentityRail() {
   const { character, report } = useBuilderState();
-  const {
-    onClickField,
-    onRestart,
-    onSetClassLevel,
-    onRemoveClass,
-    onAddClass,
-    onOpenLineage,
-    onInspect,
-    onSetEvent,
-  } = useBuilderActions();
+  const { onClickField, onRestart, onSetClassLevel, onRemoveClass, onAddClass, onOpenLineage, onInspect, onSetEvent } =
+    useBuilderActions();
   const classes = getClasses(character);
   return (
     <aside className="b-rail b-rail-left">
@@ -182,9 +174,14 @@ export function IdentityRail() {
         </div>
       )}
 
-      {report.spellSlots && Object.entries(report.spellSlots).map(([magicType, slots]) => (
-        <SpellSlotStrip key={magicType} magicType={Object.keys(report.spellSlots).length > 1 ? magicType : null} slots={slots} />
-      ))}
+      {report.spellSlots &&
+        Object.entries(report.spellSlots).map(([magicType, slots]) => (
+          <SpellSlotStrip
+            key={magicType}
+            magicType={Object.keys(report.spellSlots).length > 1 ? magicType : null}
+            slots={slots}
+          />
+        ))}
 
       <BudgetMeter />
 
@@ -208,7 +205,12 @@ function ClassCard({ classes, spec, onSetLevel, onRemove, onAdd, onInspect }) {
         )}
         {classes.map((c, i) => (
           <span key={c.name} className="b-class-row">
-            <button className="b-class-name" onClick={() => onInspect(c.name)} title="Inspect class" style={{ color: CLASS_TONES[c.name] ? `var(--b-${CLASS_TONES[c.name]})` : undefined }}>
+            <button
+              className="b-class-name"
+              onClick={() => onInspect(c.name)}
+              title="Inspect class"
+              style={{ color: CLASS_TONES[c.name] ? `var(--b-${CLASS_TONES[c.name]})` : undefined }}
+            >
               {c.name}
               {i === 0 && spec ? ` (${spec})` : ""}
             </button>
@@ -323,7 +325,7 @@ function SpellSlotStrip({ magicType, slots }) {
   ];
   return (
     <div className="b-spellslots">
-      <span className="b-spellslots-label">{magicType ? `${magicType} Spell Slots` : 'Spell Slots'}</span>
+      <span className="b-spellslots-label">{magicType ? `${magicType} Spell Slots` : "Spell Slots"}</span>
       <div className="b-spellslots-row">
         {tiers.map((t) => (
           <div key={t.key} className={`b-spellslot b-tier-${t.key} ${slots[t.key] ? "" : "is-zero"}`}>
@@ -349,31 +351,49 @@ function PoolTile({ pool, onInspect }) {
   const sources = (max.sources || []).map((s) => ({ name: s.name, n: s.amount, type: "powers" }));
   const refills = pool.refills || [];
   const spends = pool.spends || [];
-  const title = max.total != null
-    ? `${pool.name}: ${max.total} max (${max.base} base${sources.length ? " + permanent boosts" : ""}). Resets each rest.`
-    : `${pool.name}: size depends on rules not yet derivable.`;
+  const title =
+    max.total != null
+      ? `${pool.name}: ${max.total} max (${max.base} base${sources.length ? " + permanent boosts" : ""}). Resets each rest.`
+      : `${pool.name}: size depends on rules not yet derivable.`;
 
-  const powersSection = (refills.length > 0 || spends.length > 0)
-    ? (close) => (
-        <>
-          <h4 className="b-stat-pop-title b-stat-pop-subhead">Interacts with</h4>
-          <ul className="b-pool-powers">
-            {spends.map((p) => (
-              <li key={`s-${p.name}`} className="b-pool-power">
-                <span className="b-pool-power-tag is-spend">spends</span>
-                <button className="b-pool-power-link" onClick={() => { onInspect?.(p.name, null, "powers"); close(); }}>{p.name}</button>
-              </li>
-            ))}
-            {refills.map((p) => (
-              <li key={`r-${p.name}`} className="b-pool-power">
-                <span className="b-pool-power-tag is-refill">refills</span>
-                <button className="b-pool-power-link" onClick={() => { onInspect?.(p.name, null, "powers"); close(); }}>{p.name}</button>
-              </li>
-            ))}
-          </ul>
-        </>
-      )
-    : null;
+  const powersSection =
+    refills.length > 0 || spends.length > 0
+      ? (close) => (
+          <>
+            <h4 className="b-stat-pop-title b-stat-pop-subhead">Interacts with</h4>
+            <ul className="b-pool-powers">
+              {spends.map((p) => (
+                <li key={`s-${p.name}`} className="b-pool-power">
+                  <span className="b-pool-power-tag is-spend">spends</span>
+                  <button
+                    className="b-pool-power-link"
+                    onClick={() => {
+                      onInspect?.(p.name, null, "powers");
+                      close();
+                    }}
+                  >
+                    {p.name}
+                  </button>
+                </li>
+              ))}
+              {refills.map((p) => (
+                <li key={`r-${p.name}`} className="b-pool-power">
+                  <span className="b-pool-power-tag is-refill">refills</span>
+                  <button
+                    className="b-pool-power-link"
+                    onClick={() => {
+                      onInspect?.(p.name, null, "powers");
+                      close();
+                    }}
+                  >
+                    {p.name}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </>
+        )
+      : null;
 
   return (
     <StatWithSources

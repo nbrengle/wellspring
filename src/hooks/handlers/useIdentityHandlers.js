@@ -4,9 +4,12 @@ import { formatParameterizedName } from "../../engine/resolver.js";
 import { MAX_DOMAINS } from "../../engine/validate.js";
 
 export function useIdentityHandlers({ character, setCharacter, setPicking }) {
-  const handleSetName = useCallback((name) => {
-    setCharacter((c) => ({ ...c, name }));
-  }, [setCharacter]);
+  const handleSetName = useCallback(
+    (name) => {
+      setCharacter((c) => ({ ...c, name }));
+    },
+    [setCharacter],
+  );
 
   const handlePickDevotion = useCallback(() => {
     const candidates = DEVOTIONS.map((d) => ({
@@ -27,7 +30,9 @@ export function useIdentityHandlers({ character, setCharacter, setPicking }) {
           // the Worship entry's entityId wherever it sits.
           const updateWorshipSkills = (skills) =>
             (skills || []).map((sk) =>
-              /^worship\b/i.test(sk.entityId) ? { ...sk, entityId: formatParameterizedName("Worship", name, sk.entityId) } : sk,
+              /^worship\b/i.test(sk.entityId)
+                ? { ...sk, entityId: formatParameterizedName("Worship", name, sk.entityId) }
+                : sk,
             );
           return {
             ...c,
@@ -41,24 +46,27 @@ export function useIdentityHandlers({ character, setCharacter, setPicking }) {
     });
   }, [character.devotion, setPicking, setCharacter]);
 
-  const handleToggleDomain = useCallback((domain) => {
-    setCharacter((c) => {
-      const cur = c.divineDomains || [];
-      if (cur.includes(domain)) {
-        const nextDomains = cur.filter((d) => d !== domain);
-        const domPowers = (DOMAINS.find((x) => x.name === domain)?.powers || []).map((p) => p.name);
-        return {
-          ...c,
-          divineDomains: nextDomains,
-          domainPowers: (c.domainPowers || []).filter(
-            (p) => !domPowers.includes(p.replace(/\s*\(.+\)$/, "")) && !domPowers.includes(p),
-          ),
-        };
-      }
-      if (cur.length >= MAX_DOMAINS) return c;
-      return { ...c, divineDomains: [...cur, domain] };
-    });
-  }, [setCharacter]);
+  const handleToggleDomain = useCallback(
+    (domain) => {
+      setCharacter((c) => {
+        const cur = c.divineDomains || [];
+        if (cur.includes(domain)) {
+          const nextDomains = cur.filter((d) => d !== domain);
+          const domPowers = (DOMAINS.find((x) => x.name === domain)?.powers || []).map((p) => p.name);
+          return {
+            ...c,
+            divineDomains: nextDomains,
+            domainPowers: (c.domainPowers || []).filter(
+              (p) => !domPowers.includes(p.replace(/\s*\(.+\)$/, "")) && !domPowers.includes(p),
+            ),
+          };
+        }
+        if (cur.length >= MAX_DOMAINS) return c;
+        return { ...c, divineDomains: [...cur, domain] };
+      });
+    },
+    [setCharacter],
+  );
 
   const handleClearDevotion = useCallback(() => {
     setCharacter((c) => {
