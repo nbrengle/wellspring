@@ -27,7 +27,7 @@ import CLASSES_JSON from '../../src/data/classes.json' with { type: 'json' };
 // A character built straight from an archetype mirrors what loadArchetype keeps.
 const fromArchetype = (a) => a;
 
-// Starting skills are V2-native: starting-sourced entries in the skills[] bucket.
+// Starting skills are: starting-sourced entries in the skills[] bucket.
 const startingChoices = (c) => (c.skills || []).filter((s) => isStarting(s.source));
 const startingNames = (c) => startingChoices(c).map((s) => s.entityId);
 // Rename the i-th starting skill (player picks a parameter, etc.) in place.
@@ -136,7 +136,7 @@ function loadWithChoices(a) {
 
     const rebuilt = rebuildStartingSkills(c, primary, c.startingChoices);
 
-    // Propagate the rebuilt starting skills back into the V2 skills array
+    // Propagate the rebuilt starting skills back into the skills array
     if (rebuilt.skills) {
       const newStarting = rebuilt.startingSkills.map((s, i) => ({
         entityId: s,

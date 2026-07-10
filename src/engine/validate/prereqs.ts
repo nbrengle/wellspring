@@ -8,8 +8,8 @@
 //
 // Re-exported by the validate.js barrel.
 
-import { lookupEntity, CLASSES } from '../data.js';
-import { bareSkill, getClasses } from '../resolver.js';
+import { CLASSES } from '../data.js';
+import { getClasses } from '../resolver.js';
 import { characterLevel } from './core.js';
 import { spellSlots } from './slots.js';
 import { resolveCharacterGraph } from '../graph.js';

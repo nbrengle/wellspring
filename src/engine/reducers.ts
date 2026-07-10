@@ -3,20 +3,20 @@
 // lift of a `setCharacter(c => …)` body, so the write path — previously only
 // reachable through React — is directly unit-testable.
 //
-// These operate on CharacterStateV2: every add/remove/rename patches an ontological
+// These operate on CharacterState: every add/remove/rename patches an ontological
 // CharacterChoice[] bucket (skills/perks/powers/spells/flaws), addressed positionally
 // among the relevant sub-list. There is no flat shape — a pick's provenance is its
 // source and its BP key is its costField, both on the CharacterChoice.
 
-import type { CharacterStateV2, CharacterChoice } from "./types.js";
+import type { CharacterState, CharacterChoice } from "./types.js";
 import { Source, isPurchased } from "./types.js";
 import { addToCharacter } from "./character-add.js";
 import { UNLIMITED_SKILLS, DEVOTIONS, DOMAINS } from "./data.js";
 
-type Char = CharacterStateV2;
+type Char = CharacterState;
 
-// ─── V2 purchased-bucket helpers ────────────────────────────────────────────
-// Purchased skills and perks are V2-native: CharacterChoice[] entries (source
+// ─── purchased-bucket helpers ────────────────────────────────────────────
+// Purchased skills and perks are: CharacterChoice[] entries (source
 // 'Purchased') in `character.skills` / `character.perks`, NOT flat name arrays.
 // The UI addresses a purchased entry by its position among the PURCHASED entries
 // of its bucket (the row index the bucketed view emits), so removal/rank are
@@ -75,7 +75,7 @@ export function updateParameter(
   newName: string,
   index: number | null = null,
 ): Char {
-  // Everything lives in a V2 bucket; patch the entry's entityId in place, then fall
+  // Everything lives in a bucket; patch the entry's entityId in place, then fall
   // through to the shared Worship reconciliation (a Worship skill can be purchased).
   // Purchased skills/perks address by position among purchased entries; power/spell
   // fields address by position among their costField entries.
@@ -95,7 +95,7 @@ export function updateParameter(
 
   const { baseName, paramVal } = splitParameterizedName(newName);
 
-  // Domain powers are V2-native: CharacterChoice[] in `powers` (costField
+  // Domain powers are: CharacterChoice[] in `powers` (costField
   // 'domainPowers'). Keep the entries whose domain is still available; drop the rest.
   const keepDomainPowers = (keep: (basePower: string, full: string) => boolean): CharacterChoice[] =>
     (nextChar.powers || []).filter((p) => {
@@ -135,9 +135,9 @@ export function updateParameter(
   return nextChar;
 }
 
-// ─── V2 slot-pick helpers (powers + spells) ─────────────────────────────────
+// ─── slot-pick helpers (powers + spells) ─────────────────────────────────
 // Slot picks (martial powers basic/advanced/veteran/utility AND caster spells
-// cantrips/spells-known/book) are V2-native: CharacterChoice[] entries in the
+// cantrips/spells-known/book) are: CharacterChoice[] entries in the
 // `powers` / `spells` bucket, sourced `Source.class(<grantingClass>)` (a slot pick
 // is FREE and belongs to the class whose slot it fills — the granting class lives
 // IN the source, replacing the old parallel `powerClass[field]` map). Each entry
@@ -186,7 +186,7 @@ export function clearSlot(c: Char, field: string, flatIndex: number): Char {
 }
 
 /** Add a named entity to `field`, appending a rank of 1. No-op if the name is
- *  already present and not in UNLIMITED_SKILLS. Purchased skills route to the V2
+ *  already present and not in UNLIMITED_SKILLS. Purchased skills route to the
  *  `skills` bucket; other fields stay on the flat parallel-array path. */
 export function addEntity(c: Char, field: string, name: string): Char {
   const bucket = purchasedBucketKey(field);
@@ -202,7 +202,7 @@ export function addEntity(c: Char, field: string, name: string): Char {
   }
   if (field === "flaws") {
     if ((c.flaws || []).some((f) => f.entityId === name)) return c;
-    return addToCharacter(c as CharacterStateV2, name) as Char;
+    return addToCharacter(c as CharacterState, name) as Char;
   }
   return c;
 }

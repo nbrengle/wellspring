@@ -27,8 +27,8 @@ export function eq(actual, expected, msg = '') {
 
 export function ok(cond, msg = '') { if (!cond) throw new Error(msg || 'expected truthy'); }
 
-// Build the V2 `skills` bucket (source 'Purchased') from skill names (or
-// {name,ranks}). Purchased skills are V2-native (CharacterChoice[]), so a test
+// Build the skills bucket (source 'Purchased') from skill names (or
+// {name,ranks}). Purchased skills are native (CharacterChoice[]), so a test
 // that used to pass `purchasedSkills: ['Lore (Arcane)']` now spreads
 // `...pSkills(['Lore (Arcane)'])` into the character literal. The engine keys
 // these under the `skills:` prefix in the BP ledger.
@@ -41,7 +41,7 @@ export function pSkills(names) {
   };
 }
 
-// Same, for the V2 `perks` bucket (source 'Purchased'). A test that used to pass
+// Same, for the perks bucket (source 'Purchased'). A test that used to pass
 // `purchasedPerks: ['Toughness']` now spreads `...pPerks(['Toughness'])`. The BP
 // ledger keys these under the `purchasedPerks:` prefix.
 export function pPerks(names) {

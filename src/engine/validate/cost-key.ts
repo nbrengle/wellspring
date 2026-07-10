@@ -7,7 +7,7 @@ export function costKey(nodeOrId) {
   // built for identity, not for the ledger). These MUST precede the node.id
   // short-circuit below, since a starting skill's id ('startingSkills:Name') would
   // otherwise return without the index the ledger key needs.
-  //   - purchased → `skills:<name>`              (positional, V2-native)
+  //   - purchased → `skills:<name>`              (positional)
   //   - starting  → `startingSkills:<i>:<name>`  (indexed, still flat-path)
   if (node.field === 'skills') {
     if (node.sourceType === 'purchased') return `skills:${node.rawString || node.name}`;

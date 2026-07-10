@@ -1,4 +1,4 @@
-import { REFS, CLASSES, lookupEntity } from './data.js';
+import { REFS, lookupEntity } from './data.js';
 import { getClasses } from './resolver.js';
 /**
  * Extractor plugins for the CharacterGraph.

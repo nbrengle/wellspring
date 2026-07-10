@@ -1,4 +1,4 @@
-// make-char.mjs — the V2 character factory for tests.
+// make-char.mjs — the character factory for tests.
 //
 // Tests express INTENT — "a Fighter 4 with Battlemind and Toughness" — not the
 // character's internals. They never name a bucket, an EntitySource, or a costField;
@@ -32,7 +32,7 @@ const EMPTY = () => ({
 });
 
 /**
- * Build a V2 character for a test.
+ * Build a character for a test.
  * @param {string|Array} classSpec  "Fighter 4" | "Cleric 6, Mage 4" | [{name,level}]
  * @param {object} [opts]  { add?: (string|object)[], ...scalars } — scalars
  *        (lineage, devotion, choices, sublineage, lineageChallenges, …) are copied

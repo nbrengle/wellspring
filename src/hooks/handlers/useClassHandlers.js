@@ -14,7 +14,7 @@ export function useClassHandlers({ setCharacter }) {
     return { ...c, classes };
   };
 
-  // The single-class level +/- buttons set the PRIMARY class's level. V2-native:
+  // The single-class level +/- buttons set the PRIMARY class's level:
   // patch the classes array (no flat classLevels string), then re-seed starting
   // abilities for the new level.
   const handleLevelChange = useCallback((next) => {
@@ -63,7 +63,7 @@ export function useClassHandlers({ setCharacter }) {
       const c = toClassesForm(c0);
       if (c.classes.length <= 1) return c0;
       const classes = c.classes.filter((x) => x.name !== className);
-      // Slot powers & class-granted spells are V2-native: CharacterChoice[] sourced
+      // Slot powers & class-granted spells are: CharacterChoice[] sourced
       // to the granting class. Drop the removed class's picks by reading the source —
       // no parallel powerClass map to splice.
       const powers = (c.powers || []).filter((p) => sourceClass(p.source) !== className);

@@ -442,7 +442,7 @@ export function reconcileStartingChoices(character, className) {
   // rank 2 (e.g. "Extended Capacity - Novice") counts as two copies, so an option
   // asking for "x2" still matches. Rank comes off the CharacterChoice; falls back
   // to a trailing "xN" in the name. Starting skills are the Class:Starting entries
-  // of the V2 skills[] bucket.
+  // of the skills[] bucket.
   const ownedPool = {};
   const startingEntries = (character.skills || []).filter((s) => isStarting(s.source));
   startingEntries.forEach((choice) => {
@@ -594,7 +594,7 @@ export function rebuildStartingSkills(character, primaryClassName, updatedChoice
     }
   }
 
-  // Starting skills are V2-native: CharacterChoice[] with a `starting` source in
+  // Starting skills are: CharacterChoice[] with a `starting` source in
   // character.skills. Purchased (and any other-source) entries are preserved
   // untouched; only the starting ones are rebuilt.
   const allSkills = character.skills || [];

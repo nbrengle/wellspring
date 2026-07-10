@@ -7,7 +7,7 @@ import { cleanItemName, bareSkill, getClasses } from './resolver.js';
 import { characterLevel, getMaxRanks } from './validate/core.js';
 import { paramInfo, paramReusable } from './param-domain.js';
 import { spellSlots } from './validate/slots.js';
-import type { CharacterStateV2, GraphItem, CharacterGraph, Entity, Effect, EntitySource, BucketedView, BPLedger, BPLedgerEntry } from './types.js';
+import type { CharacterState, GraphItem, CharacterGraph, Effect, EntitySource, BucketedView, BPLedger, BPLedgerEntry } from './types.js';
 import { Source, isPurchased, isStarting } from './types.js';
 
 const idName = (id: string) => id.split(':')[1] || id;
@@ -51,7 +51,7 @@ export class CharacterGraphModel implements CharacterGraph {
   }
 
   constructor(
-    public character: CharacterStateV2,
+    public character: CharacterState,
     private _items: GraphItem[],
     public characterLevel: number,
     public classes: { name: string; level: number }[]
@@ -172,7 +172,6 @@ export class CharacterGraphModel implements CharacterGraph {
     for (const node of this._items) {
       if (node.field === 'synthetic' || node.field === 'lineageAdvantages' || node.field === 'lineageChallenges') continue;
 
-      const clean = cleanItemName(node.rawString || node.name);
       // Use the structured node.param (parsed once at creation); fall back to the
       // entity's param label only for display when the node carries no value.
       const paramValue = node.param ?? (node.entity?.parameter || undefined);
@@ -738,7 +737,6 @@ export class CharacterGraphModel implements CharacterGraph {
     // and the total read the entry off the node; nothing looks a cost up by a string
     // key or array index. `byItem` (below) is a derived name-keyed PROJECTION built
     // once at the end for external/UI consumers, not the engine's source of truth.
-    let startingExcess = 0;
     const setEntry = (node: GraphItem, entry: BPLedgerEntry) => { node.costEntry = entry; };
 
     for (const node of this._items) {
@@ -762,9 +760,7 @@ export class CharacterGraphModel implements CharacterGraph {
         ? nId.replace(/^purchasedSkills:/, 'skills:').replace(/^startingSkills(:\d+)?:/, 'skills:').replace(/^purchasedPerks:/, 'perks:')
         : null;
 
-      if (node.grantSidecar?.kind === 'grant') {
-        isGranted = true; grantSrc = node.grantSidecar.source;
-      } else if (normalizedId && grantIndex[normalizedId]) {
+      if (normalizedId && grantIndex[normalizedId]) {
         isGranted = true; grantSrc = grantIndex[normalizedId]; isDerived = true;
       } else if (nodeParamKey && grantParamIndex[nodeParamKey]) {
         isGranted = true; grantSrc = grantParamIndex[nodeParamKey]; isDerived = true;
@@ -776,19 +772,12 @@ export class CharacterGraphModel implements CharacterGraph {
         if (isDerived && node.authoredCost > 0) {
           setEntry(node, { cost: 0, base: node.baseCost, grant: { kind: 'grant', source: grantSrc, derived: true }, rank: node.rank });
         } else {
-          setEntry(node, { cost: node.authoredCost, base: node.baseCost, grant: node.grantSidecar, rank: node.rank, authored: true });
+          setEntry(node, { cost: node.authoredCost, base: node.baseCost, grant: null, rank: node.rank, authored: true });
         }
         continue;
       }
 
       if (node.sourceType === 'class') {
-        const grant = node.grantSidecar;
-        if (grant?.kind === 'discount' && grant.amount) {
-          setEntry(node, { cost: -grant.amount, base: 0, grant });
-          refunded += grant.amount;
-          continue;
-        }
-
         const floor = node.floor;
 
         if (isGranted) {
@@ -802,7 +791,6 @@ export class CharacterGraphModel implements CharacterGraph {
           const entCost = (node.baseCost / node.rank) || 0;
           const extraCost = entCost * extra;
           setEntry(node, { cost: extraCost, base: entCost, grant: null, rank: node.rank, freeRanks: floor, paidRanks: extra });
-          startingExcess += extraCost;
         } else {
           setEntry(node, { cost: 0, base: (node.baseCost / node.rank)||0, grant: null, rank: node.rank, freeRanks: floor || 1, paidRanks: 0 });
         }
@@ -812,7 +800,7 @@ export class CharacterGraphModel implements CharacterGraph {
       if (isGranted) {
         setEntry(node, { cost: 0, base: node.baseCost, grant: { kind: 'grant', source: grantSrc, derived: true }, rank: node.rank });
       } else {
-        setEntry(node, { cost: node.baseCost, base: node.baseCost, grant: node.grantSidecar, rank: node.rank });
+        setEntry(node, { cost: node.baseCost, base: node.baseCost, grant: null, rank: node.rank });
       }
     }
 
@@ -1005,7 +993,7 @@ function checkLevelConstraint(character: any, constraintStr: string, owned: Set<
 // entry — so everything past resolveCharacterGraph sees a complete character.
 // Idempotent: re-running never double-seeds (innates dedupe by name, the devotion
 // entry is added only when absent).
-function normalizeV2(character: CharacterStateV2): CharacterStateV2 {
+function normalizeCharacter(character: CharacterState): CharacterState {
   const classes = getClasses(character);
   const powers = [...(character.powers || [])];
   // Class-granted innate powers (level-gated) are DERIVED from the class list, not
@@ -1031,11 +1019,11 @@ function normalizeV2(character: CharacterStateV2): CharacterStateV2 {
   return { ...character, classes, powers, devotions };
 }
 
-export function resolveCharacterGraph(charInput: CharacterStateV2): CharacterGraphModel {
-  // The character is born V2 (UI reducers, loadArchetype, the sheet importer, and
-  // the test factory all produce V2 buckets). At the boundary we only DERIVE the
+export function resolveCharacterGraph(charInput: CharacterState): CharacterGraphModel {
+  // The character is born from the buckets (UI reducers, loadArchetype, the sheet importer, and
+  // the test factory all produce buckets). At the boundary we only DERIVE the
   // two facts that aren't stored — class innate powers + the devotion entry.
-  const character = normalizeV2(charInput);
+  const character = normalizeCharacter(charInput);
 
   const items: GraphItem[] = [];
   const charLevel = characterLevel(character);
@@ -1090,7 +1078,7 @@ export function resolveCharacterGraph(charInput: CharacterStateV2): CharacterGra
     // Node id is the PARAMETER-PRESERVING instance key used for the BP ledger,
     // prereq issue ids, and dedupe — NOT ent.id (the param-stripped BASE). Its
     // prefix is the ORIGINATING character field: flat-path buckets carry it as
-    // `choice.costField` (e.g. 'classPowers'); V2-native skills have none, so they
+    // `choice.costField` (e.g. 'classPowers'); native skills have none, so they
     // key under their entity collection ('skills'). Falls back to the raw entityId.
     const idPrefixName = (choice as any).costField || (ent?.type ? idPrefix(ent) : null);
     const nodeId = idPrefixName ? `${idPrefixName}:${cleanName}` : entityId;
@@ -1106,7 +1094,6 @@ export function resolveCharacterGraph(charInput: CharacterStateV2): CharacterGra
       index: choice.originalIndex,
       baseCost: baseCost,
       authoredCost: choice.costOverride,
-      grantSidecar: null,
       entity: ent,
       effects,
       specialty: null,

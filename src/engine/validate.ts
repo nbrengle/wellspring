@@ -10,7 +10,7 @@
 // unit-testable. The input is a CharacterState; resolveCharacterGraph derives the
 // class innates + devotion entry, and everything downstream reads the resolved graph.
 
-import { LEVEL_TABLE, lookupEntity, CLASS_POWER_SLOTS, DEVOTIONS, DOMAINS, CRAFTING, RITUALS, UNLIMITED_SKILLS, divineSubstitutionOptions } from '../engine/data.js';
+import { LEVEL_TABLE, lookupEntity, CLASS_POWER_SLOTS, DEVOTIONS, DOMAINS, CRAFTING, RITUALS, divineSubstitutionOptions } from '../engine/data.js';
 import { cleanItemName, bareSkill, getClasses, primaryClass } from './resolver.js';
 
 // Shared primitives now live in validate/core.js (hotspot split). Import the ones
@@ -18,7 +18,7 @@ import { cleanItemName, bareSkill, getClasses, primaryClass } from './resolver.j
 // barrel so existing imports (`from './data/validate.js'`) keep working unchanged.
 import {
   MAX_LBP, MAX_FLAW_BP, BACKSTORY_BP, MAX_DOMAINS, DEFAULT_WEALTH,
-  LEGAL_MIN_LEVEL, LEVEL_CAP, subKey, POWER_SOURCE_FIELDS,
+  LEGAL_MIN_LEVEL, LEVEL_CAP, subKey,
   characterLevel, getLegalMinLevel, getMaxRanks,
   maxProgressionLevel,
 } from './validate/core.js';
@@ -82,7 +82,7 @@ export function activePowerBenefits(character) {
 
 
 // Whether the character has the Worship skill (lets them follow a devotion and
-// access its domains). Reads the V2 skills bucket (entityId), any source. Any
+// access its domains). Reads the skills bucket (entityId), any source. Any
 // class can take it; "Worship - <Devotion>" matches the prefix.
 export function hasWorship(character) {
   return (character?.skills || []).some((s) => /^worship\b/i.test(s.entityId || s.name || ''));
@@ -125,7 +125,7 @@ export function devotionState(character) {
   };
 }
 
-// Whether the character owns the Divine Substitution Class power (in the V2
+// Whether the character owns the Divine Substitution Class power (in the
 // powers bucket).
 function ownsDivineSubstitution(character) {
   return (character.powers || []).some((p) => /^Divine Substitution\b/.test(cleanItemName(p.entityId || p.name || '')));

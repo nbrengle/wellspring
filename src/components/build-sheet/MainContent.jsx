@@ -277,7 +277,7 @@ export function SlotBlock({ slot }) {
     : [SLOT_FIELD[slot.category]];
   const granted = slot.granted || [];
   const grantedSet = new Set(granted);
-  // Slot picks are V2-native: CharacterChoice[] in the powers/spells bucket sourced
+  // Slot picks are: CharacterChoice[] in the powers/spells bucket sourced
   // to the granting class. flatIndex is the position among a field's entries — the
   // same addressing setSlotPick/clearSlot use (costField-scoped).
   const bucket = isSpells ? (character.spells || []) : (character.powers || []);

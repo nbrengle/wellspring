@@ -12,7 +12,7 @@
 // ledger. Callers never name a bucket, a Source.*, or a costField themselves —
 // those are the character's internals, not the caller's concern.
 
-import type { CharacterStateV2, CharacterChoice, EntitySource, Entity } from './types.js';
+import type { CharacterState, CharacterChoice, EntitySource, Entity } from './types.js';
 import { Source } from './types.js';
 import { lookupEntity } from './data.js';
 import { getClasses } from './resolver.js';
@@ -35,9 +35,9 @@ const CASTER_TIERS = new Set<string>(['Cantrip', 'Novice', 'Adept', 'Greater']);
 const isSpellEntity = (ent: Entity | null): boolean =>
   !!ent && (ent.type === 'spell' || (ent.tier != null && CASTER_TIERS.has(ent.tier)));
 
-/** Which V2 bucket an entity lives in. Spells are powers with a caster tier, so we
+/** Which bucket an entity lives in. Spells are powers with a caster tier, so we
  *  route on the entity, not the bare type. A null entity (unknown name) → skills. */
-function bucketOf(ent: Entity | null): keyof Pick<CharacterStateV2, 'skills' | 'perks' | 'powers' | 'spells' | 'flaws'> {
+function bucketOf(ent: Entity | null): keyof Pick<CharacterState, 'skills' | 'perks' | 'powers' | 'spells' | 'flaws'> {
   if (isSpellEntity(ent)) return 'spells';
   switch (ent?.type) {
     case 'perk': return 'perks';
@@ -135,11 +135,11 @@ export function sourceForField(field: string, primaryClass: string): EntitySourc
 
 // Which bucket a parsed SECTION field lands in (routes by field, the section's
 // authority — not by looking the entity up).
-const FIELD_BUCKET: Record<string, keyof Pick<CharacterStateV2, 'skills' | 'perks' | 'powers' | 'spells' | 'flaws'>> = {
+const FIELD_BUCKET: Record<string, keyof Pick<CharacterState, 'skills' | 'perks' | 'powers' | 'spells' | 'flaws'>> = {
   startingSkills: 'skills', purchasedSkills: 'skills',
   purchasedPerks: 'perks', flaws: 'flaws',
 };
-export function bucketForField(field: string): keyof Pick<CharacterStateV2, 'skills' | 'perks' | 'powers' | 'spells' | 'flaws'> {
+export function bucketForField(field: string): keyof Pick<CharacterState, 'skills' | 'perks' | 'powers' | 'spells' | 'flaws'> {
   return FIELD_BUCKET[field] ?? (SPELL_FIELDS.has(field) ? 'spells' : 'powers');
 }
 
@@ -176,7 +176,7 @@ export function choiceFromParsed(item: ParsedItem, primaryClass: string): Charac
  * Idempotent for non-repeatable entities is the caller's concern (the UI reducers
  * dedupe); this primitive appends.
  */
-export function addToCharacter(char: CharacterStateV2, name: string, opts: AddOpts = {}): CharacterStateV2 {
+export function addToCharacter(char: CharacterState, name: string, opts: AddOpts = {}): CharacterState {
   const ent: Entity | null = lookupEntity(name);
   // A caller-supplied field wins the bucket routing (the UI knows the slot clicked);
   // otherwise derive from the entity (spells are powers with a caster tier).

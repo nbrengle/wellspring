@@ -28,7 +28,7 @@ export function powerPickerSpec(slot, character) {
     ? ["noviceSpells", "adeptSpells", "greaterSpells"] : [field];
   const taken = new Set();
   const counts = {};
-  // Existing picks are V2-native CharacterChoice[] in the powers/spells bucket,
+  // Existing picks are native CharacterChoice[] in the powers/spells bucket,
   // keyed by costField (the slot field).
   const bucket = isSpells ? (character.spells || []) : (character.powers || []);
   for (const f of takenFields) {

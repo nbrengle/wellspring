@@ -23,7 +23,7 @@ function reconcileBuildChoices(character) {
     if (dash) return `${dash[1].trim().toLowerCase()}|${dash[2].trim().toLowerCase()}`;
     return clean.toLowerCase();
   };
-  // All owned skills (starting + purchased) live in the V2 skills[] bucket.
+  // All owned skills (starting + purchased) live in the skills[] bucket.
   const ownedSkillNames = (character.skills || [])
     .filter((s) => typeof s !== "string")
     .map((s) => s.entityId || s.name);
@@ -49,7 +49,7 @@ function reconcileBuildChoices(character) {
 }
 
 // ─── INITIAL STATE TEMPLATE ──────────────────────────────────────────────────
-// A blank CharacterStateV2: empty ontological buckets, no class. Everything a
+// A blank CharacterState: empty ontological buckets, no class. Everything a
 // character owns is a CharacterChoice in one of the buckets — there are no flat
 // name-arrays. applyClassStartingAbilities seeds starting skills when a class is
 // chosen; the reducers (addToCharacter) add the rest.
@@ -122,9 +122,6 @@ export function loadArchetype(archetype) {
       }
     }
   }
-  if (archetype.grants) c.grants = archetype.grants;
-  if (archetype.effectiveBP) c.effectiveBP = archetype.effectiveBP;
-  if (archetype.ranks) c.ranks = archetype.ranks;
   // Normalize classes to the canonical array form [{name, level}] that getClasses +
   // the class handlers use. Archetypes store it as an object map ({ Cleric: 4 }); the
   // copy loop above would carry that raw shape, so overwrite with the normalized form.

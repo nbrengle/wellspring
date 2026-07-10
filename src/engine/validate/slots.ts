@@ -7,11 +7,11 @@
 // by the validate.js barrel.
 
 import { lookupEntity, CLASS_POWERS, CLASS_PROGRESSION, CLASS_POWER_SLOTS, CLASSES, BASE_CLASSES, LINEAGES, lineageCantripChoices } from '../data.js';
-import { cleanItemName, getClasses, bareSkill } from '../resolver.js';
+import { cleanItemName, getClasses } from '../resolver.js';
 import { SPELL_TIERS, SLOT_CATS, BOOKCASTER_TIER_FIELD, KNOWN_SPELL_FIELDS } from '../config.js';
 import {
   countPicksForClass, progressionRow, sourceClass,
-  activeInnatePowers, CASTER_SLOT_FIELDS, MARTIAL_SLOT_FIELDS, GENERIC_POWER_FIELDS
+  activeInnatePowers
 } from './core.js';
 
 // Skills whose grant is scoped to a CLASS the player must choose — and the choice
@@ -78,7 +78,6 @@ export function slotGrants(character, sources = null) {
   for (const field of ['skills', 'powers']) {
     (character[field] || []).forEach((item: any) => {
       const clean = cleanItemName(item.entityId.replace(/^(skills|powers):/, ''));
-      const bare = bareSkill(clean);
       const ent = lookupEntity(item.entityId) as any;
       const rank = item.ranks || 1;
 
@@ -397,7 +396,7 @@ export function bookcasterSpellOptions(character) {
   }
   // Spells the character actually knows (their spells-known picks). A known spell
   // is offered even if its tier later falls out of `accessible` — you still know it.
-  // Spells-known are V2 CharacterChoice[] in `spells`, keyed by their tier costField.
+  // Spells-known are CharacterChoice[] in `spells`, keyed by their tier costField.
   const knownSet = new Set();
   const knownFields = new Set(KNOWN_SPELL_FIELDS);
   for (const choice of (character.spells || [])) {
