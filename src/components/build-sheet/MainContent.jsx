@@ -375,9 +375,14 @@ export function ClassifiedRows({ rows, resolveType, showClass }) {
   return (
     <ul className="b-rows">
       {rows.map((row) => {
-        const { name, field, index, source, grantedBy, cls, refundedBP, specialty, floor } = row;
+        const { name, field, index, source, grantedBy, cls, specialty, floor } = row;
         // Cost is attached to the row by validate() (from the BP ledger).
         const cost = row.cost;
+        
+        const refundEff = row.effects?.find(e => e.type === 'REFUND_GRANT');
+        const refundedBy = refundEff?.source;
+        const refundedBP = refundEff ? (cost?.base || 0) : 0;
+
         const sourceType = row.sourceType || row.source;
         const canRemove = sourceType === "purchased" && index >= 0;
         const rank = cost?.rank || (index >= 0 ? character.ranks?.[field]?.[index] : null) || 1;
@@ -431,16 +436,16 @@ export function ClassifiedRows({ rows, resolveType, showClass }) {
                           {src.toUpperCase()}{specialty && <span className="b-badge-spec"> · {specialty}</span>}
                         </span>
                       )}
-                      {refundedBP ? (
-                        <span className="b-row-badge b-badge-refund" title="BP spent on this item was refunded because you received it for free">
-                          +{refundedBP} BP REFUNDED
-                        </span>
-                      ) : null}
                       {canBuyUp && cost?.paidRanks > 0 && <CostBadge cost={cost} />}
                     </>
                   );
                 })()
-              : cost && <CostBadge cost={cost} />}
+              : cost && !refundEff && <CostBadge cost={cost} />}
+            {refundEff && (
+              <span className="b-row-badge b-badge-refund" title={`BP spent on this item was refunded because you received it for free from ${refundedBy}`}>
+                +{refundedBP} BP REFUNDED · {refundedBy?.toUpperCase()}
+              </span>
+            )}
             {hasRanks && onSetRank && (
               <div className="b-row-rank-adjust">
                 <button className="b-rank-btn" type="button" onClick={() => onSetRank(field, index, rank - 1)} disabled={rank <= rankFloor}>-</button>
