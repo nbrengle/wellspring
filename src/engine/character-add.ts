@@ -176,17 +176,34 @@ export interface ParsedItem {
   rank?: number;
 }
 
+/** Split a raw source name ("Lore (Historical)", "Profession - Apprentice (Smith)")
+ *  ONCE, at the parse/write boundary, into what a CharacterChoice stores: `entityId` =
+ *  the bare entity, `parameter` = the chosen value (or none). The entity is whatever
+ *  the name RESOLVES to (`lookupEntity(name).id`, the authoritative canonical id — NOT
+ *  string-munged), and the parameter is the trailing "(value)" the resolved entity name
+ *  doesn't itself carry. Downstream never re-does this: it reads `choice.entityId` (bare)
+ *  and `choice.parameter`. A name that doesn't resolve is stored verbatim, no parameter. */
+export function splitEntityParam(name: string): { entityId: string; parameter?: string } {
+  const ent = lookupEntity(name);
+  if (!ent?.id) return { entityId: name };
+  const entityId = ent.id.replace(/^[a-z]+:/i, ""); // canonical bare entity ("Lore")
+  if (name === entityId) return { entityId }; // no parameter
+  const m = name.match(/\(([^)]+)\)\s*$/); // trailing "(value)" the base name lacks
+  return m ? { entityId, parameter: m[1].trim() } : { entityId };
+}
+
 /** Turn a parsed item into a CharacterChoice for its bucket — the shared "build"
  *  step both text parsers use, so neither re-implements the flat→bucket zip. The
- *  section field decides source (sourceForField) + costField; the entityId is the
- *  raw name VERBATIM — the engine resolves the "Base - Tier (Param)" form itself
- *  (extractParam at node creation), so no separate `parameter` field is needed. */
+ *  section field decides source (sourceForField) + costField; the raw name is split
+ *  into a bare `entityId` + a `parameter` field (never a "Base (Param)" string). */
 export function choiceFromParsed(item: ParsedItem, primaryClass: string): CharacterChoice {
+  const { entityId, parameter } = splitEntityParam(item.name);
   const choice: CharacterChoice = {
-    entityId: item.name,
+    entityId,
     source: sourceForField(item.field, primaryClass),
     costField: item.field,
   };
+  if (parameter) choice.parameter = parameter;
   if (item.cost != null) choice.costOverride = item.cost;
   if (item.rank && item.rank > 1) choice.ranks = item.rank;
   return choice;
@@ -206,17 +223,21 @@ export function addToCharacter(char: CharacterState, name: string, opts: AddOpts
 
   const cls = opts.cls ?? ent?.parentClass ?? (getClasses(char).length === 1 ? getClasses(char)[0].name : undefined);
 
-  const entityId = opts.param ? `${name} (${opts.param})` : name;
+  // Parametrization is a FIELD, never concatenated into the id. A caller passes the
+  // param either as opts.param OR embedded in the name ("Lore (Historical)") — split
+  // the name structurally and let an explicit opts.param win.
+  const split = splitEntityParam(name);
+  const parameter = opts.param ?? split.parameter;
   const source = opts.source ?? deriveSource(ent, cls);
   const costField = opts.costField ?? opts.field ?? deriveCostField(ent);
 
   const choice: CharacterChoice = {
-    entityId,
+    entityId: split.entityId,
     source,
     ranks: opts.ranks ?? 1,
     ...(costField ? { costField } : {}),
     ...(opts.cost != null ? { costOverride: opts.cost } : {}),
-    ...(opts.param ? { parameter: opts.param } : {}),
+    ...(parameter ? { parameter } : {}),
   };
 
   return { ...char, [bucket]: [...(char[bucket] || []), choice] };

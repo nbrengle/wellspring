@@ -14,10 +14,9 @@ import {
   setChoice,
   setSlotPick,
   clearSlot,
-  updateParameter,
+  setParameter,
   setGrantedSelection,
   setAgileLearnerTrade,
-  splitParameterizedName,
 } from "../../src/engine/reducers.js";
 
 // The purchased-skill entries of a character (a purchased source in skills[]).
@@ -208,48 +207,42 @@ test("clearSlot removes a spell pick without touching powers", () => {
   eq(slotEntries(c, "basicPowers").length, 1, "power entry untouched");
 });
 
-// ─── updateParameter (patches the purchased-skill entityId) ─────────────────
+// ─── setParameter (sets the `parameter` FIELD at field[index]) ──────────────
+// Parametrization is a field on the row, never concatenated into entityId. The
+// reducer patches parameter at a known position; the entityId stays bare.
 const mkPurchased = (...names) => ({
   skills: names.map((entityId) => ({ entityId, source: Source.purchased(), ranks: 1 })),
 });
-test("updateParameter renames the purchased skill at the given position", () => {
+test("setParameter sets the parameter field of the row at the given position", () => {
   const c0 = mkPurchased("Lore", "Craft");
-  const c = updateParameter(c0, "skills", "Lore", "Lore (History)", 0);
-  eq(purchased(c)[0].entityId, "Lore (History)", "renamed in place");
-  eq(purchased(c)[1].entityId, "Craft", "sibling untouched");
+  const c = setParameter(c0, "skills", 0, "History");
+  eq(purchased(c)[0].entityId, "Lore", "entityId stays bare");
+  eq(purchased(c)[0].parameter, "History", "parameter set in the field");
+  eq(purchased(c)[1].parameter, undefined, "sibling untouched");
 });
-test("updateParameter falls back to entityId match when no index is given", () => {
-  const c0 = mkPurchased("Lore", "Craft");
-  const c = updateParameter(c0, "skills", "Craft", "Craft (Smithing)");
-  eq(purchased(c)[1].entityId, "Craft (Smithing)", "located by oldName");
+test("setParameter clears the parameter when value is empty", () => {
+  const c0 = { skills: [{ entityId: "Lore", parameter: "History", source: Source.purchased(), ranks: 1 }] };
+  const c = setParameter(c0, "skills", 0, "");
+  eq(purchased(c)[0].parameter, undefined, "parameter field removed");
 });
-test("updateParameter is a no-op when the purchased skill is not found", () => {
+test("setParameter is a no-op for an out-of-range position", () => {
   const c0 = mkPurchased("Lore");
-  const c = updateParameter(c0, "skills", "Missing", "Whatever");
-  eq(c, c0, "unchanged reference");
+  eq(setParameter(c0, "skills", 5, "History"), c0, "unchanged reference");
 });
-test("updateParameter clears devotion state when a Worship skill loses its parameter", () => {
+test("setParameter clears devotion state when a Worship skill loses its parameter", () => {
   const c0 = {
-    ...mkPurchased("Worship (Some Deity)"),
+    skills: [{ entityId: "Worship", parameter: "Some Deity", source: Source.purchased(), ranks: 1 }],
     devotion: "Some Deity",
     divineDomains: ["War"],
     // Domain powers live in their OWN bucket (not `powers`), costField 'domainPowers'.
     domainPowers: [{ entityId: "Smite", source: Source.purchased(), ranks: 1, costField: "domainPowers" }],
   };
-  const c = updateParameter(c0, "skills", "Worship (Some Deity)", "Worship", 0);
-  eq(purchased(c)[0].entityId, "Worship", "skill entityId cleared to bare Worship");
+  const c = setParameter(c0, "skills", 0, "");
+  eq(purchased(c)[0].entityId, "Worship", "skill entityId stays bare Worship");
+  eq(purchased(c)[0].parameter, undefined, "parameter cleared");
   eq(c.devotion, null, "devotion cleared");
   eq(c.divineDomains.length, 0, "domains cleared");
   eq((c.domainPowers || []).length, 0, "domain powers cleared");
-});
-
-// ─── splitParameterizedName ─────────────────────────────────────────────────
-test("splitParameterizedName parses (paren) and - dash - forms", () => {
-  eq(splitParameterizedName("Lore (History)").baseName, "Lore", "paren base");
-  eq(splitParameterizedName("Lore (History)").paramVal, "History", "paren param");
-  eq(splitParameterizedName("Worship - Sun God").baseName, "Worship", "dash base");
-  eq(splitParameterizedName("Worship - Sun God").paramVal, "Sun God", "dash param");
-  eq(splitParameterizedName("Athletics").paramVal, "", "bare name has no param");
 });
 
 // ─── misc keyed reducers ────────────────────────────────────────────────────

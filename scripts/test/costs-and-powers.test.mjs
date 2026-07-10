@@ -281,12 +281,17 @@ test("shared powers are mechanically equivalent unless level-scaled", () => {
 const purchasedSkills = (c) => (c.skills || []).filter((s) => isPurchased(s.source)).map((s) => s.entityId);
 test("two distinct parameterized Lores are two separate purchased rows", () => {
   const c = makeChar("Mage 4", { add: ["Lore (Historical)", "Lore (Arcane)"] });
-  const p = purchasedSkills(c);
-  eq(p.length, 2, "two rows");
-  ok(p[0] !== p[1], "distinct subjects");
+  const rows = (c.skills || []).filter((s) => isPurchased(s.source));
+  eq(rows.length, 2, "two rows");
+  // The entity is bare "Lore" on both; the chosen subject lives in the parameter field.
   ok(
-    p.every((n) => /^Lore \(/.test(n)),
-    "both parameterized Lore",
+    rows.every((r) => r.entityId === "Lore"),
+    "both are the bare Lore entity",
+  );
+  ok(rows[0].parameter !== rows[1].parameter, "distinct subjects (in the parameter field)");
+  ok(
+    rows.every((r) => r.parameter),
+    "both carry a parameter",
   );
 });
 test("two Lores under Sharp Mind cost 1 each (per-instance discount), net 2", () => {
