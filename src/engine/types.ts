@@ -351,7 +351,7 @@ export interface GraphItem {
   authoredCost?: number;
   entity?: Entity | null;
   effects: Effect[];
-  specialty?: any;
+  specialty?: unknown;
   floor?: number;
   choiceData?: CharacterChoice;
   index?: number;
@@ -379,7 +379,7 @@ export type ViewState = {
   rawString?: string;
   field: string;
   choiceData?: CharacterChoice;
-  specialty?: any;
+  specialty?: unknown;
   floor?: number;
 };
 
@@ -430,7 +430,7 @@ export interface WealthReport {
 }
 
 export interface ResolvedStats {
-  [stat: string]: number | any;
+  [stat: string]: number | unknown;
 }
 
 export interface PrereqNote {
@@ -462,13 +462,19 @@ export interface PrereqReport {
 
 export interface ProgressionRow {
   cantrip?: number;
+  cantrips?: number;
   novice?: number;
   adept?: number;
   greater?: number;
+  basic?: number;
+  advanced?: number;
+  veteran?: number;
+  utility?: number;
+  spellsKnown?: number;
   innateCantrips?: string[];
   slots?: string;
   statMods?: StatMod[];
   statModNotes?: { stat: string; [k: string]: unknown }[];
-  [key: string]: any;
+  [key: string]: unknown;
 }
 

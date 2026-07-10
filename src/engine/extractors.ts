@@ -1,4 +1,4 @@
-import type { Effect, Entity, CharacterState, ChoiceOption, Class } from "./types.js";
+import type { Effect, Entity, CharacterState, Class } from "./types.js";
 import { REFS, lookupEntity } from "./data.js";
 import { getClasses } from "./resolver.js";
 /**
@@ -114,7 +114,7 @@ function extractStudiedFocus(ent: Entity | null | undefined, character: Characte
   return [];
 }
 
-function extractLevelDiscounts(ent: Entity | null | undefined, character: CharacterState, id: string): Effect[] {
+function extractLevelDiscounts(ent: Entity | null | undefined, character: CharacterState, _id: string): Effect[] {
   if (!ent?.levelDiscounts || ent.levelDiscounts.length === 0) return [];
 
   const charClasses = getClasses(character);

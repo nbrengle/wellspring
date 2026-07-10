@@ -21,7 +21,7 @@ import {
   divineSubstitutionOptions,
 } from "../engine/data.js";
 import { cleanItemName, bareSkill, getClasses, primaryClass } from "./resolver.js";
-import type { CharacterState, CharacterChoice, BaseEntity, BPLedgerEntry } from "./types.js";
+import type { CharacterState, CharacterChoice, Effect } from "./types.js";
 
 // Shared primitives now live in validate/core.js (hotspot split). Import the ones
 // this module still uses internally, and re-export the public surface from the
@@ -210,7 +210,7 @@ export function classifyOwnedItems(character: CharacterState) {
       cls: mc.source,
       index: -1,
       rank: 1,
-    } as any);
+    } as unknown as import("./types.js").SkillView);
   }
 
   return {

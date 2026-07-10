@@ -19,7 +19,7 @@ import {
 import { cleanItemName, getClasses } from "../resolver.js";
 import { SPELL_TIERS, SLOT_CATS, BOOKCASTER_TIER_FIELD, KNOWN_SPELL_FIELDS } from "../config.js";
 import { countPicksForClass, progressionRow, sourceClass, activeInnatePowers } from "./core.js";
-import type { CharacterChoice, CharacterState, BaseEntity } from "../types.js";
+import type { CharacterChoice, CharacterState } from "../types.js";
 
 // ─── Structured slot/spell shapes ───────────────────────────────────────────
 /** One power/spell slot row for a class+category: how many are `used` vs `allowed`
@@ -271,7 +271,6 @@ export function computeSlots(character: CharacterState) {
       // appears in the character's cantrip pick list. Exclude it from `used`.
       const used = (character.spells || []).reduce((n: number, choice: CharacterChoice) => {
         if (sourceClass(choice.source) !== cls) return n;
-        const costField = choice.costField || "cantrip";
         const ent = lookupEntity(choice.entityId);
         if (ent?.tier?.toLowerCase() !== "cantrip") return n;
         if (granted.includes(cleanItemName(choice.entityId.replace("spells:", "")))) return n;
