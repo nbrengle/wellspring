@@ -459,3 +459,16 @@ test("import: inline Devotion alone is honored when no Worship skill", () => {
   eq(c.devotion, "The Mother", "inline fallback");
   ok(!c.devotionWarning, "no warning when only inline");
 });
+
+test("domainPowers: a domain power that defines a pool (Balance Pool) resolves the pool", () => {
+  // The Balance of Life is a domain power that defines the Balance Pool: owning it
+  // in the domainPowers bucket makes the pool resolve.
+  const c = {
+    ...makeChar({ classes: [{ name: "Cleric", level: 6 }] }),
+    domainPowers: [
+      { entityId: "The Balance of Life", source: Source.purchased(), ranks: 1, costField: "domainPowers" },
+    ],
+  };
+  const pool = (validate(c).pools || []).find((p) => p.name === "Balance Pool");
+  ok(pool, "Balance Pool resolves from the owned domain power");
+});

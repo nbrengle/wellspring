@@ -4,6 +4,14 @@
  * This defines both the static definitions (from JSON) and the player's Character State.
  */
 
+import { CHARACTER_BUCKETS } from "./config.js";
+
+/** A storage-bucket name — derived from the CHARACTER_BUCKETS source of truth. */
+export type CharacterBucket = (typeof CHARACTER_BUCKETS)[number];
+/** The CharacterChoice[] bucket fields on the character, derived from the constant
+ *  so the interface and the list can't drift. */
+export type CharacterBuckets = Record<CharacterBucket, CharacterChoice[]>;
+
 // ─── 1. Core Data Models (The Rules) ────────────────────────────────────────
 
 export interface SlotGrant {
@@ -197,7 +205,7 @@ export interface CharacterChoice {
   costField?: string;
 }
 
-export interface CharacterState {
+export interface CharacterState extends CharacterBuckets {
   name?: string;
   archetypeName?: string | null;
   backstoryApproved?: boolean;
@@ -230,11 +238,10 @@ export interface CharacterState {
   // The ontological buckets — the engine's single shape. Every producer (UI
   // reducers, loadArchetype, the sheet importer, the test factory) writes these
   // directly via addToCharacter.
-  skills: CharacterChoice[];
-  perks: CharacterChoice[];
-  flaws: CharacterChoice[];
-  powers: CharacterChoice[];
-  spells: CharacterChoice[];
+  // The bucket fields (skills / perks / flaws / powers / domainPowers / spells) are
+  // derived from CHARACTER_BUCKETS below via `Record<CharacterBucket, …>`, so this
+  // interface and the constant can't disagree. domainPowers is its OWN bucket, not
+  // class powers — kept separate so nothing conflates a domain power with a class one.
 
   /** Per-stat overrides read by lineage checks (e.g. The Fractured). */
   stats?: Record<string, number>;

@@ -24867,7 +24867,9 @@
     "archetypes:Defensive Sword + Shield Fighter": {},
     "archetypes:Great Weapon Fighter": {},
     "archetypes:Archer Fighter": {},
-    "archetypes:Balanced Cleric": {},
+    "archetypes:Balanced Cleric": {
+      "domainPowers": []
+    },
     "archetypes:Form Fighter Druid": {},
     "archetypes:Healer Druid": {},
     "archetypes:Utility Mage": {},

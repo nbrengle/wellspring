@@ -12,7 +12,7 @@
 // ledger. Callers never name a bucket, a Source.*, or a costField themselves —
 // those are the character's internals, not the caller's concern.
 
-import type { CharacterState, CharacterChoice, EntitySource, Entity } from "./types.js";
+import type { CharacterState, CharacterChoice, CharacterBucket, EntitySource, Entity } from "./types.js";
 import { Source } from "./types.js";
 import { lookupEntity } from "./data.js";
 import { getClasses } from "./resolver.js";
@@ -41,7 +41,7 @@ const isSpellEntity = (ent: Entity | null): boolean =>
 
 /** Which bucket an entity lives in. Spells are powers with a caster tier, so we
  *  route on the entity, not the bare type. A null entity (unknown name) → skills. */
-function bucketOf(ent: Entity | null): keyof Pick<CharacterState, "skills" | "perks" | "powers" | "spells" | "flaws"> {
+function bucketOf(ent: Entity | null): CharacterBucket {
   if (isSpellEntity(ent)) return "spells";
   switch (ent?.type) {
     case "perk":
@@ -154,15 +154,14 @@ export function sourceForField(field: string, primaryClass: string): EntitySourc
 
 // Which bucket a parsed SECTION field lands in (routes by field, the section's
 // authority — not by looking the entity up).
-const FIELD_BUCKET: Record<string, keyof Pick<CharacterState, "skills" | "perks" | "powers" | "spells" | "flaws">> = {
+const FIELD_BUCKET: Record<string, CharacterBucket> = {
   startingSkills: "skills",
   purchasedSkills: "skills",
   purchasedPerks: "perks",
   flaws: "flaws",
+  domainPowers: "domainPowers",
 };
-export function bucketForField(
-  field: string,
-): keyof Pick<CharacterState, "skills" | "perks" | "powers" | "spells" | "flaws"> {
+export function bucketForField(field: string): CharacterBucket {
   return FIELD_BUCKET[field] ?? (SPELL_FIELDS.has(field) ? "spells" : "powers");
 }
 

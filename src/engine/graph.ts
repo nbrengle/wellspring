@@ -1433,7 +1433,7 @@ export function resolveCharacterGraph(charInput: CharacterState): CharacterGraph
   for (const choice of character.perks || []) addItem(choice);
 
   const powerIdxByField: Record<string, number> = {};
-  for (const choice of character.powers || []) {
+  const addPurchasablePower = (choice: CharacterChoice) => {
     if (isPurchased(choice.source) && choice.costField) {
       const idx = powerIdxByField[choice.costField] || 0;
       powerIdxByField[choice.costField] = idx + 1;
@@ -1441,7 +1441,11 @@ export function resolveCharacterGraph(charInput: CharacterState): CharacterGraph
     } else {
       addItem(choice);
     }
-  }
+  };
+  for (const choice of character.powers || []) addPurchasablePower(choice);
+  // Domain powers are their own bucket now, but materialize the same way (purchased,
+  // positional among their costField) so the view routes them into view.domainPowers.
+  for (const choice of character.domainPowers || []) addPurchasablePower(choice);
   for (const choice of character.spells || []) addItem(choice);
   for (const choice of character.devotions || []) addItem(choice);
 
