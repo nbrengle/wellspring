@@ -1307,7 +1307,7 @@ export function resolveCharacterGraph(charInput: CharacterState): CharacterGraph
     }
   }
   for (const choice of character.perks || []) addItem(choice);
-  
+
   const powerIdxByField: Record<string, number> = {};
   for (const choice of character.powers || []) {
     if (isPurchased(choice.source) && choice.costField) {

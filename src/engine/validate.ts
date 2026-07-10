@@ -193,13 +193,7 @@ export function classifyOwnedItems(character) {
   // veteran/utility/class/domain) collapse into one classPowers list for the UI.
   const g = resolveCharacterGraph(character);
   const b = g.uiBuckets;
-  const classPowers = [
-    ...b.basicPowers,
-    ...b.advancedPowers,
-    ...b.veteranPowers,
-    ...b.utilityPowers,
-    ...b.classPowers,
-  ];
+  const classPowers = [...b.basicPowers, ...b.advancedPowers, ...b.veteranPowers, ...b.utilityPowers, ...b.classPowers];
   const skills = [...b.skills];
   const mcGrants = multiclassGrants(character).skills;
   for (const mc of mcGrants) {
