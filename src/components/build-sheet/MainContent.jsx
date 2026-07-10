@@ -545,14 +545,16 @@ export function ClassifiedRows({ rows, resolveType, showClass }) {
                     label = `${cls.toUpperCase()} · ${grantedBy.toUpperCase()}`;
                   }
 
+                  if (!src) {
+                    label = sourceType.toUpperCase();
+                  }
+                  
                   return (
                     <>
-                      {src && (
-                        <span className={`b-row-badge ${toneClass}`} title={title}>
-                          {label}
-                          {specialty && <span className="b-badge-spec"> · {specialty}</span>}
-                        </span>
-                      )}
+                      <span className={`b-row-badge ${toneClass}`} title={title}>
+                        {label}
+                        {specialty && <span className="b-badge-spec"> · {specialty}</span>}
+                      </span>
                       {canBuyUp && cost?.paidRanks > 0 && <CostBadge cost={cost} />}
                     </>
                   );

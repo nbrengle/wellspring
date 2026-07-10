@@ -28,7 +28,7 @@ import type {
   BPLedger,
   BPLedgerEntry,
 } from "./types.js";
-import { Source, isPurchased, isStarting } from "./types.js";
+import { Source, isPurchased, isStarting, sourceClass } from "./types.js";
 
 const idName = (id: string) => id.split(":")[1] || id;
 
@@ -1277,6 +1277,7 @@ export function resolveCharacterGraph(charInput: CharacterState): CharacterGraph
       param: extractParam(rawName),
       field,
       sourceType,
+      cls: sourceClass(src),
       rank: choice.ranks || 1,
       index: choice.originalIndex,
       baseCost: baseCost,
