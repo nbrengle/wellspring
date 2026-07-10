@@ -1,3 +1,4 @@
+import type { Effect } from "./types.js";
 import { REFS, lookupEntity } from "./data.js";
 import { getClasses } from "./resolver.js";
 /**
@@ -103,7 +104,7 @@ function extractStudiedFocus(ent, character, _id) {
   if (ent?.name === "Studied Focus") {
     const pick1 = character.choices?.["powers:Studied Focus:1"];
     const pick2 = character.choices?.["powers:Studied Focus:2"];
-    const effects = [];
+    const effects: Effect[] = [];
     if (pick1) effects.push({ type: "GRANT_SOURCE", grants: [`powers:${pick1}`] });
     if (pick2) effects.push({ type: "GRANT_SOURCE", grants: [`powers:${pick2}`] });
     return effects;
@@ -115,7 +116,7 @@ function extractLevelDiscounts(ent, character, id) {
   if (!ent?.levelDiscounts || ent.levelDiscounts.length === 0) return [];
 
   const charClasses = getClasses(character);
-  const effects = [];
+  const effects: Effect[] = [];
 
   let maxRelevantLevel = 0;
   for (const c of charClasses) {

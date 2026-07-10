@@ -9,15 +9,15 @@
 // "also: …" badges, so grouping and labelling never drift apart.
 import { REFS } from "./data.js";
 
-const stripType = (t) => t.slice(t.indexOf(":") + 1);
+const stripType = (t: string) => t.slice(t.indexOf(":") + 1);
 
 // The mention keys for an item, in resolution order. A lineage challenge keys under
 // `challenges:`/`advantages:` but also overlaps `perks:`/`flaws:`; a power under
 // `powers:`. Try the caller's type first, then the lineage variants, then powers —
 // the first key that exists in the graph wins, so the same item resolves the same
 // way regardless of which surface asked.
-function mentionRefs(entityType, name) {
-  const order = [];
+function mentionRefs(entityType: string | null | undefined, name: string): string[] {
+  const order: string[] = [];
   if (entityType) order.push(`${entityType}:${name}`);
   for (const t of ["powers", "perks", "flaws", "skills", "challenges", "advantages"]) {
     const k = `${t}:${name}`;
@@ -30,9 +30,9 @@ function mentionRefs(entityType, name) {
 }
 
 // All mention targets of a given type-prefix for an item.
-function mentionsOfType(entityType, name, prefixes) {
+function mentionsOfType(entityType: string | null | undefined, name: string, prefixes: string[]): string[] {
   const refs = mentionRefs(entityType, name);
-  const out = [];
+  const out: string[] = [];
   for (const t of refs) {
     for (const p of prefixes) {
       if (t.startsWith(`${p}:`)) {
