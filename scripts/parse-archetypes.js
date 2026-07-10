@@ -15,7 +15,7 @@ import { fileURLToPath } from "url";
 import { Source } from "../src/engine/types.js";
 import { choiceFromParsed, bucketForField } from "../src/engine/character-add.js";
 import { emptyBuckets } from "../src/engine/config.js";
-import { LABEL_FIELD, CHOICE_DEFAULTS } from "../src/engine/sheet-schema.js";
+import { LABEL_FIELD, CHOICE_DEFAULTS } from "./archetype-schema.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, "..");
