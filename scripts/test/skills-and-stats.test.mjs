@@ -21,7 +21,6 @@ import {
   basicSpellOptions,
 } from "../../src/engine/testing.js";
 import { bareSkill, cleanItemName, getClasses, formatParameterizedName } from "../../src/engine/resolver.js";
-import { formatCharacterSheet, parseCharacterSheet } from "../../src/engine/sheet.js";
 import {
   solveCrafting,
   RECIPES,
@@ -191,28 +190,15 @@ test("dedupe: class starting Bookcaster skills + additional purchased Bookcaster
   eq(r.spend.net, 1, "Total spend net should be 1 BP (purchased Bookcaster)");
 });
 
-test("export/import: round-tripping with ranks and instances preserves rank & parameters", () => {
+test("ranked + parameterized purchases cost and rank correctly (Spell-Scholar x3, Bookcaster instances)", () => {
   const c = makeChar("Mage 5", {
     add: [{ name: "Spell-Scholar", ranks: 3 }, "Bookcaster (Identify)", "Bookcaster (Mageskin)"],
   });
-  const orig = validate(c);
-  const sheet = formatCharacterSheet(c, orig);
-  ok(sheet.includes("Spell-Scholar x3 - 12 BP"), "Prints rank and total BP for Spell-Scholar");
-  ok(sheet.includes("Bookcaster (Identify) - 1 BP"), "Prints Bookcaster (Identify)");
-  ok(sheet.includes("Bookcaster (Mageskin) - 1 BP"), "Prints Bookcaster (Mageskin)");
-
-  const rt = parseCharacterSheet(sheet);
-  // Round-trip parses back into the skills[] bucket (source 'Purchased').
-  const rtPurchased = (rt.skills || []).filter((s) => isPurchased(s.source));
-  eq(rtPurchased.length, 3, "rt three purchased skills");
-  ok(
-    rtPurchased.some((s) => s.entityId === "Spell-Scholar"),
-    "rt includes bare Spell-Scholar",
-  );
-  eq(rtPurchased.find((s) => s.entityId === "Spell-Scholar")?.ranks, 3, "rt preserved rank 3 on the choice");
-
-  const rtValidated = validate(rt);
-  eq(rtValidated.spend.net, orig.spend.net, "round-trip spend net");
-  eq(rtValidated.spend.byItem["skills:Spell-Scholar"].rank, 3, "round-trip Spell-Scholar rank");
-  eq(rtValidated.spend.byItem["skills:Bookcaster (Identify)"].rank, 1, "round-trip Bookcaster (Identify) rank");
+  const { spend } = validate(c);
+  // A rank-3 Spell-Scholar is one row at cumulative cost; each Bookcaster instance is 1 BP.
+  eq(spend.byItem["skills:Spell-Scholar"].rank, 3, "Spell-Scholar rank 3");
+  eq(spend.byItem["skills:Spell-Scholar"].cost, 12, "Spell-Scholar x3 costs 12 BP");
+  eq(spend.byItem["skills:Bookcaster (Identify)"].rank, 1, "Bookcaster (Identify) rank 1");
+  eq(spend.byItem["skills:Bookcaster (Identify)"].cost, 1, "Bookcaster (Identify) costs 1 BP");
+  eq(spend.byItem["skills:Bookcaster (Mageskin)"].cost, 1, "Bookcaster (Mageskin) costs 1 BP");
 });

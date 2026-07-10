@@ -7,9 +7,7 @@ export default function ArchetypePicker({ onPick, onStartBlank }) {
   const byClass = useMemo(() => {
     const map = new Map();
     for (const a of ARCHETYPES) {
-      // Group by the archetype's primary class. getClasses understands every class
-      // shape (the object map { Cleric: 4 } archetypes ship, an array, or the legacy
-      // classLevels string) — so this stays correct regardless of the stored form.
+      // Group by the archetype's primary class (classes is the {name, level}[] shape).
       const cls = getClasses(a)[0]?.name || "Other";
       if (!map.has(cls)) map.set(cls, []);
       map.get(cls).push(a);

@@ -113,8 +113,8 @@ export function updateParameter(
 
   if (baseName === "Worship") {
     if (!paramVal) {
-      // null (not undefined) to match handleClearDevotion and preserve the
-      // present-but-empty devotion key the legacy handler wrote.
+      // null (not undefined) to match handleClearDevotion — a present-but-empty
+      // devotion key, distinct from "never set".
       nextChar.devotion = null as unknown as undefined;
       nextChar.divineDomains = [];
       nextChar.domainPowers = keepDomainPowers(() => false);
