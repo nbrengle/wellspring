@@ -279,7 +279,11 @@ function expandOptionLine(line: string, baseToks: SkillToken[]) {
     const opts: ChoiceOption[] = [];
     for (const raw of oneOf[1].split(/\s*,\s*|\bor\b/i)) {
       const tok = canonicalSkill(raw);
-      if (tok) opts.push({ label: [...baseToks.map((t: SkillToken) => t.name), tok.name].join(", "), skills: [...baseToks, tok] });
+      if (tok)
+        opts.push({
+          label: [...baseToks.map((t: SkillToken) => t.name), tok.name].join(", "),
+          skills: [...baseToks, tok],
+        });
     }
     if (opts.length) return opts;
   }
@@ -297,7 +301,10 @@ function expandOptionLine(line: string, baseToks: SkillToken[]) {
     if (leftToks.length && altTok) {
       const lastLeft = leftToks[leftToks.length - 1];
       const common = [...leftToks.slice(0, -1), ...sharedToks];
-      const mk = (alt: SkillToken) => ({ label: [...common, alt].map((t: SkillToken) => t.name).join(", "), skills: [...common, alt] });
+      const mk = (alt: SkillToken) => ({
+        label: [...common, alt].map((t: SkillToken) => t.name).join(", "),
+        skills: [...common, alt],
+      });
       return [mk(lastLeft), mk(altTok)];
     }
   }
