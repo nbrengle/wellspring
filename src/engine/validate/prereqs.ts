@@ -85,7 +85,9 @@ export function checkLevelConstraint(character, constraintStr, owned) {
   }
 
   // 5. "N Apprentice spell-slot(s)"
-  m = constraintStr.match(/^(One|Two|Three|\d+)\s+(Apprentice|Novice-level|Novice|Journeyman|Adept|Greater|Master)\s+spell-slots?/i);
+  m = constraintStr.match(
+    /^(One|Two|Three|\d+)\s+(Apprentice|Novice-level|Novice|Journeyman|Adept|Greater|Master)\s+spell-slots?/i,
+  );
   if (m) {
     const count = parseWordNumber(m[1]);
     if (count === null) return null;
