@@ -13,8 +13,10 @@
 import classesJson from "../data/classes.json";
 import { lookupEntity, ALL_SKILLS } from "./data.js";
 import { bareSkill, cleanItemName, getClasses } from "../engine/resolver.js";
-import { Source, isStarting } from "./types.js";
+
+import type { CharacterState } from "./types.js";
 import type { CharacterChoice } from "./types.js";
+import { Source, isStarting } from "./types.js";
 
 // ─── Structured shapes for a class's starting-skill data ────────────────────
 /** One parsed skill token from a starting-skills line: the skill name + its rank
@@ -597,7 +599,10 @@ function expectedStartingSkills(primaryClassName, choices) {
 // (freshly built, imported from a sheet, or loaded from a URL hash) rather than
 // only on ones that just went through a rebuild. Returns
 // { specialty: {idx→label}, floor: {idx→rank} } for indices that came from a grant.
-export function startingSkillGrants(character) {
+export function startingSkillGrants(character: CharacterState): {
+  specialty: Record<number, string>;
+  floor: Record<number, number>;
+} {
   const primary = getClasses(character)[0]?.name;
   const specialty = {};
   const floor = {};
