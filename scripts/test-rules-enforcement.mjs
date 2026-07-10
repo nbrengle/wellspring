@@ -37,11 +37,30 @@ for (const s of skills) {
     const char = makeChar("Peasant 4", { lineage: "Human", add: [item] });
     const res = validate(char);
     const hasIssue = res.prereqs.issues.some((issue) => {
+      if (!issue.missing && !issue.anyOf) return false;
       const issueClean = issue.item.replace(/\s*-\s*\d+\s*BP$/i, "").trim();
       return issueClean === item;
     });
     if (!hasIssue) {
       reportGap("Prerequisite", s.name, "Missing prerequisites are not flagged as validation issues.");
+    } else {
+      // Positive test: if we add the hard skill prereqs, does the issue go away?
+      const prereqNames = pr.skills.map(idName);
+      if (pr.anyOf && pr.anyOf.length > 0) {
+        pr.anyOf.forEach(group => prereqNames.push(idName(group[0])));
+      }
+      if (prereqNames.length > 0) {
+        const charWithPrereqs = makeChar("Peasant 4", { lineage: "Human", add: [...prereqNames, item] });
+        const resWithPrereqs = validate(charWithPrereqs);
+        const stillHasIssue = resWithPrereqs.prereqs.issues.some((issue) => {
+          if (!issue.missing && !issue.anyOf) return false;
+          const issueClean = issue.item.replace(/\s*-\s*\d+\s*BP$/i, "").trim();
+          return issueClean === item;
+        });
+        if (stillHasIssue) {
+          reportGap("Prerequisite", s.name, "Adding the prerequisite did not resolve the validation issue.");
+        }
+      }
     }
   }
 }
@@ -53,11 +72,29 @@ for (const p of perks) {
     const char = makeChar("Peasant 4", { lineage: "Human", add: [p.name] });
     const res = validate(char);
     const hasIssue = res.prereqs.issues.some((issue) => {
+      if (!issue.missing && !issue.anyOf) return false;
       const issueClean = issue.item.replace(/\s*-\s*\d+\s*BP$/i, "").trim();
       return issueClean === p.name;
     });
     if (!hasIssue) {
       reportGap("Prerequisite", p.name, "Missing prerequisites are not flagged as validation issues.");
+    } else {
+      const prereqNames = pr.skills.map(idName);
+      if (pr.anyOf && pr.anyOf.length > 0) {
+        pr.anyOf.forEach(group => prereqNames.push(idName(group[0])));
+      }
+      if (prereqNames.length > 0) {
+        const charWithPrereqs = makeChar("Peasant 4", { lineage: "Human", add: [...prereqNames, p.name] });
+        const resWithPrereqs = validate(charWithPrereqs);
+        const stillHasIssue = resWithPrereqs.prereqs.issues.some((issue) => {
+          if (!issue.missing && !issue.anyOf) return false;
+          const issueClean = issue.item.replace(/\s*-\s*\d+\s*BP$/i, "").trim();
+          return issueClean === p.name;
+        });
+        if (stillHasIssue) {
+          reportGap("Prerequisite", p.name, "Adding the prerequisite did not resolve the validation issue.");
+        }
+      }
     }
   }
 }
