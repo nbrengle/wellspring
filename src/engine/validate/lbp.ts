@@ -10,13 +10,15 @@
 import { LINEAGES, REFS } from "../data.js";
 import { cleanItemName } from "../resolver.js";
 import { MAX_LBP, subKey } from "./core.js";
+import type { CharacterState } from "../types.js";
 
-export function lbpState(character) {
-  const lin = character?.lineage && LINEAGES[character.lineage];
+export function lbpState(character: CharacterState) {
+  const lineageStr = typeof character?.lineage === "string" ? character.lineage : (character?.lineage as any)?.name;
+  const lin = lineageStr && LINEAGES[lineageStr as keyof typeof LINEAGES];
   if (!lin) return null;
   const chosenC = character.lineageChallenges || [];
   const chosenA = character.lineageAdvantages || [];
-  const stripParameter = (s) => {
+  const stripParameter = (s: string) => {
     const firstOpen = s.indexOf("(");
     const lastClose = s.lastIndexOf(")");
     if (firstOpen !== -1 && lastClose > firstOpen) {
@@ -27,13 +29,13 @@ export function lbpState(character) {
 
   // Match a chosen item-name back to its lineage entry (names may carry [Repped]
   // / sublineage tags; compare on the display name the data exposes).
-  const findIn = (list, name) => {
+  const findIn = (list: any[], name: string) => {
     const clean = stripParameter(name);
-    return list.find((x) => x.name === clean || x.baseName === clean || x.name === name || x.baseName === name);
+    return list.find((x: any) => x.name === clean || x.baseName === clean || x.name === name || x.baseName === name);
   };
 
   const challenges = chosenC
-    .map((n) => {
+    .map((n: string) => {
       const c = findIn(lin.challenges, n);
       if (!c) return null;
 
@@ -65,14 +67,14 @@ export function lbpState(character) {
     })
     .filter(Boolean);
 
-  const advantages = chosenA.map((n) => findIn(lin.advantages, n)).filter(Boolean);
+  const advantages = chosenA.map((n: string) => findIn(lin.advantages, n)).filter(Boolean);
 
   // Perks that modify the LBP economy (Strong Bloodline: +3 LBP, cap 10→13). Sum
   // any the character owns; the highest stated newMax raises the challenge cap.
   const lbpB = REFS.lbpBonuses || {};
   let bonusLbp = 0,
     cap = MAX_LBP;
-  const perkNames = (character.perks || []).map((p) => (typeof p === "string" ? p : p.entityId));
+  const perkNames = (character.perks || []).map((p: any) => (typeof p === "string" ? p : p.entityId));
   for (const name of perkNames) {
     const b = lbpB[`perks:${cleanItemName(name)}`];
     if (b) {
@@ -81,10 +83,10 @@ export function lbpState(character) {
     }
   }
 
-  const rawAwarded = challenges.reduce((s, c) => s + (c.lbp || 0), 0);
+  const rawAwarded = challenges.reduce((s: number, c: any) => s + (c.lbp || 0), 0);
   // Challenge LBP is capped; the perk bonus is granted on top of the cap.
   const awarded = Math.min(rawAwarded, cap) + bonusLbp;
-  const spent = advantages.reduce((s, a) => s + (a.lbp || 0), 0);
+  const spent = advantages.reduce((s: number, a: any) => s + (a.lbp || 0), 0);
 
   // Sublineage scoping: all chosen non-"General" items must share ONE sublineage
   // (normalized, since the data tags it inconsistently), and — when the character
@@ -93,16 +95,18 @@ export function lbpState(character) {
   // excluded from the commitment check below (some lineages tag a required
   // challenge to a default presentation).
   const subs = new Set(
-    [...challenges, ...advantages].map((x) => subKey(x.sublineage)).filter((s) => s && s !== "general"),
+    [...challenges, ...advantages]
+      .map((x: any) => subKey(x.sublineage))
+      .filter((s: string | null) => s && s !== "general"),
   );
   const optionalSubs = new Set(
     [...challenges, ...advantages]
-      .filter((x) => !x.required)
-      .map((x) => subKey(x.sublineage))
-      .filter((s) => s && s !== "general"),
+      .filter((x: any) => !x.required)
+      .map((x: any) => subKey(x.sublineage))
+      .filter((s: string | null) => s && s !== "general"),
   );
   const pickedSub = character.sublineage ? subKey(character.sublineage) : null;
-  const mixedSublineage = subs.size > 1 || (pickedSub && [...subs].some((s) => s !== pickedSub));
+  const mixedSublineage = subs.size > 1 || (pickedSub && [...subs].some((s: string) => s !== pickedSub));
 
   // A sublineage is a COMMITMENT: any OPTIONAL chosen item tagged to a sublineage
   // (e.g. a Psionic challenge, which represents being psionic) requires that the
@@ -115,11 +119,11 @@ export function lbpState(character) {
   // Required challenges the character hasn't taken (some lineages mandate them).
   // A required challenge belonging to a specific sublineage is only required if
   // that sublineage is selected.
-  const missingRequired = lin.challenges.filter((c) => {
+  const missingRequired = lin.challenges.filter((c: any) => {
     if (!c.required) return false;
     const cSub = subKey(c.sublineage);
     if (cSub && cSub !== "general" && cSub !== pickedSub) return false;
-    return !challenges.some((x) => x.baseName === c.baseName);
+    return !challenges.some((x: any) => x.baseName === c.baseName);
   });
 
   return {
