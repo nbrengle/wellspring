@@ -621,13 +621,21 @@ export class CharacterGraphModel implements CharacterGraph {
     const excludes = REFS.excludes || {};
     if (Object.keys(excludes).length) {
       const ownedExcl = new Set<string>();
+      const entityToNode = new Map<string, string>();
       for (const node of this.items) {
-        if (node.field === "purchasedPerks" || node.field === "flaws" || node.field === "innatePerks") {
-          if (node.id) ownedExcl.add(node.id);
+        if (node.field === "perks" || node.field === "flaws" || node.field === "innatePerks" || node.field === "purchasedPerks") {
+          if (node.id) {
+            const eId = node.entity?.id || node.id.replace(/^(purchasedPerks|innatePerks):/, "perks:");
+            ownedExcl.add(eId);
+            entityToNode.set(eId, node.id);
+          }
         }
       }
       for (const g of this._grantedAbilitiesList) {
-        if (/^(perks|flaws):/.test(g.ability)) ownedExcl.add(g.ability);
+        if (/^(perks|flaws):/.test(g.ability)) {
+          ownedExcl.add(g.ability);
+          if (!entityToNode.has(g.ability)) entityToNode.set(g.ability, g.ability);
+        }
       }
       const reportedPairs = new Set<string>();
       for (const id of ownedExcl) {
@@ -636,10 +644,11 @@ export class CharacterGraphModel implements CharacterGraph {
           const pairKey = [id, other].sort().join("|");
           if (reportedPairs.has(pairKey)) continue;
           reportedPairs.add(pairKey);
+          const nodeId = entityToNode.get(id) || id;
           issues.push({
-            id,
+            id: nodeId,
             item: idName(id),
-            field: id.split(":")[0],
+            field: nodeId.split(":")[0],
             excludes: other,
             text: `cannot be taken along with ${idName(other)}`,
           });
@@ -718,7 +727,7 @@ export class CharacterGraphModel implements CharacterGraph {
 
     const powerCounts = new Map<string, number>();
     for (const node of this.items) {
-      if (node.entity?.type !== "power" || node.sourceType !== "purchased") continue;
+      if (node.entity?.type !== "power" || node.sourceType === "granted") continue;
       const name = cleanItemName(node.name);
       if (!name) continue;
       powerCounts.set(name, (powerCounts.get(name) || 0) + 1);
