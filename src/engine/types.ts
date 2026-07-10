@@ -450,3 +450,17 @@ export interface CharacterGraph {
   characterLevel: number;
   classes: { name: string; level: number }[];
 }
+
+export interface ProgressionRow {
+  utility?: number;
+  basic?: number;
+  advanced?: number;
+  veteran?: number;
+  bonus?: number | null;
+  cantrips?: number;
+  spellsKnown?: number;
+  slots?: string;
+  innateCantrips?: string[];
+  statMods?: StatMod[];
+  statModNotes?: { stat: string; [k: string]: unknown }[];
+}

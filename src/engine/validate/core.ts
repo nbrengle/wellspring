@@ -10,7 +10,7 @@ import {
   CLASSES,
 } from "../data.js";
 import { cleanItemName, bareSkill, getClasses } from "../resolver.js";
-import type { CharacterState } from "../types.js";
+import type { CharacterState, ProgressionRow } from "../types.js";
 import { sourceClass, Entity } from "../types.js";
 
 import { MAX_LBP, MAX_FLAW_BP, BACKSTORY_BP, MAX_DOMAINS, DEFAULT_WEALTH, LEVEL_CAP } from "../config.js";
@@ -107,27 +107,11 @@ export function maxProgressionLevel(cls: string) {
   return levels.length ? Math.max(...levels) : 4;
 }
 
-export interface ProgressionRow {
-  utility?: number;
-  basic?: number;
-  advanced?: number;
-  veteran?: number;
-  bonus?: number | null;
-  cantrips?: number;
-  spellsKnown?: number;
-  slots?: string;
-  innateCantrips?: number;
-  statMods?: string;
-}
+// progressionRow definition moved to types.ts
 
 export function progressionRow(cls: string, level: number): ProgressionRow {
-  const prog = (CLASS_PROGRESSION as unknown as Record<string, Record<number, ProgressionRow>>)[cls] || {};
-  return (
-    prog[level] ||
-    prog[Math.min(level, maxProgressionLevel(cls))] ||
-    (CLASS_POWER_SLOTS as unknown as Record<string, ProgressionRow>)[cls] ||
-    {}
-  );
+  const prog = CLASS_PROGRESSION[cls] || {};
+  return prog[level] || prog[Math.min(level, maxProgressionLevel(cls))] || CLASS_POWER_SLOTS[cls] || {};
 }
 
 // ─── Grant cluster ──────────────────────────────────────────────────────────

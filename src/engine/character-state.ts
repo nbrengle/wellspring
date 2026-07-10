@@ -99,16 +99,18 @@ export function applyClassStartingAbilities(character: CharacterState, className
   return nextCharacter;
 }
 
-export function loadArchetype(archetype: Record<string, unknown>) {
+export function loadArchetype(
+  archetype: Partial<CharacterState> & { name?: string; lineage?: string | { name: string } },
+): CharacterState {
   const c = { ...EMPTY_CHARACTER, archetypeName: archetype.name as string | null } as CharacterState;
   for (const k of Object.keys(EMPTY_CHARACTER) as (keyof CharacterState)[]) {
     if (k === "archetypeName") continue;
     const archValue = archetype[k];
     if (archValue !== undefined) {
-      if (k === "lineage" && typeof archValue === "object" && archValue !== null) {
+      if (k === "lineage" && typeof archValue === "object" && archValue !== null && "name" in archValue) {
         c.lineage = (archValue as { name: string }).name;
       } else {
-        (c as unknown as Record<string, unknown>)[k] = archValue;
+        Object.assign(c, { [k]: archValue });
       }
     }
   }

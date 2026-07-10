@@ -4,7 +4,7 @@
 // (npm run parse) refreshes everything downstream automatically.
 
 import classesJson from "../data/classes.json";
-import type { Entity, DiscountSpec } from "./types.js";
+import type { Entity, ProgressionRow, DiscountSpec } from "./types.js";
 import skillsJson from "../data/skills.json";
 import perksJson from "../data/perks.json";
 import flawsJson from "../data/flaws.json";
@@ -463,14 +463,28 @@ export function lineageCantripChoices(character): { item: string; cantrip: strin
   return out;
 }
 
+type ClassJsonType = {
+  name: string;
+  type?: string;
+  progression?: Record<string, ProgressionRow>;
+  utilityPowers?: number;
+  basicPowers?: number;
+  advancedPowers?: number;
+  veteranPowers?: number;
+  cantrips?: number;
+  spellsKnown?: number;
+  slots?: string;
+};
+
 // Power-slot counts at the starting level come from the progression table's
 // level-4 row, so they stay in sync with the source rather than being hardcoded.
-export const CLASS_POWER_SLOTS = Object.fromEntries(
-  classesJson.map((c) => {
-    const lvl4 = c.progression?.["4"] || {};
-    if (c.type === "Spellcaster") {
+export const CLASS_POWER_SLOTS: Record<string, ProgressionRow> = Object.fromEntries(
+  classesJson.map((c: unknown) => {
+    const cls = c as ClassJsonType;
+    const lvl4 = cls.progression?.["4"] || {};
+    if (cls.type === "Spellcaster") {
       return [
-        c.name,
+        cls.name,
         {
           cantrips: lvl4.cantrips ?? 0,
           spellsKnown: lvl4.spellsKnown ?? 0,
@@ -479,7 +493,7 @@ export const CLASS_POWER_SLOTS = Object.fromEntries(
       ];
     }
     return [
-      c.name,
+      cls.name,
       {
         utility: lvl4.utility ?? 0,
         basic: lvl4.basic ?? 0,
@@ -493,7 +507,9 @@ export const CLASS_POWER_SLOTS = Object.fromEntries(
 // Full per-level progression table per class (level → { cantrips, spellsKnown,
 // slots, utility, basic, …, bonus }). The validator scans the `bonus` prose for
 // level-granted features like the casters' "Innate Bonus Cantrip".
-export const CLASS_PROGRESSION = Object.fromEntries(classesJson.map((c) => [c.name, c.progression || {}]));
+export const CLASS_PROGRESSION: Record<string, Record<number, ProgressionRow>> = Object.fromEntries(
+  classesJson.map((c: unknown) => [(c as ClassJsonType).name, (c as ClassJsonType).progression || {}]),
+);
 
 // ─── LINEAGES ─────────────────────────────────────────────────────────────────
 // UI expects LINEAGES keyed by name with challenges/advantages whose display
