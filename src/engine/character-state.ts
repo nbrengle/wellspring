@@ -1,6 +1,7 @@
 import { getClasses, cleanItemName } from "./resolver.js";
 import { getAllEntities } from "./data.js";
 import type { CharacterState } from "./types.js";
+import { emptyBuckets } from "./config.js";
 import {
   STARTING_CHOICES_CONFIG,
   hasStartingChoices,
@@ -70,12 +71,7 @@ export const EMPTY_CHARACTER: CharacterState = {
   wealth: null, // null → DEFAULT_WEALTH (8); perks/sheet may set it
   resources: null, // free-form, from the sheet
   classes: [],
-  skills: [],
-  perks: [],
-  powers: [],
-  domainPowers: [],
-  spells: [],
-  flaws: [],
+  ...emptyBuckets(),
   devotions: [],
   advantageChoices: {},
   grantedSelections: {},
