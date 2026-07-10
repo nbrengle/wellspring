@@ -9,7 +9,7 @@
 // Re-exported by the validate.js barrel.
 
 import { CLASSES } from "../data.js";
-import { getClasses } from "../resolver.js";
+import { getClasses, parseWordNumber } from "../resolver.js";
 import { characterLevel } from "./core.js";
 import { spellSlots, type SpellPool } from "./slots.js";
 import { resolveCharacterGraph } from "../graph.js";
@@ -87,11 +87,8 @@ export function checkLevelConstraint(character, constraintStr, owned) {
   // 5. "N Apprentice spell-slot(s)"
   m = constraintStr.match(/^(One|Two|Three|\d+)\s+(Apprentice|Novice-level|Novice|Journeyman|Adept|Greater|Master)\s+spell-slots?/i);
   if (m) {
-    let countStr = m[1].toLowerCase();
-    let count = parseInt(countStr, 10);
-    if (countStr === "one") count = 1;
-    if (countStr === "two") count = 2;
-    if (countStr === "three") count = 3;
+    const count = parseWordNumber(m[1]);
+    if (count === null) return null;
 
     const POOL_KEY: Record<string, keyof SpellPool> = {
       apprentice: "novice",

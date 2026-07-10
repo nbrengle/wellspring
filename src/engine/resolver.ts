@@ -44,3 +44,11 @@ export function formatParameterizedName(baseName: string, parameter: string, ori
   }
   return `${baseName} (${parameter})`;
 }
+
+const WORD_NUM: Record<string, number> = { one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9, ten: 10 };
+export function parseWordNumber(s: string): number | null {
+  const w = WORD_NUM[s.toLowerCase()];
+  if (w != null) return w;
+  const n = parseInt(s, 10);
+  return isNaN(n) ? null : n;
+}

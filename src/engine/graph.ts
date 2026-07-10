@@ -14,7 +14,7 @@ import {
 import { startingSkillGrants } from "./starting-choices.js";
 import { MAX_FLAW_BP } from "./validate/core.js";
 import { costKey } from "./validate/cost-key.js";
-import { cleanItemName, bareSkill, getClasses } from "./resolver.js";
+import { cleanItemName, bareSkill, getClasses, parseWordNumber } from "./resolver.js";
 import { characterLevel, getMaxRanks } from "./validate/core.js";
 import { paramInfo, paramReusable } from "./param-domain.js";
 import { spellSlots, type SpellPool } from "./validate/slots.js";
@@ -1165,7 +1165,7 @@ function discountApplies(src: DiscountSpec & { id: string; name: string }, itemN
 //   true  if the constraint is parsed and met.
 //   false if the constraint is parsed and failed.
 //   null  if the constraint format is unrecognized.
-function checkLevelConstraint(character: any, constraintStr: string, owned: Set<string>): boolean | null {
+function checkLevelConstraint(character: CharacterState, constraintStr: string, owned: Set<string>): boolean | null {
   const charLevel = characterLevel(character);
   const charClasses = getClasses(character);
 
@@ -1185,7 +1185,7 @@ function checkLevelConstraint(character: any, constraintStr: string, owned: Set<
   if (m) {
     const required = parseInt(m[1], 10);
     const martial = charClasses
-      .filter((c) => (CLASSES as any)[c.name]?.tags?.includes("Martial"))
+      .filter((c) => CLASSES[c.name]?.tags?.includes("Martial"))
       .reduce((sum, c) => sum + c.level, 0);
     return martial >= required;
   }
@@ -1199,7 +1199,7 @@ function checkLevelConstraint(character: any, constraintStr: string, owned: Set<
     // Spellcaster meta-class
     if (classStr === "spellcaster" || classStr === "spellcaster class") {
       const highestSpellcasterLevel = charClasses
-        .filter((c) => (CLASSES as any)[c.name]?.spellcaster)
+        .filter((c) => CLASSES[c.name]?.spellcaster)
         .reduce((max, c) => Math.max(max, c.level), 0);
       return highestSpellcasterLevel >= requiredLevel;
     }
@@ -1223,13 +1223,10 @@ function checkLevelConstraint(character: any, constraintStr: string, owned: Set<
   // 5. "N Apprentice spell-slot(s)"
   m = constraintStr.match(/^(One|Two|Three|\d+)\s+(Apprentice|Novice-level|Novice|Journeyman|Adept|Greater|Master)\s+spell-slots?/i);
   if (m) {
-    let countStr = m[1].toLowerCase();
-    let count = parseInt(countStr, 10);
-    if (countStr === "one") count = 1;
-    if (countStr === "two") count = 2;
-    if (countStr === "three") count = 3;
+    const count = parseWordNumber(m[1]);
+    if (count === null) return null;
 
-    const POOL_KEY: Record<string, keyof any> = {
+    const POOL_KEY: Record<string, keyof SpellPool> = {
       apprentice: "novice",
       novice: "novice",
       "novice-level": "novice",
@@ -1239,8 +1236,8 @@ function checkLevelConstraint(character: any, constraintStr: string, owned: Set<
       master: "greater",
     };
     const key = POOL_KEY[m[2].toLowerCase()];
-    const slots = spellSlots(character) as any;
-    const have = key && slots ? Object.values(slots).reduce((s: any, c: any) => s + (c[key] || 0), 0) as number : 0;
+    const slots = spellSlots(character);
+    const have = key && slots ? Object.values(slots).reduce((s, c) => s + (c[key] || 0), 0) : 0;
     return have >= count;
   }
 
@@ -1269,7 +1266,7 @@ function checkLevelConstraint(character: any, constraintStr: string, owned: Set<
 
   // 9. "One level in a non-casting class"
   if (/One level in a non-casting class/i.test(constraintStr)) {
-    return charClasses.some((c) => !(CLASSES as any)[c.name]?.spellcaster && c.level >= 1);
+    return charClasses.some((c) => !CLASSES[c.name]?.spellcaster && c.level >= 1);
   }
 
   // 10. "class-levels in at least two Base Classes"
