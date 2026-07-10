@@ -23,12 +23,7 @@ interface SkillToken {
   name: string;
   rank: number;
 }
-/** A FIXED starting-skills block (granted outright, no choice), e.g. "The Most Basic
- *  Training: Basic Martial Weapons, Basic Shields". */
-interface StartingBlock {
-  label: string;
-  skills: SkillToken[];
-}
+
 /** One option of a "Choose one of the following" block: its display text + the skills
  *  it would grant. */
 interface ChoiceOption {
