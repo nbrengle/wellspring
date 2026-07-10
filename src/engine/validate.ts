@@ -203,13 +203,18 @@ export function classifyOwnedItems(character) {
   const mcGrants = multiclassGrants(character).skills;
   for (const mc of mcGrants) {
     skills.push({
+      id: mc.name,
+      entityId: `skills:${mc.name}`,
       name: mc.name,
       field: "skills",
       sourceType: "multiclass",
+      type: "skill",
+      cost: 0,
+      free: true,
       cls: mc.source,
-      index: -1,
       rank: 1,
-    } as any);
+      effects: [],
+    });
   }
 
   return {

@@ -54,14 +54,24 @@ export interface BaseEntity {
   requiredLevel?: number;
   requiredClass?: string;
   requiresEntity?: string[];
+
+  // Parsed loose JSON fields across various entities
+  ranks?: number | string;
+  levelBenefits?: { name: string; requiredLevel?: number }[];
+  levelBenefitClass?: string;
+  slotGrants?: SlotGrant[];
+  grantedSelections?: Record<string, unknown>;
+  highestSlot?: number;
+  magicType?: string;
+  bp?: number | string; // For flawed abilities that grant bp
+  effect?: string;
+  call?: string;
 }
 
 export interface Skill extends BaseEntity {
   type: "skill";
   cost: number | string;
-  ranks?: number;
   category?: string; // e.g. "Martial", "Crafting"
-  slotGrants?: SlotGrant[];
   stats?: StatMod[];
   chooseOne?: ChooseOneConfig;
 }
@@ -71,20 +81,19 @@ export interface Power extends BaseEntity {
   tier: "Basic" | "Advanced" | "Veteran" | "Utility" | "Class";
   parentClass?: string;
   parameter?: string; // E.g. (Swords)
-  highestSlot?: number;
+
 }
 
 export interface Spell extends BaseEntity {
   type: "spell";
   tier: "Cantrip" | "Novice" | "Adept" | "Greater";
   sphere: string; // e.g. "Arcane", "Divine"
-  magicType?: string;
+
 }
 
 export interface Perk extends BaseEntity {
   type: "perk";
   cost: number | string;
-  ranks?: number;
   category?: string;
 }
 
@@ -98,7 +107,7 @@ export interface Class extends BaseEntity {
   type: "class";
   innate?: { name: string; requiredLevel?: number }[];
   spellcaster?: boolean;
-  magicType?: string;
+
 }
 
 /**
@@ -390,7 +399,8 @@ export type ViewState = {
   id: string;
   entityId: string;
   param?: string;
-  source: string;
+  sourceType: string;
+  cls?: string | null;
   grantedBy?: string;
   free: boolean;
   cost: number;
