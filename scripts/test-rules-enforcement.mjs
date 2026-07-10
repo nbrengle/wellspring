@@ -47,7 +47,7 @@ for (const s of skills) {
       // Positive test: if we add the hard skill prereqs, does the issue go away?
       const prereqNames = pr.skills.map(idName);
       if (pr.anyOf && pr.anyOf.length > 0) {
-        pr.anyOf.forEach(group => prereqNames.push(idName(group[0])));
+        pr.anyOf.forEach((group) => prereqNames.push(idName(group[0])));
       }
       if (prereqNames.length > 0) {
         const charWithPrereqs = makeChar("Peasant 4", { lineage: "Human", add: [...prereqNames, item] });
@@ -81,7 +81,7 @@ for (const p of perks) {
     } else {
       const prereqNames = pr.skills.map(idName);
       if (pr.anyOf && pr.anyOf.length > 0) {
-        pr.anyOf.forEach(group => prereqNames.push(idName(group[0])));
+        pr.anyOf.forEach((group) => prereqNames.push(idName(group[0])));
       }
       if (prereqNames.length > 0) {
         const charWithPrereqs = makeChar("Peasant 4", { lineage: "Human", add: [...prereqNames, p.name] });

@@ -623,7 +623,12 @@ export class CharacterGraphModel implements CharacterGraph {
       const ownedExcl = new Set<string>();
       const entityToNode = new Map<string, string>();
       for (const node of this.items) {
-        if (node.field === "perks" || node.field === "flaws" || node.field === "innatePerks" || node.field === "purchasedPerks") {
+        if (
+          node.field === "perks" ||
+          node.field === "flaws" ||
+          node.field === "innatePerks" ||
+          node.field === "purchasedPerks"
+        ) {
           if (node.id) {
             const eId = node.entity?.id || node.id.replace(/^(purchasedPerks|innatePerks):/, "perks:");
             ownedExcl.add(eId);
