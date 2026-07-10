@@ -118,10 +118,10 @@ export function activePowerBenefits(character): PowerBenefit[] {
   for (const item of character.powers || []) {
     const ent = lookupEntity(`powers:${cleanItemName(item.entityId || item.name || "")}`);
     if (!ent?.levelBenefits) continue;
-    const lvl = levelByClass[ent.levelBenefitClass] ?? characterLevel(character);
+    const lvl = levelByClass[ent.levelBenefitClass ?? ""] ?? characterLevel(character);
     out.push({
       power: ent.name,
-      gateClass: ent.levelBenefitClass,
+      gateClass: ent.levelBenefitClass ?? "",
       benefits: ent.levelBenefits.map((b) => ({ ...b, active: lvl >= b.level })),
     });
   }

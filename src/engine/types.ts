@@ -57,10 +57,10 @@ export interface BaseEntity {
 
   // Parsed loose JSON fields across various entities
   ranks?: number | string;
-  levelBenefits?: { name: string; requiredLevel?: number }[];
+  levelBenefits?: { level: number; text: string }[];
   levelBenefitClass?: string;
   slotGrants?: SlotGrant[];
-  grantedSelections?: Record<string, unknown>;
+  grantedSelections?: Record<string, unknown>[];
   highestSlot?: number;
   magicType?: string;
   bp?: number | string; // For flawed abilities that grant bp

@@ -355,7 +355,7 @@ export class CharacterGraphModel implements CharacterGraph {
       for (const cand of candidates) {
         const e = lookupEntity(cand);
         if (e) {
-          owned.add(e.id);
+          if (e.id) owned.add(e.id);
           owned.add(`${idPrefix(e)}:${bareSkill(e.name)}`);
         }
       }
@@ -1223,7 +1223,7 @@ function normalizeCharacter(character: CharacterState): CharacterState {
   const owned = new Set(powers.map((p) => p.entityId));
   for (const c of classes) {
     const clsDef = lookupEntity(`classes:${c.name}`);
-    for (const p of clsDef?.innate || []) {
+    for (const p of (clsDef?.type === "class" ? clsDef.innate : []) || []) {
       if (c.level >= (p.requiredLevel || 1) && !owned.has(p.name)) {
         owned.add(p.name);
         powers.push({ entityId: p.name, source: Source.innate(), ranks: 1, costField: "innatePowers" });

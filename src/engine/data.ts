@@ -58,7 +58,8 @@ export const EVENTS_TABLE = eventsTableJson;
 export const META = {
   ...metaJson,
   appVersion:
-    (typeof (import.meta as any).env !== "undefined" && (import.meta as any).env.VITE_APP_VERSION) ||
+    (typeof (import.meta as unknown as { env?: { VITE_APP_VERSION?: string } }).env !== "undefined" && 
+     (import.meta as unknown as { env?: { VITE_APP_VERSION?: string } }).env?.VITE_APP_VERSION) ||
     metaJson.appVersion,
 };
 
@@ -182,7 +183,7 @@ const MAGIC_TYPE = Object.fromEntries(classesJson.filter((c) => c.magicType).map
 // When they arrive the parser should mark them (e.g. type:'Advanced' or
 // isAdvanced); exclude any such marker here so the base/advanced split stays correct.
 export const BASE_CLASSES = new Set(
-  classesJson.filter((c) => c.type !== "Advanced" && !(c as any).isAdvanced).map((c) => c.name),
+  classesJson.filter((c) => c.type !== "Advanced" && !("isAdvanced" in c && c.isAdvanced)).map((c) => c.name),
 );
 
 export const CLASSES = Object.fromEntries(
@@ -353,7 +354,7 @@ export function lineageRepOptions() {
 // recorded as "<Lineage> - <Advantage>" so the graph can resolve it cross-lineage
 // and apply its full effects (with prereqs still enforced).
 export function pickAndChooseOptions() {
-  const out = [] as any[];
+  const out: {name: string, group: string, description: string, advId: string}[] = [];
   for (const [lineage, lin] of Object.entries(LINEAGES)) {
     if (lineage === "Lost") continue;
     for (const a of lin.advantages || []) {
@@ -361,7 +362,7 @@ export function pickAndChooseOptions() {
       out.push({
         name,
         group: lineage,
-        description: (a as any).description || a.desc || "",
+        description: ("description" in a ? (a as {description?: string}).description : (a as {desc?: string}).desc) || "",
         advId: `${lineage} - ${name}`,
       });
     }
@@ -418,7 +419,7 @@ export function lineageItemImpact(item, lineage) {
     return [`pick ${article} ${label} (flavor)`];
   }
 
-  const out = [] as any[];
+  const out: string[] = [];
   for (const m of item.statMods || []) {
     const label = STAT_LABELS[m.stat] || m.stat;
     out.push(`${m.n >= 0 ? "+" : ""}${m.n} ${label}`);
@@ -446,16 +447,16 @@ function idNameLocal(id) {
   return i >= 0 ? id.slice(i + 1) : id;
 }
 
-export function lineageCantripChoices(character) {
+export function lineageCantripChoices(character): {item: string, cantrip: string}[] {
   const choices = character?.advantageChoices || {};
   const lin = character?.lineage && LINEAGES[character.lineage];
   if (!lin) return [];
-  const out = [] as any[];
+  const out: {item: string, cantrip: string}[] = [];
   for (const it of [...(lin.challenges || []), ...(lin.advantages || [])]) {
     const base = it.baseName || it.name;
     const spec = LINEAGE_CHOICE_SPECS[base];
     if (spec?.kind === "cantrip" && choices[base]) {
-      out.push({ item: base, cantrip: choices[base] });
+      out.push({ item: base, cantrip: String(choices[base]) });
     }
   }
   return out;
@@ -825,7 +826,7 @@ function applySkillAlias(name) {
   if (ALIAS_EXACT[lower]) return ALIAS_EXACT[lower];
   for (const [re, fn] of ALIAS_PATTERNS) {
     const m = name.match(re);
-    if (m) return name.replace(re, (fn as any)(m));
+    if (m) return name.replace(re, (fn as (match: RegExpMatchArray) => string)(m));
   }
   return name;
 }
@@ -833,7 +834,7 @@ function applySkillAlias(name) {
 // Lookup by entity id, e.g. "skills:Basic Faith" → { type, name, description, ... }.
 // Falls back to a canonical-name match across all types when the exact id misses,
 // so reference links resolve despite linker/file namespace differences.
-export const lookupEntity = (id: string | null | undefined): Entity | any | null => {
+export const lookupEntity = (id: string | null | undefined): Entity | null => {
   if (!id) return null;
   const baseId = id.includes("|") ? id.split("|")[0] : id;
   const direct = ENTITY_INDEX.get(baseId);
