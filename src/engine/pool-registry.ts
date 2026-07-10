@@ -21,6 +21,7 @@
 // via unresolvedPoolMentions() if a reference can't be matched.
 
 import { lookupEntity } from "./data.js";
+import { Entity } from "./types.js";
 
 export interface PoolDef {
   id: string;
@@ -51,10 +52,11 @@ export const POOLS: PoolDef[] = [
 const poolById = new Map(POOLS.map((p) => [p.id, p]));
 export const getPool = (id: string): PoolDef | undefined => poolById.get(id);
 
-const textOf = (e: import("./types.js").Entity | null | undefined): string => [e?.description, e?.effect, e?.call].filter(Boolean).join("  ");
+const textOf = (e: Entity | null | undefined): string =>
+  [e?.description, e?.effect, e?.call].filter(Boolean).join("  ");
 
 /** Which pool(s) does this entity's text reference? Returns pool ids. */
-export function poolsReferenced(entity: import("./types.js").Entity | null | undefined): string[] {
+export function poolsReferenced(entity: Entity | null | undefined): string[] {
   const text = textOf(entity);
   if (!/pool|maintenance points/i.test(text)) return [];
   return POOLS.filter((p) => p.aliases.test(text)).map((p) => p.id);
@@ -76,7 +78,7 @@ const ACTIVATION_TRIGGER = /\b(casting|cast|whenever|each time|when they|for eac
  *  boost) → `refills` (TEMPORARY add during play) → `mentions`.
  *  ⚠ TODO(derive): verb-cue classification is fuzzy; a structured pool-effect from
  *  the parser should replace it. */
-export function poolRelation(entity: import("./types.js").Entity | null | undefined, poolId: string): PoolRelation | null {
+export function poolRelation(entity: Entity | null | undefined, poolId: string): PoolRelation | null {
   const pool = poolById.get(poolId);
   const text = textOf(entity);
   if (!pool || !pool.aliases.test(text)) return null;
@@ -104,7 +106,7 @@ const WORD_NUM: Record<string, number> = { one: 1, two: 2, three: 3, four: 4, fi
 /** Parse a defining power's size formula into { mult, add } so size = mult*level + add.
  *  Handles "three times … class-level" / "3 x … level" / "10 plus … level" / flat
  *  "maximum points of N". Returns null if the prose isn't recognized (→ guard). */
-export function poolSizeFormula(entity: import("./types.js").Entity | null | undefined): { mult: number; add: number } | null {
+export function poolSizeFormula(entity: Entity | null | undefined): { mult: number; add: number } | null {
   const t = textOf(entity).replace(/\s+/g, " ");
   const num = (s: string): number | null => {
     const w = WORD_NUM[s.toLowerCase()];
@@ -148,7 +150,7 @@ export interface PoolMaxBreakdown {
  *  `refills` are NOT included — they add to the current pool during play, not the
  *  max. Returns a breakdown so the UI can show "9 (3×L) + Greater Healing Touch (+3)".
  *  `owned` = entities the character actually has (so unowned augments don't count). */
-export function poolMax(poolId: string, classLevel: number, owned: import("./types.js").Entity[]): PoolMaxBreakdown {
+export function poolMax(poolId: string, classLevel: number, owned: Entity[]): PoolMaxBreakdown {
   const base = poolSize(poolId, classLevel);
   const sources: Array<{ name: string; amount: number }> = [];
   for (const e of owned) {
@@ -204,7 +206,7 @@ export function characterPools(owned: OwnedLike[], classLevelOf: (className: str
     ent: (lookupEntity(`classes:${o.name}`) ||
       lookupEntity(`domains:${o.name}`) ||
       lookupEntity(`skills:${o.name}`) ||
-      lookupEntity(`powers:${o.name}`) || { name: o.name }) as import("./types.js").Entity,
+      lookupEntity(`powers:${o.name}`) || { name: o.name }) as Entity,
   }));
 
   const out: CharacterPool[] = [];
@@ -213,7 +215,7 @@ export function characterPools(owned: OwnedLike[], classLevelOf: (className: str
     const definer = resolved.find((r) => r.owned.name === pool.definedBy);
     if (!definer) continue;
 
-    const classLevel = classLevelOf((definer.ent as import("./types.js").Entity | undefined)?.parentClass || definer.owned.cls || "") || 1;
+    const classLevel = classLevelOf((definer.ent as Entity | undefined)?.parentClass || definer.owned.cls || "") || 1;
     const toPower = (r: (typeof resolved)[number], relation: PoolRelation): PoolPower => ({
       name: r.owned.name,
       source: r.owned.source ?? "purchased",
@@ -243,7 +245,7 @@ export function characterPools(owned: OwnedLike[], classLevelOf: (className: str
 /** Build guard: every defining power must yield a parseable size formula, and the
  *  audit's unresolved mentions must be empty. Feed RAW entities. Returns offenders. */
 export function unresolvedPoolMentions(
-  entities: import("./types.js").Entity[],
+  entities: Entity[],
 ): Array<{ pool: string; reason: "no-formula" | "missing-definer" }> {
   const out: Array<{ pool: string; reason: "no-formula" | "missing-definer" }> = [];
   for (const p of POOLS) {

@@ -11,7 +11,7 @@ import {
 } from "../data.js";
 import { cleanItemName, bareSkill, getClasses } from "../resolver.js";
 import type { CharacterState } from "../types.js";
-import { sourceClass } from "../types.js";
+import { sourceClass, Entity } from "../types.js";
 
 import { MAX_LBP, MAX_FLAW_BP, BACKSTORY_BP, MAX_DOMAINS, DEFAULT_WEALTH, LEVEL_CAP } from "../config.js";
 
@@ -63,7 +63,7 @@ export function getMaxRanks(entityId: string): number {
   return 1;
 }
 
-export function requiredLevel(power: import("../types.js").Entity | null | undefined) {
+export function requiredLevel(power: Entity | null | undefined) {
   return power?.requiredLevel ?? 0;
 }
 // (pickClass removed — a slot power's granting class now lives in its structured
@@ -117,7 +117,7 @@ export function progressionRow(cls: string, level: number) {
 // Active innate powers for the character: class-innate powers whose level
 // requirements are met. (In CharacterState, user-added innates are just in `powers` with source `GrantedBy:Innate`)
 export function activeInnatePowers(character: CharacterState) {
-  const list: {name: string, entity: import("../types.js").Entity | undefined, cls: string, source: string}[] = [];
+  const list: { name: string; entity: Entity | undefined; cls: string; source: string }[] = [];
   const seen = new Set();
 
   for (const { name: cls, level } of getClasses(character)) {
@@ -137,8 +137,8 @@ export function activeInnatePowers(character: CharacterState) {
 // Multiclass grants
 export function multiclassGrants(character: CharacterState) {
   const classes = getClasses(character);
-  const skills: {name: string, source: string}[] = [];
-  const freeBPItems: {skill: string, source: string, bp: number}[] = [];
+  const skills: { name: string; source: string }[] = [];
+  const freeBPItems: { skill: string; source: string; bp: number }[] = [];
   let freeBP = 0;
 
   // What does the character explicitly own in their choices?

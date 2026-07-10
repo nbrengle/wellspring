@@ -19,6 +19,7 @@ import {
 import { cleanItemName, getClasses } from "../resolver.js";
 import { SPELL_TIERS, SLOT_CATS, BOOKCASTER_TIER_FIELD, KNOWN_SPELL_FIELDS } from "../config.js";
 import { countPicksForClass, progressionRow, sourceClass, activeInnatePowers } from "./core.js";
+import { CharacterChoice, CharacterState, BaseEntity } from "../types.js";
 
 // ─── Structured slot/spell shapes ───────────────────────────────────────────
 /** One power/spell slot row for a class+category: how many are `used` vs `allowed`
@@ -110,7 +111,7 @@ export function slotGrants(character, sources: Record<string, string[]> | null =
   //    (GENERIC_POWER_FIELDS) — innate slot grants are handled by the
   //    activeInnatePowers() loop below; iterating them here too would double-count.
   for (const field of ["skills", "powers"]) {
-    (character[field] || []).forEach((item: import("../types.js").CharacterChoice) => {
+    (character[field] || []).forEach((item: CharacterChoice) => {
       const clean = cleanItemName(item.entityId.replace(/^(skills|powers):/, ""));
       const ent = lookupEntity(item.entityId);
       const rank = item.ranks || 1;
@@ -196,8 +197,8 @@ export function innateBonusCantrips(character): GrantedCantrip[] {
 // How many Agile Learner trades the character is entitled to — the total rank of
 // every Agile Learner skill they own (it has no maxRanks, so each purchase = one
 // more trade). 0 when the skill isn't owned.
-export function agileLearnerCapacity(character: import("../types.js").CharacterState): number {
-  return (character.skills || []).reduce((n: number, s: import("../types.js").CharacterChoice) => {
+export function agileLearnerCapacity(character: CharacterState): number {
+  return (character.skills || []).reduce((n: number, s: CharacterChoice) => {
     if (cleanItemName(s.entityId.replace("skills:", "")) === "Agile Learner") return n + (s.ranks || 1);
     return n;
   }, 0);
@@ -268,7 +269,7 @@ export function computeSlots(character) {
       const granted = grantedCantrips.filter((g) => g.cls === cls || g.cls === "ALL").map((g) => g.name);
       // A granted (innate) cantrip never consumes a choosable slot, even if it
       // appears in the character's cantrip pick list. Exclude it from `used`.
-      const used = (character.spells || []).reduce((n: number, choice: import("../types.js").CharacterChoice) => {
+      const used = (character.spells || []).reduce((n: number, choice: CharacterChoice) => {
         if (sourceClass(choice.source) !== cls) return n;
         const ent = lookupEntity(choice.entityId);
         if (ent?.tier?.toLowerCase() !== "cantrip") return n;
@@ -329,7 +330,7 @@ export function spellSlots(character) {
   if (!pools[primaryType]) pools[primaryType] = { novice: 0, adept: 0, greater: 0 };
 
   const highestSlots: string[] = []; // array of target pool strings
-  const applySpellGrants = (ent: import("../types.js").BaseEntity | null | undefined, rank = 1, itemName: string | null = null) => {
+  const applySpellGrants = (ent: BaseEntity | null | undefined, rank = 1, itemName: string | null = null) => {
     if (!ent) return;
 
     let targetPool = primaryType;

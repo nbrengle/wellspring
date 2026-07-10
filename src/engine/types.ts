@@ -81,14 +81,12 @@ export interface Power extends BaseEntity {
   tier: "Basic" | "Advanced" | "Veteran" | "Utility" | "Class";
   parentClass?: string;
   parameter?: string; // E.g. (Swords)
-
 }
 
 export interface Spell extends BaseEntity {
   type: "spell";
   tier: "Cantrip" | "Novice" | "Adept" | "Greater";
   sphere: string; // e.g. "Arcane", "Divine"
-
 }
 
 export interface Perk extends BaseEntity {
@@ -107,7 +105,6 @@ export interface Class extends BaseEntity {
   type: "class";
   innate?: { name: string; requiredLevel?: number }[];
   spellcaster?: boolean;
-
 }
 
 /**
