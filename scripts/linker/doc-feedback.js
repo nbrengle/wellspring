@@ -16,17 +16,45 @@ const ROOT = join(__dirname, "..", "..");
 const DATA = join(ROOT, "src", "data");
 const read = (f) => JSON.parse(readFileSync(join(DATA, f), "utf8"));
 
-const POWER_TIERS = ["innate", "utility", "basic", "advanced", "veteran", "classSkills", "rightHandPowers", "cantrips", "noviceSpells", "adeptSpells", "greaterSpells"];
+const POWER_TIERS = [
+  "innate",
+  "utility",
+  "basic",
+  "advanced",
+  "veteran",
+  "classSkills",
+  "rightHandPowers",
+  "cantrips",
+  "noviceSpells",
+  "adeptSpells",
+  "greaterSpells",
+];
 
 // ─── BUILD CORPUS (entity-id, body) ──────────────────────────────────────────
 const corpus = [];
 read("skills.json").forEach((s) => corpus.push({ id: `skills:${s.name}`, body: s.description || "" }));
 read("perks.json").forEach((p) => corpus.push({ id: `perks:${p.name}`, body: p.description || "" }));
 read("flaws.json").forEach((f) => corpus.push({ id: `flaws:${f.name}`, body: f.description || "" }));
-read("classes.json").forEach((c) => POWER_TIERS.forEach((t) => (c[t] || []).forEach((p) => corpus.push({ id: `powers:${p.name}`, body: p.description || "" }))));
-read("domains.json").forEach((d) => (d.powers || []).forEach((p) => corpus.push({ id: `powers:${p.name}`, body: p.description || "" })));
-read("crafting-recipes.json").forEach((r) => corpus.push({ id: `recipes:${r.name}`, body: [r.materials, r.process, r.description, r.effect].filter(Boolean).join(" ") }));
-read("ritual-recipes.json").forEach((r) => corpus.push({ id: `rituals:${r.name}`, body: [r.summary, r.components, r.process, r.effect].filter(Boolean).join(" ") }));
+read("classes.json").forEach((c) =>
+  POWER_TIERS.forEach((t) =>
+    (c[t] || []).forEach((p) => corpus.push({ id: `powers:${p.name}`, body: p.description || "" })),
+  ),
+);
+read("domains.json").forEach((d) =>
+  (d.powers || []).forEach((p) => corpus.push({ id: `powers:${p.name}`, body: p.description || "" })),
+);
+read("crafting-recipes.json").forEach((r) =>
+  corpus.push({
+    id: `recipes:${r.name}`,
+    body: [r.materials, r.process, r.description, r.effect].filter(Boolean).join(" "),
+  }),
+);
+read("ritual-recipes.json").forEach((r) =>
+  corpus.push({
+    id: `rituals:${r.name}`,
+    body: [r.summary, r.components, r.process, r.effect].filter(Boolean).join(" "),
+  }),
+);
 
 const allBodies = corpus.map((c) => c.body).join(" \n ");
 
@@ -65,7 +93,8 @@ const escapeRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 // surrounding context contains nearby capitalized game terms or mechanical
 // keywords. This filters out pure English-word uses ("force of will", "make
 // life harder", "their power source") that would mislead the report.
-const MECHANICAL_NEAR = /\b(Counter|Effect|Power|Spike|Damage|Accent|Cure|Heal|Grant|Quick|Short|Long|Slow|Resist|Protect|Counter|Wounding|Piercing|Refresh|Spell|Cantrip|by|vs|Rest|Counter)\b/;
+const MECHANICAL_NEAR =
+  /\b(Counter|Effect|Power|Spike|Damage|Accent|Cure|Heal|Grant|Quick|Short|Long|Slow|Resist|Protect|Counter|Wounding|Piercing|Refresh|Spell|Cantrip|by|vs|Rest|Counter)\b/;
 function examples(form, asCase, n = 2) {
   const esc = escapeRe(form);
   const re = new RegExp(`(?<![\\w-])${esc}(?![\\w-])`, "gi");
@@ -120,8 +149,12 @@ for (const { type, name } of allEntities) {
   if (lowerExamples.length === 0) continue;
   seenName.add(name);
   caseFindings.push({
-    type, name,
-    caps: s.upper, lower: s.lower, total: s.total, pct,
+    type,
+    name,
+    caps: s.upper,
+    lower: s.lower,
+    total: s.total,
+    pct,
     capsExamples: examples(name, "caps", 2),
     lowerExamples,
     policy: MATCH_POLICY[name] || "default",
@@ -142,11 +175,16 @@ const spellingFindings = [];
 for (const s of read("skills.json")) {
   if (!s.prereq || s.prereq === "None") continue;
   // Tokenize on commas, dropping known phrasings.
-  const parts = s.prereq.split(/,(?![^(]*\))/).map((p) => p.trim()).filter(Boolean);
+  const parts = s.prereq
+    .split(/,(?![^(]*\))/)
+    .map((p) => p.trim())
+    .filter(Boolean);
   for (const part of parts) {
     const partN = norm(part);
     if (!partN) continue;
-    const matches = skillNorms.filter((sn) => sn.n === partN && sn.name !== part.replace(/\s*\([^)]*\)\s*/g, "").trim());
+    const matches = skillNorms.filter(
+      (sn) => sn.n === partN && sn.name !== part.replace(/\s*\([^)]*\)\s*/g, "").trim(),
+    );
     for (const m of matches) {
       spellingFindings.push({ in: `skill:${s.name} prereq`, wrote: part, shouldBe: m.name });
     }
@@ -163,7 +201,10 @@ for (const [name, policy] of Object.entries(MATCH_POLICY)) {
   const s = caseStats(name);
   if (s.total === 0) continue;
   ambiguous.push({
-    name, caps: s.upper, lower: s.lower, total: s.total,
+    name,
+    caps: s.upper,
+    lower: s.lower,
+    total: s.total,
     capsExamples: examples(name, "caps", 1),
     lowerExamples: examples(name, "lower", 1),
   });
@@ -188,18 +229,46 @@ for (const { name } of allEntities) {
 // Artisan" prefixed by an article isn't an undefined concept.
 const classNames = new Set(read("classes.json").map((c) => c.name));
 const IGNORE = new Set([
-  "long rest", "short rest", "spell slot", "spell slots", "spike damage",
-  "dark territory", "build points", "life points", "armor points",
-  "the power", "the call", "the accent", "this power", "for example",
-  "natural armor", "physical armor", "summoned armor",
+  "long rest",
+  "short rest",
+  "spell slot",
+  "spell slots",
+  "spike damage",
+  "dark territory",
+  "build points",
+  "life points",
+  "armor points",
+  "the power",
+  "the call",
+  "the accent",
+  "this power",
+  "for example",
+  "natural armor",
+  "physical armor",
+  "summoned armor",
   // Cross-references to doc sections (class-sheet fields, core-rules pointers).
-  "starting skills", "multiclass skills", "level progression table",
-  "wellspring core rules", "core rules", "key features",
+  "starting skills",
+  "multiclass skills",
+  "level progression table",
+  "wellspring core rules",
+  "core rules",
+  "key features",
   // Derived stats and power-tier compounds that aren't standalone entities.
-  "maximum life points", "maximum spikes", "base maximum spikes",
-  "innate power", "innate powers", "utility power", "utility powers",
-  "tier power", "tier powers", "basic power", "basic powers",
-  "advanced power", "advanced powers", "class power", "class powers",
+  "maximum life points",
+  "maximum spikes",
+  "base maximum spikes",
+  "innate power",
+  "innate powers",
+  "utility power",
+  "utility powers",
+  "tier power",
+  "tier powers",
+  "basic power",
+  "basic powers",
+  "advanced power",
+  "advanced powers",
+  "class power",
+  "class powers",
 ]);
 const isClassWithArticle = (phrase) => {
   const m = phrase.match(/^(The|A|An)\s+(.+)$/);
@@ -219,11 +288,39 @@ for (const { body } of corpus) {
 // a power-tier label or quantity word) — that's just a normal English sentence
 // using game terms ("Cure Insubstantial", "Novice Spell"). Real findings are
 // concepts the doc references as if defined but actually aren't.
-const PROSE_LEADS = new Set(["The", "A", "An", "This", "That", "These", "Those", "Their", "Your", "His", "Her", "Its", "None", "No"]);
+const PROSE_LEADS = new Set([
+  "The",
+  "A",
+  "An",
+  "This",
+  "That",
+  "These",
+  "Those",
+  "Their",
+  "Your",
+  "His",
+  "Her",
+  "Its",
+  "None",
+  "No",
+]);
 const COMPOUND_PARTS = new Set([
   ...knownLower,
-  "novice", "adept", "greater", "basic", "utility", "advanced", "veteran", "cantrip",
-  "maximum", "minimum", "quick", "slow", "long", "short", "focus",
+  "novice",
+  "adept",
+  "greater",
+  "basic",
+  "utility",
+  "advanced",
+  "veteran",
+  "cantrip",
+  "maximum",
+  "minimum",
+  "quick",
+  "slow",
+  "long",
+  "short",
+  "focus",
 ]);
 const isCompoundOfKnowns = (phrase) => {
   const words = phrase.split(/\s+/);
@@ -239,7 +336,7 @@ const compoundFindings = [...phraseCounts.entries()]
     const words = phrase.split(/\s+/);
     if (PROSE_LEADS.has(words[0])) return false;
     if (isCompoundOfKnowns(phrase)) return false;
-    if (/\s{2,}/.test(phrase)) return false;       // columnar stat-block leak
+    if (/\s{2,}/.test(phrase)) return false; // columnar stat-block leak
     if (classNamesPlural.has(phrase)) return false; // "Sourcerer Level" requirement
     return true;
   })
@@ -276,9 +373,15 @@ md.push("");
 for (const f of caseFindings) {
   md.push(`### \`${f.name}\` (${f.type})`);
   md.push("");
-  md.push(`- **Caps:** ${f.caps} · **lowercase:** ${f.lower} · ${Math.round(f.pct * 100)}% caps · linker policy: \`${f.policy}\``);
-  if (f.policy === "stop") md.push(`- _Currently stopped: we don't link this name at all because lowercase use is too common._`);
-  if (f.policy === "case-sensitive") md.push(`- _Currently case-sensitive: we link only the capitalized form, so each lowercase mention is a lost link._`);
+  md.push(
+    `- **Caps:** ${f.caps} · **lowercase:** ${f.lower} · ${Math.round(f.pct * 100)}% caps · linker policy: \`${f.policy}\``,
+  );
+  if (f.policy === "stop")
+    md.push(`- _Currently stopped: we don't link this name at all because lowercase use is too common._`);
+  if (f.policy === "case-sensitive")
+    md.push(
+      `- _Currently case-sensitive: we link only the capitalized form, so each lowercase mention is a lost link._`,
+    );
   md.push("");
   if (f.capsExamples.length) {
     md.push(`- Capitalized examples:`);
@@ -345,4 +448,6 @@ md.push("_`npm run doc:feedback` to refresh._");
 
 writeFileSync(join(ROOT, "DOC_FEEDBACK.md"), md.join("\n"));
 console.log(`Wrote DOC_FEEDBACK.md`);
-console.log(`  ${caseFindings.length} case inconsistencies, ${spellingFindings.length} spelling, ${ambiguous.length} stop-worded, ${compoundFindings.length} undefined compounds`);
+console.log(
+  `  ${caseFindings.length} case inconsistencies, ${spellingFindings.length} spelling, ${ambiguous.length} stop-worded, ${compoundFindings.length} undefined compounds`,
+);

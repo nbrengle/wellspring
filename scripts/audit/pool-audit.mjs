@@ -12,23 +12,33 @@
 // (MegaDoc) can be fixed to one canonical spelling per pool.
 //
 // Run: node scripts/audit/pool-audit.mjs   (or tsx)
-import { readdirSync, readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from "node:fs";
 
 const flatten = (d) => {
   const o = [];
   const w = (v) => {
     if (Array.isArray(v)) v.forEach(w);
-    else if (v && typeof v === 'object') { if (v.name) o.push(v); Object.values(v).forEach(w); }
+    else if (v && typeof v === "object") {
+      if (v.name) o.push(v);
+      Object.values(v).forEach(w);
+    }
   };
   w(d);
   return o;
 };
 
 const all = [];
-for (const f of readdirSync('src/data').filter((x) => x.endsWith('.json'))) {
+for (const f of readdirSync("src/data").filter((x) => x.endsWith(".json"))) {
   let d;
-  try { d = JSON.parse(readFileSync('src/data/' + f)); } catch { continue; }
-  for (const e of flatten(d)) { e._file = f.replace('.json', ''); all.push(e); }
+  try {
+    d = JSON.parse(readFileSync("src/data/" + f));
+  } catch {
+    continue;
+  }
+  for (const e of flatten(d)) {
+    e._file = f.replace(".json", "");
+    all.push(e);
+  }
 }
 
 // ── Canonical pools ──────────────────────────────────────────────────────────
@@ -36,24 +46,30 @@ for (const f of readdirSync('src/data').filter((x) => x.endsWith('.json'))) {
 // `defines` phrase is what the source SHOULD say (one canonical spelling).
 // TODO(derive): ideally these are parsed from the defining power, not listed here.
 const CANONICAL_POOLS = [
-  { id: 'healing-touch', name: 'Healing Touch Pool', match: /healing touch pool/i, definedBy: 'Healing Touch' },
-  { id: 'life-tap',      name: 'Life Tap Pool',      match: /life tap pool/i,      definedBy: 'Life Tap' },
-  { id: 'living-iron',   name: 'Living Iron Pool',   match: /living iron pool/i,   definedBy: 'Living Iron' },
-  { id: 'balance',       name: 'Balance Pool',       match: /balance pool/i,       definedBy: 'The Balance of Life' },
-  { id: 'maintenance',   name: 'Maintenance Points',  match: /maintenance points?\b|maintenance pool/i, definedBy: 'Field Maintenance' },
+  { id: "healing-touch", name: "Healing Touch Pool", match: /healing touch pool/i, definedBy: "Healing Touch" },
+  { id: "life-tap", name: "Life Tap Pool", match: /life tap pool/i, definedBy: "Life Tap" },
+  { id: "living-iron", name: "Living Iron Pool", match: /living iron pool/i, definedBy: "Living Iron" },
+  { id: "balance", name: "Balance Pool", match: /balance pool/i, definedBy: "The Balance of Life" },
+  {
+    id: "maintenance",
+    name: "Maintenance Points",
+    match: /maintenance points?\b|maintenance pool/i,
+    definedBy: "Field Maintenance",
+  },
 ];
 
 // Any "<words> pool" or "pool of <X>" phrase, to catch mentions that DON'T map to
 // a canonical pool (variant spellings, or a pool we haven't catalogued).
-const ANY_POOL = /\b([A-Za-z][A-Za-z'’]*(?:\s+[A-Za-z][A-Za-z'’]*){0,3}\s+[Pp]ool)\b|pool of ([A-Za-z][A-Za-z ]+?Points?)/g;
+const ANY_POOL =
+  /\b([A-Za-z][A-Za-z'’]*(?:\s+[A-Za-z][A-Za-z'’]*){0,3}\s+[Pp]ool)\b|pool of ([A-Za-z][A-Za-z ]+?Points?)/g;
 // Phrases that are anaphora, not a named pool ("this pool", "the pool") — ignore.
 const ANAPHORA = /^(this|the|a|their|its|that|existing|same)\s+pool$/i;
 
 const byPool = new Map(CANONICAL_POOLS.map((p) => [p.id, []]));
-const unresolved = [];   // pool-ish phrases that match no canonical pool
+const unresolved = []; // pool-ish phrases that match no canonical pool
 const variantSpellings = new Map(); // canonical id -> Set of exact raw spellings seen
 
-const textOf = (e) => [e.description, e.effect, e.call].filter(Boolean).join('  ');
+const textOf = (e) => [e.description, e.effect, e.call].filter(Boolean).join("  ");
 
 for (const e of all) {
   const text = textOf(e);
@@ -68,7 +84,7 @@ for (const e of all) {
   let m;
   ANY_POOL.lastIndex = 0;
   while ((m = ANY_POOL.exec(text))) {
-    const raw = (m[1] || m[2] || '').replace(/\s+/g, ' ').trim();
+    const raw = (m[1] || m[2] || "").replace(/\s+/g, " ").trim();
     if (!raw || ANAPHORA.test(raw)) continue;
     const canon = CANONICAL_POOLS.find((p) => p.match.test(raw));
     if (canon) {
@@ -88,13 +104,13 @@ for (const e of all) {
 }
 
 // ── Report ───────────────────────────────────────────────────────────────────
-console.log('═══ POOL AUDIT ═══\n');
+console.log("═══ POOL AUDIT ═══\n");
 
 for (const p of CANONICAL_POOLS) {
   const ents = byPool.get(p.id);
   const def = all.find((e) => e.name === p.definedBy);
   console.log(`▶ ${p.name}  (id: ${p.id})`);
-  console.log(`   defined by: ${p.definedBy}${def ? ` [${def._file}]` : '  ⚠ DEFINING POWER NOT FOUND'}`);
+  console.log(`   defined by: ${p.definedBy}${def ? ` [${def._file}]` : "  ⚠ DEFINING POWER NOT FOUND"}`);
   const vm = variantSpellings.get(p.id) || new Map();
   const spellings = [...vm.keys()];
   // Flag when the canonical name is spelled more than one way (e.g. casing).
@@ -102,17 +118,17 @@ for (const p of CANONICAL_POOLS) {
   if (offCanon.length > 0) {
     console.log(`   ⚠ non-canonical spellings (canonical = "${p.name}"):`);
     for (const s of offCanon) {
-      console.log(`       "${s}"  in  ${[...vm.get(s)].join(', ')}`);
+      console.log(`       "${s}"  in  ${[...vm.get(s)].join(", ")}`);
     }
   }
-  console.log(`   referenced by ${ents.length}: ${ents.map((e) => e.name).join(', ')}`);
-  console.log('');
+  console.log(`   referenced by ${ents.length}: ${ents.map((e) => e.name).join(", ")}`);
+  console.log("");
 }
 
 // Variant / wrong-name mentions that should be fixed in source.
-console.log('═══ UNRESOLVED / VARIANT MENTIONS (fix these in the MegaDoc) ═══');
+console.log("═══ UNRESOLVED / VARIANT MENTIONS (fix these in the MegaDoc) ═══");
 if (unresolved.length === 0) {
-  console.log('  (none — every pool mention maps to a canonical pool)');
+  console.log("  (none — every pool mention maps to a canonical pool)");
 } else {
   for (const u of unresolved) {
     console.log(`  ✗ "${u.raw}"  in  ${u.entity} [${u.file}]`);

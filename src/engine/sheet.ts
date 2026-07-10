@@ -5,43 +5,46 @@
 // and reusable for copy / download / print. The output round-trips visually with
 // the source archetype format.
 
-import { lookupEntity } from '../engine/data.js';
-import { bareSkill, cleanItemName, getClasses } from '../engine/resolver.js';
-import { ARCHETYPES, UNLIMITED_SKILLS, BASE_CLASSES } from './data.js';
-import { lookupCost } from './validate/cost-key.js';
-import type { BuildReport } from './validate.js';
-import type { CharacterChoice, CharacterStateV2, EntitySource } from './types.js';
-import { Source, isPurchased, isStarting } from './types.js';
+import { bareSkill, cleanItemName, getClasses } from "../engine/resolver.js";
+import { ARCHETYPES, UNLIMITED_SKILLS, BASE_CLASSES } from "./data.js";
+import { lookupCost } from "./validate/cost-key.js";
+import type { BuildReport } from "./validate.js";
+import type { CharacterChoice, CharacterState } from "./types.js";
+import { isPurchased, isStarting } from "./types.js";
+import { choiceFromParsed, bucketForField } from "./character-add.js";
 
-/** The mutable accumulator the sheet IMPORTER builds up field-by-field: a partial V2
- *  character (buckets fill in as lines parse) plus the transient flat name-lists the
- *  text parser emits (converted to skills/perks buckets, then deleted, before the
- *  character is returned). Local to the importer — no live character carries these. */
-type ParsedSheet = Partial<CharacterStateV2> & {
-  startingSkills?: string[];
-  purchasedSkills?: string[];
-  purchasedPerks?: string[];
-  ranks?: Record<string, number[]>;
-  effectiveBP?: Record<string, (number | undefined)[]>;
-};
-import { SCALAR_FIELDS, ITEM_FIELDS, fieldForLabel, cleanItem, splitItems,
-  expandInstances, CHOICE_DEFAULTS,
-} from './sheet-schema.js';
+/** The mutable accumulator the sheet IMPORTER builds up as it walks the text: a
+ *  partial character whose buckets are filled — in one pass after parsing — from the
+ *  parsed section items. Local to the importer; the returned value is a real
+ *  character (buckets populated, scalars set). */
+type ParsedSheet = Partial<CharacterState>;
+import {
+  SCALAR_FIELDS,
+  ITEM_FIELDS,
+  fieldForLabel,
+  cleanItem,
+  splitItems,
+  expandInstances,
+  CHOICE_DEFAULTS,
+} from "./sheet-schema.js";
 
 // BP annotation for any item line, mirroring the archetype source. Pulls the
 // effective cost from the report's byItem map so EVERY section that can carry a
 // cost (purchased skills/perks, BP-bought powers, refund-bearing starting skills,
 // flaws) round-trips. Returns '' when the item has no cost/grant of note.
-function bpSuffix(name: string, field: string, report: BuildReport, idx?: number) {
-  if (!report?.spend?.byItem) return '';
+function bpSuffix(name: string, field: string, report: BuildReport) {
+  if (!report?.spend?.byItem) return "";
   let e = null;
   const cleanN = cleanItemName(name);
   if (report._graph) {
-    const node = Array.from(report._graph).filter(n => n.field === field.replace(/^(purchased|starting)/, '').toLowerCase() && cleanItemName(n.rawString) === cleanN)[0];
+    const node = Array.from(report._graph).filter(
+      (n) =>
+        n.field === field.replace(/^(purchased|starting)/, "").toLowerCase() && cleanItemName(n.rawString) === cleanN,
+    )[0];
     if (node) e = report.spend.byItem[node.id];
   }
   if (!e) e = lookupCost(report.spend.byItem, `${field}:${cleanN}`);
-  if (!e) return '';
+  if (!e) return "";
   // Flaws award BP; a starting-skill refund is also a negative cost on a free item.
   if (e.cost < 0) {
     if (e.grant?.source && BASE_CLASSES.has(e.grant.source)) {
@@ -57,116 +60,122 @@ function bpSuffix(name: string, field: string, report: BuildReport, idx?: number
   }
   if (e.cost > 0) return ` - ${e.cost} BP`;
   if (e.base > 0) return ` - 0 BP`;
-  return '';
+  return "";
 }
 
 // Join a list of item names into the "item, item" form used per section, adding
 // each item's BP suffix when a field/report is given.
 function joinItems(items: any, field: string, report: BuildReport) {
-  if (!items || !items.length) return 'None';
-  return items.map((n, i) => {
-    const costInfo = lookupCost(report?.spend.byItem, field, n, i);
-    const rank = costInfo?.rank || 1;
-    const baseName = bareSkill(cleanItemName(n));
-    const showRank = rank > 1 && !UNLIMITED_SKILLS.has(baseName);
-    const nameCleaned = n.replace(/\s*x\s*\d+\b/i, '');
-    const nameWithRank = showRank ? `${nameCleaned} x${rank}` : nameCleaned;
-    return `${nameWithRank}${field ? bpSuffix(n, field, report, i) : ''}`;
-  }).join(', ');
+  if (!items || !items.length) return "None";
+  return items
+    .map((n, i) => {
+      const costInfo = lookupCost(report?.spend.byItem, field, n, i);
+      const rank = costInfo?.rank || 1;
+      const baseName = bareSkill(cleanItemName(n));
+      const showRank = rank > 1 && !UNLIMITED_SKILLS.has(baseName);
+      const nameCleaned = n.replace(/\s*x\s*\d+\b/i, "");
+      const nameWithRank = showRank ? `${nameCleaned} x${rank}` : nameCleaned;
+      return `${nameWithRank}${field ? bpSuffix(n, field, report) : ""}`;
+    })
+    .join(", ");
 }
 
 // Power/spell sections in source order. These carry no BP suffix in the source
 // (they're slot-filled, not purchased), so they're listed plain.
 // Which POWER_SECTIONS fields live in the `spells` bucket (the rest are `powers`).
-const SPELL_SECTION_FIELDS = new Set(['cantrips', 'noviceSpells', 'adeptSpells', 'greaterSpells', 'bookSpells']);
+const SPELL_SECTION_FIELDS = new Set(["cantrips", "noviceSpells", "adeptSpells", "greaterSpells", "bookSpells"]);
 
 const POWER_SECTIONS = [
-  ['innatePowers', 'Innate Powers'],
-  ['utilityPowers', 'Utility Powers'],
-  ['basicPowers', 'Basic Powers'],
-  ['advancedPowers', 'Advanced Powers'],
-  ['veteranPowers', 'Veteran Powers'],
-  ['classPowers', 'Class Powers'],
-  ['rightHandPowers', 'Right Hand Powers'],
-  ['cantrips', 'Cantrips'],
-  ['noviceSpells', 'Novice Spells known'],
-  ['adeptSpells', 'Adept Spells known'],
-  ['greaterSpells', 'Greater Spells known'],
-  ['bookSpells', 'Book Spells'],
-  ['domainPowers', 'Domain Powers'],
-  ['formPowers', 'Form Powers'],
+  ["innatePowers", "Innate Powers"],
+  ["utilityPowers", "Utility Powers"],
+  ["basicPowers", "Basic Powers"],
+  ["advancedPowers", "Advanced Powers"],
+  ["veteranPowers", "Veteran Powers"],
+  ["classPowers", "Class Powers"],
+  ["rightHandPowers", "Right Hand Powers"],
+  ["cantrips", "Cantrips"],
+  ["noviceSpells", "Novice Spells known"],
+  ["adeptSpells", "Adept Spells known"],
+  ["greaterSpells", "Greater Spells known"],
+  ["bookSpells", "Book Spells"],
+  ["domainPowers", "Domain Powers"],
+  ["formPowers", "Form Powers"],
 ];
 
 export function formatCharacterSheet(character: any, report: BuildReport) {
-  // Powers + spells are read straight from their V2 buckets — each section is the
+  // Powers + spells are read straight from their buckets — each section is the
   // entries whose costField matches (basicPowers/cantrips/…). No flat reconstruction.
   const bucketFor = (field: string): CharacterChoice[] =>
     (SPELL_SECTION_FIELDS.has(field) ? character.spells : character.powers) || [];
   const powerSectionNames = (field: string): string[] =>
-    bucketFor(field).filter((s: CharacterChoice) => s.costField === field).map((s) => s.entityId);
+    bucketFor(field)
+      .filter((s: CharacterChoice) => s.costField === field)
+      .map((s) => s.entityId);
   const lines = [];
   const classes = getClasses(character);
-  const title = character.name?.trim() || character.archetypeName || 'Unnamed Character';
+  const title = character.name?.trim() || character.archetypeName || "Unnamed Character";
   const line = (label, value) => lines.push(`${label}: ${value}`);
 
   // ── Header: name + tagline (matches the archetype H1 + subtitle) ──
   lines.push(title);
-  const tagline = character.tagline
-    || (character.archetypeName && ARCHETYPES.find((a) => a.name === character.archetypeName)?.tagline);
+  const tagline =
+    character.tagline ||
+    (character.archetypeName && ARCHETYPES.find((a) => a.name === character.archetypeName)?.tagline);
   if (tagline) lines.push(tagline);
 
   // ── Identity block ──
-  line('Lineage', character.lineage
-    ? `${character.lineage}${character.sublineage ? ` (${character.sublineage})` : ''}`
-    : 'None');
-  line('Lineage Challenges', joinItems(character.lineageChallenges));
-  line('Lineage Advantages', joinItems(character.lineageAdvantages));
-  line('Life Points', report.stats?.lifePoints ?? character.lifePoints ?? '—');
-  line('Armor Points', character.armorPoints ?? '—');
-  line('Spikes', report.stats?.spikes ?? character.spikes ?? '—');
-  line('Wealth', character.wealth ?? 8);
-  if (character.resources) line('Resources', character.resources);
-  line('Class Levels', classes.length ? classes.map((c) => `${c.name} ${c.level}`).join(' / ') : 'None');
-  if (character.specialization) line('Specialization', character.specialization);
-  if (character.devotion) line('Devotion', character.devotion);
-  if (character.currentEvent) line('Active Event', character.currentEvent);
-  line('Flaws', joinItems(character.flaws, 'flaws', report));
+  line(
+    "Lineage",
+    character.lineage ? `${character.lineage}${character.sublineage ? ` (${character.sublineage})` : ""}` : "None",
+  );
+  line("Lineage Challenges", joinItems(character.lineageChallenges));
+  line("Lineage Advantages", joinItems(character.lineageAdvantages));
+  line("Life Points", report.stats?.lifePoints ?? character.lifePoints ?? "—");
+  line("Armor Points", character.armorPoints ?? "—");
+  line("Spikes", report.stats?.spikes ?? character.spikes ?? "—");
+  line("Wealth", character.wealth ?? 8);
+  if (character.resources) line("Resources", character.resources);
+  line("Class Levels", classes.length ? classes.map((c) => `${c.name} ${c.level}`).join(" / ") : "None");
+  if (character.specialization) line("Specialization", character.specialization);
+  if (character.devotion) line("Devotion", character.devotion);
+  if (character.currentEvent) line("Active Event", character.currentEvent);
+  line("Flaws", joinItems(character.flaws, "flaws", report));
 
-  // ── Skills / perks ── skills (starting + purchased) are V2 CharacterChoice[] in
+  // ── Skills / perks ── skills (starting + purchased) are CharacterChoice[] in
   // the skills[] bucket; the BP ledger keys starting under startingSkills:<i>: and
   // purchased under skills:.
   const startingSkillNames = (character.skills || [])
-    .filter((s) => typeof s !== 'string' && isStarting(s.source))
+    .filter((s) => typeof s !== "string" && isStarting(s.source))
     .map((s) => s.entityId || s.name);
-  line('Starting Skills (free)', joinItems(startingSkillNames, 'startingSkills', report));
-  if (character.divineDomains?.length) line('Divine Domains', joinItems(character.divineDomains));
-  if (character.devotionAccents?.length) line('Available Devotion Accents', joinItems(character.devotionAccents));
+  line("Starting Skills (free)", joinItems(startingSkillNames, "startingSkills", report));
+  if (character.divineDomains?.length) line("Divine Domains", joinItems(character.divineDomains));
+  if (character.devotionAccents?.length) line("Available Devotion Accents", joinItems(character.devotionAccents));
   const purchasedSkillNames = (character.skills || [])
-    .filter((s) => typeof s !== 'string' && isPurchased(s.source))
+    .filter((s) => typeof s !== "string" && isPurchased(s.source))
     .map((s) => s.entityId || s.name);
-  line('Purchased Skills', joinItems(purchasedSkillNames, 'skills', report));
+  line("Purchased Skills", joinItems(purchasedSkillNames, "skills", report));
   const purchasedPerkNames = (character.perks || [])
-    .filter((s) => typeof s !== 'string' && isPurchased(s.source))
+    .filter((s) => typeof s !== "string" && isPurchased(s.source))
     .map((s) => s.entityId || s.name);
-  line('Purchased Perks', joinItems(purchasedPerkNames, 'purchasedPerks', report));
+  line("Purchased Perks", joinItems(purchasedPerkNames, "purchasedPerks", report));
 
   // ── Powers / spells ── each section reads its bucket by costField (domain/class
   // powers may be BP-bought). Innate powers come from the resolved report so the
   // engine-synthesized (non-selectable) ones are excluded.
   for (const [field, label] of POWER_SECTIONS) {
-    const items = field === 'innatePowers'
-      ? (report?.owned?.innatePowers || [])
-          .filter((ip) => typeof ip === 'string' || ip.field !== 'synthetic')
-          .map((ip) => ip.name || ip)
-      : powerSectionNames(field);
+    const items =
+      field === "innatePowers"
+        ? (report?.owned?.innatePowers || [])
+            .filter((ip) => typeof ip === "string" || ip.field !== "synthetic")
+            .map((ip) => ip.name || ip)
+        : powerSectionNames(field);
     if (items?.length) line(label, joinItems(items, field, report));
   }
-
 
   // ── Spell slots (casters), shown like the source's "Novice Spell-slots: N" ──
   if (report.spellSlots) {
     for (const [magicType, slots] of Object.entries(report.spellSlots)) {
-      const prefix = Object.keys(report.spellSlots).length > 1 ? `${magicType} ` : '';
+      const prefix = Object.keys(report.spellSlots).length > 1 ? `${magicType} ` : "";
       if (slots.novice) line(`${prefix}Novice Spell-slots`, slots.novice);
       if (slots.adept) line(`${prefix}Adept Spell-slots`, slots.adept);
       if (slots.greater) line(`${prefix}Greater Spell-slots`, slots.greater);
@@ -177,14 +186,16 @@ export function formatCharacterSheet(character: any, report: BuildReport) {
   // Just the BP tally — the legal/illegal VERDICT is a live judgment of the
   // builder UI, not part of the character sheet, so it's intentionally omitted
   // here (it doesn't belong in the exported/imported document).
-  lines.push('');
+  lines.push("");
   const { spend, budget } = report;
-  lines.push(`Build Points: ${spend.net} / ${budget}` +
-    (spend.awarded > 0 ? ` (+${spend.awarded} from flaws)` : '') +
-    (character.extraMaxBP > 0 ? ` (+${character.extraMaxBP} extra BP)` : '') +
-    (report.usesBonus ? ` (+${report.bonusUsed} bonus BP)` : ''));
+  lines.push(
+    `Build Points: ${spend.net} / ${budget}` +
+      (spend.awarded > 0 ? ` (+${spend.awarded} from flaws)` : "") +
+      (character.extraMaxBP > 0 ? ` (+${character.extraMaxBP} extra BP)` : "") +
+      (report.usesBonus ? ` (+${report.bonusUsed} bonus BP)` : ""),
+  );
 
-  return lines.join('\n');
+  return lines.join("\n");
 }
 
 // ─── IMPORT (inverse of the export) ───────────────────────────────────────────
@@ -200,29 +211,38 @@ function labelOf(line) {
   const m = line.match(/^([^:]{1,40}):\s*(.*)$/);
   if (!m) return null;
   const label = m[1].trim();
-  if (label === 'Lineage' || fieldForLabel(label)) return { label, value: m[2].trim() };
+  if (label === "Lineage" || fieldForLabel(label)) return { label, value: m[2].trim() };
   return null;
 }
 
 // Parse already-normalized plain text in the "Label: value" sheet shape. Internal
 // — callers use parseCharacterSheet, which handles format detection first.
 function parseSheetText(text) {
-  const raw = String(text).replace(/\r/g, '');
-  const rows = raw.split('\n').map((l) => l.trim());
-  const character = { name: '', archetypeName: 'Imported Character', effectiveBP: {}, grants: {} };
+  const raw = String(text).replace(/\r/g, "");
+  const rows = raw.split("\n").map((l) => l.trim());
+  const character = { name: "", archetypeName: "Imported Character" };
+  // Parsed section items, accumulated during the walk and turned into bucket entries
+  // in one pass AFTER parsing (so the class — needed for the source — is known).
+  const parsedItems = [];
 
   // First non-empty line = name; an immediately following non-"Label:" line that
   // isn't a known field is the tagline.
   let i = 0;
   while (i < rows.length && !rows[i]) i++;
-  if (i < rows.length) { character.name = rows[i]; i++; }
-  if (i < rows.length && rows[i] && !rows[i].includes(':')) { character.tagline = rows[i]; i++; }
+  if (i < rows.length) {
+    character.name = rows[i];
+    i++;
+  }
+  if (i < rows.length && rows[i] && !rows[i].includes(":")) {
+    character.tagline = rows[i];
+    i++;
+  }
 
   // Apply a parsed section (label + its collected item strings) to the character.
   const apply = (label, valueStr, extraItems) => {
-    if (label === 'Lineage') {
+    if (label === "Lineage") {
       const lm = valueStr.match(/^(.+?)(?:\s*\(([^)]+)\))?$/);
-      if (valueStr && valueStr !== 'None') {
+      if (valueStr && valueStr !== "None") {
         character.lineage = lm[1].trim();
         if (lm[2]) character.sublineage = lm[2].trim();
       }
@@ -230,7 +250,10 @@ function parseSheetText(text) {
     }
     const field = fieldForLabel(label);
     if (!field) return;
-    if (SCALAR_FIELDS.has(field)) { character[field] = valueStr || null; return; }
+    if (SCALAR_FIELDS.has(field)) {
+      character[field] = valueStr || null;
+      return;
+    }
     if (!ITEM_FIELDS.has(field)) return;
     // Items can be inline (comma-separated after the label) AND/OR on the lines
     // that follow the label until the next section — gather both. Expand "Skill
@@ -239,24 +262,18 @@ function parseSheetText(text) {
     const items = [...splitItems(valueStr), ...extraItems]
       .flatMap((raw) => expandInstances(raw, (b) => UNLIMITED_SKILLS.has(b), CHOICE_DEFAULTS))
       .map(cleanItem);
-    
-    character[field] = items.map((it) => {
-      const match = it.name.match(/\s*x\s*(\d+)\b/i);
-      return match ? it.name.replace(match[0], '').trim() : it.name;
-    });
-    
-    const ranks = items.map((it) => {
-      const match = it.name.match(/\s*x\s*(\d+)\b/i);
-      return match ? parseInt(match[1], 10) : 1;
-    });
-    
-    if (ranks.some(r => r > 1)) {
-      if (!character.ranks) character.ranks = {};
-      character.ranks[field] = ranks;
-    }
 
-    if (items.some((it) => it.bp != null)) character.effectiveBP[field] = items.map((it) => it.bp);
-    if (items.some((it) => it.grant)) character.grants[field] = items.map((it) => it.grant);
+    // Accumulate each item as a parsed line {field, name, cost, rank} — no parallel
+    // arrays. The trailing "xN" is the rank; strip it from the name.
+    for (const it of items) {
+      const rankMatch = it.name.match(/\s*x\s*(\d+)\b/i);
+      parsedItems.push({
+        field,
+        name: rankMatch ? it.name.replace(rankMatch[0], "").trim() : it.name,
+        cost: it.bp ?? null,
+        rank: rankMatch ? parseInt(rankMatch[1], 10) : 1,
+      });
+    }
   };
 
   for (; i < rows.length; i++) {
@@ -279,52 +296,29 @@ function parseSheetText(text) {
     let j = i + 1;
     for (; j < rows.length; j++) {
       if (!rows[j]) break;
-      if (rows[j].includes(':')) break;
+      if (rows[j].includes(":")) break;
       extra.push(rows[j]);
     }
     apply(lab.label, lab.value, extra);
     i = j - 1;
   }
-  if (!Object.keys(character.effectiveBP).length) delete character.effectiveBP;
-  if (!Object.keys(character.grants).length) delete character.grants;
   if (character.currentEvent) {
     character.currentEvent = parseInt(character.currentEvent, 10) || 1;
   }
-  // The generic sheet parser emits transient flat name-lists (startingSkills /
-  // purchasedSkills / purchasedPerks) with parallel ranks/effectiveBP; convert them
-  // into the skills[]/perks[] CharacterChoice buckets, then drop them. This is the
-  // ONLY flat→bucket conversion left — it lives at the import boundary because the
-  // text parser produces flat lists, not because a character is ever flat.
+  // Build every parsed section into its bucket through the SAME choiceFromParsed the
+  // archetype parser uses (the shared build step) — skills, perks, powers, spells,
+  // flaws all import the same way now (not just skills/perks). No flat name-lists,
+  // no parallel arrays: the parsed item carries name/cost/rank, the field decides
+  // bucket + source + costField.
   const ch = character as ParsedSheet;
-  const primaryClass = getClasses(ch)[0]?.name || '';
-  const toChoices = (names: string[] | undefined, source: EntitySource, field: string): CharacterChoice[] => {
-    const ranks = ch.ranks?.[field] || [];
-    const bp = ch.effectiveBP?.[field] || [];
-    return (names || []).map((name, i) => ({
-      entityId: name,
-      source,
-      ranks: ranks[i] ?? 1,
-      ...(bp[i] != null ? { costOverride: bp[i] } : {}),
-    }));
-  };
-  if (ch.startingSkills || ch.purchasedSkills) {
-    ch.skills = [
-      ...toChoices(ch.startingSkills, Source.starting(primaryClass), 'startingSkills'),
-      ...(ch.skills || []),
-      ...toChoices(ch.purchasedSkills, Source.purchased(), 'purchasedSkills'),
-    ];
-    for (const f of ['startingSkills', 'purchasedSkills'] as const) {
-      delete ch[f];
-      if (ch.ranks) delete ch.ranks[f];
-      if (ch.effectiveBP) delete ch.effectiveBP[f];
-    }
-  }
-  // Perks: same flat→bucket conversion (purchased).
-  if (ch.purchasedPerks) {
-    ch.perks = [...(ch.perks || []), ...toChoices(ch.purchasedPerks, Source.purchased(), 'purchasedPerks')];
-    delete ch.purchasedPerks;
-    if (ch.ranks) delete ch.ranks.purchasedPerks;
-    if (ch.effectiveBP) delete ch.effectiveBP.purchasedPerks;
+  ch.skills ||= [];
+  ch.perks ||= [];
+  ch.powers ||= [];
+  ch.spells ||= [];
+  ch.flaws ||= [];
+  const primaryClass = getClasses(ch)[0]?.name || "";
+  for (const item of parsedItems) {
+    ch[bucketForField(item.field)].push(choiceFromParsed(item, primaryClass));
   }
   reconcileDevotion(character);
   return character;
@@ -336,10 +330,8 @@ function parseSheetText(text) {
 // fills in when no Worship skill is present. Mirrors the build-time parser so an
 // imported character resolves its devotion the same way an archetype does.
 function reconcileDevotion(character) {
-  // All skills live in the V2 skills[] bucket; find the Worship entry among them.
-  const skills = (character.skills || [])
-    .filter((s) => typeof s !== 'string')
-    .map((s) => s.entityId || s.name);
+  // All skills live in the skills[] bucket; find the Worship entry among them.
+  const skills = (character.skills || []).filter((s) => typeof s !== "string").map((s) => s.entityId || s.name);
   const worship = skills.map((s) => s.match(/^Worship\s*[-–—:]\s*(.+)$/i)).find(Boolean);
   const worshipDevotion = worship ? worship[1].trim() : null;
   if (worshipDevotion && character.devotion && character.devotion !== worshipDevotion) {
@@ -354,17 +346,28 @@ function reconcileDevotion(character) {
 // text shape parseCharacterSheet understands, then parse. For multi-character
 // HTML (like the full starter sheet) only the FIRST character block is taken.
 function htmlToText(html) {
-  const decode = (s) => s
-    .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
-    .replace(/&nbsp;/g, ' ').replace(/&rsquo;|&#8217;/g, '’')
-    .replace(/&lsquo;|&#8216;/g, '‘').replace(/&ldquo;|&#8220;/g, '“')
-    .replace(/&rdquo;|&#8221;/g, '”').replace(/&#(\d+);/g, (_, n) => String.fromCharCode(+n))
-    .replace(/&[a-z]+;/gi, ' ');
-  return decode(html
-    .replace(/<\/(p|li|h[1-6]|tr|div|td|th)>/gi, '\n')
-    .replace(/<br\s*\/?>/gi, '\n')
-    .replace(/<[^>]+>/g, ''))
-    .split('\n').map((l) => l.replace(/\s+/g, ' ').trim()).filter(Boolean).join('\n');
+  const decode = (s) =>
+    s
+      .replace(/&amp;/g, "&")
+      .replace(/&lt;/g, "<")
+      .replace(/&gt;/g, ">")
+      .replace(/&nbsp;/g, " ")
+      .replace(/&rsquo;|&#8217;/g, "’")
+      .replace(/&lsquo;|&#8216;/g, "‘")
+      .replace(/&ldquo;|&#8220;/g, "“")
+      .replace(/&rdquo;|&#8221;/g, "”")
+      .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(+n))
+      .replace(/&[a-z]+;/gi, " ");
+  return decode(
+    html
+      .replace(/<\/(p|li|h[1-6]|tr|div|td|th)>/gi, "\n")
+      .replace(/<br\s*\/?>/gi, "\n")
+      .replace(/<[^>]+>/g, ""),
+  )
+    .split("\n")
+    .map((l) => l.replace(/\s+/g, " ").trim())
+    .filter(Boolean)
+    .join("\n");
 }
 
 // Trim a multi-block sheet down to a single character: from the first line that
@@ -380,16 +383,26 @@ function firstCharacterBlock(lines) {
   // very next line (name / tagline / "Lineage:"). The TOC has no taglines between
   // its name lines, so this lands on the first real block.
   let start = 0;
-  const plain = (l) => l && !isHeader(l) && !l.includes(':');
+  const plain = (l) => l && !isHeader(l) && !l.includes(":");
   for (let i = 0; i < lines.length - 2; i++) {
-    if (plain(lines[i]) && plain(lines[i + 1]) && isHeader(lines[i + 2])) { start = i; break; }
+    if (plain(lines[i]) && plain(lines[i + 1]) && isHeader(lines[i + 2])) {
+      start = i;
+      break;
+    }
   }
   // End at the next name+header boundary (a non-header line followed by a header,
   // after we've already seen this block's headers).
-  let seenHeader = false, end = lines.length;
+  let seenHeader = false,
+    end = lines.length;
   for (let i = start + 1; i < lines.length; i++) {
-    if (isHeader(lines[i])) { seenHeader = true; continue; }
-    if (seenHeader && lines.slice(i + 1, i + 4).some(isHeader) && !lines[i].includes(':')) { end = i; break; }
+    if (isHeader(lines[i])) {
+      seenHeader = true;
+      continue;
+    }
+    if (seenHeader && lines.slice(i + 1, i + 4).some(isHeader) && !lines[i].includes(":")) {
+      end = i;
+      break;
+    }
   }
   return lines.slice(start, end);
 }
@@ -401,11 +414,18 @@ function firstCharacterBlock(lines) {
 // public entry point; callers don't need to know the input format.
 export function parseCharacterSheet(input) {
   let text = String(input);
-  if (/<[a-z][^>]*>/i.test(text)) text = htmlToText(text);       // HTML
-  else if (text.includes('\t')) {                                 // spreadsheet/TSV
-    text = text.split('\n').map((row) => row.replace(/\t+/g, ': ')).join('\n');
+  if (/<[a-z][^>]*>/i.test(text))
+    text = htmlToText(text); // HTML
+  else if (text.includes("\t")) {
+    // spreadsheet/TSV
+    text = text
+      .split("\n")
+      .map((row) => row.replace(/\t+/g, ": "))
+      .join("\n");
   }
-  const lines = text.split('\n').map((l) => l.trim()).filter(Boolean);
-  return parseSheetText(firstCharacterBlock(lines).join('\n'));
+  const lines = text
+    .split("\n")
+    .map((l) => l.trim())
+    .filter(Boolean);
+  return parseSheetText(firstCharacterBlock(lines).join("\n"));
 }
-

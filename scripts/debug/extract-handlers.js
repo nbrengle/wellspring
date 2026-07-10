@@ -1,9 +1,9 @@
-const fs = require('fs');
+const fs = require("fs");
 
-const code = fs.readFileSync('src/Builder.jsx', 'utf-8');
+const code = fs.readFileSync("src/Builder.jsx", "utf-8");
 
-const handlersStart = code.indexOf('  const handlePickArchetype = useCallback(');
-const handlersEnd = code.indexOf('  // ─── CONTEXT BUNDLES ──────────────────────────────────────────────────────');
+const handlersStart = code.indexOf("  const handlePickArchetype = useCallback(");
+const handlersEnd = code.indexOf("  // ─── CONTEXT BUNDLES ──────────────────────────────────────────────────────");
 
 const handlersCode = code.slice(handlersStart, handlersEnd);
 
@@ -92,5 +92,5 @@ ${handlersCode}
 }
 `;
 
-fs.writeFileSync('src/hooks/useBuilderHandlers.js', newFileContent);
+fs.writeFileSync("src/hooks/useBuilderHandlers.js", newFileContent);
 console.log("Extracted handlers to src/hooks/useBuilderHandlers.js");

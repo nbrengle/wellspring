@@ -1,7 +1,7 @@
 // reducers.test.mjs — coverage for the pure character-state reducers
 // (src/engine/reducers.ts), the character write path.
 //
-// PURCHASED SKILLS are V2-native: the reducers push/patch/remove CharacterChoice
+// PURCHASED SKILLS are: the reducers push/patch/remove CharacterChoice
 // entries in `character.skills` (source 'Purchased'), addressed positionally
 // among the purchased entries — no flat `purchasedSkills`, no id. Other fields
 // (perks/powers/spells) still use the flat parallel-array path until their slice.
@@ -41,7 +41,13 @@ test("addEntity accepts the resolved 'skills' field too (row field)", () => {
 test("addEntity appends multiple purchased skills in order", () => {
   let c = addEntity({}, "purchasedSkills", "Athletics");
   c = addEntity(c, "purchasedSkills", "Stealth");
-  eq(purchased(c).map((s) => s.entityId).join(","), "Athletics,Stealth", "both, in order");
+  eq(
+    purchased(c)
+      .map((s) => s.entityId)
+      .join(","),
+    "Athletics,Stealth",
+    "both, in order",
+  );
 });
 test("addEntity is a no-op for a duplicate (non-unlimited) name", () => {
   const c0 = addEntity({}, "purchasedSkills", "Athletics");
@@ -72,8 +78,20 @@ test("removeEntity removes the purchased skill at the given position", () => {
     ],
   };
   const c = removeEntity(c0, "skills", 1);
-  eq(purchased(c).map((s) => s.entityId).join(","), "A,C", "B removed by position");
-  eq(purchased(c).map((s) => s.ranks).join(","), "1,3", "surviving ranks intact");
+  eq(
+    purchased(c)
+      .map((s) => s.entityId)
+      .join(","),
+    "A,C",
+    "B removed by position",
+  );
+  eq(
+    purchased(c)
+      .map((s) => s.ranks)
+      .join(","),
+    "1,3",
+    "surviving ranks intact",
+  );
 });
 test("removeEntity is a no-op for an out-of-range position", () => {
   const c0 = { skills: [{ entityId: "A", source: Source.purchased(), ranks: 1 }] };
@@ -112,7 +130,7 @@ test("setChoice clears when option is null", () => {
   ok(!("pow1" in c.choices), "null clears the choice");
 });
 
-// ─── slot pick / clear (V2 powers bucket) ───────────────────────────────────
+// ─── slot pick / clear (powers bucket) ───────────────────────────────────
 // Slot powers are CharacterChoice[] in powers[], costField = the slot field, and
 // sourced Source.class(<grantingClass>) — the class lives IN the source, not a
 // parallel powerClass map. Addressing is positional among a field's entries.
@@ -128,7 +146,13 @@ test("setSlotPick places a power sourced to the granting class", () => {
 test("setSlotPick with flatIndex < 0 appends", () => {
   const c0 = setSlotPick({}, "basicPowers", 0, "Battlemind", "Fighter");
   const c = setSlotPick(c0, "basicPowers", -1, "Disengage", "Fighter");
-  eq(slotEntries(c, "basicPowers").map((p) => p.entityId).join(","), "Battlemind,Disengage", "appended at end");
+  eq(
+    slotEntries(c, "basicPowers")
+      .map((p) => p.entityId)
+      .join(","),
+    "Battlemind,Disengage",
+    "appended at end",
+  );
 });
 test("setSlotPick keeps other-field power entries untouched", () => {
   const c0 = setSlotPick({}, "utilityPowers", 0, "Bowyer", "Fighter");
@@ -140,7 +164,13 @@ test("clearSlot removes the pick at the given position", () => {
   let c = setSlotPick({}, "basicPowers", 0, "Battlemind", "Fighter");
   c = setSlotPick(c, "basicPowers", -1, "Disengage", "Fighter");
   c = clearSlot(c, "basicPowers", 0);
-  eq(slotEntries(c, "basicPowers").map((p) => p.entityId).join(","), "Disengage", "first pick removed");
+  eq(
+    slotEntries(c, "basicPowers")
+      .map((p) => p.entityId)
+      .join(","),
+    "Disengage",
+    "first pick removed",
+  );
 });
 test("clearSlot is a no-op for an out-of-range position", () => {
   const c0 = setSlotPick({}, "basicPowers", 0, "Battlemind", "Fighter");
@@ -154,7 +184,7 @@ test("addEntity routes classPowers to the powers bucket (purchased)", () => {
   eq(e[0].costField, "classPowers", "costField preserved");
 });
 
-// ─── slot pick / clear (V2 spells bucket) ───────────────────────────────────
+// ─── slot pick / clear (spells bucket) ───────────────────────────────────
 // Caster slot picks (cantrips / spells-known tier fields) route to the SPELLS
 // bucket, not powers — same setSlotPick/clearSlot, bucket chosen by the field.
 const spellEntries = (c, field) => (c.spells || []).filter((p) => p.costField === field);
@@ -203,7 +233,7 @@ test("updateParameter clears devotion state when a Worship skill loses its param
     ...mkPurchased("Worship (Some Deity)"),
     devotion: "Some Deity",
     divineDomains: ["War"],
-    // Domain powers are V2-native: CharacterChoice[] in `powers`, costField 'domainPowers'.
+    // Domain powers are: CharacterChoice[] in `powers`, costField 'domainPowers'.
     powers: [{ entityId: "Smite", source: Source.purchased(), ranks: 1, costField: "domainPowers" }],
   };
   const c = updateParameter(c0, "skills", "Worship (Some Deity)", "Worship", 0);

@@ -1,8 +1,11 @@
 import { getClasses, cleanItemName } from "./resolver.js";
 import { getAllEntities } from "./data.js";
 import {
-  STARTING_CHOICES_CONFIG, hasStartingChoices, reconcileStartingChoices, rebuildStartingSkills
-} from '../engine/starting-choices.js';
+  STARTING_CHOICES_CONFIG,
+  hasStartingChoices,
+  reconcileStartingChoices,
+  rebuildStartingSkills,
+} from "../engine/starting-choices.js";
 
 // Infer build choose-one selections (Way of the Blade, Expert Craft) from the skills
 // a character already owns. Archetypes ship the granted skills + a grant sidecar but
@@ -23,21 +26,21 @@ function reconcileBuildChoices(character) {
     if (dash) return `${dash[1].trim().toLowerCase()}|${dash[2].trim().toLowerCase()}`;
     return clean.toLowerCase();
   };
-  // All owned skills (starting + purchased) live in the V2 skills[] bucket.
+  // All owned skills (starting + purchased) live in the skills[] bucket.
   const ownedSkillNames = (character.skills || [])
     .filter((s) => typeof s !== "string")
     .map((s) => s.entityId || s.name);
   const owned = new Set(ownedSkillNames.map(key));
   const choices = { ...(character.choices || {}) };
   for (const ent of getAllEntities()) {
-    if (ent.chooseOne?.kind !== 'build') continue;
+    if (ent.chooseOne?.kind !== "build") continue;
     const choiceKey = `powers:${ent.name}`;
     if (choices[choiceKey]) continue; // already recorded — don't override an explicit pick
     for (const opt of ent.chooseOne.options) {
       const grants = opt.grants || opt.grantsSkills || [];
       // The option's DISTINGUISHING grant is its parameterized one; require that it's
       // owned (shared grants like "Two Weapon Style" can't tell options apart).
-      const distinguishing = grants.filter((g) => key(g).includes('|'));
+      const distinguishing = grants.filter((g) => key(g).includes("|"));
       const probe = distinguishing.length ? distinguishing : grants;
       if (probe.length && probe.every((g) => owned.has(key(g)))) {
         choices[choiceKey] = opt.text;
@@ -49,24 +52,29 @@ function reconcileBuildChoices(character) {
 }
 
 // ─── INITIAL STATE TEMPLATE ──────────────────────────────────────────────────
-// A blank CharacterStateV2: empty ontological buckets, no class. Everything a
+// A blank CharacterState: empty ontological buckets, no class. Everything a
 // character owns is a CharacterChoice in one of the buckets — there are no flat
 // name-arrays. applyClassStartingAbilities seeds starting skills when a class is
 // chosen; the reducers (addToCharacter) add the rest.
 export const EMPTY_CHARACTER = {
   name: "",
-  archetypeName: null,       // which archetype this was loaded from (for the badge)
-  specialization: null,      // "Mystic" / "Crafter" / "Artificer" — only for Artisan
-  lineage: null,             // "Human" / "Aewen" / ...
+  archetypeName: null, // which archetype this was loaded from (for the badge)
+  specialization: null, // "Mystic" / "Crafter" / "Artificer" — only for Artisan
+  lineage: null, // "Human" / "Aewen" / ...
   sublineage: null,
-  devotion: null,            // for clerics: "The Mother" / "Senri" / ...
+  devotion: null, // for clerics: "The Mother" / "Senri" / ...
   lifePoints: null,
   armorPoints: null,
   spikes: null,
-  wealth: null,              // null → DEFAULT_WEALTH (8); perks/sheet may set it
-  resources: null,           // free-form, from the sheet
+  wealth: null, // null → DEFAULT_WEALTH (8); perks/sheet may set it
+  resources: null, // free-form, from the sheet
   classes: [],
-  skills: [], perks: [], powers: [], spells: [], flaws: [], devotions: [],
+  skills: [],
+  perks: [],
+  powers: [],
+  spells: [],
+  flaws: [],
+  devotions: [],
   advantageChoices: {},
   grantedSelections: {},
   agileLearnerTrades: {},
@@ -97,13 +105,13 @@ export function applyClassStartingAbilities(character, className, _level = 1) {
 function normalizeClasses(value) {
   if (!value) return [];
   if (Array.isArray(value)) return value;
-  if (typeof value === 'string') {
-    return value.split(',').map((part) => {
+  if (typeof value === "string") {
+    return value.split(",").map((part) => {
       const m = part.trim().match(/^(.+?)\s+(\d+)$/);
       return m ? { name: m[1], level: parseInt(m[2], 10) } : { name: part.trim(), level: 1 };
     });
   }
-  if (typeof value === 'object') {
+  if (typeof value === "object") {
     return Object.entries(value).map(([name, level]) => ({ name: String(name), level: Number(level) || 1 }));
   }
   return [];
@@ -114,7 +122,7 @@ export function loadArchetype(archetype) {
   for (const k of Object.keys(EMPTY_CHARACTER)) {
     if (k === "archetypeName") continue;
     if (archetype[k] !== undefined) {
-      if (k === 'lineage' && typeof archetype[k] === 'object' && archetype[k] !== null) {
+      if (k === "lineage" && typeof archetype[k] === "object" && archetype[k] !== null) {
         c[k] = archetype[k].name;
         // In the future, we could also map archetype[k].choices to c.advantageChoices here
       } else {
@@ -122,9 +130,6 @@ export function loadArchetype(archetype) {
       }
     }
   }
-  if (archetype.grants) c.grants = archetype.grants;
-  if (archetype.effectiveBP) c.effectiveBP = archetype.effectiveBP;
-  if (archetype.ranks) c.ranks = archetype.ranks;
   // Normalize classes to the canonical array form [{name, level}] that getClasses +
   // the class handlers use. Archetypes store it as an object map ({ Cleric: 4 }); the
   // copy loop above would carry that raw shape, so overwrite with the normalized form.
@@ -146,4 +151,3 @@ export function loadArchetype(archetype) {
   if (Object.keys(choices).length) out = { ...out, choices };
   return out;
 }
-

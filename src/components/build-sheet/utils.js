@@ -8,12 +8,16 @@ export const CLASS_TONES = {
   Mage: "blue",
   Rogue: "teal",
   Socialite: "purple",
-  Sourcerer: "indigo"
+  Sourcerer: "indigo",
 };
 
 export function spellTierKey(c) {
   if (!c) return null;
-  if (c.tierList) return { noviceSpells: "novice", adeptSpells: "adept", greaterSpells: "greater", cantrips: "cantrip" }[c.tierList] || null;
+  if (c.tierList)
+    return (
+      { noviceSpells: "novice", adeptSpells: "adept", greaterSpells: "greater", cantrips: "cantrip" }[c.tierList] ||
+      null
+    );
   const t = (c.tier || "").toLowerCase();
   return ["novice", "adept", "greater", "cantrip"].includes(t) ? t : null;
 }
@@ -24,7 +28,9 @@ export function spellTierLabel(c) {
 }
 
 export function sourceType(name) {
-  const clean = String(name).replace(/\s*\([^)]*\)\s*$/, "").trim();
+  const clean = String(name)
+    .replace(/\s*\([^)]*\)\s*$/, "")
+    .trim();
   for (const t of ["powers", "perks", "skills"]) {
     if (lookupEntity(`${t}:${clean}`)) return t;
   }
@@ -51,9 +57,10 @@ export function grantSourceRole(grant) {
   if (grant.sourceRole) {
     return grant.sourceRole.replace(/\b\w/g, (c) => c.toUpperCase());
   }
-  const ent = lookupEntity(`powers:${grant.source}`)
-    || lookupEntity(`skills:${grant.source}`)
-    || lookupEntity(`perks:${grant.source}`);
+  const ent =
+    lookupEntity(`powers:${grant.source}`) ||
+    lookupEntity(`skills:${grant.source}`) ||
+    lookupEntity(`perks:${grant.source}`);
   if (!ent) return null;
   if (ent.type === "power") return `${ent.tier || ""} Power`.trim();
   if (ent.type === "skill") return "Skill";

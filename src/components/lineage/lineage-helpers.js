@@ -77,8 +77,7 @@ export function costumeStatus(lin, takenReppedNames, pickedSubName) {
   if (!req || typeof req !== "object") return null;
   const have = takenReppedNames || [];
   // The must-include applies unconditionally, or only when its sublineage is picked.
-  const mustApplies =
-    !!req.mustInclude && (!req.mustIncludeIf || subKey(req.mustIncludeIf) === subKey(pickedSubName));
+  const mustApplies = !!req.mustInclude && (!req.mustIncludeIf || subKey(req.mustIncludeIf) === subKey(pickedSubName));
   const haveMust = !mustApplies || have.includes(req.mustInclude);
   const met = have.length >= (req.minRepped || 0) && haveMust;
   const parts = [];

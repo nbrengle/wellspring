@@ -9,18 +9,18 @@
 //
 // Run: node scripts/parse-archetypes.js
 
-import { readFileSync, writeFileSync, existsSync } from 'fs';
-import { join, dirname } from 'path';
-import { fileURLToPath } from 'url';
-import crypto from 'crypto';
-import { Source } from '../src/engine/types.js';
-import { LABEL_FIELD, CHOICE_DEFAULTS } from '../src/engine/sheet-schema.js';
+import { readFileSync, writeFileSync, existsSync } from "fs";
+import { join, dirname } from "path";
+import { fileURLToPath } from "url";
+import { Source } from "../src/engine/types.js";
+import { choiceFromParsed, bucketForField } from "../src/engine/character-add.js";
+import { LABEL_FIELD, CHOICE_DEFAULTS } from "../src/engine/sheet-schema.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const ROOT = join(__dirname, '..');
-const DOC = join(ROOT, 'StarterCharacterSheets.html');
-const OUT = join(ROOT, 'src', 'data', 'archetypes.json');
-const CLASSES_JSON = join(ROOT, 'src', 'data', 'classes.json');
+const ROOT = join(__dirname, "..");
+const DOC = join(ROOT, "StarterCharacterSheets.html");
+const OUT = join(ROOT, "src", "data", "archetypes.json");
+const CLASSES_JSON = join(ROOT, "src", "data", "classes.json");
 
 // Map of class name → array of specialization names, e.g. Artisan → [Artificer,
 // Crafter, Mystic]. Used to extract the implied specialization from archetype
@@ -29,7 +29,7 @@ const CLASSES_JSON = join(ROOT, 'src', 'data', 'classes.json');
 // (running parse-archetypes before parse-megadoc), skip specialization extraction.
 let CLASS_SPECS = {};
 if (existsSync(CLASSES_JSON)) {
-  const classes = JSON.parse(readFileSync(CLASSES_JSON, 'utf8'));
+  const classes = JSON.parse(readFileSync(CLASSES_JSON, "utf8"));
   for (const c of classes) {
     CLASS_SPECS[c.name] = (c.specializations || []).map((s) => s.name);
   }
@@ -39,11 +39,11 @@ if (existsSync(CLASSES_JSON)) {
 // leveled — "Skill xN" means N SEPARATE skill instances (each a distinct subject /
 // spell), not rank N of one skill. We expand those into N rows; everything else
 // keeps `xN` = rank N. Sourced from skills.json so the rule is data-driven.
-const SKILLS_JSON = join(ROOT, 'src', 'data', 'skills.json');
+const SKILLS_JSON = join(ROOT, "src", "data", "skills.json");
 const UNLIMITED_SKILLS = new Set();
 if (existsSync(SKILLS_JSON)) {
-  for (const s of JSON.parse(readFileSync(SKILLS_JSON, 'utf8'))) {
-    if (String(s.ranks).toLowerCase() === 'unlimited') UNLIMITED_SKILLS.add(s.name);
+  for (const s of JSON.parse(readFileSync(SKILLS_JSON, "utf8"))) {
+    if (String(s.ranks).toLowerCase() === "unlimited") UNLIMITED_SKILLS.add(s.name);
   }
 }
 
@@ -52,7 +52,7 @@ if (!existsSync(DOC)) {
   process.exit(1);
 }
 
-const raw = readFileSync(DOC, 'utf8');
+const raw = readFileSync(DOC, "utf8");
 
 // ─── HTML PARSER ──────────────────────────────────────────────────────────────
 // Mirrors the walker in parse-megadoc.js. Kept separate so this script stays
@@ -60,35 +60,46 @@ const raw = readFileSync(DOC, 'utf8');
 
 function decode(s) {
   return s
-    .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
-    .replace(/&nbsp;/g, ' ')
-    .replace(/&rsquo;/g, '’').replace(/&lsquo;/g, '‘')
-    .replace(/&ldquo;/g, '“').replace(/&rdquo;/g, '”')
-    .replace(/&hellip;/g, '…').replace(/&ndash;/g, '–').replace(/&mdash;/g, '—')
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&rsquo;/g, "’")
+    .replace(/&lsquo;/g, "‘")
+    .replace(/&ldquo;/g, "“")
+    .replace(/&rdquo;/g, "”")
+    .replace(/&hellip;/g, "…")
+    .replace(/&ndash;/g, "–")
+    .replace(/&mdash;/g, "—")
     .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(+n))
     .replace(/&#x([0-9a-f]+);/gi, (_, h) => String.fromCharCode(parseInt(h, 16)))
-    .replace(/&[a-z]+;/gi, '');
+    .replace(/&[a-z]+;/gi, "");
 }
-const stripTags = (s) => decode(s.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ')).trim();
+const stripTags = (s) => decode(s.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ")).trim();
 
 function parseHTML() {
   const nodes = [];
   const TAG = /<(\/?)([a-zA-Z][a-zA-Z0-9]*)[^>]*>/g;
-  const BLOCK = new Set(['p', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6']);
-  let pos = 0, inTag = null, buf = '';
+  const BLOCK = new Set(["p", "li", "h1", "h2", "h3", "h4", "h5", "h6"]);
+  let pos = 0,
+    inTag = null,
+    buf = "";
   let m;
   while ((m = TAG.exec(raw)) !== null) {
     if (inTag) buf += raw.slice(pos, m.index);
     pos = m.index + m[0].length;
-    const closing = m[1] === '/';
+    const closing = m[1] === "/";
     const tag = m[2].toLowerCase();
-    if (!closing && BLOCK.has(tag)) { buf = ''; inTag = tag; }
-    else if (closing && inTag === tag) {
+    if (!closing && BLOCK.has(tag)) {
+      buf = "";
+      inTag = tag;
+    } else if (closing && inTag === tag) {
       const text = stripTags(buf).trim();
-      buf = ''; inTag = null;
+      buf = "";
+      inTag = null;
       if (!text) continue;
-      if (/^h[1-6]$/.test(tag)) nodes.push({ type: 'heading', level: +tag[1], text });
-      else nodes.push({ type: 'text', text });
+      if (/^h[1-6]$/.test(tag)) nodes.push({ type: "heading", level: +tag[1], text });
+      else nodes.push({ type: "text", text });
     }
   }
   return nodes;
@@ -112,7 +123,8 @@ const nodes = parseHTML();
 // Kept patterns:
 //   (your choice)         — instruction to the player
 //   (Daggers), (Religious) — parameter values for parameterized entities
-const BOOKKEEPING_NOTE = /\s*\((?:-?\d+\s*BP\s+)?(?:free\s+from|discounted\s+from|refunded\s+from|from|starting)[^()]*\)/gi;
+const BOOKKEEPING_NOTE =
+  /\s*\((?:-?\d+\s*BP\s+)?(?:free\s+from|discounted\s+from|refunded\s+from|from|starting)[^()]*\)/gi;
 
 // Trailing effective-cost suffix the doc author writes on purchased items, e.g.
 // "Shield Expertise - 5 BP". This is the *effective* per-build cost (after class
@@ -124,37 +136,9 @@ const parseBPSuffix = (s) => {
   // The "- N BP" cost may be followed by a trailing bookkeeping note, e.g.
   // "Lore x2 (your choice) - 2 BP (discounted from Sharp Mind)". Strip the note
   // first so the cost suffix lands at end-of-string for the match.
-  const m = s.replace(BOOKKEEPING_NOTE, '').match(BP_SUFFIX);
+  const m = s.replace(BOOKKEEPING_NOTE, "").match(BP_SUFFIX);
   return m ? parseInt(m[1], 10) : null;
 };
-
-// The bookkeeping notes aren't just clutter — they're the hand-authored grant
-// model. "(from Linked Armor Utility Power)" means the item is granted by that
-// power and so costs no BP; "(1 BP refunded from Poisoner)" is a discount.
-// Parse the first such note on a line into structured provenance so the
-// validator can model grants/discounts instead of guessing from prose.
-//   kind: 'grant'   — fully free, granted by source (free from / from / starting)
-//         'discount'— partial refund (N BP refunded / discounted from)
-//   amount: BP refunded for discounts (null for full grants)
-//   source: the granting entity text ("Linked Armor", "Poisoner"), best-effort
-const NOTE_DETAIL = /\((?:(-?\d+)\s*BP\s+)?(free\s+from|discounted\s+from|refunded\s+from|from|starting)\s*([^()]*)\)/i;
-function parseProvenance(s) {
-  const m = s.match(NOTE_DETAIL);
-  if (!m) return null;
-  const [, amt, verb, rest] = m;
-  const v = verb.toLowerCase();
-  const kind = (v === 'refunded from' || v === 'discounted from' || amt) ? 'discount' : 'grant';
-  // The note may name the source's ROLE ("Utility Power", "innate Power", "Perk").
-  // Capture it (when stated) so the UI can say what kind of thing granted this,
-  // then strip it from `source` so that's just the entity name. Role isn't always
-  // present ("from The Learned One") — the UI can fall back to entity lookup.
-  const roleMatch = rest.match(/\b((?:utility|innate|basic|class|advanced|veteran)?\s*power|perk|skill|class\s+feature)\b/i);
-  const sourceRole = roleMatch ? roleMatch[1].replace(/\s+/g, ' ').trim().toLowerCase() : null;
-  const source = rest.replace(/\b(utility|innate|basic|class|advanced|veteran)?\s*power\b/i, '')
-                     .replace(/\bperk\b/i, '').replace(/\bskill\b/i, '').replace(/\bclass\s+feature\b/i, '')
-                     .replace(/\s+/g, ' ').trim() || null;
-  return { kind, amount: amt ? Math.abs(parseInt(amt, 10)) : null, source, sourceRole };
-}
 
 // Rank multiplier: "Foo x2" / "Foo x2 (your choice)" means take Foo twice. We
 // keep ONE row and record the count in a `ranks` sidecar; the name is stripped of
@@ -173,7 +157,10 @@ function parseRank(s) {
 // Lores (collisions would otherwise overwrite each other in the by-item map).
 // The base skill name of an item line (leading words before " - ", " x", " (").
 function baseSkillName(s) {
-  return s.replace(RANK_RE, '').split(/\s*-\s*|\s*\(/)[0].trim();
+  return s
+    .replace(RANK_RE, "")
+    .split(/\s*-\s*|\s*\(/)[0]
+    .trim();
 }
 // Replace a "(your choice)" parameter with the `instance`-th concrete default for
 // the base skill (default 0). If no mapped default, drop the placeholder.
@@ -181,21 +168,21 @@ function concretizeChoice(s, instance = 0) {
   if (!/\(your choice\)/i.test(s)) return s;
   const defaults = CHOICE_DEFAULTS[baseSkillName(s)];
   const choice = defaults ? defaults[instance % defaults.length] : null;
-  return s.replace(/\s*\(your choice\)/i, choice ? ` (${choice})` : '');
+  return s.replace(/\s*\(your choice\)/i, choice ? ` (${choice})` : "");
 }
 
 const stripNotes = (s, instance = 0) => {
   const cleaned = concretizeChoice(s, instance)
-    .replace(BOOKKEEPING_NOTE, '')
-    .replace(BP_SUFFIX, '')
-    .replace(RANK_RE, '')
-    .replace(/\s+/g, ' ')
+    .replace(BOOKKEEPING_NOTE, "")
+    .replace(BP_SUFFIX, "")
+    .replace(RANK_RE, "")
+    .replace(/\s+/g, " ")
     .trim();
 
   if (cleaned === "Shake it Off") return "Shake It Off I";
   if (cleaned === "Deflect Projectiles") return "Deflect Projectile";
   if (cleaned === "Backstab (+1 damage)") return "Backstab";
-  
+
   return cleaned;
 };
 
@@ -213,26 +200,34 @@ const stripNotes = (s, instance = 0) => {
 //
 // Fields whose label appears as an inline "Label: value" line:
 const INLINE_FIELD_NAMES = new Set([
-  'lineage', 'lineageChallenges', 'lineageAdvantages', 'lifePoints', 'armorPoints',
-  'spikes', 'classLevels', 'specialization', 'devotion', 'flaws', 'divineDomains',
-  'devotionAccents',
+  "lineage",
+  "lineageChallenges",
+  "lineageAdvantages",
+  "lifePoints",
+  "armorPoints",
+  "spikes",
+  "classLevels",
+  "specialization",
+  "devotion",
+  "flaws",
+  "divineDomains",
+  "devotionAccents",
 ]);
-const SECTION_FIELDS = Object.fromEntries(
-  Object.entries(LABEL_FIELD).filter(([, f]) => !INLINE_FIELD_NAMES.has(f)),
-);
-const INLINE_FIELDS = Object.fromEntries(
-  Object.entries(LABEL_FIELD).filter(([, f]) => INLINE_FIELD_NAMES.has(f)),
-);
+const SECTION_FIELDS = Object.fromEntries(Object.entries(LABEL_FIELD).filter(([, f]) => !INLINE_FIELD_NAMES.has(f)));
+const INLINE_FIELDS = Object.fromEntries(Object.entries(LABEL_FIELD).filter(([, f]) => INLINE_FIELD_NAMES.has(f)));
 
 // Inline-list fields are stored as arrays (split on ", "). Comma-less values
 // pass through as single-element arrays.
-const LIST_FIELDS = new Set([
-  'lineageChallenges', 'lineageAdvantages', 'flaws',
-  'divineDomains', 'devotionAccents',
-]);
+const LIST_FIELDS = new Set(["lineageChallenges", "lineageAdvantages", "flaws", "divineDomains", "devotionAccents"]);
 
 // "None" → empty array (for list fields) or null (for scalar fields).
-const normalizeListValue = (v) => v.trim() === 'None' ? [] : v.split(/,\s*/).map((s) => s.trim()).filter(Boolean);
+const normalizeListValue = (v) =>
+  v.trim() === "None"
+    ? []
+    : v
+        .split(/,\s*/)
+        .map((s) => s.trim())
+        .filter(Boolean);
 
 // Parse a section-header line: text ending with a colon, optionally followed
 // by an inline value. "Starting Skills (free):" → header; "Lineage: Human"
@@ -248,35 +243,30 @@ function parseArchetype(start, end) {
   // The first non-header text line is the tagline (e.g. "Guard your allies,
   // block hits, and take a beating…").
   let i = start + 1;
-  if (i < end && nodes[i].type === 'text' && !INLINE_RE.test(nodes[i].text) && !HEADER_RE.test(nodes[i].text)) {
+  if (i < end && nodes[i].type === "text" && !INLINE_RE.test(nodes[i].text) && !HEADER_RE.test(nodes[i].text)) {
     archetype.tagline = nodes[i].text;
     i++;
   }
 
-  let currentList = null;   // when truthy, subsequent unlabeled text lines append here
-  let currentField = null;  // field name backing currentList, for the BP sidecar
-  // effectiveBP[field] and grants[field] are index-aligned with archetype[field]:
-  // the author's stated per-build cost and grant provenance for each item (null
-  // when none was written).
+  let currentList = null; // when truthy, subsequent unlabeled text lines append here
+  let currentField = null; // field name backing currentList, for the BP sidecar
+  // effectiveBP[field] / ranks[field] are index-aligned with archetype[field]: the
+  // author's stated per-build cost + rank for each item (null when none was written).
   archetype.effectiveBP = {};
-  archetype.grants = {};
   archetype.ranks = {};
 
-  // Append a raw item line to the current section list, splitting off the
-  // trailing "- N BP" cost, the "(from X)" provenance note, and the "xN" rank
-  // multiplier into index-aligned sidecars before storing the cleaned name.
+  // Append a raw item line to the current section list, splitting off the trailing
+  // "- N BP" cost and the "xN" rank multiplier into index-aligned sidecars before
+  // storing the cleaned name.
   //
   // For UNLIMITED-ranks skills (Lore, Bookcaster, …), "xN" means N SEPARATE
   // instances, not rank N — so expand into N distinct rows, each with its own
   // concrete subject. Per-instance cost is left to the validator to DERIVE (base
-  // minus any discount source the character owns), so we store effectiveBP: null
-  // and drop the authored discount note (the engine applies it once per instance —
-  // keeping the note too would double-count). Genuine ranked skills keep one row
-  // with ranks: N and their authored cost.
-  const pushOne = (name, bp, grant, rank) => {
+  // minus any discount source the character owns), so we store effectiveBP: null.
+  // Genuine ranked skills keep one row with ranks: N and their authored cost.
+  const pushOne = (name, bp, rank) => {
     currentList.push(name);
     (archetype.effectiveBP[currentField] ||= []).push(bp);
-    (archetype.grants[currentField] ||= []).push(grant);
     (archetype.ranks[currentField] ||= []).push(rank);
   };
   const pushItem = (rawLine) => {
@@ -294,16 +284,19 @@ function parseArchetype(start, end) {
           const d = CHOICE_DEFAULTS[base];
           name = `${name} (${d[k % d.length]})`;
         }
-        pushOne(name, null, null, 1);  // derive cost per instance
+        pushOne(name, null, 1); // derive cost per instance
       }
       return;
     }
-    pushOne(stripNotes(rawLine), parseBPSuffix(rawLine), parseProvenance(rawLine), count);
+    pushOne(stripNotes(rawLine), parseBPSuffix(rawLine), count);
   };
 
   while (i < end) {
     const n = nodes[i];
-    if (n.type !== 'text') { i++; continue; }
+    if (n.type !== "text") {
+      i++;
+      continue;
+    }
     const text = n.text;
 
     const inlineMatch = text.match(INLINE_RE);
@@ -312,8 +305,8 @@ function parseArchetype(start, end) {
     // "Purchased Perks:Deathgrip..." → label "Purchased Perks", first item
     // "Deathgrip...". Only honour this shape when the label is a known section
     // header (otherwise things like "URL:https://..." would false-trigger).
-    const headerPlusItem = headerPlusItemMatch && SECTION_FIELDS[headerPlusItemMatch[1].trim()]
-      ? headerPlusItemMatch : null;
+    const headerPlusItem =
+      headerPlusItemMatch && SECTION_FIELDS[headerPlusItemMatch[1].trim()] ? headerPlusItemMatch : null;
 
     if (inlineMatch) {
       const [, rawLabel, value] = inlineMatch;
@@ -326,12 +319,11 @@ function parseArchetype(start, end) {
         // Section-list field written inline ("Purchased Perks: None" — common
         // shorthand). "None" closes the list as empty; any other value would
         // be unexpected here, so treat it as a single-item list.
-        if (value.trim() === 'None') {
+        if (value.trim() === "None") {
           archetype[sectionField] = [];
         } else {
           archetype[sectionField] = [stripNotes(value)];
           archetype.effectiveBP[sectionField] = [parseBPSuffix(value)];
-          archetype.grants[sectionField] = [parseProvenance(value)];
         }
       }
       currentList = null;
@@ -400,8 +392,6 @@ function parseArchetype(start, end) {
   // archetypes without authored costs / grants stay clean.
   const anyBP = Object.values(archetype.effectiveBP).some((arr) => arr.some((v) => v !== null));
   if (!anyBP) delete archetype.effectiveBP;
-  const anyGrant = Object.values(archetype.grants).some((arr) => arr.some((v) => v !== null));
-  if (!anyGrant) delete archetype.grants;
   const anyRank = Object.values(archetype.ranks).some((arr) => arr.some((v) => v > 1));
   if (!anyRank) delete archetype.ranks;
 
@@ -416,14 +406,16 @@ function parseArchetype(start, end) {
     .find(Boolean);
   const worshipDevotion = worshipMatch ? worshipMatch[1].trim() : null;
   if (worshipDevotion && archetype.devotion && archetype.devotion !== worshipDevotion) {
-    console.warn(`  ⚠ ${archetype.name}: devotion mismatch — inline "${archetype.devotion}" vs Worship "${worshipDevotion}"; using Worship.`);
+    console.warn(
+      `  ⚠ ${archetype.name}: devotion mismatch — inline "${archetype.devotion}" vs Worship "${worshipDevotion}"; using Worship.`,
+    );
   }
   if (worshipDevotion) archetype.devotion = worshipDevotion;
 
   // Fix up Extended Capacity - Novice based on class magic type
-  for (const field of ['startingSkills', 'purchasedSkills']) {
+  for (const field of ["startingSkills", "purchasedSkills"]) {
     if (archetype[field]) {
-      archetype[field] = archetype[field].map(skill => {
+      archetype[field] = archetype[field].map((skill) => {
         if (skill === "Extended Capacity - Novice") {
           if (archetype.classLevels && /Mage|Sourcerer|Artisan/.test(archetype.classLevels)) {
             return "Extended Capacity - Novice (Arcane)";
@@ -442,21 +434,21 @@ function parseArchetype(start, end) {
 const archetypes = [];
 for (let i = 0; i < nodes.length; i++) {
   const n = nodes[i];
-  if (n.type !== 'heading' || n.level !== 1) continue;
+  if (n.type !== "heading" || n.level !== 1) continue;
   // Skip the "Table of Contents" wrapper H1 — it has no archetype data under it.
-  if (n.text === 'Table of Contents') continue;
-  const nextH1 = nodes.findIndex((m, j) => j > i && m.type === 'heading' && m.level === 1);
+  if (n.text === "Table of Contents") continue;
+  const nextH1 = nodes.findIndex((m, j) => j > i && m.type === "heading" && m.level === 1);
   const end = nextH1 === -1 ? nodes.length : nextH1;
-  const v1 = parseArchetype(i, end);
-  archetypes.push(convertToV2(v1));
+  const raw = parseArchetype(i, end);
+  archetypes.push(buildCharacter(raw));
 }
 
-function convertToV2(v1) {
-  const v2 = {
+function buildCharacter(raw) {
+  const character = {
     // The archetype's own name — `name`, canonical like every other entity, so UI
     // code reads a.name uniformly. (The CHARACTER built from it carries the
     // provenance separately as `archetypeName`; loadArchetype sets that.)
-    name: v1.name,
+    name: raw.name,
     classes: {},
     skills: [],
     perks: [],
@@ -464,122 +456,90 @@ function convertToV2(v1) {
     powers: [],
     spells: [],
     devotions: [],
-    wealth: v1.wealth || 'None',
+    wealth: raw.wealth || "None",
   };
-  let idCounter = 0;
-  const nextId = (entityId) => crypto.createHash('md5').update(`${v1.name}:${entityId}:${idCounter++}`).digest('hex');
 
   // 1. Classes
-  if (v1.classLevels) {
-    const classMatch = v1.classLevels.match(/^([A-Z][a-zA-Z]+)\s+(\d+)/);
+  if (raw.classLevels) {
+    const classMatch = raw.classLevels.match(/^([A-Z][a-zA-Z]+)\s+(\d+)/);
     if (classMatch) {
-       v2.classes[classMatch[1]] = parseInt(classMatch[2], 10);
+      character.classes[classMatch[1]] = parseInt(classMatch[2], 10);
     } else {
-       // Fallback for edge cases
-       v2.classes[v1.classLevels.split(' ')[0]] = parseInt(v1.classLevels.split(' ')[1], 10) || 1;
+      // Fallback for edge cases
+      character.classes[raw.classLevels.split(" ")[0]] = parseInt(raw.classLevels.split(" ")[1], 10) || 1;
     }
   }
 
   // 2. Lineage
-  if (v1.lineage) {
-    v2.lineage = { name: v1.lineage, choices: [] };
+  if (raw.lineage) {
+    character.lineage = { name: raw.lineage, choices: [] };
     const addAdv = (arr) => {
       for (const adv of arr || []) {
-        v2.perks.push({
-          id: nextId('advantages:' + v1.lineage + ' - ' + adv),
-          entityId: 'advantages:' + v1.lineage + ' - ' + adv,
+        character.perks.push({
+          entityId: "advantages:" + raw.lineage + " - " + adv,
           source: Source.lineage(),
         });
-        v2.lineage.choices.push(adv);
+        character.lineage.choices.push(adv);
       }
     };
-    addAdv(v1.lineageAdvantages);
-    
-    for (const ch of v1.lineageChallenges || []) {
-      v2.flaws.push({
-        id: nextId('challenges:' + v1.lineage + ' - ' + ch),
-        entityId: 'challenges:' + v1.lineage + ' - ' + ch,
-        source: Source.lineage()
+    addAdv(raw.lineageAdvantages);
+
+    for (const ch of raw.lineageChallenges || []) {
+      character.flaws.push({
+        entityId: "challenges:" + raw.lineage + " - " + ch,
+        source: Source.lineage(),
       });
-      v2.lineage.choices.push(ch);
+      character.lineage.choices.push(ch);
     }
   }
 
-  // 3. Helper to create Choice objects
-  const addChoice = (fieldStr, targetArray, sourceName, fallbackPrefix = '') => {
-    const list = v1[fieldStr] || [];
-    list.forEach((item, idx) => {
-      const cost = v1.effectiveBP?.[fieldStr]?.[idx] ?? null;
-      let ranks = v1.ranks?.[fieldStr]?.[idx] ?? 1;
-      let cleanName = item;
-      
-      // Attempt to strip parameterized formats (Item - Param) -> just Item
-      const baseMatch = cleanName.match(/^([^-]+?)\\s*-/);
-      let entityId = baseMatch ? baseMatch[1].trim() : cleanName;
-      if (fallbackPrefix) entityId = fallbackPrefix + ':' + entityId;
-      else entityId = cleanName; // Will be resolved by the engine
-
-      const choice = {
-        id: nextId(entityId),
-        entityId,
-        source: sourceName,
-        // The originating field (e.g. 'bookSpells', 'basicPowers') — keys the BP
-        // ledger and lets the validator tell book spells (Bookcaster's own pool)
-        // apart from spells-known, which share the same tiers.
-        costField: fieldStr,
-      };
-      if (cost !== null) choice.costOverride = cost;
-      if (ranks > 1) choice.ranks = ranks;
-      
-      const paramMatch = cleanName.match(/\\((.*?)\\)/) || cleanName.match(/\\s-\\s(.*)$/);
-      if (paramMatch && !paramMatch[0].includes('your choice')) {
-        choice.parameter = paramMatch[1].trim();
-      }
-
-      targetArray.push(choice);
+  // 3. Build each parsed section into its bucket via the SHARED write-path helper
+  // (choiceFromParsed): the section field decides bucket + source + costField; the
+  // parsed line carries name / authored BP / rank. One loop over every parseable
+  // field, in output order — no per-field addChoice, no parallel-array zip.
+  const primaryClass = Object.keys(character.classes)[0] || "";
+  const SECTION_ORDER = [
+    "startingSkills",
+    "purchasedSkills",
+    "purchasedPerks",
+    "flaws",
+    "innatePowers",
+    "utilityPowers",
+    "basicPowers",
+    "advancedPowers",
+    "veteranPowers",
+    "formPowers",
+    "classPowers",
+    "rightHandPowers",
+    "domainPowers",
+    "cantrips",
+    "spellsKnown",
+    "noviceSpells",
+    "adeptSpells",
+    "greaterSpells",
+    "bookSpells",
+  ];
+  for (const field of SECTION_ORDER) {
+    (raw[field] || []).forEach((name, idx) => {
+      character[bucketForField(field)].push(
+        choiceFromParsed(
+          {
+            field,
+            name,
+            cost: raw.effectiveBP?.[field]?.[idx] ?? null,
+            rank: raw.ranks?.[field]?.[idx] ?? 1,
+          },
+          primaryClass,
+        ),
+      );
     });
-  };
-
-  // Structured EntitySource per bucket. Starting skills carry the primary class;
-  // innate powers use the innate source (re-synthesized from the class at resolve);
-  // cantrips/spells-known are class-granted (free). Slot/class powers stay purchased
-  // here — the powers slice reclassifies slot powers to a class source.
-  const primaryClass = Object.keys(v2.classes)[0] || '';
-  addChoice('startingSkills', v2.skills, Source.starting(primaryClass));
-  addChoice('purchasedSkills', v2.skills, Source.purchased());
-  addChoice('purchasedPerks', v2.perks, Source.purchased());
-  addChoice('flaws', v2.flaws, Source.flaw());
-
-  addChoice('innatePowers', v2.powers, Source.innate());
-  // Slot powers fill a class progression slot (free) — sourced to the class.
-  addChoice('utilityPowers', v2.powers, Source.class(primaryClass));
-  addChoice('basicPowers', v2.powers, Source.class(primaryClass));
-  addChoice('advancedPowers', v2.powers, Source.class(primaryClass));
-  addChoice('veteranPowers', v2.powers, Source.class(primaryClass));
-  addChoice('formPowers', v2.powers, Source.class(primaryClass));
-  // Purchase-style powers cost BP.
-  addChoice('classPowers', v2.powers, Source.purchased());
-  addChoice('rightHandPowers', v2.powers, Source.purchased());
-  addChoice('domainPowers', v2.powers, Source.purchased());
-
-  // Every spell field fills a caster slot (free) and is sourced to the caster class
-  // (the class carries the sphere — Arcane vs Divine — via CLASSES[cls].magicType;
-  // the tier is on the spell entity). Cantrips, spells-known (novice/adept/greater),
-  // and book spells all resolve the same way.
-  addChoice('cantrips', v2.spells, Source.class(primaryClass));
-  addChoice('spellsKnown', v2.spells, Source.class(primaryClass));
-  addChoice('noviceSpells', v2.spells, Source.class(primaryClass));
-  addChoice('adeptSpells', v2.spells, Source.class(primaryClass));
-  addChoice('greaterSpells', v2.spells, Source.class(primaryClass));
-  // Book spells are Bookcaster's OWN pool — parametrized against the granting skill,
-  // not the class's spells-known slots (they share tiers but aren't slot picks).
-  addChoice('bookSpells', v2.spells, Source.granted('Bookcaster'));
-
-  if (v1.devotion) {
-     v2.devotions.push({ id: nextId('devotions:' + v1.devotion), entityId: 'devotions:' + v1.devotion, source: Source.purchased() });
   }
 
-  return v2;
+  if (raw.devotion) {
+    character.devotions.push({ entityId: "devotions:" + raw.devotion, source: Source.purchased() });
+  }
+
+  return character;
 }
 
 writeFileSync(OUT, JSON.stringify(archetypes, null, 2));

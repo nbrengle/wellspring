@@ -22,8 +22,8 @@ export default function ArchetypePicker({ onPick, onStartBlank }) {
       <header className="b-sheet-header">
         <h1 className="b-sheet-title">Pick a starting character</h1>
         <p className="b-sheet-tagline">
-          New to Wellspring? Any of these gives you a complete, legal level-4 character.
-          You can tweak anything afterward — or start blank to build from scratch.
+          New to Wellspring? Any of these gives you a complete, legal level-4 character. You can tweak anything
+          afterward — or start blank to build from scratch.
         </p>
       </header>
 

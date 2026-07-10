@@ -34,11 +34,14 @@ export function canonicalKey(name) {
   // "heretics'" both end up "heretics".
   s = s.replace(/['’‘ʼ`]/g, "");
   // Normalize whitespace around "/" and collapse all whitespace.
-  s = s.replace(/\s*\/\s*/g, " / ").replace(/\s+/g, " ").trim();
+  s = s
+    .replace(/\s*\/\s*/g, " / ")
+    .replace(/\s+/g, " ")
+    .trim();
   // Singularize trailing -s on the last word, unless the word ends in "ss"
   // (e.g. "Compass", "Goddess"). Confirmed no entity-name collisions exist
   // between singular and plural forms in the current dataset.
-  s = s.replace(/(\w)s$/, (m, c) => c === "s" ? m : c);
+  s = s.replace(/(\w)s$/, (m, c) => (c === "s" ? m : c));
   return s;
 }
 
@@ -56,18 +59,20 @@ export function inflect(name) {
   add(last + "ed");
   add(last + "ing");
   if (/e$/.test(last)) {
-    add(last + "d");                 // Cure -> Cured
-    add(last.slice(0, -1) + "ing");  // Cure -> Curing
+    add(last + "d"); // Cure -> Cured
+    add(last.slice(0, -1) + "ing"); // Cure -> Curing
   }
   if (/[^aeiou]y$/.test(last)) {
-    add(last.slice(0, -1) + "ies");  // -y -> -ies
+    add(last.slice(0, -1) + "ies"); // -y -> -ies
   }
 
   // Reverse inflections (plural -> singular), so a plural-named entity ("Great
   // Weapons", "Effects") matches its singular use in body text. This is what
   // lets us avoid hand-listing those as aliases.
-  if (/ies$/.test(last)) add(last.slice(0, -3) + "y");      // Abilities -> Ability
-  else if (/sses$/.test(last)) add(last.slice(0, -2));       // Classes -> Class
+  if (/ies$/.test(last))
+    add(last.slice(0, -3) + "y"); // Abilities -> Ability
+  else if (/sses$/.test(last))
+    add(last.slice(0, -2)); // Classes -> Class
   else if (/s$/.test(last) && !/ss$/.test(last)) add(last.slice(0, -1)); // Weapons -> Weapon
 
   return [...forms];
@@ -86,36 +91,36 @@ export function inflect(name) {
 //                      even though "Call" is stopped).
 export const MATCH_POLICY = {
   // case-sensitive: caps reliably mean the game-term (audit ratios in comments).
-  "Power":      "case-sensitive", // 61% caps — "the Power" vs "their power source"
-  "Armor":      "case-sensitive", // 54% — flag for doc cleanup; same skill mixes both
-  "Conditions": "case-sensitive", // 79% — "non-Inherent Conditions"
-  "Cure":       "case-sensitive", // 90%
-  "Heal":       "case-sensitive", // 73% — "Heal effect" vs "heal" verb
-  "Mend":       "case-sensitive", // 89%
-  "Marshal":    "case-sensitive", // 100%
-  "Sphere":     "case-sensitive", // 100%
-  "Focus":      "case-sensitive", // 80%
-  "Death":      "case-sensitive", // 65% — "Death Effect" vs "distribute death"
-  "Grant":      "case-sensitive", // 78% — Grant effect family
-  "Count":      "case-sensitive", // 74% — "Slow Count" vs "count toward"
-  "Perk":       "case-sensitive", // 100%
-  "Flaw":       "case-sensitive", // 100%
-  "Lineage":    "case-sensitive", // 100%
+  Power: "case-sensitive", // 61% caps — "the Power" vs "their power source"
+  Armor: "case-sensitive", // 54% — flag for doc cleanup; same skill mixes both
+  Conditions: "case-sensitive", // 79% — "non-Inherent Conditions"
+  Cure: "case-sensitive", // 90%
+  Heal: "case-sensitive", // 73% — "Heal effect" vs "heal" verb
+  Mend: "case-sensitive", // 89%
+  Marshal: "case-sensitive", // 100%
+  Sphere: "case-sensitive", // 100%
+  Focus: "case-sensitive", // 80%
+  Death: "case-sensitive", // 65% — "Death Effect" vs "distribute death"
+  Grant: "case-sensitive", // 78% — Grant effect family
+  Count: "case-sensitive", // 74% — "Slow Count" vs "count toward"
+  Perk: "case-sensitive", // 100%
+  Flaw: "case-sensitive", // 100%
+  Lineage: "case-sensitive", // 100%
 
   // Power names that overlap common English. When capitalized they reliably mean
   // the power (always written "<Name> [Tier]" at the definition); the lowercase
   // form is ordinary prose ("the loot", "kill", "charge them"). case-sensitive
   // links the game-term without the false hits. (Caps ratios are deflated by
   // frequent lowercase prose use, which is exactly what case-sensitive ignores.)
-  "Loot":     "case-sensitive", // power vs "the loot"
-  "Grit":     "case-sensitive", // power vs "true grit"
-  "Cancel":   "case-sensitive", // cantrip vs "cancel the effect"
-  "Kick":     "case-sensitive", // power vs "kicked"
-  "Execute":  "case-sensitive", // power vs "execute a plan"
-  "Soothe":   "case-sensitive", // power vs "soothe"
-  "Charge":   "case-sensitive", // cantrip vs "charge them / in charge"
-  "Stop":     "case-sensitive", // cantrip vs "stop"
-  "Shoulder": "case-sensitive", // power vs "shoulder the burden"
+  Loot: "case-sensitive", // power vs "the loot"
+  Grit: "case-sensitive", // power vs "true grit"
+  Cancel: "case-sensitive", // cantrip vs "cancel the effect"
+  Kick: "case-sensitive", // power vs "kicked"
+  Execute: "case-sensitive", // power vs "execute a plan"
+  Soothe: "case-sensitive", // power vs "soothe"
+  Charge: "case-sensitive", // cantrip vs "charge them / in charge"
+  Stop: "case-sensitive", // cantrip vs "stop"
+  Shoulder: "case-sensitive", // power vs "shoulder the burden"
 
   // stop: capitalization doesn't disambiguate; the lowercase form ALSO means
   // the game-term (e.g. "they should call 'Counter…'" is mechanical use). The
@@ -125,56 +130,58 @@ export const MATCH_POLICY = {
   // and the possessive pronoun ("Mine forever, yours is lost"). Only one cap
   // occurrence is the power itself. No case/context rule separates them — stop
   // the bare match; the power still exists as its own entity / picker entry.
-  "Mine":     "stop", // 62% caps but almost entirely ore-noun / pronoun
-  "Call":     "stop", // 37% — verb usage of the game concept is common
-  "Effects":  "stop", // 44% — "effects of that Trap" is the game-term, lowercased
-  "Skills":   "stop", // 56% — "Lore skills" is meant
-  "Spells":   "stop", // 67% — "cast spells" is the game concept
-  "Hold":     "stop", // 0% caps — exclusively prose
-  "Dead":     "stop", // 54% but low volume, "the dead" is heavy in lore
-  "Materia":  "stop", // 30% low volume
-  "Paces":    "stop", // 0% effectively absent
+  Mine: "stop", // 62% caps but almost entirely ore-noun / pronoun
+  Call: "stop", // 37% — verb usage of the game concept is common
+  Effects: "stop", // 44% — "effects of that Trap" is the game-term, lowercased
+  Skills: "stop", // 56% — "Lore skills" is meant
+  Spells: "stop", // 67% — "cast spells" is the game concept
+  Hold: "stop", // 0% caps — exclusively prose
+  Dead: "stop", // 54% but low volume, "the dead" is heavy in lore
+  Materia: "stop", // 30% low volume
+  Paces: "stop", // 0% effectively absent
   // Tier: bare "Tier" rarely meaningful; the compound IS the entity (Tier Power,
   // Basic Tier). Stop the bare match so compounds win cleanly.
-  "Tier":     "stop", // 67% but the compound is the real concept
+  Tier: "stop", // 67% but the compound is the real concept
 
   // Accents whose names overlap common English (case audit data per word):
-  "Force":   "case-sensitive", // 62% caps — Physical Force vs "force them"
-  "Mind":    "case-sensitive", // 85% caps
-  "Life":    "case-sensitive", // 84% caps — "Life Accent" vs "save your life"
-  "Shadow":  "case-sensitive", // 47% but the cap form is the accent
-  "Fear":    "case-sensitive", // 77%
-  "Divine":  "case-sensitive", // 80%
-  "Disease": "case-sensitive", // 89%
-  "Poison":  "case-sensitive", // 78%
+  Force: "case-sensitive", // 62% caps — Physical Force vs "force them"
+  Mind: "case-sensitive", // 85% caps
+  Life: "case-sensitive", // 84% caps — "Life Accent" vs "save your life"
+  Shadow: "case-sensitive", // 47% but the cap form is the accent
+  Fear: "case-sensitive", // 77%
+  Divine: "case-sensitive", // 80%
+  Disease: "case-sensitive", // 89%
+  Poison: "case-sensitive", // 78%
   // Defense calls and modifiers with English-word overlap:
-  "Counter":  "case-sensitive", // 97% — already very clean, but be explicit
-  "Protect":  "case-sensitive", // 77%
-  "Final":    "case-sensitive", // 73% — modifier vs "final exam"
-  "Self":     "case-sensitive", // 93% — modifier
-  "Subtle":   "case-sensitive", // 63% — modifier
-  "Inherent": "case-sensitive", // 100%
+  Counter: "case-sensitive", // 97% — already very clean, but be explicit
+  Protect: "case-sensitive", // 77%
+  Final: "case-sensitive", // 73% — modifier vs "final exam"
+  Self: "case-sensitive", // 93% — modifier
+  Subtle: "case-sensitive", // 63% — modifier
+  Inherent: "case-sensitive", // 100%
   // Low-volume defense calls / modifiers — keep stopped (rare clean uses).
-  "Altered":       "stop", // 13% caps
-  "Reduced":       "stop", // 0% caps
-  "Immune":        "stop", // 44% caps low volume
-  "Obvious":       "stop", // 0% caps
-  "Environmental": "stop", // 0% caps low volume
+  Altered: "stop", // 13% caps
+  Reduced: "stop", // 0% caps
+  Immune: "stop", // 44% caps low volume
+  Obvious: "stop", // 0% caps
+  Environmental: "stop", // 0% caps low volume
 
   // Duration-value entities (rules-concepts:Short/Long/Permanent/Instantaneous)
   // are real concepts but their names are common English words. We stop the bare
   // match here, and link-refs adds CONTEXTUAL matchers that fire only when the
   // word is followed by a known Effect or Defense Call name — i.e. when it's
   // actually being used as a Duration in a Call shape.
-  "Short":         "stop",
-  "Long":          "stop",
-  "Permanent":     "stop",
-  "Instantaneous": "stop",
+  Short: "stop",
+  Long: "stop",
+  Permanent: "stop",
+  Instantaneous: "stop",
 };
 
 // Backwards-compat: legacy code paths that only care about "is this stopped?"
 export const STOP_WORDS = new Set(
-  Object.entries(MATCH_POLICY).filter(([, p]) => p === "stop").map(([n]) => n)
+  Object.entries(MATCH_POLICY)
+    .filter(([, p]) => p === "stop")
+    .map(([n]) => n),
 );
 
 // Curated aliases keyed by canonical entity name — ONLY for surface forms with
@@ -194,7 +201,7 @@ export const CURATED = {
   "Spell-slots": ["Spell Slot", "Spell Slots", "spell slot", "spell slots"],
   // Documentation spelling inconsistency, surfaced by `npm run link:audit`:
   // the skill is "Daggercraft" but a prereq writes it "Dagger Craft".
-  "Daggercraft": ["Dagger Craft"],
+  Daggercraft: ["Dagger Craft"],
   // The doc has no entity literally named "Devotion" — the individual deities
   // are entities of their own. "Devotions & Divine Beings" is the H1 section
   // that introduces the concept. Alias "Devotion"/"Devotions" so prose
@@ -203,12 +210,12 @@ export const CURATED = {
   // Tiered skill families have entries "Forage I/II/III", "Scavenge I/II/III".
   // Prose references the family by the bare verb ("Foraging skill", "Scavenge
   // unless ...") — route those to the tier-I entry, the canonical entry point.
-  "Forage I":   ["Forage", "Foraging"],
+  "Forage I": ["Forage", "Foraging"],
   "Scavenge I": ["Scavenge", "Scavenging"],
   // Tinkering crafting skill ladder. Bare "Tinker"/"Tinkering" → Apprentice tier.
   "Apprentice Tinkering": ["Tinker", "Tinkering"],
   // Irregular inflections that `inflect()` can't derive algorithmically.
-  "Rebuild": ["Rebuilt"],
+  Rebuild: ["Rebuilt"],
   // Latin plural.
   "Formula Types": ["Formula", "Formulae"],
   // Magic spheres: bare "Arcane" / "Divine" / "Druidic" referenced everywhere
@@ -219,8 +226,11 @@ export const CURATED = {
   // They're defined in one paragraph inside the Forge's description, not as
   // their own headings. Route the compounds to the parent concept.
   "The Enchanting Forge": [
-    "Reality Tear", "Circle of Sacrifice", "Circle of Assignment",
-    "Circle of Empowerment", "Rune Circle",
+    "Reality Tear",
+    "Circle of Sacrifice",
+    "Circle of Assignment",
+    "Circle of Empowerment",
+    "Rune Circle",
   ],
   // Tinker's Workshop — entity name has the possessive "Tinker's" but body
   // text often just says "Workshop" in context.

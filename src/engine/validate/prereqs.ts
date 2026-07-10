@@ -8,11 +8,11 @@
 //
 // Re-exported by the validate.js barrel.
 
-import { lookupEntity, CLASSES } from '../data.js';
-import { bareSkill, getClasses } from '../resolver.js';
-import { characterLevel } from './core.js';
-import { spellSlots } from './slots.js';
-import { resolveCharacterGraph } from '../graph.js';
+import { CLASSES } from "../data.js";
+import { getClasses } from "../resolver.js";
+import { characterLevel } from "./core.js";
+import { spellSlots } from "./slots.js";
+import { resolveCharacterGraph } from "../graph.js";
 
 // Whether a character meets the prereqs for a single entity id — used by the
 // power picker to flag locked candidates. Returns { met, missing, anyOf, notes }
@@ -37,7 +37,8 @@ export function checkLevelConstraint(character, constraintStr, owned) {
   let m = constraintStr.match(/^(\d+)\s+(?:levels?|class-levels)\s+in\s+(?:a\s+)?Martial\s+Classes/i);
   if (m) {
     const required = parseInt(m[1], 10);
-    const martial = charClasses.filter((c) => CLASSES[c.name]?.tags?.includes('Martial'))
+    const martial = charClasses
+      .filter((c) => CLASSES[c.name]?.tags?.includes("Martial"))
       .reduce((sum, c) => sum + c.level, 0);
     return martial >= required;
   }
@@ -46,15 +47,15 @@ export function checkLevelConstraint(character, constraintStr, owned) {
   if (m) {
     const requiredLevel = parseInt(m[1], 10);
     const classStr = m[2].trim().toLowerCase();
-    
+
     // Spellcaster meta-class
-    if (classStr === 'spellcaster' || classStr === 'spellcaster class') {
+    if (classStr === "spellcaster" || classStr === "spellcaster class") {
       const highestSpellcasterLevel = charClasses
         .filter((c) => CLASSES[c.name]?.spellcaster)
         .reduce((max, c) => Math.max(max, c.level), 0);
       return highestSpellcasterLevel >= requiredLevel;
     }
-    
+
     // Specific class
     const matchClass = charClasses.find((c) => c.name.toLowerCase() === classStr);
     return matchClass ? matchClass.level >= requiredLevel : false;
@@ -81,7 +82,7 @@ export function checkLevelConstraint(character, constraintStr, owned) {
   m = constraintStr.match(/^(\d+)\s+Ranks\s+of\s+Profession/i);
   if (m) {
     const count = parseInt(m[1], 10);
-    const profs = [...owned].filter(id => /^skills:Profession/i.test(id));
+    const profs = [...owned].filter((id) => /^skills:Profession/i.test(id));
     return profs.length >= count;
   }
 

@@ -3424,7 +3424,6 @@
   color: var(--b-amber);
 }
 
-
 .b-lin-choices-group {
   padding: 0.6rem 1.1rem 0;
 }
@@ -3536,7 +3535,9 @@
   font-size: 0.78rem;
   text-align: left;
   cursor: pointer;
-  transition: border-color 0.12s ease, background 0.12s ease;
+  transition:
+    border-color 0.12s ease,
+    background 0.12s ease;
 }
 
 .b-lin-subchoice-btn:hover {
@@ -3858,7 +3859,6 @@
   color: var(--b-text);
 }
 
-
 /* Divider banner: marks the earn/spend axis as separate from the nature step. */
 .b-lin-options-banner {
   padding: 0.4rem 1.1rem;
@@ -4158,9 +4158,13 @@
   cursor: pointer;
 }
 
-.b-facet-pop-body { padding: 0.3rem 0.7rem 0.6rem; }
+.b-facet-pop-body {
+  padding: 0.3rem 0.7rem 0.6rem;
+}
 
-.b-facet-group { margin-top: 0.5rem; }
+.b-facet-group {
+  margin-top: 0.5rem;
+}
 
 .b-facet-group-label {
   margin: 0 0 0.2rem;
@@ -4180,7 +4184,9 @@
   color: var(--b-text);
 }
 
-.b-facet-opt.is-on { color: var(--b-amber); }
+.b-facet-opt.is-on {
+  color: var(--b-amber);
+}
 
 .b-facet-opt.is-zero {
   color: var(--b-dim, #5e564b);
@@ -4291,10 +4297,14 @@
   padding: 0.25rem 0.6rem;
   font-size: 0.82rem;
   cursor: pointer;
-  transition: border-color 0.12s ease, color 0.12s ease;
+  transition:
+    border-color 0.12s ease,
+    color 0.12s ease;
 }
 
-.b-subselect-chip:hover { border-color: var(--b-amber); }
+.b-subselect-chip:hover {
+  border-color: var(--b-amber);
+}
 
 /* "Type your own" chip — dashed to read as an action, not a fixed option. */
 .b-subselect-chip.is-custom {
@@ -4302,7 +4312,9 @@
   color: var(--b-muted);
 }
 
-.b-subselect-chip.is-custom:hover { color: var(--b-amber); }
+.b-subselect-chip.is-custom:hover {
+  color: var(--b-amber);
+}
 
 /* Inline input the custom chip opens into. */
 .b-subselect-custom-input {

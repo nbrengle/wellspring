@@ -28,21 +28,63 @@ const read = (f) => JSON.parse(readFileSync(join(DATA, f), "utf8"));
 // short glossary definition). All identifiers are plural to match the JSON
 // collection files they correspond to; the one exception is `creature-types`,
 // because `types` would collide with the `type` field on every entity record.
-const TYPE_PRIORITY = ["effects", "conditions", "creature-types", "resources", "accents", "defenses", "modifiers", "crafting-concepts", "ritual-concepts", "skills", "perks", "flaws", "classes", "domains", "devotions", "powers", "recipes", "rituals", "advantages", "challenges", "archetypes", "rules-concepts", "terms"];
+const TYPE_PRIORITY = [
+  "effects",
+  "conditions",
+  "creature-types",
+  "resources",
+  "accents",
+  "defenses",
+  "modifiers",
+  "crafting-concepts",
+  "ritual-concepts",
+  "skills",
+  "perks",
+  "flaws",
+  "classes",
+  "domains",
+  "devotions",
+  "powers",
+  "recipes",
+  "rituals",
+  "advantages",
+  "challenges",
+  "archetypes",
+  "rules-concepts",
+  "terms",
+];
 
-const POWER_TIERS = ["innate", "utility", "basic", "advanced", "veteran", "classSkills", "rightHandPowers", "cantrips", "noviceSpells", "adeptSpells", "greaterSpells"];
+const POWER_TIERS = [
+  "innate",
+  "utility",
+  "basic",
+  "advanced",
+  "veteran",
+  "classSkills",
+  "rightHandPowers",
+  "cantrips",
+  "noviceSpells",
+  "adeptSpells",
+  "greaterSpells",
+];
 
 function buildRegistry() {
   const reg = [];
-  const add = (type, name, body, extra) => { if (name) reg.push({ type, name, id: `${type}:${name}`, body: body || "", ...extra }); };
+  const add = (type, name, body, extra) => {
+    if (name) reg.push({ type, name, id: `${type}:${name}`, body: body || "", ...extra });
+  };
 
-  read("skills.json").forEach((s) => add("skills", s.name, s.description, s.parameter ? { parameter: s.parameter } : {}));
+  read("skills.json").forEach((s) =>
+    add("skills", s.name, s.description, s.parameter ? { parameter: s.parameter } : {}),
+  );
   read("perks.json").forEach((p) => add("perks", p.name, p.description));
   read("flaws.json").forEach((f) => add("flaws", f.name, f.description));
   read("glossary.json").forEach((g) => add("terms", g.term, g.definition));
   // Effects carry the doc-derived condition they cause (effects.json), kept as a
   // typed relationship rather than re-encoded by hand.
-  read("effects.json").forEach((e) => add("effects", e.name, e.description, { causesCondition: e.causesCondition || null }));
+  read("effects.json").forEach((e) =>
+    add("effects", e.name, e.description, { causesCondition: e.causesCondition || null }),
+  );
   read("conditions.json").forEach((c) => add("conditions", c.name, c.description));
   // "creature-types", not "types" — the latter would collide with the `type`
   // field on every entity record.
@@ -67,10 +109,23 @@ function buildRegistry() {
   // every field here or those reference edges are lost. Keep this list in sync with
   // the parser's power-field set (notably `incantation`, added so RP/Focus/Quick
   // references in the incantation still link).
-  const powerBody = (p) => [
-    p.incantation, p.call, p.target, p.duration, p.delivery, p.refresh, p.accent,
-    p.effect, p.requirement, p.prerequisites, p.skillsAndOptions, p.description,
-  ].filter(Boolean).join(" ");
+  const powerBody = (p) =>
+    [
+      p.incantation,
+      p.call,
+      p.target,
+      p.duration,
+      p.delivery,
+      p.refresh,
+      p.accent,
+      p.effect,
+      p.requirement,
+      p.prerequisites,
+      p.skillsAndOptions,
+      p.description,
+    ]
+      .filter(Boolean)
+      .join(" ");
 
   read("domains.json").forEach((d) => {
     add("domains", d.name, "");
@@ -83,11 +138,21 @@ function buildRegistry() {
   // source of those edges. Typed as advantages/challenges, scoped per lineage so
   // same-named items in different lineages stay distinct.
   read("lineages.json").forEach((lin) => {
-    (lin.advantages || []).forEach((a) => add("advantages", `${lin.name} - ${a.name}`, a.description, { lineage: lin.name, baseName: a.name }));
-    (lin.challenges || []).forEach((c) => add("challenges", `${lin.name} - ${c.name}`, c.description, { lineage: lin.name, baseName: c.name }));
+    (lin.advantages || []).forEach((a) =>
+      add("advantages", `${lin.name} - ${a.name}`, a.description, { lineage: lin.name, baseName: a.name }),
+    );
+    (lin.challenges || []).forEach((c) =>
+      add("challenges", `${lin.name} - ${c.name}`, c.description, { lineage: lin.name, baseName: c.name }),
+    );
   });
   read("classes.json").forEach((c) => {
-    add("classes", c.name, [c.description, (c.startingSkills || []).join(" "), (c.multiclassSkills || []).join(" ")].filter(Boolean).join(" "));
+    add(
+      "classes",
+      c.name,
+      [c.description, (c.startingSkills || []).join(" "), (c.multiclassSkills || []).join(" ")]
+        .filter(Boolean)
+        .join(" "),
+    );
     // Class specializations (e.g. Artisan → Mystic, Crafter, Artificer).
     (c.specializations || []).forEach((s) => add("classes", s.name, s.description, { parentClass: c.name }));
     POWER_TIERS.forEach((tier) => (c[tier] || []).forEach((p) => add("powers", p.name, powerBody(p))));
@@ -96,8 +161,22 @@ function buildRegistry() {
   // that reference Resources, Effects, Conditions, etc. Index them as entities
   // so they participate in the graph (and so Bloom in a recipe's materials
   // creates a backlink to Bloom).
-  read("crafting-recipes.json").forEach((r) => add("recipes", r.name, [r.materials, r.usesPerBatch, r.expiration, r.application, r.process, r.description, r.effect].filter(Boolean).join(" ")));
-  read("ritual-recipes.json").forEach((r) => add("rituals", r.name, [r.summary, r.components, r.targets, r.tools, r.effect, r.process].filter(Boolean).join(" ")));
+  read("crafting-recipes.json").forEach((r) =>
+    add(
+      "recipes",
+      r.name,
+      [r.materials, r.usesPerBatch, r.expiration, r.application, r.process, r.description, r.effect]
+        .filter(Boolean)
+        .join(" "),
+    ),
+  );
+  read("ritual-recipes.json").forEach((r) =>
+    add(
+      "rituals",
+      r.name,
+      [r.summary, r.components, r.targets, r.tools, r.effect, r.process].filter(Boolean).join(" "),
+    ),
+  );
   // Archetype templates from the Starter Sheets. The body is the tagline +
   // joined references so the body-text scanner picks up the same skills/perks/
   // powers the archetype lists. Structured refs are resolved separately below.
@@ -108,13 +187,21 @@ function buildRegistry() {
       ...(a.purchasedSkills || []),
       ...(a.purchasedPerks || []),
       ...(a.flaws || []),
-      ...(a.innatePowers || []), ...(a.utilityPowers || []),
-      ...(a.basicPowers || []), ...(a.advancedPowers || []),
-      ...(a.veteranPowers || []), ...(a.cantrips || []),
-      ...(a.noviceSpells || []), ...(a.adeptSpells || []),
-      ...(a.greaterSpells || []), ...(a.bookSpells || []),
-      ...(a.domainPowers || []), ...(a.rightHandPowers || []),
-    ].filter(Boolean).join(" ");
+      ...(a.innatePowers || []),
+      ...(a.utilityPowers || []),
+      ...(a.basicPowers || []),
+      ...(a.advancedPowers || []),
+      ...(a.veteranPowers || []),
+      ...(a.cantrips || []),
+      ...(a.noviceSpells || []),
+      ...(a.adeptSpells || []),
+      ...(a.greaterSpells || []),
+      ...(a.bookSpells || []),
+      ...(a.domainPowers || []),
+      ...(a.rightHandPowers || []),
+    ]
+      .filter(Boolean)
+      .join(" ");
     add("archetypes", a.name, body, { specialization: a.specialization || null });
   });
 
@@ -124,12 +211,29 @@ function buildRegistry() {
   // hardcode the filenames — instead we glob src/data and detect the shape so
   // that newly emitted buckets are picked up automatically.
   const KNOWN_FILES = new Set([
-    "skills.json","perks.json","flaws.json","glossary.json","effects.json",
-    "conditions.json","types.json","resources.json","accents.json",
-    "defense-calls.json","modifiers.json","crafting-concepts.json",
-    "ritual-concepts.json","domains.json","devotions.json","classes.json",
-    "crafting-recipes.json","ritual-recipes.json","lineages.json",
-    "level-table.json","core-rules.json","refs.json","archetypes.json",
+    "skills.json",
+    "perks.json",
+    "flaws.json",
+    "glossary.json",
+    "effects.json",
+    "conditions.json",
+    "types.json",
+    "resources.json",
+    "accents.json",
+    "defense-calls.json",
+    "modifiers.json",
+    "crafting-concepts.json",
+    "ritual-concepts.json",
+    "domains.json",
+    "devotions.json",
+    "classes.json",
+    "crafting-recipes.json",
+    "ritual-recipes.json",
+    "lineages.json",
+    "level-table.json",
+    "core-rules.json",
+    "refs.json",
+    "archetypes.json",
   ]);
   // Names already claimed by a more specific entity type (terms, defenses,
   // crafting-concepts, etc.). When a rules-concept H2 collides — e.g. "Short
@@ -138,7 +242,7 @@ function buildRegistry() {
   const claimed = new Set(reg.map((e) => e.name.toLowerCase()));
   // Strip a trailing plural "s" for comparison so that "Short Rests" matches
   // "Short Rest" (and "Tests" matches "Test").
-  const singular = (s) => s.endsWith("s") ? s.slice(0, -1) : s;
+  const singular = (s) => (s.endsWith("s") ? s.slice(0, -1) : s);
   const isClaimed = (name) => {
     const ln = name.toLowerCase();
     return claimed.has(ln) || claimed.has(singular(ln));
@@ -154,9 +258,9 @@ function buildRegistry() {
     if (!file.endsWith(".json") || KNOWN_FILES.has(file)) continue;
     const data = read(file);
     if (!Array.isArray(data)) continue;
-    const looksLikeSubConcepts = data.length > 0 && data.every(
-      (e) => e && typeof e === "object" && "name" in e && "section" in e && "description" in e
-    );
+    const looksLikeSubConcepts =
+      data.length > 0 &&
+      data.every((e) => e && typeof e === "object" && "name" in e && "section" in e && "description" in e);
     if (looksLikeSubConcepts) data.forEach(addSubConcept);
   }
 
@@ -206,7 +310,10 @@ function buildMatchers(registry) {
       const key = caseSensitive ? form : form.toLowerCase();
       const existing = matchers.find((m) => m.key === key);
       if (existing) {
-        if (priority(e.type) < priority(existing.type)) { existing.id = e.id; existing.type = e.type; }
+        if (priority(e.type) < priority(existing.type)) {
+          existing.id = e.id;
+          existing.type = e.type;
+        }
         continue;
       }
       matchers.push({ form, key, id: e.id, type: e.type, caseSensitive });
@@ -258,9 +365,7 @@ function findRefs(text, selfId, matchers) {
     // " (value)" suffix. Used so "Lore (Religious)" links to skills:Lore and
     // the parenthesized value is masked away (no follow-up matcher tries to
     // match "Religious" as a separate entity).
-    const tail = m.lookahead ? `(?=${m.lookahead})`
-      : m.paramSuffix ? "\\s+\\([^)]+\\)"
-      : "";
+    const tail = m.lookahead ? `(?=${m.lookahead})` : m.paramSuffix ? "\\s+\\([^)]+\\)" : "";
     const re = new RegExp(`(?<![\\w-])${escapeRe(m.form)}(?![\\w-])${tail}`, flags);
     if (re.test(masked)) {
       if (m.id !== selfId) found.add(m.id);
@@ -287,7 +392,8 @@ function skillsIn(fragment, skillForms) {
   for (const h of hits) {
     if (ids.has(h.id)) continue;
     if (taken.some((t) => t.form.includes(h.form))) continue;
-    taken.push(h); ids.add(h.id);
+    taken.push(h);
+    ids.add(h.id);
   }
   return [...ids];
 }
@@ -297,17 +403,23 @@ function parsePrereq(prereqText, skillForms) {
     return { skills: [], anyOf: [], levels: [], other: [] };
   }
   const skills = new Set();
-  const anyOf = [];   // groups of alternative skill ids — satisfied if ANY is held
+  const anyOf = []; // groups of alternative skill ids — satisfied if ANY is held
   const levels = [];
   const other = [];
 
   // Split on commas, but keep "(...)" groups intact.
-  const parts = prereqText.split(/,(?![^(]*\))/).map((p) => p.trim()).filter(Boolean);
+  const parts = prereqText
+    .split(/,(?![^(]*\))/)
+    .map((p) => p.trim())
+    .filter(Boolean);
   for (const part of parts) {
     const wsMatch = part.match(/Weapon Specialization\s*\(([^)]+)\)/i);
     if (wsMatch) {
-      const params = wsMatch[1].split(/,|\bor\b/i).map(s => s.trim().toLowerCase()).filter(Boolean);
-      const wsIds = params.map(p => `skills:Weapon Specialization|${p}`);
+      const params = wsMatch[1]
+        .split(/,|\bor\b/i)
+        .map((s) => s.trim().toLowerCase())
+        .filter(Boolean);
+      const wsIds = params.map((p) => `skills:Weapon Specialization|${p}`);
       if (wsIds.length > 1) {
         anyOf.push(wsIds);
       } else if (wsIds.length === 1) {
@@ -317,20 +429,32 @@ function parsePrereq(prereqText, skillForms) {
     }
 
     // Level requirement: "N levels in X", "Nth character-level", "Character Level N", or non-casting/class levels.
-    const lvl = part.match(/(?:\d+|one|two|three|four|five|six|seven|eight|nine|ten)(?:st|nd|rd|th)?\s*(?:levels?|character-level|character level)/i)
-      || part.match(/(?:level|character[- ]level)\s*(\d+)/i)
-      || part.match(/class-levels/i)
-      || part.match(/level\s+in\s+a\s+non-casting\s+class/i);
+    const lvl =
+      part.match(
+        /(?:\d+|one|two|three|four|five|six|seven|eight|nine|ten)(?:st|nd|rd|th)?\s*(?:levels?|character-level|character level)/i,
+      ) ||
+      part.match(/(?:level|character[- ]level)\s*(\d+)/i) ||
+      part.match(/class-levels/i) ||
+      part.match(/level\s+in\s+a\s+non-casting\s+class/i);
 
     // Disjunction: "Basic Arcane or Basic Faith" — record every alternative as
     // an anyOf group rather than collapsing to one required skill. Only treat it
     // as a disjunction when more than one alternative actually names a skill.
     if (!lvl && /\bor\b/i.test(part)) {
-      const alts = part.split(/\bor\b/i).map((s) => s.trim()).filter(Boolean);
+      const alts = part
+        .split(/\bor\b/i)
+        .map((s) => s.trim())
+        .filter(Boolean);
       const altIds = alts.flatMap((a) => skillsIn(a, skillForms));
       const uniq = [...new Set(altIds)];
-      if (uniq.length > 1) { anyOf.push(uniq); continue; }
-      if (uniq.length === 1) { skills.add(uniq[0]); continue; }
+      if (uniq.length > 1) {
+        anyOf.push(uniq);
+        continue;
+      }
+      if (uniq.length === 1) {
+        skills.add(uniq[0]);
+        continue;
+      }
       other.push(part);
       continue;
     }
@@ -350,7 +474,8 @@ function parsePrereq(prereqText, skillForms) {
 // Parse the explicit "gains/adds the <Name> <Perk|Power|Skill>" form and resolve
 // <Name> against the matching type's lookup. Conservative: only the explicit
 // noun-tagged form, so prose like "gains 3 points of Natural Armor" stays prose.
-const GRANT_RE = /\b(?:gains?|adds?|learns?|receives?|granted)\s+(?:the\s+|one\s+|a\s+|all\s+the\s+)?([A-Z][\w’'-]+(?:\s+[A-Z][\w’'-]+){0,3})\s+(Perk|Power|Skill)\b/gi;
+const GRANT_RE =
+  /\b(?:gains?|adds?|learns?|receives?|granted)\s+(?:the\s+|one\s+|a\s+|all\s+the\s+)?([A-Z][\w’'-]+(?:\s+[A-Z][\w’'-]+){0,3})\s+(Perk|Power|Skill)\b/gi;
 // "Grant Power: X" (a power's Call that bestows the sub-power X) — X is a power.
 const GRANT_POWER_CALL = /\bGrant Power:\s*([A-Z][\w’'-]+(?:\s+[A-Z][\w’'-]+){0,3})/g;
 // "the X Power below" — the unambiguous sub-power marker (any surrounding verb).
@@ -383,7 +508,8 @@ function parseGrants(text, grantLookups) {
     // "Lore: Historical (2)" / "Lore: Noble (2)" (Lessons from Scars) is captured as
     // the parameterized skill "Lore (Historical)" — the colon form slipped past the
     // bare-name pattern, which is why those grants were silently dropped.
-    const PAREN_NUM_RE = /\b([A-Z][\w’'-]+(?:\s+(?:[A-Z][\w’'-]+|of|the|and|to|a|in)){0,4})(?:\s*:\s*([A-Z][\w’' -]+?))?\s*\((\d+)\)/g;
+    const PAREN_NUM_RE =
+      /\b([A-Z][\w’'-]+(?:\s+(?:[A-Z][\w’'-]+|of|the|and|to|a|in)){0,4})(?:\s*:\s*([A-Z][\w’' -]+?))?\s*\((\d+)\)/g;
     PAREN_NUM_RE.lastIndex = 0;
     while ((m = PAREN_NUM_RE.exec(text))) {
       // m[1] = base name, m[2] = parameter (if "Base: Param" form).
@@ -398,9 +524,10 @@ function parseGrants(text, grantLookups) {
             // "skills:Lore (Historical)") so two parameterized grants of the same
             // base skill stay distinct and materialize with their parameter, instead
             // of collapsing to one bare "skills:Lore".
-            const base = entity.id.slice(0, entity.id.indexOf(':'));
+            const base = entity.id.slice(0, entity.id.indexOf(":"));
             out.add(param && entity.parameter ? `${base}:${entity.baseName || entity.name} (${param})` : entity.id);
-            matched = true; break;
+            matched = true;
+            break;
           }
         }
         if (matched) break;
@@ -428,11 +555,12 @@ function parseDiscounts(text, exclusionLookup, grantLookups, selfName) {
   if (!/\bdiscount(?:ed|s)?\b|\bBP\s+less\b|\bless\s+BP\b|\bpoints?\s+less\b|\breduced\s+by\b/i.test(text)) return null;
 
   // Amount: "1 BP/point less" / "N BP discount" / "discounted by N BP" / "reduced by [word/number]" → default 1.
-  const amtM = text.match(/(\d+)\s*(?:BP|points?)\s+less/i)
-    || text.match(/(\d+)\s*BP\s+discount/i)
-    || text.match(/discount(?:ed)?\s+(?:by\s+)?(\d+)\s*BP/i)
-    || text.match(/reduced\s+by\s+(\d+|one|two|three|four|five)/i)
-    || (/\bone\s+less\s+(?:BP|point)\b/i.test(text) ? [null, "1"] : null);
+  const amtM =
+    text.match(/(\d+)\s*(?:BP|points?)\s+less/i) ||
+    text.match(/(\d+)\s*BP\s+discount/i) ||
+    text.match(/discount(?:ed)?\s+(?:by\s+)?(\d+)\s*BP/i) ||
+    text.match(/reduced\s+by\s+(\d+|one|two|three|four|five)/i) ||
+    (/\bone\s+less\s+(?:BP|point)\b/i.test(text) ? [null, "1"] : null);
   if (!amtM) return null;
 
   let amount;
@@ -445,8 +573,7 @@ function parseDiscounts(text, exclusionLookup, grantLookups, selfName) {
 
   const cap = (text.match(/maximum\s+of\s+(\d+)\s*BP\s+in\s+discounts/i) || [])[1];
   const min = (text.match(/minimum\s+(?:cost\s+)?of\s+(\d+)/i) || [])[1];
-  const refundIfFree = !/does not apply to|granted for free|unless the source states/i.test(text)
-    ? true : true; // general rule: refund unless explicitly stated otherwise (rare)
+  const refundIfFree = !/does not apply to|granted for free|unless the source states/i.test(text) ? true : true; // general rule: refund unless explicitly stated otherwise (rare)
 
   // Scope detection, most specific first.
   let scope = null;
@@ -454,8 +581,9 @@ function parseDiscounts(text, exclusionLookup, grantLookups, selfName) {
   // going to be considered a gift from the <X>" — the player DESIGNATES which
   // eligible perks become discounted gifts (not the Gifts themselves, which carry
   // the prerequisite). Distinct from a fixed-category discount.
-  const giftM = text.match(/considered\s+a\s+gift\s+from\s+the\s+([A-Z][\w’'-]+)/i)
-    || text.match(/doesn[’']?t\s+have\s+the\s+([A-Z][\w’'-]+)\s+prerequisite/i);
+  const giftM =
+    text.match(/considered\s+a\s+gift\s+from\s+the\s+([A-Z][\w’'-]+)/i) ||
+    text.match(/doesn[’']?t\s+have\s+the\s+([A-Z][\w’'-]+)\s+prerequisite/i);
   const prereqM = text.match(/with\s+the\s+([A-Z][\w’'-]+(?:\s+[A-Z][\w’'-]+){0,3})\s+prerequisite/i);
   const firstNM = text.match(/first\s+(\w+)\s+([A-Z][\w’'-]+)\s+skills?/i);
   // "<Skill> ranks cost N less" — every rank of one named skill is discounted
@@ -475,7 +603,10 @@ function parseDiscounts(text, exclusionLookup, grantLookups, selfName) {
     const n = WORD_NUM[firstNM[1].toLowerCase()] || parseInt(firstNM[1], 10) || null;
     scope = { kind: "firstN", value: firstNM[2].trim(), n };
   } else if (catM) {
-    const cats = catM[1].split(/,|\band\b|\bor\b/i).map((s) => s.trim()).filter(Boolean);
+    const cats = catM[1]
+      .split(/,|\band\b|\bor\b/i)
+      .map((s) => s.trim())
+      .filter(Boolean);
     scope = { kind: "category", value: cats };
   }
 
@@ -484,8 +615,8 @@ function parseDiscounts(text, exclusionLookup, grantLookups, selfName) {
     const skills = registry.filter((e) => e.type === "skills");
     for (const sk of skills) {
       if (sk.name === selfName) continue;
-      const escaped = sk.name.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
-      const re = new RegExp(`\\b${escaped}\\b`, 'i');
+      const escaped = sk.name.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
+      const re = new RegExp(`\\b${escaped}\\b`, "i");
       if (re.test(text)) {
         scope = { kind: "skillRanks", value: sk.name };
         break;
@@ -497,15 +628,30 @@ function parseDiscounts(text, exclusionLookup, grantLookups, selfName) {
 
   // Exclusions: "(The) X and Y (Perks) cannot be discounted".
   const exclusions = [];
-  const exM = text.match(/\b((?:The\s+)?[A-Z][\w’'-]+(?:\s+[A-Z][\w’'-]+){0,3}(?:\s+and\s+[A-Z][\w’'-]+(?:\s+[A-Z][\w’'-]+){0,3})?)\s+(?:Perks?\s+)?cannot\s+be\s+discounted/i);
+  const exM = text.match(
+    /\b((?:The\s+)?[A-Z][\w’'-]+(?:\s+[A-Z][\w’'-]+){0,3}(?:\s+and\s+[A-Z][\w’'-]+(?:\s+[A-Z][\w’'-]+){0,3})?)\s+(?:Perks?\s+)?cannot\s+be\s+discounted/i,
+  );
   if (exM) {
-    for (let nm of exM[1].split(/\band\b/i).map((s) => s.trim()).filter(Boolean)) {
-      nm = nm.replace(/^The\s+/i, '').replace(/\s+Perks?$/i, '').trim();
+    for (let nm of exM[1]
+      .split(/\band\b/i)
+      .map((s) => s.trim())
+      .filter(Boolean)) {
+      nm = nm
+        .replace(/^The\s+/i, "")
+        .replace(/\s+Perks?$/i, "")
+        .trim();
       const { entity } = resolve(nm, exclusionLookup);
       if (entity) exclusions.push(entity.id);
     }
   }
-  return { amount, scope, cap: cap ? parseInt(cap, 10) : null, min: min ? parseInt(min, 10) : null, refundIfFree, exclusions };
+  return {
+    amount,
+    scope,
+    cap: cap ? parseInt(cap, 10) : null,
+    min: min ? parseInt(min, 10) : null,
+    refundIfFree,
+    exclusions,
+  };
 }
 
 // ─── BUILD ────────────────────────────────────────────────────────────────────
@@ -532,7 +678,8 @@ const effectNames = registry.filter((e) => e.type === "effects").map((e) => e.na
 const defenseNames = registry.filter((e) => e.type === "defenses").map((e) => e.name);
 const callKeywordRe = [...effectNames, ...defenseNames]
   .sort((a, b) => b.length - a.length)
-  .map(escapeRe).join("|");
+  .map(escapeRe)
+  .join("|");
 
 for (const dur of DURATION_VALUES) {
   const id = `rules-concepts:${dur}`;
@@ -556,7 +703,7 @@ for (const dur of DURATION_VALUES) {
 // a number. Lookahead matches any of those three shapes.
 const COUNT_DURATIONS = [
   { word: "Quick", entityName: "“Quick X” Count" },
-  { word: "Slow",  entityName: "“Slow X” Count" },
+  { word: "Slow", entityName: "“Slow X” Count" },
 ];
 for (const { word, entityName } of COUNT_DURATIONS) {
   const id = `rules-concepts:${entityName}`;
@@ -704,11 +851,12 @@ const exclusionTargetLookup = buildLookup([
 ]);
 // "cannot/may not be taken (along) with <Name>" — capture the entity name that
 // follows. Bodies start the sentence with "This" (the owning entity).
-const EXCLUSION_RE = /\b(?:cannot|can ?not|may not|must not)\s+be\s+taken\s+(?:along\s+)?with\s+([A-Z][A-Za-z' -]+?)(?=[.,;]|\s+(?:and|or|when|while|if|at|in|to)\b|$)/gi;
+const EXCLUSION_RE =
+  /\b(?:cannot|can ?not|may not|must not)\s+be\s+taken\s+(?:along\s+)?with\s+([A-Z][A-Za-z' -]+?)(?=[.,;]|\s+(?:and|or|when|while|if|at|in|to)\b|$)/gi;
 const excludes = {};
 const addExclusion = (a, b) => {
   if (!a || !b || a === b) return;
-  (excludes[a] = excludes[a] || []);
+  excludes[a] = excludes[a] || [];
   if (!excludes[a].includes(b)) excludes[a].push(b);
 };
 for (const e of registry) {
@@ -751,13 +899,20 @@ const ARCHETYPE_FIELD_LOOKUPS = {
   purchasedSkills: purchasedSkillLookup,
   purchasedPerks: perkLookup,
   flaws: flawLookup,
-  innatePowers: powerLookup, utilityPowers: powerLookup,
-  basicPowers: powerLookup, advancedPowers: powerLookup,
-  veteranPowers: powerLookup, cantrips: powerLookup,
-  noviceSpells: powerLookup, adeptSpells: powerLookup,
-  greaterSpells: powerLookup, bookSpells: powerLookup,
-  domainPowers: powerLookup, rightHandPowers: powerLookup,
-  classPowers: powerLookup, formPowers: powerLookup,
+  innatePowers: powerLookup,
+  utilityPowers: powerLookup,
+  basicPowers: powerLookup,
+  advancedPowers: powerLookup,
+  veteranPowers: powerLookup,
+  cantrips: powerLookup,
+  noviceSpells: powerLookup,
+  adeptSpells: powerLookup,
+  greaterSpells: powerLookup,
+  bookSpells: powerLookup,
+  domainPowers: powerLookup,
+  rightHandPowers: powerLookup,
+  classPowers: powerLookup,
+  formPowers: powerLookup,
 };
 
 for (const a of read("archetypes.json")) {
@@ -780,7 +935,7 @@ for (const a of read("archetypes.json")) {
       }
     }
     archetypeRefs[archetypeId][field] = [...new Set(ids)];
-    
+
     // Ensure all structured refs also appear in the body-text mentions graph
     // so the UI can linkify them even if the literal matcher missed them (due to drift).
     for (const id of archetypeRefs[archetypeId][field]) {
@@ -830,6 +985,8 @@ console.log(`  ${registry.length} entities, ${totalRefs} body references, ${tota
 console.log(`  ${totalGrants} bestowal edges, ${Object.keys(discounts).length} discount sources`);
 console.log(`  ${Object.keys(excludes).length} mutual-exclusion entities`);
 if (archetypeDrift.length) {
-  console.log(`  ${archetypeDrift.length} archetype refs resolved via drift fallback (see validate-archetypes for detail).`);
+  console.log(
+    `  ${archetypeDrift.length} archetype refs resolved via drift fallback (see validate-archetypes for detail).`,
+  );
 }
 console.log("  refs.json written.");

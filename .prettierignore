@@ -4,3 +4,8 @@ scratch
 .claude
 public
 *.html
+
+# Generated data — written by the parse/link generators and guarded byte-for-byte by
+# `npm run check:data`. Prettier must NOT touch it, or it would fight the generator
+# (check:data would fail on the reformatted output).
+src/data/

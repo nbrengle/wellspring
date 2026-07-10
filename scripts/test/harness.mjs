@@ -17,39 +17,48 @@ let passed = 0;
 const failures = [];
 
 export function test(name, fn) {
-  try { fn(); passed++; }
-  catch (e) { failures.push(`${name}: ${e.message}\n${e.stack}`); }
+  try {
+    fn();
+    passed++;
+  } catch (e) {
+    failures.push(`${name}: ${e.message}\n${e.stack}`);
+  }
 }
 
-export function eq(actual, expected, msg = '') {
-  if (actual !== expected) throw new Error(`${msg} expected ${JSON.stringify(expected)}, got ${JSON.stringify(actual)}`);
+export function eq(actual, expected, msg = "") {
+  if (actual !== expected)
+    throw new Error(`${msg} expected ${JSON.stringify(expected)}, got ${JSON.stringify(actual)}`);
 }
 
-export function ok(cond, msg = '') { if (!cond) throw new Error(msg || 'expected truthy'); }
+export function ok(cond, msg = "") {
+  if (!cond) throw new Error(msg || "expected truthy");
+}
 
-// Build the V2 `skills` bucket (source 'Purchased') from skill names (or
-// {name,ranks}). Purchased skills are V2-native (CharacterChoice[]), so a test
+// Build the skills bucket (source 'Purchased') from skill names (or
+// {name,ranks}). Purchased skills are native (CharacterChoice[]), so a test
 // that used to pass `purchasedSkills: ['Lore (Arcane)']` now spreads
 // `...pSkills(['Lore (Arcane)'])` into the character literal. The engine keys
 // these under the `skills:` prefix in the BP ledger.
 export function pSkills(names) {
   return {
     skills: names.map((n) =>
-      typeof n === 'string'
+      typeof n === "string"
         ? { entityId: n, source: Source.purchased(), ranks: 1 }
-        : { entityId: n.name, source: Source.purchased(), ranks: n.ranks ?? 1 }),
+        : { entityId: n.name, source: Source.purchased(), ranks: n.ranks ?? 1 },
+    ),
   };
 }
 
-// Same, for the V2 `perks` bucket (source 'Purchased'). A test that used to pass
+// Same, for the perks bucket (source 'Purchased'). A test that used to pass
 // `purchasedPerks: ['Toughness']` now spreads `...pPerks(['Toughness'])`. The BP
 // ledger keys these under the `purchasedPerks:` prefix.
 export function pPerks(names) {
   return {
     perks: names.map((n) =>
-      typeof n === 'string'
+      typeof n === "string"
         ? { entityId: n, source: Source.purchased(), ranks: 1 }
-        : { entityId: n.name, source: Source.purchased(), ranks: n.ranks ?? 1 }),
+        : { entityId: n.name, source: Source.purchased(), ranks: n.ranks ?? 1 },
+    ),
   };
 }
 
@@ -60,5 +69,5 @@ export function report() {
     for (const f of failures) console.log(`  ✗ ${f}`);
     process.exit(1);
   }
-  console.log('✓ all green');
+  console.log("✓ all green");
 }

@@ -82,18 +82,21 @@ function AdvantageChoice({ item, value, onSetChoice }) {
       <button
         type="button"
         className="b-lin-subchoice-btn"
-        onClick={() => onOpenChoicePicker?.({
-          title: "Pick an advantage from another lineage",
-          subtitle: "Purchase one Lineage Advantage from another lineage — you must still meet its prerequisites.",
-          entityType: "advantages",
-          // PickerOverlay groups by `cat`; advantage names are unique across lineages,
-          // so onChoose(name) → resolve back to its lineage-qualified advId.
-          options: options.map((o) => ({ name: o.name, cat: o.group, desc: o.description })),
-          onChoose: (name) => {
-            const opt = options.find((o) => o.name === name);
-            if (opt) onSetChoice(item, opt.advId);
-          },
-        })}>
+        onClick={() =>
+          onOpenChoicePicker?.({
+            title: "Pick an advantage from another lineage",
+            subtitle: "Purchase one Lineage Advantage from another lineage — you must still meet its prerequisites.",
+            entityType: "advantages",
+            // PickerOverlay groups by `cat`; advantage names are unique across lineages,
+            // so onChoose(name) → resolve back to its lineage-qualified advId.
+            options: options.map((o) => ({ name: o.name, cat: o.group, desc: o.description })),
+            onChoose: (name) => {
+              const opt = options.find((o) => o.name === name);
+              if (opt) onSetChoice(item, opt.advId);
+            },
+          })
+        }
+      >
         {current ? `${current.name} (${current.group})` : "Choose an advantage…"}
         <span className="b-lin-subchoice-btn-caret">⌄</span>
       </button>
@@ -115,7 +118,10 @@ function RepChoice({ item, field, value, onSetRep }) {
       {open && (
         <RepPicker
           value={value || null}
-          onChoose={(rep) => { onSetRep(field, item, rep); setOpen(false); }}
+          onChoose={(rep) => {
+            onSetRep(field, item, rep);
+            setOpen(false);
+          }}
           onClose={() => setOpen(false)}
         />
       )}

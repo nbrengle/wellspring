@@ -80,6 +80,7 @@ src/engine/starting-choices.js) can be deleted.
 ## 3. Two orphaned `]` typos from the reformatting — TRIVIAL but breaks parsing
 
 **Where (exact):**
+
 - Artisan → Starting Skills → "A Path Unfolds" → **"Apprentice Tinkering] (3)"**
   (stray `]` after Tinkering)
 - Artisan → Starting Skills → "Materials, Everywhere" (Multiclass) → **"Scavenge] (3)"**
@@ -100,7 +101,7 @@ orphaned brackets in the whole doc — verified.)
   lists, replaced by "Choose one of the following:" + explicit option lines. Once
   #1/#2 are nested, the parser's `parseMulticlassSkills` bracket-splitting regex
   (`/,(?![^[]*\])/`) and its hardcoded default map (`{ Lore: 'Lore (Historical)',
-  Gathering: 'Forage I' }`) can be deleted.
+Gathering: 'Forage I' }`) can be deleted.
 
 ---
 

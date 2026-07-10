@@ -1,42 +1,47 @@
 // validate/core.ts — shared primitives for the build validator.
 
-import { LEVEL_TABLE, lookupEntity, CLASS_POWERS, CLASS_PROGRESSION, CLASS_POWER_SLOTS, EVENTS_TABLE, CLASSES } from '../data.js';
-import { cleanItemName, bareSkill, getClasses } from '../resolver.js';
-import type { CharacterStateV2, CharacterChoice } from '../types.js';
-import { sourceClass } from '../types.js';
-
 import {
-  MAX_LBP, MAX_FLAW_BP, BACKSTORY_BP, MAX_DOMAINS, DEFAULT_WEALTH, LEVEL_CAP
-} from '../config.js';
+  LEVEL_TABLE,
+  lookupEntity,
+  CLASS_POWERS,
+  CLASS_PROGRESSION,
+  CLASS_POWER_SLOTS,
+  EVENTS_TABLE,
+  CLASSES,
+} from "../data.js";
+import { cleanItemName, bareSkill, getClasses } from "../resolver.js";
+import type { CharacterState } from "../types.js";
+import { sourceClass } from "../types.js";
+
+import { MAX_LBP, MAX_FLAW_BP, BACKSTORY_BP, MAX_DOMAINS, DEFAULT_WEALTH, LEVEL_CAP } from "../config.js";
 
 export { MAX_LBP, MAX_FLAW_BP, BACKSTORY_BP, MAX_DOMAINS, DEFAULT_WEALTH, LEVEL_CAP };
 
-export const LEGAL_MIN_LEVEL = LEVEL_TABLE.length
-  ? Math.min(...LEVEL_TABLE.map((l) => l.level)) : 4;
+export const LEGAL_MIN_LEVEL = LEVEL_TABLE.length ? Math.min(...LEVEL_TABLE.map((l) => l.level)) : 4;
 
 export { EVENTS_TABLE };
 
-export const subKey = (s: string) => String(s || '').split(' (')[0].trim().toLowerCase();
+export const subKey = (s: string) =>
+  String(s || "")
+    .split(" (")[0]
+    .trim()
+    .toLowerCase();
 
-import {
-  MARTIAL_SLOT_FIELDS, CASTER_SLOT_FIELDS, POWER_SOURCE_FIELDS, GENERIC_POWER_FIELDS
-} from '../config.js';
+import { MARTIAL_SLOT_FIELDS, CASTER_SLOT_FIELDS, POWER_SOURCE_FIELDS, GENERIC_POWER_FIELDS } from "../config.js";
 
-export {
-  MARTIAL_SLOT_FIELDS, CASTER_SLOT_FIELDS, POWER_SOURCE_FIELDS, GENERIC_POWER_FIELDS
-};
+export { MARTIAL_SLOT_FIELDS, CASTER_SLOT_FIELDS, POWER_SOURCE_FIELDS, GENERIC_POWER_FIELDS };
 
 // ─── Class / level primitives ───────────────────────────────────────────────
 
-export function characterLevel(character: CharacterStateV2) {
+export function characterLevel(character: CharacterState) {
   const classes = getClasses(character);
   if (!classes.length) return 4;
   return classes.reduce((sum, c) => sum + (c.level || 0), 0);
 }
 
-export function getLegalMinLevel(character: CharacterStateV2) {
+export function getLegalMinLevel(character: CharacterState) {
   const evtNum = character?.currentEvent || 1;
-  const evt = EVENTS_TABLE.find(e => e.event === evtNum);
+  const evt = EVENTS_TABLE.find((e) => e.event === evtNum);
   return evt ? evt.level : 4;
 }
 
@@ -49,9 +54,9 @@ export function getMaxRanks(entityId: string): number {
   // One field for "how many times can this be taken": `ranks`, uniform across
   // skills, perks, and powers (powers used to call it `maxRanks`).
   const maxR = ent.ranks;
-  if (maxR === 'unlimited') return Infinity;
-  if (typeof maxR === 'number') return maxR;
-  if (typeof maxR === 'string') {
+  if (maxR === "unlimited") return Infinity;
+  if (typeof maxR === "number") return maxR;
+  if (typeof maxR === "string") {
     const val = parseInt(maxR, 10);
     if (!isNaN(val)) return val;
   }
@@ -74,8 +79,8 @@ export { sourceClass };
 // do not: they're the granting entity's own pool, not the class's slots, even when
 // they share the novice/adept/greater tiers.
 export function countPicksForClass(
-  state: CharacterStateV2,
-  category: 'powers' | 'spells',
+  state: CharacterState,
+  category: "powers" | "spells",
   cls: string,
   tierFilter?: string | string[],
 ): number {
@@ -86,7 +91,7 @@ export function countPicksForClass(
       const ent = lookupEntity(choice.entityId) as any;
       const tier = ent?.tier?.toLowerCase();
       if (Array.isArray(tierFilter)) {
-        if (!tier || !tierFilter.map(t => t.toLowerCase()).includes(tier)) return n;
+        if (!tier || !tierFilter.map((t) => t.toLowerCase()).includes(tier)) return n;
       } else {
         if (tier !== tierFilter.toLowerCase()) return n;
       }
@@ -96,7 +101,9 @@ export function countPicksForClass(
 }
 
 export function maxProgressionLevel(cls: string) {
-  const levels = Object.keys(CLASS_PROGRESSION[cls] || {}).map(Number).filter((n) => n > 0);
+  const levels = Object.keys(CLASS_PROGRESSION[cls] || {})
+    .map(Number)
+    .filter((n) => n > 0);
   return levels.length ? Math.max(...levels) : 4;
 }
 
@@ -108,18 +115,18 @@ export function progressionRow(cls: string, level: number) {
 // ─── Grant cluster ──────────────────────────────────────────────────────────
 
 // Active innate powers for the character: class-innate powers whose level
-// requirements are met. (In CharacterStateV2, user-added innates are just in `powers` with source `GrantedBy:Innate`)
-export function activeInnatePowers(character: CharacterStateV2) {
+// requirements are met. (In CharacterState, user-added innates are just in `powers` with source `GrantedBy:Innate`)
+export function activeInnatePowers(character: CharacterState) {
   const list: any[] = [];
   const seen = new Set();
 
   for (const { name: cls, level } of getClasses(character)) {
-    for (const p of (CLASS_POWERS[cls]?.innate || [])) {
+    for (const p of CLASS_POWERS[cls]?.innate || []) {
       if (level >= requiredLevel(p)) {
         const cleanName = cleanItemName(p.name);
         if (!seen.has(cleanName)) {
           seen.add(cleanName);
-          list.push({ name: p.name, entity: p, cls, source: 'class' });
+          list.push({ name: p.name, entity: p, cls, source: "class" });
         }
       }
     }
@@ -128,17 +135,17 @@ export function activeInnatePowers(character: CharacterStateV2) {
 }
 
 // Multiclass grants
-export function multiclassGrants(character: CharacterStateV2) {
+export function multiclassGrants(character: CharacterState) {
   const classes = getClasses(character);
   const skills: any[] = [];
   const freeBPItems: any[] = [];
   let freeBP = 0;
-  
+
   // What does the character explicitly own in their choices?
-  const owned = new Set((character.skills || []).map(s => bareSkill(s.entityId.replace('skills:', ''))));
+  const owned = new Set((character.skills || []).map((s) => bareSkill(s.entityId.replace("skills:", ""))));
 
   classes.slice(1).forEach(({ name }) => {
-    for (const g of (CLASSES[name]?.multiclassGrants || [])) {
+    for (const g of CLASSES[name]?.multiclassGrants || []) {
       if (owned.has(bareSkill(g.name))) {
         freeBP += g.cost || 0;
         freeBPItems.push({ skill: g.name, source: name, bp: g.cost || 0 });

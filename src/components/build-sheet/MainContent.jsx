@@ -23,7 +23,10 @@ const SLOT_FIELD = {
 };
 
 const SPELL_TIER_LABEL = {
-  noviceSpells: "Novice", adeptSpells: "Adept", greaterSpells: "Greater", cantrips: "Cantrip",
+  noviceSpells: "Novice",
+  adeptSpells: "Adept",
+  greaterSpells: "Greater",
+  cantrips: "Cantrip",
 };
 
 export function LineageSummary() {
@@ -33,7 +36,7 @@ export function LineageSummary() {
   const lbp = report.lbp;
   const chosen = lbp?.chosenAdvantages || [];
   const grantedBySource = {};
-  for (const g of (report.grantedAbilities?.list || [])) {
+  for (const g of report.grantedAbilities?.list || []) {
     if (g.sourceKind !== "advantage") continue;
     (grantedBySource[g.source] = grantedBySource[g.source] || []).push(g);
   }
@@ -46,12 +49,20 @@ export function LineageSummary() {
       )}
       {challenges.length > 0 && (
         <>
-          <h3 className="b-lin-subhead">Challenges <span className="b-lin-subhead-note">award LBP</span></h3>
+          <h3 className="b-lin-subhead">
+            Challenges <span className="b-lin-subhead-note">award LBP</span>
+          </h3>
           <ul className="b-rows">
             {challenges.map((ch, i) => {
               const name = ch.baseName || ch.name;
               return (
-                <InspectableRow key={`ch-${i}-${name}`} item={name} field="lineageChallenges" resolveType="flaws" className="b-lin-adv-row">
+                <InspectableRow
+                  key={`ch-${i}-${name}`}
+                  item={name}
+                  field="lineageChallenges"
+                  resolveType="flaws"
+                  className="b-lin-adv-row"
+                >
                   {ch.required && <span className="b-row-badge b-badge-granted">required</span>}
                   <span className="b-row-bp is-award">+{ch.lbp} LBP</span>
                 </InspectableRow>
@@ -61,7 +72,9 @@ export function LineageSummary() {
         </>
       )}
       {chosen.length > 0 && (
-        <h3 className="b-lin-subhead">Advantages <span className="b-lin-subhead-note">spend LBP</span></h3>
+        <h3 className="b-lin-subhead">
+          Advantages <span className="b-lin-subhead-note">spend LBP</span>
+        </h3>
       )}
       <ul className="b-rows">
         {chosen.map((adv, i) => {
@@ -73,9 +86,17 @@ export function LineageSummary() {
                 <span className="b-row-bp is-cost">−{adv.lbp} LBP</span>
               </InspectableRow>
               {grants.map((g) => (
-                <InspectableRow key={g.ability} item={g.abilityName} field={g.abilityType} resolveType={g.abilityType}
-                                className="b-lin-grant-row" label={<>↳ {g.abilityName}</>}>
-                  <span className="b-row-bp is-free" title={`Granted by ${g.source}`}>free · {g.source}</span>
+                <InspectableRow
+                  key={g.ability}
+                  item={g.abilityName}
+                  field={g.abilityType}
+                  resolveType={g.abilityType}
+                  className="b-lin-grant-row"
+                  label={<>↳ {g.abilityName}</>}
+                >
+                  <span className="b-row-bp is-free" title={`Granted by ${g.source}`}>
+                    free · {g.source}
+                  </span>
                 </InspectableRow>
               ))}
             </React.Fragment>
@@ -104,8 +125,8 @@ export function StartingChoicesSection() {
   return (
     <Section title="Starting Choices" tone="amber">
       <p className="b-spec-hint">
-        Your {primary} made {configs.length > 1 ? `${configs.length} choices` : "a choice"} at
-        character creation. Change one to swap the free abilities it grants.
+        Your {primary} made {configs.length > 1 ? `${configs.length} choices` : "a choice"} at character creation.
+        Change one to swap the free abilities it grants.
       </p>
       <ul className="b-spec-list">
         {configs.map((conf) => (
@@ -131,22 +152,38 @@ export function StartingChoicesSection() {
 export function CraftingSection({ crafting }) {
   const groups = [
     ...crafting.crafting.map((c) => ({
-      key: c.discipline, label: `${c.discipline} — ${c.tier}`,
-      resolveType: "recipes", recipes: c.recipes,
+      key: c.discipline,
+      label: `${c.discipline} — ${c.tier}`,
+      resolveType: "recipes",
+      recipes: c.recipes,
     })),
-    ...(crafting.rituals ? [{
-      key: "Rituals", label: `Rituals — ${crafting.rituals.tier} Ritual Magic`,
-      resolveType: "rituals", recipes: crafting.rituals.recipes,
-    }] : []),
+    ...(crafting.rituals
+      ? [
+          {
+            key: "Rituals",
+            label: `Rituals — ${crafting.rituals.tier} Ritual Magic`,
+            resolveType: "rituals",
+            recipes: crafting.rituals.recipes,
+          },
+        ]
+      : []),
   ];
   return (
     <Section title="Can Craft" tone="teal">
       {groups.map((g) => (
         <div key={g.key} className="b-craft-group">
-          <h3 className="b-craft-head">{g.label} <span className="b-craft-count">{g.recipes.length}</span></h3>
+          <h3 className="b-craft-head">
+            {g.label} <span className="b-craft-count">{g.recipes.length}</span>
+          </h3>
           <ul className="b-craft-list">
             {g.recipes.map((r) => (
-              <InspectableRow key={r.name} item={r.name} field={null} resolveType={g.resolveType} className="b-craft-row">
+              <InspectableRow
+                key={r.name}
+                item={r.name}
+                field={null}
+                resolveType={g.resolveType}
+                className="b-craft-row"
+              >
                 <span className="b-craft-tier">{r.tier}</span>
               </InspectableRow>
             ))}
@@ -156,7 +193,6 @@ export function CraftingSection({ crafting }) {
     </Section>
   );
 }
-
 
 function getSelectionOptions(sel) {
   const opts = [];
@@ -172,11 +208,11 @@ function getSelectionOptions(sel) {
     for (const c of Object.values(CLASSES)) {
       if (!c.spellSphere || c.spellSphere !== sel.sphere) continue;
       if (sel.tier === "Cantrip") {
-         const tierArray = c.cantrips || [];
-         for (const s of tierArray) opts.push(`${s.name} (${c.name})`);
+        const tierArray = c.cantrips || [];
+        for (const s of tierArray) opts.push(`${s.name} (${c.name})`);
       } else {
-         const allSpells = [...(c.noviceSpells||[]), ...(c.adeptSpells||[]), ...(c.greaterSpells||[])];
-         for (const s of allSpells) opts.push(`${s.name} (${c.name})`);
+        const allSpells = [...(c.noviceSpells || []), ...(c.adeptSpells || []), ...(c.greaterSpells || [])];
+        for (const s of allSpells) opts.push(`${s.name} (${c.name})`);
       }
     }
   } else if (sel.type === "devotionAccent") {
@@ -207,7 +243,11 @@ export function GrantedSelectionsSection() {
               {/* A granted selection can be unmade (value ""), so the chip control's
                   "Choose" badge surfaces it — the easy-to-miss case the user flagged. */}
               <SubSelect
-                prompt={<>{sel.sourceName} <span className="b-choice-desc">({typeLabel})</span></>}
+                prompt={
+                  <>
+                    {sel.sourceName} <span className="b-choice-desc">({typeLabel})</span>
+                  </>
+                }
                 value={value || null}
                 onChange={(v) => onSetGrantedSelection(sel.id, v || "")}
                 options={options.map((opt) => ({ value: opt }))}
@@ -242,50 +282,67 @@ export function AgileLearnerSection() {
     <div className="b-slot-block">
       <div className="b-slot-head">
         <h3 className="b-slot-label">Agile Learner Trades</h3>
-        <span className="b-slot-count">{used} / {rank}</span>
+        <span className="b-slot-count">
+          {used} / {rank}
+        </span>
       </div>
-      <ul className="b-rows" style={{ marginTop: '0.5rem' }}>
-        {classes.map(c => {
-           const classTrades = trades[c.name] || 0;
-           return (
-             <li key={c.name} className="b-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-               <span>{c.name} <em style={{opacity:0.7, paddingLeft: '0.5rem'}}>(trade 1st-tier for 2nd-tier)</em></span>
-               <div className="b-row-rank-adjust">
-                 <button className="b-rank-btn" type="button" onClick={() => removeTrade(c.name)} disabled={classTrades <= 0}>-</button>
-                 <span className="b-rank-val" style={{ margin: '0 0.5rem' }}>{classTrades}</span>
-                 <button className="b-rank-btn" type="button" onClick={() => addTrade(c.name)} disabled={available <= 0}>+</button>
-               </div>
-             </li>
-           );
+      <ul className="b-rows" style={{ marginTop: "0.5rem" }}>
+        {classes.map((c) => {
+          const classTrades = trades[c.name] || 0;
+          return (
+            <li
+              key={c.name}
+              className="b-row"
+              style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}
+            >
+              <span>
+                {c.name} <em style={{ opacity: 0.7, paddingLeft: "0.5rem" }}>(trade 1st-tier for 2nd-tier)</em>
+              </span>
+              <div className="b-row-rank-adjust">
+                <button
+                  className="b-rank-btn"
+                  type="button"
+                  onClick={() => removeTrade(c.name)}
+                  disabled={classTrades <= 0}
+                >
+                  -
+                </button>
+                <span className="b-rank-val" style={{ margin: "0 0.5rem" }}>
+                  {classTrades}
+                </span>
+                <button className="b-rank-btn" type="button" onClick={() => addTrade(c.name)} disabled={available <= 0}>
+                  +
+                </button>
+              </div>
+            </li>
+          );
         })}
       </ul>
     </div>
-
   );
 }
 
 export function SlotBlock({ slot }) {
   const { character, view } = useBuilderState();
   const { onInspect, onOpenSlot } = useBuilderActions();
-  const isFocused = (item, field) =>
-    view?.mode === "inspect" && view.item === item && view.field === field;
+  const isFocused = (item, field) => view?.mode === "inspect" && view.item === item && view.field === field;
   // Cantrips + spells-known are spell categories (bucket: spells); spells-known
   // spans three tier fields, cantrips its own. Martial powers use the powers bucket.
   const isSpells = slot.category === "spellsKnown" || slot.category === "cantrips";
-  const fields = slot.category === "spellsKnown"
-    ? ["noviceSpells", "adeptSpells", "greaterSpells"]
-    : [SLOT_FIELD[slot.category]];
+  const fields =
+    slot.category === "spellsKnown" ? ["noviceSpells", "adeptSpells", "greaterSpells"] : [SLOT_FIELD[slot.category]];
   const granted = slot.granted || [];
   const grantedSet = new Set(granted);
-  // Slot picks are V2-native: CharacterChoice[] in the powers/spells bucket sourced
+  // Slot picks are: CharacterChoice[] in the powers/spells bucket sourced
   // to the granting class. flatIndex is the position among a field's entries — the
   // same addressing setSlotPick/clearSlot use (costField-scoped).
-  const bucket = isSpells ? (character.spells || []) : (character.powers || []);
+  const bucket = isSpells ? character.spells || [] : character.powers || [];
   const myPicks = fields.flatMap((field) =>
     bucket
       .filter((p) => p.costField === field)
       .map((p, flatIndex) => ({ name: p.entityId, flatIndex, field, source: p.source }))
-      .filter((p) => sourceClass(p.source) === slot.cls && !grantedSet.has(p.name)));
+      .filter((p) => sourceClass(p.source) === slot.cls && !grantedSet.has(p.name)),
+  );
 
   const rowCount = Math.max(slot.allowed, myPicks.length);
   if (rowCount === 0 && granted.length === 0) return null;
@@ -297,30 +354,43 @@ export function SlotBlock({ slot }) {
       <div className="b-slot-head">
         <h3 className="b-slot-label">{slot.label}</h3>
         {slot.bonusFrom?.length > 0 && (
-          <span className="b-slot-bonus" title={`+${slot.bonus} bonus slot${slot.bonus === 1 ? "" : "s"} from ${slot.bonusFrom.join(", ")}`}>
+          <span
+            className="b-slot-bonus"
+            title={`+${slot.bonus} bonus slot${slot.bonus === 1 ? "" : "s"} from ${slot.bonusFrom.join(", ")}`}
+          >
             +{slot.bonus} from {slot.bonusFrom.join(", ")}
           </span>
         )}
-        <span className="b-slot-count">{slot.used} / {slot.allowed}</span>
+        <span className="b-slot-count">
+          {slot.used} / {slot.allowed}
+        </span>
       </div>
       <ol className="b-slot-rows">
         {granted.map((name) => (
-            <React.Fragment key={`granted-${name}`}>
-              {(() => {
-                const ent = lookupEntity(`powers:${name}`);
-                const tags = ent?.tags || [];
-                return (
-                  <li className="b-slot-row is-filled is-granted">
-                    <span className="b-slot-num" title="Granted by class">★</span>
-                    <button className="b-slot-pick" onClick={() => onInspect(name, fields[0], "powers")}>{name}</button>
-                    {tags.map((t) => {
-                      const tone = CLASS_TONES[t];
-                      return <span key={t} className={`b-picker-row-tag ${tone ? `b-tag-${tone}` : "b-data"}`}>{t}</span>;
-                    })}
-                    <span className="b-slot-tier b-slot-granted-tag">innate</span>
-                  </li>
-                );
-              })()}
+          <React.Fragment key={`granted-${name}`}>
+            {(() => {
+              const ent = lookupEntity(`powers:${name}`);
+              const tags = ent?.tags || [];
+              return (
+                <li className="b-slot-row is-filled is-granted">
+                  <span className="b-slot-num" title="Granted by class">
+                    ★
+                  </span>
+                  <button className="b-slot-pick" onClick={() => onInspect(name, fields[0], "powers")}>
+                    {name}
+                  </button>
+                  {tags.map((t) => {
+                    const tone = CLASS_TONES[t];
+                    return (
+                      <span key={t} className={`b-picker-row-tag ${tone ? `b-tag-${tone}` : "b-data"}`}>
+                        {t}
+                      </span>
+                    );
+                  })}
+                  <span className="b-slot-tier b-slot-granted-tag">innate</span>
+                </li>
+              );
+            })()}
             <InlineDetail item={name} field={fields[0]} />
           </React.Fragment>
         ))}
@@ -333,20 +403,42 @@ export function SlotBlock({ slot }) {
                   const ent = lookupEntity(`powers:${pick.name}`);
                   const tags = ent?.tags || [];
                   return (
-                    <li className={`b-slot-row is-filled ${over ? "is-over" : ""} ${isFocused(pick.name, pick.field) ? "is-focused" : ""}`}>
+                    <li
+                      className={`b-slot-row is-filled ${over ? "is-over" : ""} ${isFocused(pick.name, pick.field) ? "is-focused" : ""}`}
+                    >
                       <span className="b-slot-num">{i + 1}</span>
-                      <button className="b-slot-pick" onClick={() => onInspect(pick.name, pick.field, "powers")}>{pick.name}</button>
+                      <button className="b-slot-pick" onClick={() => onInspect(pick.name, pick.field, "powers")}>
+                        {pick.name}
+                      </button>
                       {tags.map((t) => {
                         const tone = CLASS_TONES[t];
-                        return <span key={t} className={`b-picker-row-tag ${tone ? `b-tag-${tone}` : "b-data"}`}>{t}</span>;
+                        return (
+                          <span key={t} className={`b-picker-row-tag ${tone ? `b-tag-${tone}` : "b-data"}`}>
+                            {t}
+                          </span>
+                        );
                       })}
                       {slot.category === "spellsKnown" && spellTierKey({ tierList: pick.field }) && (
                         <span className={`b-slot-tier b-tier-${spellTierKey({ tierList: pick.field })}`}>
                           {SPELL_TIER_LABEL[pick.field]}
                         </span>
                       )}
-                      <button className="b-slot-action" title="Swap" aria-label={`Swap ${pick.name}`} onClick={() => onOpenSlot(slot, pick.flatIndex, false, pick.field)}>✎</button>
-                      <button className="b-slot-action" title="Clear" aria-label={`Clear ${pick.name}`} onClick={() => onOpenSlot(slot, pick.flatIndex, true, pick.field)}>✕</button>
+                      <button
+                        className="b-slot-action"
+                        title="Swap"
+                        aria-label={`Swap ${pick.name}`}
+                        onClick={() => onOpenSlot(slot, pick.flatIndex, false, pick.field)}
+                      >
+                        ✎
+                      </button>
+                      <button
+                        className="b-slot-action"
+                        title="Clear"
+                        aria-label={`Clear ${pick.name}`}
+                        onClick={() => onOpenSlot(slot, pick.flatIndex, true, pick.field)}
+                      >
+                        ✕
+                      </button>
                     </li>
                   );
                 })()}
@@ -375,39 +467,52 @@ export function ClassifiedRows({ rows, resolveType, showClass }) {
   return (
     <ul className="b-rows">
       {rows.map((row) => {
-        const { name, field, index, source, grantedBy, cls, specialty, floor } = row;
+        const { name, field, index, grantedBy, cls, specialty, floor, sourceType } = row;
         // Cost is attached to the row by validate() (from the BP ledger).
         const cost = row.cost;
-        
-        const refundEff = row.effects?.find(e => e.type === 'REFUND_GRANT');
+        const refundEff = row.effects?.find((e) => e.type === "REFUND_GRANT");
         const refundedBy = refundEff?.source;
-        const refundedBP = refundEff ? (cost?.base || 0) : 0;
+        const refundedBP = refundEff ? cost?.base || 0 : 0;
 
-        const sourceType = row.sourceType || row.source;
         const canRemove = sourceType === "purchased" && index >= 0;
         const rank = cost?.rank || (index >= 0 ? character.ranks?.[field]?.[index] : null) || 1;
 
         const baseName = bareSkill(cleanItemName(name));
         const maxR = getMaxRanks(name, field, character);
         const grantedFloor = floor || 0;
-        
-        const isGranted = sourceType === 'grant' || sourceType === 'class' || sourceType === 'innate' || sourceType === 'lineage';
-        
-        const canBuyUp = isGranted && grantedFloor > 0 && maxR > grantedFloor
-          && !UNLIMITED_SKILLS.has(baseName);
+        const isGranted =
+          sourceType === "grant" || sourceType === "class" || sourceType === "innate" || sourceType === "lineage";
+
+        const canBuyUp = isGranted && grantedFloor > 0 && maxR > grantedFloor && !UNLIMITED_SKILLS.has(baseName);
         const rankFloor = canBuyUp ? grantedFloor : 1;
         const hasRanks = (canRemove || canBuyUp) && maxR > 1 && !UNLIMITED_SKILLS.has(baseName);
 
-        const ent = lookupEntity(resolveType ? `${resolveType}:${baseName}` : baseName) || lookupEntity(resolveType ? `${resolveType}:${name}` : name);
+        const ent =
+          lookupEntity(resolveType ? `${resolveType}:${baseName}` : baseName) ||
+          lookupEntity(resolveType ? `${resolveType}:${name}` : name);
         const tags = ent?.tags || [];
 
         return (
-          <InspectableRow key={`${field}-${index}-${name}-${grantedBy || cls || ''}`}
-                          item={name} field={field} resolveType={resolveType} index={index}
-                          label={<>{name}{rank > 1 && !hasRanks && <span className="b-row-rank">×{rank}</span>}</>}>
+          <InspectableRow
+            key={`${field}-${index}-${name}-${grantedBy || cls || ""}`}
+            item={name}
+            field={field}
+            resolveType={resolveType}
+            index={index}
+            label={
+              <>
+                {name}
+                {rank > 1 && !hasRanks && <span className="b-row-rank">×{rank}</span>}
+              </>
+            }
+          >
             {tags.map((t) => {
               const tone = CLASS_TONES[t];
-              return <span key={t} className={`b-picker-row-tag ${tone ? `b-tag-${tone}` : "b-data"}`}>{t}</span>;
+              return (
+                <span key={t} className={`b-picker-row-tag ${tone ? `b-tag-${tone}` : "b-data"}`}>
+                  {t}
+                </span>
+              );
             })}
             {showClass && cls && !isGranted && (
               <span className={`b-row-badge ${CLASS_TONES[cls] ? `b-tag-${CLASS_TONES[cls]}` : "b-badge-class"}`}>
@@ -418,22 +523,25 @@ export function ClassifiedRows({ rows, resolveType, showClass }) {
               ? (() => {
                   const src = grantedBy || cls;
                   let title = "Granted free";
-                  if (sourceType === 'lineage') {
+                  if (sourceType === "lineage") {
                     title = "Granted free by your lineage";
-                  } else if (sourceType === 'grant' && grantedBy) {
+                  } else if (sourceType === "grant" && grantedBy) {
                     title = `Granted free by ${grantedBy}`;
                   } else if (specialty) {
                     title = `Granted free by your ${src}'s "${specialty}" starting choice`;
                   } else {
                     title = `Granted free by your ${src} class`;
                   }
-                  
+
                   return (
                     <>
                       {src && (
-                        <span className={`b-row-badge ${CLASS_TONES[src] ? `b-tag-${CLASS_TONES[src]}` : "b-badge-granted"}`}
-                              title={title}>
-                          {src.toUpperCase()}{specialty && <span className="b-badge-spec"> · {specialty}</span>}
+                        <span
+                          className={`b-row-badge ${CLASS_TONES[src] ? `b-tag-${CLASS_TONES[src]}` : "b-badge-granted"}`}
+                          title={title}
+                        >
+                          {src.toUpperCase()}
+                          {specialty && <span className="b-badge-spec"> · {specialty}</span>}
                         </span>
                       )}
                       {canBuyUp && cost?.paidRanks > 0 && <CostBadge cost={cost} />}
@@ -442,20 +550,43 @@ export function ClassifiedRows({ rows, resolveType, showClass }) {
                 })()
               : cost && !refundEff && <CostBadge cost={cost} />}
             {refundEff && (
-              <span className="b-row-badge b-badge-refund" title={`BP spent on this item was refunded because you received it for free from ${refundedBy}`}>
+              <span
+                className="b-row-badge b-badge-refund"
+                title={`BP spent on this item was refunded because you received it for free from ${refundedBy}`}
+              >
                 +{refundedBP} BP REFUNDED · {refundedBy?.toUpperCase()}
               </span>
             )}
             {hasRanks && onSetRank && (
               <div className="b-row-rank-adjust">
-                <button className="b-rank-btn" type="button" onClick={() => onSetRank(field, index, rank - 1)} disabled={rank <= rankFloor}>-</button>
+                <button
+                  className="b-rank-btn"
+                  type="button"
+                  onClick={() => onSetRank(field, index, rank - 1)}
+                  disabled={rank <= rankFloor}
+                >
+                  -
+                </button>
                 <span className="b-rank-val">{rank}</span>
-                <button className="b-rank-btn" type="button" onClick={() => onSetRank(field, index, rank + 1)} disabled={rank >= maxR}>+</button>
+                <button
+                  className="b-rank-btn"
+                  type="button"
+                  onClick={() => onSetRank(field, index, rank + 1)}
+                  disabled={rank >= maxR}
+                >
+                  +
+                </button>
               </div>
             )}
             {canRemove && (
-              <button className="b-row-remove" title="Remove" aria-label={`Remove ${name}`}
-                      onClick={() => onRemove(field, index)}>×</button>
+              <button
+                className="b-row-remove"
+                title="Remove"
+                aria-label={`Remove ${name}`}
+                onClick={() => onRemove(field, index)}
+              >
+                ×
+              </button>
             )}
           </InspectableRow>
         );
@@ -481,19 +612,43 @@ export function EditableRows({ items, field, resolveType, removable }) {
         const maxR = getMaxRanks(item, field, character);
         const hasRanks = canRemove && maxR > 1 && !UNLIMITED_SKILLS.has(baseName);
 
-        const ent = lookupEntity(resolveType ? `${resolveType}:${baseName}` : baseName) || lookupEntity(resolveType ? `${resolveType}:${item}` : item);
+        const ent =
+          lookupEntity(resolveType ? `${resolveType}:${baseName}` : baseName) ||
+          lookupEntity(resolveType ? `${resolveType}:${item}` : item);
         const tags = ent?.tags || [];
 
         return (
-          <InspectableRow key={`${field}-${i}-${item}`} item={item} field={field} resolveType={resolveType} index={i}
-                          label={<>{item}{rank > 1 && !hasRanks && <span className="b-row-rank">×{rank}</span>}</>}>
+          <InspectableRow
+            key={`${field}-${i}-${item}`}
+            item={item}
+            field={field}
+            resolveType={resolveType}
+            index={i}
+            label={
+              <>
+                {item}
+                {rank > 1 && !hasRanks && <span className="b-row-rank">×{rank}</span>}
+              </>
+            }
+          >
             {tags.map((t) => {
               const tone = CLASS_TONES[t];
-              return <span key={t} className={`b-picker-row-tag ${tone ? `b-tag-${tone}` : "b-data"}`}>{t}</span>;
+              return (
+                <span key={t} className={`b-picker-row-tag ${tone ? `b-tag-${tone}` : "b-data"}`}>
+                  {t}
+                </span>
+              );
             })}
             <CostBadge cost={cost} />
             {canRemove && (
-              <button className="b-row-remove" title="Remove" aria-label={`Remove ${item}`} onClick={() => onRemoveEntity(field, i)}>×</button>
+              <button
+                className="b-row-remove"
+                title="Remove"
+                aria-label={`Remove ${item}`}
+                onClick={() => onRemoveEntity(field, i)}
+              >
+                ×
+              </button>
             )}
           </InspectableRow>
         );
@@ -501,5 +656,3 @@ export function EditableRows({ items, field, resolveType, removable }) {
     </ul>
   );
 }
-
-

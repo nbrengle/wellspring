@@ -29,10 +29,22 @@ const flaws = read("flaws.json").map((f) => ({ id: `flaws:${f.name}`, name: f.na
 
 const powers = [];
 const classSkills = [];
-const TIERS = ["innate","utility","basic","advanced","veteran","classSkills","rightHandPowers","cantrips","noviceSpells","adeptSpells","greaterSpells"];
+const TIERS = [
+  "innate",
+  "utility",
+  "basic",
+  "advanced",
+  "veteran",
+  "classSkills",
+  "rightHandPowers",
+  "cantrips",
+  "noviceSpells",
+  "adeptSpells",
+  "greaterSpells",
+];
 for (const cls of read("classes.json")) {
   for (const tier of TIERS) {
-    for (const p of (cls[tier] || [])) {
+    for (const p of cls[tier] || []) {
       const entity = { id: `powers:${p.name}`, name: p.name, type: "powers" };
       powers.push(entity);
       if (tier === "classSkills") classSkills.push(entity);
@@ -40,7 +52,7 @@ for (const cls of read("classes.json")) {
   }
 }
 for (const dom of read("domains.json")) {
-  for (const p of (dom.powers || [])) {
+  for (const p of dom.powers || []) {
     powers.push({ id: `powers:${p.name}`, name: p.name, type: "powers" });
   }
 }
@@ -73,7 +85,22 @@ function check(archetypeName, fieldName, items, lookup) {
   }
 }
 
-const POWER_FIELDS = ["innatePowers","utilityPowers","basicPowers","advancedPowers","veteranPowers","classPowers","rightHandPowers","domainPowers","cantrips","noviceSpells","adeptSpells","greaterSpells","bookSpells","formPowers"];
+const POWER_FIELDS = [
+  "innatePowers",
+  "utilityPowers",
+  "basicPowers",
+  "advancedPowers",
+  "veteranPowers",
+  "classPowers",
+  "rightHandPowers",
+  "domainPowers",
+  "cantrips",
+  "noviceSpells",
+  "adeptSpells",
+  "greaterSpells",
+  "bookSpells",
+  "formPowers",
+];
 
 for (const a of archetypes) {
   check(a.name, "startingSkills", a.startingSkills, lookupStarting);

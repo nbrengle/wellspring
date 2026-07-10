@@ -1,9 +1,16 @@
 export { IdentityRail } from "./build-sheet/IdentityRail.jsx";
 import { Section } from "./build-sheet/SharedUI.jsx";
-import { LineageSummary, StartingChoicesSection, GrantedSelectionsSection, AgileLearnerSection, CraftingSection, SlotBlock, ClassifiedRows, EditableRows } from "./build-sheet/MainContent.jsx";
 import {
-  ARCHETYPES
-} from '../engine/data.js';
+  LineageSummary,
+  StartingChoicesSection,
+  GrantedSelectionsSection,
+  AgileLearnerSection,
+  CraftingSection,
+  SlotBlock,
+  ClassifiedRows,
+  EditableRows,
+} from "./build-sheet/MainContent.jsx";
+import { ARCHETYPES } from "../engine/data.js";
 import { getClasses } from "../engine/resolver.js";
 import { useBuilderState, useBuilderActions } from "./builder-context.jsx";
 
@@ -11,23 +18,7 @@ import ArchetypePicker from "./build-sheet/ArchetypePicker.jsx";
 
 // ─── IDENTITY RAIL ───────────────────────────────────────────────────────────
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 // ─── BUILD SHEET ─────────────────────────────────────────────────────────────
-
-
-
 
 export default function BuildSheet() {
   const { character, report } = useBuilderState();
@@ -48,15 +39,30 @@ export default function BuildSheet() {
           onChange={(e) => onSetName(e.target.value)}
         />
         <p className="b-sheet-tagline">
-          {character.archetypeName && character.archetypeName !== "Custom Build"
-            ? <>Based on <em>{character.archetypeName}</em>{" — "}
-                {ARCHETYPES.find((a) => a.name === character.archetypeName)?.tagline}</>
-            : ARCHETYPES.find((a) => a.name === character.archetypeName)?.tagline}
+          {character.archetypeName && character.archetypeName !== "Custom Build" ? (
+            <>
+              Based on <em>{character.archetypeName}</em>
+              {" — "}
+              {ARCHETYPES.find((a) => a.name === character.archetypeName)?.tagline}
+            </>
+          ) : (
+            ARCHETYPES.find((a) => a.name === character.archetypeName)?.tagline
+          )}
         </p>
-        <button className="b-btn-change-archetype" onClick={onChangeArchetype} style={{
-          background: 'none', border: 'none', color: 'var(--b-amber)', cursor: 'pointer',
-          fontSize: '0.85em', padding: '0', marginTop: '0.25rem', textDecoration: 'underline'
-        }}>
+        <button
+          className="b-btn-change-archetype"
+          onClick={onChangeArchetype}
+          style={{
+            background: "none",
+            border: "none",
+            color: "var(--b-amber)",
+            cursor: "pointer",
+            fontSize: "0.85em",
+            padding: "0",
+            marginTop: "0.25rem",
+            textDecoration: "underline",
+          }}
+        >
           ‹ Change Archetype
         </button>
       </header>
@@ -75,12 +81,18 @@ export default function BuildSheet() {
       <LineageSummary />
 
       {report.devotion?.chosen.length > 0 && (
-        <Section title={`Domain Powers — ${report.devotion.chosen.join(" · ")}`} tone="purple"
-                 onAdd={report.devotion.worship ? () => onOpenAdd("domainPower") : undefined}>
-          {!report.devotion.worship && (
-            <p className="b-empty">Take the Worship skill to purchase domain powers.</p>
-          )}
-          <EditableRows items={character.domainPowers} field="domainPowers" resolveType="powers" removable={() => true} />
+        <Section
+          title={`Domain Powers — ${report.devotion.chosen.join(" · ")}`}
+          tone="purple"
+          onAdd={report.devotion.worship ? () => onOpenAdd("domainPower") : undefined}
+        >
+          {!report.devotion.worship && <p className="b-empty">Take the Worship skill to purchase domain powers.</p>}
+          <EditableRows
+            items={(character.powers || []).filter((p) => p.costField === "domainPowers").map((p) => p.entityId)}
+            field="domainPowers"
+            resolveType="powers"
+            removable={() => true}
+          />
         </Section>
       )}
 
@@ -109,22 +121,7 @@ export default function BuildSheet() {
         <EditableRows items={character.flaws} field="flaws" resolveType="flaws" removable={() => true} />
       </Section>
 
-      {report.crafting?.any && (
-        <CraftingSection crafting={report.crafting} onInspect={onInspect} />
-      )}
+      {report.crafting?.any && <CraftingSection crafting={report.crafting} onInspect={onInspect} />}
     </main>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
