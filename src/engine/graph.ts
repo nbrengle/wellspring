@@ -762,9 +762,7 @@ export class CharacterGraphModel implements CharacterGraph {
         ? nId.replace(/^purchasedSkills:/, 'skills:').replace(/^startingSkills(:\d+)?:/, 'skills:').replace(/^purchasedPerks:/, 'perks:')
         : null;
 
-      if (node.grantSidecar?.kind === 'grant') {
-        isGranted = true; grantSrc = node.grantSidecar.source;
-      } else if (normalizedId && grantIndex[normalizedId]) {
+      if (normalizedId && grantIndex[normalizedId]) {
         isGranted = true; grantSrc = grantIndex[normalizedId]; isDerived = true;
       } else if (nodeParamKey && grantParamIndex[nodeParamKey]) {
         isGranted = true; grantSrc = grantParamIndex[nodeParamKey]; isDerived = true;
@@ -776,19 +774,12 @@ export class CharacterGraphModel implements CharacterGraph {
         if (isDerived && node.authoredCost > 0) {
           setEntry(node, { cost: 0, base: node.baseCost, grant: { kind: 'grant', source: grantSrc, derived: true }, rank: node.rank });
         } else {
-          setEntry(node, { cost: node.authoredCost, base: node.baseCost, grant: node.grantSidecar, rank: node.rank, authored: true });
+          setEntry(node, { cost: node.authoredCost, base: node.baseCost, grant: null, rank: node.rank, authored: true });
         }
         continue;
       }
 
       if (node.sourceType === 'class') {
-        const grant = node.grantSidecar;
-        if (grant?.kind === 'discount' && grant.amount) {
-          setEntry(node, { cost: -grant.amount, base: 0, grant });
-          refunded += grant.amount;
-          continue;
-        }
-
         const floor = node.floor;
 
         if (isGranted) {
@@ -812,7 +803,7 @@ export class CharacterGraphModel implements CharacterGraph {
       if (isGranted) {
         setEntry(node, { cost: 0, base: node.baseCost, grant: { kind: 'grant', source: grantSrc, derived: true }, rank: node.rank });
       } else {
-        setEntry(node, { cost: node.baseCost, base: node.baseCost, grant: node.grantSidecar, rank: node.rank });
+        setEntry(node, { cost: node.baseCost, base: node.baseCost, grant: null, rank: node.rank });
       }
     }
 
@@ -1106,7 +1097,6 @@ export function resolveCharacterGraph(charInput: CharacterStateV2): CharacterGra
       index: choice.originalIndex,
       baseCost: baseCost,
       authoredCost: choice.costOverride,
-      grantSidecar: null,
       entity: ent,
       effects,
       specialty: null,

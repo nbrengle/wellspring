@@ -281,7 +281,6 @@ export interface GraphItem {
   rank: number;
   baseCost: number;
   authoredCost?: number;
-  grantSidecar?: any;
   entity?: Entity | null;
   effects: Effect[];
   specialty?: any;
