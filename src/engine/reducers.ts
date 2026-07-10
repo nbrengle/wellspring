@@ -103,11 +103,10 @@ export function updateParameter(
 
   const { baseName, paramVal } = splitParameterizedName(newName);
 
-  // Domain powers are: CharacterChoice[] in `powers` (costField
-  // 'domainPowers'). Keep the entries whose domain is still available; drop the rest.
+  // Domain powers live in their own `domainPowers` bucket. Keep the entries whose
+  // domain is still available; drop the rest.
   const keepDomainPowers = (keep: (basePower: string, full: string) => boolean): CharacterChoice[] =>
-    (nextChar.powers || []).filter((p) => {
-      if (p.costField !== "domainPowers") return true;
+    (nextChar.domainPowers || []).filter((p) => {
       const full = p.entityId;
       return keep(full.replace(/\s*\(.+\)$/, ""), full);
     });
@@ -118,7 +117,7 @@ export function updateParameter(
       // present-but-empty devotion key the legacy handler wrote.
       nextChar.devotion = null as unknown as undefined;
       nextChar.divineDomains = [];
-      nextChar.powers = keepDomainPowers(() => false);
+      nextChar.domainPowers = keepDomainPowers(() => false);
     } else {
       const dev = DEVOTIONS.find(
         (d) =>
@@ -131,7 +130,7 @@ export function updateParameter(
       if (dev) {
         const remainingDomains = (c.divineDomains || []).filter((dn) => dev.domains.includes(dn));
         nextChar.divineDomains = remainingDomains;
-        nextChar.powers = keepDomainPowers((basePower, full) =>
+        nextChar.domainPowers = keepDomainPowers((basePower, full) =>
           remainingDomains.some((dn) => {
             const dom = DOMAINS.find((x) => x.name === dn);
             return dom?.powers.some((x) => x.name === basePower || x.name === full);
@@ -157,7 +156,9 @@ export function updateParameter(
 // The bucket a slot field lives in — spell fields route to `spells`, all others to
 // `powers`. (Devotion/domain aside, every slot field is one or the other.)
 const SPELL_FIELDS = new Set(["cantrips", "spellsKnown", "noviceSpells", "adeptSpells", "greaterSpells", "bookSpells"]);
-const bucketOfField = (field: string): "spells" | "powers" => (SPELL_FIELDS.has(field) ? "spells" : "powers");
+// Domain powers live in their OWN bucket, not the shared `powers` array.
+const bucketOfField = (field: string): "spells" | "powers" | "domainPowers" =>
+  field === "domainPowers" ? "domainPowers" : SPELL_FIELDS.has(field) ? "spells" : "powers";
 
 // Power fields added via the plain "Add a …" picker (handleAddEntity) rather than
 // a class slot: these COST BP and route to the powers bucket with a purchased

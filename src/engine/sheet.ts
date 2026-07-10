@@ -339,6 +339,7 @@ function parseSheetText(text: string) {
   ch.skills ||= [];
   ch.perks ||= [];
   ch.powers ||= [];
+  ch.domainPowers ||= [];
   ch.spells ||= [];
   ch.flaws ||= [];
   const primaryClass = getClasses(ch)[0]?.name || "";

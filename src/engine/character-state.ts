@@ -73,6 +73,7 @@ export const EMPTY_CHARACTER: CharacterState = {
   skills: [],
   perks: [],
   powers: [],
+  domainPowers: [],
   spells: [],
   flaws: [],
   devotions: [],

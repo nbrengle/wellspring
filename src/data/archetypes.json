@@ -152,6 +152,7 @@
         "costField": "basicPowers"
       }
     ],
+    "domainPowers": [],
     "spells": [],
     "devotions": [],
     "wealth": "None",
@@ -289,6 +290,7 @@
         "costField": "basicPowers"
       }
     ],
+    "domainPowers": [],
     "spells": [],
     "devotions": [],
     "wealth": "None",
@@ -442,6 +444,7 @@
         "costField": "basicPowers"
       }
     ],
+    "domainPowers": [],
     "spells": [],
     "devotions": [],
     "wealth": "None",
@@ -553,7 +556,9 @@
           "type": "innate"
         },
         "costField": "innatePowers"
-      },
+      }
+    ],
+    "domainPowers": [
       {
         "entityId": "Lifeline (Life)",
         "source": {
@@ -748,6 +753,7 @@
         "costField": "innatePowers"
       }
     ],
+    "domainPowers": [],
     "spells": [
       {
         "entityId": "Cancel",
@@ -934,6 +940,7 @@
         "costField": "innatePowers"
       }
     ],
+    "domainPowers": [],
     "spells": [
       {
         "entityId": "Cancel",
@@ -1135,6 +1142,7 @@
         "costField": "innatePowers"
       }
     ],
+    "domainPowers": [],
     "spells": [
       {
         "entityId": "Cancel",
@@ -1352,6 +1360,7 @@
         "costField": "basicPowers"
       }
     ],
+    "domainPowers": [],
     "spells": [],
     "devotions": [],
     "wealth": "None",
@@ -1537,6 +1546,7 @@
         "costField": "basicPowers"
       }
     ],
+    "domainPowers": [],
     "spells": [],
     "devotions": [],
     "wealth": "None",
@@ -1738,6 +1748,7 @@
         "costField": "basicPowers"
       }
     ],
+    "domainPowers": [],
     "spells": [],
     "devotions": [],
     "wealth": "None",
@@ -1842,6 +1853,7 @@
         "costField": "innatePowers"
       }
     ],
+    "domainPowers": [],
     "spells": [
       {
         "entityId": "Cancel",
@@ -2030,6 +2042,7 @@
         "costField": "basicPowers"
       }
     ],
+    "domainPowers": [],
     "spells": [],
     "devotions": [],
     "wealth": "None",
@@ -2193,6 +2206,7 @@
         "costField": "basicPowers"
       }
     ],
+    "domainPowers": [],
     "spells": [],
     "devotions": [],
     "wealth": "None",
@@ -2356,6 +2370,7 @@
         "costField": "basicPowers"
       }
     ],
+    "domainPowers": [],
     "spells": [],
     "devotions": [],
     "wealth": "None",
