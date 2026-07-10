@@ -27,5 +27,5 @@ export function computeWealth(graph: CharacterGraphModel): WealthReport {
     }
   }
 
-  return { base, income, total: base + income, sources };
+  return { base, income, total: base + income, sources, items: [] };
 }

@@ -14,7 +14,7 @@ export interface SlotGrant {
 export interface ChoiceOption {
   text: string;
   grants?: string[];
-  grantsSkill?: boolean;
+  grantsSkills?: string[];
 }
 
 export interface ChooseOneConfig {
@@ -54,6 +54,22 @@ export interface BaseEntity {
   requiredLevel?: number;
   requiredClass?: string;
   requiresEntity?: string[];
+
+  // Re-added for validators / graph
+  levelDiscounts?: { atLevel: number; skill: string; amount: number }[];
+  levelBenefits?: { level: number; text: string; param?: string }[];
+  levelBenefitClass?: string;
+  grantedSelections?: Record<string, unknown>[];
+  lbp?: number;
+  bp?: number;
+  cost?: number | string;
+  ranks?: number | "unlimited";
+  effect?: string;
+  call?: string;
+  slotGrants?: SlotGrant[];
+  highestSlot?: number;
+  chooseOne?: ChooseOneConfig;
+  wealthIncome?: { n: number; kind: string };
 }
 
 export interface Skill extends BaseEntity {
@@ -72,6 +88,8 @@ export interface Power extends BaseEntity {
   parentClass?: string;
   parameter?: string; // E.g. (Swords)
   highestSlot?: number;
+  chooseOne?: ChooseOneConfig;
+  slotGrants?: SlotGrant[];
 }
 
 export interface Spell extends BaseEntity {
@@ -99,13 +117,26 @@ export interface Class extends BaseEntity {
   innate?: { name: string; requiredLevel?: number }[];
   spellcaster?: boolean;
   magicType?: string;
+  utility?: string[];
+  basic?: string[];
+  advanced?: string[];
+  veteran?: string[];
+  classSkills?: string[];
+  rightHandPowers?: string[];
 }
 
 /**
  * A discriminated union of all possible entities that can be returned by the data layer.
  * Allows the engine to narrow the type via `if (ent.type === 'spell') { ... }`.
  */
-export type Entity = Skill | Power | Spell | Perk | Flaw | Class;
+export interface Advantage extends BaseEntity {
+  type: "advantage";
+}
+export interface Challenge extends BaseEntity {
+  type: "challenge";
+}
+
+export type Entity = Skill | Power | Spell | Perk | Flaw | Class | Advantage | Challenge;
 
 // ─── 2. Ontological Character State ────────────────────────────────────
 
@@ -170,6 +201,8 @@ export function grantedBy(s: EntitySource | undefined): string | null {
 /**
  * A choice made by the player to add an entity to their sheet.
  */
+export type CharacterBucket = "skills" | "perks" | "flaws" | "innatePowers" | "classPowers" | "domainPowers" | "spells" | "powers";
+
 export interface CharacterChoice {
   entityId: string; // The canonical name/key of the entity in the rules database
   source: EntitySource; // Where this capability came from
@@ -236,6 +269,7 @@ export interface CharacterState {
   /** Lineage picks (names). Read directly by the graph's lineage-item resolution. */
   lineageChallenges?: string[];
   lineageAdvantages?: string[];
+  domainPowers?: CharacterChoice[];
 }
 
 // ─── 3. Graph Types ─────────────────────────────────────────────────────────
@@ -277,7 +311,7 @@ export interface BPLedger {
  *  the spend phase. `scope.value` is the parameter the discount is keyed to (e.g. a
  *  skill name); null-cap means uncapped. */
 export interface DiscountSpec {
-  scope: { kind: string; value: string | string[] };
+  scope: { kind: string; value: string | string[]; n?: number };
   amount: number;
   min?: number | null;
   cap?: number | null;
@@ -333,7 +367,7 @@ export type ViewState = {
   source: string;
   grantedBy?: string;
   free: boolean;
-  cost: number;
+  cost: number | BPLedgerEntry;
   rank: number;
   effects: Effect[];
   rawString?: string;
@@ -371,3 +405,64 @@ export interface CharacterGraph {
   characterLevel: number;
   classes: { name: string; level: number }[];
 }
+
+export interface GrantedAbility {
+  ability: string;
+  abilityName: string;
+  abilityType: string;
+  source: string;
+  sourceId: string;
+  sourceKind: string;
+}
+
+export interface WealthReport {
+  total: number;
+  items: { amount: number; note: string }[];
+  sources?: { source: string; amount: number; note: string }[];
+  base?: number;
+  income?: number;
+}
+
+export interface ResolvedStats {
+  [stat: string]: number | any;
+}
+
+export interface PrereqNote {
+  item: string;
+  text: string;
+  id?: string;
+  field?: string;
+  kind?: string;
+}
+
+export interface PrereqIssue {
+  item: string;
+  missing?: { name: string }[];
+  anyOf?: { name: string }[][];
+  text?: string;
+  id?: string;
+  field?: string;
+  tierLevel?: number;
+  tier?: string | number;
+  excludes?: string | string[];
+  requiresEntity?: string | string[];
+  duplicate?: boolean | number;
+}
+
+export interface PrereqReport {
+  issues: PrereqIssue[];
+  notes: PrereqNote[];
+}
+
+export interface ProgressionRow {
+  cantrip?: number;
+  novice?: number;
+  adept?: number;
+  greater?: number;
+  innateCantrips?: string[];
+  slots?: string;
+  statMods?: StatMod[];
+  statModNotes?: { stat: string; [k: string]: unknown }[];
+  [key: string]: any;
+}
+

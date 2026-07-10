@@ -240,5 +240,5 @@ export function addToCharacter(char: CharacterState, name: string, opts: AddOpts
     ...(parameter ? { parameter } : {}),
   };
 
-  return { ...char, [bucket]: [...(char[bucket] || []), choice] };
+  return { ...char, [bucket]: [...((char[bucket as keyof CharacterState] as import("./types.js").CharacterChoice[]) || []), choice] };
 }

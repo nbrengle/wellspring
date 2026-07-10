@@ -48,7 +48,7 @@ function extractWealth(ent: Entity | null | undefined, _character: CharacterStat
 
 function extractStatMods(ent: Entity | null | undefined, _character: CharacterState, _id: string): Effect[] {
   if (ent?.statMods) {
-    return ent.statMods.map((mod) => ({ type: "STAT", stat: mod.stat, amount: mod.amount }));
+    return ent.statMods.map((mod) => ({ type: "STAT" as const, stat: mod.stat, amount: typeof mod.amount === "string" ? parseInt(mod.amount, 10) || 0 : mod.amount }));
   }
   return [];
 }
@@ -57,14 +57,14 @@ function extractStatMods(ent: Entity | null | undefined, _character: CharacterSt
 // for most powers but `grantsSkills` for a few (Way of the Blade) — read either so a
 // field-name drift never silently drops the grant (which left the chosen spec NOT
 // free). Normalizing the parser too, but stay tolerant here.
-const optGrants = (o: ChoiceOption | undefined) => o?.grants || o?.grantsSkills || [];
+const optGrants = (o: import("./types.js").ChoiceOption | undefined) => o?.grants || o?.grantsSkills || [];
 
 function extractChooseOne(ent: Entity | null | undefined, character: CharacterState, _id: string): Effect[] {
   if (ent?.chooseOne?.kind === "build") {
     const chosen = character.choices?.[`powers:${ent.name}`];
     if (chosen) {
       // Find the option by direct text match, or by seeing if one of its granted skills matches the chosen string.
-      const opt = ent.chooseOne.options.find((o) => o.text === chosen || optGrants(o).includes(chosen));
+      const opt = ent.chooseOne.options.find((o: import("./types.js").ChoiceOption) => o.text === chosen || optGrants(o).includes(chosen));
       const grants = optGrants(opt);
       if (grants.length > 0) {
         return [{ type: "GRANT_SOURCE", grants: grants.map((s) => `skills:${s}`) }];
@@ -133,7 +133,7 @@ function extractLevelDiscounts(ent: Entity | null | undefined, character: Charac
       clsDef.veteran,
       clsDef.classSkills,
       clsDef.rightHandPowers,
-    ].some((list) => list?.some((p) => (p.id || p.name) === ent?.name || p.id === id || p.name === ent?.name));
+    ].some((list: any) => list?.some((p: any) => (p.id || p.name) === ent?.name || p.id === id || p.name === ent?.name));
 
     if (offers && c.level > maxRelevantLevel) {
       maxRelevantLevel = c.level;

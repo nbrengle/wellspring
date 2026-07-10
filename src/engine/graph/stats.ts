@@ -9,9 +9,10 @@ export function computeStats(graph: CharacterGraphModel) {
   const apply = (name: string, ent: Pick<BaseEntity, "statMods" | "statModNotes"> | undefined) => {
     if (!ent) return;
     for (const { stat, amount } of ent.statMods || []) {
-      if (amount !== 0) {
-        mods[stat] = (mods[stat] || 0) + amount;
-        sources.push({ name, stat, n: amount });
+      const n = typeof amount === "string" ? parseInt(amount, 10) || 0 : amount;
+      if (n !== 0) {
+        mods[stat] = (mods[stat] || 0) + n;
+        sources.push({ name, stat, n });
       }
     }
     for (const note of ent.statModNotes || []) {

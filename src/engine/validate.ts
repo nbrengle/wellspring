@@ -110,20 +110,20 @@ import { CRAFT_DISCIPLINES, CRAFTING_TIERS } from "./config.js";
 // [{ power, gateClass, benefits: [{ level, text, active }] }].
 interface PowerBenefit {
   power: string;
-  gateClass: string;
-  benefits: { level: number; text: string; active: boolean }[];
+  gateClass?: string;
+  benefits: { level: number; text: string; param?: string; active: boolean }[];
 }
 export function activePowerBenefits(character: CharacterState) {
   const levelByClass = Object.fromEntries(getClasses(character).map((c) => [c.name, c.level]));
   const out: PowerBenefit[] = [];
   for (const item of character.powers || []) {
-    const ent = lookupEntity(`powers:${cleanItemName(item.entityId || (item as any).name || "")}`);
+    const ent = lookupEntity(`powers:${cleanItemName(item.entityId || (item as CharacterChoice & {name?: string}).name || "")}`);
     if (!ent?.levelBenefits) continue;
-    const lvl = levelByClass[ent.levelBenefitClass] ?? characterLevel(character);
+    const lvl = (ent.levelBenefitClass ? levelByClass[ent.levelBenefitClass] : undefined) ?? characterLevel(character);
     out.push({
       power: ent.name,
       gateClass: ent.levelBenefitClass,
-      benefits: ent.levelBenefits.map((b: any) => ({ ...b, active: lvl >= b.level })),
+      benefits: ent.levelBenefits.map((b: {level: number; text: string}) => ({ ...b, active: lvl >= b.level })),
     });
   }
   return out;
@@ -229,7 +229,7 @@ export function classifyOwnedItems(character: CharacterState) {
 // own. Crafting tiers nest (Greater requires Journeyman requires Apprentice — see
 // REFS.prereqs), so the highest owned tier in a discipline unlocks that tier and
 // every tier below it. Ritual Magic gates the ritual recipe list the same way.
-const CRAFT_TIER_RANK = { Apprentice: 1, Journeyman: 2, Greater: 3 };
+const CRAFT_TIER_RANK: Record<string, number> = { Apprentice: 1, Journeyman: 2, Greater: 3 };
 
 // Every skill the character possesses (starting + purchased + granted), bare of
 // any "(parameter)" suffix. Shared basis for capability checks.
@@ -253,7 +253,7 @@ export function craftingCapability(character: CharacterState) {
   const topTier = (stem: string) => {
     let best = 0;
     for (const t of CRAFTING_TIERS) {
-      if (owned.has(`${t} ${stem}`)) best = Math.max(best, CRAFT_TIER_RANK[t as keyof typeof CRAFT_TIER_RANK]);
+      if (owned.has(`${t} ${stem}`)) best = Math.max(best, CRAFT_TIER_RANK[t]);
     }
     return best; // 0 = none
   };
@@ -267,8 +267,8 @@ export function craftingCapability(character: CharacterState) {
   for (const [discipline, stem] of Object.entries(CRAFT_DISCIPLINES)) {
     const rank = topTier(stem);
     if (!rank) continue;
-    const tier = Object.keys(CRAFT_TIER_RANK).find((t) => CRAFT_TIER_RANK[t as keyof typeof CRAFT_TIER_RANK] === rank);
-    const recipes = CRAFTING.filter((r) => r.discipline === discipline && CRAFT_TIER_RANK[r.tier as keyof typeof CRAFT_TIER_RANK] <= rank).map((r) => ({
+    const tier = Object.keys(CRAFT_TIER_RANK).find((t) => CRAFT_TIER_RANK[t] === rank);
+    const recipes = CRAFTING.filter((r) => r.discipline === discipline && CRAFT_TIER_RANK[r.tier] <= rank).map((r) => ({
       name: r.name,
       tier: r.tier,
     }));
@@ -278,8 +278,8 @@ export function craftingCapability(character: CharacterState) {
   const ritualRank = topTier("Ritual Magic");
   let rituals: { tier: string | undefined; count: number; recipes: { name: string; tier: string }[] } | null = null;
   if (ritualRank) {
-    const tier = Object.keys(CRAFT_TIER_RANK).find((t) => CRAFT_TIER_RANK[t as keyof typeof CRAFT_TIER_RANK] === ritualRank);
-    const recipes = RITUALS.filter((r) => CRAFT_TIER_RANK[r.tier as keyof typeof CRAFT_TIER_RANK] <= ritualRank).map((r) => ({
+    const tier = Object.keys(CRAFT_TIER_RANK).find((t) => CRAFT_TIER_RANK[t] === ritualRank);
+    const recipes = RITUALS.filter((r) => CRAFT_TIER_RANK[r.tier] <= ritualRank).map((r) => ({
       name: r.name,
       tier: r.tier,
     }));
@@ -308,7 +308,7 @@ export function bonusBudgetFor(level: number) {
   return level;
 }
 
-export function computeActiveSelections(graph: any, lbp: any) {
+export function computeActiveSelections(graph: import("./types.js").CharacterGraph, lbp?: { missingRequired?: { baseName: string }[], advantages?: { name: string, baseName?: string }[] } | null) {
   // A granted "choose one" selection surfaced for the UI, tagged with the entity that
   // granted it. `gs` is parser-shaped (open), so we widen it and add sourceName.
   const active: (Record<string, unknown> & { sourceName: string })[] = [];
@@ -320,13 +320,13 @@ export function computeActiveSelections(graph: any, lbp: any) {
       }
     }
   };
-  for (const item of graph) {
+  for (const item of graph.items) {
     if (item.field !== "synthetic") {
-      check(item.name || item.rawString);
+      const nm = item.name || item.rawString; if (nm) check(nm);
     }
   }
   for (const a of lbp?.advantages || []) {
-    check(a.name || a.baseName);
+    const nm = a.name || a.baseName; if (nm) check(nm);
   }
   return active;
 }
@@ -398,10 +398,10 @@ export function validate(character: CharacterState) {
   // Attach each classified row's computed cost record (from the BP ledger) so the
   // UI reads `row.cost` directly instead of reconstructing a ledger key per row.
   for (const bucket of ["skills", "perks", "classPowers", "domainPowers", "flaws", "innatePowers"] as const) {
-    for (const row of (owned[bucket as keyof typeof owned] as any[])) {
-      const key = costKey(row);
+    for (const row of (owned[bucket as keyof typeof owned] as (import("./types.js").ViewState & { cost: number | import("./types.js").BPLedgerEntry })[])) {
+      const key = costKey(row.id);
       if (key) {
-        row.cost = spend.byItem[key];
+        row.cost = spend.byItem[key] || row.cost;
       }
     }
   }
@@ -491,8 +491,8 @@ export function validityReasons(report: BuildReport | null | undefined) {
       continue;
     }
     const need = [
-      ...(iss.missing || []).map((m: any) => m.name),
-      ...(iss.anyOf || []).map((g: any) => g.map((m: any) => m.name).join(" or ")),
+      ...(iss.missing || []).map((m: { name: string }) => m.name),
+      ...(iss.anyOf || []).map((g: { name: string }[]) => g.map((m) => m.name).join(" or ")),
     ].join(", ");
     out.push(`${iss.item} needs: ${need}`);
   }
@@ -503,7 +503,7 @@ export function validityReasons(report: BuildReport | null | undefined) {
     if (lbp.needsSublineage)
       out.push(`Lineage: select the ${lbp.requiredSublineages.join("/")} sublineage to take its items`);
     if (lbp.missingRequired?.length)
-      out.push(`Lineage: missing required ${lbp.missingRequired.map((c: any) => c.baseName).join(", ")}`);
+      out.push(`Lineage: missing required ${lbp.missingRequired.map((c: { baseName: string }) => c.baseName).join(", ")}`);
   }
   for (const n of report.prereqs?.notes || []) {
     out.push(`Note (${n.item}): ${n.text}`);
