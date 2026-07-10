@@ -1,50 +1,28 @@
-import { EFFECT_EXTRACTORS } from "../extractors.js";
 import {
-  lookupEntity,
-  allergenAward,
-  ALLERGEN_AWARDS,
-  LEVEL_TABLE,
-  CLASS_PROGRESSION,
-  REFS,
-  CLASS_POWERS,
-  CLASSES,
-  BASE_CLASSES,
-  collectionOf,
+    ALLERGEN_AWARDS,
+    allergenAward,
+    lookupEntity
 } from "../../engine/data.js";
-import { startingSkillGrants } from "../starting-choices.js";
-import { MAX_FLAW_BP } from "../validate/core.js";
-import { costKey } from "../validate/cost-key.js";
-import { cleanItemName, bareSkill, getClasses, parseWordNumber } from "../resolver.js";
-import { characterLevel, getMaxRanks } from "../validate/core.js";
+import { EFFECT_EXTRACTORS } from "../extractors.js";
 import { paramInfo, paramReusable } from "../param-domain.js";
-import { spellSlots, type SpellPool } from "../validate/slots.js";
+import { bareSkill, cleanItemName, getClasses } from "../resolver.js";
+import { startingSkillGrants } from "../starting-choices.js";
 import type {
-  CharacterState,
-  GraphItem,
-  CharacterGraph,
-  Effect,
-  EntitySource,
-  BucketedView,
-  BPLedger,
-  BPLedgerEntry,
-  BaseEntity,
-  Entity,
-  CharacterChoice,
-  DiscountSpec,
-  WealthReport,
+    CharacterChoice,
+    CharacterState,
+    Effect,
+    Entity,
+    EntitySource,
+    GraphItem
 } from "../types.js";
 import {
-  Source,
-  isPurchased,
-  isStarting,
-  sourceClass,
-  ResolvedStats,
-  GrantedAbility,
-  PrereqReport,
-  PrereqIssue,
-  PrereqNote,
+    Source,
+    isPurchased,
+    isStarting,
+    sourceClass
 } from "../types.js";
-import { CharacterGraphModel, idPrefix, extractParam } from "./model.js";
+import { characterLevel, getMaxRanks } from "../validate/core.js";
+import { CharacterGraphModel, extractParam, idPrefix } from "./model.js";
 
 export function normalizeCharacter(character: CharacterState): CharacterState {
     const classes = getClasses(character);

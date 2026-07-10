@@ -1,51 +1,24 @@
-import { EFFECT_EXTRACTORS } from "../extractors.js";
 import {
-  lookupEntity,
-  allergenAward,
-  ALLERGEN_AWARDS,
-  LEVEL_TABLE,
-  CLASS_PROGRESSION,
-  REFS,
-  CLASS_POWERS,
-  CLASSES,
-  BASE_CLASSES,
-  collectionOf,
+    BASE_CLASSES,
+    CLASSES,
+    CLASS_POWERS,
+    REFS,
+    lookupEntity
 } from "../../engine/data.js";
-import { startingSkillGrants } from "../starting-choices.js";
-import { MAX_FLAW_BP } from "../validate/core.js";
-import { costKey } from "../validate/cost-key.js";
-import { cleanItemName, bareSkill, getClasses, parseWordNumber } from "../resolver.js";
-import { characterLevel, getMaxRanks } from "../validate/core.js";
-import { paramInfo, paramReusable } from "../param-domain.js";
-import { spellSlots, type SpellPool } from "../validate/slots.js";
+import { bareSkill, cleanItemName, getClasses, parseWordNumber } from "../resolver.js";
 import type {
-  CharacterState,
-  GraphItem,
-  CharacterGraph,
-  Effect,
-  EntitySource,
-  BucketedView,
-  BPLedger,
-  BPLedgerEntry,
-  BaseEntity,
-  Entity,
-  CharacterChoice,
-  DiscountSpec,
-  WealthReport,
+    BaseEntity,
+    CharacterState
 } from "../types.js";
 import {
-  Source,
-  isPurchased,
-  isStarting,
-  sourceClass,
-  ResolvedStats,
-  GrantedAbility,
-  PrereqReport,
-  PrereqIssue,
-  PrereqNote,
+    PrereqIssue,
+    PrereqNote,
+    PrereqReport
 } from "../types.js";
+import { characterLevel } from "../validate/core.js";
+import { spellSlots, type SpellPool } from "../validate/slots.js";
 import type { CharacterGraphModel } from "./model.js";
-import { idPrefix, idName } from "./model.js";
+import { idName, idPrefix } from "./model.js";
 
 export function prereqStatusFor(graph: CharacterGraphModel, entityId: string): {
         met: boolean;

@@ -1,48 +1,9 @@
-import { EFFECT_EXTRACTORS } from "../extractors.js";
 import {
-  lookupEntity,
-  allergenAward,
-  ALLERGEN_AWARDS,
-  LEVEL_TABLE,
-  CLASS_PROGRESSION,
-  REFS,
-  CLASS_POWERS,
-  CLASSES,
-  BASE_CLASSES,
-  collectionOf,
+    CLASS_PROGRESSION,
+    LEVEL_TABLE
 } from "../../engine/data.js";
-import { startingSkillGrants } from "../starting-choices.js";
-import { MAX_FLAW_BP } from "../validate/core.js";
-import { costKey } from "../validate/cost-key.js";
-import { cleanItemName, bareSkill, getClasses, parseWordNumber } from "../resolver.js";
-import { characterLevel, getMaxRanks } from "../validate/core.js";
-import { paramInfo, paramReusable } from "../param-domain.js";
-import { spellSlots, type SpellPool } from "../validate/slots.js";
 import type {
-  CharacterState,
-  GraphItem,
-  CharacterGraph,
-  Effect,
-  EntitySource,
-  BucketedView,
-  BPLedger,
-  BPLedgerEntry,
-  BaseEntity,
-  Entity,
-  CharacterChoice,
-  DiscountSpec,
-  WealthReport,
-} from "../types.js";
-import {
-  Source,
-  isPurchased,
-  isStarting,
-  sourceClass,
-  ResolvedStats,
-  GrantedAbility,
-  PrereqReport,
-  PrereqIssue,
-  PrereqNote,
+    BaseEntity
 } from "../types.js";
 import type { CharacterGraphModel } from "./model.js";
 export function computeStats(graph: CharacterGraphModel) {
