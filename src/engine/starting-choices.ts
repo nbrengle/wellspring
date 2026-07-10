@@ -62,7 +62,7 @@ interface ExpectedSkill {
 
 // Deterministic, label-derived block id — no hand-typed ids (there are no saved
 // characters, so id stability across edits doesn't matter).
-const slugId = (label) =>
+const slugId = (label: string) =>
   "choice-" +
   String(label)
     .toLowerCase()
@@ -71,12 +71,12 @@ const slugId = (label) =>
 
 // A CHOICE HEADER asks the player to choose and ends with ":" (options follow on
 // later lines). A mid-line "Choose a Lore Skill (2)" is an INLINE choice instead.
-const isChoiceHeader = (line) => /\bchoose\b/i.test(line) && /:\s*$/.test(line.trim());
-const hasInlineChoose = (line) => /\bchoose\b/i.test(line) && !/:\s*$/.test(line.trim());
+const isChoiceHeader = (line: string) => /\bchoose\b/i.test(line) && /:\s*$/.test(line.trim());
+const hasInlineChoose = (line: string) => /\bchoose\b/i.test(line) && !/:\s*$/.test(line.trim());
 
 // Human label from a header/inline line: text before " - Choose", "Title: Choose",
 // or the leading "Title:" — whichever yields a title.
-function choiceLabel(line) {
+function choiceLabel(line: string) {
   let m = line.match(/^(.*?)\s*[-–]\s*choose\b/i);
   if (m) return m[1].trim();
   m = line.match(/^(.*?):\s*choose\b/i);
@@ -90,7 +90,7 @@ function choiceLabel(line) {
 // "xN" rank multipliers, splits on commas / "&" / "and" / "or" / "either", strips
 // bracketed params, and keeps only tokens that resolve to a real skill (via the
 // alias layer) — prose noise ("A Good Defense") is dropped.
-function parseSkillTokens(text) {
+function parseSkillTokens(text: string) {
   const out: SkillToken[] = [];
   // Strip a leading "Block Title - " / "Block Title: " provenance prefix, but only
   // when doing so leaves a resolvable first skill (skill names also contain " - ",
@@ -104,17 +104,17 @@ function parseSkillTokens(text) {
   let body = text
     .replace(
       /\b(Apprentice|Journeyman|Greater|Master)\s*&\s*(Apprentice|Journeyman|Greater|Master)\s+(\w+)/gi,
-      (_, a, b, base) => `${a} ${base}, ${b} ${base}`,
+      (_: string, a: string, b: string, base: string) => `${a} ${base}, ${b} ${base}`,
     )
     .replace(
       /\b(\w+):\s*(Apprentice|Journeyman|Greater|Master)\s*&\s*(Apprentice|Journeyman|Greater|Master)\b/gi,
-      (_, base, a, b) => `${a} ${base}, ${b} ${base}`,
+      (_: string, base: string, a: string, b: string) => `${a} ${base}, ${b} ${base}`,
     );
   // Strip a leading "Block Title - " / "Block Title: " provenance prefix, but only
   // when doing so leaves a resolvable first skill (skill names also contain " - ").
   const pm = body.match(/^(.+?)\s*[-–:]\s+(.+)$/);
   if (pm) {
-    const firstRaw = (s) =>
+    const firstRaw = (s: string) =>
       s
         .split(/\s*,\s*|\s*&\s*/)[0]
         .replace(/x\s*\d+/gi, "")
@@ -144,7 +144,7 @@ function parseSkillTokens(text) {
 // parameterized skill (Lore) keeps its subject; normalizes dash spacing as a
 // fallback. The one place a token becomes a canonical {name,rank}, shared by the
 // token scanner and the option-line expander.
-function canonicalSkill(raw) {
+function canonicalSkill(raw: string) {
   if (!raw || !raw.trim()) return null;
   const xm = raw.match(/x\s*(\d+)/i);
   const rank = xm ? parseInt(xm[1], 10) : 1;
@@ -193,7 +193,7 @@ function loreAreaOptions() {
 
 // Expand an INLINE "Choose a <category> Skill" into concrete options from the skill
 // list. Returns { options, fixed } — fixed = non-choice skills sharing the line.
-function expandInlineChoice(line) {
+function expandInlineChoice(line: string) {
   const fixed: SkillToken[] = [];
   let options: ChoiceOption[] = [];
   if (/choose\s+a\s+lore\s+skill/i.test(line)) {
@@ -225,22 +225,22 @@ function expandInlineChoice(line) {
 //   "Basic Medicine (2) and one of [Bits & Pieces, …]"  (Artisan)
 // Returns { fixedText, options } — fixedText is the line with the choice clause
 // removed; options is the extracted alternatives (empty if none).
-function extractEmbeddedChoice(line) {
+function extractEmbeddedChoice(line: string) {
   let m = line.match(/\b(?:and\s+)?one of\s*\[([^\]]*)\]/i);
   if (m) {
     const options = m[1]
       .split(/\s*,\s*|\bor\b/i)
-      .map((s) => canonicalSkill(s))
+      .map((s: string) => canonicalSkill(s))
       .filter((t): t is SkillToken => t !== null)
-      .map((t) => ({ label: t.name, skills: [t] }));
+      .map((t: SkillToken) => ({ label: t.name, skills: [t] }));
     if (options.length) return { fixedText: line.replace(m[0], ""), options };
   }
   m = line.match(/\b(?:and\s+)?either\s+(.+?)\s+or\s+(.+?)(?:$|,)/i);
   if (m) {
     const options = [m[1], m[2]]
-      .map((s) => canonicalSkill(s))
+      .map((s: string) => canonicalSkill(s))
       .filter((t): t is SkillToken => t !== null)
-      .map((t) => ({ label: t.name, skills: [t] }));
+      .map((t: SkillToken) => ({ label: t.name, skills: [t] }));
     if (options.length >= 2) return { fixedText: line.replace(m[0], ""), options };
   }
   return { fixedText: line, options: [] };
@@ -252,7 +252,7 @@ function extractEmbeddedChoice(line) {
 // Enchanting, …]") or "<fixed> and one of [a, b, c]" — becomes several options, one
 // per alternative, each combining the line's fixed tokens with that alternative.
 // `baseToks` are the already-parsed non-bracket tokens of the line.
-function expandOptionLine(line, baseToks) {
+function expandOptionLine(line: string, baseToks: SkillToken[]) {
   // Tier-distributed bracket: "Apprentice Crafting: [Alchemy, (Ritual Magic AND
   // Ritual Lore), Enchanting, or Tinkering]" → one option per crafting discipline.
   const br = line.match(/\b(Apprentice|Journeyman|Greater|Master)\b[^[]*\[([^\]]*)\]/i);
@@ -269,7 +269,7 @@ function expandOptionLine(line, baseToks) {
         const tok = canonicalSkill(`${tier} ${piece.trim()}`) || canonicalSkill(piece.trim());
         if (tok) skills.push(tok);
       }
-      if (skills.length) opts.push({ label: skills.map((s) => s.name).join(", "), skills });
+      if (skills.length) opts.push({ label: skills.map((s: SkillToken) => s.name).join(", "), skills });
     }
     if (opts.length) return opts;
   }
@@ -279,7 +279,11 @@ function expandOptionLine(line, baseToks) {
     const opts: ChoiceOption[] = [];
     for (const raw of oneOf[1].split(/\s*,\s*|\bor\b/i)) {
       const tok = canonicalSkill(raw);
-      if (tok) opts.push({ label: [...baseToks.map((t) => t.name), tok.name].join(", "), skills: [...baseToks, tok] });
+      if (tok)
+        opts.push({
+          label: [...baseToks.map((t: SkillToken) => t.name), tok.name].join(", "),
+          skills: [...baseToks, tok],
+        });
     }
     if (opts.length) return opts;
   }
@@ -293,20 +297,23 @@ function expandOptionLine(line, baseToks) {
     const leftToks = parseSkillTokens(orM[1]);
     const rightParts = orM[2].split(/\s*,\s*/);
     const altTok = canonicalSkill(rightParts[0]);
-    const sharedToks = rightParts.slice(1).flatMap((p) => parseSkillTokens(p));
+    const sharedToks = rightParts.slice(1).flatMap((p: string) => parseSkillTokens(p));
     if (leftToks.length && altTok) {
       const lastLeft = leftToks[leftToks.length - 1];
       const common = [...leftToks.slice(0, -1), ...sharedToks];
-      const mk = (alt) => ({ label: [...common, alt].map((t) => t.name).join(", "), skills: [...common, alt] });
+      const mk = (alt: SkillToken) => ({
+        label: [...common, alt].map((t: SkillToken) => t.name).join(", "),
+        skills: [...common, alt],
+      });
       return [mk(lastLeft), mk(altTok)];
     }
   }
   // Plain option: its parsed tokens are the one option.
-  return [{ label: baseToks.map((t) => t.name).join(", "), skills: baseToks }];
+  return [{ label: baseToks.map((t: SkillToken) => t.name).join(", "), skills: baseToks }];
 }
 
 // Structure one class's raw startingSkills lines into { fixed, choices }.
-function deriveStartingSkills(className) {
+function deriveStartingSkills(className: string) {
   const cls = classesJson.find((c) => c.name === className);
   const fixed: SkillToken[] = [];
   const choices: ChoiceConfig[] = [];
@@ -428,7 +435,7 @@ export const BASE_STARTING_SKILLS = Object.fromEntries(Object.entries(DERIVED).m
 export const STARTING_CHOICES_CONFIG = Object.fromEntries(Object.entries(DERIVED).map(([cls, d]) => [cls, d.choices]));
 
 // Does this class have any starting-choice blocks?
-export function hasStartingChoices(className) {
+export function hasStartingChoices(className: string) {
   return !!(STARTING_CHOICES_CONFIG[className] || []).length;
 }
 
@@ -440,14 +447,14 @@ export function hasStartingChoices(className) {
 // bare " - " (e.g. "Extended Capacity - Novice") is part of the canonical name, not
 // a parameter, so it never counts.
 const PLACEHOLDER_PARAM = /\b(your|character'?s?|specific|a)\b.*\bchoice\b|\bspecific\b|\bcharacter'?s?\b/i;
-function hasParameter(name) {
+function hasParameter(name: string) {
   const m = String(name).match(/\(([^()]*)\)\s*$/);
   return !!m && !PLACEHOLDER_PARAM.test(m[1]);
 }
 
 // Normalize an option's skills entry to { name, rank }.
-export function optionSkills(opt) {
-  return (opt?.skills || []).map((s) =>
+export function optionSkills(opt: ChoiceOption | undefined | null) {
+  return (opt?.skills || []).map((s: string | SkillToken) =>
     typeof s === "string" ? { name: s, rank: 1 } : { name: s.name, rank: s.rank || 1 },
   );
 }
@@ -457,7 +464,7 @@ export function optionSkills(opt) {
 // Apprentice", parameter stripping, rank suffixes) via lookupEntity. The single
 // resolution path shared by reconciliation, match-keying, and the config-integrity
 // test — so the test can't drift from how the runtime actually resolves names.
-export function resolveSkill(name) {
+export function resolveSkill(name: string) {
   return (
     lookupEntity(`skills:${cleanItemName(name)}`) ||
     lookupEntity(`perks:${cleanItemName(name)}`) ||
@@ -470,7 +477,7 @@ export function resolveSkill(name) {
 // skill against a choice-config option regardless of surface form. Keys off the
 // resolved BASE entity name; falls back to the bare cleaned name when nothing
 // resolves. Lower-cased so case never matters.
-function skillMatchKey(name) {
+function skillMatchKey(name: string) {
   const ent = resolveSkill(name);
   const base = ent ? ent.baseName || ent.name : bareSkill(cleanItemName(name));
   return base.toLowerCase();
@@ -480,7 +487,7 @@ function skillMatchKey(name) {
 // Only the explicit "xN" form bumps the count here; bare Roman/digit suffixes are
 // left to the validator's richer parseTrailingRank. Lets reconciliation tell a
 // shipped "Foo x2" apart from a single "Foo".
-function parseStartingRank(name) {
+function parseStartingRank(name: string) {
   const m = String(name || "")
     .trim()
     .match(/\sx\s*(\d+)$/i);
@@ -502,7 +509,7 @@ function parseStartingRank(name) {
 // option combinations, CONSUMING each option's skills from a shared owned-skill
 // pool, and keep the assignment that explains the most owned skills. Falls back to
 // the default option for any block left unmatched. Pure: returns { [id]: label }.
-export function reconcileStartingChoices(character, className) {
+export function reconcileStartingChoices(character: CharacterState, className: string) {
   const configs = STARTING_CHOICES_CONFIG[className] || [];
   if (!configs.length) return {};
   // Owned starting skills by canonical key, RANK-AWARE: a skill stored once with
@@ -510,15 +517,15 @@ export function reconcileStartingChoices(character, className) {
   // asking for "x2" still matches. Rank comes off the CharacterChoice; falls back
   // to a trailing "xN" in the name. Starting skills are the Class:Starting entries
   // of the skills[] bucket.
-  const ownedPool = {};
+  const ownedPool: Record<string, number> = {};
   const startingEntries = (character.skills || []).filter((s) => isStarting(s.source));
-  startingEntries.forEach((choice) => {
+  startingEntries.forEach((choice: CharacterChoice) => {
     const b = skillMatchKey(choice.entityId);
     ownedPool[b] = (ownedPool[b] || 0) + (choice.ranks || parseStartingRank(choice.entityId) || 1);
   });
 
   // Need-counts for one option, keyed by canonical skill key.
-  const optionNeed = (opt) => {
+  const optionNeed = (opt: ChoiceOption) => {
     const need: Record<string, number> = {};
     for (const s of optionSkills(opt)) {
       const b = skillMatchKey(s.name);
@@ -541,9 +548,9 @@ export function reconcileStartingChoices(character, className) {
   // satisfy (consuming its skills), plus an "unmatched" branch. Score = total
   // owned skills consumed; richer (more-specific) matches win, and shared skills
   // can only be claimed once. Best assignment across the whole search is kept.
-  let bestAssign = null;
+  let bestAssign: Record<string, string | null> | null = null;
   let bestScore = -1;
-  const search = (i, pool, assign, score) => {
+  const search = (i: number, pool: Record<string, number>, assign: Record<string, string | null>, score: number) => {
     if (i === configs.length) {
       if (score > bestScore) {
         bestScore = score;
@@ -563,7 +570,7 @@ export function reconcileStartingChoices(character, className) {
   };
   search(0, ownedPool, {}, 0);
 
-  const res = {};
+  const res: Record<string, string> = {};
   for (const conf of configs) {
     res[conf.id] = (bestAssign && bestAssign[conf.id]) || conf.options[0]?.label;
   }
@@ -575,7 +582,7 @@ export function reconcileStartingChoices(character, className) {
 // chosen option's skills tagged with their block label. The single source of truth
 // for "what does this build's starting block produce", shared by rebuild (forward)
 // and startingSkillGrants (derive-on-read).
-function expectedStartingSkills(primaryClassName, choices) {
+function expectedStartingSkills(primaryClassName: string, choices?: Record<string, string>) {
   const fixed = (BASE_STARTING_SKILLS[primaryClassName] || []).map((s) =>
     typeof s === "string"
       ? { name: s, rank: 1, specialty: null }
@@ -604,17 +611,17 @@ export function startingSkillGrants(character: CharacterState): {
   floor: Record<number, number>;
 } {
   const primary = getClasses(character)[0]?.name;
-  const specialty = {};
-  const floor = {};
+  const specialty: Record<number, string> = {};
+  const floor: Record<number, number> = {};
   if (!primary || !hasStartingChoices(primary)) return { specialty, floor };
   const choices =
     character.startingChoices && Object.keys(character.startingChoices).length
       ? character.startingChoices
       : reconcileStartingChoices(character, primary);
   const expected = expectedStartingSkills(primary, choices);
-  const byBase = {};
+  const byBase: Record<string, ExpectedSkill[]> = {};
   for (const t of expected) (byBase[skillMatchKey(t.name)] = byBase[skillMatchKey(t.name)] || []).push(t);
-  const kept = {};
+  const kept: Record<string, number> = {};
   // Key specialty/floor by the starting skill's index AMONG the Class:Starting
   // entries of the bucket — the same index the graph stamps as node.originalIndex,
   // so floor billing (startFloors[node.index]) lines up.
@@ -643,7 +650,7 @@ export function startingSkillGrants(character: CharacterState): {
 // persisted on the character — they're derived on read by startingSkillGrants, so
 // they can't be lost on import / round-trip.
 export function rebuildStartingSkills(
-  character,
+  character: CharacterState,
   primaryClassName: string,
   updatedChoices: Record<string, string> | null = null,
 ) {
@@ -679,12 +686,12 @@ export function rebuildStartingSkills(
   // character.skills. Purchased (and any other-source) entries are preserved
   // untouched; only the starting ones are rebuilt.
   const allSkills = character.skills || [];
-  const currentStarting = allSkills.filter((s) => isStarting(s.source));
-  const otherSkills = allSkills.filter((s) => !isStarting(s.source));
+  const currentStarting = allSkills.filter((s: CharacterChoice) => isStarting(s.source));
+  const otherSkills = allSkills.filter((s: CharacterChoice) => !isStarting(s.source));
 
   const nextStarting: CharacterChoice[] = [];
-  const keptCounts = {};
-  const pushItem = (name, rank) =>
+  const keptCounts: Record<string, number> = {};
+  const pushItem = (name: string, rank?: number) =>
     nextStarting.push({ entityId: name, source: Source.starting(primaryClassName), ranks: rank || 1 });
 
   // Keep current starting items that still belong (matched to an expected
@@ -740,13 +747,13 @@ export function rebuildStartingSkills(
 // grants — turning silent drift into a loud, located failure.
 
 // Canonical key for a config-or-source skill name (shared with reconciliation).
-function skillKey(name) {
+function skillKey(name: string) {
   return skillMatchKey(name);
 }
 
 // The skill keys the curated config can grant for a class (across all blocks +
 // options), each tagged so a diff can point at the offending block.
-export function configSkillKeys(className) {
+export function configSkillKeys(className: string) {
   const out = new Set();
   for (const block of STARTING_CHOICES_CONFIG[className] || []) {
     for (const s of block.options.flatMap(optionSkills)) out.add(skillKey(s.name));
@@ -764,7 +771,7 @@ export function configSkillKeys(className) {
 // needs ("every config skill is mentioned somewhere in the prose"). This can't be
 // fooled by a typo'd config skill, and degrades gracefully (a window that doesn't
 // resolve is simply ignored).
-export function sourceStartingSkillKeys(className) {
+export function sourceStartingSkillKeys(className: string) {
   const cls = classesJson.find((c) => c.name === className);
   if (!cls) return new Set();
   const keys = new Set();
@@ -813,7 +820,7 @@ export function sourceStartingSkillKeys(className) {
 // All resolvable 1–5-word windows in a prose line, as canonical skill keys. Cost
 // "(n)" and rank "xN" markers are stripped; commas/&/AND/brackets become word
 // breaks so neighbouring skills don't fuse.
-function resolvableWindows(line) {
+function resolvableWindows(line: string) {
   const out = new Set();
   const words = line
     .replace(/\(\d+\)/g, "")
