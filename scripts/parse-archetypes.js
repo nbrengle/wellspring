@@ -454,6 +454,7 @@ function buildCharacter(raw) {
     perks: [],
     flaws: [],
     powers: [],
+    domainPowers: [],
     spells: [],
     devotions: [],
     wealth: raw.wealth || "None",
