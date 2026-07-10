@@ -1454,6 +1454,7 @@ export function resolveCharacterGraph(charInput: CharacterState): CharacterGraph
           sourceType: "grant",
           grantedBy: node.name,
           grantKind: node.sourceType,
+          cls: node.cls ?? node.entity?.parentClass ?? null,
           rank: 1,
           baseCost: 0,
           entity: ent,

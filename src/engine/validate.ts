@@ -201,8 +201,21 @@ export function classifyOwnedItems(character) {
     ...b.classPowers,
     ...b.domainPowers,
   ];
+  const skills = [...b.skills];
+  const mcGrants = multiclassGrants(character).skills;
+  for (const mc of mcGrants) {
+    skills.push({
+      name: mc.name,
+      field: "skills",
+      sourceType: "multiclass",
+      cls: mc.source,
+      index: -1,
+      rank: 1,
+    } as any);
+  }
+
   return {
-    skills: b.skills,
+    skills,
     perks: b.perks,
     classPowers,
     innatePowers: b.innatePowers,

@@ -461,7 +461,7 @@ export function SlotBlock({ slot }) {
 }
 
 export function ClassifiedRows({ rows, resolveType, showClass }) {
-  const { character } = useBuilderState();
+  const { character, report } = useBuilderState();
   const { onRemoveEntity: onRemove, onSetRank } = useBuilderActions();
   if (!rows || rows.length === 0) return <p className="b-empty">none</p>;
   return (
@@ -471,8 +471,9 @@ export function ClassifiedRows({ rows, resolveType, showClass }) {
         // Cost is attached to the row by validate() (from the BP ledger).
         const cost = row.cost;
         const refundEff = row.effects?.find((e) => e.type === "REFUND_GRANT");
-        const refundedBy = refundEff?.source;
-        const refundedBP = refundEff ? cost?.base || 0 : 0;
+        const mcRefund = report?.multiclassGrants?.freeBPItems?.find((f) => f.skill === bareSkill(cleanItemName(name)));
+        const refundedBy = refundEff?.source || mcRefund?.source;
+        const refundedBP = refundEff ? cost?.base || 0 : mcRefund?.bp || 0;
 
         const canRemove = sourceType === "purchased" && index >= 0;
         const rank = cost?.rank || (index >= 0 ? character.ranks?.[field]?.[index] : null) || 1;
@@ -481,7 +482,11 @@ export function ClassifiedRows({ rows, resolveType, showClass }) {
         const maxR = getMaxRanks(name, field, character);
         const grantedFloor = floor || 0;
         const isGranted =
-          sourceType === "grant" || sourceType === "class" || sourceType === "innate" || sourceType === "lineage";
+          sourceType === "grant" ||
+          sourceType === "class" ||
+          sourceType === "innate" ||
+          sourceType === "lineage" ||
+          sourceType === "multiclass";
 
         const canBuyUp = isGranted && grantedFloor > 0 && maxR > grantedFloor && !UNLIMITED_SKILLS.has(baseName);
         const rankFloor = canBuyUp ? grantedFloor : 1;
@@ -533,14 +538,18 @@ export function ClassifiedRows({ rows, resolveType, showClass }) {
                     title = `Granted free by your ${src} class`;
                   }
 
+                  const toneKey = cls || grantedBy || src;
+                  const toneClass = CLASS_TONES[toneKey] ? `b-tag-${CLASS_TONES[toneKey]}` : "b-badge-granted";
+                  let label = src?.toUpperCase() || "";
+                  if (cls && grantedBy && cls !== grantedBy) {
+                    label = `${cls.toUpperCase()} · ${grantedBy.toUpperCase()}`;
+                  }
+
                   return (
                     <>
                       {src && (
-                        <span
-                          className={`b-row-badge ${CLASS_TONES[src] ? `b-tag-${CLASS_TONES[src]}` : "b-badge-granted"}`}
-                          title={title}
-                        >
-                          {src.toUpperCase()}
+                        <span className={`b-row-badge ${toneClass}`} title={title}>
+                          {label}
                           {specialty && <span className="b-badge-spec"> · {specialty}</span>}
                         </span>
                       )}
@@ -548,8 +557,8 @@ export function ClassifiedRows({ rows, resolveType, showClass }) {
                     </>
                   );
                 })()
-              : cost && !refundEff && <CostBadge cost={cost} />}
-            {refundEff && (
+              : cost && !(refundEff || mcRefund) && <CostBadge cost={cost} />}
+            {(refundEff || mcRefund) && (
               <span
                 className="b-row-badge b-badge-refund"
                 title={`BP spent on this item was refunded because you received it for free from ${refundedBy}`}
