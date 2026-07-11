@@ -30,9 +30,7 @@ export interface ChooseOneConfig {
   options: ChoiceOption[];
 }
 
-export type StatMod =
-  | { stat: string; amount: number }
-  | { stat: string; text: string };
+export type StatMod = { stat: string; amount: number } | { stat: string; text: string };
 
 // ─── Discriminated Union for Entities ───────────────────────────────────────
 
