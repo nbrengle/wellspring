@@ -128,7 +128,7 @@ export function sourceForField(field: string, primaryClass: string): EntitySourc
     case "innatePowers":
       return Source.innate();
     case "bookSpells":
-      return Source.granted("Bookcaster");
+      return Source.bestowed("Bookcaster");
     // Slot powers + all caster spells fill a class slot (free) — sourced to the class.
     case "utilityPowers":
     case "basicPowers":

@@ -2,7 +2,7 @@
 //
 // Extracted from validate.js (hotspot split). Self-contained: depends only on the
 // shared core primitives + the class/lineage data. Holds slot-cap usage
-// (computeSlots), bonus-slot grants (slotGrants), innate bonus cantrips, caster
+// (computeSlots), bonus-slot grants (slotBestows), innate bonus cantrips, caster
 // spell-slot capacity (spellSlots), and the Bookcaster spell options. Re-exported
 // by the validate.js barrel.
 
@@ -43,7 +43,7 @@ export interface SpellPool {
   greater: number;
 }
 /** An innate (locked) cantrip granted by progression: which class (or 'ALL'). */
-interface GrantedCantrip {
+interface BestowedCantrip {
   cls: string;
   name: string;
 }
@@ -52,7 +52,7 @@ interface GrantedCantrip {
 // is gated by the classes they actually have levels in (the rules: "from a
 // non-casting class that they have levels in", "a spell-casting class in which they
 // have a Known Spell"). The chosen class is stored as the skill's parameter
-// ("Extensive Training (Fighter)"), which slotGrants() already routes the bonus slot
+// ("Extensive Training (Fighter)"), which slotBestows() already routes the bonus slot
 // to. `kind` filters which of the character's classes are eligible.
 //   nonCasting  — Extensive Combat Training / Extensive Training: pick a non-casting
 //                 class you have levels in → +1 power slot of that tier there.
@@ -84,9 +84,9 @@ export function eligibleClassChoices(character: CharacterState, baseName: string
 // attribute to their own class; skill grants attribute to a relevant class (the
 // caster class for cantrip/spell grants, the martial class for power grants), so
 // the bonus lands on the correct per-class slot row.
-// `sources` (optional) is filled with { "cls:cat": [grantingItemName, …] } so the
+// `sources` (optional) is filled with { "cls:cat": [bestowingItemName, …] } so the
 // slot UI can show WHICH skill granted a bonus slot (the "auditable" attribution).
-export function slotGrants(character: CharacterState, sources: Record<string, string[]> | null = null) {
+export function slotBestows(character: CharacterState, sources: Record<string, string[]> | null = null) {
   const grants: Record<string, number> = {};
   // computeSlots categories only. Raw spell-tier grants (novice/adept/greater) are
   // the province of spellSlots(), not the slot-cap budget here — skip them.
@@ -106,7 +106,7 @@ export function slotGrants(character: CharacterState, sources: Record<string, st
 
   // 1. Purchased / starting skills that grant slots (Additional Cantrip,
   //    Extended Capacity, Spell-Scholar). The grants are parser-extracted
-  //    (ent.slotGrants); attribute each to the relevant class and multiply by the
+  //    (ent.slotBestows); attribute each to the relevant class and multiply by the
   //    item's rank ("Extended Capacity - Novice x2" → +2). innatePowers is excluded
   //    (GENERIC_POWER_FIELDS) — innate slot grants are handled by the
   //    activeInnatePowers() loop below; iterating them here too would double-count.
@@ -140,7 +140,7 @@ export function slotGrants(character: CharacterState, sources: Record<string, st
         }
       }
 
-      for (const { cat, n } of ent?.slotGrants || []) {
+      for (const { cat, n } of ent?.slotBestows || []) {
         addTo(targetCls || classFor(cat), cat, n * rank, ent?.baseName || ent?.name || cleanItemName(item));
       }
     });
@@ -151,8 +151,8 @@ export function slotGrants(character: CharacterState, sources: Record<string, st
   // progression "Innate Bonus Cantrip" is NOT a slot — it grants the specific
   // locked cantrip, handled by innateBonusCantrips(), so it never bumps the cap.
   for (const ip of activeInnatePowers(character)) {
-    if (ip.cls && ip.entity?.slotGrants) {
-      for (const { cat, n } of ip.entity.slotGrants || []) addTo(ip.cls, cat, n, ip.entity.name || ip.name);
+    if (ip.cls && ip.entity?.slotBestows) {
+      for (const { cat, n } of ip.entity.slotBestows || []) addTo(ip.cls, cat, n, ip.entity.name || ip.name);
     }
   }
 
@@ -162,8 +162,8 @@ export function slotGrants(character: CharacterState, sources: Record<string, st
 // Cantrips a caster is GRANTED for free (locked, not choosable) by the
 // progression "Innate Bonus Cantrip: <name>" prose. Returns [{ cls, name }],
 // deduped per class+name.
-export function innateBonusCantrips(character: CharacterState): GrantedCantrip[] {
-  const out: GrantedCantrip[] = [];
+export function innateBonusCantrips(character: CharacterState): BestowedCantrip[] {
+  const out: BestowedCantrip[] = [];
   const seen = new Set();
   for (const { name: cls, level: clsLevel } of getClasses(character)) {
     const classCantrips = new Set((CLASS_POWERS[cls]?.cantrips || []).map((c) => c.name));
@@ -234,9 +234,9 @@ export function computeSlots(character: CharacterState) {
   if (!classes.length) return [];
   const multi = classes.length > 1;
   const bonusSources: Record<string, string[]> = {};
-  const bonus = slotGrants(character, bonusSources);
+  const bonus = slotBestows(character, bonusSources);
   // Free, locked cantrips granted by progression ("Innate Bonus Cantrip: Cancel").
-  const grantedCantrips = innateBonusCantrips(character);
+  const bestowedCantrips = innateBonusCantrips(character);
 
   // Agile Learner trades a tier-1 slot for a tier-2 (same class). You can only make
   // as many trades as you own Agile Learner ranks — so clamp the recorded trades to
@@ -269,7 +269,7 @@ export function computeSlots(character: CharacterState) {
       };
     };
     if (isCaster) {
-      const granted = grantedCantrips.filter((g) => g.cls === cls || g.cls === "ALL").map((g) => g.name);
+      const granted = bestowedCantrips.filter((g) => g.cls === cls || g.cls === "ALL").map((g) => g.name);
       // A granted (innate) cantrip never consumes a choosable slot, even if it
       // appears in the character's cantrip pick list. Exclude it from `used`.
       const used = (character.spells || []).reduce((n: number, choice: CharacterChoice) => {
@@ -326,14 +326,14 @@ export function spellSlots(character: CharacterState) {
   }
 
   // Additional spell-slot grants from owned skills/perks/advantages are
-  // parser-extracted (ent.slotGrants for novice/adept/greater; ent.highestSlot for
+  // parser-extracted (ent.slotBestows for novice/adept/greater; ent.highestSlot for
   // a floating "highest-level" slot).
   // We apply these general grants to the primary caster's magic type pool.
   const primaryType = CLASSES[casters[0].name]?.magicType || "Unknown";
   if (!pools[primaryType]) pools[primaryType] = { novice: 0, adept: 0, greater: 0 };
 
   const highestSlots: string[] = []; // array of target pool strings
-  const applySpellGrants = (ent: BaseEntity | null | undefined, rank = 1, itemName: string | null = null) => {
+  const applySpellBestows = (ent: BaseEntity | null | undefined, rank = 1, itemName: string | null = null) => {
     if (!ent) return;
 
     let targetPool = primaryType;
@@ -349,7 +349,7 @@ export function spellSlots(character: CharacterState) {
 
     if (!pools[targetPool]) pools[targetPool] = { novice: 0, adept: 0, greater: 0 };
 
-    for (const { cat, n } of ent.slotGrants || []) {
+    for (const { cat, n } of ent.slotBestows || []) {
       if (SPELL_TIERS.has(cat)) pools[targetPool][cat as keyof SpellPool] += n * rank;
     }
     if (ent.highestSlot) {
@@ -358,16 +358,16 @@ export function spellSlots(character: CharacterState) {
   };
 
   for (const item of character.skills || []) {
-    applySpellGrants(lookupEntity(item.entityId), item.ranks || 1, item.entityId);
+    applySpellBestows(lookupEntity(item.entityId), item.ranks || 1, item.entityId);
   }
   for (const item of character.perks || []) {
-    applySpellGrants(lookupEntity(item.entityId), item.ranks || 1, item.entityId);
+    applySpellBestows(lookupEntity(item.entityId), item.ranks || 1, item.entityId);
   }
   if (character.lineage) {
     const lineageName = typeof character.lineage === "string" ? character.lineage : character.lineage.name;
     const lin = LINEAGES[lineageName];
     for (const name of character.lineageAdvantages || []) {
-      applySpellGrants(
+      applySpellBestows(
         (lin?.advantages || []).find((x: BaseEntity) => x.name === name || x.baseName === name),
         1,
         name,

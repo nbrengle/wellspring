@@ -96,9 +96,9 @@ export function useCoreHandlers({ character, setCharacter, setPicking, setView }
     [setCharacter],
   );
 
-  const handleSetGrantedSelection = useCallback(
+  const handleSetBestowedSelection = useCallback(
     (selectionId, value) => {
-      setCharacter((c) => reducers.setGrantedSelection(c, selectionId, value));
+      setCharacter((c) => reducers.setBestowedSelection(c, selectionId, value));
     },
     [setCharacter],
   );
@@ -118,7 +118,7 @@ export function useCoreHandlers({ character, setCharacter, setPicking, setView }
     handleRemoveEntity,
     handleSetRank,
     handleSetSpecialty,
-    handleSetGrantedSelection,
+    handleSetBestowedSelection,
     handleSetAgileLearnerTrade,
   };
 }

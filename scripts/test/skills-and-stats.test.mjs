@@ -11,7 +11,7 @@ import {
   prereqStatus,
   LEVEL_CAP,
   LEGAL_MIN_LEVEL,
-  grantedAbilities,
+  bestowedAbilities,
   computeSpend,
   getMaxRanks,
   bookcasterSpellOptions,
@@ -148,7 +148,7 @@ test("an in-play Grant (sub-power) is NOT bestowed on the caster", () => {
   const c = makeChar("Cleric 4", { add: ["Prayer of Rest"] });
   const r = validate(c);
   ok(
-    !r.grantedAbilities.list.some((g) => g.abilityName === "Holy Rest"),
+    !r.bestowedAbilities.list.some((g) => g.abilityName === "Holy Rest"),
     "Holy Rest is an in-play Grant to a target, not bestowed on the caster",
   );
   // And it's still not directly selectable (unchanged).

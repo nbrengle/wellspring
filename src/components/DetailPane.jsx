@@ -282,9 +282,9 @@ export function EntityBody({
   // Hooks must run unconditionally and in the same order every render — so this
   // useMemo is hoisted ABOVE the early `!entity` return (it already guards on
   // entity?.id internally). Calling it after the return tripped rules-of-hooks.
-  const grantedSubPowers = useMemo(() => {
+  const bestowedSubPowers = useMemo(() => {
     if (!entity?.id) return [];
-    const targets = REFS.grants?.[entity.id] || [];
+    const targets = REFS.bestows?.[entity.id] || [];
     return targets.map((id) => lookupEntity(id)).filter((sub) => sub && sub.tier === "SubPower");
   }, [entity]);
   if (!entity) {
@@ -320,7 +320,7 @@ export function EntityBody({
   const isParamEditable = !!(
     onUpdateParameter &&
     view?.field &&
-    view.field !== "multiclassGrant" &&
+    view.field !== "multiclassBestow" &&
     (paramSuggestions?.length || paramGroups?.length || baseName === "Bookcaster" || TYPEABLE_PARAMS.has(baseName))
   ); // typeable params are editable even with no suggestions
   // A devotion's "description" lives in lore + tenets (not a `description` field),
@@ -382,7 +382,7 @@ export function EntityBody({
           if (build && onSetChoice) {
             // Match the stored value whether it's the option text or a granted skill name.
             const value =
-              co.options.find((o) => o.text === chosen || (o.grants || o.grantsSkills || []).includes(chosen))?.text ||
+              co.options.find((o) => o.text === chosen || (o.grants || o.bestowsSkills || []).includes(chosen))?.text ||
               null;
             return (
               <div className="b-detail-section">
@@ -392,7 +392,7 @@ export function EntityBody({
                   onChange={(v) => onSetChoice(powerId, v)}
                   options={co.options.map((o) => ({
                     value: o.text,
-                    free: (o.grants || o.grantsSkills || []).length > 0,
+                    free: (o.grants || o.bestowsSkills || []).length > 0,
                   }))}
                 />
               </div>
@@ -530,9 +530,9 @@ export function EntityBody({
           ids={domainPowers.map((p) => `powers:${p.name}`)}
         />
       )}
-      {grantedSubPowers.length > 0 && (
+      {bestowedSubPowers.length > 0 && (
         <div className="b-detail-subpowers">
-          {grantedSubPowers.map((sub) => {
+          {bestowedSubPowers.map((sub) => {
             const subTerms = conceptTerms(sub);
             return (
               <div key={sub.id} className="b-detail-section b-detail-subpower-inline">

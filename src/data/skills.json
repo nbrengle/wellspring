@@ -368,7 +368,7 @@
     "ranks": 2,
     "category": "Martial",
     "description": "The character may choose an additional Basic Tier Power from a non-casting class that they have levels in. The Power cannot be one the character already has. This is just like an additional Tier Power from the class. The Power must be of a Tier they could normally take without using Agile Learner.",
-    "slotGrants": [
+    "slotBestows": [
       {
         "cat": "basic",
         "n": 1
@@ -382,7 +382,7 @@
     "ranks": 2,
     "category": "Martial",
     "description": "The character may choose an additional Adept Tier Power from a non-casting class that they have levels in. The Power cannot be one the character already has. This is just like an additional Tier Power from the class. The Power must be of a Tier they could normally take without using Agile Learner.",
-    "slotGrants": [
+    "slotBestows": [
       {
         "cat": "advanced",
         "n": 1
@@ -396,7 +396,7 @@
     "ranks": 1,
     "category": "Martial",
     "description": "The character may choose an additional Veteran Tier Power from a non-casting class that they have levels in. The Power cannot be one the character already has. This is just like an additional Tier Power from the class. The Power must be of a Tier they could normally take without using Agile Learner.",
-    "slotGrants": [
+    "slotBestows": [
       {
         "cat": "veteran",
         "n": 1
@@ -410,7 +410,7 @@
     "ranks": 2,
     "category": "Martial",
     "description": "The character may choose an additional Utility Power from a non-casting class that they have levels in. This is just like an additional Utility Power from the class.",
-    "slotGrants": [
+    "slotBestows": [
       {
         "cat": "utility",
         "n": 1
@@ -481,7 +481,7 @@
     "category": "Magic",
     "description": "The character chooses one Sphere of magic and gains one additional Novice spell-slot in that Sphere and can use it to cast a Known spell.",
     "parameter": "Sphere",
-    "slotGrants": [
+    "slotBestows": [
       {
         "cat": "novice",
         "n": 1
@@ -496,7 +496,7 @@
     "category": "Magic",
     "description": "The character chooses one Sphere of magic they have an Adept Spell slot for and gains one additional Adept Spell-Slot in that Sphere and can use it to cast a Known spell.",
     "parameter": "Sphere",
-    "slotGrants": [
+    "slotBestows": [
       {
         "cat": "adept",
         "n": 1
@@ -511,7 +511,7 @@
     "category": "Magic",
     "description": "The character chooses one Sphere of magic they have a Greater Spell slot for and gains one additional Greater Spell-Slot in that Sphere and can use it to cast a Known spell.",
     "parameter": "Sphere",
-    "slotGrants": [
+    "slotBestows": [
       {
         "cat": "greater",
         "n": 1
@@ -525,7 +525,7 @@
     "ranks": 4,
     "category": "Magic",
     "description": "The character can choose one additional Cantrip from their class’ Cantrip spell-list. If the character does not have a class spell-list, they may pick any Base Class Cantrip but the Cantrip must be from the same Sphere (Arcane or Divine) as the prerequisite that qualifies them for this skill.",
-    "slotGrants": [
+    "slotBestows": [
       {
         "cat": "cantrips",
         "n": 1
@@ -547,7 +547,7 @@
     "ranks": 12,
     "category": "Magic",
     "description": "The character chooses one spell-casting class in which they have at least 1 Known Spell, and adds 1 to the number of Known Spells that they have access to in that class.",
-    "slotGrants": [
+    "slotBestows": [
       {
         "cat": "spellsKnown",
         "n": 1

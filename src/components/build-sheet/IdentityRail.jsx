@@ -422,8 +422,8 @@ function BudgetMeter() {
   const pct = budget ? Math.min(100, (spend.net / budget) * 100) : 0;
 
   const refundsByClass = {};
-  if (report.multiclassGrants?.freeBPItems) {
-    for (const item of report.multiclassGrants.freeBPItems) {
+  if (report.multiclassBestows?.freeBPItems) {
+    for (const item of report.multiclassBestows.freeBPItems) {
       const clsName = item.source;
       refundsByClass[clsName] = (refundsByClass[clsName] || 0) + item.bp;
     }

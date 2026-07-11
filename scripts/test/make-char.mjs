@@ -11,7 +11,7 @@
 //   makeChar('Cleric 4', { devotion: 'The Mother', add: [{ name: 'Lore', param: 'Religion' }] })
 //
 // `add` items are a bare name, or { name, cls?, param?, cost?, ranks?, source?,
-// field? } for the rare cases the API can't derive (multiclass grantor, a param, an
+// field? } for the rare cases the API can't derive (multiclass bestower, a param, an
 // authored cost). Everything else on the options bag is a scalar the character
 // carries as-is (lineage, devotion, choices, sublineage, agileLearnerTrades, …).
 

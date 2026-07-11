@@ -82,10 +82,10 @@ export {
   basicSpellOptions,
   BASIC_SPELL_SKILLS,
 } from "./validate/slots.js";
-import { resolveCharacterGraph, grantedAbilities } from "./graph.js";
+import { resolveCharacterGraph, bestowedAbilities } from "./graph.js";
 import type { CharacterGraphModel } from "./graph/model.js";
 import { characterPools } from "./pool-registry.js";
-export { grantedAbilities };
+export { bestowedAbilities };
 
 import { costKey } from "./validate/cost-key.js";
 import type { CharacterState } from "./types.js";
@@ -95,10 +95,10 @@ import { CRAFT_DISCIPLINES, CRAFTING_TIERS } from "./config.js";
 
 // Wellspring has three distinct "consequence" kinds, kept separate by design:
 //   1. GRANT-OF-ENTITY — a source gives you a named Perk/Power/Skill for free
-//      ("gains the Magical Resilience Perk"). Edge: REFS.grants/grantedBy. ↓ here.
+//      ("gains the Magical Resilience Perk"). Edge: REFS.bestows/bestowedBy. ↓ here.
 //   2. GRANT-OF-SLOT    — a source gives you an extra slot/pool ("+1 Novice
-//      spell-slot"). Parser-extracted to entity.slotGrants; applied by
-//      slotGrants/spellSlots, not here.
+//      spell-slot"). Parser-extracted to entity.slotBestows; applied by
+//      slotBestows/spellSlots, not here.
 //   3. DISCOUNT         — a source makes other purchases cheaper (Patron, etc.).
 //      Edge: REFS.discounts. Handled by discountSources/applyDiscounts.
 // (We use one word — "grant" — for #1; an earlier draft called it "bestowal".)
@@ -186,11 +186,11 @@ function ownsDivineSubstitution(character: CharacterState) {
 
 // bareSkill helper is now imported from ./resolver.js
 
-// multiclassGrants moved to validate/core.js (the graph emits its `skills` as
+// multiclassBestows moved to validate/core.js (the graph emits its `skills` as
 // owned items; validate() consumes its `freeBP` as a budget derivation). Import
 // for internal use and re-export to preserve the public API.
-import { multiclassGrants } from "./validate/core.js";
-export { multiclassGrants };
+import { multiclassBestows } from "./validate/core.js";
+export { multiclassBestows };
 
 export function classifyOwnedItems(character: CharacterState) {
   // The single resolution site is the CharacterGraph: project its bucketed read
@@ -202,8 +202,8 @@ export function classifyOwnedItems(character: CharacterState) {
   const b = g.uiBuckets;
   const classPowers = [...b.basicPowers, ...b.advancedPowers, ...b.veteranPowers, ...b.utilityPowers, ...b.classPowers];
   const skills = [...b.skills];
-  const mcGrants = multiclassGrants(character).skills;
-  for (const mc of mcGrants) {
+  const mcBestows = multiclassBestows(character).skills;
+  for (const mc of mcBestows) {
     skills.push({
       id: mc.name,
       entityId: `skills:${mc.name}`,
@@ -243,11 +243,11 @@ export function ownedSkillNames(character: CharacterState) {
   // All owned skills (starting + purchased) are CharacterChoice[] in skills[].
   const skillNames = (character.skills || []).map((s) => s.entityId);
   const names = new Set(skillNames.map(bareSkill));
-  for (const g of grantedAbilities(character).list) {
+  for (const g of bestowedAbilities(character).list) {
     if (g.abilityType === "skills") names.add(bareSkill(g.abilityName));
   }
   // Multiclass auto-granted skills count too.
-  for (const s of multiclassGrants(character).skills) names.add(bareSkill(s.name));
+  for (const s of multiclassBestows(character).skills) names.add(bareSkill(s.name));
   return names;
 }
 
@@ -320,8 +320,8 @@ export function computeActiveSelections(graph: CharacterGraphModel, lbp: ReturnT
   const active: (Record<string, string> & { sourceName: string })[] = [];
   const check = (name: string) => {
     const ent = lookupEntity(name);
-    if (ent?.grantedSelections) {
-      for (const gs of ent.grantedSelections) {
+    if (ent?.bestowedSelections) {
+      for (const gs of ent.bestowedSelections) {
         active.push({ ...gs, sourceName: name });
       }
     }
@@ -345,8 +345,8 @@ export function validate(character: CharacterState) {
   // Base budget plus DERIVED "free BP" (redundant multiclass grants award free BP
   // equal to the skill's cost). Derived from the classes, not a cached field, so
   // it's correct for any character (built, imported, or hand-edited).
-  const mcGrants = multiclassGrants(resolved);
-  const freeBP = mcGrants.freeBP;
+  const mcBestows = multiclassBestows(resolved);
+  const freeBP = mcBestows.freeBP;
   // "Approved backstories provide the character with 2 additional BP." Opt-in
   // (plot-team approval), so it's a flag on the character that lifts the base
   // budget by a fixed +2 rather than free spend.
@@ -385,7 +385,7 @@ export function validate(character: CharacterState) {
   const wealth = graph.wealth;
   const devotion = devotionState(resolved);
   const lbp = lbpState(resolved);
-  const granted = grantedAbilities(resolved);
+  const granted = bestowedAbilities(resolved);
   const crafting = craftingCapability(resolved);
   const owned = classifyOwnedItems(resolved);
   // Class "pools" (Healing Touch Pool, Living Iron Pool, …): derived from the
@@ -450,7 +450,7 @@ export function validate(character: CharacterState) {
     budget,
     freeBP,
     backstoryBP,
-    multiclassGrants: mcGrants,
+    multiclassBestows: mcBestows,
     bonusBudget,
     maxBudget,
     _graph: graph,
@@ -471,7 +471,7 @@ export function validate(character: CharacterState) {
     wealth,
     devotion,
     lbp,
-    grantedAbilities: granted,
+    bestowedAbilities: granted,
     crafting,
     owned,
     pools,

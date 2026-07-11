@@ -37,7 +37,7 @@ function reconcileBuildChoices(character: CharacterState) {
     const choiceKey = `powers:${ent.name}`;
     if (choices[choiceKey]) continue; // already recorded — don't override an explicit pick
     for (const opt of ent.chooseOne.options) {
-      const grants = opt.grants || opt.grantsSkills || [];
+      const grants = opt.grants || opt.bestowsSkills || [];
       // The option's DISTINGUISHING grant is its parameterized one; require that it's
       // owned (shared grants like "Two Weapon Style" can't tell options apart).
       const distinguishing = grants.filter((g: string) => key(g).includes("|"));
@@ -72,7 +72,7 @@ export const EMPTY_CHARACTER: CharacterState = {
   ...emptyBuckets(),
   devotions: [],
   advantageChoices: {},
-  grantedSelections: {},
+  bestowedSelections: {},
   agileLearnerTrades: {},
 };
 

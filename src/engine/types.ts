@@ -14,7 +14,7 @@ export type CharacterBuckets = Record<CharacterBucket, CharacterChoice[]>;
 
 // ─── 1. Core Data Models (The Rules) ────────────────────────────────────────
 
-export interface SlotGrant {
+export interface SlotBestow {
   cat: string;
   n: number;
 }
@@ -22,7 +22,7 @@ export interface SlotGrant {
 export interface ChoiceOption {
   text: string;
   grants?: string[];
-  grantsSkill?: boolean;
+  bestowsSkill?: boolean;
 }
 
 export interface ChooseOneConfig {
@@ -63,8 +63,8 @@ export interface BaseEntity {
   ranks?: number | string;
   levelBenefits?: { level: number; text: string }[];
   levelBenefitClass?: string;
-  slotGrants?: SlotGrant[];
-  grantedSelections?: Record<string, string>[];
+  slotBestows?: SlotBestow[];
+  bestowedSelections?: Record<string, string>[];
   highestSlot?: number;
   magicType?: string;
   bp?: number | string; // For flawed abilities that grant bp
@@ -153,7 +153,7 @@ export type EntitySource =
   | { type: "class"; name: string }
   | { type: "starting"; class: string }
   | { type: "innate"; class?: string }
-  | { type: "granted"; by: string }
+  | { type: "bestowed"; by: string }
   | { type: "lineage" }
   | { type: "flaw" };
 
@@ -166,7 +166,7 @@ export const Source = {
   class: (name: string): EntitySource => ({ type: "class", name }),
   starting: (cls: string): EntitySource => ({ type: "starting", class: cls }),
   innate: (cls?: string): EntitySource => ({ type: "innate", ...(cls ? { class: cls } : {}) }),
-  granted: (by: string): EntitySource => ({ type: "granted", by }),
+  bestowed: (by: string): EntitySource => ({ type: "bestowed", by }),
   lineage: (): EntitySource => ({ type: "lineage" }),
   flaw: (): EntitySource => ({ type: "flaw" }),
 };
@@ -186,9 +186,9 @@ export function sourceClass(s: EntitySource | undefined): string | null {
   return null;
 }
 
-/** The granting entity when the source is a grant (else null). */
-export function grantedBy(s: EntitySource | undefined): string | null {
-  return s?.type === "granted" ? s.by : null;
+/** The bestowing entity when the source is a bestowal (else null). */
+export function bestowedBy(s: EntitySource | undefined): string | null {
+  return s?.type === "bestowed" ? s.by : null;
 }
 
 /**
@@ -255,13 +255,13 @@ export interface CharacterState extends CharacterBuckets {
   choices?: Record<string, string>;
   agileLearnerTrades?: Record<string, number>;
   /** Selections made for granted "choose one" powers, keyed by selection id. */
-  grantedSelections?: Record<string, string>;
+  bestowedSelections?: Record<string, string>;
   /** Lineage picks (names). Read directly by the graph's lineage-item resolution. */
   lineageChallenges?: string[];
   lineageAdvantages?: string[];
 }
 
-export interface GrantedAbility {
+export interface BestowedAbility {
   ability: string;
   abilityName: string;
   abilityType: string;
@@ -323,10 +323,10 @@ export interface PrereqReport {
 
 // ─── 3. Graph Types ─────────────────────────────────────────────────────────
 
-/** Why an item is free/discounted (grant provenance) in the BP ledger. */
-export interface BPGrant {
-  kind: string; // 'grant' | …
-  source?: string; // the granting entity/class name
+/** Why an item is free/discounted (bestowal provenance) in the BP ledger. */
+export interface BPBestow {
+  kind: string; // 'bestow' | …
+  source?: string; // the bestowing entity/class name
   derived?: boolean;
   amount?: number;
 }
@@ -334,8 +334,8 @@ export interface BPGrant {
 /** Per-item BP accounting entry (graph.spend.byItem[id]). */
 export interface BPLedgerEntry {
   cost: number; // BP actually charged (negative = award/refund)
-  base: number; // the item's base cost before grants/discounts
-  grant: BPGrant | null;
+  base: number; // the item's base cost before bestowals/discounts
+  bestow: BPBestow | null;
   rank?: number;
   authored?: boolean;
   freeRanks?: number;
@@ -372,12 +372,12 @@ export interface DiscountSpec {
  *  Discriminated on `type` so each variant's payload is statically known. */
 export type Effect =
   | { type: "STAT"; stat: string; amount: number }
-  | { type: "GRANT_SOURCE"; grants: string[] }
+  | { type: "BESTOW_SOURCE"; bestows: string[] }
   | { type: "DISCOUNT_SOURCE"; discount: DiscountSpec }
   | { type: "WEALTH"; amount: number; note?: string }
   | { type: "FLAW_AWARD"; amount: number }
   | { type: "OVER_CAP"; cap: number }
-  | { type: "REFUND_GRANT"; source: string };
+  | { type: "REFUND_BESTOW"; source: string };
 
 export interface GraphItem {
   id: string;
@@ -398,8 +398,8 @@ export interface GraphItem {
   floor?: number;
   choiceData?: CharacterChoice;
   index?: number;
-  grantedBy?: string;
-  grantKind?: string;
+  bestowedBy?: string;
+  bestowKind?: string;
   entityId?: string;
   /** The BP cost accounting for THIS item, computed and attached here (the
    *  spreadsheet row's cost cells) rather than looked up in a separate name-keyed
@@ -417,7 +417,7 @@ export type ViewState = {
   param?: string;
   sourceType: string;
   cls?: string | null;
-  grantedBy?: string;
+  bestowedBy?: string;
   free: boolean;
   cost: number;
   rank: number;

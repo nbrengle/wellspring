@@ -14,7 +14,7 @@
 //   5. Free-BP redundancies    — a grant for something already owned → free BP.
 
 import { validate } from "../src/engine/validate.js";
-import { budgetFor, bonusBudgetFor, computeSpend, grantedAbilities } from "../src/engine/testing.js";
+import { budgetFor, bonusBudgetFor, computeSpend, bestowedAbilities } from "../src/engine/testing.js";
 import { ALL_SKILLS, ALL_PERKS, ALL_FLAWS, REFS, LINEAGES, CLASS_POWERS, lookupEntity } from "../src/engine/data.js";
 import { classPowers, freqMult } from "./effect-score.mjs";
 

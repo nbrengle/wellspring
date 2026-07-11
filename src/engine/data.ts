@@ -193,7 +193,7 @@ export const CLASSES = Object.fromEntries(
       description: c.description,
       startingSkills: c.startingSkills,
       multiclassSkills: c.multiclassSkills,
-      multiclassGrants: c.multiclassGrants || [],
+      multiclassBestows: c.multiclassBestows || [],
       // The parser does not emit class tags today, so this is always empty; a
       // "Martial Classes" prereq that reads it therefore never matches on tags.
       // Kept as a typed seam so that consumer (prereqs) type-checks and lights up
@@ -227,7 +227,7 @@ function powerEntry(p) {
     // re-parsing the description). Keep this list in sync with enrichMechanics.
     statMods: [...(p.statMods ?? []), ...(p.statModNotes ?? [])],
     wealthIncome: p.wealthIncome ?? null,
-    slotGrants: p.slotGrants ?? [],
+    slotBestows: p.slotBestows ?? [],
     highestSlot: p.highestSlot ?? false,
     levelDiscounts: p.levelDiscounts ?? [],
     sharedWith: p.sharedWith ?? [],
@@ -425,7 +425,7 @@ export function lineageItemImpact(item, lineage) {
       out.push(`${m.amount >= 0 ? "+" : ""}${m.amount} ${label}`);
     }
   }
-  for (const g of item.slotGrants || []) {
+  for (const g of item.slotBestows || []) {
     out.push(`+${g.n} ${g.cat} slot${g.n === 1 ? "" : "s"}`);
   }
   if (item.highestSlot) out.push("+1 highest spell-slot");
@@ -433,7 +433,7 @@ export function lineageItemImpact(item, lineage) {
   // Fixed grants (Telekinesis Power, Magical Resilience perk, …).
   const base = item.baseName || item.name;
   const gid = lineage ? `advantages:${lineage} - ${base}` : null;
-  const grants = gid ? REFS.grants?.[gid] || REFS.grants?.[`challenges:${lineage} - ${base}`] : null;
+  const grants = gid ? REFS.bestows?.[gid] || REFS.bestows?.[`challenges:${lineage} - ${base}`] : null;
   for (const tid of grants || []) {
     const ent = lookupEntity(tid);
     out.push(`grants ${ent?.name || idNameLocal(tid)}`);
@@ -466,7 +466,7 @@ type BaseClassJson = {
   isAdvanced?: boolean;
   startingSkills?: string[];
   multiclassSkills?: string[];
-  multiclassGrants?: { name: string; cost: number }[];
+  multiclassBestows?: { name: string; cost: number }[];
   innate?: { name: string; requiredLevel?: number }[];
   classSkills?: string[];
   rightHandPowers?: string[];
@@ -555,7 +555,7 @@ const lineageItem = (it) => ({
   desc: it.description,
   statMods: [...(it.statMods ?? []), ...(it.statModNotes ?? [])],
   wealthIncome: it.wealthIncome ?? null,
-  slotGrants: it.slotGrants ?? [],
+  slotBestows: it.slotBestows ?? [],
   highestSlot: it.highestSlot ?? false,
 });
 
@@ -618,7 +618,8 @@ export interface LbpBonus {
   newMax?: number;
 }
 export interface RefsData {
-  grants: Record<string, string[]>;
+  bestows: Record<string, string[]>;
+  bestowedBy: Record<string, string[]>;
   discounts: Record<string, DiscountSpec>;
   excludes: Record<string, string[]>;
   prereqs: Record<string, { skills?: string[]; anyOf?: string[][]; levels?: string[]; other?: string[] }>;
@@ -747,7 +748,7 @@ for (const c of classesJson) {
 for (const d of domainsJson) for (const p of d.powers || []) powerEntities.push({ ...p, domain: d.name });
 indexEntities(powerEntities, "powers", { typed: true });
 // Lineage advantages AND challenges. Keyed "<type>:<Lineage> - <name>" to match how
-// the rules relations reference them (REFS.grants/discounts) and how ownedGrantSources
+// the rules relations reference them (REFS.bestows/discounts) and how ownedBestowSources
 // builds the id — without this, grant/discount edges, descriptions, and the inspector
 // resolve to nothing. `...item` carries the lineage facets (sublineage, repped,
 // required, lbp, statMods, desc) straight onto the entity so they're browsable/

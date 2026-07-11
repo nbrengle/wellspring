@@ -32,8 +32,8 @@ const validateSrc = readFileSync(join(root, "src", "data", "validate.js"), "utf8
 // it, and how. enforcer:null => we believe NOTHING consumes this relation.
 const RELATION_MAP = {
   prereqs: { enforcer: "checkPrereqs / checkLevelConstraint", countBy: "keys" },
-  grants: { enforcer: "multiclassGrants / grantedAbilities", countBy: "keys" },
-  grantedBy: { enforcer: "(inverse index of grants)", countBy: "keys", mirror: "grants" },
+  grants: { enforcer: "multiclassBestows / bestowedAbilities", countBy: "keys" },
+  bestowedBy: { enforcer: "(inverse index of grants)", countBy: "keys", mirror: "grants" },
   // unlocks is the pre-computed INVERSE of prereqs: every "A unlocks B" pair is
   // exactly mirrored by a "B requires A" prereq (verified: 104/104 pairs). So it
   // carries no independent rule — checkPrereqs already enforces it. It's a UI

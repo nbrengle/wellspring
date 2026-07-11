@@ -486,7 +486,7 @@ const GRANT_RE =
 // build-time bestowal, and must not become a bestowal edge (that wrongly added the
 // sub-power to the caster's owned abilities). Filter sub-power targets out.
 const isSubPower = (entity) => entity?.entityType === "subpower";
-function parseGrants(text, grantLookups) {
+function parseBestowals(text, bestowLookups) {
   if (!text) return [];
   const out = new Set();
   let m;
@@ -494,7 +494,7 @@ function parseGrants(text, grantLookups) {
   while ((m = GRANT_RE.exec(text))) {
     const name = m[1].trim();
     const noun = m[2].toLowerCase(); // perk | power | skill
-    const lookup = grantLookups[noun];
+    const lookup = bestowLookups[noun];
     if (!lookup) continue;
     const { entity } = resolve(name, lookup);
     if (entity && !isSubPower(entity)) out.add(entity.id);
@@ -516,7 +516,7 @@ function parseGrants(text, grantLookups) {
       let matched = false;
       for (const name of candidates) {
         for (const type of ["perk", "skill", "power"]) {
-          const { entity } = resolve(name, grantLookups[type]);
+          const { entity } = resolve(name, bestowLookups[type]);
           if (entity && !isSubPower(entity)) {
             // Preserve a chosen PARAMETER on the grant edge ("Lore: Historical" →
             // "skills:Lore (Historical)") so two parameterized grants of the same
@@ -545,7 +545,7 @@ function parseGrants(text, grantLookups) {
 //
 // Returns { amount, scope, cap, min, refundIfFree, exclusions } or null. Scope is
 // the structured target: { kind: 'giftEligible'|'prereq'|'category'|'firstN', value, n? }.
-function parseDiscounts(text, exclusionLookup, grantLookups, selfName) {
+function parseDiscounts(text, exclusionLookup, bestowLookups, selfName) {
   if (!text) return null;
   // Must actually be a discount source (not just mention the word in flavor). The
   // doc phrases BP discounts as "BP less", "less BP", or — for skills — "point(s)
@@ -609,7 +609,7 @@ function parseDiscounts(text, exclusionLookup, grantLookups, selfName) {
   }
 
   // Fallback: check if the text mentions a specific known skill name (e.g. Poisoner → Apprentice Alchemy)
-  if (!scope && grantLookups) {
+  if (!scope && bestowLookups) {
     const skills = registry.filter((e) => e.type === "skills");
     for (const sk of skills) {
       if (sk.name === selfName) continue;
@@ -802,13 +802,13 @@ for (const id of Object.keys(unlocks)) unlocks[id] = [...new Set(unlocks[id])];
 // discount-source clause. Sources are mainly perks, class features (powers), and
 // lineage advantages. Resolution lookups are type-scoped so "Magical Resilience
 // Perk" resolves against perks, not a same-named power.
-const grantTargetLookups = {
+const bestowTargetLookups = {
   perk: buildLookup(registry.filter((e) => e.type === "perks")),
   power: buildLookup(registry.filter((e) => e.type === "powers")),
   skill: buildLookup(registry.filter((e) => e.type === "skills")),
 };
 // Exclusions ("Strong Bloodline and Inheritance cannot be discounted") name perks.
-const exclusionLookup = grantTargetLookups.perk;
+const exclusionLookup = bestowTargetLookups.perk;
 
 // A few perks modify the Lineage Build Point economy directly: "gain N additional
 // Lineage Build Points … increases the maximum to M" (Strong Bloodline). Capture
@@ -821,22 +821,22 @@ function parseLbpBonus(text) {
   return { extra: parseInt(extraM[1], 10), newMax: maxM ? parseInt(maxM[1], 10) : null };
 }
 
-const grants = {};
-const grantedBy = {};
+const bestows = {};
+const bestowedBy = {};
 const discounts = {};
 const lbpBonuses = {};
 for (const e of registry) {
-  const g = parseGrants(e.body, grantTargetLookups).filter((id) => id !== e.id);
+  const g = parseBestowals(e.body, bestowTargetLookups).filter((id) => id !== e.id);
   if (g.length) {
-    grants[e.id] = g;
-    for (const t of g) (grantedBy[t] = grantedBy[t] || []).push(e.id);
+    bestows[e.id] = g;
+    for (const t of g) (bestowedBy[t] = bestowedBy[t] || []).push(e.id);
   }
-  const d = parseDiscounts(e.body, exclusionLookup, grantTargetLookups, e.name);
+  const d = parseDiscounts(e.body, exclusionLookup, bestowTargetLookups, e.name);
   if (d) discounts[e.id] = d;
   const lb = parseLbpBonus(e.body);
   if (lb) lbpBonuses[e.id] = lb;
 }
-for (const id of Object.keys(grantedBy)) grantedBy[id] = [...new Set(grantedBy[id])];
+for (const id of Object.keys(bestowedBy)) bestowedBy[id] = [...new Set(bestowedBy[id])];
 
 // ─── MUTUAL-EXCLUSION EDGES ───────────────────────────────────────────────────
 // Some perks/flaws are mutually exclusive — "This cannot be taken along with X".
@@ -966,8 +966,8 @@ const result = {
   causedBy,
   prereqs,
   unlocks,
-  grants,
-  grantedBy,
+  bestows,
+  bestowedBy,
   discounts,
   lbpBonuses,
   excludes,
@@ -978,9 +978,9 @@ writeFileSync(join(DATA, "refs.json"), JSON.stringify(result, null, 2));
 
 const totalRefs = Object.values(mentions).reduce((a, r) => a + r.length, 0);
 const totalPrereqEdges = Object.values(prereqs).reduce((a, p) => a + p.skills.length, 0);
-const totalGrants = Object.values(grants).reduce((a, g) => a + g.length, 0);
+const totalBestows = Object.values(bestows).reduce((a, g) => a + g.length, 0);
 console.log(`  ${registry.length} entities, ${totalRefs} body references, ${totalPrereqEdges} prereq edges`);
-console.log(`  ${totalGrants} bestowal edges, ${Object.keys(discounts).length} discount sources`);
+console.log(`  ${totalBestows} bestowal edges, ${Object.keys(discounts).length} discount sources`);
 console.log(`  ${Object.keys(excludes).length} mutual-exclusion entities`);
 if (archetypeDrift.length) {
   console.log(

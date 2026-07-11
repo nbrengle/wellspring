@@ -186,7 +186,7 @@ export function useBuilderHandlers({
   const handleRemoveEntity = coreHandlers.handleRemoveEntity;
   const handleSetRank = coreHandlers.handleSetRank;
   const handleSetSpecialty = coreHandlers.handleSetSpecialty;
-  const handleSetGrantedSelection = coreHandlers.handleSetGrantedSelection;
+  const handleSetBestowedSelection = coreHandlers.handleSetBestowedSelection;
   const handleSetAgileLearnerTrade = coreHandlers.handleSetAgileLearnerTrade;
 
   const classHandlers = useClassHandlers({ setCharacter });
@@ -278,7 +278,7 @@ export function useBuilderHandlers({
     handleToggleLineageItem,
     handleSetLineageRep,
     handleSetAdvantageChoice,
-    handleSetGrantedSelection,
+    handleSetBestowedSelection,
     handleSetAgileLearnerTrade,
     handleStartBlank,
     handleOpenChoicePicker,

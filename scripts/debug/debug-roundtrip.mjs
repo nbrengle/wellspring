@@ -17,12 +17,12 @@ for (const a of ARCHETYPES) {
 
     console.log("--- Original spend by item ---");
     for (const [k, v] of Object.entries(orig.spend.byItem)) {
-      console.log(`  ${k}: cost=${v.cost} (base=${v.base}, grant=${v.grant ? JSON.stringify(v.grant) : "null"})`);
+      console.log(`  ${k}: cost=${v.cost} (base=${v.base}, grant=${v.bestow ? JSON.stringify(v.bestow) : "null"})`);
     }
 
     console.log("--- Parsed spend by item ---");
     for (const [k, v] of Object.entries(rt.spend.byItem)) {
-      console.log(`  ${k}: cost=${v.cost} (base=${v.base}, grant=${v.grant ? JSON.stringify(v.grant) : "null"})`);
+      console.log(`  ${k}: cost=${v.cost} (base=${v.base}, grant=${v.bestow ? JSON.stringify(v.bestow) : "null"})`);
     }
 
     if (orig.spend.discountsApplied.length || rt.spend.discountsApplied.length) {

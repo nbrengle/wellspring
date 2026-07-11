@@ -35,7 +35,7 @@
       "Prospect I (3)",
       "Scavenge I (3)"
     ],
-    "multiclassGrants": [
+    "multiclassBestows": [
       {
         "name": "Basic Martial Weapons",
         "cost": 1
@@ -173,7 +173,7 @@
         "prerequisites": null,
         "skillsAndOptions": null,
         "description": "The Artisan learns an additional Basic Power from the Artisan Class Powers.",
-        "slotGrants": [
+        "slotBestows": [
           {
             "cat": "basic",
             "n": 1
@@ -258,7 +258,7 @@
         "prerequisites": null,
         "skillsAndOptions": null,
         "description": "The Artisan learns an additional Utility Power from the Artisan Class Powers.",
-        "slotGrants": [
+        "slotBestows": [
           {
             "cat": "utility",
             "n": 1
@@ -308,7 +308,7 @@
         "prerequisites": null,
         "skillsAndOptions": null,
         "description": "The Artisan learns an additional Advanced Power from the Artisan Class Powers.",
-        "slotGrants": [
+        "slotBestows": [
           {
             "cat": "advanced",
             "n": 1
@@ -341,19 +341,19 @@
           "options": [
             {
               "text": "Greater Alchemy (5)",
-              "grants": [
+              "bestows": [
                 "Greater Alchemy"
               ]
             },
             {
               "text": "Greater Enchanting (5)",
-              "grants": [
+              "bestows": [
                 "Greater Enchanting"
               ]
             },
             {
               "text": "Greater Tinkering (5)",
-              "grants": [
+              "bestows": [
                 "Greater Tinkering"
               ]
             }
@@ -1450,7 +1450,7 @@
         "prerequisites": null,
         "skillsAndOptions": null,
         "description": "When this power is chosen the Artisan can choose one Basic-Tier Power from any other non-Artisan Base Class. This choice is permanent, and the Power will have the same Incantation, requirements, etc. as it did in the original class. The Power cannot have a Refresh of “Spell”.",
-        "slotGrants": [
+        "slotBestows": [
           {
             "cat": "basic",
             "n": 1
@@ -1458,7 +1458,7 @@
         ],
         "requiredLevel": 1,
         "requiredClass": null,
-        "grantedSelections": [
+        "bestowedSelections": [
           {
             "id": "broad_study_power",
             "type": "power",
@@ -1879,7 +1879,7 @@
         "prerequisites": null,
         "skillsAndOptions": null,
         "description": "Instead of taking an Advanced Power, the Artisan can choose two Basic-tier Powers from the Artisan Base Class with the same Specialty Tag. Choose one of the following: (ie: • Artificer, • Crafter, Mystic).",
-        "slotGrants": [
+        "slotBestows": [
           {
             "cat": "basic",
             "n": 2
@@ -2010,7 +2010,7 @@
         "prerequisites": null,
         "skillsAndOptions": null,
         "description": "The Artisan learns an additional Utility Power from the Artisan Class Powers.",
-        "slotGrants": [
+        "slotBestows": [
           {
             "cat": "utility",
             "n": 1
@@ -2125,7 +2125,7 @@
     "multiclassSkills": [
       "A Vow to the Divine: Basic Faith (4), Worship (1)"
     ],
-    "multiclassGrants": [
+    "multiclassBestows": [
       {
         "name": "Basic Faith",
         "cost": 4
@@ -2429,7 +2429,7 @@
         "prerequisites": null,
         "skillsAndOptions": null,
         "description": "The Cleric learns an additional Cantrip from the Cleric Class Powers or Cantrips.",
-        "slotGrants": [
+        "slotBestows": [
           {
             "cat": "cantrips",
             "n": 1
@@ -3444,7 +3444,7 @@
     "multiclassSkills": [
       "The Voice of the Forest: Basic Faith (4)"
     ],
-    "multiclassGrants": [
+    "multiclassBestows": [
       {
         "name": "Basic Faith",
         "cost": 4
@@ -3788,7 +3788,7 @@
         "prerequisites": null,
         "skillsAndOptions": null,
         "description": "The Druid learns an additional Cantrip from the Druid Class Powers or Cantrips.",
-        "slotGrants": [
+        "slotBestows": [
           {
             "cat": "cantrips",
             "n": 1
@@ -4885,7 +4885,7 @@
     "multiclassSkills": [
       "Combat for the Uninitiated: Basic Martial Weapons (1), Short Weapons (3)"
     ],
-    "multiclassGrants": [
+    "multiclassBestows": [
       {
         "name": "Basic Martial Weapons",
         "cost": 1
@@ -6303,7 +6303,7 @@
         "prerequisites": null,
         "skillsAndOptions": null,
         "description": "The Fighter learns an additional Utility Power from the Fighter Class Powers.",
-        "slotGrants": [
+        "slotBestows": [
           {
             "cat": "utility",
             "n": 1
@@ -6364,7 +6364,7 @@
     "multiclassSkills": [
       "Dabbling in the Arcane: Basic Arcane (4)"
     ],
-    "multiclassGrants": [
+    "multiclassBestows": [
       {
         "name": "Basic Arcane",
         "cost": 4
@@ -6679,7 +6679,7 @@
         "prerequisites": null,
         "skillsAndOptions": null,
         "description": "The Mage learns an additional Cantrip from the Mage Class Powers or Cantrips.",
-        "slotGrants": [
+        "slotBestows": [
           {
             "cat": "cantrips",
             "n": 1
@@ -7749,7 +7749,7 @@
     "multiclassSkills": [
       "The Tools of the Trade: Basic Martial Weapons (1), Thrown Weapons (3)"
     ],
-    "multiclassGrants": [
+    "multiclassBestows": [
       {
         "name": "Basic Martial Weapons",
         "cost": 1
@@ -8271,21 +8271,21 @@
           "options": [
             {
               "text": "Swords",
-              "grants": [
+              "bestows": [
                 "Weapon Specialization - Swords",
                 "Two Weapon Style"
               ]
             },
             {
               "text": "Thrown Weapons",
-              "grants": [
+              "bestows": [
                 "Weapon Specialization - Thrown Weapons",
                 "Two Weapon Style"
               ]
             },
             {
               "text": "Daggers",
-              "grants": [
+              "bestows": [
                 "Weapon Specialization - Daggers",
                 "Two Weapon Style"
               ]
@@ -9073,7 +9073,7 @@
         "prerequisites": null,
         "skillsAndOptions": null,
         "description": "The Rogue learns an additional Utility Power from the Rogue Class Powers.",
-        "slotGrants": [
+        "slotBestows": [
           {
             "cat": "utility",
             "n": 1
@@ -9135,7 +9135,7 @@
     "multiclassSkills": [
       "Finishing School: Lore [Your Choice] (2), Library Use (1), Poisoner (1)"
     ],
-    "multiclassGrants": [
+    "multiclassBestows": [
       {
         "name": "Lore [Your Choice]",
         "cost": 2
@@ -9242,7 +9242,7 @@
         "prerequisites": null,
         "skillsAndOptions": null,
         "description": "The Socialite learns an additional Basic Power from the Socialite Class Powers.",
-        "slotGrants": [
+        "slotBestows": [
           {
             "cat": "basic",
             "n": 1
@@ -10516,7 +10516,7 @@
         "prerequisites": null,
         "skillsAndOptions": null,
         "description": "The Socialite learns an additional Utility Power from the Socialite Class Powers.",
-        "slotGrants": [
+        "slotBestows": [
           {
             "cat": "utility",
             "n": 1
@@ -10901,7 +10901,7 @@
     "multiclassSkills": [
       "The Fundamentals: Basic Arcane (4)"
     ],
-    "multiclassGrants": [
+    "multiclassBestows": [
       {
         "name": "Basic Arcane",
         "cost": 4
@@ -11307,7 +11307,7 @@
         "prerequisites": null,
         "skillsAndOptions": null,
         "description": "The Sourcerer learns an additional Cantrip from the Sourcerer Class Powers or Cantrips.",
-        "slotGrants": [
+        "slotBestows": [
           {
             "cat": "cantrips",
             "n": 1

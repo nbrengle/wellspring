@@ -1241,7 +1241,7 @@
       {
         "entityId": "Magekey",
         "source": {
-          "type": "granted",
+          "type": "bestowed",
           "by": "Bookcaster"
         },
         "costField": "bookSpells"
@@ -1249,7 +1249,7 @@
       {
         "entityId": "Mask Aura",
         "source": {
-          "type": "granted",
+          "type": "bestowed",
           "by": "Bookcaster"
         },
         "costField": "bookSpells"

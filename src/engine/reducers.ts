@@ -136,7 +136,7 @@ export function setParameter(c: Char, field: string, index: number, value: strin
 // ─── slot-pick helpers (powers + spells) ─────────────────────────────────
 // Slot picks (martial powers basic/advanced/veteran/utility AND caster spells
 // cantrips/spells-known/book) are: CharacterChoice[] entries in the
-// `powers` / `spells` bucket, sourced `Source.class(<grantingClass>)` (a slot pick
+// `powers` / `spells` bucket, sourced `Source.class(<bestowingClass>)` (a slot pick
 // is FREE and belongs to the class whose slot it fills — the granting class lives
 // IN the source, replacing the old parallel `powerClass[field]` map). Each entry
 // keeps `costField` = the flat field it came from (e.g. 'basicPowers' /
@@ -256,11 +256,11 @@ export function setRank(c: Char, field: string, index: number, nextRank: number)
   return c;
 }
 
-/** Record a granted-power selection under `grantedSelections[selectionId]`. */
-export function setGrantedSelection(c: Char, selectionId: string, value: string): Char {
+/** Record a bestowed-power selection under `bestowedSelections[selectionId]`. */
+export function setBestowedSelection(c: Char, selectionId: string, value: string): Char {
   return {
     ...c,
-    grantedSelections: { ...(c.grantedSelections || {}), [selectionId]: value },
+    bestowedSelections: { ...(c.bestowedSelections || {}), [selectionId]: value },
   };
 }
 

@@ -1,6 +1,6 @@
 import { useState, useRef, useLayoutEffect, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { grantSourceRole } from "./utils.js";
+import { bestowSourceRole } from "./utils.js";
 
 export function Stat({ label, value, title }) {
   return (
@@ -178,11 +178,11 @@ export function CostBadge({ cost }) {
   if (!cost) return null;
   if (cost.cost < 0) return <span className="b-row-bp is-award">+{-cost.cost} BP</span>;
   if (!(cost.base > 0)) return null;
-  if (cost.cost === 0 && cost.grant?.source) {
-    const role = grantSourceRole(cost.grant);
+  if (cost.cost === 0 && cost.bestow?.source) {
+    const role = bestowSourceRole(cost.bestow);
     return (
-      <span className="b-row-bp is-free" title={`Granted by ${cost.grant.source}${role ? ` (${role})` : ""}`}>
-        free · {cost.grant.source}
+      <span className="b-row-bp is-free" title={`Granted by ${cost.bestow.source}${role ? ` (${role})` : ""}`}>
+        free · {cost.bestow.source}
         {role && <span className="b-row-role"> ({role})</span>}
       </span>
     );

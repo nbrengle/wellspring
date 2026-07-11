@@ -11,7 +11,7 @@ import {
   prereqStatus,
   LEVEL_CAP,
   LEGAL_MIN_LEVEL,
-  grantedAbilities,
+  bestowedAbilities,
   computeSpend,
   getMaxRanks,
   bookcasterSpellOptions,
@@ -96,7 +96,7 @@ test("node.param is structured (parsed once), incl. on grants", () => {
 
   // A GRANT also carries its param (Lessons from Scars → Lore (Historical), (Noble)).
   const g2 = resolveCharacterGraph(makeChar("Fighter 6", { add: ["Lessons from Scars"] }));
-  const granted = g2.filter((n) => n.sourceType === "grant" && /Lore/.test(n.name));
+  const granted = g2.filter((n) => n.sourceType === "bestow" && /Lore/.test(n.name));
   ok(
     granted.length > 0 && granted.every((n) => typeof n.param === "string" && n.param.length > 0),
     "granted Lore nodes carry a structured param: " + JSON.stringify(granted.map((n) => n.param)),
@@ -124,7 +124,7 @@ test("book spells (Bookcaster grant) do not consume spells-known slots", () => {
     classes: [{ name: "Mage", level: 4 }],
     spells: [
       { entityId: "spells:" + nov[0].name, source: Source.class("Mage"), costField: "noviceSpells" },
-      { entityId: "spells:" + nov[1].name, source: Source.granted("Bookcaster"), costField: "bookSpells" },
+      { entityId: "spells:" + nov[1].name, source: Source.bestowed("Bookcaster"), costField: "bookSpells" },
     ],
   };
   const row = computeSlots(c).find((s) => s.category === "spellsKnown");
@@ -208,10 +208,10 @@ test("Agile Learner trades require owning the skill and are capped by its rank",
 });
 
 // ─── multiclass skills ────────────────────────────────────────────────────────
-test("every class has parsed multiclassGrants that resolve to entities", () => {
+test("every class has parsed multiclassBestows that resolve to entities", () => {
   const cleanName = (n) => n.replace(/\s*\([^)]*\)\s*$/, "").trim();
   for (const name of Object.keys(CLASSES)) {
-    const grants = CLASSES[name].multiclassGrants;
+    const grants = CLASSES[name].multiclassBestows;
     ok(grants.length >= 1, `${name} has multiclass grants`);
     for (const g of grants) {
       ok(
@@ -241,7 +241,7 @@ test("multiclass grants are derived (new skills free, redundant → free BP)", (
     },
   );
   const r = validate(c);
-  const granted = r.multiclassGrants.skills.map((g) => g.name);
+  const granted = r.multiclassBestows.skills.map((g) => g.name);
   ok(granted.includes("Thrown Weapons"), "Thrown Weapons granted as new free skill");
   ok(!granted.includes("Basic Martial Weapons"), "redundant BMW not re-granted");
   eq(r.freeBP, 1, "redundant BMW → 1 free BP");

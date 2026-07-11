@@ -72,16 +72,16 @@ export function buildBucketedView(graph: CharacterGraphModel): BucketedView {
 
 function createViewEntry<T extends Entity>(node: GraphItem, expectedType: string): (T | FallbackEntity) & ViewState {
   const isFree =
-    node.sourceType === "grant" ||
+    node.sourceType === "bestow" ||
     node.sourceType === "innate" ||
-    (node.effects && node.effects.some((e) => e.type === "REFUND_GRANT"));
+    (node.effects && node.effects.some((e) => e.type === "REFUND_BESTOW"));
   const paramValue = node.param ?? (node.entity?.parameter || undefined);
   const displayName = paramValue && !node.name.includes(paramValue) ? `${node.name} (${paramValue})` : node.name;
 
-  let grantedBy = node.grantedBy;
-  if (node.sourceType === "grant" && !grantedBy) {
-    const refundEff = node.effects?.find((e) => e.type === "REFUND_GRANT");
-    if (refundEff) grantedBy = refundEff.source;
+  let bestowedBy = node.bestowedBy;
+  if (node.sourceType === "bestow" && !bestowedBy) {
+    const refundEff = node.effects?.find((e) => e.type === "REFUND_BESTOW");
+    if (refundEff) bestowedBy = refundEff.source;
   }
 
   const baseEntity = isEntity<T>(node.entity, expectedType)
@@ -94,11 +94,11 @@ function createViewEntry<T extends Entity>(node: GraphItem, expectedType: string
     entityId: node.entity?.id || node.id,
     param: paramValue,
     sourceType: node.sourceType,
-    grantedBy,
+    bestowedBy,
     free: isFree,
     cost: isFree ? 0 : (node.authoredCost ?? node.baseCost),
     rank: node.rank,
-    index: node.index ?? (node.sourceType === "grant" ? -1 : node.index),
+    index: node.index ?? (node.sourceType === "bestow" ? -1 : node.index),
     cls: node.cls ?? node.entity?.parentClass ?? null,
     effects: node.effects,
     rawString: node.rawString,

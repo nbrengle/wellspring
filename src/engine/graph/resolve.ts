@@ -81,14 +81,14 @@ export function resolveCharacterGraph(charInput: CharacterState): CharacterGraph
 
     // The node model's internal sourceType string, derived from the structured
     // source's `type`. `starting` maps to 'class' (a starting skill was the old
-    // 'Class:Starting' string → sourceType 'class'); `granted` → 'grant'.
+    // 'Class:Starting' string → sourceType 'class'); `bestowed` → 'bestow'.
     const src: EntitySource = choice.source || Source.purchased();
     const SOURCE_TYPE: Record<EntitySource["type"], string> = {
       purchased: "purchased",
       class: "class",
       starting: "class",
       innate: "innate",
-      granted: "grant",
+      bestowed: "bestow",
       lineage: "lineage",
       flaw: "flaw",
     };
@@ -247,8 +247,8 @@ export function resolveCharacterGraph(charInput: CharacterState): CharacterGraph
 
   for (const node of [...items]) {
     for (const eff of node.effects) {
-      if (eff.type !== "GRANT_SOURCE") continue;
-      for (const gid of eff.grants) {
+      if (eff.type !== "BESTOW_SOURCE") continue;
+      for (const gid of eff.bestows) {
         let ent = lookupEntity(gid);
         const gType = gid.slice(0, gid.indexOf(":"));
         const rawGidName = gid.slice(gid.indexOf(":") + 1);
@@ -267,17 +267,17 @@ export function resolveCharacterGraph(charInput: CharacterState): CharacterGraph
         }
 
         // Check if we are at cap with grants + purchases
-        const grantCount = group.nodes.filter((n) => n.sourceType === "grant").length;
+        const bestowCount = group.nodes.filter((n) => n.sourceType === "bestow").length;
         const purchaseCount = group.nodes.filter((n) => n.sourceType === "purchased").length;
 
-        if (grantCount + purchaseCount >= cap) {
+        if (bestowCount + purchaseCount >= cap) {
           // We are at cap. Grant wins, so refund a purchase if one exists
           const purchasedNode = group.nodes.find(
-            (n) => n.sourceType === "purchased" && !n.effects?.some((e) => e.type === "REFUND_GRANT"),
+            (n) => n.sourceType === "purchased" && !n.effects?.some((e) => e.type === "REFUND_BESTOW"),
           );
           if (purchasedNode) {
             purchasedNode.effects = purchasedNode.effects || [];
-            purchasedNode.effects.push({ type: "REFUND_GRANT", source: node.name });
+            purchasedNode.effects.push({ type: "REFUND_BESTOW", source: node.name });
           }
           // At cap: the grant is redundant and is dropped (not added as a node).
           // This is correct for cost — a grant's baseCost is 0, so "free BP equal to
@@ -288,15 +288,15 @@ export function resolveCharacterGraph(charInput: CharacterState): CharacterGraph
           continue;
         }
 
-        const newGrant: GraphItem = {
+        const newBestow: GraphItem = {
           id: ent?.id || gid,
           name: gName,
           rawString: gName,
           param: extractParam(gName),
-          field: `${gType}Grant`,
-          sourceType: "grant",
-          grantedBy: node.name,
-          grantKind: node.sourceType,
+          field: `${gType}Bestow`,
+          sourceType: "bestow",
+          bestowedBy: node.name,
+          bestowKind: node.sourceType,
           cls: node.cls ?? node.entity?.parentClass ?? null,
           rank: 1,
           baseCost: 0,
@@ -306,8 +306,8 @@ export function resolveCharacterGraph(charInput: CharacterState): CharacterGraph
           floor: 0,
           index: -1,
         };
-        items.push(newGrant);
-        group.nodes.push(newGrant);
+        items.push(newBestow);
+        group.nodes.push(newBestow);
       }
     }
   }

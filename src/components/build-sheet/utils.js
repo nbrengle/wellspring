@@ -52,15 +52,15 @@ export function statTitle(stats, key, label) {
   return `${label}: ${base ? `${base} base ` : ""}${parts.join(", ")}`;
 }
 
-export function grantSourceRole(grant) {
-  if (!grant?.source) return null;
-  if (grant.sourceRole) {
-    return grant.sourceRole.replace(/\b\w/g, (c) => c.toUpperCase());
+export function bestowSourceRole(bestow) {
+  if (!bestow?.source) return null;
+  if (bestow.sourceRole) {
+    return bestow.sourceRole.replace(/\b\w/g, (c) => c.toUpperCase());
   }
   const ent =
-    lookupEntity(`powers:${grant.source}`) ||
-    lookupEntity(`skills:${grant.source}`) ||
-    lookupEntity(`perks:${grant.source}`);
+    lookupEntity(`powers:${bestow.source}`) ||
+    lookupEntity(`skills:${bestow.source}`) ||
+    lookupEntity(`perks:${bestow.source}`);
   if (!ent) return null;
   if (ent.type === "power") return `${ent.tier || ""} Power`.trim();
   if (ent.type === "spell") return `${ent.tier || ""} Spell`.trim();
