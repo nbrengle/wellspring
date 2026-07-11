@@ -12,7 +12,7 @@ import type {
 } from "../types.js";
 import type { CharacterGraphModel } from "./model.js";
 
-function isEntity<T extends Entity>(entity: Entity | null | undefined, type: string): entity is T {
+function isEntity<T extends Entity>(entity: Entity | null, type: string): entity is T {
   return entity?.type === type;
 }
 export function buildBucketedView(graph: CharacterGraphModel): BucketedView {

@@ -33,6 +33,15 @@ export interface ChooseOneConfig {
 
 export type StatMod = { stat: string; amount: number } | { stat: string; text: string };
 
+/** How many times an entity can be taken: a finite cap, or genuinely unbounded.
+ *  "unlimited" skills are instance-based ("Skill xN" = N distinct subjects, not rank
+ *  N; see UNLIMITED_SKILLS). Read the cap with `rankCap()` rather than switching on
+ *  the union inline. */
+export type Rank = number | "unlimited";
+
+/** The numeric cap of a Rank — Infinity when unbounded. */
+export const rankCap = (r: Rank | undefined): number => (r === "unlimited" ? Infinity : (r ?? 1));
+
 // ─── Discriminated Union for Entities ───────────────────────────────────────
 
 export interface BaseEntity {
@@ -61,19 +70,19 @@ export interface BaseEntity {
   requiresEntity?: string[];
 
   // Parsed loose JSON fields across various entities
-  ranks?: number | string;
+  /** How many times the entity can be taken — see Rank. Read via rankCap(). */
+  ranks?: Rank;
   levelBenefits?: { level: number; text: string }[];
   levelBenefitClass?: string;
   slotBestows?: SlotBestow[];
   bestowedSelections?: Record<string, string>[];
   highestSlot?: number;
   magicType?: string;
-  bp?: number | string; // For flawed abilities that grant bp
   effect?: string;
   call?: string;
   /** BP cost, when the entity carries one directly (skills/perks; also lineage
    *  entities via `lbp`). Skill/Perk redeclare `cost` as required. */
-  cost?: number | string;
+  cost?: number;
   /** Lineage BP cost — attached to advantage/challenge entities by the data layer. */
   lbp?: number;
   chooseOne?: ChooseOneConfig;
@@ -83,7 +92,7 @@ export interface BaseEntity {
 
 export interface Skill extends BaseEntity {
   type: "skill";
-  cost: number | string;
+  cost: number;
   category?: string; // e.g. "Martial", "Crafting"
   stats?: StatMod[];
 }
@@ -112,13 +121,18 @@ export interface SubPower extends BaseEntity {
 
 export interface Perk extends BaseEntity {
   type: "perk";
-  cost: number | string;
+  cost: number;
   category?: string;
 }
 
 export interface Flaw extends BaseEntity {
   type: "flaw";
-  award: number | string;
+  /** BP the flaw awards — the numeric floor the BP math uses. A variable award
+   *  ("1 or 2") is resolved elsewhere (allergies from ALLERGEN_AWARDS, per
+   *  substance); `bpLabel` carries the human-readable range for display. */
+  bp: number;
+  /** The award as written ("1 or 2"), when it differs from the numeric floor. */
+  bpLabel?: string;
   category?: string;
 }
 
@@ -437,7 +451,7 @@ export interface GraphItem {
   rank: number;
   baseCost: number;
   authoredCost?: number;
-  entity?: Entity | null;
+  entity: Entity | null;
   effects: Effect[];
   specialty?: string | null;
   floor?: number;

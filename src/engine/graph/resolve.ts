@@ -215,8 +215,8 @@ export function resolveCharacterGraph(charInput: CharacterState): CharacterGraph
       if (allergenTable) {
         const chosen = allergenAward(allergenBase, param);
         bp = chosen != null ? chosen : Math.min(...Object.values(allergenTable));
-      } else {
-        bp = typeof ent.bp === "number" ? ent.bp : parseInt(String(ent.bp), 10) || 0;
+      } else if (ent.type === "flaw") {
+        bp = ent.bp;
       }
     }
     items.push({
@@ -235,7 +235,7 @@ export function resolveCharacterGraph(charInput: CharacterState): CharacterGraph
     });
   }
 
-  const getIdentity = (rawName: string, ent: Entity | null | undefined, param?: string | null) => {
+  const getIdentity = (rawName: string, ent: Entity | null, param?: string | null) => {
     const clean = cleanItemName(rawName);
     const entityId = ent?.id || rawName;
     const cap = getMaxRanks(entityId);

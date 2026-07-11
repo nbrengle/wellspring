@@ -11,7 +11,7 @@ import {
 } from "../data.js";
 import { cleanItemName, bareSkill, getClasses } from "../resolver.js";
 import type { CharacterState, ProgressionRow } from "../types.js";
-import { sourceClass, Entity } from "../types.js";
+import { sourceClass, Entity, rankCap } from "../types.js";
 
 import { MAX_LBP, MAX_FLAW_BP, BACKSTORY_BP, MAX_DOMAINS, DEFAULT_WEALTH, LEVEL_CAP } from "../config.js";
 
@@ -53,17 +53,10 @@ export function getMaxRanks(entityId: string): number {
   if (!ent) return 1;
   // One field for "how many times can this be taken": `ranks`, uniform across
   // skills, perks, and powers (powers used to call it `maxRanks`).
-  const maxR = ent.ranks;
-  if (maxR === "unlimited") return Infinity;
-  if (typeof maxR === "number") return maxR;
-  if (typeof maxR === "string") {
-    const val = parseInt(maxR, 10);
-    if (!isNaN(val)) return val;
-  }
-  return 1;
+  return rankCap(ent.ranks);
 }
 
-export function requiredLevel(power: Entity | null | undefined) {
+export function requiredLevel(power: Entity | null) {
   return power?.requiredLevel ?? 0;
 }
 // (pickClass removed — a slot power's granting class now lives in its structured
@@ -119,7 +112,7 @@ export function progressionRow(cls: string, level: number): ProgressionRow {
 // Active innate powers for the character: class-innate powers whose level
 // requirements are met. (In CharacterState, user-added innates are just in `powers` with source `BestowedBy:Innate`)
 export function activeInnatePowers(character: CharacterState) {
-  const list: { name: string; entity: Entity | undefined; cls: string; source: string }[] = [];
+  const list: { name: string; entity: Entity | null; cls: string; source: string }[] = [];
   const seen = new Set();
 
   for (const { name: cls, level } of getClasses(character)) {
@@ -129,7 +122,7 @@ export function activeInnatePowers(character: CharacterState) {
         const cleanName = cleanItemName(p.name);
         if (!seen.has(cleanName)) {
           seen.add(cleanName);
-          list.push({ name: p.name, entity: lookupEntity(p.name) || undefined, cls, source: "class" });
+          list.push({ name: p.name, entity: lookupEntity(p.name), cls, source: "class" });
         }
       }
     }
