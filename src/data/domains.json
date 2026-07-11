@@ -7,6 +7,7 @@
     "powers": [
       {
         "name": "The Path Less Travelled",
+        "type": "power",
         "tier": null,
         "cost": 1,
         "incantation": null,
@@ -22,6 +23,7 @@
       },
       {
         "name": "Disruption",
+        "type": "power",
         "tier": "Adept",
         "cost": 2,
         "incantation": "“Calling upon chaos unbounded, I leave my foe lost and confounded”",
@@ -37,6 +39,7 @@
       },
       {
         "name": "Dissolution",
+        "type": "power",
         "tier": null,
         "cost": 2,
         "incantation": null,
@@ -60,6 +63,7 @@
     "powers": [
       {
         "name": "Inspired Hands",
+        "type": "power",
         "tier": null,
         "cost": 1,
         "incantation": null,
@@ -75,6 +79,7 @@
       },
       {
         "name": "Waste Not",
+        "type": "power",
         "tier": null,
         "cost": 3,
         "incantation": null,
@@ -90,6 +95,7 @@
       },
       {
         "name": "Spontaneous Creation",
+        "type": "power",
         "tier": null,
         "cost": 2,
         "incantation": null,
@@ -113,6 +119,7 @@
     "powers": [
       {
         "name": "Death Pact",
+        "type": "power",
         "tier": null,
         "cost": 3,
         "incantation": null,
@@ -128,6 +135,7 @@
       },
       {
         "name": "The Balance of Life",
+        "type": "power",
         "tier": null,
         "cost": 4,
         "incantation": "I call my faith, divine and right, to knit your wounds with dying light.",
@@ -143,6 +151,7 @@
       },
       {
         "name": "Purposed to Death",
+        "type": "power",
         "tier": null,
         "cost": 1,
         "incantation": null,
@@ -166,6 +175,7 @@
     "powers": [
       {
         "name": "Dissolve",
+        "type": "power",
         "tier": null,
         "cost": 4,
         "incantation": null,
@@ -181,6 +191,7 @@
       },
       {
         "name": "Pyrrhic Strike",
+        "type": "power",
         "tier": null,
         "cost": 2,
         "incantation": null,
@@ -204,6 +215,7 @@
     "powers": [
       {
         "name": "Energistic Specialization",
+        "type": "power",
         "tier": null,
         "cost": 1,
         "incantation": null,
@@ -219,6 +231,7 @@
       },
       {
         "name": "Overflowing Energy",
+        "type": "power",
         "tier": null,
         "cost": 3,
         "incantation": null,
@@ -234,6 +247,7 @@
       },
       {
         "name": "Energistic Adaptation",
+        "type": "power",
         "tier": null,
         "cost": 2,
         "incantation": null,
@@ -257,6 +271,7 @@
     "powers": [
       {
         "name": "Emotional Attunement",
+        "type": "power",
         "tier": null,
         "cost": 1,
         "incantation": null,
@@ -272,6 +287,7 @@
       },
       {
         "name": "Divine Performance",
+        "type": "power",
         "tier": null,
         "cost": 2,
         "incantation": "RP - artistic expression (see description)",
@@ -287,6 +303,7 @@
       },
       {
         "name": "Poetry in Motion",
+        "type": "power",
         "tier": null,
         "cost": 2,
         "incantation": null,
@@ -310,6 +327,7 @@
     "powers": [
       {
         "name": "Expanded Healing",
+        "type": "power",
         "tier": null,
         "cost": 2,
         "incantation": null,
@@ -325,6 +343,7 @@
       },
       {
         "name": "Sworn to Life",
+        "type": "power",
         "tier": null,
         "cost": 4,
         "incantation": null,
@@ -340,6 +359,7 @@
       },
       {
         "name": "Lifeline",
+        "type": "power",
         "tier": null,
         "cost": 3,
         "incantation": null,
@@ -363,6 +383,7 @@
     "powers": [
       {
         "name": "No Stone Unturned",
+        "type": "power",
         "tier": null,
         "cost": 3,
         "incantation": null,
@@ -378,6 +399,7 @@
       },
       {
         "name": "Bring Light to the Shadows",
+        "type": "power",
         "tier": null,
         "cost": 3,
         "incantation": null,
@@ -393,6 +415,7 @@
       },
       {
         "name": "Pulse of Light",
+        "type": "power",
         "tier": null,
         "cost": 1,
         "incantation": null,
@@ -416,6 +439,7 @@
     "powers": [
       {
         "name": "Well Read",
+        "type": "power",
         "tier": null,
         "cost": 1,
         "incantation": null,
@@ -431,6 +455,7 @@
       },
       {
         "name": "Arcane Secrets",
+        "type": "power",
         "tier": null,
         "cost": 3,
         "incantation": null,
@@ -446,6 +471,7 @@
       },
       {
         "name": "Divine Symposium",
+        "type": "power",
         "tier": null,
         "cost": 2,
         "incantation": null,
@@ -469,6 +495,7 @@
     "powers": [
       {
         "name": "Mind Wipe",
+        "type": "power",
         "tier": null,
         "cost": 3,
         "incantation": "RP - Focus Slow 300",
@@ -484,6 +511,7 @@
       },
       {
         "name": "Subtlety",
+        "type": "power",
         "tier": null,
         "cost": 3,
         "incantation": null,
@@ -499,6 +527,7 @@
       },
       {
         "name": "Dominating Presence",
+        "type": "power",
         "tier": null,
         "cost": 2,
         "incantation": "RP - friendly conversation with a target for Slow 60",
@@ -522,6 +551,7 @@
     "powers": [
       {
         "name": "Nature’s Form",
+        "type": "power",
         "tier": null,
         "cost": 2,
         "incantation": null,
@@ -537,6 +567,7 @@
       },
       {
         "name": "Moving Grove",
+        "type": "power",
         "tier": null,
         "cost": 3,
         "incantation": null,
@@ -552,6 +583,7 @@
       },
       {
         "name": "Tree Teleport",
+        "type": "power",
         "tier": null,
         "cost": 3,
         "incantation": null,
@@ -575,6 +607,7 @@
     "powers": [
       {
         "name": "Orderly Conduct",
+        "type": "power",
         "tier": null,
         "cost": 2,
         "incantation": null,
@@ -590,6 +623,7 @@
       },
       {
         "name": "Create Compact",
+        "type": "power",
         "tier": null,
         "cost": 1,
         "incantation": null,
@@ -613,6 +647,7 @@
     "powers": [
       {
         "name": "Non-Aggression Pact",
+        "type": "power",
         "tier": null,
         "cost": 1,
         "incantation": "RP - 1 minute of forming truce",
@@ -628,6 +663,7 @@
       },
       {
         "name": "Sworn to Peace",
+        "type": "power",
         "tier": null,
         "cost": 3,
         "incantation": null,
@@ -643,6 +679,7 @@
       },
       {
         "name": "Aura of Peace",
+        "type": "power",
         "tier": null,
         "cost": 1,
         "incantation": null,
@@ -666,6 +703,7 @@
     "powers": [
       {
         "name": "Protection Mastery",
+        "type": "power",
         "tier": null,
         "cost": 4,
         "incantation": null,
@@ -681,6 +719,7 @@
       },
       {
         "name": "Selfless",
+        "type": "power",
         "tier": null,
         "cost": 4,
         "incantation": null,
@@ -696,6 +735,7 @@
       },
       {
         "name": "Unbreakable",
+        "type": "power",
         "tier": null,
         "cost": 3,
         "incantation": null,
@@ -719,6 +759,7 @@
     "powers": [
       {
         "name": "Slippery Tongue",
+        "type": "power",
         "tier": null,
         "cost": 1,
         "incantation": null,
@@ -734,6 +775,7 @@
       },
       {
         "name": "Shadow Step",
+        "type": "power",
         "tier": null,
         "cost": 4,
         "incantation": null,
@@ -749,6 +791,7 @@
       },
       {
         "name": "Broodlord",
+        "type": "power",
         "tier": null,
         "cost": 3,
         "incantation": null,
@@ -772,6 +815,7 @@
     "powers": [
       {
         "name": "Severing Strikes",
+        "type": "power",
         "tier": null,
         "cost": 3,
         "incantation": null,
@@ -787,6 +831,7 @@
       },
       {
         "name": "Death to Cowards",
+        "type": "power",
         "tier": null,
         "cost": 3,
         "incantation": null,
@@ -802,6 +847,7 @@
       },
       {
         "name": "Violent Posturing",
+        "type": "power",
         "tier": null,
         "cost": 3,
         "incantation": null,

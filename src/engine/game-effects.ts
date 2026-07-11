@@ -19,7 +19,7 @@ const stripType = (t: string) => t.slice(t.indexOf(":") + 1);
 function mentionRefs(entityType: string | null | undefined, name: string): string[] {
   const order: string[] = [];
   if (entityType) order.push(`${entityType}:${name}`);
-  for (const t of ["powers", "perks", "flaws", "skills", "challenges", "advantages"]) {
+  for (const t of ["powers", "spells", "perks", "flaws", "skills", "challenges", "advantages"]) {
     const k = `${t}:${name}`;
     if (!order.includes(k)) order.push(k);
   }
