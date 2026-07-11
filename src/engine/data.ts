@@ -228,8 +228,7 @@ function powerEntry(p) {
     ranks: p.ranks ?? 1,
     // Parser-extracted structured mechanics (read by the validator instead of
     // re-parsing the description). Keep this list in sync with enrichMechanics.
-    statMods: p.statMods ?? [],
-    statModNotes: p.statModNotes ?? [],
+    statMods: [...(p.statMods ?? []), ...(p.statModNotes ?? [])],
     wealthIncome: p.wealthIncome ?? null,
     slotGrants: p.slotGrants ?? [],
     highestSlot: p.highestSlot ?? false,
@@ -422,11 +421,12 @@ export function lineageItemImpact(item, lineage) {
 
   const out: string[] = [];
   for (const m of item.statMods || []) {
-    const label = STAT_LABELS[m.stat] || m.stat;
-    out.push(`${m.amount >= 0 ? "+" : ""}${m.amount} ${label}`);
-  }
-  for (const note of item.statModNotes || []) {
-    if (note?.text) out.push(note.text);
+    if ("text" in m && m.text) {
+      out.push(m.text);
+    } else if ("amount" in m) {
+      const label = STAT_LABELS[m.stat] || m.stat;
+      out.push(`${m.amount >= 0 ? "+" : ""}${m.amount} ${label}`);
+    }
   }
   for (const g of item.slotGrants || []) {
     out.push(`+${g.n} ${g.cat} slot${g.n === 1 ? "" : "s"}`);
@@ -532,8 +532,7 @@ const lineageItem = (it) => ({
   repped: it.repped,
   sublineage: it.sublineage,
   desc: it.description,
-  statMods: it.statMods ?? [],
-  statModNotes: it.statModNotes ?? [],
+  statMods: [...(it.statMods ?? []), ...(it.statModNotes ?? [])],
   wealthIncome: it.wealthIncome ?? null,
   slotGrants: it.slotGrants ?? [],
   highestSlot: it.highestSlot ?? false,

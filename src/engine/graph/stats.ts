@@ -4,18 +4,19 @@ import type { CharacterGraphModel } from "./model.js";
 export function computeStats(graph: CharacterGraphModel) {
   const mods: Record<string, number> = { lifePoints: 0, spikes: 0, naturalArmor: 0, armor: 0 };
   const sources: { name: string; stat: string; n: number }[] = [];
-  const notes: { name: string; stat: string; [k: string]: unknown }[] = [];
+  const notes: { name: string; stat: string; text: string }[] = [];
 
-  const apply = (name: string, ent: Pick<BaseEntity, "statMods" | "statModNotes"> | undefined) => {
+  const apply = (name: string, ent: Pick<BaseEntity, "statMods"> | undefined) => {
     if (!ent) return;
-    for (const { stat, amount } of ent.statMods || []) {
-      if (amount !== 0) {
-        mods[stat] = (mods[stat] || 0) + amount;
-        sources.push({ name, stat, n: amount });
+    for (const mod of ent.statMods || []) {
+      if ("amount" in mod) {
+        if (mod.amount !== 0) {
+          mods[mod.stat] = (mods[mod.stat] || 0) + mod.amount;
+          sources.push({ name, stat: mod.stat, n: mod.amount });
+        }
+      } else if ("text" in mod) {
+        notes.push({ name, ...mod });
       }
-    }
-    for (const note of ent.statModNotes || []) {
-      notes.push({ name, ...note });
     }
   };
 
@@ -26,9 +27,11 @@ export function computeStats(graph: CharacterGraphModel) {
         sources.push({ name: node.name, stat: eff.stat, n: eff.amount });
       }
     }
-    if (node.entity?.statModNotes) {
-      for (const note of node.entity.statModNotes) {
-        notes.push({ name: node.name, ...note });
+    if (node.entity?.statMods) {
+      for (const mod of node.entity.statMods) {
+        if ("text" in mod) {
+          notes.push({ name: node.name, ...mod });
+        }
       }
     }
   }
