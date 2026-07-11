@@ -15,6 +15,7 @@
 import type { CharacterState, CharacterChoice, CharacterBucket, EntitySource, Entity } from "./types.js";
 import { Source } from "./types.js";
 import { lookupEntity } from "./data.js";
+import { stripParam } from "./graph/model.js";
 import { getClasses } from "./resolver.js";
 
 // tier (e.g. 'Basic') → the costField that keys its BP-ledger prefix ('basicPowers').
@@ -86,7 +87,7 @@ const SPELL_FIELDS = new Set(["cantrips", "spellsKnown", "noviceSpells", "adeptS
  *  player buys is purchased. Callers override via opts.source for starting/innate/
  *  granted provenance. */
 function deriveSource(ent: Entity | null, cls: string | undefined): EntitySource {
-  const tier = ent?.tier;
+  const tier = ent?.type === "power" || ent?.type === "spell" || ent?.type === "subpower" ? ent.tier : undefined;
   // Caster slot spells (cantrips + spells-known) are class-sourced (free).
   if (isSpellEntity(ent)) return Source.class(cls || "");
   if (ent?.type === "power") {
@@ -106,7 +107,7 @@ function deriveSource(ent: Entity | null, cls: string | undefined): EntitySource
  *  key by their own bucket, so they get no costField. Callers override via
  *  opts.costField for classPowers/domainPowers/bookSpells. */
 function deriveCostField(ent: Entity | null): string | undefined {
-  const tier = ent?.tier;
+  const tier = ent?.type === "power" || ent?.type === "spell" || ent?.type === "subpower" ? ent.tier : undefined;
   if (isSpellEntity(ent)) return (tier && SPELL_TIER_FIELD[tier]) || "noviceSpells";
   if (ent?.type === "power") {
     if (tier === "Innate") return "innatePowers";
@@ -183,10 +184,18 @@ export interface ParsedItem {
  *  doesn't itself carry. Downstream never re-does this: it reads `choice.entityId` (bare)
  *  and `choice.parameter`. A name that doesn't resolve is stored verbatim, no parameter. */
 export function splitEntityParam(name: string): { entityId: string; parameter?: string } {
-  const ent = lookupEntity(name);
-  if (!ent?.id) return { entityId: name };
+  // Always strip parens to find the base entity name (do NOT strip hyphens, as they are part of the entity id)
+  const strippedName = name.replace(/\s*\([^)]*\)\s*$/, "").trim();
+  const ent = lookupEntity(strippedName);
+
+  if (!ent?.id) {
+    // If it STILL doesn't resolve, just try to regex the param out anyway, fallback to strippedName
+    const m = name.match(/\(([^)]+)\)\s*$/);
+    return m ? { entityId: strippedName, parameter: m[1].trim() } : { entityId: name };
+  }
+
   const entityId = ent.id.replace(/^[a-z]+:/i, ""); // canonical bare entity ("Lore")
-  if (name === entityId) return { entityId }; // no parameter
+  if (name === entityId || name === strippedName) return { entityId }; // no parameter
   const m = name.match(/\(([^)]+)\)\s*$/); // trailing "(value)" the base name lacks
   return m ? { entityId, parameter: m[1].trim() } : { entityId };
 }
@@ -220,18 +229,19 @@ export function addToCharacter(char: CharacterState, name: string, opts: AddOpts
   // otherwise derive from the entity (spells are powers with a caster tier).
   const bucket = opts.field && SPELL_FIELDS.has(opts.field) ? "spells" : bucketOf(ent);
 
-  const cls = opts.cls ?? ent?.parentClass ?? (getClasses(char).length === 1 ? getClasses(char)[0].name : undefined);
+  const cls =
+    opts.cls ??
+    (ent?.type === "power" || ent?.type === "skill" ? ent.parentClass : undefined) ??
+    (getClasses(char).length === 1 ? getClasses(char)[0].name : undefined);
 
-  // Parametrization is a FIELD, never concatenated into the id. A caller passes the
-  // param either as opts.param OR embedded in the name ("Lore (Historical)") — split
-  // the name structurally and let an explicit opts.param win.
-  const split = splitEntityParam(name);
-  const parameter = opts.param ?? split.parameter;
+  // Parametrization is a FIELD. A caller passes the param either as opts.param
+  // or it was already split out before calling this API.
+  const parameter = opts.param;
   const source = opts.source ?? deriveSource(ent, cls);
   const costField = opts.costField ?? opts.field ?? deriveCostField(ent);
 
   const choice: CharacterChoice = {
-    entityId: split.entityId,
+    entityId: name,
     source,
     ranks: opts.ranks ?? 1,
     ...(costField ? { costField } : {}),

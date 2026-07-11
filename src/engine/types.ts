@@ -46,12 +46,6 @@ export interface BaseEntity {
   description?: string;
   prereq?: string;
   category?: string;
-  /** Tier label (Basic/Advanced/…/SubPower) — on powers/spells, but read broadly. */
-  tier?: string;
-  /** Rank tiers (each may gate on a character level), for tiered perks/skills. */
-  tiers?: { cost?: number; level?: number }[];
-  /** The class this belongs to (powers/class skills). */
-  parentClass?: string;
   /** Parser-extracted stat modifiers + free-text stat notes. */
   statMods?: StatMod[];
 
@@ -61,21 +55,6 @@ export interface BaseEntity {
   requiresEntity?: string[];
 
   // Parsed loose JSON fields across various entities
-  ranks?: number | string;
-  levelBenefits?: { level: number; text: string }[];
-  levelBenefitClass?: string;
-  slotBestows?: SlotBestow[];
-  bestowedSelections?: Record<string, string>[];
-  highestSlot?: number;
-  magicType?: string;
-  bp?: number | string; // For flawed abilities that grant bp
-  effect?: string;
-  call?: string;
-  /** BP cost, when the entity carries one directly (skills/perks; also lineage
-   *  entities via `lbp`). Skill/Perk redeclare `cost` as required. */
-  cost?: number | string;
-  /** Lineage BP cost — attached to advantage/challenge entities by the data layer. */
-  lbp?: number;
   chooseOne?: ChooseOneConfig;
   levelDiscounts?: { atLevel: number; amount: number; pool?: string; category?: string; skill?: string }[];
   wealthIncome?: { n: number; kind: string; skill?: string };
@@ -83,22 +62,38 @@ export interface BaseEntity {
 
 export interface Skill extends BaseEntity {
   type: "skill";
-  cost: number | string;
+  cost: number;
   category?: string; // e.g. "Martial", "Crafting"
   stats?: StatMod[];
+  ranks?: number;
+  unlimitedRanks?: boolean;
+  tiers?: { cost?: number; level?: number }[];
+  parentClass?: string;
 }
 
 export interface Power extends BaseEntity {
   type: "power";
-  tier: "Basic" | "Advanced" | "Veteran" | "Utility" | "Class";
+  tier: "Innate" | "Basic" | "Advanced" | "Veteran" | "Utility" | "Class";
   parentClass?: string;
   parameter?: string; // E.g. (Swords)
+  cost?: number;
+  ranks?: number;
+  unlimitedRanks?: boolean;
+  tiers?: { cost?: number; level?: number }[];
+  effect?: string;
+  call?: string;
 }
 
 export interface Spell extends BaseEntity {
   type: "spell";
   tier: "Cantrip" | "Novice" | "Adept" | "Greater";
   sphere: string; // e.g. "Arcane", "Divine"
+  magicType?: string;
+  cost?: number;
+  ranks?: number;
+  unlimitedRanks?: boolean;
+  effect?: string;
+  call?: string;
 }
 
 // A granted ability conferred by a power/spell ("Grant Power: Curious Balm") — never
@@ -108,34 +103,51 @@ export interface Spell extends BaseEntity {
 export interface SubPower extends BaseEntity {
   type: "subpower";
   tier: "SubPower";
+  ranks?: number;
+  effect?: string;
+  call?: string;
 }
 
 export interface Perk extends BaseEntity {
   type: "perk";
-  cost: number | string;
+  cost: number;
   category?: string;
+  ranks?: number;
+  unlimitedRanks?: boolean;
+  tiers?: { cost?: number; level?: number }[];
 }
 
 export interface Flaw extends BaseEntity {
   type: "flaw";
-  award: number | string;
+  award: number;
   category?: string;
+  bp?: number;
+  ranks?: number;
+  unlimitedRanks?: boolean;
 }
 
 export interface Class extends BaseEntity {
   type: "class";
   innate?: { name: string; requiredLevel?: number }[];
   spellcaster?: boolean;
+  magicType?: string;
+  levelBenefits?: { level: number; text: string }[];
+  levelBenefitClass?: string;
+  slotBestows?: SlotBestow[];
+  bestowedSelections?: Record<string, string>[];
+  highestSlot?: number;
 }
 
 export interface Advantage extends BaseEntity {
   type: "advantage";
   lineage?: string;
+  lbp?: number;
 }
 
 export interface Challenge extends BaseEntity {
   type: "challenge";
   lineage?: string;
+  lbp?: number;
 }
 
 /**
@@ -304,7 +316,7 @@ export interface ResolvedStats {
     spikes?: number;
     armor?: number;
     naturalArmor?: number;
-    sources: { name: string; stat: string; n: number }[];
+    sources: { name: string; stat: string; amount: number }[];
     notes: { name: string; stat: string; text: string }[];
   };
 }

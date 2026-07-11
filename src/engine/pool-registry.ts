@@ -54,7 +54,9 @@ const poolById = new Map(POOLS.map((p) => [p.id, p]));
 export const getPool = (id: string): PoolDef | undefined => poolById.get(id);
 
 const textOf = (e: Entity | null | undefined): string =>
-  [e?.description, e?.effect, e?.call].filter(Boolean).join("  ");
+  [e?.description, e && "effect" in e ? e.effect : undefined, e && "call" in e ? e.call : undefined]
+    .filter(Boolean)
+    .join("  ");
 
 /** Which pool(s) does this entity's text reference? Returns pool ids. */
 export function poolsReferenced(entity: Entity | null | undefined): string[] {
@@ -210,7 +212,9 @@ export function characterPools(owned: OwnedLike[], classLevelOf: (className: str
     const definer = resolved.find((r) => r.owned.name === pool.definedBy);
     if (!definer) continue;
 
-    const classLevel = classLevelOf((definer.ent as Entity | undefined)?.parentClass || definer.owned.cls || "") || 1;
+    const ent = definer.ent as Entity | undefined;
+    const parentClass = ent && "parentClass" in ent ? ent.parentClass : undefined;
+    const classLevel = classLevelOf(parentClass || definer.owned.cls || "") || 1;
     const toPower = (r: (typeof resolved)[number], relation: PoolRelation): PoolPower => ({
       name: r.owned.name,
       source: r.owned.source ?? "purchased",

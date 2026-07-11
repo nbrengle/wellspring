@@ -11,6 +11,7 @@ import type {
   ViewState,
 } from "../types.js";
 import type { CharacterGraphModel } from "./model.js";
+import { composeDisplayName } from "./model.js";
 
 function isEntity<T extends Entity>(entity: Entity | null | undefined, type: string): entity is T {
   return entity?.type === type;
@@ -46,7 +47,7 @@ export function buildBucketedView(graph: CharacterGraphModel): BucketedView {
     }
 
     const t = node.entity?.type;
-    const tier = node.entity?.tier;
+    const tier = t === "power" || t === "spell" || t === "subpower" ? node.entity?.tier : undefined;
 
     if (t === "spell") {
       view.knownSpells.push(createViewEntry<Spell>(node, "spell"));
@@ -85,7 +86,7 @@ function createViewEntry<T extends Entity>(node: GraphItem, expectedType: string
     node.sourceType === "innate" ||
     (node.effects && node.effects.some((e) => e.type === "REFUND_BESTOW"));
   const paramValue = node.param ?? (node.entity?.parameter || undefined);
-  const displayName = paramValue && !node.name.includes(paramValue) ? `${node.name} (${paramValue})` : node.name;
+  const displayName = composeDisplayName(node.name, paramValue);
 
   let bestowedBy = node.bestowedBy;
   if (node.sourceType === "bestow" && !bestowedBy) {
@@ -108,7 +109,10 @@ function createViewEntry<T extends Entity>(node: GraphItem, expectedType: string
     cost: isFree ? 0 : (node.authoredCost ?? node.baseCost),
     rank: node.rank,
     index: node.index ?? (node.sourceType === "bestow" ? -1 : node.index),
-    cls: node.cls ?? node.entity?.parentClass ?? null,
+    cls:
+      node.cls ??
+      (node.entity?.type === "power" || node.entity?.type === "skill" ? node.entity.parentClass : undefined) ??
+      null,
     effects: node.effects,
     rawString: node.rawString,
     field: node.field,

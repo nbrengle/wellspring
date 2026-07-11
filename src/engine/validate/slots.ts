@@ -19,7 +19,7 @@ import {
 import { cleanItemName, getClasses } from "../resolver.js";
 import { SPELL_TIERS, SLOT_CATS, BOOKCASTER_TIER_FIELD, KNOWN_SPELL_FIELDS } from "../config.js";
 import { countPicksForClass, progressionRow, sourceClass, activeInnatePowers } from "./core.js";
-import { CharacterChoice, CharacterState, BaseEntity } from "../types.js";
+import { CharacterChoice, CharacterState, Entity } from "../types.js";
 
 // ─── Structured slot/spell shapes ───────────────────────────────────────────
 /** One power/spell slot row for a class+category: how many are `used` vs `allowed`
@@ -112,36 +112,36 @@ export function slotBestows(character: CharacterState, sources: Record<string, s
   //    activeInnatePowers() loop below; iterating them here too would double-count.
   for (const field of ["skills", "powers"] as const) {
     (character[field] || []).forEach((item: CharacterChoice) => {
-      const clean = cleanItemName(item.entityId.replace(/^(skills|powers):/, ""));
       const ent = lookupEntity(item.entityId);
-      const rank = item.ranks || 1;
-
-      let targetCls = sourceClass(item.source);
-      if (!targetCls) {
-        const paramMatch = clean.match(/\((.*?)\)/);
-        if (paramMatch && CLASSES[paramMatch[1].trim()]) {
-          targetCls = paramMatch[1].trim();
-        }
-      }
-
-      if (!targetCls && ent && ent.id && ent.id.startsWith("powers:")) {
-        // Find which class has this power
-        for (const c of classes) {
-          const byTier = CLASS_POWERS[c.name];
-          if (byTier) {
-            for (const t of Object.values(byTier)) {
-              if (t.some((p) => p.name === ent.name)) {
-                targetCls = c.name;
-                break;
-              }
+      if (ent && "slotBestows" in ent && Array.isArray(ent.slotBestows)) {
+        for (const bs of ent.slotBestows) {
+          const rank = item.ranks || 1;
+          const base = ent.baseName || ent.name;
+          let targetCls = sourceClass(item.source);
+          if (!targetCls && item.parameter) {
+            if (CLASSES[item.parameter.trim()]) {
+              targetCls = item.parameter.trim();
             }
           }
-          if (targetCls) break;
-        }
-      }
 
-      for (const { cat, n } of ent?.slotBestows || []) {
-        addTo(targetCls || classFor(cat), cat, n * rank, ent?.baseName || ent?.name || cleanItemName(item));
+          if (!targetCls && ent && ent.id && ent.id.startsWith("powers:")) {
+            // Find which class has this power
+            for (const c of classes) {
+              const byTier = CLASS_POWERS[c.name];
+              if (byTier) {
+                for (const t of Object.values(byTier)) {
+                  if (t.some((p) => p.name === ent.name)) {
+                    targetCls = c.name;
+                    break;
+                  }
+                }
+              }
+              if (targetCls) break;
+            }
+          }
+
+          addTo(targetCls || classFor(bs.cat), bs.cat, bs.n * rank, ent?.baseName || ent?.name || cleanItemName(item));
+        }
       }
     });
   }
@@ -151,7 +151,7 @@ export function slotBestows(character: CharacterState, sources: Record<string, s
   // progression "Innate Bonus Cantrip" is NOT a slot — it grants the specific
   // locked cantrip, handled by innateBonusCantrips(), so it never bumps the cap.
   for (const ip of activeInnatePowers(character)) {
-    if (ip.cls && ip.entity?.slotBestows) {
+    if (ip.cls && ip.entity && "slotBestows" in ip.entity && Array.isArray(ip.entity.slotBestows)) {
       for (const { cat, n } of ip.entity.slotBestows || []) addTo(ip.cls, cat, n, ip.entity.name || ip.name);
     }
   }
@@ -275,7 +275,8 @@ export function computeSlots(character: CharacterState) {
       const used = (character.spells || []).reduce((n: number, choice: CharacterChoice) => {
         if (sourceClass(choice.source) !== cls) return n;
         const ent = lookupEntity(choice.entityId);
-        if (ent?.tier?.toLowerCase() !== "cantrip") return n;
+        const tier = ent?.type === "spell" || ent?.type === "power" ? ent.tier?.toLowerCase() : undefined;
+        if (tier !== "cantrip") return n;
         if (granted.includes(cleanItemName(choice.entityId.replace("spells:", "")))) return n;
         return n + (choice.ranks || 1);
       }, 0);
@@ -333,7 +334,7 @@ export function spellSlots(character: CharacterState) {
   if (!pools[primaryType]) pools[primaryType] = { novice: 0, adept: 0, greater: 0 };
 
   const highestSlots: string[] = []; // array of target pool strings
-  const applySpellBestows = (ent: BaseEntity | null | undefined, rank = 1, itemName: string | null = null) => {
+  const applySpellBestows = (ent: Entity | null | undefined, rank = 1, itemName: string | null = null) => {
     if (!ent) return;
 
     let targetPool = primaryType;
@@ -349,10 +350,12 @@ export function spellSlots(character: CharacterState) {
 
     if (!pools[targetPool]) pools[targetPool] = { novice: 0, adept: 0, greater: 0 };
 
-    for (const { cat, n } of ent.slotBestows || []) {
+    const bestows = ent && "slotBestows" in ent ? (ent.slotBestows as any[]) : undefined;
+    for (const { cat, n } of bestows || []) {
       if (SPELL_TIERS.has(cat)) pools[targetPool][cat as keyof SpellPool] += n * rank;
     }
-    if (ent.highestSlot) {
+    const highest = ent && "highestSlot" in ent ? ent.highestSlot : undefined;
+    if (highest) {
       for (let i = 0; i < rank; i++) highestSlots.push(targetPool);
     }
   };
@@ -370,7 +373,7 @@ export function spellSlots(character: CharacterState) {
       applySpellBestows(
         (lin?.advantages || []).find(
           (x: { name: string; baseName?: string }) => x.name === name || x.baseName === name,
-        ) as unknown as BaseEntity,
+        ) as unknown as Entity,
         1,
         name,
       );

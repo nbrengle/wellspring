@@ -461,9 +461,10 @@
     "name": "Divine Favor",
     "cost": 2,
     "prereq": "Worship",
-    "ranks": "unlimited",
+    "ranks": null,
     "category": "Magic",
-    "description": "The character may channel divine favor through their martial prowess. Once per Short Rest, they may add the Divine Accent to any one basic Spike weapon attack or replace the Accent of a Martial Power (Basic, Advanced, etc) or basic attack that has an Accent already to the Divine Accent."
+    "description": "The character may channel divine favor through their martial prowess. Once per Short Rest, they may add the Divine Accent to any one basic Spike weapon attack or replace the Accent of a Martial Power (Basic, Advanced, etc) or basic attack that has an Accent already to the Divine Accent.",
+    "unlimitedRanks": true
   },
   {
     "name": "Divine Focus",
@@ -558,9 +559,10 @@
     "name": "Bookcaster",
     "cost": 1,
     "prereq": "Basic Arcane Skill or Basic Faith",
-    "ranks": "unlimited",
+    "ranks": null,
     "category": "Magic",
-    "description": "Upon purchasing this skill, the player selects one spell from any spell list they have access to through their classes, of a Tier they would normally be able to access. The character may cast this spell when they are out of combat by expending a spell-slot and reading the incantation a full five times, or actively studying their spell book for a full minute, while satisfying all the normal requirements of the spell. Additionally, once per event, the character may deposit one Hide and one Bloom into an ashbin and spend 10 minutes writing in their spell book to exchange one spell from their book for another from a list they have access to."
+    "description": "Upon purchasing this skill, the player selects one spell from any spell list they have access to through their classes, of a Tier they would normally be able to access. The character may cast this spell when they are out of combat by expending a spell-slot and reading the incantation a full five times, or actively studying their spell book for a full minute, while satisfying all the normal requirements of the spell. Additionally, once per event, the character may deposit one Hide and one Bloom into an ashbin and spend 10 minutes writing in their spell book to exchange one spell from their book for another from a list they have access to.",
+    "unlimitedRanks": true
   },
   {
     "name": "Bookcasting Expertise",
@@ -622,9 +624,10 @@
     "name": "Lore",
     "cost": 2,
     "prereq": "None",
-    "ranks": "unlimited",
+    "ranks": null,
     "category": "Scholar",
     "description": "The character has learned about a specific area of study, with each area of study considered a separate skill. Lore confers a level of knowledge that is both deep and detailed, although not quite encyclopedic, and represents a long commitment to education on the topic. Mechanically, Lore skills will often appear as requirements on blue cards, or be prompted by a Marshal during modules when relevant. The following is a list of suggested areas of study. Players should feel free to choose ones not in this list as long as they are appropriate to the setting. The more granular the area of knowledge, the more in-depth the knowledge is likely to be, though it will be in turn less likely to come up in game. Arcane Lore: Magic and its uses, magical tools and applications, and magical constructs. Historical Lore: Major events, dates, interactions of events and casualties, historical figures. Nature Lore: Animals and their habits, woodcraft, myths and legends about the natural world, plants and their uses. This also includes creatures and monsters that are native to the region. Noble Lore: Etiquette, titles, traditions and customs, noble names and families, history of ruling families, especially the Great Houses. Religious Lore: Divine Beings and their domains, afterlife beliefs, Devotion traditions, cultural attitudes towards Divine Beings. Ritual Lore: Details about past ritual sites, determining ritual means to solving problems, etc. Shadow Lore: Underworld and underworld etiquette, power players, customs and mores, connections, illicit substances and their uses, cons and crimes.",
+    "unlimitedRanks": true,
     "parameter": "Area of Lore"
   },
   {

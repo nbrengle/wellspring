@@ -193,7 +193,7 @@ test("parameterized skills satisfy prerequisites and undergo prerequisite checki
   eq(issues[0].missing[0].id, "skills:Profession - Apprentice", "identifies missing base prerequisite");
 
   // 3. Adding Apprentice (Smith) satisfies the prerequisite
-  c.skills.push({ entityId: "Profession - Apprentice (Smith)", source: Source.purchased(), ranks: 1 });
+  c.skills.push({ entityId: "Profession - Apprentice", parameter: "Smith", source: Source.purchased(), ranks: 1 });
   eq(validate(c).prereqs.issues.length, 0, "Apprentice satisfies Journeyman");
 });
 

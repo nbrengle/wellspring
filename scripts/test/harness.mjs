@@ -8,6 +8,7 @@
 // report() once for a single pass/fail tally + exit code.
 
 import { Source, isPurchased, isStarting, sourceClass } from "../../src/engine/types.js";
+import { splitEntityParam } from "../../src/engine/character-add.js";
 
 // Re-exported so test files build/read structured sources without each importing
 // from the engine directly (they already import test helpers from here).
@@ -41,11 +42,13 @@ export function ok(cond, msg = "") {
 // these under the `skills:` prefix in the BP ledger.
 export function pSkills(names) {
   return {
-    skills: names.map((n) =>
-      typeof n === "string"
-        ? { entityId: n, source: Source.purchased(), ranks: 1 }
-        : { entityId: n.name, source: Source.purchased(), ranks: n.ranks ?? 1 },
-    ),
+    skills: names.map((n) => {
+      if (typeof n === "string") {
+        const { entityId, parameter } = splitEntityParam(n);
+        return { entityId, parameter, source: Source.purchased(), ranks: 1 };
+      }
+      return { entityId: n.name, parameter: n.parameter, source: Source.purchased(), ranks: n.ranks ?? 1 };
+    }),
   };
 }
 
@@ -54,11 +57,13 @@ export function pSkills(names) {
 // ledger keys these under the `purchasedPerks:` prefix.
 export function pPerks(names) {
   return {
-    perks: names.map((n) =>
-      typeof n === "string"
-        ? { entityId: n, source: Source.purchased(), ranks: 1 }
-        : { entityId: n.name, source: Source.purchased(), ranks: n.ranks ?? 1 },
-    ),
+    perks: names.map((n) => {
+      if (typeof n === "string") {
+        const { entityId, parameter } = splitEntityParam(n);
+        return { entityId, parameter, source: Source.purchased(), ranks: 1 };
+      }
+      return { entityId: n.name, parameter: n.parameter, source: Source.purchased(), ranks: n.ranks ?? 1 };
+    }),
   };
 }
 

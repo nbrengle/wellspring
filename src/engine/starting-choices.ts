@@ -200,12 +200,12 @@ function expandInlineChoice(line: string) {
     // Lore areas enumerated from the Lore skill's description (see loreAreaOptions).
     options = loreAreaOptions();
   } else if (/choose\s+a\s+gathering\s+skill/i.test(line)) {
-    options = ALL_SKILLS.filter((s) => s.cat === "Gathering" && /\bI\b/.test(s.name)).map((s) => ({
+    options = ALL_SKILLS.filter((s) => s.category === "Gathering" && /\bI\b/.test(s.name)).map((s) => ({
       label: s.name,
       skills: [{ name: s.name, rank: 1 }],
     }));
   } else if (/apprentice\s+crafting/i.test(line)) {
-    options = ALL_SKILLS.filter((s) => /^Apprentice /.test(s.name) && s.cat === "Crafting").map((s) => ({
+    options = ALL_SKILLS.filter((s) => /^Apprentice /.test(s.name) && s.category === "Crafting").map((s) => ({
       label: s.name,
       skills: [{ name: s.name, rank: 1 }],
     }));

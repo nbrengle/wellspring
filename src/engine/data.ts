@@ -84,9 +84,10 @@ const descBody = (text: string | null | undefined) => splitDescription(text).bod
 
 export const ALL_SKILLS = skillsJson.map((s) => ({
   name: s.name,
-  cost: s.cost,
+  cost: s.cost ?? null,
   ranks: s.ranks,
-  cat: s.category,
+  unlimitedRanks: s.unlimitedRanks,
+  category: s.category,
   prereq: cleanPrereq(s.prereq),
   desc: s.description,
 }));
@@ -114,11 +115,10 @@ export const ALL_PERKS = perksJson.map((p) => ({
 
 export const ALL_FLAWS = flawsJson.map((f) => ({
   name: f.name,
-  // Award/BP may be a number or a string like "1 or 2"; keep as-is and expose a
-  // numeric value the BP math can use (the lower bound when it's a range).
-  bp: typeof f.bp === "number" ? f.bp : parseInt(String(f.bp), 10) || 0,
-  bpLabel: String(f.bp),
+  bp: f.bp || 0,
+  bpLabel: String(f.bp || 0),
   ranks: f.ranks,
+  unlimitedRanks: undefined,
   cat: f.category,
   prereq: cleanPrereq(f.prereq),
   desc: descBody(f.description),
@@ -233,6 +233,7 @@ export interface RawPower {
   requiredClass?: string;
   requiresEntity?: string[];
   id?: string;
+  unlimitedRanks?: boolean;
 }
 
 function powerEntry(p: RawPower) {
@@ -243,6 +244,7 @@ function powerEntry(p: RawPower) {
     prereq: p.prerequisites ?? null,
     requirement: p.requirement ?? null,
     cost: p.cost ?? null,
+    unlimitedRanks: p.unlimitedRanks,
     tier: p.tier,
     tags: p.tags ?? [],
     call: p.call ?? null,
@@ -453,10 +455,12 @@ export function lineageItemImpact(item: Partial<Entity>, lineage: string | null 
       out.push(`${m.amount >= 0 ? "+" : ""}${m.amount} ${label}`);
     }
   }
-  for (const g of item.slotBestows || []) {
-    out.push(`+${g.n} ${g.cat} slot${g.n === 1 ? "" : "s"}`);
+  if ("slotBestows" in item && Array.isArray(item.slotBestows)) {
+    for (const g of item.slotBestows || []) {
+      out.push(`+${g.n} ${g.cat} slot${g.n === 1 ? "" : "s"}`);
+    }
   }
-  if (item.highestSlot) out.push("+1 highest spell-slot");
+  if ("highestSlot" in item && item.highestSlot) out.push("+1 highest spell-slot");
   if (item.wealthIncome?.n) out.push(`+${item.wealthIncome.n} Wealth`);
   // Fixed grants (Telekinesis Power, Magical Resilience perk, …).
   const base = item.baseName || item.name;

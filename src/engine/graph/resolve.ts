@@ -16,7 +16,7 @@ import type {
 } from "../types.js";
 import { Source, isPurchased, isStarting, sourceClass } from "../types.js";
 import { characterLevel, getMaxRanks } from "../validate/core.js";
-import { CharacterGraphModel, extractParam, idPrefix } from "./model.js";
+import { CharacterGraphModel, composeDisplayName, extractParam, idPrefix } from "./model.js";
 
 // Stored EntitySource.type → the graph node's provenance. The stored `bestowed` becomes
 // the graph's `bestow`; every other member passes through. Total over EntitySource["type"].
@@ -76,43 +76,42 @@ export function resolveCharacterGraph(charInput: CharacterState): CharacterGraph
   const items: GraphItem[] = [];
   const charLevel = characterLevel(character);
   const classes = getClasses(character);
+
+  buildNodes(character, items);
+  const itemIdentities = applyCaps(items);
+  expandBestows(items, itemIdentities);
+  applySynthetics(character, items);
+
+  return new CharacterGraphModel(character, items, charLevel, classes);
+}
+
+function buildNodes(character: CharacterState, items: GraphItem[]) {
   const addItem = (choice: CharacterChoice) => {
-    // The ENTITY is choice.entityId (bare — "Lore", never "Lore (Historical)"): all
-    // rules data (REFS grants/prereqs/discounts, cost) is keyed on the bare id, so we
-    // look THAT up. The `parameter` FIELD is used only to (a) build the display name
-    // and (b) distinguish instances for dedupe — never to resolve the entity.
     let ent = lookupEntity(choice.entityId);
     const rawName = choice.entityId.replace(/^[a-z]+:/i, "");
     const cleanName = cleanItemName(rawName);
     const bareName = bareSkill(cleanName);
 
-    // Fallback if entityId wasn't fully qualified
     if (!ent) {
       ent =
         lookupEntity(`skills:${bareName}`) || lookupEntity(`perks:${cleanName}`) || lookupEntity(`powers:${cleanName}`);
     }
 
-    // Display form = the entity's name + the chosen parameter (the FIELD). Derived
-    // for the row's label / instance key; NOT an entity lookup key. Only a real
-    // stored `choice.parameter` reconstructs the name — we must NOT re-append a param
-    // scraped from the id string, or a name that merely contains " - " (e.g. a
-    // lineage-qualified "Underkin - Iron Touch") would be mangled. `param` (used for
-    // dedup) still falls back to extractParam for any legacy inline-param data.
     const baseDisplay = ent?.name || cleanName;
-    const displayName =
-      choice.parameter && !/\(/.test(baseDisplay) ? `${baseDisplay} (${choice.parameter})` : baseDisplay;
-    const param = choice.parameter ?? extractParam(rawName);
+    const param = choice.parameter;
+    const displayName = composeDisplayName(baseDisplay, param);
 
     const rank = choice.ranks || 1;
     const effects: Effect[] = [];
 
-    // Extract Base Cost
     let baseCost = 0;
-    if (Array.isArray(ent?.tiers) && ent.tiers.length) {
+    if (ent && "tiers" in ent && Array.isArray(ent.tiers) && ent.tiers.length) {
       const n = Math.min(rank, ent.tiers.length);
-      baseCost = ent.tiers.slice(0, n).reduce((s, t) => s + (t.cost || 0), 0);
+      baseCost = ent.tiers.slice(0, n).reduce((s: number, t: { cost?: number }) => s + (t.cost || 0), 0);
     } else {
-      baseCost = (typeof ent?.cost === "number" ? ent.cost : ent?.lbp || 0) * rank;
+      const entityCost = ent && "cost" in ent ? ent.cost : undefined;
+      const lbp = ent && "lbp" in ent ? ent.lbp : 0;
+      baseCost = (typeof entityCost === "number" ? entityCost : lbp || 0) * rank;
     }
 
     const entityId = ent?.id || choice.entityId;
@@ -120,27 +119,17 @@ export function resolveCharacterGraph(charInput: CharacterState): CharacterGraph
       effects.push(...extractor(ent, character, entityId));
     }
 
-    // The node's provenance (GraphSourceType), mapped from the structured source's
-    // `type` via SOURCE_TYPE. A class-sourced skill (a starting/free skill) keeps
-    // 'class'; the stored `bestowed` becomes 'bestow'.
     const src: EntitySource = choice.source || Source.purchased();
     const sourceType = SOURCE_TYPE[src.type];
 
-    // Determine the field (originating collection) from the entity-id prefix or fallback.
     const field = toGraphField(choice.entityId.split(":")[0], ent?.id?.split(":")[0]);
 
-    // class vs domain power — the entity carries no flag, so read the originating bucket.
     const powerKind: PowerKind | undefined =
       ent?.type === "power" ? (choice.costField === "domainPowers" ? "domain" : "class") : undefined;
 
-    // Node id is the PARAMETER-PRESERVING instance key used for the BP ledger,
-    // prereq issue ids, and dedupe — NOT ent.id (the param-stripped BASE), so it keys
-    // off the display form (base + param) to keep two Lores distinct. Its prefix is
-    // the ORIGINATING character field: flat-path buckets carry it as `choice.costField`
-    // (e.g. 'classPowers'); native skills have none, so they key under their entity
-    // collection ('skills'). Falls back to the entity id.
     const idPrefixName = ent?.type ? idPrefix(ent) : null;
     const nodeId = idPrefixName ? `${idPrefixName}:${displayName}` : entityId;
+
     items.push({
       id: nodeId,
       entityId: entityId,
@@ -162,6 +151,7 @@ export function resolveCharacterGraph(charInput: CharacterState): CharacterGraph
       choiceData: choice,
     });
   };
+
   let purchasedSkillIdx = 0;
   let startingSkillIdx = 0;
   for (const choice of character.skills || []) {
@@ -189,6 +179,7 @@ export function resolveCharacterGraph(charInput: CharacterState): CharacterGraph
   for (const choice of character.domainPowers || []) addPurchasablePower(choice);
   for (const choice of character.spells || []) addItem(choice);
   for (const choice of character.devotions || []) addItem(choice);
+
   for (const field of ["lineageAdvantages", "lineageChallenges"] as const) {
     for (const name of character[field] || []) {
       const type = field === "lineageAdvantages" ? "advantages" : "challenges";
@@ -205,9 +196,8 @@ export function resolveCharacterGraph(charInput: CharacterState): CharacterGraph
     const rawName = choice.entityId.replace(/^flaws:/i, "");
     const cleanName = cleanItemName(rawName);
     const ent = lookupEntity(`flaws:${cleanName}`);
-    // Param is the FIELD (fallback to any inline "(value)" in legacy data). The award
-    // for a parameterized flaw (Mild Allergy → substance) is keyed on the chosen value.
-    const param = choice.parameter ?? extractParam(rawName);
+
+    const param = choice.parameter;
     let bp = 0;
     if (ent) {
       const allergenBase = ent.baseName || ent.name;
@@ -215,14 +205,18 @@ export function resolveCharacterGraph(charInput: CharacterState): CharacterGraph
       if (allergenTable) {
         const chosen = allergenAward(allergenBase, param);
         bp = chosen != null ? chosen : Math.min(...Object.values(allergenTable));
-      } else {
-        bp = typeof ent.bp === "number" ? ent.bp : parseInt(String(ent.bp), 10) || 0;
+      } else if (ent?.type === "flaw") {
+        bp = typeof ent.bp === "number" ? ent.bp : 0;
       }
     }
+
+    const displayName = composeDisplayName(ent?.name || cleanName, param);
+    const rawString = ent?.name && param ? `${ent.name} (${param})` : choice.entityId;
+
     items.push({
       id: ent?.id || `flaws:${cleanName}`,
-      name: param && ent?.name && !/\(/.test(ent.name) ? `${ent.name} (${param})` : ent?.name || cleanName,
-      rawString: param && ent?.name ? `${ent.name} (${param})` : choice.entityId,
+      name: displayName,
+      rawString,
       param,
       field: "flaws",
       sourceType: "flaw",
@@ -234,32 +228,24 @@ export function resolveCharacterGraph(charInput: CharacterState): CharacterGraph
       choiceData: choice,
     });
   }
+}
 
-  const getIdentity = (rawName: string, ent: Entity | null | undefined, param?: string | null) => {
-    const clean = cleanItemName(rawName);
-    const entityId = ent?.id || rawName;
-    const cap = getMaxRanks(entityId);
-    const info = paramInfo(ent);
-    const reusable = paramReusable(ent, entityId);
-    const baseName = (ent?.baseName || ent?.name || bareSkill(clean)).toLowerCase();
+function getIdentity(rawName: string, ent: Entity | null | undefined, param?: string | null) {
+  const clean = cleanItemName(rawName);
+  const entityId = ent?.id || rawName;
+  const cap = getMaxRanks(entityId);
+  const info = paramInfo(ent);
+  const reusable = paramReusable(ent, entityId);
+  const baseName = (ent?.baseName || ent?.name || bareSkill(clean)).toLowerCase();
 
-    // Take-once entities (cap 1) have ONE identity regardless of parameter — the
-    // param is flavor on the single instance, not a distinguisher. e.g. Weapon
-    // Specialization (Swords) and (Axes) are the SAME identity, so a second one is
-    // redundant (free BP). Without this, a parameterized cap-1 entity keyed by
-    // base|param wrongly kept both. (Param distinguishes only when cap > 1.)
-    if (cap <= 1) return { key: baseName, cap };
+  if (cap <= 1) return { key: baseName, cap };
+  if (!info || reusable) return { key: baseName, cap };
 
-    // No param, or param is payload (reusable) → identity is the base; the cap
-    // governs how many total takings are kept.
-    if (!info || reusable) return { key: baseName, cap };
+  const paramValue = (param ?? ent?.parameter ?? "unknown").toLowerCase();
+  return { key: `${baseName}|${paramValue}`, cap: 1 };
+}
 
-    // Parameterized, multi-rank, not reusable (Lore, …) → param distinguishes
-    // distinct instances, each capped at one. Read the structured node.param,
-    // falling back to the entity's param label only if absent.
-    const paramValue = (param ?? ent?.parameter ?? "unknown").toLowerCase();
-    return { key: `${baseName}|${paramValue}`, cap: 1 };
-  };
+function applyCaps(items: GraphItem[]) {
   const itemIdentities = new Map<string, { cap: number; nodes: GraphItem[] }>();
   for (const it of items) {
     if (it.sourceType === "lineage") continue;
@@ -277,7 +263,10 @@ export function resolveCharacterGraph(charInput: CharacterState): CharacterGraph
       }
     }
   }
+  return itemIdentities;
+}
 
+function expandBestows(items: GraphItem[], itemIdentities: Map<string, { cap: number; nodes: GraphItem[] }>) {
   for (const node of [...items]) {
     for (const eff of node.effects) {
       if (eff.type !== "BESTOW_SOURCE") continue;
@@ -291,6 +280,7 @@ export function resolveCharacterGraph(charInput: CharacterState): CharacterGraph
         }
 
         const gName = ent?.name || rawGidName;
+        // Still need extractParam here as it comes from a string gid
         const { key, cap } = getIdentity(gName, ent, extractParam(rawGidName));
 
         let group = itemIdentities.get(key);
@@ -299,12 +289,10 @@ export function resolveCharacterGraph(charInput: CharacterState): CharacterGraph
           itemIdentities.set(key, group);
         }
 
-        // Check if we are at cap with grants + purchases
         const bestowCount = group.nodes.filter((n) => n.sourceType === "bestow").length;
         const purchaseCount = group.nodes.filter((n) => n.sourceType === "purchased").length;
 
         if (bestowCount + purchaseCount >= cap) {
-          // We are at cap. Grant wins, so refund a purchase if one exists
           const purchasedNode = group.nodes.find(
             (n) => n.sourceType === "purchased" && !n.effects?.some((e) => e.type === "REFUND_BESTOW"),
           );
@@ -312,15 +300,11 @@ export function resolveCharacterGraph(charInput: CharacterState): CharacterGraph
             purchasedNode.effects = purchasedNode.effects || [];
             purchasedNode.effects.push({ type: "REFUND_BESTOW", source: node.name });
           }
-          // At cap: the grant is redundant and is dropped (not added as a node).
-          // This is correct for cost — a grant's baseCost is 0, so "free BP equal to
-          // its cost" is 0; there's no BP to recover. If a PURCHASE shared the key it
-          // was refunded above (grant wins, purchase becomes free). With no purchase
-          // (e.g. two classes granting the same skill) the duplicate simply collapses
-          // to the single kept node.
           continue;
         }
 
+        const bucketCls = node.cls;
+        const pClass = ent?.type === "power" || ent?.type === "skill" ? ent.parentClass : undefined;
         const newBestow: GraphItem = {
           id: ent?.id || gid,
           name: gName,
@@ -330,7 +314,7 @@ export function resolveCharacterGraph(charInput: CharacterState): CharacterGraph
           sourceType: "bestow",
           bestowedBy: node.name,
           bestowKind: node.sourceType,
-          cls: node.cls ?? node.entity?.parentClass ?? null,
+          cls: pClass && bucketCls !== pClass ? pClass : bucketCls,
           rank: 1,
           baseCost: 0,
           entity: ent,
@@ -344,10 +328,9 @@ export function resolveCharacterGraph(charInput: CharacterState): CharacterGraph
       }
     }
   }
+}
 
-  // Tax Evasion's wealth bonus is now a WEALTH effect on the Tax Evasion node itself
-  // (see extractTaxEvasion) — no synthetic node, no `synthetic` source/field.
-
+function applySynthetics(character: CharacterState, items: GraphItem[]) {
   const grants = startingSkillGrants(character);
   let startingNodeIdx = 0;
   for (const node of items) {
@@ -357,6 +340,4 @@ export function resolveCharacterGraph(charInput: CharacterState): CharacterGraph
       startingNodeIdx++;
     }
   }
-
-  return new CharacterGraphModel(character, items, charLevel, classes);
 }

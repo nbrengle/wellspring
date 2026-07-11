@@ -22,6 +22,11 @@ export function stripParam(name: string): string {
     .trim();
 }
 
+export function composeDisplayName(baseName: string, param?: string | null): string {
+  if (!param) return baseName;
+  return /\(/.test(baseName) ? baseName : `${baseName} (${param})`;
+}
+
 export function idPrefix(entity: { type?: string } | null | undefined): string {
   return entity?.type ? collectionOf(entity.type) : "";
 }

@@ -1345,7 +1345,8 @@ function parseSkills() {
         .replace(/\s*\((?:\d+|Unlimited)\)\s*$/i, "")
         .replace(/\s\[[^\]]+\]/, "")
         .trim();
-      const parsedRanks = !ranksMatch ? null : /unlimited/i.test(ranksMatch[1]) ? "unlimited" : parseInt(ranksMatch[1]);
+      const isUnlimited = ranksMatch && /unlimited/i.test(ranksMatch[1]);
+      const parsedRanks = !ranksMatch || isUnlimited ? null : parseInt(ranksMatch[1], 10);
       const parameter = paramMatch ? paramMatch[1].trim() : null;
 
       // Collect text nodes until next H3/H4
@@ -1387,6 +1388,7 @@ function parseSkills() {
       if (cost !== null) {
         const description = descParts.join(" ");
         const entry = { name, cost, prereq, ranks, category: currentCat, description };
+        if (isUnlimited) entry.unlimitedRanks = true;
         // Parameter: either an explicit "[Placeholder]" in the name, OR — for skills
         // whose body says the player picks something — derived from that prose. The
         // Extended Capacity skills read "The character chooses one Sphere of magic",
@@ -1590,15 +1592,22 @@ function parsePerkFlawList(listH2Text, valueKey) {
     // A data row has a name + at least a value, and isn't the header row.
     if (cells.length >= 2 && cells[0] && !PERK_HEADER.test(cells[0])) {
       const rawVal = cells[1];
-      const value = /^\d+$/.test(rawVal) ? parseInt(rawVal) : rawVal;
-      results.push({
+      let value = /^\d+$/.test(rawVal) ? parseInt(rawVal) : rawVal;
+      if (typeof value === "string") {
+        const m = value.match(/^(\d+)/);
+        value = m ? parseInt(m[1], 10) : 0;
+      }
+      const isUnlimited = cells[2] && cells[2].toLowerCase() === "unlimited";
+      const entry = {
         name: cells[0],
         [valueKey]: value,
-        ranks: cells[2] && cells[2] !== "-" ? parseInt(cells[2]) || null : null,
+        ranks: isUnlimited ? null : cells[2] && cells[2] !== "-" ? parseInt(cells[2], 10) || null : null,
         prereq: cells[3] && cells[3] !== "-" ? cells[3] : null,
         category: currentCat,
         description: cells[4] || "",
-      });
+      };
+      if (isUnlimited) entry.unlimitedRanks = true;
+      results.push(entry);
     }
     cells = [];
   };

@@ -15,7 +15,7 @@
 // authored cost). Everything else on the options bag is a scalar the character
 // carries as-is (lineage, devotion, choices, sublineage, agileLearnerTrades, …).
 
-import { addToCharacter } from "../../src/engine/character-add.js";
+import { addToCharacter, splitEntityParam } from "../../src/engine/character-add.js";
 import { applyClassStartingAbilities } from "../../src/engine/character-state.js";
 
 // Parse "Fighter 4" / "Cleric 6, Mage 4" / [{name,level}] → canonical [{name,level}].
@@ -59,7 +59,9 @@ export function makeChar(classSpec, opts = {}) {
   // Funnel every intent item through the one real add API.
   for (const item of add) {
     const { name, ...addOpts } = typeof item === "string" ? { name: item } : item;
-    c = addToCharacter(c, name, addOpts);
+    const { entityId, parameter } = splitEntityParam(name);
+    if (parameter && !addOpts.param) addOpts.param = parameter;
+    c = addToCharacter(c, entityId, addOpts);
   }
   return c;
 }

@@ -53,13 +53,9 @@ export function getMaxRanks(entityId: string): number {
   if (!ent) return 1;
   // One field for "how many times can this be taken": `ranks`, uniform across
   // skills, perks, and powers (powers used to call it `maxRanks`).
-  const maxR = ent.ranks;
-  if (maxR === "unlimited") return Infinity;
+  if (ent && "unlimitedRanks" in ent && ent.unlimitedRanks) return Infinity;
+  const maxR = ent && "ranks" in ent ? ent.ranks : undefined;
   if (typeof maxR === "number") return maxR;
-  if (typeof maxR === "string") {
-    const val = parseInt(maxR, 10);
-    if (!isNaN(val)) return val;
-  }
   return 1;
 }
 
@@ -89,7 +85,7 @@ export function countPicksForClass(
     if (sourceClass(choice.source) !== cls) return n;
     if (tierFilter) {
       const ent = lookupEntity(choice.entityId);
-      const tier = ent?.tier?.toLowerCase();
+      const tier = ent?.type === "power" || ent?.type === "spell" ? ent.tier?.toLowerCase() : undefined;
       if (Array.isArray(tierFilter)) {
         if (!tier || !tierFilter.map((t) => t.toLowerCase()).includes(tier)) return n;
       } else {

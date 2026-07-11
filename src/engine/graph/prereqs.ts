@@ -49,7 +49,11 @@ export function computePrereqs(graph: CharacterGraphModel): PrereqReport {
 
     // Tiered perks (Draconic Heritage): each purchased tier requires a minimum
     // CHARACTER level (tier 2 → lvl 5, …).
-    if (Array.isArray(ent?.tiers) && ent.tiers.length) {
+    if (
+      (ent?.type === "skill" || ent?.type === "perk" || ent?.type === "power") &&
+      Array.isArray(ent.tiers) &&
+      ent.tiers.length
+    ) {
       const rank = Math.min(node.rank || 1, ent.tiers.length);
       const need = ent.tiers[rank - 1]?.level || 0;
       if (need > charLevel) {
@@ -68,7 +72,7 @@ export function computePrereqs(graph: CharacterGraphModel): PrereqReport {
     // confers it (e.g. Holding Out for a Hero grants the sub-power Save the Day).
     // Flag a player-CHOSEN one (purchased, or a class-slot pick), NOT a granted or
     // innate one. (Slot picks are sourceType 'class' — still a direct selection.)
-    if (ent && ent.tier === "SubPower" && (node.sourceType === "purchased" || node.sourceType === "class")) {
+    if (ent?.type === "subpower" && (node.sourceType === "purchased" || node.sourceType === "class")) {
       issues.push({
         id,
         item: node.name,
@@ -94,7 +98,12 @@ export function computePrereqs(graph: CharacterGraphModel): PrereqReport {
     }
     for (const lvl of pr.levels || []) {
       const p = node.entity;
-      if (p && p.parentClass && charClasses.every((c) => c.name !== p.parentClass)) {
+      if (
+        p &&
+        (p.type === "skill" || p.type === "power") &&
+        p.parentClass &&
+        charClasses.every((c) => c.name !== (p as Extract<Entity, { parentClass?: string }>).parentClass)
+      ) {
         issues.push({
           id: p.id || id,
           item: node.name,

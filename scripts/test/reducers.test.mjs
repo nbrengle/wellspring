@@ -61,7 +61,7 @@ test("addEntity does not mutate its input", () => {
   eq(purchased(out).length, 2, "output extended");
 });
 test("addEntity preserves non-purchased (e.g. starting) skill entries", () => {
-  const input = { skills: [{ entityId: "Lore (Arcane)", source: Source.class("Mage"), ranks: 1 }] };
+  const input = { skills: [{ entityId: "Lore", parameter: "Arcane", source: Source.class("Mage"), ranks: 1 }] };
   const out = addEntity(input, "purchasedSkills", "Athletics");
   eq(out.skills.length, 2, "starting entry kept + purchased added");
   eq((out.skills || []).filter((s) => isStarting(s.source)).length, 1, "starting preserved");

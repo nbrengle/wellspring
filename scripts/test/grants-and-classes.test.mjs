@@ -156,7 +156,7 @@ test("Extensive Training routes its bonus slot to the CHOSEN class, attributed",
       { name: "Fighter", level: 3 },
       { name: "Rogue", level: 3 },
     ],
-    skills: [{ entityId: "Extensive Training (Rogue)", source: Source.purchased(), ranks: 1 }],
+    skills: [{ entityId: "Extensive Training", parameter: "Rogue", source: Source.purchased(), ranks: 1 }],
   };
   const rows = computeSlots(c);
   const fu = rows.find((s) => s.cls === "Fighter" && s.category === "utility");

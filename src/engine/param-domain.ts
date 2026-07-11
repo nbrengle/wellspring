@@ -121,8 +121,8 @@ export function paramIsIdentity(entity: Entity | null | undefined, entityId: str
 }
 
 const capOf = (e: Entity | null | undefined): number => {
-  const r = e?.ranks;
-  if (r === "unlimited") return Infinity;
+  if (e && "unlimitedRanks" in e && e.unlimitedRanks) return Infinity;
+  const r = e && "ranks" in e ? e.ranks : undefined;
   if (typeof r === "number") return r;
   return 1;
 };

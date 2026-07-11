@@ -118,14 +118,15 @@ export function activePowerBenefits(character: CharacterState): PowerBenefit[] {
   const levelByClass = Object.fromEntries(getClasses(character).map((c) => [c.name, c.level]));
   const out: PowerBenefit[] = [];
   for (const item of character.powers || []) {
-    const ent = lookupEntity(`powers:${cleanItemName(item.entityId || "")}`);
-    if (!ent?.levelBenefits) continue;
-    const lvl = levelByClass[ent.levelBenefitClass ?? ""] ?? characterLevel(character);
-    out.push({
-      power: ent.name,
-      gateClass: ent.levelBenefitClass ?? "",
-      benefits: ent.levelBenefits.map((b) => ({ ...b, active: lvl >= b.level })),
-    });
+    const ent = lookupEntity(`powers:${cleanItemName(item.entityId || "")}`) || lookupEntity(item.entityId);
+    if ((ent?.type === "class" || ent?.type === "power") && "levelBenefits" in ent && ent.levelBenefits) {
+      const lvl = levelByClass[ent.levelBenefitClass ?? ""] ?? characterLevel(character);
+      out.push({
+        power: ent.name,
+        gateClass: ent.levelBenefitClass ?? "",
+        benefits: ent.levelBenefits.map((b: { level: number; text: string }) => ({ ...b, active: lvl >= b.level })),
+      });
+    }
   }
   return out;
 }
@@ -327,7 +328,7 @@ export function computeActiveSelections(graph: CharacterGraphModel, lbp: ReturnT
   const active: (Record<string, string> & { sourceName: string })[] = [];
   const check = (name: string) => {
     const ent = lookupEntity(name);
-    if (ent?.bestowedSelections) {
+    if (ent?.type === "class" && ent.bestowedSelections) {
       for (const gs of ent.bestowedSelections) {
         active.push({ ...gs, sourceName: name });
       }
