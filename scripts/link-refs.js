@@ -129,7 +129,7 @@ function buildRegistry() {
 
   read("domains.json").forEach((d) => {
     add("domains", d.name, "");
-    (d.powers || []).forEach((p) => add("powers", p.name, powerBody(p)));
+    (d.powers || []).forEach((p) => add("powers", p.name, powerBody(p), { entityType: p.type }));
   });
   read("devotions.json").forEach((d) => add("devotions", d.name, [d.lore, (d.tenets || []).join(" ")].join(" ")));
   // Lineage advantages/challenges are linkable entities in their own right: their
@@ -155,7 +155,7 @@ function buildRegistry() {
     );
     // Class specializations (e.g. Artisan → Mystic, Crafter, Artificer).
     (c.specializations || []).forEach((s) => add("classes", s.name, s.description, { parentClass: c.name }));
-    POWER_TIERS.forEach((tier) => (c[tier] || []).forEach((p) => add("powers", p.name, powerBody(p))));
+    POWER_TIERS.forEach((tier) => (c[tier] || []).forEach((p) => add("powers", p.name, powerBody(p), { entityType: p.type })));
   });
   // Crafting recipes and rituals have dense bodies (materials, process, effect)
   // that reference Resources, Effects, Conditions, etc. Index them as entities
@@ -476,22 +476,18 @@ function parsePrereq(prereqText, skillForms) {
 // noun-tagged form, so prose like "gains 3 points of Natural Armor" stays prose.
 const GRANT_RE =
   /\b(?:gains?|adds?|learns?|receives?|granted)\s+(?:the\s+|one\s+|a\s+|all\s+the\s+)?([A-Z][\w’'-]+(?:\s+[A-Z][\w’'-]+){0,3})\s+(Perk|Power|Skill)\b/gi;
-// "Grant Power: X" (a power's Call that bestows the sub-power X) — X is a power.
-const GRANT_POWER_CALL = /\bGrant Power:\s*([A-Z][\w’'-]+(?:\s+[A-Z][\w’'-]+){0,3})/g;
-// "the X Power below" — the unambiguous sub-power marker (any surrounding verb).
-// The name may contain lowercase connectors (Save *the* Day), so allow them mid-name.
-const GRANT_BELOW = /\bthe\s+([A-Z][\w’'-]+(?:\s+(?:[A-Z][\w’'-]+|the|of|and|to|a))*)\s+Power\s+below\b/g;
+// A BESTOWAL target can NEVER be a sub-power. A sub-power (Holy Rest, Curious Balm) is
+// conferred by the in-play "Grant" mechanic — a power's Call "Grant Power: Holy Rest"
+// (target: Individual (Other)) hands the sub-power to a TARGET when the ability is used
+// in play; the owner gains nothing on their sheet. So "the X Power below" /
+// "target receives X" phrasings that name a sub-power are the in-play Grant, not a
+// build-time bestowal, and must not become a bestowal edge (that wrongly added the
+// sub-power to the caster's owned abilities). Filter sub-power targets out.
+const isSubPower = (entity) => entity?.entityType === "subpower";
 function parseGrants(text, grantLookups) {
   if (!text) return [];
   const out = new Set();
   let m;
-  for (const RE of [GRANT_POWER_CALL, GRANT_BELOW]) {
-    RE.lastIndex = 0;
-    while ((m = RE.exec(text))) {
-      const { entity } = resolve(m[1].trim(), grantLookups.power);
-      if (entity) out.add(entity.id);
-    }
-  }
   GRANT_RE.lastIndex = 0;
   while ((m = GRANT_RE.exec(text))) {
     const name = m[1].trim();
@@ -499,7 +495,7 @@ function parseGrants(text, grantLookups) {
     const lookup = grantLookups[noun];
     if (!lookup) continue;
     const { entity } = resolve(name, lookup);
-    if (entity) out.add(entity.id);
+    if (entity && !isSubPower(entity)) out.add(entity.id);
   }
 
   // Dynamic check for name followed by parenthesized number in description containing gains/free/choose
@@ -519,7 +515,7 @@ function parseGrants(text, grantLookups) {
       for (const name of candidates) {
         for (const type of ["perk", "skill", "power"]) {
           const { entity } = resolve(name, grantLookups[type]);
-          if (entity) {
+          if (entity && !isSubPower(entity)) {
             // Preserve a chosen PARAMETER on the grant edge ("Lore: Historical" →
             // "skills:Lore (Historical)") so two parameterized grants of the same
             // base skill stay distinct and materialize with their parameter, instead
