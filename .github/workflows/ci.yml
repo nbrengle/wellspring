@@ -64,6 +64,16 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run format:check
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run audit
   test-unit:
     runs-on: ubuntu-latest
     steps:
@@ -133,6 +143,7 @@ jobs:
         test-rules,
         test-browser,
         vite-build,
+        audit,
       ]
     runs-on: ubuntu-latest
     steps:
