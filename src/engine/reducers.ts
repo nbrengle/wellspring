@@ -257,7 +257,7 @@ export function setRank(c: Char, field: string, index: number, nextRank: number)
 }
 
 /** Record a granted-power selection under `grantedSelections[selectionId]`. */
-export function setGrantedSelection(c: Char, selectionId: string, value: unknown): Char {
+export function setGrantedSelection(c: Char, selectionId: string, value: string): Char {
   return {
     ...c,
     grantedSelections: { ...(c.grantedSelections || {}), [selectionId]: value },

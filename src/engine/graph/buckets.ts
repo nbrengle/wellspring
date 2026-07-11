@@ -1,5 +1,20 @@
-import type { BucketedView, FlawView, PowerView, SpellView, PerkView, SkillView, GraphItem } from "../types.js";
+import type {
+  BucketedView,
+  GraphItem,
+  Entity,
+  Flaw,
+  Power,
+  Spell,
+  Perk,
+  Skill,
+  FallbackEntity,
+  ViewState,
+} from "../types.js";
 import type { CharacterGraphModel } from "./model.js";
+
+function isEntity<T extends Entity>(entity: Entity | null | undefined, type: string): entity is T {
+  return entity?.type === type;
+}
 export function buildBucketedView(graph: CharacterGraphModel): BucketedView {
   const view: BucketedView = {
     classes: [],
@@ -25,7 +40,7 @@ export function buildBucketedView(graph: CharacterGraphModel): BucketedView {
       continue;
 
     if (node.field === "flaws") {
-      view.flaws.push(createViewEntry(node) as unknown as FlawView);
+      view.flaws.push(createViewEntry<Flaw>(node, "flaw"));
       continue;
     }
 
@@ -33,29 +48,29 @@ export function buildBucketedView(graph: CharacterGraphModel): BucketedView {
     const tier = node.entity?.tier;
 
     if (t === "spell") {
-      view.knownSpells.push(createViewEntry(node) as unknown as SpellView);
+      view.knownSpells.push(createViewEntry<Spell>(node, "spell"));
     } else if (node.sourceType === "innate") {
-      view.innatePowers.push(createViewEntry(node) as unknown as PowerView);
+      view.innatePowers.push(createViewEntry<Power>(node, "power"));
     } else if (t === "power") {
-      if (tier === "Basic") view.basicPowers.push(createViewEntry(node) as unknown as PowerView);
-      else if (tier === "Advanced") view.advancedPowers.push(createViewEntry(node) as unknown as PowerView);
-      else if (tier === "Veteran") view.veteranPowers.push(createViewEntry(node) as unknown as PowerView);
-      else if (tier === "Utility") view.utilityPowers.push(createViewEntry(node) as unknown as PowerView);
+      if (tier === "Basic") view.basicPowers.push(createViewEntry<Power>(node, "power"));
+      else if (tier === "Advanced") view.advancedPowers.push(createViewEntry<Power>(node, "power"));
+      else if (tier === "Veteran") view.veteranPowers.push(createViewEntry<Power>(node, "power"));
+      else if (tier === "Utility") view.utilityPowers.push(createViewEntry<Power>(node, "power"));
       else if (tier === "Class" || node.field === "classPowers")
-        view.classPowers.push(createViewEntry(node) as unknown as PowerView);
-      else if (node.field === "domainPowers") view.domainPowers.push(createViewEntry(node) as unknown as PowerView);
-      else view.classPowers.push(createViewEntry(node) as unknown as PowerView);
+        view.classPowers.push(createViewEntry<Power>(node, "power"));
+      else if (node.field === "domainPowers") view.domainPowers.push(createViewEntry<Power>(node, "power"));
+      else view.classPowers.push(createViewEntry<Power>(node, "power"));
     } else if (t === "perk") {
-      view.perks.push(createViewEntry(node) as unknown as PerkView);
+      view.perks.push(createViewEntry<Perk>(node, "perk"));
     } else {
-      view.skills.push(createViewEntry(node) as unknown as SkillView);
+      view.skills.push(createViewEntry<Skill>(node, "skill"));
     }
   }
 
   return view;
 }
 
-function createViewEntry(node: GraphItem) {
+function createViewEntry<T extends Entity>(node: GraphItem, expectedType: string): (T | FallbackEntity) & ViewState {
   const isFree =
     node.sourceType === "grant" ||
     node.sourceType === "innate" ||
@@ -69,11 +84,15 @@ function createViewEntry(node: GraphItem) {
     if (refundEff) grantedBy = refundEff.source;
   }
 
-  return {
-    ...(node.entity || { name: displayName, type: "unknown" }),
+  const baseEntity = isEntity<T>(node.entity, expectedType)
+    ? node.entity
+    : { name: displayName, type: "unknown" as const };
+
+  const viewState: ViewState = {
     id: node.id,
-    entityId: node.entity?.id || node.id,
     name: displayName,
+    entityId: node.entity?.id || node.id,
+    param: paramValue,
     sourceType: node.sourceType,
     grantedBy,
     free: isFree,
@@ -88,4 +107,6 @@ function createViewEntry(node: GraphItem) {
     specialty: node.specialty,
     floor: node.floor,
   };
+
+  return { ...baseEntity, ...viewState };
 }

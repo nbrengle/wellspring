@@ -23,6 +23,17 @@ interface Shortfall {
   available: number;
   missing: number;
 }
+export interface RecipeInfo {
+  name: string;
+  type: "crafting" | "ritual";
+  discipline?: string;
+  tier?: string;
+  yield: number;
+  materialsStr: string;
+  requirements: Record<string, number>[];
+  raw: Record<string, unknown>;
+}
+
 /** A node in the craft dependency tree: what's needed, how much is on hand vs still
  *  needed, and (for a crafted node) the recipe + its child ingredient trees. */
 interface CraftTree {
@@ -32,7 +43,7 @@ interface CraftTree {
   have: number;
   need: number;
   children: CraftTree[];
-  recipe?: unknown;
+  recipe?: RecipeInfo | null;
   batches?: number;
 }
 
@@ -184,7 +195,7 @@ function parseYield(recipe: { usesPerBatch?: string | number; yield?: string | n
 }
 
 // Initialize recipe index
-export const RECIPES = new Map();
+export const RECIPES = new Map<string, RecipeInfo>();
 
 for (const r of CRAFTING || []) {
   RECIPES.set(r.name, {
