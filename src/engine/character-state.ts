@@ -29,7 +29,7 @@ function reconcileBuildChoices(character: CharacterState) {
     return clean.toLowerCase();
   };
   // All owned skills (starting + purchased) live in the skills[] bucket.
-  const ownedSkillNames = (character.skills || []).map((s) => s.entityId || s.name);
+  const ownedSkillNames = (character.skills || []).map((s) => s.entityId);
   const owned = new Set(ownedSkillNames.map(key));
   const choices = { ...(character.choices || {}) };
   for (const ent of getAllEntities()) {

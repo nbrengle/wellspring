@@ -36,10 +36,10 @@ export function buildBucketedView(graph: CharacterGraphModel): BucketedView {
     const t = node.entity?.type;
     const tier = node.entity?.tier;
 
-    if (node.sourceType === "innate") {
-      view.innatePowers.push(createViewEntry<Power>(node, "power"));
-    } else if (t === "spell") {
+    if (t === "spell") {
       view.knownSpells.push(createViewEntry<Spell>(node, "spell"));
+    } else if (node.sourceType === "innate") {
+      view.innatePowers.push(createViewEntry<Power>(node, "power"));
     } else if (t === "power") {
       if (tier === "Basic") view.basicPowers.push(createViewEntry<Power>(node, "power"));
       else if (tier === "Advanced") view.advancedPowers.push(createViewEntry<Power>(node, "power"));

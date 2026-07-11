@@ -1,6 +1,16 @@
-import type { GraphItem, BPLedgerEntry } from "../types.js";
+import type { BPLedgerEntry } from "../types.js";
 
-export function costKey(nodeOrId: GraphItem | string | null | undefined): string | undefined {
+export type CostKeyItem = {
+  id?: string;
+  name?: string;
+  rawString?: string;
+  field?: string;
+  sourceType?: string;
+  index?: number;
+  choiceData?: { costField?: string };
+};
+
+export function costKey(nodeOrId: CostKeyItem | string | null | undefined): string | undefined {
   if (typeof nodeOrId === "string") return nodeOrId;
   const node = nodeOrId;
   if (!node) return undefined;

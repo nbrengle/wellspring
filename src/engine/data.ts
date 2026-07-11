@@ -225,8 +225,7 @@ function powerEntry(p) {
     ranks: p.ranks ?? 1,
     // Parser-extracted structured mechanics (read by the validator instead of
     // re-parsing the description). Keep this list in sync with enrichMechanics.
-    statMods: p.statMods ?? [],
-    statModNotes: p.statModNotes ?? [],
+    statMods: [...(p.statMods ?? []), ...(p.statModNotes ?? [])],
     wealthIncome: p.wealthIncome ?? null,
     slotGrants: p.slotGrants ?? [],
     highestSlot: p.highestSlot ?? false,
@@ -419,11 +418,12 @@ export function lineageItemImpact(item, lineage) {
 
   const out: string[] = [];
   for (const m of item.statMods || []) {
-    const label = STAT_LABELS[m.stat] || m.stat;
-    out.push(`${m.amount >= 0 ? "+" : ""}${m.amount} ${label}`);
-  }
-  for (const note of item.statModNotes || []) {
-    if (note?.text) out.push(note.text);
+    if ("text" in m && m.text) {
+      out.push(m.text);
+    } else if ("amount" in m) {
+      const label = STAT_LABELS[m.stat] || m.stat;
+      out.push(`${m.amount >= 0 ? "+" : ""}${m.amount} ${label}`);
+    }
   }
   for (const g of item.slotGrants || []) {
     out.push(`+${g.n} ${g.cat} slot${g.n === 1 ? "" : "s"}`);
@@ -554,8 +554,7 @@ const lineageItem = (it) => ({
   repped: it.repped,
   sublineage: it.sublineage,
   desc: it.description,
-  statMods: it.statMods ?? [],
-  statModNotes: it.statModNotes ?? [],
+  statMods: [...(it.statMods ?? []), ...(it.statModNotes ?? [])],
   wealthIncome: it.wealthIncome ?? null,
   slotGrants: it.slotGrants ?? [],
   highestSlot: it.highestSlot ?? false,
@@ -629,6 +628,15 @@ export interface RefsData {
 }
 export const REFS = refsJson as RefsData;
 
+// The refs graph (link-refs.js) is a NAME-matching index: it keys every ability —
+// power or spell alike — under the `powers:` reference namespace, because a mention
+// of "Prayer of Rest" is the same reference whether the entity is typed power or
+// spell. The typed ENTITY_INDEX splits them (`spells:` vs `powers:`), so an entity's
+// id may be `spells:X` while its refs live under `powers:X`. This maps an entity id
+// to the key REFS uses. Only spells need remapping; every other id passes through.
+export const refsKey = (id: string | null | undefined): string =>
+  id && id.startsWith("spells:") ? `powers:${id.slice("spells:".length)}` : id || "";
+
 // Lookup by entity id, e.g. "skills:Basic Faith" → { type, name, description, ... }.
 // Used by the detail pane when an item card is clicked.
 const ENTITY_INDEX = new Map();
@@ -669,77 +677,76 @@ type JsonRecord = {
   [key: string]: string | number | boolean | object | null | undefined;
 };
 interface IndexOptions {
-  nameKey?: string;
-  extra?: (e: JsonRecord) => JsonRecord;
   splitDesc?: boolean;
+  // When true, each record's OWN `type` field names its collection — used for the
+  // power/spell batch, where the parser stamps a meaningful `type` that varies WITHIN
+  // the batch (power vs spell). Default false: the batch is homogeneous and its type
+  // IS `defaultType` (the collection/file name), so any incidental `type` field on a
+  // record — e.g. crafting recipes carry a `type` that means the crafting ACTION
+  // ("Enchant"/"Scribe"), not the entity type — is left as data and NOT used as the key.
+  typed?: boolean;
 }
-const indexCollection = (
+// Index a batch of entity records in ONE loop. The id prefix is the plural COLLECTION
+// path (`collectionOf(type)` → "perks:Foo"); the `type` written on the entity is the
+// SINGULAR discriminator ("perk"). For a `typed` batch the type comes from the record
+// (so powers and spells — same shape, different type — split into `powers:`/`spells:`
+// off the same pass); otherwise it's the batch's `defaultType`.
+const indexEntities = (
   items: JsonRecord[],
-  type: string,
-  { nameKey = "name", extra = () => ({}), splitDesc = false }: IndexOptions = {},
+  defaultType: string,
+  { splitDesc = false, typed = false }: IndexOptions = {},
 ) => {
   for (const e of items) {
-    const name = e[nameKey];
+    const name = e.name;
     if (!name) continue;
+    const type = (typed && (e.type as string)) || singularType(defaultType);
+    const id = `${collectionOf(type)}:${name}`;
     const desc =
       splitDesc && e.description
         ? (() => {
-            const { summary, body } = splitDescription(e.description);
+            const { summary, body } = splitDescription(e.description as string);
             return { description: body, summary };
           })()
         : {};
-    // `id` prefix is the plural COLLECTION path (perks:Foo); `type` is the SINGULAR
-    // discriminator (perk). Two different concepts — deliberately not the same string.
-    ENTITY_INDEX.set(`${type}:${name}`, {
-      ...e,
-      ...desc,
-      ...extra(e),
-      id: `${type}:${name}`,
-      type: singularType(type),
-      name,
-    });
+    ENTITY_INDEX.set(id, { ...e, ...desc, id, type, name });
   }
 };
-indexCollection(skillsJson, "skills");
-indexCollection(perksJson, "perks", { splitDesc: true });
-indexCollection(flawsJson, "flaws", { splitDesc: true });
-indexCollection(devotionsJson, "devotions");
-indexCollection(domainsJson, "domains");
-indexCollection(craftingJson, "recipes");
-indexCollection(ritualsJson, "rituals");
+indexEntities(skillsJson, "skills");
+indexEntities(perksJson, "perks", { splitDesc: true });
+indexEntities(flawsJson, "flaws", { splitDesc: true });
+indexEntities(devotionsJson, "devotions");
+indexEntities(domainsJson, "domains");
+indexEntities(craftingJson, "recipes");
+indexEntities(ritualsJson, "rituals");
+
+// Classes carry their powers/spells nested per tier (the doc's shape, load-bearing
+// for eligiblePowers). Flatten them into one typed entity list — each power/spell
+// carries its parser-stamped `type` and the parenting facet (parentClass, tier) it
+// needs to stand alone — plus the domain powers, then index the whole lot in the
+// single pass above. Nothing here decides power-vs-spell; the record already knows.
+const POWER_TIERS = [
+  "innate",
+  "utility",
+  "basic",
+  "advanced",
+  "veteran",
+  "classSkills",
+  "rightHandPowers",
+  "cantrips",
+  "noviceSpells",
+  "adeptSpells",
+  "greaterSpells",
+];
+const powerEntities: JsonRecord[] = [];
 for (const c of classesJson) {
   ENTITY_INDEX.set(`classes:${c.name}`, { ...c, id: `classes:${c.name}`, type: "class" });
   for (const s of c.specializations || []) {
     ENTITY_INDEX.set(`classes:${s.name}`, { ...s, id: `classes:${s.name}`, type: "class", parentClass: c.name });
   }
-  const TIERS = [
-    "innate",
-    "utility",
-    "basic",
-    "advanced",
-    "veteran",
-    "classSkills",
-    "rightHandPowers",
-    "cantrips",
-    "noviceSpells",
-    "adeptSpells",
-    "greaterSpells",
-  ];
-  for (const t of TIERS)
-    for (const p of c[t] || []) {
-      ENTITY_INDEX.set(`powers:${p.name}`, {
-        tier: t,
-        ...p,
-        id: `powers:${p.name}`,
-        type: "power",
-        parentClass: c.name,
-      });
-    }
+  for (const t of POWER_TIERS) for (const p of c[t] || []) powerEntities.push({ tier: t, ...p, parentClass: c.name });
 }
-for (const d of domainsJson)
-  for (const p of d.powers || []) {
-    ENTITY_INDEX.set(`powers:${p.name}`, { ...p, id: `powers:${p.name}`, type: "power", domain: d.name });
-  }
+for (const d of domainsJson) for (const p of d.powers || []) powerEntities.push({ ...p, domain: d.name });
+indexEntities(powerEntities, "powers", { typed: true });
 // Lineage advantages AND challenges. Keyed "<type>:<Lineage> - <name>" to match how
 // the rules relations reference them (REFS.grants/discounts) and how ownedGrantSources
 // builds the id — without this, grant/discount edges, descriptions, and the inspector

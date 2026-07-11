@@ -30,16 +30,8 @@ export interface ChooseOneConfig {
   options: ChoiceOption[];
 }
 
-export interface StatMod {
-  stat: string;
-  amount: number;
-}
+export type StatMod = { stat: string; amount: number } | { stat: string; text: string };
 
-export interface StatModNote {
-  stat: string;
-  name?: string;
-  text?: string;
-}
 
 // ─── Discriminated Union for Entities ───────────────────────────────────────
 
@@ -62,7 +54,6 @@ export interface BaseEntity {
   parentClass?: string;
   /** Parser-extracted stat modifiers + free-text stat notes. */
   statMods?: StatMod[];
-  statModNotes?: StatModNote[];
 
   // Mechanically extracted prerequisites
   requiredLevel?: number;
@@ -108,6 +99,15 @@ export interface Spell extends BaseEntity {
   sphere: string; // e.g. "Arcane", "Divine"
 }
 
+// A granted ability conferred by a power/spell ("Grant Power: Curious Balm") — never
+// picked, never costed. Shares the power/spell stat-block shape but is its OWN type: it
+// is neither a spell nor a power, and the build treats it as a mechanical grant, not an
+// acquisition (see resolve.ts: no build node is created for it).
+export interface SubPower extends BaseEntity {
+  type: "subpower";
+  tier: "SubPower";
+}
+
 export interface Perk extends BaseEntity {
   type: "perk";
   cost: number | string;
@@ -130,7 +130,7 @@ export interface Class extends BaseEntity {
  * A discriminated union of all possible entities that can be returned by the data layer.
  * Allows the engine to narrow the type via `if (ent.type === 'spell') { ... }`.
  */
-export type Entity = Skill | Power | Spell | Perk | Flaw | Class;
+export type Entity = Skill | Power | Spell | SubPower | Perk | Flaw | Class;
 
 // ─── 2. Ontological Character State ────────────────────────────────────
 
@@ -291,7 +291,7 @@ export interface ResolvedStats {
     armor?: number;
     naturalArmor?: number;
     sources: { name: string; stat: string; n: number }[];
-    notes: StatModNote[];
+    notes: { name: string; stat: string; text: string }[];
   };
 }
 
@@ -470,5 +470,4 @@ export interface ProgressionRow {
   slots?: string;
   innateCantrips?: string[];
   statMods?: StatMod[];
-  statModNotes?: StatModNote[];
 }
