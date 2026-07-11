@@ -411,6 +411,13 @@ function parsePowerNodes(powerNodes) {
 
 // SUB-POWER DEFINITION CELLS: a granted sub-power (Curious Balm, Holy Rest, …) has
 // no [Tier]-tagged H4 heading — its whole stat block lives in a single table cell,
+// A spell IS a power whose tier is a caster tier; every other power tier (and the
+// tier-less domain/sub powers) is a power. The tier is the discriminator, so the
+// entity type is DERIVED from it here — at parse time, where the section heading
+// already told us which it is — instead of being reconstructed downstream.
+const CASTER_TIERS = new Set(["Cantrip", "Novice", "Adept", "Greater"]);
+const powerType = (tier) => (CASTER_TIERS.has(tier) ? "spell" : "power");
+
 // with the sub-power NAME prefixed onto the first field:
 //   "Curious Balm" · "Incantation: Quick 100" · "Call: …" · … · "Effect: Heal, Drain" · "<prose>"
 // The cell's `parts` array preserves those inner-<p> boundaries (the flat `text`
@@ -434,6 +441,7 @@ function parseSubPowerCell(cell, subNames) {
   const { fields, description } = parsePowerNodes(bodyNodes);
   return {
     name,
+    type: powerType("SubPower"),
     tier: "SubPower",
     tags: [],
     ranks: 1,
@@ -516,6 +524,7 @@ function parsePowersInRange(start, end) {
       const { fields, description } = parsePowerNodes(bodyNodes);
       powers.push({
         name,
+        type: powerType(tier),
         tier,
         tags,
         ranks,
@@ -2006,6 +2015,9 @@ function parseDivineDomains() {
         const { fields, description } = parsePowerNodes(bodyNodes);
         powers.push({
           name: pwrName,
+          // Domain powers are always powers — the `[Adept]`/`[Greater]` tag here gates
+          // ACCESS by devotion progression, it does not make the power a caster spell.
+          type: "power",
           tier: tierMatch ? tierMatch[1] : null,
           cost: costMatch ? parseInt(costMatch[1]) : null,
           incantation: fields["incantation"] ?? null,

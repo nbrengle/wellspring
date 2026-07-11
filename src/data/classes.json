@@ -134,6 +134,7 @@
     "innate": [
       {
         "name": "Living Iron",
+        "type": "power",
         "tier": "Innate",
         "tags": [],
         "ranks": 1,
@@ -155,6 +156,7 @@
       },
       {
         "name": "Brilliant Thinker",
+        "type": "power",
         "tier": "Innate",
         "tags": [],
         "ranks": 1,
@@ -182,6 +184,7 @@
       },
       {
         "name": "The Learned One",
+        "type": "power",
         "tier": "Innate",
         "tags": [],
         "ranks": 1,
@@ -238,6 +241,7 @@
       },
       {
         "name": "Pragmatist",
+        "type": "power",
         "tier": "Innate",
         "tags": [],
         "ranks": 1,
@@ -265,6 +269,7 @@
       },
       {
         "name": "Grand Ritualist",
+        "type": "power",
         "tier": "Innate",
         "tags": [],
         "ranks": 1,
@@ -286,6 +291,7 @@
       },
       {
         "name": "Technical Expertise",
+        "type": "power",
         "tier": "Innate",
         "tags": [],
         "ranks": 1,
@@ -313,6 +319,7 @@
       },
       {
         "name": "Expert Craft",
+        "type": "power",
         "tier": "Innate",
         "tags": [],
         "ranks": 1,
@@ -357,6 +364,7 @@
       },
       {
         "name": "Opus",
+        "type": "power",
         "tier": "Innate",
         "tags": [],
         "ranks": 1,
@@ -380,6 +388,7 @@
     "utility": [
       {
         "name": "A Spoonful of Sugar",
+        "type": "power",
         "tier": "Utility",
         "tags": [
           "Crafter"
@@ -403,6 +412,7 @@
       },
       {
         "name": "Adept Ritualist",
+        "type": "power",
         "tier": "Utility",
         "tags": [
           "Mystic"
@@ -441,6 +451,7 @@
       },
       {
         "name": "Apt Assistant",
+        "type": "power",
         "tier": "Utility",
         "tags": [
           "Crafter"
@@ -464,6 +475,7 @@
       },
       {
         "name": "Custom Creation",
+        "type": "power",
         "tier": "Utility",
         "tags": [
           "Crafter"
@@ -487,6 +499,7 @@
       },
       {
         "name": "Forged From Steel",
+        "type": "power",
         "tier": "Utility",
         "tags": [
           "Artificer"
@@ -510,6 +523,7 @@
       },
       {
         "name": "Forgesource Specialist",
+        "type": "power",
         "tier": "Utility",
         "tags": [
           "Artificer",
@@ -534,6 +548,7 @@
       },
       {
         "name": "Good Timing",
+        "type": "power",
         "tier": "Utility",
         "tags": [
           "Crafter"
@@ -557,6 +572,7 @@
       },
       {
         "name": "Hunter Gatherer",
+        "type": "power",
         "tier": "Utility",
         "tags": [
           "Crafter"
@@ -580,6 +596,7 @@
       },
       {
         "name": "Mechanical Augmentation",
+        "type": "power",
         "tier": "Utility",
         "tags": [
           "Artificer"
@@ -603,6 +620,7 @@
       },
       {
         "name": "Otherworldly Sight",
+        "type": "power",
         "tier": "Utility",
         "tags": [
           "Mystic"
@@ -626,6 +644,7 @@
       },
       {
         "name": "Perspicacity",
+        "type": "power",
         "tier": "Utility",
         "tags": [
           "Artificer",
@@ -650,6 +669,7 @@
       },
       {
         "name": "Protected Casting",
+        "type": "power",
         "tier": "Utility",
         "tags": [
           "Mystic"
@@ -673,6 +693,7 @@
       },
       {
         "name": "Smithy’s Blessing",
+        "type": "power",
         "tier": "Utility",
         "tags": [
           "Artificer"
@@ -696,6 +717,7 @@
       },
       {
         "name": "Shield Bearer",
+        "type": "power",
         "tier": "Utility",
         "tags": [
           "Artificer"
@@ -719,6 +741,7 @@
       },
       {
         "name": "Spirit Guide",
+        "type": "power",
         "tier": "Utility",
         "tags": [
           "Mystic"
@@ -742,6 +765,7 @@
       },
       {
         "name": "Tanner",
+        "type": "power",
         "tier": "Utility",
         "tags": [
           "Crafter"
@@ -765,6 +789,7 @@
       },
       {
         "name": "Triage",
+        "type": "power",
         "tier": "Utility",
         "tags": [
           "Mystic"
@@ -790,6 +815,7 @@
     "basic": [
       {
         "name": "Acid Soak",
+        "type": "power",
         "tier": "Basic",
         "tags": [
           "Artificer"
@@ -813,6 +839,7 @@
       },
       {
         "name": "Aegis of the Unknown / Sundering of the Unknown",
+        "type": "power",
         "tier": "Basic",
         "tags": [
           "Mystic"
@@ -836,6 +863,7 @@
       },
       {
         "name": "Analysis",
+        "type": "power",
         "tier": "Basic",
         "tags": [
           "Crafter"
@@ -859,6 +887,7 @@
       },
       {
         "name": "Antidote",
+        "type": "power",
         "tier": "Basic",
         "tags": [
           "Crafter"
@@ -882,6 +911,7 @@
       },
       {
         "name": "Armor Upkeep Specialist",
+        "type": "power",
         "tier": "Basic",
         "tags": [
           "Artificer",
@@ -906,6 +936,7 @@
       },
       {
         "name": "Borrow Knowledge",
+        "type": "power",
         "tier": "Basic",
         "tags": [
           "Mystic"
@@ -929,6 +960,7 @@
       },
       {
         "name": "Blood Scroll",
+        "type": "power",
         "tier": "Basic",
         "tags": [
           "Crafter"
@@ -952,6 +984,7 @@
       },
       {
         "name": "Combat Analysis",
+        "type": "power",
         "tier": "Basic",
         "tags": [
           "Artificer"
@@ -975,6 +1008,7 @@
       },
       {
         "name": "Reconstitute Summon",
+        "type": "power",
         "tier": "Basic",
         "tags": [
           "Mystic"
@@ -998,6 +1032,7 @@
       },
       {
         "name": "Create Infusion",
+        "type": "power",
         "tier": "Basic",
         "tags": [
           "Crafter"
@@ -1021,6 +1056,7 @@
       },
       {
         "name": "Critique Construction",
+        "type": "power",
         "tier": "Basic",
         "tags": [
           "Artificer"
@@ -1044,6 +1080,7 @@
       },
       {
         "name": "Custom Brew",
+        "type": "power",
         "tier": "Basic",
         "tags": [
           "Crafter"
@@ -1067,6 +1104,7 @@
       },
       {
         "name": "Dig Deep",
+        "type": "power",
         "tier": "Basic",
         "tags": [
           "Mystic"
@@ -1090,6 +1128,7 @@
       },
       {
         "name": "Forcefield",
+        "type": "power",
         "tier": "Basic",
         "tags": [
           "Artificer"
@@ -1113,6 +1152,7 @@
       },
       {
         "name": "Intimidating Spines",
+        "type": "power",
         "tier": "Basic",
         "tags": [
           "Artificer"
@@ -1136,6 +1176,7 @@
       },
       {
         "name": "Jury Rig",
+        "type": "power",
         "tier": "Basic",
         "tags": [
           "Artificer"
@@ -1159,6 +1200,7 @@
       },
       {
         "name": "Kick",
+        "type": "power",
         "tier": "Basic",
         "tags": [
           "Crafter"
@@ -1196,6 +1238,7 @@
       },
       {
         "name": "Mesmerize",
+        "type": "power",
         "tier": "Basic",
         "tags": [
           "Mystic"
@@ -1219,6 +1262,7 @@
       },
       {
         "name": "Overcharge",
+        "type": "power",
         "tier": "Basic",
         "tags": [
           "Artificer"
@@ -1242,6 +1286,7 @@
       },
       {
         "name": "Share",
+        "type": "power",
         "tier": "Basic",
         "tags": [
           "Mystic"
@@ -1265,6 +1310,7 @@
       },
       {
         "name": "Spiritual Anchor",
+        "type": "power",
         "tier": "Basic",
         "tags": [
           "Mystic"
@@ -1288,6 +1334,7 @@
       },
       {
         "name": "Trap Recovery",
+        "type": "power",
         "tier": "Basic",
         "tags": [
           "Artificer"
@@ -1311,6 +1358,7 @@
       },
       {
         "name": "Treat",
+        "type": "power",
         "tier": "Basic",
         "tags": [
           "Artificer",
@@ -1335,6 +1383,7 @@
       },
       {
         "name": "Warming Elixir / Cooling Draught",
+        "type": "power",
         "tier": "Basic",
         "tags": [
           "Crafter"
@@ -1358,6 +1407,7 @@
       },
       {
         "name": "Weapon Upkeep Specialist",
+        "type": "power",
         "tier": "Basic",
         "tags": [
           "Crafter"
@@ -1381,6 +1431,7 @@
       },
       {
         "name": "Weird Wanderings",
+        "type": "power",
         "tier": "Basic",
         "tags": [
           "Mystic"
@@ -1425,6 +1476,7 @@
     "advanced": [
       {
         "name": "Advanced Treatment",
+        "type": "power",
         "tier": "Advanced",
         "tags": [
           "Mystic",
@@ -1449,6 +1501,7 @@
       },
       {
         "name": "Detonate",
+        "type": "power",
         "tier": "Advanced",
         "tags": [
           "Artificer"
@@ -1472,6 +1525,7 @@
       },
       {
         "name": "Explosive Impact",
+        "type": "power",
         "tier": "SubPower",
         "tags": [],
         "ranks": 1,
@@ -1491,6 +1545,7 @@
       },
       {
         "name": "Efficiencies of Scale",
+        "type": "power",
         "tier": "Advanced",
         "tags": [
           "Crafter"
@@ -1514,6 +1569,7 @@
       },
       {
         "name": "Empower Friends",
+        "type": "power",
         "tier": "Advanced",
         "tags": [
           "Mystic"
@@ -1537,6 +1593,7 @@
       },
       {
         "name": "Exploding Arrows",
+        "type": "power",
         "tier": "Advanced",
         "tags": [
           "Artificer"
@@ -1560,6 +1617,7 @@
       },
       {
         "name": "Grounded",
+        "type": "power",
         "tier": "Advanced",
         "tags": [
           "Artificer"
@@ -1583,6 +1641,7 @@
       },
       {
         "name": "Hiatus",
+        "type": "power",
         "tier": "Advanced",
         "tags": [
           "Mystic"
@@ -1606,6 +1665,7 @@
       },
       {
         "name": "Infuse",
+        "type": "power",
         "tier": "Advanced",
         "tags": [
           "Crafter",
@@ -1630,6 +1690,7 @@
       },
       {
         "name": "Perfect Practice",
+        "type": "power",
         "tier": "Advanced",
         "tags": [
           "Crafter",
@@ -1654,6 +1715,7 @@
       },
       {
         "name": "Reinforce Shield",
+        "type": "power",
         "tier": "Advanced",
         "tags": [
           "Artificer"
@@ -1677,6 +1739,7 @@
       },
       {
         "name": "Soulhold Survival",
+        "type": "power",
         "tier": "Advanced",
         "tags": [
           "Crafter"
@@ -1700,6 +1763,7 @@
       },
       {
         "name": "Spark of Doom",
+        "type": "power",
         "tier": "Advanced",
         "tags": [
           "Artificer"
@@ -1723,6 +1787,7 @@
       },
       {
         "name": "Spiritual Defense",
+        "type": "power",
         "tier": "Advanced",
         "tags": [
           "Mystic"
@@ -1746,6 +1811,7 @@
       },
       {
         "name": "Strange Token",
+        "type": "power",
         "tier": "Advanced",
         "tags": [
           "Mystic"
@@ -1772,6 +1838,7 @@
       },
       {
         "name": "Curious Balm",
+        "type": "power",
         "tier": "SubPower",
         "tags": [],
         "ranks": 1,
@@ -1791,6 +1858,7 @@
       },
       {
         "name": "Studied Focus",
+        "type": "power",
         "tier": "Advanced",
         "tags": [
           "Artificer",
@@ -1827,6 +1895,7 @@
       },
       {
         "name": "Uninterrupted Creativity",
+        "type": "power",
         "tier": "Advanced",
         "tags": [
           "Crafter"
@@ -1850,6 +1919,7 @@
       },
       {
         "name": "Zenith of Knowledge",
+        "type": "power",
         "tier": "Advanced",
         "tags": [
           "Mystic"
@@ -1896,6 +1966,7 @@
     "classSkills": [
       {
         "name": "Studied Process",
+        "type": "power",
         "tier": "Class",
         "tags": [],
         "ranks": 3,
@@ -1922,6 +1993,7 @@
       },
       {
         "name": "Utilitarian",
+        "type": "power",
         "tier": "Class",
         "tags": [],
         "ranks": 1,
@@ -1955,6 +2027,7 @@
       },
       {
         "name": "Batch Process",
+        "type": "power",
         "tier": "Class",
         "tags": [],
         "ranks": 4,
@@ -1982,6 +2055,7 @@
       },
       {
         "name": "Quality Control",
+        "type": "power",
         "tier": "Class",
         "tags": [],
         "ranks": 5,
@@ -2003,6 +2077,7 @@
       },
       {
         "name": "It’s Alive!",
+        "type": "power",
         "tier": "Class",
         "tags": [],
         "ranks": 1,
@@ -2136,6 +2211,7 @@
     "innate": [
       {
         "name": "Refreshing Prayer",
+        "type": "power",
         "tier": "Innate",
         "tags": [],
         "ranks": 1,
@@ -2157,6 +2233,7 @@
       },
       {
         "name": "Healing Touch",
+        "type": "power",
         "tier": "Innate",
         "tags": [],
         "ranks": 1,
@@ -2178,6 +2255,7 @@
       },
       {
         "name": "Ritual Affinity",
+        "type": "power",
         "tier": "Innate",
         "tags": [],
         "ranks": 1,
@@ -2215,6 +2293,7 @@
       },
       {
         "name": "Shield of Faith",
+        "type": "power",
         "tier": "Innate",
         "tags": [],
         "ranks": 1,
@@ -2239,6 +2318,7 @@
       },
       {
         "name": "Holy Armor",
+        "type": "power",
         "tier": "Innate",
         "tags": [],
         "ranks": 1,
@@ -2260,6 +2340,7 @@
       },
       {
         "name": "Shepherd the Faithful",
+        "type": "power",
         "tier": "Innate",
         "tags": [],
         "ranks": 1,
@@ -2287,6 +2368,7 @@
     "classSkills": [
       {
         "name": "Path of Panic",
+        "type": "power",
         "tier": "Class",
         "tags": [],
         "ranks": 1,
@@ -2308,6 +2390,7 @@
       },
       {
         "name": "Mantle of Faith",
+        "type": "power",
         "tier": "Class",
         "tags": [],
         "ranks": 1,
@@ -2329,6 +2412,7 @@
       },
       {
         "name": "Cantrip Scholar",
+        "type": "power",
         "tier": "Class",
         "tags": [],
         "ranks": 1,
@@ -2362,6 +2446,7 @@
       },
       {
         "name": "Expand Focus",
+        "type": "power",
         "tier": "Class",
         "tags": [],
         "ranks": 1,
@@ -2383,6 +2468,7 @@
       },
       {
         "name": "Expansive Worship",
+        "type": "power",
         "tier": "Class",
         "tags": [],
         "ranks": 1,
@@ -2404,6 +2490,7 @@
       },
       {
         "name": "Greater Healing Touch",
+        "type": "power",
         "tier": "Class",
         "tags": [],
         "ranks": 1,
@@ -2425,6 +2512,7 @@
       },
       {
         "name": "Divine Substitution",
+        "type": "power",
         "tier": "Class",
         "tags": [],
         "ranks": 1,
@@ -2449,6 +2537,7 @@
     "cantrips": [
       {
         "name": "Blade Blessing",
+        "type": "spell",
         "tier": "Cantrip",
         "tags": [],
         "ranks": 1,
@@ -2470,6 +2559,7 @@
       },
       {
         "name": "Cancel",
+        "type": "spell",
         "tier": "Cantrip",
         "tags": [],
         "ranks": 1,
@@ -2497,6 +2587,7 @@
       },
       {
         "name": "Curing Prayer",
+        "type": "spell",
         "tier": "Cantrip",
         "tags": [],
         "ranks": 1,
@@ -2518,6 +2609,7 @@
       },
       {
         "name": "Detect Devotion",
+        "type": "spell",
         "tier": "Cantrip",
         "tags": [],
         "ranks": 1,
@@ -2539,6 +2631,7 @@
       },
       {
         "name": "Devotion’s Strike",
+        "type": "spell",
         "tier": "Cantrip",
         "tags": [],
         "ranks": 1,
@@ -2560,6 +2653,7 @@
       },
       {
         "name": "Divine Bolt",
+        "type": "spell",
         "tier": "Cantrip",
         "tags": [],
         "ranks": 1,
@@ -2581,6 +2675,7 @@
       },
       {
         "name": "Revivify",
+        "type": "spell",
         "tier": "Cantrip",
         "tags": [],
         "ranks": 1,
@@ -2602,6 +2697,7 @@
       },
       {
         "name": "Sense Supernatural",
+        "type": "spell",
         "tier": "Cantrip",
         "tags": [],
         "ranks": 1,
@@ -2623,6 +2719,7 @@
       },
       {
         "name": "Shield of Devotion",
+        "type": "spell",
         "tier": "Cantrip",
         "tags": [],
         "ranks": 1,
@@ -2646,6 +2743,7 @@
     "noviceSpells": [
       {
         "name": "Armor of Faith",
+        "type": "spell",
         "tier": "Novice",
         "tags": [],
         "ranks": 1,
@@ -2667,6 +2765,7 @@
       },
       {
         "name": "Augury",
+        "type": "spell",
         "tier": "Novice",
         "tags": [],
         "ranks": 1,
@@ -2688,6 +2787,7 @@
       },
       {
         "name": "Benediction",
+        "type": "spell",
         "tier": "Novice",
         "tags": [],
         "ranks": 1,
@@ -2709,6 +2809,7 @@
       },
       {
         "name": "Burn",
+        "type": "spell",
         "tier": "Novice",
         "tags": [],
         "ranks": 1,
@@ -2730,6 +2831,7 @@
       },
       {
         "name": "Cure",
+        "type": "spell",
         "tier": "Novice",
         "tags": [],
         "ranks": 1,
@@ -2751,6 +2853,7 @@
       },
       {
         "name": "Disable Undead",
+        "type": "spell",
         "tier": "Novice",
         "tags": [],
         "ranks": 1,
@@ -2772,6 +2875,7 @@
       },
       {
         "name": "Faith’s Lash",
+        "type": "spell",
         "tier": "Novice",
         "tags": [],
         "ranks": 1,
@@ -2793,6 +2897,7 @@
       },
       {
         "name": "Fortress of Faith",
+        "type": "spell",
         "tier": "Novice",
         "tags": [],
         "ranks": 1,
@@ -2814,6 +2919,7 @@
       },
       {
         "name": "Heal",
+        "type": "spell",
         "tier": "Novice",
         "tags": [],
         "ranks": 1,
@@ -2835,6 +2941,7 @@
       },
       {
         "name": "Heretics’ Brand",
+        "type": "spell",
         "tier": "Novice",
         "tags": [],
         "ranks": 1,
@@ -2856,6 +2963,7 @@
       },
       {
         "name": "Intercession",
+        "type": "spell",
         "tier": "Novice",
         "tags": [],
         "ranks": 1,
@@ -2877,6 +2985,7 @@
       },
       {
         "name": "Blade Guard",
+        "type": "spell",
         "tier": "Novice",
         "tags": [],
         "ranks": 1,
@@ -2898,6 +3007,7 @@
       },
       {
         "name": "Prayer of Rest",
+        "type": "spell",
         "tier": "Novice",
         "tags": [],
         "ranks": 1,
@@ -2919,6 +3029,7 @@
       },
       {
         "name": "Holy Rest",
+        "type": "power",
         "tier": "SubPower",
         "tags": [],
         "ranks": 1,
@@ -2938,6 +3049,7 @@
       },
       {
         "name": "Rekindle",
+        "type": "spell",
         "tier": "Novice",
         "tags": [],
         "ranks": 1,
@@ -2959,6 +3071,7 @@
       },
       {
         "name": "Spirit Speak",
+        "type": "spell",
         "tier": "Novice",
         "tags": [],
         "ranks": 1,
@@ -2982,6 +3095,7 @@
     "adeptSpells": [
       {
         "name": "Bless Shield",
+        "type": "spell",
         "tier": "Adept",
         "tags": [],
         "ranks": 1,
@@ -3003,6 +3117,7 @@
       },
       {
         "name": "Blessing",
+        "type": "spell",
         "tier": "Adept",
         "tags": [],
         "ranks": 1,
@@ -3024,6 +3139,7 @@
       },
       {
         "name": "Cleanse",
+        "type": "spell",
         "tier": "Adept",
         "tags": [],
         "ranks": 1,
@@ -3045,6 +3161,7 @@
       },
       {
         "name": "Disrupt",
+        "type": "spell",
         "tier": "Adept",
         "tags": [],
         "ranks": 1,
@@ -3066,6 +3183,7 @@
       },
       {
         "name": "Divine Armor",
+        "type": "spell",
         "tier": "Adept",
         "tags": [],
         "ranks": 1,
@@ -3087,6 +3205,7 @@
       },
       {
         "name": "Flame of Faith",
+        "type": "spell",
         "tier": "Adept",
         "tags": [],
         "ranks": 1,
@@ -3108,6 +3227,7 @@
       },
       {
         "name": "Gift of Life",
+        "type": "spell",
         "tier": "Adept",
         "tags": [],
         "ranks": 1,
@@ -3129,6 +3249,7 @@
       },
       {
         "name": "Judgment",
+        "type": "spell",
         "tier": "Adept",
         "tags": [],
         "ranks": 1,
@@ -3150,6 +3271,7 @@
       },
       {
         "name": "Minor Circle",
+        "type": "spell",
         "tier": "Adept",
         "tags": [],
         "ranks": 1,
@@ -3171,6 +3293,7 @@
       },
       {
         "name": "Punish",
+        "type": "spell",
         "tier": "Adept",
         "tags": [],
         "ranks": 1,
@@ -3192,6 +3315,7 @@
       },
       {
         "name": "Retributive Protection",
+        "type": "spell",
         "tier": "Adept",
         "tags": [],
         "ranks": 1,
@@ -3213,6 +3337,7 @@
       },
       {
         "name": "Safe Return",
+        "type": "spell",
         "tier": "Adept",
         "tags": [],
         "ranks": 1,
@@ -3234,6 +3359,7 @@
       },
       {
         "name": "Salvation",
+        "type": "spell",
         "tier": "Adept",
         "tags": [],
         "ranks": 1,
@@ -3255,6 +3381,7 @@
       },
       {
         "name": "Speak With The Dead",
+        "type": "spell",
         "tier": "Adept",
         "tags": [],
         "ranks": 1,
@@ -3276,6 +3403,7 @@
       },
       {
         "name": "Spell-Warding",
+        "type": "spell",
         "tier": "Adept",
         "tags": [],
         "ranks": 1,
@@ -3392,6 +3520,7 @@
     "innate": [
       {
         "name": "Commune with Nature",
+        "type": "power",
         "tier": "Innate",
         "tags": [],
         "ranks": 1,
@@ -3413,6 +3542,7 @@
       },
       {
         "name": "Nature’s Understanding",
+        "type": "power",
         "tier": "Innate",
         "tags": [],
         "ranks": 1,
@@ -3434,6 +3564,7 @@
       },
       {
         "name": "Message of the Flowers",
+        "type": "power",
         "tier": "Innate",
         "tags": [],
         "ranks": 1,
@@ -3455,6 +3586,7 @@
       },
       {
         "name": "Earth’s Vitality",
+        "type": "power",
         "tier": "Innate",
         "tags": [],
         "ranks": 1,
@@ -3476,6 +3608,7 @@
       },
       {
         "name": "Natural Cycle",
+        "type": "power",
         "tier": "Innate",
         "tags": [],
         "ranks": 1,
@@ -3497,6 +3630,7 @@
       },
       {
         "name": "Grove",
+        "type": "power",
         "tier": "Innate",
         "tags": [],
         "ranks": 1,
@@ -3524,6 +3658,7 @@
     "classSkills": [
       {
         "name": "Red in Tooth and Claw",
+        "type": "power",
         "tier": "Class",
         "tags": [],
         "ranks": 1,
@@ -3545,6 +3680,7 @@
       },
       {
         "name": "Favored Form",
+        "type": "power",
         "tier": "Class",
         "tags": [],
         "ranks": 1,
@@ -3566,6 +3702,7 @@
       },
       {
         "name": "Find the Path",
+        "type": "power",
         "tier": "Class",
         "tags": [],
         "ranks": 1,
@@ -3587,6 +3724,7 @@
       },
       {
         "name": "Hunter",
+        "type": "power",
         "tier": "Class",
         "tags": [],
         "ranks": 1,
@@ -3608,6 +3746,7 @@
       },
       {
         "name": "Wyvern’s Tooth and Claw",
+        "type": "power",
         "tier": "Class",
         "tags": [],
         "ranks": 1,
@@ -3632,6 +3771,7 @@
       },
       {
         "name": "Cantrip Scholar",
+        "type": "power",
         "tier": "Class",
         "tags": [],
         "ranks": 1,
@@ -3665,6 +3805,7 @@
       },
       {
         "name": "Flexible Form",
+        "type": "power",
         "tier": "Class",
         "tags": [],
         "ranks": 1,
@@ -3692,6 +3833,7 @@
     "cantrips": [
       {
         "name": "Antitoxin",
+        "type": "spell",
         "tier": "Cantrip",
         "tags": [],
         "ranks": 1,
@@ -3713,6 +3855,7 @@
       },
       {
         "name": "Cancel",
+        "type": "spell",
         "tier": "Cantrip",
         "tags": [],
         "ranks": 1,
@@ -3740,6 +3883,7 @@
       },
       {
         "name": "Care for the Fallen",
+        "type": "spell",
         "tier": "Cantrip",
         "tags": [],
         "ranks": 1,
@@ -3761,6 +3905,7 @@
       },
       {
         "name": "Enchanted Thorn",
+        "type": "spell",
         "tier": "Cantrip",
         "tags": [],
         "ranks": 1,
@@ -3782,6 +3927,7 @@
       },
       {
         "name": "Festering Lash",
+        "type": "spell",
         "tier": "Cantrip",
         "tags": [],
         "ranks": 1,
@@ -3803,6 +3949,7 @@
       },
       {
         "name": "Hide",
+        "type": "spell",
         "tier": "Cantrip",
         "tags": [],
         "ranks": 1,
@@ -3824,6 +3971,7 @@
       },
       {
         "name": "Life Tap",
+        "type": "spell",
         "tier": "Cantrip",
         "tags": [],
         "ranks": 1,
@@ -3845,6 +3993,7 @@
       },
       {
         "name": "Nature’s Rebuke",
+        "type": "spell",
         "tier": "Cantrip",
         "tags": [],
         "ranks": 1,
@@ -3866,6 +4015,7 @@
       },
       {
         "name": "Nettles and Barbs",
+        "type": "spell",
         "tier": "Cantrip",
         "tags": [],
         "ranks": 1,
@@ -3887,6 +4037,7 @@
       },
       {
         "name": "Natural Remedies",
+        "type": "spell",
         "tier": "Cantrip",
         "tags": [],
         "ranks": 1,
@@ -3910,6 +4061,7 @@
     "noviceSpells": [
       {
         "name": "Lesser Form of the Hulking Bear",
+        "type": "spell",
         "tier": "Novice",
         "tags": [
           "Form"
@@ -3933,6 +4085,7 @@
       },
       {
         "name": "Lesser Form of the Striking Serpent",
+        "type": "spell",
         "tier": "Novice",
         "tags": [
           "Form"
@@ -3956,6 +4109,7 @@
       },
       {
         "name": "Lesser Form of the Hunting Panther",
+        "type": "spell",
         "tier": "Novice",
         "tags": [
           "Form"
@@ -3979,6 +4133,7 @@
       },
       {
         "name": "Arboreal Transformation",
+        "type": "spell",
         "tier": "Novice",
         "tags": [],
         "ranks": 1,
@@ -4000,6 +4155,7 @@
       },
       {
         "name": "Balm",
+        "type": "spell",
         "tier": "Novice",
         "tags": [],
         "ranks": 1,
@@ -4021,6 +4177,7 @@
       },
       {
         "name": "Barkskin",
+        "type": "spell",
         "tier": "Novice",
         "tags": [],
         "ranks": 1,
@@ -4042,6 +4199,7 @@
       },
       {
         "name": "Blessing of the Oak",
+        "type": "spell",
         "tier": "Novice",
         "tags": [],
         "ranks": 1,
@@ -4063,6 +4221,7 @@
       },
       {
         "name": "Bounty of the Land",
+        "type": "spell",
         "tier": "Novice",
         "tags": [],
         "ranks": 1,
@@ -4084,6 +4243,7 @@
       },
       {
         "name": "Corrosive Bolt",
+        "type": "spell",
         "tier": "Novice",
         "tags": [],
         "ranks": 1,
@@ -4105,6 +4265,7 @@
       },
       {
         "name": "Ensnare",
+        "type": "spell",
         "tier": "Novice",
         "tags": [],
         "ranks": 1,
@@ -4126,6 +4287,7 @@
       },
       {
         "name": "Entangling Vines",
+        "type": "spell",
         "tier": "Novice",
         "tags": [],
         "ranks": 1,
@@ -4147,6 +4309,7 @@
       },
       {
         "name": "Eyes of the Crow",
+        "type": "spell",
         "tier": "Novice",
         "tags": [],
         "ranks": 1,
@@ -4168,6 +4331,7 @@
       },
       {
         "name": "Frostbite",
+        "type": "spell",
         "tier": "Novice",
         "tags": [],
         "ranks": 1,
@@ -4189,6 +4353,7 @@
       },
       {
         "name": "Nature’s Embrace",
+        "type": "spell",
         "tier": "Novice",
         "tags": [],
         "ranks": 1,
@@ -4210,6 +4375,7 @@
       },
       {
         "name": "Purifying Flame",
+        "type": "spell",
         "tier": "Novice",
         "tags": [],
         "ranks": 1,
@@ -4231,6 +4397,7 @@
       },
       {
         "name": "Quell Beast",
+        "type": "spell",
         "tier": "Novice",
         "tags": [],
         "ranks": 1,
@@ -4252,6 +4419,7 @@
       },
       {
         "name": "Sap of Life",
+        "type": "spell",
         "tier": "Novice",
         "tags": [],
         "ranks": 1,
@@ -4273,6 +4441,7 @@
       },
       {
         "name": "Shape Metal",
+        "type": "spell",
         "tier": "Novice",
         "tags": [],
         "ranks": 1,
@@ -4294,6 +4463,7 @@
       },
       {
         "name": "Submerge",
+        "type": "spell",
         "tier": "Novice",
         "tags": [],
         "ranks": 1,
@@ -4317,6 +4487,7 @@
     "adeptSpells": [
       {
         "name": "Form of the Hulking Bear",
+        "type": "spell",
         "tier": "Adept",
         "tags": [
           "Form"
@@ -4340,6 +4511,7 @@
       },
       {
         "name": "Form of the Striking Serpent",
+        "type": "spell",
         "tier": "Adept",
         "tags": [
           "Form"
@@ -4363,6 +4535,7 @@
       },
       {
         "name": "Form of the Hunting Panther",
+        "type": "spell",
         "tier": "Adept",
         "tags": [
           "Form"
@@ -4386,6 +4559,7 @@
       },
       {
         "name": "Curse the Despoiler",
+        "type": "spell",
         "tier": "Adept",
         "tags": [],
         "ranks": 1,
@@ -4407,6 +4581,7 @@
       },
       {
         "name": "Dart Frog’s Skin",
+        "type": "spell",
         "tier": "Adept",
         "tags": [],
         "ranks": 1,
@@ -4428,6 +4603,7 @@
       },
       {
         "name": "Feral Strength",
+        "type": "spell",
         "tier": "Adept",
         "tags": [],
         "ranks": 1,
@@ -4449,6 +4625,7 @@
       },
       {
         "name": "Health of the World",
+        "type": "spell",
         "tier": "Adept",
         "tags": [],
         "ranks": 1,
@@ -4470,6 +4647,7 @@
       },
       {
         "name": "Putrid Blade",
+        "type": "spell",
         "tier": "Adept",
         "tags": [],
         "ranks": 1,
@@ -4491,6 +4669,7 @@
       },
       {
         "name": "Phoenix Reborn",
+        "type": "spell",
         "tier": "Adept",
         "tags": [],
         "ranks": 1,
@@ -4512,6 +4691,7 @@
       },
       {
         "name": "Hide of the Rhino",
+        "type": "spell",
         "tier": "Adept",
         "tags": [],
         "ranks": 1,
@@ -4533,6 +4713,7 @@
       },
       {
         "name": "Lifethrive",
+        "type": "spell",
         "tier": "Adept",
         "tags": [],
         "ranks": 1,
@@ -4554,6 +4735,7 @@
       },
       {
         "name": "Nature’s Blessing",
+        "type": "spell",
         "tier": "Adept",
         "tags": [],
         "ranks": 1,
@@ -4575,6 +4757,7 @@
       },
       {
         "name": "Spitting Venom",
+        "type": "spell",
         "tier": "Adept",
         "tags": [],
         "ranks": 1,
@@ -4596,6 +4779,7 @@
       },
       {
         "name": "Spirit Strike",
+        "type": "spell",
         "tier": "Adept",
         "tags": [],
         "ranks": 1,
@@ -4617,6 +4801,7 @@
       },
       {
         "name": "Thorns of Ruin",
+        "type": "spell",
         "tier": "Adept",
         "tags": [],
         "ranks": 1,
@@ -4638,6 +4823,7 @@
       },
       {
         "name": "Sprout Wings",
+        "type": "spell",
         "tier": "Adept",
         "tags": [],
         "ranks": 1,
@@ -4659,6 +4845,7 @@
       },
       {
         "name": "Weasel’s Agility",
+        "type": "spell",
         "tier": "Adept",
         "tags": [],
         "ranks": 1,
@@ -4802,6 +4989,7 @@
     "innate": [
       {
         "name": "Deadly Remnants",
+        "type": "power",
         "tier": "Innate",
         "tags": [],
         "ranks": 1,
@@ -4823,6 +5011,7 @@
       },
       {
         "name": "Parry Blow",
+        "type": "power",
         "tier": "Innate",
         "tags": [],
         "ranks": 1,
@@ -4844,6 +5033,7 @@
       },
       {
         "name": "Fighting Instructor",
+        "type": "power",
         "tier": "Innate",
         "tags": [],
         "ranks": 1,
@@ -4865,6 +5055,7 @@
       },
       {
         "name": "Mountain of Steel",
+        "type": "power",
         "tier": "Innate",
         "tags": [],
         "ranks": 1,
@@ -4886,6 +5077,7 @@
       },
       {
         "name": "Warrior Spirit",
+        "type": "power",
         "tier": "Innate",
         "tags": [],
         "ranks": 1,
@@ -4940,6 +5132,7 @@
     "utility": [
       {
         "name": "Armored Shell",
+        "type": "power",
         "tier": "Utility",
         "tags": [],
         "ranks": 1,
@@ -4967,6 +5160,7 @@
       },
       {
         "name": "Armored Shell II",
+        "type": "power",
         "tier": "Utility",
         "tags": [],
         "ranks": 1,
@@ -4988,6 +5182,7 @@
       },
       {
         "name": "Bowyer",
+        "type": "power",
         "tier": "Utility",
         "tags": [],
         "ranks": 1,
@@ -5009,6 +5204,7 @@
       },
       {
         "name": "Execute",
+        "type": "power",
         "tier": "Utility",
         "tags": [],
         "ranks": 1,
@@ -5030,6 +5226,7 @@
       },
       {
         "name": "Fortitude",
+        "type": "power",
         "tier": "Utility",
         "tags": [],
         "ranks": 1,
@@ -5051,6 +5248,7 @@
       },
       {
         "name": "Knight’s Strength",
+        "type": "power",
         "tier": "Utility",
         "tags": [],
         "ranks": 1,
@@ -5072,6 +5270,7 @@
       },
       {
         "name": "Lessons from Scars",
+        "type": "power",
         "tier": "Utility",
         "tags": [],
         "ranks": 1,
@@ -5093,6 +5292,7 @@
       },
       {
         "name": "Linked Armor",
+        "type": "power",
         "tier": "Utility",
         "tags": [],
         "ranks": 1,
@@ -5114,6 +5314,7 @@
       },
       {
         "name": "Reload",
+        "type": "power",
         "tier": "Utility",
         "tags": [],
         "ranks": 1,
@@ -5139,6 +5340,7 @@
       },
       {
         "name": "Renowned Soldier",
+        "type": "power",
         "tier": "Utility",
         "tags": [],
         "ranks": 1,
@@ -5160,6 +5362,7 @@
       },
       {
         "name": "Scales of the Serpent",
+        "type": "power",
         "tier": "Utility",
         "tags": [
           "Reinforce"
@@ -5183,6 +5386,7 @@
       },
       {
         "name": "Shoulder",
+        "type": "power",
         "tier": "Utility",
         "tags": [],
         "ranks": 1,
@@ -5204,6 +5408,7 @@
       },
       {
         "name": "Wall of Steel",
+        "type": "power",
         "tier": "Utility",
         "tags": [
           "Reinforce"
@@ -5229,6 +5434,7 @@
     "basic": [
       {
         "name": "Battlemind",
+        "type": "power",
         "tier": "Basic",
         "tags": [],
         "ranks": 2,
@@ -5250,6 +5456,7 @@
       },
       {
         "name": "Disarming Strike",
+        "type": "power",
         "tier": "Basic",
         "tags": [],
         "ranks": 5,
@@ -5271,6 +5478,7 @@
       },
       {
         "name": "Disengage",
+        "type": "power",
         "tier": "Basic",
         "tags": [],
         "ranks": 3,
@@ -5292,6 +5500,7 @@
       },
       {
         "name": "Flaming Arrow",
+        "type": "power",
         "tier": "Basic",
         "tags": [],
         "ranks": 5,
@@ -5313,6 +5522,7 @@
       },
       {
         "name": "Grit",
+        "type": "power",
         "tier": "Basic",
         "tags": [
           "Reinforce",
@@ -5337,6 +5547,7 @@
       },
       {
         "name": "Harry",
+        "type": "power",
         "tier": "Basic",
         "tags": [
           "Reinforce"
@@ -5360,6 +5571,7 @@
       },
       {
         "name": "Heroic Save",
+        "type": "power",
         "tier": "Basic",
         "tags": [],
         "ranks": 2,
@@ -5381,6 +5593,7 @@
       },
       {
         "name": "Patchwork Defense",
+        "type": "power",
         "tier": "Basic",
         "tags": [],
         "ranks": 1,
@@ -5405,6 +5618,7 @@
       },
       {
         "name": "Raging Blows",
+        "type": "power",
         "tier": "Basic",
         "tags": [],
         "ranks": 2,
@@ -5426,6 +5640,7 @@
       },
       {
         "name": "Resolve",
+        "type": "power",
         "tier": "Basic",
         "tags": [
           "Reinforce"
@@ -5449,6 +5664,7 @@
       },
       {
         "name": "Shake It Off I",
+        "type": "power",
         "tier": "Basic",
         "tags": [
           "Reinforce"
@@ -5472,6 +5688,7 @@
       },
       {
         "name": "Shot Placement",
+        "type": "power",
         "tier": "Basic",
         "tags": [],
         "ranks": 2,
@@ -5493,6 +5710,7 @@
       },
       {
         "name": "Smite",
+        "type": "power",
         "tier": "Basic",
         "tags": [],
         "ranks": 2,
@@ -5514,6 +5732,7 @@
       },
       {
         "name": "Snap Shot",
+        "type": "power",
         "tier": "Basic",
         "tags": [],
         "ranks": 3,
@@ -5535,6 +5754,7 @@
       },
       {
         "name": "Stifle",
+        "type": "power",
         "tier": "Basic",
         "tags": [],
         "ranks": 1,
@@ -5556,6 +5776,7 @@
       },
       {
         "name": "Twin Shot",
+        "type": "power",
         "tier": "Basic",
         "tags": [],
         "ranks": 1,
@@ -5579,6 +5800,7 @@
     "advanced": [
       {
         "name": "Archer’s Eye",
+        "type": "power",
         "tier": "Advanced",
         "tags": [],
         "ranks": 1,
@@ -5600,6 +5822,7 @@
       },
       {
         "name": "Challenging Shout",
+        "type": "power",
         "tier": "Advanced",
         "tags": [],
         "ranks": 1,
@@ -5621,6 +5844,7 @@
       },
       {
         "name": "Expert Parry",
+        "type": "power",
         "tier": "Advanced",
         "tags": [
           "Reinforce"
@@ -5647,6 +5871,7 @@
       },
       {
         "name": "Hammer Down",
+        "type": "power",
         "tier": "Advanced",
         "tags": [],
         "ranks": 1,
@@ -5668,6 +5893,7 @@
       },
       {
         "name": "Heartseeker Shot",
+        "type": "power",
         "tier": "Advanced",
         "tags": [],
         "ranks": 3,
@@ -5689,6 +5915,7 @@
       },
       {
         "name": "Improved Blows",
+        "type": "power",
         "tier": "Advanced",
         "tags": [],
         "ranks": 1,
@@ -5710,6 +5937,7 @@
       },
       {
         "name": "Lock Down",
+        "type": "power",
         "tier": "Advanced",
         "tags": [],
         "ranks": 2,
@@ -5731,6 +5959,7 @@
       },
       {
         "name": "Rally the Troops",
+        "type": "power",
         "tier": "Advanced",
         "tags": [],
         "ranks": 2,
@@ -5752,6 +5981,7 @@
       },
       {
         "name": "Rapid Shot",
+        "type": "power",
         "tier": "Advanced",
         "tags": [],
         "ranks": 3,
@@ -5773,6 +6003,7 @@
       },
       {
         "name": "Refocus",
+        "type": "power",
         "tier": "Advanced",
         "tags": [],
         "ranks": 5,
@@ -5798,6 +6029,7 @@
       },
       {
         "name": "Rest",
+        "type": "power",
         "tier": "Advanced",
         "tags": [],
         "ranks": 1,
@@ -5819,6 +6051,7 @@
       },
       {
         "name": "Riposte",
+        "type": "power",
         "tier": "Advanced",
         "tags": [],
         "ranks": 1,
@@ -5840,6 +6073,7 @@
       },
       {
         "name": "Shake It Off II",
+        "type": "power",
         "tier": "Advanced",
         "tags": [
           "Reinforce"
@@ -5863,6 +6097,7 @@
       },
       {
         "name": "Skewer",
+        "type": "power",
         "tier": "Advanced",
         "tags": [],
         "ranks": 2,
@@ -5884,6 +6119,7 @@
       },
       {
         "name": "Stand Ground",
+        "type": "power",
         "tier": "Advanced",
         "tags": [
           "Reinforce"
@@ -5907,6 +6143,7 @@
       },
       {
         "name": "Throat Shot",
+        "type": "power",
         "tier": "Advanced",
         "tags": [],
         "ranks": 1,
@@ -5928,6 +6165,7 @@
       },
       {
         "name": "Thick Skin",
+        "type": "power",
         "tier": "Advanced",
         "tags": [
           "Reinforce"
@@ -5954,6 +6192,7 @@
     "classSkills": [
       {
         "name": "Reinforce",
+        "type": "power",
         "tier": "Class",
         "tags": [],
         "ranks": 1,
@@ -5975,6 +6214,7 @@
       },
       {
         "name": "Accuracy",
+        "type": "power",
         "tier": "Class",
         "tags": [],
         "ranks": 1,
@@ -5996,6 +6236,7 @@
       },
       {
         "name": "Field Maintenance",
+        "type": "power",
         "tier": "Class",
         "tags": [],
         "ranks": 1,
@@ -6017,6 +6258,7 @@
       },
       {
         "name": "Healthy",
+        "type": "power",
         "tier": "Class",
         "tags": [],
         "ranks": 1,
@@ -6044,6 +6286,7 @@
       },
       {
         "name": "Utilitarian",
+        "type": "power",
         "tier": "Class",
         "tags": [],
         "ranks": 1,
@@ -6077,6 +6320,7 @@
       },
       {
         "name": "Flesh of the Titan",
+        "type": "power",
         "tier": "Class",
         "tags": [],
         "ranks": 1,
@@ -6195,6 +6439,7 @@
     "innate": [
       {
         "name": "Arcane Study",
+        "type": "power",
         "tier": "Innate",
         "tags": [],
         "ranks": 1,
@@ -6216,6 +6461,7 @@
       },
       {
         "name": "Replicate Enhancement",
+        "type": "power",
         "tier": "Innate",
         "tags": [],
         "ranks": 1,
@@ -6237,6 +6483,7 @@
       },
       {
         "name": "Ritual Affinity",
+        "type": "power",
         "tier": "Innate",
         "tags": [],
         "ranks": 1,
@@ -6274,6 +6521,7 @@
       },
       {
         "name": "Arcane Barrier",
+        "type": "power",
         "tier": "Innate",
         "tags": [],
         "ranks": 1,
@@ -6295,6 +6543,7 @@
       },
       {
         "name": "Cantrip Mastery",
+        "type": "power",
         "tier": "Innate",
         "tags": [],
         "ranks": 1,
@@ -6316,6 +6565,7 @@
       },
       {
         "name": "Practiced Sight",
+        "type": "power",
         "tier": "Innate",
         "tags": [],
         "ranks": 1,
@@ -6340,6 +6590,7 @@
       },
       {
         "name": "Channel the Arcane",
+        "type": "power",
         "tier": "Innate",
         "tags": [],
         "ranks": 1,
@@ -6367,6 +6618,7 @@
     "classSkills": [
       {
         "name": "Empowered Mage Bolt",
+        "type": "power",
         "tier": "Class",
         "tags": [],
         "ranks": 1,
@@ -6388,6 +6640,7 @@
       },
       {
         "name": "Arcane Charge",
+        "type": "power",
         "tier": "Class",
         "tags": [],
         "ranks": 1,
@@ -6409,6 +6662,7 @@
       },
       {
         "name": "Cantrip Scholar",
+        "type": "power",
         "tier": "Class",
         "tags": [],
         "ranks": 1,
@@ -6445,6 +6699,7 @@
     "cantrips": [
       {
         "name": "Cancel",
+        "type": "spell",
         "tier": "Cantrip",
         "tags": [],
         "ranks": 1,
@@ -6472,6 +6727,7 @@
       },
       {
         "name": "Force Shield",
+        "type": "spell",
         "tier": "Cantrip",
         "tags": [],
         "ranks": 1,
@@ -6493,6 +6749,7 @@
       },
       {
         "name": "Fumble",
+        "type": "spell",
         "tier": "Cantrip",
         "tags": [],
         "ranks": 1,
@@ -6514,6 +6771,7 @@
       },
       {
         "name": "Ghost Hand",
+        "type": "spell",
         "tier": "Cantrip",
         "tags": [],
         "ranks": 1,
@@ -6561,6 +6819,7 @@
       },
       {
         "name": "Identify",
+        "type": "spell",
         "tier": "Cantrip",
         "tags": [],
         "ranks": 1,
@@ -6582,6 +6841,7 @@
       },
       {
         "name": "Mage Bolt",
+        "type": "spell",
         "tier": "Cantrip",
         "tags": [],
         "ranks": 1,
@@ -6603,6 +6863,7 @@
       },
       {
         "name": "See Magic",
+        "type": "spell",
         "tier": "Cantrip",
         "tags": [],
         "ranks": 1,
@@ -6644,6 +6905,7 @@
       },
       {
         "name": "Stop",
+        "type": "spell",
         "tier": "Cantrip",
         "tags": [],
         "ranks": 1,
@@ -6667,6 +6929,7 @@
     "noviceSpells": [
       {
         "name": "Arcane Barrage",
+        "type": "spell",
         "tier": "Novice",
         "tags": [],
         "ranks": 1,
@@ -6688,6 +6951,7 @@
       },
       {
         "name": "Bolster Shield",
+        "type": "spell",
         "tier": "Novice",
         "tags": [],
         "ranks": 1,
@@ -6709,6 +6973,7 @@
       },
       {
         "name": "Carnate",
+        "type": "spell",
         "tier": "Novice",
         "tags": [],
         "ranks": 1,
@@ -6730,6 +6995,7 @@
       },
       {
         "name": "Cripple",
+        "type": "spell",
         "tier": "Novice",
         "tags": [],
         "ranks": 1,
@@ -6751,6 +7017,7 @@
       },
       {
         "name": "Flameburst",
+        "type": "spell",
         "tier": "Novice",
         "tags": [],
         "ranks": 1,
@@ -6772,6 +7039,7 @@
       },
       {
         "name": "Forcebolt",
+        "type": "spell",
         "tier": "Novice",
         "tags": [],
         "ranks": 1,
@@ -6793,6 +7061,7 @@
       },
       {
         "name": "Freeze",
+        "type": "spell",
         "tier": "Novice",
         "tags": [],
         "ranks": 1,
@@ -6814,6 +7083,7 @@
       },
       {
         "name": "Mage Armor",
+        "type": "spell",
         "tier": "Novice",
         "tags": [],
         "ranks": 1,
@@ -6835,6 +7105,7 @@
       },
       {
         "name": "Mage Mend",
+        "type": "spell",
         "tier": "Novice",
         "tags": [],
         "ranks": 1,
@@ -6856,6 +7127,7 @@
       },
       {
         "name": "Mage Power",
+        "type": "spell",
         "tier": "Novice",
         "tags": [],
         "ranks": 1,
@@ -6877,6 +7149,7 @@
       },
       {
         "name": "Mageskin",
+        "type": "spell",
         "tier": "Novice",
         "tags": [],
         "ranks": 1,
@@ -6898,6 +7171,7 @@
       },
       {
         "name": "Mask Aura",
+        "type": "spell",
         "tier": "Novice",
         "tags": [],
         "ranks": 1,
@@ -6919,6 +7193,7 @@
       },
       {
         "name": "Revulsion",
+        "type": "spell",
         "tier": "Novice",
         "tags": [],
         "ranks": 1,
@@ -6940,6 +7215,7 @@
       },
       {
         "name": "Magekey",
+        "type": "spell",
         "tier": "Novice",
         "tags": [],
         "ranks": 1,
@@ -6961,6 +7237,7 @@
       },
       {
         "name": "Ruinous Curse",
+        "type": "spell",
         "tier": "Novice",
         "tags": [],
         "ranks": 1,
@@ -6982,6 +7259,7 @@
       },
       {
         "name": "Shred",
+        "type": "spell",
         "tier": "Novice",
         "tags": [],
         "ranks": 1,
@@ -7003,6 +7281,7 @@
       },
       {
         "name": "Town Portal",
+        "type": "spell",
         "tier": "Novice",
         "tags": [],
         "ranks": 1,
@@ -7026,6 +7305,7 @@
     "adeptSpells": [
       {
         "name": "Adept Mage Power",
+        "type": "spell",
         "tier": "Adept",
         "tags": [],
         "ranks": 1,
@@ -7047,6 +7327,7 @@
       },
       {
         "name": "Arcane Bridge",
+        "type": "spell",
         "tier": "Adept",
         "tags": [],
         "ranks": 1,
@@ -7068,6 +7349,7 @@
       },
       {
         "name": "Betrayal",
+        "type": "spell",
         "tier": "Adept",
         "tags": [],
         "ranks": 1,
@@ -7089,6 +7371,7 @@
       },
       {
         "name": "Disintegrate Item",
+        "type": "spell",
         "tier": "Adept",
         "tags": [],
         "ranks": 1,
@@ -7110,6 +7393,7 @@
       },
       {
         "name": "Dispel Magic",
+        "type": "spell",
         "tier": "Adept",
         "tags": [],
         "ranks": 1,
@@ -7148,6 +7432,7 @@
       },
       {
         "name": "Dominate Creature",
+        "type": "spell",
         "tier": "Adept",
         "tags": [],
         "ranks": 1,
@@ -7169,6 +7454,7 @@
       },
       {
         "name": "Elemental Node",
+        "type": "spell",
         "tier": "Adept",
         "tags": [],
         "ranks": 1,
@@ -7190,6 +7476,7 @@
       },
       {
         "name": "Elemental Survival",
+        "type": "spell",
         "tier": "Adept",
         "tags": [],
         "ranks": 1,
@@ -7225,6 +7512,7 @@
       },
       {
         "name": "Gift of Solitude",
+        "type": "spell",
         "tier": "Adept",
         "tags": [],
         "ranks": 1,
@@ -7246,6 +7534,7 @@
       },
       {
         "name": "Alone But Not Lonely",
+        "type": "power",
         "tier": "SubPower",
         "tags": [],
         "ranks": 1,
@@ -7265,6 +7554,7 @@
       },
       {
         "name": "Harden Gear",
+        "type": "spell",
         "tier": "Adept",
         "tags": [],
         "ranks": 1,
@@ -7286,6 +7576,7 @@
       },
       {
         "name": "Hush",
+        "type": "spell",
         "tier": "Adept",
         "tags": [],
         "ranks": 1,
@@ -7307,6 +7598,7 @@
       },
       {
         "name": "Improved Identification",
+        "type": "spell",
         "tier": "Adept",
         "tags": [],
         "ranks": 1,
@@ -7328,6 +7620,7 @@
       },
       {
         "name": "Mageblast",
+        "type": "spell",
         "tier": "Adept",
         "tags": [],
         "ranks": 1,
@@ -7349,6 +7642,7 @@
       },
       {
         "name": "Rebuild",
+        "type": "spell",
         "tier": "Adept",
         "tags": [],
         "ranks": 1,
@@ -7370,6 +7664,7 @@
       },
       {
         "name": "Spell Absorption",
+        "type": "spell",
         "tier": "Adept",
         "tags": [],
         "ranks": 1,
@@ -7391,6 +7686,7 @@
       },
       {
         "name": "Succumb",
+        "type": "spell",
         "tier": "Adept",
         "tags": [],
         "ranks": 1,
@@ -7412,6 +7708,7 @@
       },
       {
         "name": "Wrest Control",
+        "type": "spell",
         "tier": "Adept",
         "tags": [],
         "ranks": 1,
@@ -7550,6 +7847,7 @@
     "innate": [
       {
         "name": "Deflect Projectile",
+        "type": "power",
         "tier": "Innate",
         "tags": [],
         "ranks": 1,
@@ -7571,6 +7869,7 @@
       },
       {
         "name": "Backstab",
+        "type": "power",
         "tier": "Innate",
         "tags": [],
         "ranks": 1,
@@ -7592,6 +7891,7 @@
       },
       {
         "name": "Loot",
+        "type": "power",
         "tier": "Innate",
         "tags": [],
         "ranks": 1,
@@ -7613,6 +7913,7 @@
       },
       {
         "name": "Dodge",
+        "type": "power",
         "tier": "Innate",
         "tags": [],
         "ranks": 1,
@@ -7634,6 +7935,7 @@
       },
       {
         "name": "Escape Plan",
+        "type": "power",
         "tier": "Innate",
         "tags": [],
         "ranks": 1,
@@ -7655,6 +7957,7 @@
       },
       {
         "name": "Sinister Strike",
+        "type": "power",
         "tier": "Innate",
         "tags": [],
         "ranks": 1,
@@ -7678,6 +7981,7 @@
     "utility": [
       {
         "name": "Acquired Tolerance",
+        "type": "power",
         "tier": "Utility",
         "tags": [],
         "ranks": 1,
@@ -7699,6 +8003,7 @@
       },
       {
         "name": "Back Alley Deals",
+        "type": "power",
         "tier": "Utility",
         "tags": [],
         "ranks": 1,
@@ -7720,6 +8025,7 @@
       },
       {
         "name": "Catfall",
+        "type": "power",
         "tier": "Utility",
         "tags": [],
         "ranks": 1,
@@ -7741,6 +8047,7 @@
       },
       {
         "name": "Contract Killing",
+        "type": "power",
         "tier": "Utility",
         "tags": [],
         "ranks": 1,
@@ -7762,6 +8069,7 @@
       },
       {
         "name": "Keen Hearing",
+        "type": "power",
         "tier": "Utility",
         "tags": [],
         "ranks": 1,
@@ -7783,6 +8091,7 @@
       },
       {
         "name": "Mine",
+        "type": "power",
         "tier": "Utility",
         "tags": [],
         "ranks": 1,
@@ -7804,6 +8113,7 @@
       },
       {
         "name": "Rogue’s Touch",
+        "type": "power",
         "tier": "Utility",
         "tags": [],
         "ranks": 1,
@@ -7825,6 +8135,7 @@
       },
       {
         "name": "Studded Leather Armor",
+        "type": "power",
         "tier": "Utility",
         "tags": [],
         "ranks": 1,
@@ -7846,6 +8157,7 @@
       },
       {
         "name": "Size Up",
+        "type": "power",
         "tier": "Utility",
         "tags": [],
         "ranks": 1,
@@ -7867,6 +8179,7 @@
       },
       {
         "name": "Reload",
+        "type": "power",
         "tier": "Utility",
         "tags": [],
         "ranks": 1,
@@ -7892,6 +8205,7 @@
       },
       {
         "name": "Throat Slit",
+        "type": "power",
         "tier": "Utility",
         "tags": [],
         "ranks": 1,
@@ -7913,6 +8227,7 @@
       },
       {
         "name": "What We Do",
+        "type": "power",
         "tier": "Utility",
         "tags": [],
         "ranks": 1,
@@ -7934,6 +8249,7 @@
       },
       {
         "name": "Way of the Blade",
+        "type": "power",
         "tier": "Utility",
         "tags": [],
         "ranks": 1,
@@ -7983,6 +8299,7 @@
     "basic": [
       {
         "name": "Blunt End",
+        "type": "power",
         "tier": "Basic",
         "tags": [],
         "ranks": 2,
@@ -8004,6 +8321,7 @@
       },
       {
         "name": "Concealed Dart",
+        "type": "power",
         "tier": "Basic",
         "tags": [],
         "ranks": 1,
@@ -8025,6 +8343,7 @@
       },
       {
         "name": "Expert Deflect",
+        "type": "power",
         "tier": "Basic",
         "tags": [],
         "ranks": 1,
@@ -8046,6 +8365,7 @@
       },
       {
         "name": "Evasion",
+        "type": "power",
         "tier": "Basic",
         "tags": [],
         "ranks": 1,
@@ -8067,6 +8387,7 @@
       },
       {
         "name": "Flash Attack",
+        "type": "power",
         "tier": "Basic",
         "tags": [],
         "ranks": 3,
@@ -8088,6 +8409,7 @@
       },
       {
         "name": "Hamstring",
+        "type": "power",
         "tier": "Basic",
         "tags": [],
         "ranks": 3,
@@ -8109,6 +8431,7 @@
       },
       {
         "name": "Improvised Weapon",
+        "type": "power",
         "tier": "Basic",
         "tags": [],
         "ranks": 1,
@@ -8130,6 +8453,7 @@
       },
       {
         "name": "Keen Eye",
+        "type": "power",
         "tier": "Basic",
         "tags": [],
         "ranks": 3,
@@ -8151,6 +8475,7 @@
       },
       {
         "name": "Precision Strike",
+        "type": "power",
         "tier": "Basic",
         "tags": [],
         "ranks": 1,
@@ -8172,6 +8497,7 @@
       },
       {
         "name": "Quick Nap",
+        "type": "power",
         "tier": "Basic",
         "tags": [],
         "ranks": 1,
@@ -8193,6 +8519,7 @@
       },
       {
         "name": "Reflexive Strike",
+        "type": "power",
         "tier": "Basic",
         "tags": [],
         "ranks": 1,
@@ -8214,6 +8541,7 @@
       },
       {
         "name": "Rogue’s Aim",
+        "type": "power",
         "tier": "Basic",
         "tags": [],
         "ranks": 3,
@@ -8235,6 +8563,7 @@
       },
       {
         "name": "Scarper",
+        "type": "power",
         "tier": "Basic",
         "tags": [],
         "ranks": 2,
@@ -8256,6 +8585,7 @@
       },
       {
         "name": "Scavenge Armor",
+        "type": "power",
         "tier": "Basic",
         "tags": [],
         "ranks": 1,
@@ -8277,6 +8607,7 @@
       },
       {
         "name": "Unburdened Speed",
+        "type": "power",
         "tier": "Basic",
         "tags": [],
         "ranks": 1,
@@ -8298,6 +8629,7 @@
       },
       {
         "name": "Uncanny Perception",
+        "type": "power",
         "tier": "Basic",
         "tags": [],
         "ranks": 1,
@@ -8319,6 +8651,7 @@
       },
       {
         "name": "Waylay",
+        "type": "power",
         "tier": "Basic",
         "tags": [],
         "ranks": 1,
@@ -8342,6 +8675,7 @@
     "advanced": [
       {
         "name": "Ambush",
+        "type": "power",
         "tier": "Advanced",
         "tags": [],
         "ranks": 1,
@@ -8363,6 +8697,7 @@
       },
       {
         "name": "Bloodthirst",
+        "type": "power",
         "tier": "Advanced",
         "tags": [],
         "ranks": 1,
@@ -8384,6 +8719,7 @@
       },
       {
         "name": "Breach",
+        "type": "power",
         "tier": "Advanced",
         "tags": [],
         "ranks": 1,
@@ -8405,6 +8741,7 @@
       },
       {
         "name": "Elude",
+        "type": "power",
         "tier": "Advanced",
         "tags": [],
         "ranks": 1,
@@ -8426,6 +8763,7 @@
       },
       {
         "name": "Fan of Blades",
+        "type": "power",
         "tier": "Advanced",
         "tags": [],
         "ranks": 2,
@@ -8447,6 +8785,7 @@
       },
       {
         "name": "Flat Catch",
+        "type": "power",
         "tier": "Advanced",
         "tags": [],
         "ranks": 1,
@@ -8468,6 +8807,7 @@
       },
       {
         "name": "Gut Shot",
+        "type": "power",
         "tier": "Advanced",
         "tags": [],
         "ranks": 2,
@@ -8489,6 +8829,7 @@
       },
       {
         "name": "Hidden Soul",
+        "type": "power",
         "tier": "Advanced",
         "tags": [],
         "ranks": 1,
@@ -8510,6 +8851,7 @@
       },
       {
         "name": "Incapacitate",
+        "type": "power",
         "tier": "Advanced",
         "tags": [],
         "ranks": 1,
@@ -8531,6 +8873,7 @@
       },
       {
         "name": "Piercing Strike",
+        "type": "power",
         "tier": "Advanced",
         "tags": [],
         "ranks": 1,
@@ -8552,6 +8895,7 @@
       },
       {
         "name": "Precision Throws",
+        "type": "power",
         "tier": "Advanced",
         "tags": [],
         "ranks": 2,
@@ -8573,6 +8917,7 @@
       },
       {
         "name": "Refocus",
+        "type": "power",
         "tier": "Advanced",
         "tags": [],
         "ranks": 5,
@@ -8598,6 +8943,7 @@
       },
       {
         "name": "Reversal",
+        "type": "power",
         "tier": "Advanced",
         "tags": [],
         "ranks": 1,
@@ -8619,6 +8965,7 @@
       },
       {
         "name": "Slice",
+        "type": "power",
         "tier": "Advanced",
         "tags": [],
         "ranks": 3,
@@ -8640,6 +8987,7 @@
       },
       {
         "name": "Toxic Blade",
+        "type": "power",
         "tier": "Advanced",
         "tags": [],
         "ranks": 1,
@@ -8664,6 +9012,7 @@
     "classSkills": [
       {
         "name": "Serious Knots",
+        "type": "power",
         "tier": "Class",
         "tags": [],
         "ranks": 1,
@@ -8685,6 +9034,7 @@
       },
       {
         "name": "Mask of Deception",
+        "type": "power",
         "tier": "Class",
         "tags": [],
         "ranks": 1,
@@ -8706,6 +9056,7 @@
       },
       {
         "name": "Utilitarian",
+        "type": "power",
         "tier": "Class",
         "tags": [],
         "ranks": 1,
@@ -8739,6 +9090,7 @@
       },
       {
         "name": "Retreat",
+        "type": "power",
         "tier": "Class",
         "tags": [],
         "ranks": 1,
@@ -8873,6 +9225,7 @@
     "innate": [
       {
         "name": "Practiced Manner",
+        "type": "power",
         "tier": "Innate",
         "tags": [],
         "ranks": 1,
@@ -8900,6 +9253,7 @@
       },
       {
         "name": "Heart of the Group",
+        "type": "power",
         "tier": "Innate",
         "tags": [],
         "ranks": 1,
@@ -8921,6 +9275,7 @@
       },
       {
         "name": "Stern Willed",
+        "type": "power",
         "tier": "Innate",
         "tags": [],
         "ranks": 1,
@@ -8942,6 +9297,7 @@
       },
       {
         "name": "Smuggler’s Powdercase",
+        "type": "power",
         "tier": "Innate",
         "tags": [],
         "ranks": 1,
@@ -8963,6 +9319,7 @@
       },
       {
         "name": "Of Sound Mind",
+        "type": "power",
         "tier": "Innate",
         "tags": [],
         "ranks": 1,
@@ -8984,6 +9341,7 @@
       },
       {
         "name": "Sharp Dagger, Sharper Tongue",
+        "type": "power",
         "tier": "Innate",
         "tags": [],
         "ranks": 1,
@@ -9005,6 +9363,7 @@
       },
       {
         "name": "The Last Toast",
+        "type": "power",
         "tier": "Innate",
         "tags": [],
         "ranks": 1,
@@ -9026,6 +9385,7 @@
       },
       {
         "name": "Enduring Inspiration",
+        "type": "power",
         "tier": "Innate",
         "tags": [],
         "ranks": 1,
@@ -9049,6 +9409,7 @@
     "utility": [
       {
         "name": "Aesthetic Suggestion",
+        "type": "power",
         "tier": "Utility",
         "tags": [],
         "ranks": 1,
@@ -9070,6 +9431,7 @@
       },
       {
         "name": "Headliner",
+        "type": "power",
         "tier": "Utility",
         "tags": [],
         "ranks": 1,
@@ -9094,6 +9456,7 @@
       },
       {
         "name": "Implicit Truths",
+        "type": "power",
         "tier": "Utility",
         "tags": [],
         "ranks": 1,
@@ -9115,6 +9478,7 @@
       },
       {
         "name": "It’s Who You Know",
+        "type": "power",
         "tier": "Utility",
         "tags": [],
         "ranks": 1,
@@ -9136,6 +9500,7 @@
       },
       {
         "name": "Never Stop Learning",
+        "type": "power",
         "tier": "Utility",
         "tags": [],
         "ranks": 1,
@@ -9157,6 +9522,7 @@
       },
       {
         "name": "Pit Master",
+        "type": "power",
         "tier": "Utility",
         "tags": [],
         "ranks": 1,
@@ -9182,6 +9548,7 @@
       },
       {
         "name": "Safebox",
+        "type": "power",
         "tier": "Utility",
         "tags": [],
         "ranks": 1,
@@ -9203,6 +9570,7 @@
       },
       {
         "name": "Sources",
+        "type": "power",
         "tier": "Utility",
         "tags": [],
         "ranks": 1,
@@ -9224,6 +9592,7 @@
       },
       {
         "name": "Tax Evasion",
+        "type": "power",
         "tier": "Utility",
         "tags": [],
         "ranks": 1,
@@ -9245,6 +9614,7 @@
       },
       {
         "name": "Traveling Merchant",
+        "type": "power",
         "tier": "Utility",
         "tags": [],
         "ranks": 1,
@@ -9268,6 +9638,7 @@
     "basic": [
       {
         "name": "Calming Tone",
+        "type": "power",
         "tier": "Basic",
         "tags": [],
         "ranks": 1,
@@ -9289,6 +9660,7 @@
       },
       {
         "name": "Curiosity Killed the Cat",
+        "type": "power",
         "tier": "Basic",
         "tags": [],
         "ranks": 1,
@@ -9310,6 +9682,7 @@
       },
       {
         "name": "Deducing the Apparent",
+        "type": "power",
         "tier": "Basic",
         "tags": [],
         "ranks": 1,
@@ -9331,6 +9704,7 @@
       },
       {
         "name": "Diplomatic Immunity",
+        "type": "power",
         "tier": "Basic",
         "tags": [],
         "ranks": 1,
@@ -9352,6 +9726,7 @@
       },
       {
         "name": "Don’t You Know Who I Am?",
+        "type": "power",
         "tier": "Basic",
         "tags": [],
         "ranks": 1,
@@ -9373,6 +9748,7 @@
       },
       {
         "name": "Enthrall",
+        "type": "power",
         "tier": "Basic",
         "tags": [],
         "ranks": 1,
@@ -9394,6 +9770,7 @@
       },
       {
         "name": "Inspiration",
+        "type": "power",
         "tier": "Basic",
         "tags": [],
         "ranks": 1,
@@ -9415,6 +9792,7 @@
       },
       {
         "name": "Intoxicating Aura",
+        "type": "power",
         "tier": "Basic",
         "tags": [],
         "ranks": 1,
@@ -9436,6 +9814,7 @@
       },
       {
         "name": "Mithridatization",
+        "type": "power",
         "tier": "Basic",
         "tags": [],
         "ranks": 1,
@@ -9457,6 +9836,7 @@
       },
       {
         "name": "Plausible Deniability",
+        "type": "power",
         "tier": "Basic",
         "tags": [],
         "ranks": 1,
@@ -9478,6 +9858,7 @@
       },
       {
         "name": "Pocket Sand",
+        "type": "power",
         "tier": "Basic",
         "tags": [],
         "ranks": 1,
@@ -9499,6 +9880,7 @@
       },
       {
         "name": "Poison Dart",
+        "type": "power",
         "tier": "Basic",
         "tags": [],
         "ranks": 1,
@@ -9520,6 +9902,7 @@
       },
       {
         "name": "Rotten Tomato",
+        "type": "power",
         "tier": "Basic",
         "tags": [],
         "ranks": 1,
@@ -9541,6 +9924,7 @@
       },
       {
         "name": "Soothe",
+        "type": "power",
         "tier": "Basic",
         "tags": [],
         "ranks": 1,
@@ -9562,6 +9946,7 @@
       },
       {
         "name": "Sizing Up the Opposition",
+        "type": "power",
         "tier": "Basic",
         "tags": [],
         "ranks": 1,
@@ -9597,6 +9982,7 @@
       },
       {
         "name": "Time to Go",
+        "type": "power",
         "tier": "Basic",
         "tags": [],
         "ranks": 1,
@@ -9618,6 +10004,7 @@
       },
       {
         "name": "To Dance with Death",
+        "type": "power",
         "tier": "Basic",
         "tags": [],
         "ranks": 1,
@@ -9641,6 +10028,7 @@
     "advanced": [
       {
         "name": "Battlefield Commander",
+        "type": "power",
         "tier": "Advanced",
         "tags": [],
         "ranks": 1,
@@ -9662,6 +10050,7 @@
       },
       {
         "name": "Enticing Opulence",
+        "type": "power",
         "tier": "Advanced",
         "tags": [],
         "ranks": 1,
@@ -9683,6 +10072,7 @@
       },
       {
         "name": "Fortress of the Mind",
+        "type": "power",
         "tier": "Advanced",
         "tags": [],
         "ranks": 1,
@@ -9704,6 +10094,7 @@
       },
       {
         "name": "Gathering of the Moot",
+        "type": "power",
         "tier": "Advanced",
         "tags": [],
         "ranks": 1,
@@ -9725,6 +10116,7 @@
       },
       {
         "name": "Grace Under Duress",
+        "type": "power",
         "tier": "Advanced",
         "tags": [],
         "ranks": 1,
@@ -9757,6 +10149,7 @@
       },
       {
         "name": "Hard to Read",
+        "type": "power",
         "tier": "Advanced",
         "tags": [],
         "ranks": 1,
@@ -9778,6 +10171,7 @@
       },
       {
         "name": "Inspiring Performance",
+        "type": "power",
         "tier": "Advanced",
         "tags": [],
         "ranks": 1,
@@ -9799,6 +10193,7 @@
       },
       {
         "name": "Liquid Courage",
+        "type": "power",
         "tier": "Advanced",
         "tags": [],
         "ranks": 1,
@@ -9820,6 +10215,7 @@
       },
       {
         "name": "Let’s You and Them Fight",
+        "type": "power",
         "tier": "Advanced",
         "tags": [],
         "ranks": 1,
@@ -9841,6 +10237,7 @@
       },
       {
         "name": "Mark for Death",
+        "type": "power",
         "tier": "Advanced",
         "tags": [],
         "ranks": 1,
@@ -9862,6 +10259,7 @@
       },
       {
         "name": "Method Acting",
+        "type": "power",
         "tier": "Advanced",
         "tags": [],
         "ranks": 1,
@@ -9883,6 +10281,7 @@
       },
       {
         "name": "Mostly Harmless",
+        "type": "power",
         "tier": "Advanced",
         "tags": [],
         "ranks": 1,
@@ -9904,6 +10303,7 @@
       },
       {
         "name": "Party Planner",
+        "type": "power",
         "tier": "Advanced",
         "tags": [],
         "ranks": 1,
@@ -9925,6 +10325,7 @@
       },
       {
         "name": "Peacebind",
+        "type": "power",
         "tier": "Advanced",
         "tags": [],
         "ranks": 1,
@@ -9946,6 +10347,7 @@
       },
       {
         "name": "Sense Duplicity",
+        "type": "power",
         "tier": "Advanced",
         "tags": [],
         "ranks": 1,
@@ -9967,6 +10369,7 @@
       },
       {
         "name": "Squirreled Away",
+        "type": "power",
         "tier": "Advanced",
         "tags": [],
         "ranks": 1,
@@ -9991,6 +10394,7 @@
     "classSkills": [
       {
         "name": "Gambler’s Visage",
+        "type": "power",
         "tier": "Class",
         "tags": [],
         "ranks": 1,
@@ -10012,6 +10416,7 @@
       },
       {
         "name": "The Right Hand",
+        "type": "power",
         "tier": "Class",
         "tags": [],
         "ranks": 1,
@@ -10033,6 +10438,7 @@
       },
       {
         "name": "Additional Bodyguard",
+        "type": "power",
         "tier": "Class",
         "tags": [],
         "ranks": 1,
@@ -10057,6 +10463,7 @@
       },
       {
         "name": "Inspirational Leader",
+        "type": "power",
         "tier": "Class",
         "tags": [],
         "ranks": 1,
@@ -10092,6 +10499,7 @@
       },
       {
         "name": "Utilitarian",
+        "type": "power",
         "tier": "Class",
         "tags": [],
         "ranks": 1,
@@ -10127,6 +10535,7 @@
     "rightHandPowers": [
       {
         "name": "Commission of Protection",
+        "type": "power",
         "tier": "Class",
         "tags": [
           "Right Hand"
@@ -10151,6 +10560,7 @@
       },
       {
         "name": "Holding Out For a Hero",
+        "type": "power",
         "tier": "Class",
         "tags": [
           "Right Hand"
@@ -10175,6 +10585,7 @@
       },
       {
         "name": "Save the Day",
+        "type": "power",
         "tier": "SubPower",
         "tags": [],
         "ranks": 1,
@@ -10194,6 +10605,7 @@
       },
       {
         "name": "It's Not Safe to Go Alone",
+        "type": "power",
         "tier": "Class",
         "tags": [
           "Right Hand"
@@ -10218,6 +10630,7 @@
       },
       {
         "name": "Magical Empowerment",
+        "type": "power",
         "tier": "Class",
         "tags": [
           "Right Hand"
@@ -10239,6 +10652,7 @@
       },
       {
         "name": "Bodyguards may be inspired and call upon their inner reserves to accomplish more than they thought possible. The Bodyguard may Refresh 1 Novice or Adept Spell Slot after a quick pep talk with the Socialite. Rise Above This",
+        "type": "power",
         "tier": "Class",
         "tags": [
           "Right Hand"
@@ -10263,6 +10677,7 @@
       },
       {
         "name": "Steel Yourself",
+        "type": "power",
         "tier": "Class",
         "tags": [
           "Right Hand"
@@ -10287,6 +10702,7 @@
       },
       {
         "name": "Training Regiment",
+        "type": "power",
         "tier": "Class",
         "tags": [
           "Right Hand"
@@ -10311,6 +10727,7 @@
       },
       {
         "name": "Hidden Weapon",
+        "type": "power",
         "tier": "Class",
         "tags": [
           "Right Hand"
@@ -10337,6 +10754,7 @@
       },
       {
         "name": "Concealed Weapon",
+        "type": "power",
         "tier": "SubPower",
         "tags": [],
         "ranks": 1,
@@ -10356,6 +10774,7 @@
       },
       {
         "name": "Rousing Inspiration",
+        "type": "power",
         "tier": "Class",
         "tags": [
           "Right Hand"
@@ -10382,6 +10801,7 @@
       },
       {
         "name": "Third Hand",
+        "type": "power",
         "tier": "Class",
         "tags": [
           "Right Hand"
@@ -10408,6 +10828,7 @@
       },
       {
         "name": "Guard and Savior",
+        "type": "power",
         "tier": "Class",
         "tags": [
           "Right Hand"
@@ -10434,6 +10855,7 @@
       },
       {
         "name": "This Is My Bodyguard",
+        "type": "power",
         "tier": "Class",
         "tags": [
           "Right Hand"
@@ -10561,6 +10983,7 @@
     "innate": [
       {
         "name": "Internal Battery",
+        "type": "power",
         "tier": "Innate",
         "tags": [],
         "ranks": 1,
@@ -10582,6 +11005,7 @@
       },
       {
         "name": "Arcane Source",
+        "type": "power",
         "tier": "Innate",
         "tags": [],
         "ranks": 1,
@@ -10662,6 +11086,7 @@
       },
       {
         "name": "Astride the Weave",
+        "type": "power",
         "tier": "Innate",
         "tags": [],
         "ranks": 1,
@@ -10683,6 +11108,7 @@
       },
       {
         "name": "Enduring Source",
+        "type": "power",
         "tier": "Innate",
         "tags": [],
         "ranks": 1,
@@ -10704,6 +11130,7 @@
       },
       {
         "name": "Dissipate Curse",
+        "type": "power",
         "tier": "Innate",
         "tags": [],
         "ranks": 1,
@@ -10725,6 +11152,7 @@
       },
       {
         "name": "Power of Magic",
+        "type": "power",
         "tier": "Innate",
         "tags": [],
         "ranks": 1,
@@ -10746,6 +11174,7 @@
       },
       {
         "name": "Rote Invocation",
+        "type": "power",
         "tier": "Innate",
         "tags": [],
         "ranks": 1,
@@ -10773,6 +11202,7 @@
     "classSkills": [
       {
         "name": "Additional Source",
+        "type": "power",
         "tier": "Class",
         "tags": [],
         "ranks": 1,
@@ -10794,6 +11224,7 @@
       },
       {
         "name": "Accent Substantiation",
+        "type": "power",
         "tier": "Class",
         "tags": [],
         "ranks": 8,
@@ -10815,6 +11246,7 @@
       },
       {
         "name": "Unsuppressable",
+        "type": "power",
         "tier": "Class",
         "tags": [],
         "ranks": 1,
@@ -10836,6 +11268,7 @@
       },
       {
         "name": "Interlaced Shell",
+        "type": "power",
         "tier": "Class",
         "tags": [],
         "ranks": 1,
@@ -10857,6 +11290,7 @@
       },
       {
         "name": "Cantrip Scholar",
+        "type": "power",
         "tier": "Class",
         "tags": [],
         "ranks": 1,
@@ -10890,6 +11324,7 @@
       },
       {
         "name": "Faded Slumber",
+        "type": "power",
         "tier": "Class",
         "tags": [],
         "ranks": 1,
@@ -10914,6 +11349,7 @@
     "cantrips": [
       {
         "name": "Cancel",
+        "type": "spell",
         "tier": "Cantrip",
         "tags": [],
         "ranks": 1,
@@ -10941,6 +11377,7 @@
       },
       {
         "name": "Charge",
+        "type": "spell",
         "tier": "Cantrip",
         "tags": [],
         "ranks": 1,
@@ -10962,6 +11399,7 @@
       },
       {
         "name": "Circle of Four",
+        "type": "spell",
         "tier": "Cantrip",
         "tags": [],
         "ranks": 1,
@@ -10983,6 +11421,7 @@
       },
       {
         "name": "Wild Bolt",
+        "type": "spell",
         "tier": "Cantrip",
         "tags": [],
         "ranks": 1,
@@ -11004,6 +11443,7 @@
       },
       {
         "name": "Energy Shield",
+        "type": "spell",
         "tier": "Cantrip",
         "tags": [],
         "ranks": 1,
@@ -11023,6 +11463,7 @@
       },
       {
         "name": "The Sourcerer throws up a shield of energy to protect themself from the elements. This gives the caster one Protect from the Accent of their Arcane Source. If the Sourcerer has more than one Arcane Accent, they may have a Protect for each of those Accents. Infuriate",
+        "type": "spell",
         "tier": "Cantrip",
         "tags": [],
         "ranks": 1,
@@ -11044,6 +11485,7 @@
       },
       {
         "name": "Mass Flux",
+        "type": "spell",
         "tier": "Cantrip",
         "tags": [],
         "ranks": 1,
@@ -11065,6 +11507,7 @@
       },
       {
         "name": "Synergistic Transfer",
+        "type": "spell",
         "tier": "Cantrip",
         "tags": [],
         "ranks": 1,
@@ -11086,6 +11529,7 @@
       },
       {
         "name": "Whispers of the Unseen",
+        "type": "spell",
         "tier": "Cantrip",
         "tags": [],
         "ranks": 1,
@@ -11109,6 +11553,7 @@
     "noviceSpells": [
       {
         "name": "Aether Lance",
+        "type": "spell",
         "tier": "Novice",
         "tags": [],
         "ranks": 1,
@@ -11130,6 +11575,7 @@
       },
       {
         "name": "Coalesce Scales",
+        "type": "spell",
         "tier": "Novice",
         "tags": [],
         "ranks": 1,
@@ -11151,6 +11597,7 @@
       },
       {
         "name": "Destructive Resonance",
+        "type": "spell",
         "tier": "Novice",
         "tags": [],
         "ranks": 1,
@@ -11172,6 +11619,7 @@
       },
       {
         "name": "Deteriorate",
+        "type": "spell",
         "tier": "Novice",
         "tags": [],
         "ranks": 1,
@@ -11193,6 +11641,7 @@
       },
       {
         "name": "Galvanic Shield",
+        "type": "spell",
         "tier": "Novice",
         "tags": [],
         "ranks": 1,
@@ -11214,6 +11663,7 @@
       },
       {
         "name": "Flee",
+        "type": "spell",
         "tier": "Novice",
         "tags": [],
         "ranks": 1,
@@ -11235,6 +11685,7 @@
       },
       {
         "name": "Icy Veins",
+        "type": "spell",
         "tier": "Novice",
         "tags": [],
         "ranks": 1,
@@ -11256,6 +11707,7 @@
       },
       {
         "name": "Iron Maiden",
+        "type": "spell",
         "tier": "Novice",
         "tags": [],
         "ranks": 1,
@@ -11277,6 +11729,7 @@
       },
       {
         "name": "Melt",
+        "type": "spell",
         "tier": "Novice",
         "tags": [],
         "ranks": 1,
@@ -11312,6 +11765,7 @@
       },
       {
         "name": "Primal Ray",
+        "type": "spell",
         "tier": "Novice",
         "tags": [],
         "ranks": 1,
@@ -11333,6 +11787,7 @@
       },
       {
         "name": "Soulknife",
+        "type": "spell",
         "tier": "Novice",
         "tags": [],
         "ranks": 1,
@@ -11354,6 +11809,7 @@
       },
       {
         "name": "Spirit Link",
+        "type": "spell",
         "tier": "Novice",
         "tags": [],
         "ranks": 1,
@@ -11375,6 +11831,7 @@
       },
       {
         "name": "Startle",
+        "type": "spell",
         "tier": "Novice",
         "tags": [],
         "ranks": 1,
@@ -11396,6 +11853,7 @@
       },
       {
         "name": "Aethereal Fade",
+        "type": "spell",
         "tier": "Novice",
         "tags": [],
         "ranks": 1,
@@ -11417,6 +11875,7 @@
       },
       {
         "name": "Warpfire",
+        "type": "spell",
         "tier": "Novice",
         "tags": [],
         "ranks": 1,
@@ -11440,6 +11899,7 @@
     "adeptSpells": [
       {
         "name": "Bonesplinter",
+        "type": "spell",
         "tier": "Adept",
         "tags": [],
         "ranks": 1,
@@ -11461,6 +11921,7 @@
       },
       {
         "name": "Breach Teleport",
+        "type": "spell",
         "tier": "Adept",
         "tags": [],
         "ranks": 1,
@@ -11482,6 +11943,7 @@
       },
       {
         "name": "Crimson Bargain",
+        "type": "spell",
         "tier": "Adept",
         "tags": [],
         "ranks": 1,
@@ -11503,6 +11965,7 @@
       },
       {
         "name": "Devastating Eruption",
+        "type": "spell",
         "tier": "Adept",
         "tags": [],
         "ranks": 1,
@@ -11524,6 +11987,7 @@
       },
       {
         "name": "Enduring Corrosion",
+        "type": "spell",
         "tier": "Adept",
         "tags": [],
         "ranks": 1,
@@ -11545,6 +12009,7 @@
       },
       {
         "name": "Everflowing Shield",
+        "type": "spell",
         "tier": "Adept",
         "tags": [],
         "ranks": 1,
@@ -11566,6 +12031,7 @@
       },
       {
         "name": "Immortal Focus",
+        "type": "spell",
         "tier": "Adept",
         "tags": [],
         "ranks": 1,
@@ -11587,6 +12053,7 @@
       },
       {
         "name": "Incandescent Spire",
+        "type": "spell",
         "tier": "Adept",
         "tags": [],
         "ranks": 1,
@@ -11608,6 +12075,7 @@
       },
       {
         "name": "Arcane Backlash",
+        "type": "spell",
         "tier": "Adept",
         "tags": [],
         "ranks": 1,
@@ -11629,6 +12097,7 @@
       },
       {
         "name": "Mystic Mirror",
+        "type": "spell",
         "tier": "Adept",
         "tags": [],
         "ranks": 1,
@@ -11650,6 +12119,7 @@
       },
       {
         "name": "Restful Prison",
+        "type": "spell",
         "tier": "Adept",
         "tags": [],
         "ranks": 1,
@@ -11671,6 +12141,7 @@
       },
       {
         "name": "Smothering Ash",
+        "type": "spell",
         "tier": "Adept",
         "tags": [],
         "ranks": 1,
@@ -11692,6 +12163,7 @@
       },
       {
         "name": "Spirit Chalice",
+        "type": "spell",
         "tier": "Adept",
         "tags": [],
         "ranks": 1,
@@ -11713,6 +12185,7 @@
       },
       {
         "name": "Splinter Shield",
+        "type": "spell",
         "tier": "Adept",
         "tags": [],
         "ranks": 1,
@@ -11734,6 +12207,7 @@
       },
       {
         "name": "Vaporize",
+        "type": "spell",
         "tier": "Adept",
         "tags": [],
         "ranks": 1,
@@ -11755,6 +12229,7 @@
       },
       {
         "name": "Wrack",
+        "type": "spell",
         "tier": "Adept",
         "tags": [],
         "ranks": 1,
