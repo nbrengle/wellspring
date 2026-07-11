@@ -235,8 +235,8 @@ test("multiclass grants are derived (new skills free, redundant → free BP)", (
       archetypeName: "x",
       startingKit: false,
       add: [
-        { name: "Basic Martial Weapons", source: Source.starting("Fighter") },
-        { name: "Basic Armor", source: Source.starting("Fighter") },
+        { name: "Basic Martial Weapons", source: Source.class("Fighter") },
+        { name: "Basic Armor", source: Source.class("Fighter") },
       ],
     },
   );
