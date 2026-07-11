@@ -104,7 +104,7 @@ export function setParameter(c: Char, field: string, index: number, value: strin
     if (!paramVal) {
       // null (not undefined) to match handleClearDevotion — a present-but-empty
       // devotion key, distinct from "never set".
-      nextChar.devotion = null as unknown as undefined;
+      nextChar.devotion = null;
       nextChar.divineDomains = [];
       nextChar.domainPowers = keepDomainPowers(() => false);
     } else {
@@ -256,7 +256,7 @@ export function setRank(c: Char, field: string, index: number, nextRank: number)
 }
 
 /** Record a granted-power selection under `grantedSelections[selectionId]`. */
-export function setGrantedSelection(c: Char, selectionId: string, value: unknown): Char {
+export function setGrantedSelection(c: Char, selectionId: string, value: string): Char {
   return {
     ...c,
     grantedSelections: { ...(c.grantedSelections || {}), [selectionId]: value },

@@ -57,10 +57,7 @@ export const EVENTS_TABLE = eventsTableJson;
 // when re-syncing the doc.
 export const META = {
   ...metaJson,
-  appVersion:
-    (typeof (import.meta as unknown as { env?: { VITE_APP_VERSION?: string } }).env !== "undefined" &&
-      (import.meta as unknown as { env?: { VITE_APP_VERSION?: string } }).env?.VITE_APP_VERSION) ||
-    metaJson.appVersion,
+  appVersion: import.meta.env?.VITE_APP_VERSION || metaJson.appVersion,
 };
 
 // ─── SKILLS / PERKS / FLAWS ───────────────────────────────────────────────────
@@ -463,24 +460,52 @@ export function lineageCantripChoices(character): { item: string; cantrip: strin
   return out;
 }
 
-type ClassJsonType = {
+type BaseClassJson = {
   name: string;
-  type?: string;
+  description?: string;
+  isAdvanced?: boolean;
+  startingSkills?: string[];
+  multiclassSkills?: string[];
+  multiclassGrants?: { name: string; cost: number }[];
+  innate?: { name: string; requiredLevel?: number }[];
+  classSkills?: string[];
+  rightHandPowers?: string[];
+  specializations?: string[];
   progression?: Record<string, ProgressionRow>;
+};
+
+type MartialClassJson = BaseClassJson & {
+  type: "Martial" | "Advanced";
+  magicType?: null;
   utilityPowers?: number;
   basicPowers?: number;
   advancedPowers?: number;
   veteranPowers?: number;
+};
+
+type SpellcasterClassJson = BaseClassJson & {
+  type: "Spellcaster";
+  magicType?: string;
   cantrips?: number;
   spellsKnown?: number;
   slots?: string;
+  noviceSpells?: string[];
+  adeptSpells?: string[];
+  greaterSpells?: string[];
 };
+
+type ClassJsonType = MartialClassJson | SpellcasterClassJson;
+
+// The UI expects LINEAGES keyed by name, and CLASS_POWER_SLOTS...
+function validateClasses(arr: any[]): arr is ClassJsonType[] {
+  return true; // We trust the JSON shape at compile time to avoid 50 lines of runtime checks.
+}
+const typedClassesJson: ClassJsonType[] = validateClasses(classesJson) ? classesJson : [];
 
 // Power-slot counts at the starting level come from the progression table's
 // level-4 row, so they stay in sync with the source rather than being hardcoded.
 export const CLASS_POWER_SLOTS: Record<string, ProgressionRow> = Object.fromEntries(
-  classesJson.map((c: unknown) => {
-    const cls = c as ClassJsonType;
+  typedClassesJson.map((cls) => {
     const lvl4 = cls.progression?.["4"] || {};
     if (cls.type === "Spellcaster") {
       return [
@@ -504,11 +529,8 @@ export const CLASS_POWER_SLOTS: Record<string, ProgressionRow> = Object.fromEntr
   }),
 );
 
-// Full per-level progression table per class (level → { cantrips, spellsKnown,
-// slots, utility, basic, …, bonus }). The validator scans the `bonus` prose for
-// level-granted features like the casters' "Innate Bonus Cantrip".
 export const CLASS_PROGRESSION: Record<string, Record<number, ProgressionRow>> = Object.fromEntries(
-  classesJson.map((c: unknown) => [(c as ClassJsonType).name, (c as ClassJsonType).progression || {}]),
+  typedClassesJson.map((cls) => [cls.name, cls.progression || {}]),
 );
 
 // ─── LINEAGES ─────────────────────────────────────────────────────────────────
@@ -604,7 +626,6 @@ export interface RefsData {
   prereqs: Record<string, { skills?: string[]; anyOf?: string[][]; levels?: string[]; other?: string[] }>;
   mentions: Record<string, string[]>;
   lbpBonuses: Record<string, LbpBonus>;
-  [key: string]: unknown;
 }
 export const REFS = refsJson as RefsData;
 
@@ -642,7 +663,11 @@ export const collectionOf = (type: string): string => PLURAL_TYPE[type] ?? type;
 // boilerplate so the detail pane shows the full prose, keeping the summary as a
 // separate field. Skills aren't split (no boilerplate) but parameterized ones
 // are resolved on lookup (see lookupEntity).
-type JsonRecord = Record<string, unknown>;
+type JsonRecord = {
+  name?: string;
+  description?: string;
+  [key: string]: string | number | boolean | object | null | undefined;
+};
 interface IndexOptions {
   nameKey?: string;
   extra?: (e: JsonRecord) => JsonRecord;

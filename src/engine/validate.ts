@@ -315,7 +315,7 @@ export function bonusBudgetFor(level) {
 export function computeActiveSelections(graph, lbp) {
   // A granted "choose one" selection surfaced for the UI, tagged with the entity that
   // granted it. `gs` is parser-shaped (open), so we widen it and add sourceName.
-  const active: (Record<string, unknown> & { sourceName: string })[] = [];
+  const active: (Record<string, string> & { sourceName: string })[] = [];
   const check = (name: string) => {
     const ent = lookupEntity(name);
     if (ent?.grantedSelections) {
