@@ -94,7 +94,7 @@ export class CharacterGraphModel implements CharacterGraph {
 
   private memo<K extends keyof MemoCache>(key: K, compute: () => NonNullable<MemoCache[K]>): NonNullable<MemoCache[K]> {
     if (this._memo[key] === undefined) {
-      this._memo[key] = compute() as any;
+      this._memo[key] = compute();
     }
     return this._memo[key] as NonNullable<MemoCache[K]>;
   }

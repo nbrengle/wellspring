@@ -31,7 +31,7 @@ export interface RecipeInfo {
   yield: number;
   materialsStr: string;
   requirements: Record<string, number>[];
-  raw: any;
+  raw: Record<string, unknown>;
 }
 
 /** A node in the craft dependency tree: what's needed, how much is on hand vs still

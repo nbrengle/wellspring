@@ -496,8 +496,7 @@ type SpellcasterClassJson = BaseClassJson & {
 
 type ClassJsonType = MartialClassJson | SpellcasterClassJson;
 
-// The UI expects LINEAGES keyed by name, and CLASS_POWER_SLOTS...
-function validateClasses(arr: any[]): arr is ClassJsonType[] {
+function validateClasses(_arr: typeof classesJson): _arr is ClassJsonType[] & typeof classesJson {
   return true; // We trust the JSON shape at compile time to avoid 50 lines of runtime checks.
 }
 const typedClassesJson: ClassJsonType[] = validateClasses(classesJson) ? classesJson : [];
