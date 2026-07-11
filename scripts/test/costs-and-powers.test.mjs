@@ -94,7 +94,7 @@ test("a BESTOW_SOURCE grant materializes as a free, non-removable owned item (Wa
   // canRemove (sourceType === 'purchased' && index>=0) is false: a granted ability isn't deletable.
   const c = makeChar("Rogue 4", { add: ["Way of the Blade"], choices: { "powers:Way of the Blade": "Daggers" } });
   const r = validate(c);
-  const granted = (r.owned?.skills || []).filter((x) => x.bestowedBy === "Way of the Blade");
+  const granted = (r.owned?.bestowedSkills || []).filter((x) => x.bestowedBy === "Way of the Blade");
   eq(granted.length, 2, "both granted skills surface (Weapon Spec - Daggers + Two Weapon Style)");
   const spec = granted.find((x) => /^Weapon Spec/.test(x.name));
   ok(spec, "the parameterized Weapon Specialization grant is present");
@@ -144,7 +144,7 @@ test("a fixed power grant with parameters surfaces BOTH (Lessons from Scars → 
   // distinctly (not collapse to one bare "Lore"). The in-play "Choose one target…"
   // sentence in the same description must NOT suppress the grant.
   const owned = validate(makeChar("Fighter 6", { add: ["Lessons from Scars"] })).owned;
-  const granted = (owned?.skills || []).filter((s) => s.bestowedBy === "Lessons from Scars");
+  const granted = (owned?.bestowedSkills || []).filter((s) => s.bestowedBy === "Lessons from Scars");
   eq(granted.length, 2, "both Lore grants surface");
   ok(
     granted.some((s) => /Historical/.test(s.name)) && granted.some((s) => /Noble/.test(s.name)),

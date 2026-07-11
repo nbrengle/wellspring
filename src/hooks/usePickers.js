@@ -146,7 +146,9 @@ export function usePickers({ character, report, setPicking, handleAddClass, hand
           entityType: "skills",
           candidates: ALL_SKILLS,
           title: "Add a skill",
-          taken: (report.owned?.skills || [])
+          // Already-owned skills — both bought AND bestowed (free) — are "taken", so a
+          // starting/free skill isn't offered for purchase again.
+          taken: [...(report.owned?.skills || []), ...(report.owned?.bestowedSkills || [])]
             .map((r) => r.name)
             .filter((name) => !UNLIMITED_SKILLS.has(bareSkill(cleanItemName(name)))),
         },
