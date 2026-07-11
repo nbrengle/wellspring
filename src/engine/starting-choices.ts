@@ -692,7 +692,7 @@ export function rebuildStartingSkills(
   const nextStarting: CharacterChoice[] = [];
   const keptCounts: Record<string, number> = {};
   const pushItem = (name: string, rank?: number) =>
-    nextStarting.push({ entityId: name, source: Source.starting(primaryClassName), ranks: rank || 1 });
+    nextStarting.push({ entityId: name, source: Source.class(primaryClassName), ranks: rank || 1 });
 
   // Keep current starting items that still belong (matched to an expected
   // template), plus any unrelated to the choices.

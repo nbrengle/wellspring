@@ -416,8 +416,8 @@ test('prereq disjunction: Basic Faith satisfies "Basic Arcane or Basic Faith"', 
   const c = makeChar("Cleric 4", {
     archetypeName: "x",
     add: [
-      { name: "Basic Faith", source: Source.starting("Cleric") },
-      { name: "Extended Capacity - Novice", source: Source.starting("Cleric") },
+      { name: "Basic Faith", source: Source.class("Cleric") },
+      { name: "Extended Capacity - Novice", source: Source.class("Cleric") },
     ],
   });
   const ps = prereqStatus(c, "skills:Extended Capacity - Novice");

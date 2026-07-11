@@ -11,48 +11,48 @@
       {
         "entityId": "Basic Armor",
         "source": {
-          "type": "starting",
-          "class": "Fighter"
+          "type": "class",
+          "name": "Fighter"
         },
         "costField": "startingSkills"
       },
       {
         "entityId": "Light Armor",
         "source": {
-          "type": "starting",
-          "class": "Fighter"
+          "type": "class",
+          "name": "Fighter"
         },
         "costField": "startingSkills"
       },
       {
         "entityId": "Basic Martial Weapons",
         "source": {
-          "type": "starting",
-          "class": "Fighter"
+          "type": "class",
+          "name": "Fighter"
         },
         "costField": "startingSkills"
       },
       {
         "entityId": "Basic Shields",
         "source": {
-          "type": "starting",
-          "class": "Fighter"
+          "type": "class",
+          "name": "Fighter"
         },
         "costField": "startingSkills"
       },
       {
         "entityId": "Short Weapons",
         "source": {
-          "type": "starting",
-          "class": "Fighter"
+          "type": "class",
+          "name": "Fighter"
         },
         "costField": "startingSkills"
       },
       {
         "entityId": "Advanced Shields",
         "source": {
-          "type": "starting",
-          "class": "Fighter"
+          "type": "class",
+          "name": "Fighter"
         },
         "costField": "startingSkills"
       },
@@ -176,40 +176,40 @@
       {
         "entityId": "Basic Armor",
         "source": {
-          "type": "starting",
-          "class": "Fighter"
+          "type": "class",
+          "name": "Fighter"
         },
         "costField": "startingSkills"
       },
       {
         "entityId": "Light Armor",
         "source": {
-          "type": "starting",
-          "class": "Fighter"
+          "type": "class",
+          "name": "Fighter"
         },
         "costField": "startingSkills"
       },
       {
         "entityId": "Basic Martial Weapons",
         "source": {
-          "type": "starting",
-          "class": "Fighter"
+          "type": "class",
+          "name": "Fighter"
         },
         "costField": "startingSkills"
       },
       {
         "entityId": "Basic Shields",
         "source": {
-          "type": "starting",
-          "class": "Fighter"
+          "type": "class",
+          "name": "Fighter"
         },
         "costField": "startingSkills"
       },
       {
         "entityId": "Great Weapons",
         "source": {
-          "type": "starting",
-          "class": "Fighter"
+          "type": "class",
+          "name": "Fighter"
         },
         "costField": "startingSkills"
       },
@@ -318,40 +318,40 @@
       {
         "entityId": "Basic Armor",
         "source": {
-          "type": "starting",
-          "class": "Fighter"
+          "type": "class",
+          "name": "Fighter"
         },
         "costField": "startingSkills"
       },
       {
         "entityId": "Light Armor",
         "source": {
-          "type": "starting",
-          "class": "Fighter"
+          "type": "class",
+          "name": "Fighter"
         },
         "costField": "startingSkills"
       },
       {
         "entityId": "Basic Martial Weapons",
         "source": {
-          "type": "starting",
-          "class": "Fighter"
+          "type": "class",
+          "name": "Fighter"
         },
         "costField": "startingSkills"
       },
       {
         "entityId": "Basic Shields",
         "source": {
-          "type": "starting",
-          "class": "Fighter"
+          "type": "class",
+          "name": "Fighter"
         },
         "costField": "startingSkills"
       },
       {
         "entityId": "Lore",
         "source": {
-          "type": "starting",
-          "class": "Fighter"
+          "type": "class",
+          "name": "Fighter"
         },
         "costField": "startingSkills",
         "parameter": "Historical"
@@ -359,8 +359,8 @@
       {
         "entityId": "Projectile Weapons",
         "source": {
-          "type": "starting",
-          "class": "Fighter"
+          "type": "class",
+          "name": "Fighter"
         },
         "costField": "startingSkills"
       },
@@ -477,40 +477,40 @@
       {
         "entityId": "Basic Faith",
         "source": {
-          "type": "starting",
-          "class": "Cleric"
+          "type": "class",
+          "name": "Cleric"
         },
         "costField": "startingSkills"
       },
       {
         "entityId": "Worship",
         "source": {
-          "type": "starting",
-          "class": "Cleric"
+          "type": "class",
+          "name": "Cleric"
         },
         "costField": "startingSkills"
       },
       {
         "entityId": "Basic Martial Weapons",
         "source": {
-          "type": "starting",
-          "class": "Cleric"
+          "type": "class",
+          "name": "Cleric"
         },
         "costField": "startingSkills"
       },
       {
         "entityId": "Basic Armor",
         "source": {
-          "type": "starting",
-          "class": "Cleric"
+          "type": "class",
+          "name": "Cleric"
         },
         "costField": "startingSkills"
       },
       {
         "entityId": "Extended Capacity - Novice",
         "source": {
-          "type": "starting",
-          "class": "Cleric"
+          "type": "class",
+          "name": "Cleric"
         },
         "costField": "startingSkills",
         "parameter": "Divine"
@@ -518,8 +518,8 @@
       {
         "entityId": "Additional Cantrip",
         "source": {
-          "type": "starting",
-          "class": "Cleric"
+          "type": "class",
+          "name": "Cleric"
         },
         "costField": "startingSkills"
       },
@@ -678,16 +678,16 @@
       {
         "entityId": "Basic Martial Weapons",
         "source": {
-          "type": "starting",
-          "class": "Druid"
+          "type": "class",
+          "name": "Druid"
         },
         "costField": "startingSkills"
       },
       {
         "entityId": "Profession - Apprentice",
         "source": {
-          "type": "starting",
-          "class": "Druid"
+          "type": "class",
+          "name": "Druid"
         },
         "costField": "startingSkills",
         "parameter": "Smith"
@@ -695,24 +695,24 @@
       {
         "entityId": "Basic Faith",
         "source": {
-          "type": "starting",
-          "class": "Druid"
+          "type": "class",
+          "name": "Druid"
         },
         "costField": "startingSkills"
       },
       {
         "entityId": "Scavenge I",
         "source": {
-          "type": "starting",
-          "class": "Druid"
+          "type": "class",
+          "name": "Druid"
         },
         "costField": "startingSkills"
       },
       {
         "entityId": "Extended Capacity - Novice",
         "source": {
-          "type": "starting",
-          "class": "Druid"
+          "type": "class",
+          "name": "Druid"
         },
         "costField": "startingSkills",
         "parameter": "Divine"
@@ -720,8 +720,8 @@
       {
         "entityId": "Lore",
         "source": {
-          "type": "starting",
-          "class": "Druid"
+          "type": "class",
+          "name": "Druid"
         },
         "costField": "startingSkills",
         "parameter": "Nature"
@@ -856,16 +856,16 @@
       {
         "entityId": "Basic Martial Weapons",
         "source": {
-          "type": "starting",
-          "class": "Druid"
+          "type": "class",
+          "name": "Druid"
         },
         "costField": "startingSkills"
       },
       {
         "entityId": "Profession - Apprentice",
         "source": {
-          "type": "starting",
-          "class": "Druid"
+          "type": "class",
+          "name": "Druid"
         },
         "costField": "startingSkills",
         "parameter": "Smith"
@@ -873,32 +873,32 @@
       {
         "entityId": "Forage I",
         "source": {
-          "type": "starting",
-          "class": "Druid"
+          "type": "class",
+          "name": "Druid"
         },
         "costField": "startingSkills"
       },
       {
         "entityId": "Basic Faith",
         "source": {
-          "type": "starting",
-          "class": "Druid"
+          "type": "class",
+          "name": "Druid"
         },
         "costField": "startingSkills"
       },
       {
         "entityId": "Peacecaster",
         "source": {
-          "type": "starting",
-          "class": "Druid"
+          "type": "class",
+          "name": "Druid"
         },
         "costField": "startingSkills"
       },
       {
         "entityId": "Basic Medicine",
         "source": {
-          "type": "starting",
-          "class": "Druid"
+          "type": "class",
+          "name": "Druid"
         },
         "costField": "startingSkills"
       },
@@ -1055,16 +1055,16 @@
       {
         "entityId": "Basic Arcane",
         "source": {
-          "type": "starting",
-          "class": "Mage"
+          "type": "class",
+          "name": "Mage"
         },
         "costField": "startingSkills"
       },
       {
         "entityId": "Lore",
         "source": {
-          "type": "starting",
-          "class": "Mage"
+          "type": "class",
+          "name": "Mage"
         },
         "costField": "startingSkills",
         "parameter": "Historical"
@@ -1072,16 +1072,16 @@
       {
         "entityId": "Library Use",
         "source": {
-          "type": "starting",
-          "class": "Mage"
+          "type": "class",
+          "name": "Mage"
         },
         "costField": "startingSkills"
       },
       {
         "entityId": "Bookcaster",
         "source": {
-          "type": "starting",
-          "class": "Mage"
+          "type": "class",
+          "name": "Mage"
         },
         "costField": "startingSkills",
         "parameter": "Magekey"
@@ -1089,8 +1089,8 @@
       {
         "entityId": "Bookcaster",
         "source": {
-          "type": "starting",
-          "class": "Mage"
+          "type": "class",
+          "name": "Mage"
         },
         "costField": "startingSkills",
         "parameter": "Mask Aura"
@@ -1098,8 +1098,8 @@
       {
         "entityId": "Extended Capacity - Novice",
         "source": {
-          "type": "starting",
-          "class": "Mage"
+          "type": "class",
+          "name": "Mage"
         },
         "costField": "startingSkills",
         "parameter": "Arcane",
@@ -1274,48 +1274,48 @@
       {
         "entityId": "Basic Armor",
         "source": {
-          "type": "starting",
-          "class": "Rogue"
+          "type": "class",
+          "name": "Rogue"
         },
         "costField": "startingSkills"
       },
       {
         "entityId": "Light Armor",
         "source": {
-          "type": "starting",
-          "class": "Rogue"
+          "type": "class",
+          "name": "Rogue"
         },
         "costField": "startingSkills"
       },
       {
         "entityId": "Basic Martial Weapons",
         "source": {
-          "type": "starting",
-          "class": "Rogue"
+          "type": "class",
+          "name": "Rogue"
         },
         "costField": "startingSkills"
       },
       {
         "entityId": "Thrown Weapons",
         "source": {
-          "type": "starting",
-          "class": "Rogue"
+          "type": "class",
+          "name": "Rogue"
         },
         "costField": "startingSkills"
       },
       {
         "entityId": "Basic Locks",
         "source": {
-          "type": "starting",
-          "class": "Rogue"
+          "type": "class",
+          "name": "Rogue"
         },
         "costField": "startingSkills"
       },
       {
         "entityId": "Poisoner",
         "source": {
-          "type": "starting",
-          "class": "Rogue"
+          "type": "class",
+          "name": "Rogue"
         },
         "costField": "startingSkills"
       },
@@ -1423,48 +1423,48 @@
       {
         "entityId": "Basic Armor",
         "source": {
-          "type": "starting",
-          "class": "Rogue"
+          "type": "class",
+          "name": "Rogue"
         },
         "costField": "startingSkills"
       },
       {
         "entityId": "Light Armor",
         "source": {
-          "type": "starting",
-          "class": "Rogue"
+          "type": "class",
+          "name": "Rogue"
         },
         "costField": "startingSkills"
       },
       {
         "entityId": "Basic Martial Weapons",
         "source": {
-          "type": "starting",
-          "class": "Rogue"
+          "type": "class",
+          "name": "Rogue"
         },
         "costField": "startingSkills"
       },
       {
         "entityId": "Thrown Weapons",
         "source": {
-          "type": "starting",
-          "class": "Rogue"
+          "type": "class",
+          "name": "Rogue"
         },
         "costField": "startingSkills"
       },
       {
         "entityId": "Basic Traps",
         "source": {
-          "type": "starting",
-          "class": "Rogue"
+          "type": "class",
+          "name": "Rogue"
         },
         "costField": "startingSkills"
       },
       {
         "entityId": "Poisoner",
         "source": {
-          "type": "starting",
-          "class": "Rogue"
+          "type": "class",
+          "name": "Rogue"
         },
         "costField": "startingSkills"
       },
@@ -1613,40 +1613,40 @@
       {
         "entityId": "Basic Martial Weapons",
         "source": {
-          "type": "starting",
-          "class": "Socialite"
+          "type": "class",
+          "name": "Socialite"
         },
         "costField": "startingSkills"
       },
       {
         "entityId": "Library Use",
         "source": {
-          "type": "starting",
-          "class": "Socialite"
+          "type": "class",
+          "name": "Socialite"
         },
         "costField": "startingSkills"
       },
       {
         "entityId": "Poisoner",
         "source": {
-          "type": "starting",
-          "class": "Socialite"
+          "type": "class",
+          "name": "Socialite"
         },
         "costField": "startingSkills"
       },
       {
         "entityId": "Basic Armor",
         "source": {
-          "type": "starting",
-          "class": "Socialite"
+          "type": "class",
+          "name": "Socialite"
         },
         "costField": "startingSkills"
       },
       {
         "entityId": "Lore",
         "source": {
-          "type": "starting",
-          "class": "Socialite"
+          "type": "class",
+          "name": "Socialite"
         },
         "costField": "startingSkills",
         "parameter": "Historical"
@@ -1654,8 +1654,8 @@
       {
         "entityId": "Profession - Apprentice",
         "source": {
-          "type": "starting",
-          "class": "Socialite"
+          "type": "class",
+          "name": "Socialite"
         },
         "costField": "startingSkills",
         "parameter": "Smith"
@@ -1663,8 +1663,8 @@
       {
         "entityId": "Profession - Journeyman",
         "source": {
-          "type": "starting",
-          "class": "Socialite"
+          "type": "class",
+          "name": "Socialite"
         },
         "costField": "startingSkills",
         "parameter": "Smith"
@@ -1672,16 +1672,16 @@
       {
         "entityId": "Fence",
         "source": {
-          "type": "starting",
-          "class": "Socialite"
+          "type": "class",
+          "name": "Socialite"
         },
         "costField": "startingSkills"
       },
       {
         "entityId": "Contact",
         "source": {
-          "type": "starting",
-          "class": "Socialite"
+          "type": "class",
+          "name": "Socialite"
         },
         "costField": "startingSkills"
       },
@@ -1821,24 +1821,24 @@
       {
         "entityId": "Basic Arcane",
         "source": {
-          "type": "starting",
-          "class": "Sourcerer"
+          "type": "class",
+          "name": "Sourcerer"
         },
         "costField": "startingSkills"
       },
       {
         "entityId": "Advanced Recharge",
         "source": {
-          "type": "starting",
-          "class": "Sourcerer"
+          "type": "class",
+          "name": "Sourcerer"
         },
         "costField": "startingSkills"
       },
       {
         "entityId": "Patron",
         "source": {
-          "type": "starting",
-          "class": "Sourcerer"
+          "type": "class",
+          "name": "Sourcerer"
         },
         "costField": "startingSkills",
         "parameter": "a Patron"
@@ -1846,8 +1846,8 @@
       {
         "entityId": "Gift of Hateful Retribution",
         "source": {
-          "type": "starting",
-          "class": "Sourcerer"
+          "type": "class",
+          "name": "Sourcerer"
         },
         "costField": "startingSkills"
       },
@@ -1955,56 +1955,56 @@
       {
         "entityId": "Basic Martial Weapons",
         "source": {
-          "type": "starting",
-          "class": "Artisan"
+          "type": "class",
+          "name": "Artisan"
         },
         "costField": "startingSkills"
       },
       {
         "entityId": "Short Weapons",
         "source": {
-          "type": "starting",
-          "class": "Artisan"
+          "type": "class",
+          "name": "Artisan"
         },
         "costField": "startingSkills"
       },
       {
         "entityId": "Basic Armor",
         "source": {
-          "type": "starting",
-          "class": "Artisan"
+          "type": "class",
+          "name": "Artisan"
         },
         "costField": "startingSkills"
       },
       {
         "entityId": "Apprentice Tinkering",
         "source": {
-          "type": "starting",
-          "class": "Artisan"
+          "type": "class",
+          "name": "Artisan"
         },
         "costField": "startingSkills"
       },
       {
         "entityId": "Prospect I",
         "source": {
-          "type": "starting",
-          "class": "Artisan"
+          "type": "class",
+          "name": "Artisan"
         },
         "costField": "startingSkills"
       },
       {
         "entityId": "Profession - Apprentice",
         "source": {
-          "type": "starting",
-          "class": "Artisan"
+          "type": "class",
+          "name": "Artisan"
         },
         "costField": "startingSkills"
       },
       {
         "entityId": "Profession - Journeyman",
         "source": {
-          "type": "starting",
-          "class": "Artisan"
+          "type": "class",
+          "name": "Artisan"
         },
         "costField": "startingSkills"
       },
@@ -2123,56 +2123,56 @@
       {
         "entityId": "Basic Martial Weapons",
         "source": {
-          "type": "starting",
-          "class": "Artisan"
+          "type": "class",
+          "name": "Artisan"
         },
         "costField": "startingSkills"
       },
       {
         "entityId": "Short Weapons",
         "source": {
-          "type": "starting",
-          "class": "Artisan"
+          "type": "class",
+          "name": "Artisan"
         },
         "costField": "startingSkills"
       },
       {
         "entityId": "Basic Armor",
         "source": {
-          "type": "starting",
-          "class": "Artisan"
+          "type": "class",
+          "name": "Artisan"
         },
         "costField": "startingSkills"
       },
       {
         "entityId": "Apprentice Alchemy",
         "source": {
-          "type": "starting",
-          "class": "Artisan"
+          "type": "class",
+          "name": "Artisan"
         },
         "costField": "startingSkills"
       },
       {
         "entityId": "Forage I",
         "source": {
-          "type": "starting",
-          "class": "Artisan"
+          "type": "class",
+          "name": "Artisan"
         },
         "costField": "startingSkills"
       },
       {
         "entityId": "Basic Medicine",
         "source": {
-          "type": "starting",
-          "class": "Artisan"
+          "type": "class",
+          "name": "Artisan"
         },
         "costField": "startingSkills"
       },
       {
         "entityId": "Hearth",
         "source": {
-          "type": "starting",
-          "class": "Artisan"
+          "type": "class",
+          "name": "Artisan"
         },
         "costField": "startingSkills"
       },
@@ -2290,48 +2290,48 @@
       {
         "entityId": "Basic Martial Weapons",
         "source": {
-          "type": "starting",
-          "class": "Artisan"
+          "type": "class",
+          "name": "Artisan"
         },
         "costField": "startingSkills"
       },
       {
         "entityId": "Short Weapons",
         "source": {
-          "type": "starting",
-          "class": "Artisan"
+          "type": "class",
+          "name": "Artisan"
         },
         "costField": "startingSkills"
       },
       {
         "entityId": "Basic Armor",
         "source": {
-          "type": "starting",
-          "class": "Artisan"
+          "type": "class",
+          "name": "Artisan"
         },
         "costField": "startingSkills"
       },
       {
         "entityId": "Apprentice Enchanting",
         "source": {
-          "type": "starting",
-          "class": "Artisan"
+          "type": "class",
+          "name": "Artisan"
         },
         "costField": "startingSkills"
       },
       {
         "entityId": "Apprentice Ritual Magic",
         "source": {
-          "type": "starting",
-          "class": "Artisan"
+          "type": "class",
+          "name": "Artisan"
         },
         "costField": "startingSkills"
       },
       {
         "entityId": "Lore",
         "source": {
-          "type": "starting",
-          "class": "Artisan"
+          "type": "class",
+          "name": "Artisan"
         },
         "costField": "startingSkills",
         "parameter": "Rituals"
@@ -2339,8 +2339,8 @@
       {
         "entityId": "Forage I",
         "source": {
-          "type": "starting",
-          "class": "Artisan"
+          "type": "class",
+          "name": "Artisan"
         },
         "costField": "startingSkills"
       },

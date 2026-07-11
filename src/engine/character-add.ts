@@ -65,8 +65,8 @@ export interface AddOpts {
   cost?: number;
   /** Rank for multi-rank picks (Agile Learner). Defaults to 1. */
   ranks?: number;
-  /** Force the provenance instead of deriving it — e.g. a starting skill
-   *  (Source.starting), an innate power, or a Bookcaster-granted book spell. The
+  /** Force the provenance instead of deriving it — e.g. a starting/free skill
+   *  (Source.class), an innate power, or a Bookcaster-bestowed book spell. The
    *  common path omits this and lets the API derive purchased/class. */
   source?: EntitySource;
   /** Force the costField instead of deriving from tier (e.g. a Novice book spell
@@ -124,7 +124,9 @@ function deriveCostField(ent: Entity | null): string | undefined {
 export function sourceForField(field: string, primaryClass: string): EntitySource {
   switch (field) {
     case "startingSkills":
-      return Source.starting(primaryClass);
+      // A starting skill is bestowed free by the class — sourced to the class, same
+      // as a class slot pick. It routes to the Bestowed/Free Skills bucket on read.
+      return Source.class(primaryClass);
     case "innatePowers":
       return Source.innate();
     case "bookSpells":

@@ -177,7 +177,7 @@ function loadWithChoices(a) {
     if (rebuilt.skills) {
       const newStarting = rebuilt.startingSkills.map((s, i) => ({
         entityId: s,
-        source: Source.starting(primary),
+        source: Source.class(primary),
         ranks: rebuilt.ranks?.startingSkills?.[i] || 1,
       }));
       rebuilt.skills = [...rebuilt.skills.filter((s) => !isStarting(s.source)), ...newStarting];
