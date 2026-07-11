@@ -320,7 +320,6 @@ export function EntityBody({
   const isParamEditable = !!(
     onUpdateParameter &&
     view?.field &&
-    view.field !== "multiclassBestow" &&
     (paramSuggestions?.length || paramGroups?.length || baseName === "Bookcaster" || TYPEABLE_PARAMS.has(baseName))
   ); // typeable params are editable even with no suggestions
   // A devotion's "description" lives in lore + tenets (not a `description` field),

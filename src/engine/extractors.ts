@@ -117,6 +117,25 @@ function extractStudiedFocus(ent: Entity | null | undefined, character: Characte
   return [];
 }
 
+// Tax Evasion (Socialite Utility power): a cross-entity wealth rule. Per the rules text,
+// "3 Wealth for every rank of Profession, and 2 Wealth for Manse and Income." This counts
+// the character's OWNED Profession skills + the Manse/Income perks, so it's a whole-character
+// aggregate keyed off the character buckets (not the resolved graph, which isn't built yet
+// when extractors run). Profession/Manse/Income are never bestowed or discounted, so the
+// bucket count equals the resolved-node count. Emits a single WEALTH effect on the Tax
+// Evasion node itself — replacing the old synthetic "Tax Evasion Bonus" node in resolve.ts.
+function extractTaxEvasion(ent: Entity | null | undefined, character: CharacterState, _id: string): Effect[] {
+  if (ent?.name !== "Tax Evasion") return [];
+  const profRanks = (character.skills || []).filter((s) =>
+    /^\bProfession\b/i.test(s.entityId.replace(/^skills:/i, "")),
+  ).length;
+  const ownsPerk = (name: string) => (character.perks || []).some((p) => p.entityId.replace(/^perks:/i, "") === name);
+  let bonus = profRanks * 3;
+  if (ownsPerk("Manse")) bonus += 2;
+  if (ownsPerk("Income")) bonus += 2;
+  return bonus > 0 ? [{ type: "WEALTH", amount: bonus, note: "from Profession/Manse/Income" }] : [];
+}
+
 function extractLevelDiscounts(ent: Entity | null | undefined, character: CharacterState, id: string): Effect[] {
   if (!ent?.levelDiscounts || ent.levelDiscounts.length === 0) return [];
 
@@ -166,4 +185,5 @@ export const EFFECT_EXTRACTORS = [
   extractLineageChoiceSpec,
   extractPowerSpellChoiceSpec,
   extractStudiedFocus,
+  extractTaxEvasion,
 ];

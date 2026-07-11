@@ -484,11 +484,7 @@ export function ClassifiedRows({ rows, resolveType, showClass }) {
         const maxR = getMaxRanks(name, field, character);
         const bestowedFloor = floor || 0;
         const isBestowed =
-          sourceType === "bestow" ||
-          sourceType === "class" ||
-          sourceType === "innate" ||
-          sourceType === "lineage" ||
-          sourceType === "multiclass";
+          sourceType === "bestow" || sourceType === "class" || sourceType === "innate" || sourceType === "lineage";
 
         const canBuyUp = isBestowed && bestowedFloor > 0 && maxR > bestowedFloor && !UNLIMITED_SKILLS.has(baseName);
         const rankFloor = canBuyUp ? bestowedFloor : 1;

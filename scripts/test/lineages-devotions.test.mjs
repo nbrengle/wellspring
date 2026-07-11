@@ -2,7 +2,7 @@
 // imports so concurrent features don't collide on one shared import block.
 import { test, eq, ok, Source } from "./harness.mjs";
 import { makeChar } from "./make-char.mjs";
-import { validate, characterLevel } from "../../src/engine/validate.js";
+import { validate, characterLevel, classifyOwnedItems } from "../../src/engine/validate.js";
 import {
   budgetFor,
   computeSlots,
@@ -217,6 +217,20 @@ test("Arcane Secrets (domain power) grants the chosen arcane spell as a Known Sp
     makeChar("Cleric 6", { devotion: "The Librarian", add: [{ name: "Arcane Secrets", field: "domainPowers" }] }),
   ).find((i) => /Arcane Secrets/.test(i.name));
   ok(!none.effects.some((e) => e.type === "BESTOW_SOURCE"), "no pick → no spell granted");
+});
+
+test("a domain power routes to the domainPowers bucket, not classPowers", () => {
+  // A domain power is entity.type 'power' with no distinguishing entity field; the graph
+  // stamps powerKind from its originating (domainPowers) bucket. Previously the router
+  // keyed on `field === "domainPowers"`, which never matched (field is "powers"), so
+  // domain powers wrongly fell into classPowers and domainPowers stayed empty.
+  const char = makeChar("Cleric 6", {
+    devotion: "The Librarian",
+    add: [{ name: "Arcane Secrets", field: "domainPowers" }],
+  });
+  const owned = classifyOwnedItems(char);
+  eq(owned.domainPowers.length, 1, "the domain power lands in the domainPowers bucket");
+  ok(!owned.classPowers.some((p) => /Arcane Secrets/.test(p.name)), "the domain power is NOT lumped into classPowers");
 });
 
 test("Weird Wanderings grants a chosen Basic power from a non-Artisan base class", () => {

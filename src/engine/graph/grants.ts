@@ -29,7 +29,7 @@ export function computeBestowedAbilitiesList(graph: CharacterGraphModel): Bestow
 export function computeOwnedIds(graph: CharacterGraphModel): Set<string> {
   const owned = new Set<string>();
   for (const node of graph.items) {
-    if (node.field === "flaws" || node.field === "synthetic") continue;
+    if (node.sourceType === "flaw") continue;
     if (node.id) {
       owned.add(node.id);
       if (node.id.includes("|")) owned.add(node.id.split("|")[0] + "|any");
