@@ -1,7 +1,7 @@
 [
   {
     "name": "Artisan",
-    "type": "Martial",
+    "kind": "Martial",
     "magicType": null,
     "description": "Crafting & Support Martial Class",
     "startingSkills": [
@@ -2106,7 +2106,7 @@
   },
   {
     "name": "Cleric",
-    "type": "Spellcaster",
+    "kind": "Spellcaster",
     "magicType": "Divine",
     "description": "Divine Spell-Casting Class",
     "startingSkills": [
@@ -3428,7 +3428,7 @@
   },
   {
     "name": "Druid",
-    "type": "Spellcaster",
+    "kind": "Spellcaster",
     "magicType": "Divine",
     "description": "Divine Spell-Casting Class",
     "startingSkills": [
@@ -4870,7 +4870,7 @@
   },
   {
     "name": "Fighter",
-    "type": "Martial",
+    "kind": "Martial",
     "magicType": null,
     "description": "Martial Class",
     "startingSkills": [
@@ -6349,7 +6349,7 @@
   },
   {
     "name": "Mage",
-    "type": "Spellcaster",
+    "kind": "Spellcaster",
     "magicType": "Arcane",
     "description": "Utility & Arcane Spell-Casting Class",
     "startingSkills": [
@@ -7733,7 +7733,7 @@
   },
   {
     "name": "Rogue",
-    "type": "Martial",
+    "kind": "Martial",
     "magicType": null,
     "description": "Martial Class",
     "startingSkills": [
@@ -9119,7 +9119,7 @@
   },
   {
     "name": "Socialite",
-    "type": "Martial",
+    "kind": "Martial",
     "magicType": null,
     "description": "Information & Leadership Martial Class",
     "startingSkills": [
@@ -10888,7 +10888,7 @@
   },
   {
     "name": "Sourcerer",
-    "type": "Spellcaster",
+    "kind": "Spellcaster",
     "magicType": "Arcane",
     "description": "Alpha Striker & Arcane Spell-Casting Class",
     "startingSkills": [

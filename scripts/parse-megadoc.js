@@ -665,7 +665,10 @@ function parseClasses() {
 
     classes.push({
       name: clsName,
-      type: isCaster ? "Spellcaster" : "Martial",
+      // The class's domain kind — Martial vs Spellcaster. Named `kind`, NOT `type`,
+      // so it survives entity indexing (which stamps `type: "class"` as the Entity
+      // discriminator and would otherwise clobber this).
+      kind: isCaster ? "Spellcaster" : "Martial",
       magicType,
       description,
       startingSkills: annotateSkills(skillList("Starting Skills")),

@@ -81,7 +81,7 @@ export function usePickers({ character, report, setPicking, handleAddClass, hand
     const candidates = Object.keys(CLASS_POWER_SLOTS).map((name) => ({
       name,
       desc: CLASSES[name]?.description || "",
-      cat: CLASSES[name]?.type || "Class",
+      cat: CLASSES[name]?.kind || "Class",
     }));
     setPicking(
       entityPickerSpec({
