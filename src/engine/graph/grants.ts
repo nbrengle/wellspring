@@ -1,16 +1,16 @@
 import { lookupEntity } from "../../engine/data.js";
 import { bareSkill, cleanItemName } from "../resolver.js";
 import type { CharacterState } from "../types.js";
-import { GrantedAbility } from "../types.js";
+import { BestowedAbility } from "../types.js";
 import { CharacterGraphModel, idPrefix } from "./model.js";
 import { resolveCharacterGraph } from "./resolve.js";
 
-export function computeGrantedAbilitiesList(graph: CharacterGraphModel): GrantedAbility[] {
-  const list: GrantedAbility[] = [];
+export function computeBestowedAbilitiesList(graph: CharacterGraphModel): BestowedAbility[] {
+  const list: BestowedAbility[] = [];
   for (const node of graph.items) {
     for (const eff of node.effects) {
-      if (eff.type !== "GRANT_SOURCE") continue;
-      for (const ability of eff.grants) {
+      if (eff.type !== "BESTOW_SOURCE") continue;
+      for (const ability of eff.bestows) {
         const ent = lookupEntity(ability);
         list.push({
           ability,
@@ -64,7 +64,7 @@ export function computeOwnedIds(graph: CharacterGraphModel): Set<string> {
     }
   }
   // Granted abilities also satisfy prerequisites.
-  for (const g of graph._grantedAbilitiesList) {
+  for (const g of graph._bestowedAbilitiesList) {
     owned.add(g.ability);
     const ent = lookupEntity(g.ability);
     if (ent) owned.add(`${idPrefix(ent)}:${bareSkill(ent.name)}`);
@@ -72,10 +72,10 @@ export function computeOwnedIds(graph: CharacterGraphModel): Set<string> {
   return owned;
 }
 
-export function grantedAbilities(character: CharacterState) {
+export function bestowedAbilities(character: CharacterState) {
   const graph = resolveCharacterGraph(character);
-  const list: GrantedAbility[] = [];
-  const bySource: Record<string, { source: string; sourceKind: string; abilities: GrantedAbility[] }> = {};
+  const list: BestowedAbility[] = [];
+  const bySource: Record<string, { source: string; sourceKind: string; abilities: BestowedAbility[] }> = {};
   const addRow = (ability: string, sourceName: string, sourceId: string, sourceKind: string) => {
     const ent = lookupEntity(ability);
     const row = {
@@ -92,8 +92,8 @@ export function grantedAbilities(character: CharacterState) {
   };
   for (const node of graph) {
     for (const eff of node.effects) {
-      if (eff.type !== "GRANT_SOURCE") continue;
-      for (const ability of eff.grants) {
+      if (eff.type !== "BESTOW_SOURCE") continue;
+      for (const ability of eff.bestows) {
         addRow(ability, node.name, node.id, node.sourceType);
       }
     }

@@ -99,7 +99,7 @@ const STAT_RE = {
     /(?:and\s+)?(?:\+?(\d+)\s+)?Natural\s+Armor\s+Points?/i,
   ],
 };
-// scanSlotGrant
+// scanSlotBestow
 const SLOT_RE = [
   /\badditional\s+cantrip\b/i,
   /\badditional\s+(Novice|Adept|Greater|Utility|Basic|Advanced|Veteran)\s+(?:Tier\s+)?(?:spell-?\s*slot|slot|power)/i,
@@ -116,7 +116,7 @@ const WEALTH_RE = [
 const anyMatch = (res, text) => res.some((re) => re.test(text));
 
 // Map a signal category to "does the builder catch THIS kind of effect at all".
-// `grant` is handled by the reference graph (REFS.grants) at build time, not by a
+// `grant` is handled by the reference graph (REFS.bestows) at build time, not by a
 // text scan, so we can't cheaply replicate it — mark those as 'graph' (needs
 // manual check that the grant edge exists) rather than miss.
 // Per-day spell-slot grant regex (spellSlots()), and the fields it walks.
@@ -236,6 +236,6 @@ for (const [cat, list] of Object.entries(byCat)) {
   for (const g of list) console.log(`  [${g.kind}] ${g.name}\n      "${g.sentence}"`);
 }
 
-console.log(`\n=== GRANT signals (verify a REFS.grants edge exists for each) — ${graphChecks.length} ===`);
+console.log(`\n=== GRANT signals (verify a REFS.bestows edge exists for each) — ${graphChecks.length} ===`);
 for (const g of graphChecks.slice(0, 40)) console.log(`  [${g.kind}] ${g.name}`);
 if (graphChecks.length > 40) console.log(`  …and ${graphChecks.length - 40} more`);

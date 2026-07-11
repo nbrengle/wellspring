@@ -670,7 +670,7 @@ function parseClasses() {
       description,
       startingSkills: annotateSkills(skillList("Starting Skills")),
       multiclassSkills: annotateSkills(skillList("Multiclass Skills")),
-      multiclassGrants: parseMulticlassSkills(skillList("Multiclass Skills")),
+      multiclassBestows: parseMulticlassSkills(skillList("Multiclass Skills")),
       progression,
       specializations,
       innate: powers(new RegExp(`^${clsName} Innate Powers$`)),
@@ -953,7 +953,7 @@ function extractWealthIncome(entity) {
 // ─── SLOT GRANTS (prose → structured) ──────────────────────────────────────────
 // Power/spell-slot grants an entity confers: an extra cantrip, an extra tier slot,
 // added Known Spells, or a floating "highest-level" slot. Emitted as
-// entity.slotGrants = [{ cat, n }] (+ entity.highestSlot for the floating one) so
+// entity.slotBestows = [{ cat, n }] (+ entity.highestSlot for the floating one) so
 // the validator reads structured grants instead of regexing descriptions. `cat` is
 // the slot category: cantrips | spellsKnown | utility|basic|advanced|veteran |
 // novice|adept|greater.
@@ -966,7 +966,7 @@ const SLOT_TIER_TO_CAT = {
   advanced: "advanced",
   veteran: "veteran",
 };
-function slotGrantsFromText(name, text) {
+function slotBestowsFromText(name, text) {
   const grants = [];
   let highest = false;
   if (!text) return { grants, highest };
@@ -1031,9 +1031,9 @@ function extractOptionsList(entity) {
   }
 }
 
-function extractSlotGrants(entity) {
-  const { grants, highest } = slotGrantsFromText(entity.name, entity.description || entity.desc || "");
-  if (grants.length) entity.slotGrants = grants;
+function extractSlotBestows(entity) {
+  const { grants, highest } = slotBestowsFromText(entity.name, entity.description || entity.desc || "");
+  if (grants.length) entity.slotBestows = grants;
   if (highest) entity.highestSlot = true;
   extractOptionsList(entity);
 }
@@ -1043,7 +1043,7 @@ function extractSlotGrants(entity) {
 // in THE GRANTING CLASS (Ritual Affinity: Journeyman Ritual Magic −1 BP at class L7,
 // Greater −1 BP at L12). The gate is the granting class's own level, so this can't
 // live as a flat refs edge — it's emitted per-power here and applied per class in
-// validate.js (mirroring slotGrants/statMods). Each entry: { skill, amount, atLevel }.
+// validate.js (mirroring slotBestows/statMods). Each entry: { skill, amount, atLevel }.
 // Anchored on the doc's exact phrasing "…Nth level <Class>… for one fewer Build
 // Point", which matches ONLY genuine level-gated discounts (not effect-scaling).
 function extractLevelDiscounts(entity) {
@@ -1064,10 +1064,10 @@ function extractLevelDiscounts(entity) {
 function enrichMechanics(entity) {
   extractStatMods(entity);
   extractWealthIncome(entity);
-  extractSlotGrants(entity);
+  extractSlotBestows(entity);
   extractLevelDiscounts(entity);
   extractRequirement(entity);
-  extractGrantedSelections(entity);
+  extractBestowedSelections(entity);
   extractManualParameterizations(entity);
 }
 
@@ -1079,7 +1079,7 @@ function extractManualParameterizations(entity) {
 }
 
 // ─── GRANTED SELECTIONS (Dynamic picks) ────────────────────────────────────────
-function extractGrantedSelections(entity) {
+function extractBestowedSelections(entity) {
   const text = entity.description || entity.desc;
   if (!text) return;
   const selections = [];
@@ -1130,7 +1130,7 @@ function extractGrantedSelections(entity) {
   }
 
   if (selections.length > 0) {
-    entity.grantedSelections = selections;
+    entity.bestowedSelections = selections;
   }
 }
 
@@ -1185,7 +1185,7 @@ function extractRequirement(entity) {
 // Powers offering "choose one of the following: • … • …". Two flavors:
 //   - BUILD-TIME permanent: "gains one of the following FOR FREE" (Expert Craft) —
 //     a character-creation pick; each option names a skill granted free. Tagged
-//     `chooseOne.kind:'build'` with `options[].grantsSkill`.
+//     `chooseOne.kind:'build'` with `options[].bestowsSkill`.
 //   - IN-PLAY tactical: "may choose one … (each Long Rest / per use / per cast)"
 //     (Warrior Spirit, Kick, …) — the player picks at play time, not in the
 //     builder. Tagged `kind:'play'`; options are display-only.
@@ -1224,17 +1224,17 @@ function extractChooseOne(power) {
     options: opts.map((text) => {
       // Direct skill mention: "Greater Alchemy (5)"
       const sk = build && text.match(/^([A-Z][\w’' ]+?)\s*\(\d+\)/);
-      if (sk) return { text, grants: [sk[1].trim()] };
+      if (sk) return { text, bestows: [sk[1].trim()] };
 
       // Parameterized skill mention from prefix
       if (build && prefixSkills.length > 0) {
-        const grants = prefixSkills.map((s) => {
+        const bestows = prefixSkills.map((s) => {
           if (s.includes("Specialization") || s.includes("Focus") || s.includes("Expertise")) {
             return `${s} - ${text}`;
           }
           return s;
         });
-        return { text, grants };
+        return { text, bestows };
       }
 
       return { text };
@@ -1257,7 +1257,7 @@ for (const c of CLASSES_OUT) {
 // Cross-class pass: a power offered by more than one class is the SAME shared power
 // repeated in the doc. Tag each copy with sharedWith:[classes] so downstream code
 // (entity index merge, guard test) can treat them as one ability. Only true power
-// tiers count — multiclassGrants lists skill NAMES, not power entities.
+// tiers count — multiclassBestows lists skill NAMES, not power entities.
 {
   const POWER_TIERS = [
     "innate",
@@ -1293,9 +1293,9 @@ for (const cls of CLASSES_OUT) {
       wotb.chooseOne = {
         kind: "build",
         options: [
-          { text: "Swords", grants: ["Weapon Specialization - Swords", "Two Weapon Style"] },
-          { text: "Thrown Weapons", grants: ["Weapon Specialization - Thrown Weapons", "Two Weapon Style"] },
-          { text: "Daggers", grants: ["Weapon Specialization - Daggers", "Two Weapon Style"] },
+          { text: "Swords", bestows: ["Weapon Specialization - Swords", "Two Weapon Style"] },
+          { text: "Thrown Weapons", bestows: ["Weapon Specialization - Thrown Weapons", "Two Weapon Style"] },
+          { text: "Daggers", bestows: ["Weapon Specialization - Daggers", "Two Weapon Style"] },
         ],
       };
     }

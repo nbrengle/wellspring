@@ -242,7 +242,7 @@ export function checkMutualExclusions(graph: CharacterGraphModel): {
         }
       }
     }
-    for (const g of graph._grantedAbilitiesList) {
+    for (const g of graph._bestowedAbilitiesList) {
       if (/^(perks|flaws):/.test(g.ability)) {
         ownedExcl.add(g.ability);
         if (!entityToNode.has(g.ability)) entityToNode.set(g.ability, g.ability);
@@ -340,7 +340,7 @@ export function checkPowerRequirements(graph: CharacterGraphModel): {
 
   const powerCounts = new Map<string, number>();
   for (const node of graph.items) {
-    if (!isPowerlike(node.entity?.type) || node.sourceType === "granted") continue;
+    if (!isPowerlike(node.entity?.type) || node.sourceType === "bestowed") continue;
     const name = cleanItemName(node.name);
     if (!name) continue;
     powerCounts.set(name, (powerCounts.get(name) || 0) + 1);

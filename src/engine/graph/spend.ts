@@ -20,15 +20,15 @@ export function computeSpend(graph: CharacterGraphModel): BPLedger {
     if (!m) return null;
     return `${type}:${m[1].trim()}|${m[2].trim().toLowerCase()}`;
   };
-  const grantIndex: Record<string, string> = {};
-  const grantParamIndex: Record<string, string> = {};
+  const bestowIndex: Record<string, string> = {};
+  const bestowParamIndex: Record<string, string> = {};
   for (const node of graph.items) {
     for (const eff of node.effects) {
-      if (eff.type === "GRANT_SOURCE") {
-        eff.grants.forEach((g) => {
-          if (!grantIndex[g]) grantIndex[g] = node.name;
+      if (eff.type === "BESTOW_SOURCE") {
+        eff.bestows.forEach((g) => {
+          if (!bestowIndex[g]) bestowIndex[g] = node.name;
           const pk = paramKey(g);
-          if (pk && !grantParamIndex[pk]) grantParamIndex[pk] = node.name;
+          if (pk && !bestowParamIndex[pk]) bestowParamIndex[pk] = node.name;
         });
       }
     }
@@ -51,13 +51,13 @@ export function computeSpend(graph: CharacterGraphModel): BPLedger {
 
   for (const node of graph.items) {
     if (node.field === "flaws") {
-      setEntry(node, { cost: node.baseCost, base: node.baseCost, grant: null });
+      setEntry(node, { cost: node.baseCost, base: node.baseCost, bestow: null });
       rawAwarded += -node.baseCost;
       continue;
     }
 
-    let isGranted = false;
-    let grantSrc: string | undefined;
+    let isBestowed = false;
+    let bestowSrc: string | undefined;
     let isDerived = false;
     const nId = node.entityId || node.id;
     // Build the grant-matching key from the node's STRUCTURED param (parsed once
@@ -74,17 +74,17 @@ export function computeSpend(graph: CharacterGraphModel): BPLedger {
           .replace(/^purchasedPerks:/, "perks:")
       : null;
 
-    if (normalizedId && grantIndex[normalizedId]) {
-      isGranted = true;
-      grantSrc = grantIndex[normalizedId];
+    if (normalizedId && bestowIndex[normalizedId]) {
+      isBestowed = true;
+      bestowSrc = bestowIndex[normalizedId];
       isDerived = true;
-    } else if (nodeParamKey && grantParamIndex[nodeParamKey]) {
-      isGranted = true;
-      grantSrc = grantParamIndex[nodeParamKey];
+    } else if (nodeParamKey && bestowParamIndex[nodeParamKey]) {
+      isBestowed = true;
+      bestowSrc = bestowParamIndex[nodeParamKey];
       isDerived = true;
-    } else if (node.sourceType === "innate" || node.field === "multiclassGrant") {
-      isGranted = true;
-      grantSrc = "class";
+    } else if (node.sourceType === "innate" || node.field === "multiclassBestow") {
+      isBestowed = true;
+      bestowSrc = "class";
       isDerived = true;
     }
 
@@ -93,14 +93,14 @@ export function computeSpend(graph: CharacterGraphModel): BPLedger {
         setEntry(node, {
           cost: 0,
           base: node.baseCost,
-          grant: { kind: "grant", source: grantSrc, derived: true },
+          bestow: { kind: "bestow", source: bestowSrc, derived: true },
           rank: node.rank,
         });
       } else {
         setEntry(node, {
           cost: node.authoredCost,
           base: node.baseCost,
-          grant: null,
+          bestow: null,
           rank: node.rank,
           authored: true,
         });
@@ -111,8 +111,8 @@ export function computeSpend(graph: CharacterGraphModel): BPLedger {
     if (node.sourceType === "class") {
       const floor = node.floor;
 
-      if (isGranted) {
-        setEntry(node, { cost: -node.baseCost, base: 0, grant: { kind: "grant", source: grantSrc, derived: true } });
+      if (isBestowed) {
+        setEntry(node, { cost: -node.baseCost, base: 0, bestow: { kind: "bestow", source: bestowSrc, derived: true } });
         refunded += node.baseCost;
         continue;
       }
@@ -124,7 +124,7 @@ export function computeSpend(graph: CharacterGraphModel): BPLedger {
         setEntry(node, {
           cost: extraCost,
           base: entCost,
-          grant: null,
+          bestow: null,
           rank: node.rank,
           freeRanks: floor,
           paidRanks: extra,
@@ -133,7 +133,7 @@ export function computeSpend(graph: CharacterGraphModel): BPLedger {
         setEntry(node, {
           cost: 0,
           base: node.baseCost / node.rank || 0,
-          grant: null,
+          bestow: null,
           rank: node.rank,
           freeRanks: floor || 1,
           paidRanks: 0,
@@ -142,15 +142,15 @@ export function computeSpend(graph: CharacterGraphModel): BPLedger {
       continue;
     }
 
-    if (isGranted) {
+    if (isBestowed) {
       setEntry(node, {
         cost: 0,
         base: node.baseCost,
-        grant: { kind: "grant", source: grantSrc, derived: true },
+        bestow: { kind: "bestow", source: bestowSrc, derived: true },
         rank: node.rank,
       });
     } else {
-      setEntry(node, { cost: node.baseCost, base: node.baseCost, grant: null, rank: node.rank });
+      setEntry(node, { cost: node.baseCost, base: node.baseCost, bestow: null, rank: node.rank });
     }
   }
 
@@ -189,7 +189,7 @@ export function computeSpend(graph: CharacterGraphModel): BPLedger {
       const cut = Math.min(src.amount, reducible, room);
 
       if (cut <= 0) {
-        if (eff.cost === 0 && (eff.grant?.kind === "grant" || (eff.freeRanks || 0) > 0) && src.refundIfFree) {
+        if (eff.cost === 0 && (eff.bestow?.kind === "grant" || (eff.freeRanks || 0) > 0) && src.refundIfFree) {
           const refund = Math.min(src.amount, room);
           discountFreeBP += refund;
           used.set(src.id, (used.get(src.id) || 0) + refund);

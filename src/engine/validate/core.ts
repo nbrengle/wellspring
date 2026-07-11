@@ -117,7 +117,7 @@ export function progressionRow(cls: string, level: number): ProgressionRow {
 // ─── Grant cluster ──────────────────────────────────────────────────────────
 
 // Active innate powers for the character: class-innate powers whose level
-// requirements are met. (In CharacterState, user-added innates are just in `powers` with source `GrantedBy:Innate`)
+// requirements are met. (In CharacterState, user-added innates are just in `powers` with source `BestowedBy:Innate`)
 export function activeInnatePowers(character: CharacterState) {
   const list: { name: string; entity: Entity | undefined; cls: string; source: string }[] = [];
   const seen = new Set();
@@ -137,7 +137,7 @@ export function activeInnatePowers(character: CharacterState) {
 }
 
 // Multiclass grants
-export function multiclassGrants(character: CharacterState) {
+export function multiclassBestows(character: CharacterState) {
   const classes = getClasses(character);
   const skills: { name: string; source: string }[] = [];
   const freeBPItems: { skill: string; source: string; bp: number }[] = [];
@@ -147,7 +147,7 @@ export function multiclassGrants(character: CharacterState) {
   const owned = new Set((character.skills || []).map((s) => bareSkill(s.entityId.replace("skills:", ""))));
 
   classes.slice(1).forEach(({ name }) => {
-    for (const g of CLASSES[name]?.multiclassGrants || []) {
+    for (const g of CLASSES[name]?.multiclassBestows || []) {
       if (owned.has(bareSkill(g.name))) {
         freeBP += g.cost || 0;
         freeBPItems.push({ skill: g.name, source: name, bp: g.cost || 0 });

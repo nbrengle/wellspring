@@ -11,7 +11,7 @@ import {
   prereqStatus,
   LEVEL_CAP,
   LEGAL_MIN_LEVEL,
-  grantedAbilities,
+  bestowedAbilities,
   computeSpend,
   getMaxRanks,
   bookcasterSpellOptions,
@@ -158,7 +158,7 @@ test("Pick and Choose: a cross-lineage advantage is applied with its full effect
     }),
   ).owned;
   ok(
-    (owned?.perks || []).some((p) => p.name === "Mystic Armorer" && p.grantedBy === "Iron Touch"),
+    (owned?.perks || []).some((p) => p.name === "Mystic Armorer" && p.bestowedBy === "Iron Touch"),
     "the chosen advantage’s grant is applied across lineages",
   );
 });
@@ -193,7 +193,7 @@ test("Arcane Aptitude grants the chosen spell as a Known Spell", () => {
   const items = Array.from(resolveCharacterGraph(char));
   const aa = items.find((i) => /Arcane Aptitude/.test(i.name));
   ok(
-    aa.effects.some((e) => e.type === "GRANT_SOURCE" && e.grants.includes("powers:Flameburst")),
+    aa.effects.some((e) => e.type === "BESTOW_SOURCE" && e.bestows.includes("powers:Flameburst")),
     "the picked spell is granted",
   );
 });
@@ -209,14 +209,14 @@ test("Arcane Secrets (domain power) grants the chosen arcane spell as a Known Sp
   });
   const sec = resolveCharacterGraph(char).find((i) => /Arcane Secrets/.test(i.name));
   ok(
-    sec.effects.some((e) => e.type === "GRANT_SOURCE" && e.grants.includes("powers:Arcane Barrage")),
+    sec.effects.some((e) => e.type === "BESTOW_SOURCE" && e.bestows.includes("powers:Arcane Barrage")),
     "the picked spell is granted",
   );
   // With no pick, no grant.
   const none = resolveCharacterGraph(
     makeChar("Cleric 6", { devotion: "The Librarian", add: [{ name: "Arcane Secrets", field: "domainPowers" }] }),
   ).find((i) => /Arcane Secrets/.test(i.name));
-  ok(!none.effects.some((e) => e.type === "GRANT_SOURCE"), "no pick → no spell granted");
+  ok(!none.effects.some((e) => e.type === "BESTOW_SOURCE"), "no pick → no spell granted");
 });
 
 test("Weird Wanderings grants a chosen Basic power from a non-Artisan base class", () => {
@@ -235,7 +235,7 @@ test("Weird Wanderings grants a chosen Basic power from a non-Artisan base class
   });
   const ww = resolveCharacterGraph(char).find((i) => /Weird Wanderings/.test(i.name));
   ok(
-    ww.effects.some((e) => e.type === "GRANT_SOURCE" && e.grants.includes("powers:Battlemind")),
+    ww.effects.some((e) => e.type === "BESTOW_SOURCE" && e.bestows.includes("powers:Battlemind")),
     "the picked power is granted",
   );
 });
@@ -259,10 +259,10 @@ test("Studied Focus: a tag gates the pool, and both picks are granted", () => {
     },
   });
   const sf = resolveCharacterGraph(char).find((i) => /Studied Focus/.test(i.name));
-  ok(sf.effects.filter((e) => e.type === "GRANT_SOURCE").length === 2, "both chosen powers granted");
+  ok(sf.effects.filter((e) => e.type === "BESTOW_SOURCE").length === 2, "both chosen powers granted");
   ok(
-    sf.effects.some((e) => e.grants?.includes("powers:Analysis")) &&
-      sf.effects.some((e) => e.grants?.includes("powers:Antidote")),
+    sf.effects.some((e) => e.bestows?.includes("powers:Analysis")) &&
+      sf.effects.some((e) => e.bestows?.includes("powers:Antidote")),
     "the two picks specifically",
   );
 });
@@ -289,7 +289,7 @@ test("cantrip-choice lineage items grant + slot the chosen cantrip (Divine Magic
     }),
   );
   ok(
-    dm.grantedAbilities.list.some((g) => g.ability === "powers:Cancel"),
+    dm.bestowedAbilities.list.some((g) => g.ability === "powers:Cancel"),
     "Divine Magic grants the chosen cantrip (unchanged)",
   );
   // Psionic Cantrip was hardcoded-out before; the generalized path fixes it.
@@ -302,7 +302,7 @@ test("cantrip-choice lineage items grant + slot the chosen cantrip (Divine Magic
     }),
   );
   ok(
-    pc.grantedAbilities.list.some((g) => g.ability === "powers:Cancel"),
+    pc.bestowedAbilities.list.some((g) => g.ability === "powers:Cancel"),
     "Psionic Cantrip now grants the chosen cantrip",
   );
 });

@@ -1,9 +1,9 @@
 import { collectionOf } from "../../engine/data.js";
 import { cleanItemName } from "../resolver.js";
 import type { BPLedger, BucketedView, CharacterGraph, CharacterState, GraphItem, WealthReport } from "../types.js";
-import { GrantedAbility, PrereqReport, ResolvedStats } from "../types.js";
+import { BestowedAbility, PrereqReport, ResolvedStats } from "../types.js";
 import { buildBucketedView } from "./buckets.js";
-import { computeGrantedAbilitiesList, computeOwnedIds } from "./grants.js";
+import { computeBestowedAbilitiesList, computeOwnedIds } from "./grants.js";
 import { computePrereqs, prereqStatusFor } from "./prereqs.js";
 import { computeSpend } from "./spend.js";
 import { computeStats } from "./stats.js";
@@ -29,7 +29,7 @@ export function idPrefix(entity: { type?: string } | null | undefined): string {
 interface MemoCache {
   uiBuckets?: BucketedView;
   stats?: ResolvedStats;
-  granted?: GrantedAbility[];
+  granted?: BestowedAbility[];
   ownedIds?: Set<string>;
   prereqs?: PrereqReport;
   wealth?: WealthReport;
@@ -54,8 +54,8 @@ export class CharacterGraphModel implements CharacterGraph {
     return this.memo("stats", () => computeStats(this));
   }
 
-  public get _grantedAbilitiesList(): GrantedAbility[] {
-    return this.memo("granted", () => computeGrantedAbilitiesList(this));
+  public get _bestowedAbilitiesList(): BestowedAbility[] {
+    return this.memo("granted", () => computeBestowedAbilitiesList(this));
   }
 
   public get _ownedIds(): Set<string> {

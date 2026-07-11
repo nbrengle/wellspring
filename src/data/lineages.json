@@ -1209,7 +1209,7 @@
         "tags": [],
         "sublineage": "Intervened",
         "description": "The Intervened learns one Cantrip from any basic Divine spellcasting class without fulfilling any other prerequisites. If the spell references a [Devotion Accent] and the character has no Devotion, they may choose one Devotion Accent from a divine domain associated with the Divine Being that intervened for the character, at the time of purchasing this advantage.",
-        "grantedSelections": [
+        "bestowedSelections": [
           {
             "id": "intervened_cantrip",
             "type": "spell",

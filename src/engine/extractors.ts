@@ -15,8 +15,8 @@ function extractDiscounts(ent, character, id) {
   return [];
 }
 
-function extractGlobalGrants(ent, character, id) {
-  // choice — REFS.grants lists ALL the options, so emitting them flat would wrongly
+function extractGlobalBestows(ent, character, id) {
+  // choice — REFS.bestows lists ALL the options, so emitting them flat would wrongly
   // grant every option for free (The Learned One = "choose one of 8" at level-up).
   // Trust the PARSED chooseOne, not a description regex: a fixed grant can sit beside
   // an unrelated in-play "Choose one target…" sentence (Lessons from Scars) and must
@@ -24,8 +24,8 @@ function extractGlobalGrants(ent, character, id) {
   const isChoiceGated = !!ent?.chooseOne;
 
   const key = refsKey(id);
-  if (REFS.grants?.[key] && !isChoiceGated) {
-    return [{ type: "GRANT_SOURCE", grants: REFS.grants[key] }];
+  if (REFS.bestows?.[key] && !isChoiceGated) {
+    return [{ type: "BESTOW_SOURCE", bestows: REFS.bestows[key] }];
   }
   return [];
 }
@@ -55,21 +55,20 @@ function extractStatMods(ent, _character, _id) {
   return [];
 }
 
-// A build chooseOne option's granted skills. The parser emits this under `grants`
-// for most powers but `grantsSkills` for a few (Way of the Blade) — read either so a
-// field-name drift never silently drops the grant (which left the chosen spec NOT
-// free). Normalizing the parser too, but stay tolerant here.
-const optGrants = (o) => o?.grants || o?.grantsSkills || [];
+// A build chooseOne option's bestowed skills — the entities the chosen option grants
+// you for free (Way of the Blade → Weapon Specialization). Parser emits them under the
+// option's `bestows` field.
+const optBestows = (o) => o?.bestows || [];
 
 function extractChooseOne(ent, character, _id) {
   if (ent?.chooseOne?.kind === "build") {
     const chosen = character.choices?.[`powers:${ent.name}`];
     if (chosen) {
-      // Find the option by direct text match, or by seeing if one of its granted skills matches the chosen string.
-      const opt = ent.chooseOne.options.find((o) => o.text === chosen || optGrants(o).includes(chosen));
-      const grants = optGrants(opt);
-      if (grants.length > 0) {
-        return [{ type: "GRANT_SOURCE", grants: grants.map((s) => `skills:${s}`) }];
+      // Find the option by direct text match, or by seeing if one of its bestowed skills matches the chosen string.
+      const opt = ent.chooseOne.options.find((o) => o.text === chosen || optBestows(o).includes(chosen));
+      const bestows = optBestows(opt);
+      if (bestows.length > 0) {
+        return [{ type: "BESTOW_SOURCE", bestows: bestows.map((s) => `skills:${s}`) }];
       }
     }
   }
@@ -84,7 +83,7 @@ function extractLineageChoiceSpec(ent, character, _id) {
     if (spec?.kind === "cantrip" || spec?.kind === "spell") {
       const chosen = character.advantageChoices?.[ent.name];
       if (chosen) {
-        return [{ type: "GRANT_SOURCE", grants: [`powers:${chosen}`] }];
+        return [{ type: "BESTOW_SOURCE", bestows: [`powers:${chosen}`] }];
       }
     }
   }
@@ -96,7 +95,7 @@ function extractPowerSpellChoiceSpec(ent, character, _id) {
   if (spec && (spec.kind === "spell" || spec.kind === "power")) {
     const chosen = character.choices?.[`powers:${ent.name}`];
     if (chosen) {
-      return [{ type: "GRANT_SOURCE", grants: [`powers:${chosen}`] }];
+      return [{ type: "BESTOW_SOURCE", bestows: [`powers:${chosen}`] }];
     }
   }
   return [];
@@ -107,8 +106,8 @@ function extractStudiedFocus(ent, character, _id) {
     const pick1 = character.choices?.["powers:Studied Focus:1"];
     const pick2 = character.choices?.["powers:Studied Focus:2"];
     const effects: Effect[] = [];
-    if (pick1) effects.push({ type: "GRANT_SOURCE", grants: [`powers:${pick1}`] });
-    if (pick2) effects.push({ type: "GRANT_SOURCE", grants: [`powers:${pick2}`] });
+    if (pick1) effects.push({ type: "BESTOW_SOURCE", bestows: [`powers:${pick1}`] });
+    if (pick2) effects.push({ type: "BESTOW_SOURCE", bestows: [`powers:${pick2}`] });
     return effects;
   }
   return [];
@@ -153,7 +152,7 @@ function extractLevelDiscounts(ent, character, id) {
 export const EFFECT_EXTRACTORS = [
   extractDiscounts,
   extractLevelDiscounts,
-  extractGlobalGrants,
+  extractGlobalBestows,
   extractWealth,
   extractStatMods,
   extractChooseOne,

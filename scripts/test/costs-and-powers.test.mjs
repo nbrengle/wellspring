@@ -11,7 +11,7 @@ import {
   prereqStatus,
   LEVEL_CAP,
   LEGAL_MIN_LEVEL,
-  grantedAbilities,
+  bestowedAbilities,
   computeSpend,
   getMaxRanks,
   bookcasterSpellOptions,
@@ -64,7 +64,7 @@ const fromArchetype = (a) => ({ ...a, archetypeName: a.name });
 // ─── grants: a source grants a named ability, for free (kind #1) ──────────────
 test("lineage advantage grants the named perk (Aewen → Magical Resilience)", () => {
   const c = { lineage: "Aewen", lineageAdvantages: ["Mystic Resilience"] };
-  const g = grantedAbilities(c);
+  const g = bestowedAbilities(c);
   ok(
     g.list.some((x) => x.ability === "perks:Magical Resilience"),
     "Magical Resilience granted",
@@ -73,20 +73,20 @@ test("lineage advantage grants the named perk (Aewen → Magical Resilience)", (
 });
 test("a slot-grant advantage is NOT a named entity grant (Aewen Deep Reserves)", () => {
   const c = { lineage: "Aewen", lineageAdvantages: ["Deep Reserves"] };
-  eq(grantedAbilities(c).list.length, 0, "no named-entity grant");
+  eq(bestowedAbilities(c).list.length, 0, "no named-entity grant");
 });
 test("an in-play Grant (sub-power) is NOT bestowed on the owner of the granting power", () => {
   // Holding Out for a Hero's Call is an in-play "Grant Power: Save the Day" (conferred
   // on a target when used), NOT a build-time bestowal. So Save the Day must not appear
   // as a bestowal on the character who owns Holding Out for a Hero.
   const c = makeChar("Socialite 10", { add: ["The Right Hand", "Holding Out for a Hero"] });
-  const g = grantedAbilities(c);
+  const g = bestowedAbilities(c);
   ok(
     !g.list.some((x) => x.ability === "powers:Save the Day"),
     "Save the Day is an in-play Grant to a target, not bestowed on the owner",
   );
 });
-test("a GRANT_SOURCE grant materializes as a free, non-removable owned item (Way of the Blade → Weapon Spec)", () => {
+test("a BESTOW_SOURCE grant materializes as a free, non-removable owned item (Way of the Blade → Weapon Spec)", () => {
   // Uniform engine-driven grants: a power that grants a named entity surfaces that
   // entity as an owned item (one render path, regardless of grant source) so the UI
   // shows + can parameterize it — instead of the grant living only as a hidden effect.
@@ -94,15 +94,15 @@ test("a GRANT_SOURCE grant materializes as a free, non-removable owned item (Way
   // canRemove (sourceType === 'purchased' && index>=0) is false: a granted ability isn't deletable.
   const c = makeChar("Rogue 4", { add: ["Way of the Blade"], choices: { "powers:Way of the Blade": "Daggers" } });
   const r = validate(c);
-  const granted = (r.owned?.skills || []).filter((x) => x.grantedBy === "Way of the Blade");
+  const granted = (r.owned?.skills || []).filter((x) => x.bestowedBy === "Way of the Blade");
   eq(granted.length, 2, "both granted skills surface (Weapon Spec - Daggers + Two Weapon Style)");
   const spec = granted.find((x) => /^Weapon Spec/.test(x.name));
   ok(spec, "the parameterized Weapon Specialization grant is present");
   eq(/Daggers/.test(spec.name), true, "parameterized with the Way-of-the-Blade choice (Daggers)");
-  eq(spec.field, "skillsGrant", "lands in a *Grant field (engine-materialized, not a purchase)");
-  eq(spec.sourceType, "grant", "sourceType grant so the UI treats it as non-removable");
+  eq(spec.field, "skillsBestow", "lands in a *Bestow field (engine-materialized, not a purchase)");
+  eq(spec.sourceType, "bestow", "sourceType bestow so the UI treats it as non-removable");
   eq(spec.index, -1, "index -1 → canRemove false");
-  eq(spec.cost?.cost ?? 0, 0, "granted ability is free");
+  eq(spec.cost?.cost ?? 0, 0, "bestowed ability is free");
 });
 test("a grant refunds a matching parameterized purchase, by parameter (Way of the Blade → Weapon Spec)", () => {
   // Way of the Blade (choosing Daggers) grants "Weapon Specialization - Daggers".
@@ -116,7 +116,7 @@ test("a grant refunds a matching parameterized purchase, by parameter (Way of th
   );
   const dk = daggers.byItem["skills:Weapon Specialization (Daggers)"];
   eq(dk.cost, 0, "matching weapon → refunded to free");
-  eq(dk.grant?.source, "Way of the Blade", "attributed to the granting power");
+  eq(dk.bestow?.source, "Way of the Blade", "attributed to the granting power");
 
   const swords = computeSpend(
     makeChar("Rogue 4", {
@@ -134,8 +134,8 @@ test("a selected power that grants a perk zeroes that perk (Implicit Truths → 
   const c = makeChar("Socialite 4", { add: ["Implicit Truths", "Insight"] });
   const eff = computeSpend(c).byItem["purchasedPerks:Insight"];
   eq(eff.cost, 0, "Insight free");
-  eq(eff.grant.source, "Implicit Truths", "grant source attributed");
-  ok(eff.grant.derived, "derived from the graph, not a sidecar");
+  eq(eff.bestow.source, "Implicit Truths", "grant source attributed");
+  ok(eff.bestow.derived, "derived from the graph, not a sidecar");
 });
 
 test("a fixed power grant with parameters surfaces BOTH (Lessons from Scars → 2 Lores)", () => {
@@ -144,7 +144,7 @@ test("a fixed power grant with parameters surfaces BOTH (Lessons from Scars → 
   // distinctly (not collapse to one bare "Lore"). The in-play "Choose one target…"
   // sentence in the same description must NOT suppress the grant.
   const owned = validate(makeChar("Fighter 6", { add: ["Lessons from Scars"] })).owned;
-  const granted = (owned?.skills || []).filter((s) => s.grantedBy === "Lessons from Scars");
+  const granted = (owned?.skills || []).filter((s) => s.bestowedBy === "Lessons from Scars");
   eq(granted.length, 2, "both Lore grants surface");
   ok(
     granted.some((s) => /Historical/.test(s.name)) && granted.some((s) => /Noble/.test(s.name)),
@@ -161,7 +161,7 @@ test("a choice-gated grant does NOT grant every option for free (The Learned One
   // structured chooseOne must gate them, so zero auto-grants.
   const owned = validate(makeChar("Artisan 10", { add: ["The Learned One"] })).owned;
   eq(
-    (owned?.skills || []).filter((s) => s.grantedBy === "The Learned One").length,
+    (owned?.skills || []).filter((s) => s.bestowedBy === "The Learned One").length,
     0,
     "no flat grant — the choice gates it",
   );
@@ -385,7 +385,7 @@ test("Expert Craft build-time choice grants the selected skill at 0 BP", () => {
   const chosen = { ...base, choices: { "powers:Expert Craft": "Greater Alchemy" } };
   const eff = computeSpend(chosen).byItem["skills:Greater Alchemy"];
   eq(eff.cost, 0, "free once chosen");
-  eq(eff.grant.source, "Expert Craft", "attributed to Expert Craft");
+  eq(eff.bestow.source, "Expert Craft", "attributed to Expert Craft");
 });
 
 // ─── flaw BP award capped at 5 (rules limit) ─────────────────────────────────
@@ -458,7 +458,7 @@ test("inline sub-powers are extracted as entities", () => {
 test("a power's in-play Grant of a sub-power is not a build-time bestowal", () => {
   // Strange Token's Call grants Curious Balm in play; the sub-power is captured as a
   // browsable entity (test above) but is NOT bestowed on Strange Token's owner.
-  const g = grantedAbilities(makeChar("Artisan 10", { add: ["Strange Token"] }));
+  const g = bestowedAbilities(makeChar("Artisan 10", { add: ["Strange Token"] }));
   ok(
     !g.list.some((x) => x.ability === "powers:Curious Balm"),
     "Curious Balm is an in-play Grant, not bestowed on the owner",

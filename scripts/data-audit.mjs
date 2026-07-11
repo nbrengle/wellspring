@@ -65,8 +65,8 @@ function* entities() {
 
 // Flags, ordered by severity. Each returns a reason string or null.
 const CHECKS = [
-  // EMPTY — has no description at all (multiclassGrants are skill refs, exempt).
-  (e) => (!e.desc.trim() && !/multiclassGrants/.test(e.type) && e.file !== "domains" ? "EMPTY description" : null),
+  // EMPTY — has no description at all (multiclassBestows are skill refs, exempt).
+  (e) => (!e.desc.trim() && !/multiclassBestows/.test(e.type) && e.file !== "domains" ? "EMPTY description" : null),
   // DANGLING COLON — ends on a colon (a list/table the parser likely dropped).
   // Suppress benign trailing labels that legitimately precede a NON-TEXT element
   // the builder can't show anyway: a sigil/example image (devotions' "Example
@@ -144,4 +144,4 @@ for (const f of findings) {
   }
   console.log(`  [${f.type}] ${f.name}: ${f.reason}${f.more ? "  (⚠ megadoc has more)" : ""}`);
 }
-console.log(`\nTotal: ${findings.length} flagged. (multiclassGrants skill-refs + domain power-lists exempt.)`);
+console.log(`\nTotal: ${findings.length} flagged. (multiclassBestows skill-refs + domain power-lists exempt.)`);

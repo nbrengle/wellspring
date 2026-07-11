@@ -34,10 +34,10 @@ export function LineageSummary() {
   if (!character.lineage) return null;
   const lbp = report.lbp;
   const chosen = lbp?.chosenAdvantages || [];
-  const grantedBySource = {};
-  for (const g of report.grantedAbilities?.list || []) {
+  const bestowedBySource = {};
+  for (const g of report.bestowedAbilities?.list || []) {
     if (g.sourceKind !== "advantage") continue;
-    (grantedBySource[g.source] = grantedBySource[g.source] || []).push(g);
+    (bestowedBySource[g.source] = bestowedBySource[g.source] || []).push(g);
   }
   const challenges = lbp?.chosenChallenges || [];
   const title = `Lineage — ${character.lineage}${character.sublineage ? ` · ${character.sublineage}` : ""}`;
@@ -78,7 +78,7 @@ export function LineageSummary() {
       <ul className="b-rows">
         {chosen.map((adv, i) => {
           const name = adv.baseName || adv.name;
-          const grants = grantedBySource[name] || [];
+          const grants = bestowedBySource[name] || [];
           return (
             <React.Fragment key={`adv-${i}-${name}`}>
               <InspectableRow item={name} field="lineageAdvantages" resolveType="perks" className="b-lin-adv-row">
@@ -224,9 +224,9 @@ function getSelectionOptions(sel) {
   return opts.sort();
 }
 
-export function GrantedSelectionsSection() {
+export function BestowedSelectionsSection() {
   const { character, report } = useBuilderState();
-  const { onSetGrantedSelection } = useBuilderActions();
+  const { onSetBestowedSelection } = useBuilderActions();
   const active = report.activeSelections || [];
   if (active.length === 0) return null;
 
@@ -234,7 +234,7 @@ export function GrantedSelectionsSection() {
     <Section title="Granted Selections" tone="purple">
       <ul className="b-choices">
         {active.map((sel, i) => {
-          const value = character.grantedSelections?.[sel.id] || "";
+          const value = character.bestowedSelections?.[sel.id] || "";
           const options = getSelectionOptions(sel);
           const typeLabel = sel.type === "devotionAccent" ? "Devotion Accent" : sel.type;
           return (
@@ -248,7 +248,7 @@ export function GrantedSelectionsSection() {
                   </>
                 }
                 value={value || null}
-                onChange={(v) => onSetGrantedSelection(sel.id, v || "")}
+                onChange={(v) => onSetBestowedSelection(sel.id, v || "")}
                 options={options.map((opt) => ({ value: opt }))}
               />
             </li>
@@ -331,7 +331,7 @@ export function SlotBlock({ slot }) {
   const fields =
     slot.category === "spellsKnown" ? ["noviceSpells", "adeptSpells", "greaterSpells"] : [SLOT_FIELD[slot.category]];
   const granted = slot.granted || [];
-  const grantedSet = new Set(granted);
+  const bestowedSet = new Set(granted);
   // Slot picks are: CharacterChoice[] in the powers/spells bucket sourced
   // to the granting class. flatIndex is the position among a field's entries — the
   // same addressing setSlotPick/clearSlot use (costField-scoped).
@@ -340,7 +340,7 @@ export function SlotBlock({ slot }) {
     bucket
       .filter((p) => p.costField === field)
       .map((p, flatIndex) => ({ name: p.entityId, flatIndex, field, source: p.source }))
-      .filter((p) => sourceClass(p.source) === slot.cls && !grantedSet.has(p.name)),
+      .filter((p) => sourceClass(p.source) === slot.cls && !bestowedSet.has(p.name)),
   );
 
   const rowCount = Math.max(slot.allowed, myPicks.length);
@@ -466,11 +466,13 @@ export function ClassifiedRows({ rows, resolveType, showClass }) {
   return (
     <ul className="b-rows">
       {rows.map((row) => {
-        const { name, field, index, grantedBy, cls, specialty, floor, sourceType } = row;
+        const { name, field, index, bestowedBy, cls, specialty, floor, sourceType } = row;
         // Cost is attached to the row by validate() (from the BP ledger).
         const cost = row.cost;
-        const refundEff = row.effects?.find((e) => e.type === "REFUND_GRANT");
-        const mcRefund = report?.multiclassGrants?.freeBPItems?.find((f) => f.skill === bareSkill(cleanItemName(name)));
+        const refundEff = row.effects?.find((e) => e.type === "REFUND_BESTOW");
+        const mcRefund = report?.multiclassBestows?.freeBPItems?.find(
+          (f) => f.skill === bareSkill(cleanItemName(name)),
+        );
         const refundedBy = refundEff?.source || mcRefund?.source;
         const refundedBP = refundEff ? cost?.base || 0 : mcRefund?.bp || 0;
 
@@ -480,16 +482,16 @@ export function ClassifiedRows({ rows, resolveType, showClass }) {
 
         const baseName = bareSkill(cleanItemName(name));
         const maxR = getMaxRanks(name, field, character);
-        const grantedFloor = floor || 0;
-        const isGranted =
-          sourceType === "grant" ||
+        const bestowedFloor = floor || 0;
+        const isBestowed =
+          sourceType === "bestow" ||
           sourceType === "class" ||
           sourceType === "innate" ||
           sourceType === "lineage" ||
           sourceType === "multiclass";
 
-        const canBuyUp = isGranted && grantedFloor > 0 && maxR > grantedFloor && !UNLIMITED_SKILLS.has(baseName);
-        const rankFloor = canBuyUp ? grantedFloor : 1;
+        const canBuyUp = isBestowed && bestowedFloor > 0 && maxR > bestowedFloor && !UNLIMITED_SKILLS.has(baseName);
+        const rankFloor = canBuyUp ? bestowedFloor : 1;
         const hasRanks = (canRemove || canBuyUp) && maxR > 1 && !UNLIMITED_SKILLS.has(baseName);
 
         const ent =
@@ -499,7 +501,7 @@ export function ClassifiedRows({ rows, resolveType, showClass }) {
 
         return (
           <InspectableRow
-            key={`${field}-${index}-${name}-${grantedBy || cls || ""}`}
+            key={`${field}-${index}-${name}-${bestowedBy || cls || ""}`}
             item={name}
             field={field}
             resolveType={resolveType}
@@ -519,30 +521,30 @@ export function ClassifiedRows({ rows, resolveType, showClass }) {
                 </span>
               );
             })}
-            {showClass && cls && !isGranted && (
+            {showClass && cls && !isBestowed && (
               <span className={`b-row-badge ${CLASS_TONES[cls] ? `b-tag-${CLASS_TONES[cls]}` : "b-badge-class"}`}>
                 {cls.toUpperCase()}
               </span>
             )}
-            {isGranted
+            {isBestowed
               ? (() => {
-                  const src = grantedBy || cls;
+                  const src = bestowedBy || cls;
                   let title = "Granted free";
                   if (sourceType === "lineage") {
                     title = "Granted free by your lineage";
-                  } else if (sourceType === "grant" && grantedBy) {
-                    title = `Granted free by ${grantedBy}`;
+                  } else if (sourceType === "bestow" && bestowedBy) {
+                    title = `Granted free by ${bestowedBy}`;
                   } else if (specialty) {
                     title = `Granted free by your ${src}'s "${specialty}" starting choice`;
                   } else {
                     title = `Granted free by your ${src} class`;
                   }
 
-                  const toneKey = cls || grantedBy || src;
+                  const toneKey = cls || bestowedBy || src;
                   const toneClass = CLASS_TONES[toneKey] ? `b-tag-${CLASS_TONES[toneKey]}` : "b-badge-granted";
                   let label = src?.toUpperCase() || "";
-                  if (cls && grantedBy && cls !== grantedBy) {
-                    label = `${cls.toUpperCase()} · ${grantedBy.toUpperCase()}`;
+                  if (cls && bestowedBy && cls !== bestowedBy) {
+                    label = `${cls.toUpperCase()} · ${bestowedBy.toUpperCase()}`;
                   }
 
                   if (!src) {

@@ -8,7 +8,7 @@ import { writeFileSync, mkdirSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { validate } from "../src/engine/validate.js";
-import { grantedAbilities } from "../src/engine/testing.js";
+import { bestowedAbilities } from "../src/engine/testing.js";
 import { addToCharacter } from "../src/engine/character-add.js";
 import { makeChar } from "./test/make-char.mjs";
 import { formatCharacterSheet } from "../src/data/sheet.js";
@@ -75,11 +75,11 @@ function buildStrongest(name, classLevels) {
 // plus a flat credit for stat boosts / grant edges, so perks/advantages that give
 // real stuff outrank flavor ones.
 function entityValue(id) {
-  const grants = REFS.grants?.[id] || [];
-  const grantVal = grants.reduce((s, g) => s + rawPower(g) + 2, 0); // +2 per granted entity
+  const grants = REFS.bestows?.[id] || [];
+  const bestowVal = grants.reduce((s, g) => s + rawPower(g) + 2, 0); // +2 per granted entity
   const ent = lookupEntity(id);
   const statVal = /(\bmax|Natural Armor|Life Point|Maximum)/i.test(ent?.description || "") ? 2 : 0;
-  return grantVal + statVal;
+  return bestowVal + statVal;
 }
 
 // Layer a LINEAGE (challenges fund advantages; advantages grant free abilities +
@@ -180,7 +180,7 @@ for (const [name, cl] of [...synergyBuilds, ...pureBuilds]) {
     "noviceSpells",
     "adeptSpells",
   ].reduce((s, f) => s + (c[f]?.length || 0), 0);
-  const freebies = grantedAbilities(c).list.length;
+  const freebies = bestowedAbilities(c).list.length;
   console.log(
     `  ${name.padEnd(34)} ${cl.padEnd(22)} ${picks}pw ${c.purchasedPerks?.length || 0}perk ${c.lineageAdvantages?.length || 0}adv(${c.lineage || "-"}) ${freebies}free  valid:${r.valid} BP:${r.spend.net}/${r.maxBudget}`,
   );

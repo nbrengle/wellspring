@@ -11,7 +11,7 @@ import {
   prereqStatus,
   LEVEL_CAP,
   LEGAL_MIN_LEVEL,
-  grantedAbilities,
+  bestowedAbilities,
   computeSpend,
   getMaxRanks,
   bookcasterSpellOptions,
@@ -301,7 +301,7 @@ test("every entity referenced by a rules relation resolves (no dangling refs)", 
     for (const dep of pr.skills || []) add(dep);
     for (const group of pr.anyOf || []) for (const dep of group) add(dep);
   }
-  for (const [id, targets] of Object.entries(REFS.grants || {})) {
+  for (const [id, targets] of Object.entries(REFS.bestows || {})) {
     add(id);
     for (const t of targets || []) add(t);
   }
@@ -331,7 +331,7 @@ test("Execute power makes Hard to Kill free even if sheet has positive authored 
   const costInfo = r.spend.byItem["purchasedPerks:Hard to Kill"];
   ok(costInfo, "costInfo for Hard to Kill exists");
   eq(costInfo.cost, 0, "Hard to Kill is free");
-  eq(costInfo.grant?.source, "Execute", "Granted by Execute");
+  eq(costInfo.bestow?.source, "Execute", "Granted by Execute");
 });
 
 test("Othersleep has base cost of 1", () => {

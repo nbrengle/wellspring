@@ -3,7 +3,7 @@ import { Section } from "./build-sheet/SharedUI.jsx";
 import {
   LineageSummary,
   StartingChoicesSection,
-  GrantedSelectionsSection,
+  BestowedSelectionsSection,
   AgileLearnerSection,
   CraftingSection,
   SlotBlock,
@@ -67,7 +67,7 @@ export default function BuildSheet() {
       </header>
 
       <StartingChoicesSection />
-      <GrantedSelectionsSection />
+      <BestowedSelectionsSection />
 
       <Section title="Skills" tone="amber" onAdd={() => onOpenAdd("skill")}>
         <ClassifiedRows rows={owned.skills} resolveType="skills" />

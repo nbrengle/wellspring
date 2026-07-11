@@ -15,7 +15,7 @@ import {
   setSlotPick,
   clearSlot,
   setParameter,
-  setGrantedSelection,
+  setBestowedSelection,
   setAgileLearnerTrade,
 } from "../../src/engine/reducers.js";
 
@@ -131,7 +131,7 @@ test("setChoice clears when option is null", () => {
 
 // ─── slot pick / clear (powers bucket) ───────────────────────────────────
 // Slot powers are CharacterChoice[] in powers[], costField = the slot field, and
-// sourced Source.class(<grantingClass>) — the class lives IN the source, not a
+// sourced Source.class(<bestowingClass>) — the class lives IN the source, not a
 // parallel powerClass map. Addressing is positional among a field's entries.
 const slotEntries = (c, field) => (c.powers || []).filter((p) => p.costField === field);
 test("setSlotPick places a power sourced to the granting class", () => {
@@ -246,9 +246,9 @@ test("setParameter clears devotion state when a Worship skill loses its paramete
 });
 
 // ─── misc keyed reducers ────────────────────────────────────────────────────
-test("setGrantedSelection records under the selection id", () => {
-  const c = setGrantedSelection({}, "sel1", "Option A");
-  eq(c.grantedSelections.sel1, "Option A", "value stored");
+test("setBestowedSelection records under the selection id", () => {
+  const c = setBestowedSelection({}, "sel1", "Option A");
+  eq(c.bestowedSelections.sel1, "Option A", "value stored");
 });
 test("setAgileLearnerTrade adjusts by delta and clamps at 0", () => {
   let c = setAgileLearnerTrade({}, "Fighter", 2);

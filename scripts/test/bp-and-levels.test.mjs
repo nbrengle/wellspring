@@ -11,7 +11,7 @@ import {
   prereqStatus,
   LEVEL_CAP,
   LEGAL_MIN_LEVEL,
-  grantedAbilities,
+  bestowedAbilities,
   computeSpend,
   getMaxRanks,
   bookcasterSpellOptions,
@@ -233,10 +233,10 @@ test("total level above cap is flagged (not enforced)", () => {
 test("per-level slot growth (Fighter basic 2→3 at L5, advanced 0→1 at L6)", () => {
   const slot = (lvl, cat) =>
     computeSlots({ classes: [{ name: "Fighter", level: lvl }] }).find((s) => s.category === cat);
-  eq(slot(4, "basic").allowed - slotGrantBonus(4), 2, "L4 basic base"); // base only
+  eq(slot(4, "basic").allowed - slotBestowBonus(4), 2, "L4 basic base"); // base only
   eq(slot(6, "advanced").base, 1, "L6 advanced base");
 });
-function slotGrantBonus() {
+function slotBestowBonus() {
   return 0;
 } // Fighter L4 has no basic slot grants
 test("L11+ clamps slots to the documented top row (L10)", () => {

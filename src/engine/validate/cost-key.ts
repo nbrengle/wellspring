@@ -23,7 +23,7 @@ export function costKey(nodeOrId: CostKeyItem | string | null | undefined): stri
   //   - starting  → `startingSkills:<i>:<name>`  (indexed, still flat-path)
   if (node.field === "skills") {
     if (node.sourceType === "purchased") return `skills:${node.rawString || node.name}`;
-    if (node.sourceType === "class" || node.sourceType === "grant" || node.sourceType === "lineage") {
+    if (node.sourceType === "class" || node.sourceType === "bestow" || node.sourceType === "lineage") {
       return `startingSkills:${node.index ?? 0}:${node.rawString || node.name}`;
     }
   }

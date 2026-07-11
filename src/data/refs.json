@@ -24313,7 +24313,7 @@
       "powers:Armored Shell II"
     ]
   },
-  "grants": {
+  "bestows": {
     "perks:Sharp Mind": [
       "skills:Library Use"
     ],
@@ -24495,7 +24495,7 @@
       "skills:Additional Cantrip"
     ]
   },
-  "grantedBy": {
+  "bestowedBy": {
     "skills:Library Use": [
       "perks:Sharp Mind",
       "classes:Mage",
