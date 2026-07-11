@@ -119,7 +119,7 @@ test("Class Powers are eligible per class and cost their BP", () => {
     "Arcane Charge is offered",
   );
   const s = computeSpend(makeChar("Mage 10", { add: ["Cantrip Scholar"] }));
-  eq(s.byItem["classPowers:Cantrip Scholar"].cost, 4, "Cantrip Scholar costs 4 BP");
+  eq(s.byItem["powers:Cantrip Scholar"].cost, 4, "Cantrip Scholar costs 4 BP");
   eq(s.net, 4, "counted in spend");
 });
 test("sub-powers are filtered out of eligiblePowers", () => {

@@ -99,7 +99,7 @@ test("a BESTOW_SOURCE grant materializes as a free, non-removable owned item (Wa
   const spec = granted.find((x) => /^Weapon Spec/.test(x.name));
   ok(spec, "the parameterized Weapon Specialization grant is present");
   eq(/Daggers/.test(spec.name), true, "parameterized with the Way-of-the-Blade choice (Daggers)");
-  eq(spec.field, "skillsBestow", "lands in a *Bestow field (engine-materialized, not a purchase)");
+  eq(spec.field, "skills", "lands in a *Bestow field (engine-materialized, not a purchase)");
   eq(spec.sourceType, "bestow", "sourceType bestow so the UI treats it as non-removable");
   eq(spec.index, -1, "index -1 → canRemove false");
   eq(spec.cost?.cost ?? 0, 0, "bestowed ability is free");

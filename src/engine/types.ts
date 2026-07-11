@@ -414,11 +414,7 @@ export type GraphField =
   | "devotions"
   | "classes"
   | "advantages"
-  | "challenges"
-  | "skillsBestow"
-  | "perksBestow"
-  | "powersBestow"
-  | "unknown";
+  | "challenges"  | "unknown";
 
 /** Whether a power is a class-progression power or a domain power. The two are both
  *  `entity.type === "power"` with no distinguishing entity field, so this carries the
