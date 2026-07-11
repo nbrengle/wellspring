@@ -88,7 +88,7 @@ import { characterPools } from "./pool-registry.js";
 export { grantedAbilities };
 
 import { costKey } from "./validate/cost-key.js";
-import type { CharacterState, GraphItem } from "./types.js";
+import type { CharacterState } from "./types.js";
 
 export { prereqStatus, checkLevelConstraint } from "./validate/prereqs.js";
 import { CRAFT_DISCIPLINES, CRAFTING_TIERS } from "./config.js";
@@ -416,9 +416,9 @@ export function validate(character: CharacterState) {
   // computed-ledger cost) is a type-model change beyond this pass; cast at the seam.
   for (const bucket of ["skills", "perks", "classPowers", "domainPowers", "flaws", "innatePowers"] as const) {
     for (const row of owned[bucket]) {
-      const key = costKey(row as unknown as GraphItem);
+      const key = costKey(row);
       if (key) {
-        (row as { cost: unknown }).cost = spend.byItem[key];
+        Object.assign(row, { cost: spend.byItem[key] });
       }
     }
   }
