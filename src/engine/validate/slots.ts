@@ -368,7 +368,7 @@ export function spellSlots(character: CharacterState) {
     const lin = LINEAGES[lineageName];
     for (const name of character.lineageAdvantages || []) {
       applySpellBestows(
-        (lin?.advantages || []).find((x: BaseEntity) => x.name === name || x.baseName === name),
+        (lin?.advantages || []).find((x: { name: string; baseName?: string }) => x.name === name || x.baseName === name) as unknown as BaseEntity,
         1,
         name,
       );
@@ -540,6 +540,6 @@ export const ARTISAN_SPECIALTY_TAGS = [
 export function studiedFocusOptions(tag?: string | null) {
   return (CLASS_POWERS.Artisan?.basic || [])
     .filter((p) => p?.name && (!tag || (p.tags || []).includes(tag)))
-    .map((p) => p.name)
+    .map((p) => p.name as string)
     .sort((a, b) => a.localeCompare(b));
 }

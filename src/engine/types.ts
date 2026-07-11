@@ -22,6 +22,7 @@ export interface SlotBestow {
 export interface ChoiceOption {
   text: string;
   grants?: string[];
+  bestows?: string[];
   bestowsSkill?: boolean;
 }
 
@@ -75,6 +76,9 @@ export interface BaseEntity {
   cost?: number | string;
   /** Lineage BP cost — attached to advantage/challenge entities by the data layer. */
   lbp?: number;
+  chooseOne?: ChooseOneConfig;
+  levelDiscounts?: { atLevel: number; amount: number; pool?: string; category?: string; skill?: string }[];
+  wealthIncome?: { n: number; kind: string; skill?: string };
 }
 
 export interface Skill extends BaseEntity {
@@ -82,7 +86,6 @@ export interface Skill extends BaseEntity {
   cost: number | string;
   category?: string; // e.g. "Martial", "Crafting"
   stats?: StatMod[];
-  chooseOne?: ChooseOneConfig;
 }
 
 export interface Power extends BaseEntity {
@@ -125,11 +128,21 @@ export interface Class extends BaseEntity {
   spellcaster?: boolean;
 }
 
+export interface Advantage extends BaseEntity {
+  type: "advantage";
+  lineage?: string;
+}
+
+export interface Challenge extends BaseEntity {
+  type: "challenge";
+  lineage?: string;
+}
+
 /**
  * A discriminated union of all possible entities that can be returned by the data layer.
  * Allows the engine to narrow the type via `if (ent.type === 'spell') { ... }`.
  */
-export type Entity = Skill | Power | Spell | SubPower | Perk | Flaw | Class;
+export type Entity = Skill | Power | Spell | SubPower | Perk | Flaw | Class | Advantage | Challenge;
 
 // ─── 2. Ontological Character State ────────────────────────────────────
 

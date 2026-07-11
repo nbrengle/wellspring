@@ -1,4 +1,4 @@
-import type { Effect, Entity, CharacterState } from "./types.js";
+import type { Effect, Entity, CharacterState, ChoiceOption } from "./types.js";
 import { REFS, lookupEntity, refsKey } from "./data.js";
 import { getClasses } from "./resolver.js";
 /**
@@ -7,7 +7,7 @@ import { getClasses } from "./resolver.js";
  * This pattern keeps `graph.js` agnostic to specific game mechanics.
  */
 
-function extractDiscounts(ent: any, character: CharacterState, id: string): Effect[] {
+function extractDiscounts(ent: Entity | null | undefined, character: CharacterState, id: string): Effect[] {
   const key = refsKey(id);
   if (REFS.discounts?.[key]) {
     return [{ type: "DISCOUNT_SOURCE", discount: REFS.discounts[key] }];
@@ -15,7 +15,7 @@ function extractDiscounts(ent: any, character: CharacterState, id: string): Effe
   return [];
 }
 
-function extractGlobalBestows(ent: any, character: CharacterState, id: string): Effect[] {
+function extractGlobalBestows(ent: Entity | null | undefined, character: CharacterState, id: string): Effect[] {
   // choice — REFS.bestows lists ALL the options, so emitting them flat would wrongly
   // grant every option for free (The Learned One = "choose one of 8" at level-up).
   // Trust the PARSED chooseOne, not a description regex: a fixed grant can sit beside
@@ -30,7 +30,7 @@ function extractGlobalBestows(ent: any, character: CharacterState, id: string): 
   return [];
 }
 
-function extractWealth(ent: any, _character: CharacterState, _id: string): Effect[] {
+function extractWealth(ent: Entity | null | undefined, _character: CharacterState, _id: string): Effect[] {
   if (ent && "wealthIncome" in ent && ent.wealthIncome) {
     return [
       {
@@ -48,9 +48,13 @@ function extractWealth(ent: any, _character: CharacterState, _id: string): Effec
   return [];
 }
 
-function extractStatMods(ent: any, _character: CharacterState, _id: string): Effect[] {
+function extractStatMods(ent: Entity | null | undefined, _character: CharacterState, _id: string): Effect[] {
   if (ent && "statMods" in ent && Array.isArray(ent.statMods)) {
-    return ent.statMods.map((mod: any) => ({ type: "STAT", stat: mod.stat, amount: mod.amount }));
+    return ent.statMods.map((mod: { stat: string; amount?: number; text?: string }) => ({
+      type: "STAT",
+      stat: mod.stat,
+      amount: mod.amount || 0,
+    }));
   }
   return [];
 }
@@ -58,14 +62,14 @@ function extractStatMods(ent: any, _character: CharacterState, _id: string): Eff
 // A build chooseOne option's bestowed skills — the entities the chosen option grants
 // you for free (Way of the Blade → Weapon Specialization). Parser emits them under the
 // option's `bestows` field.
-const optBestows = (o: any) => o?.bestows || [];
+const optBestows = (o: ChoiceOption | undefined) => o?.bestows || [];
 
-function extractChooseOne(ent: any, character: CharacterState, _id: string): Effect[] {
+function extractChooseOne(ent: Entity | null | undefined, character: CharacterState, _id: string): Effect[] {
   if (ent?.chooseOne?.kind === "build") {
     const chosen = character.choices?.[`powers:${ent.name}`];
     if (chosen) {
       // Find the option by direct text match, or by seeing if one of its bestowed skills matches the chosen string.
-      const opt = ent.chooseOne.options.find((o: any) => o.text === chosen || optBestows(o).includes(chosen));
+      const opt = ent.chooseOne.options.find((o: ChoiceOption) => o.text === chosen || optBestows(o).includes(chosen));
       const bestows = optBestows(opt);
       if (bestows.length > 0) {
         return [{ type: "BESTOW_SOURCE", bestows: bestows.map((s: string) => `skills:${s}`) }];
@@ -77,9 +81,9 @@ function extractChooseOne(ent: any, character: CharacterState, _id: string): Eff
 
 import { lineageChoiceSpec, powerSpellChoiceSpec } from "./choice-specs.js";
 
-function extractLineageChoiceSpec(ent: any, character: CharacterState, _id: string): Effect[] {
+function extractLineageChoiceSpec(ent: Entity | null | undefined, character: CharacterState, _id: string): Effect[] {
   if (ent?.type === "advantage" || ent?.type === "challenge") {
-    const spec = lineageChoiceSpec(ent as any);
+    const spec = lineageChoiceSpec(ent);
     if (spec?.kind === "cantrip" || spec?.kind === "spell") {
       const chosen = character.advantageChoices?.[ent.name];
       if (chosen) {
@@ -90,10 +94,10 @@ function extractLineageChoiceSpec(ent: any, character: CharacterState, _id: stri
   return [];
 }
 
-function extractPowerSpellChoiceSpec(ent: any, character: CharacterState, _id: string): Effect[] {
+function extractPowerSpellChoiceSpec(ent: Entity | null | undefined, character: CharacterState, _id: string): Effect[] {
   const spec = powerSpellChoiceSpec(ent);
-  if (spec && (spec.kind === "spell" || spec.kind === "power")) {
-    const chosen = character.choices?.[`powers:${ent.name}`];
+    if (spec && (spec.kind === "spell" || spec.kind === "power") && ent) {
+      const chosen = character.choices?.[`powers:${ent.name}`];
     if (chosen) {
       return [{ type: "BESTOW_SOURCE", bestows: [`powers:${chosen}`] }];
     }
@@ -101,7 +105,7 @@ function extractPowerSpellChoiceSpec(ent: any, character: CharacterState, _id: s
   return [];
 }
 
-function extractStudiedFocus(ent: any, character: CharacterState, _id: string): Effect[] {
+function extractStudiedFocus(ent: Entity | null | undefined, character: CharacterState, _id: string): Effect[] {
   if (ent?.name === "Studied Focus") {
     const pick1 = character.choices?.["powers:Studied Focus:1"];
     const pick2 = character.choices?.["powers:Studied Focus:2"];
@@ -113,7 +117,7 @@ function extractStudiedFocus(ent: any, character: CharacterState, _id: string): 
   return [];
 }
 
-function extractLevelDiscounts(ent: any, character: CharacterState, id: string): Effect[] {
+function extractLevelDiscounts(ent: Entity | null | undefined, character: CharacterState, id: string): Effect[] {
   if (!ent?.levelDiscounts || ent.levelDiscounts.length === 0) return [];
 
   const charClasses = getClasses(character);
@@ -124,8 +128,11 @@ function extractLevelDiscounts(ent: any, character: CharacterState, id: string):
     const clsDef = lookupEntity(`classes:${c.name}`);
     if (!clsDef) continue;
 
-    const offers = ["innate", "utility", "basic", "advanced", "veteran", "classSkills", "rightHandPowers"].some((cat) =>
-      (clsDef as any)[cat]?.some((p: any) => (p.id || p.name) === ent.name || p.id === id || p.name === ent.name),
+    const offers = ["innate", "utility", "basic", "advanced", "veteran", "classSkills", "rightHandPowers"].some(
+      (cat) => {
+        const field = (clsDef as unknown as Record<string, Entity[]>)[cat];
+        return field?.some((p: Entity) => (p.id || p.name) === ent.name || p.id === id || p.name === ent.name);
+      },
     );
 
     if (offers && c.level > maxRelevantLevel) {
@@ -138,7 +145,7 @@ function extractLevelDiscounts(ent: any, character: CharacterState, id: string):
       effects.push({
         type: "DISCOUNT_SOURCE",
         discount: {
-          scope: { kind: "namedSkill", value: ld.skill },
+          scope: { kind: "namedSkill", value: ld.skill as string },
           amount: ld.amount,
           min: 0,
           cap: null,

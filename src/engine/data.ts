@@ -4,7 +4,7 @@
 // (npm run parse) refreshes everything downstream automatically.
 
 import classesJson from "../data/classes.json";
-import type { Entity, ProgressionRow, DiscountSpec } from "./types.js";
+import type { CharacterState, Entity, ProgressionRow, DiscountSpec } from "./types.js";
 import skillsJson from "../data/skills.json";
 import perksJson from "../data/perks.json";
 import flawsJson from "../data/flaws.json";
@@ -209,7 +209,33 @@ export const CLASSES = Object.fromEntries(
 // prereq, ... }. We surface every parsed tier so all 8 classes work, including
 // caster cantrips/novice/adept and the Class-tier and Right Hand powers.
 
-function powerEntry(p: any) {
+export interface RawPower {
+  name?: string;
+  description?: string;
+  refresh?: string;
+  prerequisites?: string;
+  requirement?: string;
+  cost?: number | string;
+  tier?: string;
+  tags?: string[];
+  call?: string;
+  effect?: string;
+  incantation?: string;
+  ranks?: number;
+  statMods?: unknown[];
+  statModNotes?: unknown[];
+  wealthIncome?: unknown;
+  slotBestows?: unknown[];
+  highestSlot?: boolean;
+  levelDiscounts?: unknown[];
+  sharedWith?: string[];
+  requiredLevel?: number;
+  requiredClass?: string;
+  requiresEntity?: string[];
+  id?: string;
+}
+
+function powerEntry(p: RawPower) {
   return {
     name: p.name,
     desc: p.description,
@@ -241,17 +267,17 @@ export const CLASS_POWERS = Object.fromEntries(
   classesJson.map((c) => [
     c.name,
     {
-      innate: (c.innate || []).map(powerEntry),
-      utility: (c.utility || []).map(powerEntry),
-      basic: (c.basic || []).map(powerEntry),
-      advanced: (c.advanced || []).map(powerEntry),
-      veteran: (c.veteran || []).map(powerEntry),
-      classSkills: (c.classSkills || []).map(powerEntry),
-      rightHandPowers: (c.rightHandPowers || []).map(powerEntry),
-      cantrips: (c.cantrips || []).map(powerEntry),
-      noviceSpells: (c.noviceSpells || []).map(powerEntry),
-      adeptSpells: (c.adeptSpells || []).map(powerEntry),
-      greaterSpells: (c.greaterSpells || []).map(powerEntry),
+      innate: ((c.innate as unknown as RawPower[]) || []).map(powerEntry),
+      utility: ((c.utility as unknown as RawPower[]) || []).map(powerEntry),
+      basic: ((c.basic as unknown as RawPower[]) || []).map(powerEntry),
+      advanced: ((c.advanced as unknown as RawPower[]) || []).map(powerEntry),
+      veteran: ((c.veteran as unknown as RawPower[]) || []).map(powerEntry),
+      classSkills: ((c.classSkills as unknown as RawPower[]) || []).map(powerEntry),
+      rightHandPowers: ((c.rightHandPowers as unknown as RawPower[]) || []).map(powerEntry),
+      cantrips: ((c.cantrips as unknown as RawPower[]) || []).map(powerEntry),
+      noviceSpells: ((c.noviceSpells as unknown as RawPower[]) || []).map(powerEntry),
+      adeptSpells: ((c.adeptSpells as unknown as RawPower[]) || []).map(powerEntry),
+      greaterSpells: ((c.greaterSpells as unknown as RawPower[]) || []).map(powerEntry),
     },
   ]),
 );
@@ -282,7 +308,9 @@ export function eligiblePowers(className: string, category: string) {
   const byTier = CLASS_POWERS[className];
   if (!lists || !byTier) return [];
   return lists.flatMap((tier: string) =>
-    ((byTier as any)[tier] || []).filter((p: any) => p.tier !== "SubPower").map((p: any) => ({ ...p, tierList: tier })),
+    ((byTier as Record<string, RawPower[]>)[tier] || [])
+      .filter((p: RawPower) => p.tier !== "SubPower")
+      .map((p: RawPower) => ({ ...p, tierList: tier })),
   );
 }
 
@@ -324,8 +352,8 @@ export function lineageSpellOptions(magicTypes: string[], tiers = ["cantrip", "n
   const spells = new Set();
   for (const cls of classes) {
     for (const tier of tiers) {
-      const field = (SPELL_TIER_FIELD as any)[tier];
-      for (const p of (CLASS_POWERS[cls] as any)?.[field] || []) {
+      const field = (SPELL_TIER_FIELD as Record<string, string>)[tier];
+      for (const p of (CLASS_POWERS[cls] as Record<string, RawPower[]>)?.[field] || []) {
         if (p?.name && !/^(Adept|Greater)\s+\w+\s+Power$/i.test(p.name)) spells.add(p.name);
       }
     }
@@ -406,7 +434,7 @@ const STAT_LABELS: Record<string, string> = {
   naturalArmor: "Natural Armor",
   wealth: "Wealth",
 };
-export function lineageItemImpact(item: any, lineage: string | null | undefined) {
+export function lineageItemImpact(item: Partial<Entity>, lineage: string | null | undefined) {
   const spec = lineageChoiceSpec(item);
   if (spec?.kind === "cantrip") return ["grants a chosen cantrip (+slot to cast it)"];
   if (spec?.kind === "rep") return ["reps another lineage’s challenge for its LBP"];
@@ -445,9 +473,10 @@ function idNameLocal(id: string) {
   return i >= 0 ? id.slice(i + 1) : id;
 }
 
-export function lineageCantripChoices(character: any): { item: string; cantrip: string }[] {
+export function lineageCantripChoices(character: CharacterState): { item: string; cantrip: string }[] {
   const choices = character?.advantageChoices || {};
-  const lin = character?.lineage && LINEAGES[character.lineage];
+  const lineageName = typeof character?.lineage === "string" ? character.lineage : character?.lineage?.name;
+  const lin = lineageName ? LINEAGES[lineageName] : undefined;
   if (!lin) return [];
   const out: { item: string; cantrip: string }[] = [];
   for (const it of [...(lin.challenges || []), ...(lin.advantages || [])]) {
@@ -537,7 +566,21 @@ export const CLASS_PROGRESSION: Record<string, Record<number, ProgressionRow>> =
 // names carry the [Repped]/[Required] tags and sublineage hints, matching the
 // old inline format. We reconstruct those from the parsed flags.
 
-function lineageItemName(it: any) {
+interface RawLineageItem {
+  name: string;
+  repped?: boolean;
+  required?: boolean;
+  sublineage?: string;
+  lbp?: number;
+  description?: string;
+  statMods?: unknown[];
+  statModNotes?: unknown[];
+  wealthIncome?: unknown;
+  slotBestows?: unknown[];
+  highestSlot?: boolean;
+}
+
+function lineageItemName(it: RawLineageItem) {
   let n = it.name;
   if (it.repped) n += " [Repped]";
   if (it.required) n += " [Required]";
@@ -545,7 +588,7 @@ function lineageItemName(it: any) {
   return n;
 }
 
-const lineageItem = (it: any) => ({
+const lineageItem = (it: RawLineageItem) => ({
   name: lineageItemName(it),
   baseName: it.name,
   lbp: it.lbp ?? 0,
@@ -566,8 +609,8 @@ export const LINEAGES = Object.fromEntries(
       description: l.description,
       costume: l.costume,
       sublineages: l.sublineages.map((s) => (s.note ? `${s.name} (${s.note})` : s.name)),
-      challenges: l.challenges.map(lineageItem),
-      advantages: l.advantages.map(lineageItem),
+      challenges: l.challenges.map((c) => lineageItem(c as RawLineageItem)),
+      advantages: l.advantages.map((a) => lineageItem(a as RawLineageItem)),
     },
   ]),
 );
@@ -594,8 +637,8 @@ export const DOMAINS = domainsJson;
 // domains and NOT in direct opposition to any of them. Opposition comes from the
 // parsed `opposedBy` field (the MegaDoc's Opposed Domains table). Returns the
 // eligible domain names. `standard` is the Devotion's own domain list.
-export function divineSubstitutionOptions(standard: any[]) {
-  const std = new Set((standard || []).map((d: any) => String(d).split(":")[0].trim()));
+export function divineSubstitutionOptions(standard: string[]) {
+  const std = new Set((standard || []).map((d: string) => String(d).split(":")[0].trim()));
   const opposedToStandard = new Set(DOMAINS.filter((d) => std.has(d.name) && d.opposedBy).map((d) => d.opposedBy));
   return DOMAINS.filter((d) => !std.has(d.name) && !opposedToStandard.has(d.name)).map((d) => d.name);
 }
@@ -743,8 +786,7 @@ for (const c of classesJson) {
   for (const s of c.specializations || []) {
     ENTITY_INDEX.set(`classes:${s.name}`, { ...s, id: `classes:${s.name}`, type: "class", parentClass: c.name });
   }
-  for (const t of POWER_TIERS)
-    for (const p of (c as any)[t] || []) powerEntities.push({ tier: t, ...p, parentClass: c.name });
+  for (const t of POWER_TIERS) for (const p of (c as unknown as Record<string, RawPower[]>)[t] || []) powerEntities.push({ tier: t, ...p, parentClass: c.name } as unknown as JsonRecord);
 }
 for (const d of domainsJson) for (const p of d.powers || []) powerEntities.push({ ...p, domain: d.name });
 indexEntities(powerEntities, "powers", { typed: true });
@@ -773,7 +815,11 @@ for (const lin of lineagesJson) {
 // normalize each entry to { name, description }. Multiple source files map to the
 // same linker type (e.g. rules-concepts is spread across core-rules, combat-rules,
 // power-words); they're merged into one type bucket.
-const indexConcepts = (items: any[], type: string, { nameKey = "name", descKey = "description" } = {}) => {
+const indexConcepts = (
+  items: Record<string, unknown>[],
+  type: string,
+  { nameKey = "name", descKey = "description" } = {},
+) => {
   for (const e of items || []) {
     const name = e[nameKey] ?? e.name ?? e.term ?? e.heading;
     if (!name) continue;
@@ -788,7 +834,7 @@ const indexConcepts = (items: any[], type: string, { nameKey = "name", descKey =
     // sub-concept resolve too.
     if (Array.isArray(e.subConcepts)) {
       indexConcepts(
-        e.subConcepts.map((s: any) => (typeof s === "string" ? { name: s, description: "" } : s)),
+        e.subConcepts.map((s: string | Record<string, unknown>) => (typeof s === "string" ? { name: s, description: "" } : s)) as Record<string, unknown>[],
         type,
       );
     }
@@ -832,7 +878,7 @@ for (const src of [
 // the content actually lives (e.g. it emits `terms:Long Rest` but the entry is
 // indexed under `rules-concepts:Long Rests`). Build a map from a normalized name
 // to the best entity id so lookup can recover across that mismatch.
-const canon = (s: any) =>
+const canon = (s: string) =>
   String(s)
     .toLowerCase()
     .replace(/[“”"’‘]/g, "")

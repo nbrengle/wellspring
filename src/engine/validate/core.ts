@@ -124,6 +124,7 @@ export function activeInnatePowers(character: CharacterState) {
 
   for (const { name: cls, level } of getClasses(character)) {
     for (const p of CLASS_POWERS[cls]?.innate || []) {
+      if (!p.name) continue;
       if (level >= (p.requiredLevel ?? 0)) {
         const cleanName = cleanItemName(p.name);
         if (!seen.has(cleanName)) {
