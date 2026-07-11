@@ -75,17 +75,15 @@ test("a slot-grant advantage is NOT a named entity grant (Aewen Deep Reserves)",
   const c = { lineage: "Aewen", lineageAdvantages: ["Deep Reserves"] };
   eq(grantedAbilities(c).list.length, 0, "no named-entity grant");
 });
-test("grants from a granting power bought into purchasedSkills are seen (graph-derived)", () => {
-  // Regression: the old per-field grant walk skipped purchasedSkills, so a Right
-  // Hand power like "Holding Out for a Hero" (bought as a skill) didn't surface the
-  // "Save the Day" it grants. The graph-derived grantedAbilities catches it.
+test("an in-play Grant (sub-power) is NOT bestowed on the owner of the granting power", () => {
+  // Holding Out for a Hero's Call is an in-play "Grant Power: Save the Day" (conferred
+  // on a target when used), NOT a build-time bestowal. So Save the Day must not appear
+  // as a bestowal on the character who owns Holding Out for a Hero.
   const c = makeChar("Socialite 10", { add: ["The Right Hand", "Holding Out for a Hero"] });
   const g = grantedAbilities(c);
-  // source is the canonical entity name ("...For a Hero"), resolved from the raw
-  // input ("...for a Hero") — the graph normalizes via lookupEntity.
   ok(
-    g.list.some((x) => x.ability === "powers:Save the Day" && /^Holding Out [Ff]or a Hero$/.test(x.source)),
-    "Save the Day is granted by the purchased Holding Out for a Hero",
+    !g.list.some((x) => x.ability === "powers:Save the Day"),
+    "Save the Day is an in-play Grant to a target, not bestowed on the owner",
   );
 });
 test("a GRANT_SOURCE grant materializes as a free, non-removable owned item (Way of the Blade → Weapon Spec)", () => {
@@ -457,10 +455,12 @@ test("inline sub-powers are extracted as entities", () => {
   ok(lookupEntity("powers:Holy Rest"), "Holy Rest exists");
   ok(lookupEntity("powers:Curious Balm").effect, "sub-power carries its stat block (effect)");
 });
-test("a power that grants a sub-power surfaces it as a free granted ability", () => {
+test("a power's in-play Grant of a sub-power is not a build-time bestowal", () => {
+  // Strange Token's Call grants Curious Balm in play; the sub-power is captured as a
+  // browsable entity (test above) but is NOT bestowed on Strange Token's owner.
   const g = grantedAbilities(makeChar("Artisan 10", { add: ["Strange Token"] }));
   ok(
-    g.list.some((x) => x.ability === "powers:Curious Balm" && x.source === "Strange Token"),
-    "Curious Balm granted by Strange Token",
+    !g.list.some((x) => x.ability === "powers:Curious Balm"),
+    "Curious Balm is an in-play Grant, not bestowed on the owner",
   );
 });

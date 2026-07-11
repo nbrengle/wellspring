@@ -141,13 +141,18 @@ test("directly selecting a sub-power fails validation", () => {
   );
 });
 
-test("selecting parent power grants sub-powers correctly", () => {
+test("an in-play Grant (sub-power) is NOT bestowed on the caster", () => {
+  // Prayer of Rest's Call is "Grant Power: Holy Rest" targeting Individual (Other) —
+  // the sub-power is conferred on a TARGET in play, the caster gains nothing on their
+  // sheet. So Holy Rest must NOT appear as a bestowal (a build-time "you gain X").
   const c = makeChar("Cleric 4", { add: ["Prayer of Rest"] });
   const r = validate(c);
   ok(
-    r.grantedAbilities.list.some((g) => g.abilityName === "Holy Rest" && g.source === "Prayer of Rest"),
-    "Holy Rest is granted by Prayer of Rest",
+    !r.grantedAbilities.list.some((g) => g.abilityName === "Holy Rest"),
+    "Holy Rest is an in-play Grant to a target, not bestowed on the caster",
   );
+  // And it's still not directly selectable (unchanged).
+  ok(!eligiblePowers("Cleric", "spellsKnown").some((p) => p.name === "Holy Rest"), "Holy Rest remains non-selectable");
 });
 
 // ─── multi-rank skills, perks, class powers, and instance-based skills ────────

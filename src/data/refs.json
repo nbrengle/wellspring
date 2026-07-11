@@ -24392,12 +24392,6 @@
     "powers:Shield Bearer": [
       "skills:Basic Shields"
     ],
-    "powers:Detonate": [
-      "powers:Explosive Impact"
-    ],
-    "powers:Strange Token": [
-      "powers:Curious Balm"
-    ],
     "classes:Cleric": [
       "skills:Worship",
       "skills:Basic Martial Weapons",
@@ -24412,9 +24406,6 @@
     ],
     "powers:Ritual Affinity": [
       "skills:Apprentice Ritual Magic"
-    ],
-    "powers:Prayer of Rest": [
-      "powers:Holy Rest"
     ],
     "classes:Druid": [
       "skills:Lore (Nature)",
@@ -24464,9 +24455,6 @@
       "skills:Lore (Arcane)",
       "skills:Additional Cantrip"
     ],
-    "powers:Gift of Solitude": [
-      "powers:Alone But Not Lonely"
-    ],
     "classes:Rogue": [
       "skills:Thrown Weapons",
       "skills:Light Armor",
@@ -24501,12 +24489,6 @@
     ],
     "powers:Implicit Truths": [
       "perks:Insight"
-    ],
-    "powers:Holding Out For a Hero": [
-      "powers:Save the Day"
-    ],
-    "powers:Hidden Weapon": [
-      "powers:Concealed Weapon"
     ],
     "classes:Sourcerer": [
       "skills:Warcaster",
@@ -24635,12 +24617,6 @@
     "skills:Greater Tinkering": [
       "powers:Expert Craft"
     ],
-    "powers:Explosive Impact": [
-      "powers:Detonate"
-    ],
-    "powers:Curious Balm": [
-      "powers:Strange Token"
-    ],
     "skills:Worship": [
       "classes:Cleric"
     ],
@@ -24663,9 +24639,6 @@
     "skills:Advanced Shields": [
       "classes:Cleric",
       "classes:Fighter"
-    ],
-    "powers:Holy Rest": [
-      "powers:Prayer of Rest"
     ],
     "skills:Lore (Nature)": [
       "classes:Druid"
@@ -24718,9 +24691,6 @@
     "skills:Lore (Arcane)": [
       "classes:Mage"
     ],
-    "powers:Alone But Not Lonely": [
-      "powers:Gift of Solitude"
-    ],
     "skills:Thrown Weapons": [
       "classes:Rogue"
     ],
@@ -24754,12 +24724,6 @@
     ],
     "perks:Insight": [
       "powers:Implicit Truths"
-    ],
-    "powers:Save the Day": [
-      "powers:Holding Out For a Hero"
-    ],
-    "powers:Concealed Weapon": [
-      "powers:Hidden Weapon"
     ],
     "skills:Warcaster": [
       "classes:Sourcerer"
