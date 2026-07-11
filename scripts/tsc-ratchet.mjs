@@ -61,7 +61,7 @@ function gate(label, cmd, baseline) {
 // STRICT gate — hard: tsconfig as-is must be clean.
 const STRICT_BASELINE = 0;
 // NO-IMPLICIT-ANY gate — untyped-param / untyped-index debt (issue #177). Lower as it drops.
-const NO_IMPLICIT_ANY_BASELINE = 98;
+const NO_IMPLICIT_ANY_BASELINE = 71;
 
 const regressed =
   gate("tsc (strict)", "npx tsc --noEmit", STRICT_BASELINE) |

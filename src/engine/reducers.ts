@@ -103,8 +103,9 @@ export function setParameter(c: Char, field: string, index: number, value: strin
   if (baseEntity === "Worship") {
     if (!paramVal) {
       // null (not undefined) to match handleClearDevotion — a present-but-empty
-      // devotion key, distinct from "never set".
-      nextChar.devotion = null as unknown as undefined;
+      // devotion key, distinct from "never set". `devotion` is typed `string | null`,
+      // so null assigns directly (no cast).
+      nextChar.devotion = null;
       nextChar.divineDomains = [];
       nextChar.domainPowers = keepDomainPowers(() => false);
     } else {

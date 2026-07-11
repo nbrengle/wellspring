@@ -1,4 +1,4 @@
-import { BASE_CLASSES, CLASSES, CLASS_POWERS, REFS, lookupEntity } from "../../engine/data.js";
+import { BASE_CLASSES, CLASSES, CLASS_POWERS, REFS, lookupEntity, refsKey } from "../../engine/data.js";
 import { bareSkill, cleanItemName, getClasses, parseWordNumber } from "../resolver.js";
 import type { BaseEntity, CharacterState } from "../types.js";
 import { PrereqIssue, PrereqNote, PrereqReport } from "../types.js";
@@ -17,7 +17,7 @@ export function prereqStatusFor(
   notes: string[];
 } {
   const ent = lookupEntity(entityId) || lookupEntity(entityId.split(":")[0] + ":" + bareSkill(entityId.split(":")[1]));
-  const pr = REFS.prereqs[ent?.id || entityId];
+  const pr = REFS.prereqs[refsKey(ent?.id || entityId)];
   if (!pr) return { met: true, missing: [], anyOf: [], notes: [] };
   const owned = graph._ownedIds;
   const missing = (pr.skills || []).filter((dep: string) => !owned.has(dep));
@@ -77,7 +77,7 @@ export function computePrereqs(graph: CharacterGraphModel): PrereqReport {
       });
     }
 
-    const pr = REFS.prereqs[ent?.id || id];
+    const pr = REFS.prereqs[refsKey(ent?.id || id)];
     if (!pr) continue;
 
     const missing = (pr.skills || []).filter((dep: string) => !owned.has(dep));
@@ -296,8 +296,12 @@ export function checkPowerRequirements(graph: CharacterGraphModel): {
     return lookupEntity(`powers:${name}`);
   };
 
+  // Spells share powers' prereq mechanics (requiredLevel / requiresEntity), so both
+  // types run this check. They differ only in bucket, not in gating.
+  const isPowerlike = (t: string | undefined) => t === "power" || t === "spell";
+
   for (const node of graph.items) {
-    if (node.entity?.type !== "power") continue;
+    if (!isPowerlike(node.entity?.type)) continue;
     const name = cleanItemName(node.name);
     const field = node.field;
     const ent = powerInContext(name);
@@ -336,7 +340,7 @@ export function checkPowerRequirements(graph: CharacterGraphModel): {
 
   const powerCounts = new Map<string, number>();
   for (const node of graph.items) {
-    if (node.entity?.type !== "power" || node.sourceType === "granted") continue;
+    if (!isPowerlike(node.entity?.type) || node.sourceType === "granted") continue;
     const name = cleanItemName(node.name);
     if (!name) continue;
     powerCounts.set(name, (powerCounts.get(name) || 0) + 1);
