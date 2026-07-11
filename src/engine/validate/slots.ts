@@ -368,7 +368,9 @@ export function spellSlots(character: CharacterState) {
     const lin = LINEAGES[lineageName];
     for (const name of character.lineageAdvantages || []) {
       applySpellBestows(
-        (lin?.advantages || []).find((x: { name: string; baseName?: string }) => x.name === name || x.baseName === name) as unknown as BaseEntity,
+        (lin?.advantages || []).find(
+          (x: { name: string; baseName?: string }) => x.name === name || x.baseName === name,
+        ) as unknown as BaseEntity,
         1,
         name,
       );

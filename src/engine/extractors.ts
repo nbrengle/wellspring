@@ -96,8 +96,8 @@ function extractLineageChoiceSpec(ent: Entity | null | undefined, character: Cha
 
 function extractPowerSpellChoiceSpec(ent: Entity | null | undefined, character: CharacterState, _id: string): Effect[] {
   const spec = powerSpellChoiceSpec(ent);
-    if (spec && (spec.kind === "spell" || spec.kind === "power") && ent) {
-      const chosen = character.choices?.[`powers:${ent.name}`];
+  if (spec && (spec.kind === "spell" || spec.kind === "power") && ent) {
+    const chosen = character.choices?.[`powers:${ent.name}`];
     if (chosen) {
       return [{ type: "BESTOW_SOURCE", bestows: [`powers:${chosen}`] }];
     }

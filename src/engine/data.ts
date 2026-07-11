@@ -786,7 +786,9 @@ for (const c of classesJson) {
   for (const s of c.specializations || []) {
     ENTITY_INDEX.set(`classes:${s.name}`, { ...s, id: `classes:${s.name}`, type: "class", parentClass: c.name });
   }
-  for (const t of POWER_TIERS) for (const p of (c as unknown as Record<string, RawPower[]>)[t] || []) powerEntities.push({ tier: t, ...p, parentClass: c.name } as unknown as JsonRecord);
+  for (const t of POWER_TIERS)
+    for (const p of (c as unknown as Record<string, RawPower[]>)[t] || [])
+      powerEntities.push({ tier: t, ...p, parentClass: c.name } as unknown as JsonRecord);
 }
 for (const d of domainsJson) for (const p of d.powers || []) powerEntities.push({ ...p, domain: d.name });
 indexEntities(powerEntities, "powers", { typed: true });
@@ -834,7 +836,9 @@ const indexConcepts = (
     // sub-concept resolve too.
     if (Array.isArray(e.subConcepts)) {
       indexConcepts(
-        e.subConcepts.map((s: string | Record<string, unknown>) => (typeof s === "string" ? { name: s, description: "" } : s)) as Record<string, unknown>[],
+        e.subConcepts.map((s: string | Record<string, unknown>) =>
+          typeof s === "string" ? { name: s, description: "" } : s,
+        ) as Record<string, unknown>[],
         type,
       );
     }
