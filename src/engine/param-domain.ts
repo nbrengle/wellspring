@@ -26,7 +26,7 @@
 
 import { getMaxRanks } from "./validate/core.js";
 import accentsJson from "../data/accents.json";
-import { Entity } from "./types.js";
+import { Entity, rankCap } from "./types.js";
 
 export type ParamKind = "pool" | "distinct";
 export interface ParamInfo {
@@ -73,7 +73,7 @@ const OPEN_PARAM_TYPES = new Set(["Area of Lore", "Specific Profession"]);
 /** Derive full parameter info for an entity, or null if it takes no resolvable
  *  parameter. Order: declared override → inline list → known pool → from-a-list
  *  → open type. */
-export function paramInfo(entity: Entity | null | undefined): ParamInfo | null {
+export function paramInfo(entity: Entity | null): ParamInfo | null {
   if (!entity) return null;
   const name = entity.baseName || entity.name;
   const desc = String(entity.description ?? "");
@@ -107,7 +107,7 @@ export function paramInfo(entity: Entity | null | undefined): ParamInfo | null {
 
 /** Can the same parameter value repeat across this entity's ranks?
  *  pool → cap > poolSize; distinct → never. */
-export function paramReusable(entity: Entity | null | undefined, entityId: string): boolean {
+export function paramReusable(entity: Entity | null, entityId: string): boolean {
   const info = paramInfo(entity);
   if (!info || info.kind !== "pool") return false;
   return getMaxRanks(entityId) > info.size;
@@ -115,17 +115,12 @@ export function paramReusable(entity: Entity | null | undefined, entityId: strin
 
 /** The parameter participates in IDENTITY (distinct per value)? Inverse of
  *  reusable, for entities that take a resolvable parameter. */
-export function paramIsIdentity(entity: Entity | null | undefined, entityId: string): boolean {
+export function paramIsIdentity(entity: Entity | null, entityId: string): boolean {
   const info = paramInfo(entity);
   return info != null && !paramReusable(entity, entityId);
 }
 
-const capOf = (e: Entity | null | undefined): number => {
-  const r = e?.ranks;
-  if (r === "unlimited") return Infinity;
-  if (typeof r === "number") return r;
-  return 1;
-};
+const capOf = (e: Entity | null): number => rankCap(e?.ranks);
 
 // Prose implying the entity asks the player to choose a parameter — used to catch
 // multi-rank entities whose param the derivation FAILED to resolve, so they

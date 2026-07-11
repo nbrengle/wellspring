@@ -756,7 +756,13 @@ const indexEntities = (
 };
 indexEntities(skillsJson, "skills");
 indexEntities(perksJson, "perks", { splitDesc: true });
-indexEntities(flawsJson, "flaws", { splitDesc: true });
+// Normalize the flaw award at the boundary so the indexed entity's `bp` is a real
+// number (the floor when it's a range like "1 or 2"), with the written form kept as
+// `bpLabel` for display. The engine never has to re-parse a string award downstream.
+const flawsIndexed = flawsJson.map((f) =>
+  typeof f.bp === "number" ? f : { ...f, bp: parseInt(String(f.bp), 10) || 0, bpLabel: String(f.bp) },
+);
+indexEntities(flawsIndexed, "flaws", { splitDesc: true });
 indexEntities(devotionsJson, "devotions");
 indexEntities(domainsJson, "domains");
 indexEntities(craftingJson, "recipes");

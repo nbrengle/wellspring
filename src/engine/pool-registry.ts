@@ -53,11 +53,10 @@ export const POOLS: PoolDef[] = [
 const poolById = new Map(POOLS.map((p) => [p.id, p]));
 export const getPool = (id: string): PoolDef | undefined => poolById.get(id);
 
-const textOf = (e: Entity | null | undefined): string =>
-  [e?.description, e?.effect, e?.call].filter(Boolean).join("  ");
+const textOf = (e: Entity | null): string => [e?.description, e?.effect, e?.call].filter(Boolean).join("  ");
 
 /** Which pool(s) does this entity's text reference? Returns pool ids. */
-export function poolsReferenced(entity: Entity | null | undefined): string[] {
+export function poolsReferenced(entity: Entity | null): string[] {
   const text = textOf(entity);
   if (!/pool|maintenance points/i.test(text)) return [];
   return POOLS.filter((p) => p.aliases.test(text)).map((p) => p.id);
@@ -79,7 +78,7 @@ const ACTIVATION_TRIGGER = /\b(casting|cast|whenever|each time|when they|for eac
  *  boost) → `refills` (TEMPORARY add during play) → `mentions`.
  *  ⚠ TODO(derive): verb-cue classification is fuzzy; a structured pool-effect from
  *  the parser should replace it. */
-export function poolRelation(entity: Entity | null | undefined, poolId: string): PoolRelation | null {
+export function poolRelation(entity: Entity | null, poolId: string): PoolRelation | null {
   const pool = poolById.get(poolId);
   const text = textOf(entity);
   if (!pool || !pool.aliases.test(text)) return null;
@@ -106,7 +105,7 @@ export function poolRelation(entity: Entity | null | undefined, poolId: string):
 /** Parse a defining power's size formula into { mult, add } so size = mult*level + add.
  *  Handles "three times … class-level" / "3 x … level" / "10 plus … level" / flat
  *  "maximum points of N". Returns null if the prose isn't recognized (→ guard). */
-export function poolSizeFormula(entity: Entity | null | undefined): { mult: number; add: number } | null {
+export function poolSizeFormula(entity: Entity | null): { mult: number; add: number } | null {
   const t = textOf(entity).replace(/\s+/g, " ");
   const num = parseWordNumber;
   // "<N> (times|x) … class-level"  → mult*level
@@ -210,7 +209,7 @@ export function characterPools(owned: OwnedLike[], classLevelOf: (className: str
     const definer = resolved.find((r) => r.owned.name === pool.definedBy);
     if (!definer) continue;
 
-    const classLevel = classLevelOf((definer.ent as Entity | undefined)?.parentClass || definer.owned.cls || "") || 1;
+    const classLevel = classLevelOf(definer.ent.parentClass || definer.owned.cls || "") || 1;
     const toPower = (r: (typeof resolved)[number], relation: PoolRelation): PoolPower => ({
       name: r.owned.name,
       source: r.owned.source ?? "purchased",

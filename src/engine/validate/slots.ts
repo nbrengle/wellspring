@@ -333,7 +333,7 @@ export function spellSlots(character: CharacterState) {
   if (!pools[primaryType]) pools[primaryType] = { novice: 0, adept: 0, greater: 0 };
 
   const highestSlots: string[] = []; // array of target pool strings
-  const applySpellBestows = (ent: BaseEntity | null | undefined, rank = 1, itemName: string | null = null) => {
+  const applySpellBestows = (ent: BaseEntity | null, rank = 1, itemName: string | null = null) => {
     if (!ent) return;
 
     let targetPool = primaryType;
