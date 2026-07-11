@@ -30,10 +30,7 @@ export interface ChooseOneConfig {
   options: ChoiceOption[];
 }
 
-export interface StatMod {
-  stat: string;
-  amount: number;
-}
+export type StatMod = { stat: string; amount: number } | { stat: string; text: string };
 
 // ─── Discriminated Union for Entities ───────────────────────────────────────
 
@@ -56,7 +53,6 @@ export interface BaseEntity {
   parentClass?: string;
   /** Parser-extracted stat modifiers + free-text stat notes. */
   statMods?: StatMod[];
-  statModNotes?: { stat: string; [k: string]: unknown }[];
 
   // Mechanically extracted prerequisites
   requiredLevel?: number;
@@ -285,7 +281,7 @@ export interface ResolvedStats {
     armor?: number;
     naturalArmor?: number;
     sources: { name: string; stat: string; n: number }[];
-    notes: { name: string; stat: string; [k: string]: unknown }[];
+    notes: { name: string; stat: string; text: string }[];
   };
 }
 
@@ -462,5 +458,4 @@ export interface ProgressionRow {
   slots?: string;
   innateCantrips?: string[];
   statMods?: StatMod[];
-  statModNotes?: { stat: string; [k: string]: unknown }[];
 }
