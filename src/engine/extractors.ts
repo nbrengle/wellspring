@@ -1,5 +1,5 @@
 import type { Effect } from "./types.js";
-import { REFS, lookupEntity } from "./data.js";
+import { REFS, lookupEntity, refsKey } from "./data.js";
 import { getClasses } from "./resolver.js";
 /**
  * Extractor plugins for the CharacterGraph.
@@ -8,8 +8,9 @@ import { getClasses } from "./resolver.js";
  */
 
 function extractDiscounts(ent, character, id) {
-  if (REFS.discounts?.[id]) {
-    return [{ type: "DISCOUNT_SOURCE", discount: REFS.discounts[id] }];
+  const key = refsKey(id);
+  if (REFS.discounts?.[key]) {
+    return [{ type: "DISCOUNT_SOURCE", discount: REFS.discounts[key] }];
   }
   return [];
 }
@@ -22,8 +23,9 @@ function extractGlobalGrants(ent, character, id) {
   // still fire. So: skip only when a chooseOne structure exists.
   const isChoiceGated = !!ent?.chooseOne;
 
-  if (REFS.grants?.[id] && !isChoiceGated) {
-    return [{ type: "GRANT_SOURCE", grants: REFS.grants[id] }];
+  const key = refsKey(id);
+  if (REFS.grants?.[key] && !isChoiceGated) {
+    return [{ type: "GRANT_SOURCE", grants: REFS.grants[key] }];
   }
   return [];
 }

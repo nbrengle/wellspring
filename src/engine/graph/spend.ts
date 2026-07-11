@@ -1,4 +1,4 @@
-import { REFS } from "../../engine/data.js";
+import { REFS, refsKey } from "../../engine/data.js";
 import { bareSkill, cleanItemName } from "../resolver.js";
 import type { BPLedger, BPLedgerEntry, DiscountSpec, GraphItem } from "../types.js";
 import { MAX_FLAW_BP } from "../validate/core.js";
@@ -271,7 +271,7 @@ export function discountApplies(
   }
 
   if (src.scope.kind === "prereq") {
-    const pr = ent?.id ? REFS.prereqs?.[ent.id] : undefined;
+    const pr = ent?.id ? REFS.prereqs?.[refsKey(ent.id)] : undefined;
     const target = `perks:${scopeValue}`;
     return (
       !!pr && (pr.skills?.includes(target) || !!pr.other?.some((o: string) => new RegExp(scopeValue, "i").test(o)))

@@ -32,15 +32,12 @@ const SPELL_TIER_FIELD: Record<string, string> = {
   Greater: "greaterSpells",
 };
 
-// Caster tiers — a 'power'-typed entity with one of these tiers is a SPELL (the data
-// models spells as powers whose tier is a caster tier). Bucket routing keys on this,
-// not on `type` alone. `tier` lives on BaseEntity, so it reads off any Entity.
-const CASTER_TIERS = new Set<string>(["Cantrip", "Novice", "Adept", "Greater"]);
-const isSpellEntity = (ent: Entity | null): boolean =>
-  !!ent && (ent.type === "spell" || (ent.tier != null && CASTER_TIERS.has(ent.tier)));
+// A spell is a first-class entity type (the parser stamps `type: "spell"` on caster-
+// tier entries). Routing keys on that honest type — no tier-string re-derivation.
+const isSpellEntity = (ent: Entity | null): boolean => ent?.type === "spell";
 
-/** Which bucket an entity lives in. Spells are powers with a caster tier, so we
- *  route on the entity, not the bare type. A null entity (unknown name) → skills. */
+/** Which bucket an entity lives in, keyed on its type. A null entity (unknown
+ *  name) → skills. */
 function bucketOf(ent: Entity | null): CharacterBucket {
   if (isSpellEntity(ent)) return "spells";
   switch (ent?.type) {
