@@ -1,4 +1,15 @@
-import type { BucketedView, GraphItem, Entity, Flaw, Power, Spell, Perk, Skill, FallbackEntity, ViewState } from "../types.js";
+import type {
+  BucketedView,
+  GraphItem,
+  Entity,
+  Flaw,
+  Power,
+  Spell,
+  Perk,
+  Skill,
+  FallbackEntity,
+  ViewState,
+} from "../types.js";
 import type { CharacterGraphModel } from "./model.js";
 
 function isEntity<T extends Entity>(entity: Entity | null | undefined, type: string): entity is T {
@@ -73,10 +84,13 @@ function createViewEntry<T extends Entity>(node: GraphItem, expectedType: string
     if (refundEff) grantedBy = refundEff.source;
   }
 
-  const baseEntity = isEntity<T>(node.entity, expectedType) ? node.entity : { name: displayName, type: "unknown" as const };
+  const baseEntity = isEntity<T>(node.entity, expectedType)
+    ? node.entity
+    : { name: displayName, type: "unknown" as const };
 
   const viewState: ViewState = {
     id: node.id,
+    name: displayName,
     entityId: node.entity?.id || node.id,
     param: paramValue,
     sourceType: node.sourceType,

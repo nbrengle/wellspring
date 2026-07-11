@@ -32,7 +32,6 @@ export interface ChooseOneConfig {
 
 export type StatMod = { stat: string; amount: number } | { stat: string; text: string };
 
-
 // ─── Discriminated Union for Entities ───────────────────────────────────────
 
 export interface BaseEntity {
@@ -413,6 +412,7 @@ export interface GraphItem {
 export type FallbackEntity = { name: string; type: "unknown" };
 export type ViewState = {
   id: string;
+  name: string;
   entityId: string;
   param?: string;
   sourceType: string;
