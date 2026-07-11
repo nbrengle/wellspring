@@ -49,8 +49,6 @@ function toGraphField(idPrefix: string, entPrefix?: string): GraphField {
   return "unknown";
 }
 
-
-
 export function normalizeCharacter(character: CharacterState): CharacterState {
   const classes = getClasses(character);
   const powers = [...(character.powers || [])];
