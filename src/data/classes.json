@@ -3029,7 +3029,7 @@
       },
       {
         "name": "Holy Rest",
-        "type": "power",
+        "type": "spell",
         "tier": "SubPower",
         "tags": [],
         "ranks": 1,
@@ -7534,7 +7534,7 @@
       },
       {
         "name": "Alone But Not Lonely",
-        "type": "power",
+        "type": "spell",
         "tier": "SubPower",
         "tags": [],
         "ranks": 1,

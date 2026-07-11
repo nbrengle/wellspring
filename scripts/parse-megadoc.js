@@ -411,12 +411,6 @@ function parsePowerNodes(powerNodes) {
 
 // SUB-POWER DEFINITION CELLS: a granted sub-power (Curious Balm, Holy Rest, …) has
 // no [Tier]-tagged H4 heading — its whole stat block lives in a single table cell,
-// A spell IS a power whose tier is a caster tier; every other power tier (and the
-// tier-less domain/sub powers) is a power. The tier is the discriminator, so the
-// entity type is DERIVED from it here — at parse time, where the section heading
-// already told us which it is — instead of being reconstructed downstream.
-const CASTER_TIERS = new Set(["Cantrip", "Novice", "Adept", "Greater"]);
-const powerType = (tier) => (CASTER_TIERS.has(tier) ? "spell" : "power");
 
 // with the sub-power NAME prefixed onto the first field:
 //   "Curious Balm" · "Incantation: Quick 100" · "Call: …" · … · "Effect: Heal, Drain" · "<prose>"
@@ -424,7 +418,9 @@ const powerType = (tier) => (CASTER_TIERS.has(tier) ? "spell" : "power");
 // concatenates them with no separator). Parse the parts like a normal power body:
 // the first part is the name, the rest are stat-field lines + trailing description.
 // Returns a power object (tier 'SubPower') or null if `cell` isn't a sub-power def.
-function parseSubPowerCell(cell, subNames) {
+// `type` is the type of the SECTION this sub-power was found in (a sub-power granted
+// by a spell is a spell; by a power, a power) — passed down, never inferred from tier.
+function parseSubPowerCell(cell, subNames, type) {
   if (!cell || cell.type !== "cell" || !Array.isArray(cell.parts) || cell.parts.length < 2) return null;
   // The name is glued to the first stat field inside the leading <p>
   // ("Curious BalmIncantation: Quick 100"). Split at the first stat-field label.
@@ -441,7 +437,7 @@ function parseSubPowerCell(cell, subNames) {
   const { fields, description } = parsePowerNodes(bodyNodes);
   return {
     name,
-    type: powerType("SubPower"),
+    type,
     tier: "SubPower",
     tags: [],
     ranks: 1,
@@ -476,9 +472,12 @@ function parsePowerHeading(text) {
   return { name, tier, tags, ranks, cost };
 }
 
-// Collect all H4/H5 power entries under a section bounded by [start, end).
-// Each power heading is followed by text nodes until the next heading of any level.
-function parsePowersInRange(start, end) {
+// Collect all H4/H5 power entries under a section bounded by [start, end). `type`
+// ('power' | 'spell') is the entity type of the SECTION — the caller knows it from
+// the heading it matched (a "… Cantrips"/"… Novice Spells" section yields spells; a
+// "… Basic Powers" section yields powers) — so every entry (and its sub-powers) is
+// stamped with it, never inferred from the tier downstream.
+function parsePowersInRange(start, end, type) {
   const powers = [];
   const subNames = subPowerNames();
   let i = start;
@@ -516,7 +515,7 @@ function parsePowersInRange(start, end) {
       // power's body (between this heading and the next). Emit those as their own
       // SubPower entries; they're filtered out of `bodyNodes` above so they don't
       // pollute the parent's description.
-      const subCells = bodyRange.map((m) => parseSubPowerCell(m, subNames)).filter(Boolean);
+      const subCells = bodyRange.map((m) => parseSubPowerCell(m, subNames, type)).filter(Boolean);
       // Sub-powers have no tier tag; mark them so they're identifiable + parseable.
       const parsed = parsePowerHeading(n.text);
       const { name, tags, ranks, cost } = parsed;
@@ -524,7 +523,7 @@ function parsePowersInRange(start, end) {
       const { fields, description } = parsePowerNodes(bodyNodes);
       powers.push({
         name,
-        type: powerType(tier),
+        type,
         tier,
         tags,
         ranks,
@@ -624,15 +623,17 @@ function parseClasses() {
           })();
 
     // Power sections: each is an H2 like "Artisan Innate Powers", "Artisan Basic Powers" etc.
-    // We collect all H4/H5 power nodes under each matching H2.
-    const powers = (h2Pattern) => {
+    // We collect all H4/H5 power nodes under each matching H2. `type` is the entity type
+    // this whole section yields ('power' or 'spell') — spells are a DISTINCT entity, not a
+    // power subtype, so the caster-tier sections say so explicitly (defaults to 'power').
+    const powers = (h2Pattern, type = "power") => {
       const results = [];
       let j = clsStart + 1;
       while (j < end) {
         const m = nodes[j];
         if (m.type === "heading" && m.level === 2 && h2Pattern.test(m.text)) {
           const secEnd = nodes.findIndex((x, k) => k > j && x.type === "heading" && x.level <= 2);
-          results.push(...parsePowersInRange(j + 1, secEnd === -1 ? end : Math.min(secEnd, end)));
+          results.push(...parsePowersInRange(j + 1, secEnd === -1 ? end : Math.min(secEnd, end), type));
         }
         j++;
       }
@@ -678,10 +679,10 @@ function parseClasses() {
       veteran: powers(new RegExp(`^${clsName} Veteran Powers$`)),
       classSkills: powers(new RegExp(`^${clsName} (Class )?Skills$`)),
       rightHandPowers: powers(new RegExp(`^${clsName} Right Hand Powers$`)),
-      cantrips: powers(new RegExp(`^${clsName} Cantrips?$`)),
-      noviceSpells: powers(new RegExp(`^${clsName} (Novice( Form)? Spells?)$`)),
-      adeptSpells: powers(new RegExp(`^${clsName} (Adept( Form)? Spells?)$`)),
-      greaterSpells: powers(new RegExp(`^${clsName} (Greater( Form)? Spells?)$`)),
+      cantrips: powers(new RegExp(`^${clsName} Cantrips?$`), "spell"),
+      noviceSpells: powers(new RegExp(`^${clsName} (Novice( Form)? Spells?)$`), "spell"),
+      adeptSpells: powers(new RegExp(`^${clsName} (Adept( Form)? Spells?)$`), "spell"),
+      greaterSpells: powers(new RegExp(`^${clsName} (Greater( Form)? Spells?)$`), "spell"),
     });
 
     i = end;
