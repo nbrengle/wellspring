@@ -155,7 +155,9 @@ function buildRegistry() {
     );
     // Class specializations (e.g. Artisan → Mystic, Crafter, Artificer).
     (c.specializations || []).forEach((s) => add("classes", s.name, s.description, { parentClass: c.name }));
-    POWER_TIERS.forEach((tier) => (c[tier] || []).forEach((p) => add("powers", p.name, powerBody(p), { entityType: p.type })));
+    POWER_TIERS.forEach((tier) =>
+      (c[tier] || []).forEach((p) => add("powers", p.name, powerBody(p), { entityType: p.type })),
+    );
   });
   // Crafting recipes and rituals have dense bodies (materials, process, effect)
   // that reference Resources, Effects, Conditions, etc. Index them as entities

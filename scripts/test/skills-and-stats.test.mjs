@@ -152,10 +152,7 @@ test("an in-play Grant (sub-power) is NOT bestowed on the caster", () => {
     "Holy Rest is an in-play Grant to a target, not bestowed on the caster",
   );
   // And it's still not directly selectable (unchanged).
-  ok(
-    !eligiblePowers("Cleric", "spellsKnown").some((p) => p.name === "Holy Rest"),
-    "Holy Rest remains non-selectable",
-  );
+  ok(!eligiblePowers("Cleric", "spellsKnown").some((p) => p.name === "Holy Rest"), "Holy Rest remains non-selectable");
 });
 
 // ─── multi-rank skills, perks, class powers, and instance-based skills ────────
