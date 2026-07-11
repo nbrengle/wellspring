@@ -12,13 +12,13 @@ import { POOLS, poolsReferenced } from "../../engine/pool-registry.js";
 
 const POOL_NAME = Object.fromEntries(POOLS.map((p) => [p.id, p.name]));
 
-const SPELL_TIERS = new Set(["Novice", "Adept", "Greater", "Cantrip"]);
-
-// Power vs Spell: spells are the Novice/Adept/Greater/Cantrip tiers; everything else
-// in `powers` is a non-spell power. Only meaningful for the powers type.
+// Power vs Spell is a first-class entity type now (the parser stamps it), so this
+// reads the honest `type` rather than sniffing the tier. Only meaningful for the
+// power/spell entities; everything else has no "kind" facet.
 export function kindOf(e) {
-  if (e.type !== "powers") return null;
-  return SPELL_TIERS.has(e.tier) ? "Spell" : "Power";
+  if (e.type === "spell") return "Spell";
+  if (e.type === "power") return "Power";
+  return null;
 }
 export function classOf(e) {
   return e.requiredClass || e.parentClass || null;

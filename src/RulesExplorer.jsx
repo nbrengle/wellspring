@@ -19,7 +19,7 @@ const HIGH_LEVEL_GROUPS = [
 
 const GROUP_TYPES = {
   character: ["skills", "perks", "flaws", "classes", "devotions", "domains"],
-  powers: ["powers"],
+  powers: ["powers", "spells"],
   crafting: ["recipes", "rituals", "crafting-concepts", "ritual-concepts"],
   rules: [
     "rules-concepts",
@@ -39,6 +39,9 @@ const TYPE_LABELS = {
   perks: "Perks",
   flaws: "Flaws",
   powers: "Powers & Spells",
+  power: "Power",
+  spell: "Spell",
+  subpower: "Sub-Power",
   classes: "Classes & Specs",
   devotions: "Devotions",
   domains: "Divine Domains",
