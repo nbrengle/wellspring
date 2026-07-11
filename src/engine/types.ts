@@ -140,18 +140,19 @@ export type Entity = Skill | Power | Spell | SubPower | Perk | Flaw | Class;
  * engine anymore (and never leak into refs.json — that stays name-keyed).
  *
  *  - purchased : bought with BP (skills, perks, classPowers, spells).
- *  - class     : fills a class-progression slot (basic/advanced/veteran/utility
- *                power) — FREE; `name` is the granting class.
- *  - starting  : a class's granted starting skill; `class` is that class.
+ *  - class     : bestowed FREE by the class — a class-progression slot pick
+ *                (basic/advanced/… power, a caster spell) OR a starting skill;
+ *                `name` is the bestowing class. (There is no separate 'starting'
+ *                source — a class-sourced SKILL *is* a starting/free skill, routed
+ *                to the Bestowed/Free Skills bucket. See isStarting.)
  *  - innate    : a class innate power (level-gated grant); `class` when known.
- *  - granted   : granted by another owned entity; `by` is that entity.
- *  - lineage   : granted by the character's lineage.
+ *  - bestowed  : bestowed by another owned entity; `by` is that entity.
+ *  - lineage   : bestowed by the character's lineage.
  *  - flaw      : a flaw (awards BP).
  */
 export type EntitySource =
   | { type: "purchased" }
   | { type: "class"; name: string }
-  | { type: "starting"; class: string }
   | { type: "innate"; class?: string }
   | { type: "bestowed"; by: string }
   | { type: "lineage" }
@@ -164,7 +165,6 @@ export type EntitySource =
 export const Source = {
   purchased: (): EntitySource => ({ type: "purchased" }),
   class: (name: string): EntitySource => ({ type: "class", name }),
-  starting: (cls: string): EntitySource => ({ type: "starting", class: cls }),
   innate: (cls?: string): EntitySource => ({ type: "innate", ...(cls ? { class: cls } : {}) }),
   bestowed: (by: string): EntitySource => ({ type: "bestowed", by }),
   lineage: (): EntitySource => ({ type: "lineage" }),
@@ -172,7 +172,10 @@ export const Source = {
 };
 
 export const isPurchased = (s: EntitySource | undefined): boolean => s?.type === "purchased";
-export const isStarting = (s: EntitySource | undefined): boolean => s?.type === "starting";
+/** A STARTING (free) skill is one a class bestowed — i.e. class-sourced. Only skills
+ *  carry a class source (slot powers/spells live in the powers/spells buckets), so
+ *  within `character.skills` this uniquely identifies the class's starting skills. */
+export const isStarting = (s: EntitySource | undefined): boolean => s?.type === "class";
 export const isInnate = (s: EntitySource | undefined): boolean => s?.type === "innate";
 export const isFlaw = (s: EntitySource | undefined): boolean => s?.type === "flaw";
 
@@ -181,7 +184,6 @@ export const isFlaw = (s: EntitySource | undefined): boolean => s?.type === "fla
 export function sourceClass(s: EntitySource | undefined): string | null {
   if (!s) return null;
   if (s.type === "class") return s.name;
-  if (s.type === "starting") return s.class;
   if (s.type === "innate") return s.class ?? null;
   return null;
 }

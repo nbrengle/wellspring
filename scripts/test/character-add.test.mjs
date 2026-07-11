@@ -67,8 +67,8 @@ test("param opt stores the parameter as a field, entityId stays bare", () => {
   eq(c.skills[0].parameter, "Arcane", "param recorded in the field");
 });
 test("source opt forces provenance (e.g. a starting skill)", () => {
-  const c = addToCharacter(base(), "Basic Martial Weapons", { source: { type: "starting", class: "Fighter" } });
-  eq(c.skills[0].source.type, "starting", "starting source honored");
+  const c = addToCharacter(base(), "Basic Martial Weapons", { source: { type: "class", name: "Fighter" } });
+  eq(c.skills[0].source.type, "class", "starting source honored");
 });
 test("cls opt sets the granting class for a slot power (multiclass)", () => {
   const mc = {
@@ -92,7 +92,7 @@ test("makeChar seeds the class starting kit (realistic character)", () => {
   const c = makeChar("Fighter 4");
   ok(c.skills.length > 0, "starting skills seeded");
   ok(
-    c.skills.every((s) => s.source.type === "starting"),
+    c.skills.every((s) => s.source.type === "class"),
     "all seeded skills are starting-sourced",
   );
 });

@@ -184,8 +184,8 @@ test("dedupe: class starting Bookcaster skills + additional purchased Bookcaster
     startingKit: false,
     add: [
       // starts with Bookcaster, Bookcaster
-      { name: "Bookcaster (Magekey)", source: Source.starting("Mage") },
-      { name: "Bookcaster (Mask Aura)", source: Source.starting("Mage") },
+      { name: "Bookcaster (Magekey)", source: Source.class("Mage") },
+      { name: "Bookcaster (Mask Aura)", source: Source.class("Mage") },
       "Bookcaster (Identify)",
     ],
   });

@@ -80,13 +80,12 @@ export function resolveCharacterGraph(charInput: CharacterState): CharacterGraph
     }
 
     // The node model's internal sourceType string, derived from the structured
-    // source's `type`. `starting` maps to 'class' (a starting skill was the old
-    // 'Class:Starting' string → sourceType 'class'); `bestowed` → 'bestow'.
+    // source's `type`. A class-sourced skill (a starting/free skill) keeps sourceType
+    // 'class'; `bestowed` → 'bestow'.
     const src: EntitySource = choice.source || Source.purchased();
     const SOURCE_TYPE: Record<EntitySource["type"], string> = {
       purchased: "purchased",
       class: "class",
-      starting: "class",
       innate: "innate",
       bestowed: "bestow",
       lineage: "lineage",
