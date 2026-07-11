@@ -394,6 +394,37 @@ export type Effect =
   | { type: "OVER_CAP"; cap: number }
   | { type: "REFUND_BESTOW"; source: string };
 
+/** A resolved graph node's PROVENANCE — the honest, closed set the graph actually
+ *  produces. Derived from the stored `EntitySource.type` via the SOURCE_TYPE map in
+ *  resolve.ts (note the stored `bestowed` → graph `bestow` rename). Every member has a
+ *  live consumer. (`synthetic` was retired when Tax Evasion became a WEALTH effect.) */
+export type GraphSourceType = "purchased" | "class" | "innate" | "bestow" | "lineage" | "flaw";
+
+/** A resolved graph node's ORIGINATING COLLECTION. This is `collectionOf(entity.type)`
+ *  for real nodes plus the `${type}Bestow` kinds for grant-expansion nodes — it is NOT a
+ *  classifier (use `entity.type`/`sourceType`/`powerKind` for that). It survives only as
+ *  the BP-ledger / prereq key PREFIX (see cost-key.ts, grants.ts); collapsing those keys
+ *  is #210. */
+export type GraphField =
+  | "skills"
+  | "perks"
+  | "powers"
+  | "spells"
+  | "flaws"
+  | "devotions"
+  | "classes"
+  | "advantages"
+  | "challenges"
+  | "skillsBestow"
+  | "perksBestow"
+  | "powersBestow"
+  | "unknown";
+
+/** Whether a power is a class-progression power or a domain power. The two are both
+ *  `entity.type === "power"` with no distinguishing entity field, so this carries the
+ *  provenance `field === "domainPowers"` used to (incorrectly) try to. */
+export type PowerKind = "class" | "domain";
+
 export interface GraphItem {
   id: string;
   name: string;
@@ -402,8 +433,10 @@ export interface GraphItem {
    *  node creation so downstream (identity, buckets) reads it structurally instead
    *  of re-scraping it from the display name. null when the entity takes no param. */
   param?: string | null;
-  field: string;
-  sourceType: string;
+  field: GraphField;
+  sourceType: GraphSourceType;
+  /** class vs domain power (set from choice.costField at node creation). */
+  powerKind?: PowerKind;
   rank: number;
   baseCost: number;
   authoredCost?: number;
@@ -430,7 +463,7 @@ export type ViewState = {
   name: string;
   entityId: string;
   param?: string;
-  sourceType: string;
+  sourceType: GraphSourceType;
   cls?: string | null;
   bestowedBy?: string;
   free: boolean;
@@ -439,7 +472,8 @@ export type ViewState = {
   index?: number;
   effects: Effect[];
   rawString?: string;
-  field: string;
+  field: GraphField;
+  powerKind?: PowerKind;
   choiceData?: CharacterChoice;
   specialty?: string | null;
   floor?: number;

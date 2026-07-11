@@ -82,7 +82,7 @@ export function computeSpend(graph: CharacterGraphModel): BPLedger {
       isBestowed = true;
       bestowSrc = bestowParamIndex[nodeParamKey];
       isDerived = true;
-    } else if (node.sourceType === "innate" || node.field === "multiclassBestow") {
+    } else if (node.sourceType === "innate") {
       isBestowed = true;
       bestowSrc = "class";
       isDerived = true;

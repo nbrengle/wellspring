@@ -3,10 +3,59 @@ import { EFFECT_EXTRACTORS } from "../extractors.js";
 import { paramInfo, paramReusable } from "../param-domain.js";
 import { bareSkill, cleanItemName, getClasses } from "../resolver.js";
 import { startingSkillGrants } from "../starting-choices.js";
-import type { CharacterChoice, CharacterState, Effect, Entity, EntitySource, GraphItem } from "../types.js";
+import type {
+  CharacterChoice,
+  CharacterState,
+  Effect,
+  Entity,
+  EntitySource,
+  GraphField,
+  GraphItem,
+  GraphSourceType,
+  PowerKind,
+} from "../types.js";
 import { Source, isPurchased, isStarting, sourceClass } from "../types.js";
 import { characterLevel, getMaxRanks } from "../validate/core.js";
 import { CharacterGraphModel, extractParam, idPrefix } from "./model.js";
+
+// Stored EntitySource.type → the graph node's provenance. The stored `bestowed` becomes
+// the graph's `bestow`; every other member passes through. Total over EntitySource["type"].
+const SOURCE_TYPE: Record<EntitySource["type"], GraphSourceType> = {
+  purchased: "purchased",
+  class: "class",
+  innate: "innate",
+  bestowed: "bestow",
+  lineage: "lineage",
+  flaw: "flaw",
+};
+
+const GRAPH_FIELDS = new Set<GraphField>([
+  "skills",
+  "perks",
+  "powers",
+  "spells",
+  "flaws",
+  "devotions",
+  "classes",
+  "advantages",
+  "challenges",
+]);
+
+/** Narrow a raw id-prefix (entityId prefix, else the entity-id prefix) to a GraphField,
+ *  falling back to "unknown". `field` is the originating collection, not a classifier. */
+function toGraphField(idPrefix: string, entPrefix?: string): GraphField {
+  if (GRAPH_FIELDS.has(idPrefix as GraphField)) return idPrefix as GraphField;
+  if (entPrefix && GRAPH_FIELDS.has(entPrefix as GraphField)) return entPrefix as GraphField;
+  return "unknown";
+}
+
+/** The `${type}Bestow` field for a grant-expansion node. `gType` is the bestowed gid's
+ *  prefix (REFS.bestows only targets skills/perks/powers), so those are the only kinds. */
+function bestowField(gType: string): GraphField {
+  if (gType === "perks") return "perksBestow";
+  if (gType === "powers") return "powersBestow";
+  return "skillsBestow";
+}
 
 export function normalizeCharacter(character: CharacterState): CharacterState {
   const classes = getClasses(character);
@@ -79,26 +128,18 @@ export function resolveCharacterGraph(charInput: CharacterState): CharacterGraph
       effects.push(...extractor(ent, character, entityId));
     }
 
-    // The node model's internal sourceType string, derived from the structured
-    // source's `type`. A class-sourced skill (a starting/free skill) keeps sourceType
-    // 'class'; `bestowed` → 'bestow'.
+    // The node's provenance (GraphSourceType), mapped from the structured source's
+    // `type` via SOURCE_TYPE. A class-sourced skill (a starting/free skill) keeps
+    // 'class'; the stored `bestowed` becomes 'bestow'.
     const src: EntitySource = choice.source || Source.purchased();
-    const SOURCE_TYPE: Record<EntitySource["type"], string> = {
-      purchased: "purchased",
-      class: "class",
-      innate: "innate",
-      bestowed: "bestow",
-      lineage: "lineage",
-      flaw: "flaw",
-    };
-    const sourceType = SOURCE_TYPE[src.type] || "purchased";
+    const sourceType = SOURCE_TYPE[src.type];
 
-    // Determine the field based on the entity prefix or fallback
-    let field = choice.entityId.split(":")[0];
-    if (["skills", "perks", "powers", "flaws"].indexOf(field) === -1) {
-      if (ent?.id) field = ent.id.split(":")[0];
-      else field = "unknown";
-    }
+    // Determine the field (originating collection) from the entity-id prefix or fallback.
+    const field = toGraphField(choice.entityId.split(":")[0], ent?.id?.split(":")[0]);
+
+    // class vs domain power — the entity carries no flag, so read the originating bucket.
+    const powerKind: PowerKind | undefined =
+      ent?.type === "power" ? (choice.costField === "domainPowers" ? "domain" : "class") : undefined;
 
     // Node id is the PARAMETER-PRESERVING instance key used for the BP ledger,
     // prereq issue ids, and dedupe — NOT ent.id (the param-stripped BASE), so it keys
@@ -116,6 +157,7 @@ export function resolveCharacterGraph(charInput: CharacterState): CharacterGraph
       param,
       field,
       sourceType,
+      powerKind,
       cls: sourceClass(src),
       rank: choice.ranks || 1,
       index: choice.originalIndex,
@@ -292,7 +334,7 @@ export function resolveCharacterGraph(charInput: CharacterState): CharacterGraph
           name: gName,
           rawString: gName,
           param: extractParam(gName),
-          field: `${gType}Bestow`,
+          field: bestowField(gType),
           sourceType: "bestow",
           bestowedBy: node.name,
           bestowKind: node.sourceType,
@@ -311,25 +353,8 @@ export function resolveCharacterGraph(charInput: CharacterState): CharacterGraph
     }
   }
 
-  const hasTaxEvasion = items.some((i) => i.name === "Tax Evasion");
-  if (hasTaxEvasion) {
-    const profRanks = items.filter((i) => /^\bProfession\b/i.test(i.name)).length;
-    let bonus = profRanks * 3;
-    if (items.some((i) => i.name === "Manse")) bonus += 2;
-    if (items.some((i) => i.name === "Income")) bonus += 2;
-    if (bonus > 0) {
-      items.push({
-        id: "synthetic:Tax Evasion Wealth",
-        name: "Tax Evasion Bonus",
-        rawString: "Tax Evasion Bonus",
-        field: "synthetic",
-        sourceType: "synthetic",
-        rank: 1,
-        baseCost: 0,
-        effects: [{ type: "WEALTH", amount: bonus, note: "from Profession/Manse/Income" }],
-      });
-    }
-  }
+  // Tax Evasion's wealth bonus is now a WEALTH effect on the Tax Evasion node itself
+  // (see extractTaxEvasion) — no synthetic node, no `synthetic` source/field.
 
   const grants = startingSkillGrants(character);
   let startingNodeIdx = 0;

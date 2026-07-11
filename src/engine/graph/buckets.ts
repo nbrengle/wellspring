@@ -37,10 +37,10 @@ export function buildBucketedView(graph: CharacterGraphModel): BucketedView {
   }
 
   for (const node of graph.items) {
-    if (node.field === "synthetic" || node.field === "lineageAdvantages" || node.field === "lineageChallenges")
-      continue;
+    // Lineage advantage/challenge rows aren't view entities.
+    if (node.sourceType === "lineage") continue;
 
-    if (node.field === "flaws") {
+    if (node.sourceType === "flaw") {
       view.flaws.push(createViewEntry<Flaw>(node, "flaw"));
       continue;
     }
@@ -53,13 +53,14 @@ export function buildBucketedView(graph: CharacterGraphModel): BucketedView {
     } else if (node.sourceType === "innate") {
       view.innatePowers.push(createViewEntry<Power>(node, "power"));
     } else if (t === "power") {
-      if (tier === "Basic") view.basicPowers.push(createViewEntry<Power>(node, "power"));
+      // A domain power is a `power` with no distinguishing entity field — the graph
+      // stamps `powerKind` from its originating bucket so it routes here, not into the
+      // class-power list (the old `field === "domainPowers"` check never fired).
+      if (node.powerKind === "domain") view.domainPowers.push(createViewEntry<Power>(node, "power"));
+      else if (tier === "Basic") view.basicPowers.push(createViewEntry<Power>(node, "power"));
       else if (tier === "Advanced") view.advancedPowers.push(createViewEntry<Power>(node, "power"));
       else if (tier === "Veteran") view.veteranPowers.push(createViewEntry<Power>(node, "power"));
       else if (tier === "Utility") view.utilityPowers.push(createViewEntry<Power>(node, "power"));
-      else if (tier === "Class" || node.field === "classPowers")
-        view.classPowers.push(createViewEntry<Power>(node, "power"));
-      else if (node.field === "domainPowers") view.domainPowers.push(createViewEntry<Power>(node, "power"));
       else view.classPowers.push(createViewEntry<Power>(node, "power"));
     } else if (t === "perk") {
       view.perks.push(createViewEntry<Perk>(node, "perk"));

@@ -206,13 +206,16 @@ export function classifyOwnedItems(character: CharacterState) {
   const bestowedSkills = [...b.bestowedSkills];
   const mcBestows = multiclassBestows(character).skills;
   for (const mc of mcBestows) {
-    // A multiclass free skill is bestowed, so it belongs in the Bestowed/Free block.
+    // A multiclass free skill is bestowed (by the secondary class), so it belongs in the
+    // Bestowed/Free block with a real `bestow` provenance — NOT the old sourceType
+    // "multiclass", which never matched any consumer (see the fixed MainContent check).
     bestowedSkills.push({
       id: mc.name,
       entityId: `skills:${mc.name}`,
       name: mc.name,
       field: "skills",
-      sourceType: "multiclass",
+      sourceType: "bestow",
+      bestowedBy: mc.source,
       type: "skill",
       cost: 0,
       free: true,
@@ -331,9 +334,7 @@ export function computeActiveSelections(graph: CharacterGraphModel, lbp: ReturnT
     }
   };
   for (const item of graph) {
-    if (item.field !== "synthetic") {
-      check(item.name || item.rawString || "");
-    }
+    check(item.name || item.rawString || "");
   }
   for (const a of lbp?.advantages || []) {
     check(a.name || a.baseName);

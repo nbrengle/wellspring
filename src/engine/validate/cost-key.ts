@@ -1,11 +1,11 @@
-import type { BPLedgerEntry } from "../types.js";
+import type { BPLedgerEntry, GraphField, GraphSourceType } from "../types.js";
 
 export type CostKeyItem = {
   id?: string;
   name?: string;
   rawString?: string;
-  field?: string;
-  sourceType?: string;
+  field?: GraphField;
+  sourceType?: GraphSourceType;
   index?: number;
   choiceData?: { costField?: string };
 };
