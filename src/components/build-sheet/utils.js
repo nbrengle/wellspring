@@ -63,6 +63,7 @@ export function grantSourceRole(grant) {
     lookupEntity(`perks:${grant.source}`);
   if (!ent) return null;
   if (ent.type === "power") return `${ent.tier || ""} Power`.trim();
+  if (ent.type === "spell") return `${ent.tier || ""} Spell`.trim();
   if (ent.type === "skill") return "Skill";
   if (ent.type === "perk") return "Perk";
   return null;
