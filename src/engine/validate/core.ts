@@ -101,9 +101,9 @@ export function countPicksForClass(
 }
 
 export function maxProgressionLevel(cls: string) {
-  const levels = Object.keys((CLASS_PROGRESSION as Record<string, Record<number, unknown>>)[cls] || {})
+  const levels = Object.keys(CLASS_PROGRESSION[cls] || {})
     .map(Number)
-    .filter((n) => n > 0);
+    .filter((n) => !isNaN(n) && n > 0);
   return levels.length ? Math.max(...levels) : 4;
 }
 

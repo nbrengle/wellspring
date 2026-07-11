@@ -64,7 +64,7 @@ export interface BaseEntity {
   levelBenefits?: { level: number; text: string }[];
   levelBenefitClass?: string;
   slotGrants?: SlotGrant[];
-  grantedSelections?: Record<string, unknown>[];
+  grantedSelections?: Record<string, string>[];
   highestSlot?: number;
   magicType?: string;
   bp?: number | string; // For flawed abilities that grant bp
@@ -255,7 +255,7 @@ export interface CharacterState extends CharacterBuckets {
   choices?: Record<string, string>;
   agileLearnerTrades?: Record<string, number>;
   /** Selections made for granted "choose one" powers, keyed by selection id. */
-  grantedSelections?: Record<string, unknown>;
+  grantedSelections?: Record<string, string>;
   /** Lineage picks (names). Read directly by the graph's lineage-item resolution. */
   lineageChallenges?: string[];
   lineageAdvantages?: string[];
@@ -409,8 +409,10 @@ export interface GraphItem {
   cls?: string | null;
 }
 
+export type FallbackEntity = { name: string; type: "unknown" };
 export type ViewState = {
   id: string;
+  name: string;
   entityId: string;
   param?: string;
   sourceType: string;
@@ -419,6 +421,7 @@ export type ViewState = {
   free: boolean;
   cost: number;
   rank: number;
+  index?: number;
   effects: Effect[];
   rawString?: string;
   field: string;
@@ -427,11 +430,11 @@ export type ViewState = {
   floor?: number;
 };
 
-export type SkillView = Skill & ViewState;
-export type PowerView = Power & ViewState;
-export type SpellView = Spell & ViewState;
-export type PerkView = Perk & ViewState;
-export type FlawView = Flaw & ViewState;
+export type SkillView = (Skill | FallbackEntity) & ViewState;
+export type PowerView = (Power | FallbackEntity) & ViewState;
+export type SpellView = (Spell | FallbackEntity) & ViewState;
+export type PerkView = (Perk | FallbackEntity) & ViewState;
+export type FlawView = (Flaw | FallbackEntity) & ViewState;
 export type ClassView = Class & { level: number };
 
 export interface BucketedView {
@@ -461,7 +464,7 @@ export interface ProgressionRow {
   basic?: number;
   advanced?: number;
   veteran?: number;
-  bonus?: number | null;
+  bonus?: string | number | null;
   cantrips?: number;
   spellsKnown?: number;
   slots?: string;

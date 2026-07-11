@@ -26,8 +26,18 @@ export function idPrefix(entity: { type?: string } | null | undefined): string {
   return entity?.type ? collectionOf(entity.type) : "";
 }
 
+interface MemoCache {
+  uiBuckets?: BucketedView;
+  stats?: ResolvedStats;
+  granted?: GrantedAbility[];
+  ownedIds?: Set<string>;
+  prereqs?: PrereqReport;
+  wealth?: WealthReport;
+  spend?: BPLedger;
+}
+
 export class CharacterGraphModel implements CharacterGraph {
-  private _memo = new Map<string, unknown>();
+  private _memo: MemoCache = {};
 
   constructor(
     public character: CharacterState,
@@ -82,9 +92,11 @@ export class CharacterGraphModel implements CharacterGraph {
     return s;
   }
 
-  private memo<T>(key: string, compute: () => T): T {
-    if (!this._memo.has(key)) this._memo.set(key, compute());
-    return this._memo.get(key) as T;
+  private memo<K extends keyof MemoCache>(key: K, compute: () => NonNullable<MemoCache[K]>): NonNullable<MemoCache[K]> {
+    if (this._memo[key] === undefined) {
+      this._memo[key] = compute();
+    }
+    return this._memo[key] as NonNullable<MemoCache[K]>;
   }
 
   hasEntity(entityId: string): boolean {
