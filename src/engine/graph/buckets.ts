@@ -26,6 +26,7 @@ export function buildBucketedView(graph: CharacterGraphModel): BucketedView {
     classPowers: [],
     domainPowers: [],
     skills: [],
+    bestowedSkills: [],
     perks: [],
     flaws: [],
     knownSpells: [],
@@ -63,7 +64,14 @@ export function buildBucketedView(graph: CharacterGraphModel): BucketedView {
     } else if (t === "perk") {
       view.perks.push(createViewEntry<Perk>(node, "perk"));
     } else {
-      view.skills.push(createViewEntry<Skill>(node, "skill"));
+      // Skills split by HOW they were acquired, matching the sheet's two blocks:
+      // BOUGHT (Purchased Skills) vs BESTOWED for free (Starting/Free Skills). A skill
+      // is bestowed iff its source isn't a purchase — class starting skills, lineage
+      // or power grants. The grouping is purely a view concern; the row's provenance
+      // already lives in node.sourceType.
+      const entry = createViewEntry<Skill>(node, "skill");
+      if (node.sourceType === "purchased") view.skills.push(entry);
+      else view.bestowedSkills.push(entry);
     }
   }
 

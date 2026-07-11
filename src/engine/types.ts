@@ -446,7 +446,14 @@ export interface BucketedView {
   utilityPowers: PowerView[];
   classPowers: PowerView[];
   domainPowers: PowerView[];
+  /** Skills the player BOUGHT with BP. */
   skills: SkillView[];
+  /** Skills BESTOWED for free (class starting skills, lineage/power grants) — the
+   *  game's "Starting/Free Skills" block. Grouping is a VIEW concern: a skill lands
+   *  here iff its source is a bestowal (not a purchase), mirroring how the sheet
+   *  splits Starting/Free from Purchased. (No analogous perk bucket yet — a UI
+   *  accident, not a domain one; a bestowed perk is the same kind of thing.) */
+  bestowedSkills: SkillView[];
   perks: PerkView[];
   flaws: FlawView[];
   knownSpells: SpellView[];

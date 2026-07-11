@@ -25,7 +25,7 @@ export default function BuildSheet() {
   if (!character.archetypeName) {
     return <ArchetypePicker onPick={onPickArchetype} onStartBlank={onStartBlank} />;
   }
-  const owned = report.owned || { skills: [], perks: [], classPowers: [], innatePowers: [] };
+  const owned = report.owned || { skills: [], bestowedSkills: [], perks: [], classPowers: [], innatePowers: [] };
 
   return (
     <main className="b-sheet">
@@ -69,7 +69,13 @@ export default function BuildSheet() {
       <StartingChoicesSection />
       <BestowedSelectionsSection />
 
-      <Section title="Skills" tone="amber" onAdd={() => onOpenAdd("skill")}>
+      {owned.bestowedSkills?.length > 0 && (
+        <Section title="Starting / Free Skills" tone="amber">
+          <ClassifiedRows rows={owned.bestowedSkills} resolveType="skills" />
+        </Section>
+      )}
+
+      <Section title="Purchased Skills" tone="amber" onAdd={() => onOpenAdd("skill")}>
         <ClassifiedRows rows={owned.skills} resolveType="skills" />
       </Section>
 
