@@ -20,7 +20,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "type-check": "tsc --noEmit",
-    "type-check:ratchet": "tsx scripts/tsc-ratchet.mjs"
+    "type-check:ratchet": "tsx scripts/tsc-ratchet.mjs",
+    "prepare": "husky"
   },
   "dependencies": {
     "react": "^19.2.6",
@@ -38,6 +39,8 @@
     "eslint-plugin-react-refresh": "^0.5.3",
     "eslint-plugin-unused-imports": "^4.4.1",
     "globals": "^17.6.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.4.0",
     "playwright": "^1.60.0",
     "prettier": "^3.8.4",
     "stylelint": "^17.13.0",
@@ -46,5 +49,8 @@
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.63.0",
     "vite": "^8.0.12"
+  },
+  "lint-staged": {
+    "**/*": "prettier --write --ignore-unknown"
   }
 }
