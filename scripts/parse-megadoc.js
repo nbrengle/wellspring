@@ -417,10 +417,11 @@ function parsePowerNodes(powerNodes) {
 // The cell's `parts` array preserves those inner-<p> boundaries (the flat `text`
 // concatenates them with no separator). Parse the parts like a normal power body:
 // the first part is the name, the rest are stat-field lines + trailing description.
-// Returns a power object (tier 'SubPower') or null if `cell` isn't a sub-power def.
-// `type` is the type of the SECTION this sub-power was found in (a sub-power granted
-// by a spell is a spell; by a power, a power) — passed down, never inferred from tier.
-function parseSubPowerCell(cell, subNames, type) {
+// Returns a sub-power object (type 'subpower', tier 'SubPower') or null if `cell`
+// isn't a sub-power def. A sub-power is its OWN entity type — a granted ability, not a
+// spell or a power (it's never picked or costed; the build gates it by tier, not type),
+// so it's the same type regardless of which section granted it.
+function parseSubPowerCell(cell, subNames) {
   if (!cell || cell.type !== "cell" || !Array.isArray(cell.parts) || cell.parts.length < 2) return null;
   // The name is glued to the first stat field inside the leading <p>
   // ("Curious BalmIncantation: Quick 100"). Split at the first stat-field label.
@@ -437,7 +438,7 @@ function parseSubPowerCell(cell, subNames, type) {
   const { fields, description } = parsePowerNodes(bodyNodes);
   return {
     name,
-    type,
+    type: "subpower",
     tier: "SubPower",
     tags: [],
     ranks: 1,
@@ -515,7 +516,7 @@ function parsePowersInRange(start, end, type) {
       // power's body (between this heading and the next). Emit those as their own
       // SubPower entries; they're filtered out of `bodyNodes` above so they don't
       // pollute the parent's description.
-      const subCells = bodyRange.map((m) => parseSubPowerCell(m, subNames, type)).filter(Boolean);
+      const subCells = bodyRange.map((m) => parseSubPowerCell(m, subNames)).filter(Boolean);
       // Sub-powers have no tier tag; mark them so they're identifiable + parseable.
       const parsed = parsePowerHeading(n.text);
       const { name, tags, ranks, cost } = parsed;

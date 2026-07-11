@@ -41,6 +41,7 @@ const TYPE_LABELS = {
   powers: "Powers & Spells",
   power: "Power",
   spell: "Spell",
+  subpower: "Sub-Power",
   classes: "Classes & Specs",
   devotions: "Devotions",
   domains: "Divine Domains",

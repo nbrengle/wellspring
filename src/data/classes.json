@@ -1525,7 +1525,7 @@
       },
       {
         "name": "Explosive Impact",
-        "type": "power",
+        "type": "subpower",
         "tier": "SubPower",
         "tags": [],
         "ranks": 1,
@@ -1838,7 +1838,7 @@
       },
       {
         "name": "Curious Balm",
-        "type": "power",
+        "type": "subpower",
         "tier": "SubPower",
         "tags": [],
         "ranks": 1,
@@ -3029,7 +3029,7 @@
       },
       {
         "name": "Holy Rest",
-        "type": "spell",
+        "type": "subpower",
         "tier": "SubPower",
         "tags": [],
         "ranks": 1,
@@ -7534,7 +7534,7 @@
       },
       {
         "name": "Alone But Not Lonely",
-        "type": "spell",
+        "type": "subpower",
         "tier": "SubPower",
         "tags": [],
         "ranks": 1,
@@ -10585,7 +10585,7 @@
       },
       {
         "name": "Save the Day",
-        "type": "power",
+        "type": "subpower",
         "tier": "SubPower",
         "tags": [],
         "ranks": 1,
@@ -10754,7 +10754,7 @@
       },
       {
         "name": "Concealed Weapon",
-        "type": "power",
+        "type": "subpower",
         "tier": "SubPower",
         "tags": [],
         "ranks": 1,
