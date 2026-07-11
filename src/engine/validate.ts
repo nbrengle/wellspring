@@ -83,10 +83,12 @@ export {
   BASIC_SPELL_SKILLS,
 } from "./validate/slots.js";
 import { resolveCharacterGraph, grantedAbilities } from "./graph.js";
+import type { CharacterGraphModel } from "./graph/model.js";
 import { characterPools } from "./pool-registry.js";
 export { grantedAbilities };
 
 import { costKey } from "./validate/cost-key.js";
+import type { CharacterState, GraphItem } from "./types.js";
 
 export { prereqStatus, checkLevelConstraint } from "./validate/prereqs.js";
 import { CRAFT_DISCIPLINES, CRAFTING_TIERS } from "./config.js";
@@ -112,11 +114,11 @@ interface PowerBenefit {
   gateClass: string;
   benefits: { level: number; text: string; active: boolean }[];
 }
-export function activePowerBenefits(character): PowerBenefit[] {
+export function activePowerBenefits(character: CharacterState): PowerBenefit[] {
   const levelByClass = Object.fromEntries(getClasses(character).map((c) => [c.name, c.level]));
   const out: PowerBenefit[] = [];
   for (const item of character.powers || []) {
-    const ent = lookupEntity(`powers:${cleanItemName(item.entityId || item.name || "")}`);
+    const ent = lookupEntity(`powers:${cleanItemName(item.entityId || "")}`);
     if (!ent?.levelBenefits) continue;
     const lvl = levelByClass[ent.levelBenefitClass ?? ""] ?? characterLevel(character);
     out.push({
@@ -131,15 +133,15 @@ export function activePowerBenefits(character): PowerBenefit[] {
 // Whether the character has the Worship skill (lets them follow a devotion and
 // access its domains). Reads the skills bucket (entityId), any source. Any
 // class can take it; "Worship - <Devotion>" matches the prefix.
-export function hasWorship(character) {
-  return (character?.skills || []).some((s) => /^worship\b/i.test(s.entityId || s.name || ""));
+export function hasWorship(character: CharacterState) {
+  return (character?.skills || []).some((s) => /^worship\b/i.test(s.entityId || ""));
 }
 
 // Devotion / domain state for the UI: the chosen devotion, the domains it grants,
 // the character's selected domains (≤2, intersected with what the devotion has),
 // whether Worship is held, and the domain powers available to purchase from the
 // selected domains. Returns null when no devotion is set.
-export function devotionState(character) {
+export function devotionState(character: CharacterState) {
   const devName = character?.devotion;
   if (!devName) return null;
   const dev = DEVOTIONS.find((d) => d.name === devName || d.baseName === devName);
@@ -176,8 +178,8 @@ export function devotionState(character) {
 
 // Whether the character owns the Divine Substitution Class power (in the
 // powers bucket).
-function ownsDivineSubstitution(character) {
-  return (character.powers || []).some((p) => /^Divine Substitution\b/.test(cleanItemName(p.entityId || p.name || "")));
+function ownsDivineSubstitution(character: CharacterState) {
+  return (character.powers || []).some((p) => /^Divine Substitution\b/.test(cleanItemName(p.entityId || "")));
 }
 
 // Normalization functions getClasses and primaryClass are now imported from ./resolver.js
@@ -190,7 +192,7 @@ function ownsDivineSubstitution(character) {
 import { multiclassGrants } from "./validate/core.js";
 export { multiclassGrants };
 
-export function classifyOwnedItems(character) {
+export function classifyOwnedItems(character: CharacterState) {
   // The single resolution site is the CharacterGraph: project its bucketed read
   // layer (graph.uiBuckets) into the 4 buckets the build sheet + pickers read.
   // No second graph-walk, no parallel dedupe/misfile machinery — the model already
@@ -233,11 +235,11 @@ export function classifyOwnedItems(character) {
 // own. Crafting tiers nest (Greater requires Journeyman requires Apprentice — see
 // REFS.prereqs), so the highest owned tier in a discipline unlocks that tier and
 // every tier below it. Ritual Magic gates the ritual recipe list the same way.
-const CRAFT_TIER_RANK = { Apprentice: 1, Journeyman: 2, Greater: 3 };
+const CRAFT_TIER_RANK: Record<string, number> = { Apprentice: 1, Journeyman: 2, Greater: 3 };
 
 // Every skill the character possesses (starting + purchased + granted), bare of
 // any "(parameter)" suffix. Shared basis for capability checks.
-export function ownedSkillNames(character) {
+export function ownedSkillNames(character: CharacterState) {
   // All owned skills (starting + purchased) are CharacterChoice[] in skills[].
   const skillNames = (character.skills || []).map((s) => s.entityId);
   const names = new Set(skillNames.map(bareSkill));
@@ -252,9 +254,9 @@ export function ownedSkillNames(character) {
 // Returns { crafting: [{ discipline, tier, count, recipes:[...] }], rituals:
 // { tier, recipes:[...] }|null, any: bool }. `tier` is the HIGHEST unlocked
 // (subsumes lower); recipes lists every makeable recipe at or below that tier.
-export function craftingCapability(character) {
+export function craftingCapability(character: CharacterState) {
   const owned = ownedSkillNames(character);
-  const topTier = (stem) => {
+  const topTier = (stem: string) => {
     let best = 0;
     for (const t of CRAFTING_TIERS) {
       if (owned.has(`${t} ${stem}`)) best = Math.max(best, CRAFT_TIER_RANK[t]);
@@ -296,7 +298,7 @@ export function craftingCapability(character) {
 // Base Build Points from the level table (9 at level 4). Below the table's floor
 // the rule is "2 BP per level", so we extrapolate down (L3=7, L2=5, L1=3) rather
 // than report 0 — even though such a character is flagged below-floor / invalid.
-export function budgetFor(level, legalMinLevel = 4) {
+export function budgetFor(level: number, legalMinLevel = 4) {
   const row = LEVEL_TABLE.find((l) => l.level === level);
   if (row) return row.bp;
   const floor = LEVEL_TABLE.find((l) => l.level === legalMinLevel);
@@ -308,11 +310,11 @@ export function budgetFor(level, legalMinLevel = 4) {
 // to their total character level (MegaDoc "Bonus BP" rule). It's optional/earned,
 // so it's surfaced as headroom above the base budget rather than free spend — a
 // build that exceeds base but stays within base+bonus is "legal with bonus BP".
-export function bonusBudgetFor(level) {
+export function bonusBudgetFor(level: number) {
   return level;
 }
 
-export function computeActiveSelections(graph, lbp) {
+export function computeActiveSelections(graph: CharacterGraphModel, lbp: ReturnType<typeof lbpState>) {
   // A granted "choose one" selection surfaced for the UI, tagged with the entity that
   // granted it. `gs` is parser-shaped (open), so we widen it and add sourceName.
   const active: (Record<string, unknown> & { sourceName: string })[] = [];
@@ -326,7 +328,7 @@ export function computeActiveSelections(graph, lbp) {
   };
   for (const item of graph) {
     if (item.field !== "synthetic") {
-      check(item.name || item.rawString);
+      check(item.name || item.rawString || "");
     }
   }
   for (const a of lbp?.advantages || []) {
@@ -335,7 +337,7 @@ export function computeActiveSelections(graph, lbp) {
   return active;
 }
 
-export function validate(character) {
+export function validate(character: CharacterState) {
   const graph = resolveCharacterGraph(character);
   const resolved = graph.character;
   const level = characterLevel(resolved);
@@ -396,7 +398,7 @@ export function validate(character) {
     ...owned.domainPowers,
     ...owned.innatePowers,
   ];
-  const classLevelOf = (className) => getClasses(resolved).find((c) => c.name === className)?.level ?? 0;
+  const classLevelOf = (className: string) => getClasses(resolved).find((c) => c.name === className)?.level ?? 0;
   const pools = characterPools(ownedFlat, classLevelOf);
   // Class-choice grants (Extensive Combat Training / Extensive Training /
   // Spell-Scholar): the classes the player may pick for each, gated by the classes
@@ -407,11 +409,16 @@ export function validate(character) {
   );
   // Attach each classified row's computed cost record (from the BP ledger) so the
   // UI reads `row.cost` directly instead of reconstructing a ledger key per row.
-  for (const bucket of ["skills", "perks", "classPowers", "domainPowers", "flaws", "innatePowers"]) {
+  // NOTE (type debt): the view rows carry the GraphItem fields costKey() reads, and
+  // `row.cost` is here overwritten with the whole BPLedgerEntry (the UI reads
+  // `row.cost.base`/`.rank`) — but the View types still declare `cost: number | string`
+  // (the entity's AUTHORED cost). Reconciling those two lifecycles (authored vs
+  // computed-ledger cost) is a type-model change beyond this pass; cast at the seam.
+  for (const bucket of ["skills", "perks", "classPowers", "domainPowers", "flaws", "innatePowers"] as const) {
     for (const row of owned[bucket]) {
-      const key = costKey(row);
+      const key = costKey(row as unknown as GraphItem);
       if (key) {
-        row.cost = spend.byItem[key];
+        (row as { cost: unknown }).cost = spend.byItem[key];
       }
     }
   }
