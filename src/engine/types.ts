@@ -98,6 +98,15 @@ export interface Spell extends BaseEntity {
   sphere: string; // e.g. "Arcane", "Divine"
 }
 
+// A granted ability conferred by a power/spell ("Grant Power: Curious Balm") — never
+// picked, never costed. Shares the power/spell stat-block shape but is its OWN type: it
+// is neither a spell nor a power, and the build treats it as a mechanical grant, not an
+// acquisition (see resolve.ts: no build node is created for it).
+export interface SubPower extends BaseEntity {
+  type: "subpower";
+  tier: "SubPower";
+}
+
 export interface Perk extends BaseEntity {
   type: "perk";
   cost: number | string;
@@ -120,7 +129,7 @@ export interface Class extends BaseEntity {
  * A discriminated union of all possible entities that can be returned by the data layer.
  * Allows the engine to narrow the type via `if (ent.type === 'spell') { ... }`.
  */
-export type Entity = Skill | Power | Spell | Perk | Flaw | Class;
+export type Entity = Skill | Power | Spell | SubPower | Perk | Flaw | Class;
 
 // ─── 2. Ontological Character State ────────────────────────────────────
 
