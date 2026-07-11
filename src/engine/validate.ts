@@ -201,10 +201,13 @@ export function classifyOwnedItems(character: CharacterState) {
   const g = resolveCharacterGraph(character);
   const b = g.uiBuckets;
   const classPowers = [...b.basicPowers, ...b.advancedPowers, ...b.veteranPowers, ...b.utilityPowers, ...b.classPowers];
+  // Purchased skills; bestowed (free) skills are their own block, matching the sheet.
   const skills = [...b.skills];
+  const bestowedSkills = [...b.bestowedSkills];
   const mcBestows = multiclassBestows(character).skills;
   for (const mc of mcBestows) {
-    skills.push({
+    // A multiclass free skill is bestowed, so it belongs in the Bestowed/Free block.
+    bestowedSkills.push({
       id: mc.name,
       entityId: `skills:${mc.name}`,
       name: mc.name,
@@ -221,6 +224,7 @@ export function classifyOwnedItems(character: CharacterState) {
 
   return {
     skills,
+    bestowedSkills,
     perks: b.perks,
     classPowers,
     domainPowers: b.domainPowers,
@@ -393,6 +397,7 @@ export function validate(character: CharacterState) {
   // Read-layer-shaped record the identity rail + a Pool facet consume directly.
   const ownedFlat = [
     ...owned.skills,
+    ...owned.bestowedSkills,
     ...owned.perks,
     ...owned.classPowers,
     ...owned.domainPowers,
@@ -414,7 +419,15 @@ export function validate(character: CharacterState) {
   // `row.cost.base`/`.rank`) — but the View types still declare `cost: number | string`
   // (the entity's AUTHORED cost). Reconciling those two lifecycles (authored vs
   // computed-ledger cost) is a type-model change beyond this pass; cast at the seam.
-  for (const bucket of ["skills", "perks", "classPowers", "domainPowers", "flaws", "innatePowers"] as const) {
+  for (const bucket of [
+    "skills",
+    "bestowedSkills",
+    "perks",
+    "classPowers",
+    "domainPowers",
+    "flaws",
+    "innatePowers",
+  ] as const) {
     for (const row of owned[bucket]) {
       const key = costKey(row);
       if (key) {
