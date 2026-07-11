@@ -415,9 +415,6 @@ export type GraphField =
   | "classes"
   | "advantages"
   | "challenges"
-  | "skillsBestow"
-  | "perksBestow"
-  | "powersBestow"
   | "unknown";
 
 /** Whether a power is a class-progression power or a domain power. The two are both

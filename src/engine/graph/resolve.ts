@@ -49,14 +49,6 @@ function toGraphField(idPrefix: string, entPrefix?: string): GraphField {
   return "unknown";
 }
 
-/** The `${type}Bestow` field for a grant-expansion node. `gType` is the bestowed gid's
- *  prefix (REFS.bestows only targets skills/perks/powers), so those are the only kinds. */
-function bestowField(gType: string): GraphField {
-  if (gType === "perks") return "perksBestow";
-  if (gType === "powers") return "powersBestow";
-  return "skillsBestow";
-}
-
 export function normalizeCharacter(character: CharacterState): CharacterState {
   const classes = getClasses(character);
   const powers = [...(character.powers || [])];
@@ -147,7 +139,7 @@ export function resolveCharacterGraph(charInput: CharacterState): CharacterGraph
     // the ORIGINATING character field: flat-path buckets carry it as `choice.costField`
     // (e.g. 'classPowers'); native skills have none, so they key under their entity
     // collection ('skills'). Falls back to the entity id.
-    const idPrefixName = choice.costField || (ent?.type ? idPrefix(ent) : null);
+    const idPrefixName = ent?.type ? idPrefix(ent) : null;
     const nodeId = idPrefixName ? `${idPrefixName}:${displayName}` : entityId;
     items.push({
       id: nodeId,
@@ -334,7 +326,7 @@ export function resolveCharacterGraph(charInput: CharacterState): CharacterGraph
           name: gName,
           rawString: gName,
           param: extractParam(gName),
-          field: bestowField(gType),
+          field: toGraphField(gType),
           sourceType: "bestow",
           bestowedBy: node.name,
           bestowKind: node.sourceType,
