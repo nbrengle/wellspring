@@ -443,9 +443,7 @@ export function bookcasterSpellOptions(character: CharacterState) {
     if (!byTier) continue;
     const magicType = CLASSES[cls]?.magicType || "Unknown";
     const slots = pools[magicType] || { novice: 0, adept: 0, greater: 0 };
-    const accessibleTiers = Object.keys(BOOKCASTER_TIER_FIELD).filter(
-      (t) => (slots[t as keyof SpellPool] || 0) > 0,
-    );
+    const accessibleTiers = Object.keys(BOOKCASTER_TIER_FIELD).filter((t) => (slots[t as keyof SpellPool] || 0) > 0);
 
     for (const tier of accessibleTiers) {
       const field = BOOKCASTER_TIER_FIELD[tier as keyof typeof BOOKCASTER_TIER_FIELD];
