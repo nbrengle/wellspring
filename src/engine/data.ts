@@ -4,7 +4,7 @@
 // (npm run parse) refreshes everything downstream automatically.
 
 import classesJson from "../data/classes.json";
-import type { Entity, ProgressionRow, DiscountSpec } from "./types.js";
+import type { CharacterState, Entity, ProgressionRow, DiscountSpec } from "./types.js";
 import skillsJson from "../data/skills.json";
 import perksJson from "../data/perks.json";
 import flawsJson from "../data/flaws.json";
@@ -63,7 +63,7 @@ export const META = {
 // ─── SKILLS / PERKS / FLAWS ───────────────────────────────────────────────────
 // UI expects { name, cost, cat, prereq, ranks, desc }.
 
-const cleanPrereq = (p) => (!p || p === "None" ? null : p);
+const cleanPrereq = (p: string | null | undefined) => (!p || p === "None" ? null : p);
 
 // Perk / flaw descriptions are stored as "<one-line table summary>. Cost: N
 // Prerequisites: X <full description>" — the leading summary + Cost/Prereq
@@ -72,7 +72,7 @@ const cleanPrereq = (p) => (!p || p === "None" ? null : p);
 // while keeping the summary available as a tagline. When the boilerplate isn't
 // present the whole string is the body and there's no separate summary.
 // Returns { summary, body }.
-export function splitDescription(text) {
+export function splitDescription(text: string | null | undefined) {
   const s = String(text || "");
   // Match: summary up to the first "Cost:"/"Prerequisites:" marker, the
   // Cost/Prereq boilerplate, then the body starting at the next capitalized word.
@@ -80,7 +80,7 @@ export function splitDescription(text) {
   if (m) return { summary: m[1].trim(), body: m[2].trim() };
   return { summary: "", body: s.trim() };
 }
-const descBody = (text) => splitDescription(text).body;
+const descBody = (text: string | null | undefined) => splitDescription(text).body;
 
 export const ALL_SKILLS = skillsJson.map((s) => ({
   name: s.name,
@@ -100,7 +100,7 @@ export const UNLIMITED_SKILLS = new Set(
 
 // Perk categories in the source use "Social/Background"; the UI groups under
 // "Social". Normalize here so the UI's category list matches.
-const PERK_CAT = { "Social/Background": "Social" };
+const PERK_CAT: Record<string, string> = { "Social/Background": "Social" };
 
 export const ALL_PERKS = perksJson.map((p) => ({
   name: p.name,
@@ -147,7 +147,7 @@ export const ALLERGEN_AWARDS = Object.fromEntries(
 
 // The substances a given allergy flaw can take, in rulebook order — drives the
 // picker. From the same parsed field, so picker options and awards never drift.
-export function allergenOptions(flawName) {
+export function allergenOptions(flawName: string) {
   const f = flawsJson.find((x) => x.name === flawName);
   return Object.keys(f?.allergens || {});
 }
@@ -155,7 +155,7 @@ export function allergenOptions(flawName) {
 // BP a given allergy flaw awards for a chosen substance. Returns null when the flaw
 // isn't an allergy or no (recognized) substance is chosen yet — callers decide how
 // to present an as-yet-undetermined award (the rulebook leaves it to Staff).
-export function allergenAward(flawName, substance) {
+export function allergenAward(flawName: string, substance: string | null | undefined) {
   const table = ALLERGEN_AWARDS[flawName];
   if (!table) return null;
   const key = String(substance || "")
@@ -209,7 +209,33 @@ export const CLASSES = Object.fromEntries(
 // prereq, ... }. We surface every parsed tier so all 8 classes work, including
 // caster cantrips/novice/adept and the Class-tier and Right Hand powers.
 
-function powerEntry(p) {
+export interface RawPower {
+  name?: string;
+  description?: string;
+  refresh?: string;
+  prerequisites?: string;
+  requirement?: string;
+  cost?: number | string;
+  tier?: string;
+  tags?: string[];
+  call?: string;
+  effect?: string;
+  incantation?: string;
+  ranks?: number;
+  statMods?: unknown[];
+  statModNotes?: unknown[];
+  wealthIncome?: unknown;
+  slotBestows?: unknown[];
+  highestSlot?: boolean;
+  levelDiscounts?: unknown[];
+  sharedWith?: string[];
+  requiredLevel?: number;
+  requiredClass?: string;
+  requiresEntity?: string[];
+  id?: string;
+}
+
+function powerEntry(p: RawPower) {
   return {
     name: p.name,
     desc: p.description,
@@ -241,17 +267,17 @@ export const CLASS_POWERS = Object.fromEntries(
   classesJson.map((c) => [
     c.name,
     {
-      innate: (c.innate || []).map(powerEntry),
-      utility: (c.utility || []).map(powerEntry),
-      basic: (c.basic || []).map(powerEntry),
-      advanced: (c.advanced || []).map(powerEntry),
-      veteran: (c.veteran || []).map(powerEntry),
-      classSkills: (c.classSkills || []).map(powerEntry),
-      rightHandPowers: (c.rightHandPowers || []).map(powerEntry),
-      cantrips: (c.cantrips || []).map(powerEntry),
-      noviceSpells: (c.noviceSpells || []).map(powerEntry),
-      adeptSpells: (c.adeptSpells || []).map(powerEntry),
-      greaterSpells: (c.greaterSpells || []).map(powerEntry),
+      innate: ((c.innate as unknown as RawPower[]) || []).map(powerEntry),
+      utility: ((c.utility as unknown as RawPower[]) || []).map(powerEntry),
+      basic: ((c.basic as unknown as RawPower[]) || []).map(powerEntry),
+      advanced: ((c.advanced as unknown as RawPower[]) || []).map(powerEntry),
+      veteran: ((c.veteran as unknown as RawPower[]) || []).map(powerEntry),
+      classSkills: ((c.classSkills as unknown as RawPower[]) || []).map(powerEntry),
+      rightHandPowers: ((c.rightHandPowers as unknown as RawPower[]) || []).map(powerEntry),
+      cantrips: ((c.cantrips as unknown as RawPower[]) || []).map(powerEntry),
+      noviceSpells: ((c.noviceSpells as unknown as RawPower[]) || []).map(powerEntry),
+      adeptSpells: ((c.adeptSpells as unknown as RawPower[]) || []).map(powerEntry),
+      greaterSpells: ((c.greaterSpells as unknown as RawPower[]) || []).map(powerEntry),
     },
   ]),
 );
@@ -260,7 +286,7 @@ export const CLASS_POWERS = Object.fromEntries(
 // a tier; the caster "spellsKnown" budget spans every learnable spell tier, so
 // the picker offers them all under one budget. Keyed by the slot category names
 // used in CLASS_POWER_SLOTS / validate.computeSlots.
-export const SLOT_POWER_LISTS = {
+export const SLOT_POWER_LISTS: Record<string, string[]> = {
   utility: ["utility"],
   basic: ["basic"],
   advanced: ["advanced"],
@@ -277,22 +303,24 @@ export const SLOT_POWER_LISTS = {
 // power in the class's lists for that category's tier(s). Each carries a `tier`
 // label so the picker can group spells-known by novice/adept/greater. Returns []
 // for unknown class/category.
-export function eligiblePowers(className, category) {
+export function eligiblePowers(className: string, category: string) {
   const lists = SLOT_POWER_LISTS[category];
   const byTier = CLASS_POWERS[className];
   if (!lists || !byTier) return [];
-  return lists.flatMap((tier) =>
-    (byTier[tier] || []).filter((p) => p.tier !== "SubPower").map((p) => ({ ...p, tierList: tier })),
+  return lists.flatMap((tier: string) =>
+    ((byTier as Record<string, RawPower[]>)[tier] || [])
+      .filter((p: RawPower) => p.tier !== "SubPower")
+      .map((p: RawPower) => ({ ...p, tierList: tier })),
   );
 }
 
 // Cantrip names from spellcasting classes of the given magic type(s) — the option
 // pool a "learn a cantrip of your choice" lineage choice offers. Rules knowledge,
 // kept in the engine so the UI doesn't re-derive it. Sorted, de-duped.
-export function cantripOptions(magicTypes) {
+export function cantripOptions(magicTypes: string[]) {
   const want = new Set(magicTypes);
   const classes = Object.entries(CLASSES)
-    .filter(([, c]) => c.type === "Spellcaster" && want.has(c.magicType))
+    .filter(([, c]) => c.type === "Spellcaster" && c.magicType != null && want.has(c.magicType))
     .map(([name]) => name);
   const cantrips = new Set();
   for (const cls of classes) {
@@ -316,16 +344,16 @@ const SPELL_TIER_FIELD = {
   adept: "adeptSpells",
   greater: "greaterSpells",
 };
-export function lineageSpellOptions(magicTypes, tiers = ["cantrip", "novice"]) {
+export function lineageSpellOptions(magicTypes: string[], tiers = ["cantrip", "novice"]) {
   const want = new Set(magicTypes);
   const classes = Object.entries(CLASSES)
-    .filter(([, c]) => c.type === "Spellcaster" && want.has(c.magicType))
+    .filter(([, c]) => c.type === "Spellcaster" && c.magicType != null && want.has(c.magicType))
     .map(([name]) => name);
   const spells = new Set();
   for (const cls of classes) {
     for (const tier of tiers) {
-      const field = SPELL_TIER_FIELD[tier];
-      for (const p of CLASS_POWERS[cls]?.[field] || []) {
+      const field = (SPELL_TIER_FIELD as Record<string, string>)[tier];
+      for (const p of (CLASS_POWERS[cls] as Record<string, RawPower[]>)?.[field] || []) {
         if (p?.name && !/^(Adept|Greater)\s+\w+\s+Power$/i.test(p.name)) spells.add(p.name);
       }
     }
@@ -399,14 +427,14 @@ export {
 // shows inline so a choice's effect on the character is obvious (pain #7). `lineage`
 // is needed to resolve the grant-edge id. A `cantrip`/`rep`/`flavor` sub-choice item
 // reports its choice nature instead of fixed mechanics.
-const STAT_LABELS = {
+const STAT_LABELS: Record<string, string> = {
   lifePoints: "Max Life",
   spikes: "Max Spikes",
   armor: "Armor",
   naturalArmor: "Natural Armor",
   wealth: "Wealth",
 };
-export function lineageItemImpact(item, lineage) {
+export function lineageItemImpact(item: Partial<Entity>, lineage: string | null | undefined) {
   const spec = lineageChoiceSpec(item);
   if (spec?.kind === "cantrip") return ["grants a chosen cantrip (+slot to cast it)"];
   if (spec?.kind === "rep") return ["reps another lineage’s challenge for its LBP"];
@@ -440,14 +468,15 @@ export function lineageItemImpact(item, lineage) {
   }
   return out;
 }
-function idNameLocal(id) {
+function idNameLocal(id: string) {
   const i = id.indexOf(":");
   return i >= 0 ? id.slice(i + 1) : id;
 }
 
-export function lineageCantripChoices(character): { item: string; cantrip: string }[] {
+export function lineageCantripChoices(character: CharacterState): { item: string; cantrip: string }[] {
   const choices = character?.advantageChoices || {};
-  const lin = character?.lineage && LINEAGES[character.lineage];
+  const lineageName = typeof character?.lineage === "string" ? character.lineage : character?.lineage?.name;
+  const lin = lineageName ? LINEAGES[lineageName] : undefined;
   if (!lin) return [];
   const out: { item: string; cantrip: string }[] = [];
   for (const it of [...(lin.challenges || []), ...(lin.advantages || [])]) {
@@ -537,7 +566,21 @@ export const CLASS_PROGRESSION: Record<string, Record<number, ProgressionRow>> =
 // names carry the [Repped]/[Required] tags and sublineage hints, matching the
 // old inline format. We reconstruct those from the parsed flags.
 
-function lineageItemName(it) {
+interface RawLineageItem {
+  name: string;
+  repped?: boolean;
+  required?: boolean;
+  sublineage?: string;
+  lbp?: number;
+  description?: string;
+  statMods?: unknown[];
+  statModNotes?: unknown[];
+  wealthIncome?: unknown;
+  slotBestows?: unknown[];
+  highestSlot?: boolean;
+}
+
+function lineageItemName(it: RawLineageItem) {
   let n = it.name;
   if (it.repped) n += " [Repped]";
   if (it.required) n += " [Required]";
@@ -545,7 +588,7 @@ function lineageItemName(it) {
   return n;
 }
 
-const lineageItem = (it) => ({
+const lineageItem = (it: RawLineageItem) => ({
   name: lineageItemName(it),
   baseName: it.name,
   lbp: it.lbp ?? 0,
@@ -566,8 +609,8 @@ export const LINEAGES = Object.fromEntries(
       description: l.description,
       costume: l.costume,
       sublineages: l.sublineages.map((s) => (s.note ? `${s.name} (${s.note})` : s.name)),
-      challenges: l.challenges.map(lineageItem),
-      advantages: l.advantages.map(lineageItem),
+      challenges: l.challenges.map((c) => lineageItem(c as RawLineageItem)),
+      advantages: l.advantages.map((a) => lineageItem(a as RawLineageItem)),
     },
   ]),
 );
@@ -594,8 +637,8 @@ export const DOMAINS = domainsJson;
 // domains and NOT in direct opposition to any of them. Opposition comes from the
 // parsed `opposedBy` field (the MegaDoc's Opposed Domains table). Returns the
 // eligible domain names. `standard` is the Devotion's own domain list.
-export function divineSubstitutionOptions(standard) {
-  const std = new Set((standard || []).map((d) => String(d).split(":")[0].trim()));
+export function divineSubstitutionOptions(standard: string[]) {
+  const std = new Set((standard || []).map((d: string) => String(d).split(":")[0].trim()));
   const opposedToStandard = new Set(DOMAINS.filter((d) => std.has(d.name) && d.opposedBy).map((d) => d.opposedBy));
   return DOMAINS.filter((d) => !std.has(d.name) && !opposedToStandard.has(d.name)).map((d) => d.name);
 }
@@ -743,7 +786,9 @@ for (const c of classesJson) {
   for (const s of c.specializations || []) {
     ENTITY_INDEX.set(`classes:${s.name}`, { ...s, id: `classes:${s.name}`, type: "class", parentClass: c.name });
   }
-  for (const t of POWER_TIERS) for (const p of c[t] || []) powerEntities.push({ tier: t, ...p, parentClass: c.name });
+  for (const t of POWER_TIERS)
+    for (const p of (c as unknown as Record<string, RawPower[]>)[t] || [])
+      powerEntities.push({ tier: t, ...p, parentClass: c.name } as unknown as JsonRecord);
 }
 for (const d of domainsJson) for (const p of d.powers || []) powerEntities.push({ ...p, domain: d.name });
 indexEntities(powerEntities, "powers", { typed: true });
@@ -772,7 +817,11 @@ for (const lin of lineagesJson) {
 // normalize each entry to { name, description }. Multiple source files map to the
 // same linker type (e.g. rules-concepts is spread across core-rules, combat-rules,
 // power-words); they're merged into one type bucket.
-const indexConcepts = (items, type, { nameKey = "name", descKey = "description" } = {}) => {
+const indexConcepts = (
+  items: Record<string, unknown>[],
+  type: string,
+  { nameKey = "name", descKey = "description" } = {},
+) => {
   for (const e of items || []) {
     const name = e[nameKey] ?? e.name ?? e.term ?? e.heading;
     if (!name) continue;
@@ -787,7 +836,9 @@ const indexConcepts = (items, type, { nameKey = "name", descKey = "description" 
     // sub-concept resolve too.
     if (Array.isArray(e.subConcepts)) {
       indexConcepts(
-        e.subConcepts.map((s) => (typeof s === "string" ? { name: s, description: "" } : s)),
+        e.subConcepts.map((s: string | Record<string, unknown>) =>
+          typeof s === "string" ? { name: s, description: "" } : s,
+        ) as Record<string, unknown>[],
         type,
       );
     }
@@ -831,7 +882,7 @@ for (const src of [
 // the content actually lives (e.g. it emits `terms:Long Rest` but the entry is
 // indexed under `rules-concepts:Long Rests`). Build a map from a normalized name
 // to the best entity id so lookup can recover across that mismatch.
-const canon = (s) =>
+const canon = (s: string) =>
   String(s)
     .toLowerCase()
     .replace(/[“”"’‘]/g, "")
@@ -855,14 +906,14 @@ for (const [id, ent] of ENTITY_INDEX) {
 //     ("Scavenge" → "Scavenge I", "Basic Lock Skill" → "Basic Locks").
 // Add a row here rather than special-casing a call site, so every resolver
 // (reconcile, cost, links) gets the alias.
-const ALIAS_PATTERNS = [
+const ALIAS_PATTERNS: Array<[RegExp, (m: RegExpMatchArray) => string]> = [
   [/^apprentice profession\b/i, () => "Profession - Apprentice"],
   [/^journeyman profession\b/i, () => "Profession - Journeyman"],
   [/^master profession\b/i, () => "Profession - Master"],
   // "Lore: Nature" / "Lore [Shadow]" → "Lore (Nature)" / "Lore (Shadow)"
-  [/^lore(?::\s*\[?|\s+\[)([^\]]+)\]?$/i, (m) => `Lore (${m[1]})`],
+  [/^lore(?::\s*\[?|\s+\[)([^\]]+)\]?$/i, (m: RegExpMatchArray) => `Lore (${m[1]})`],
 ];
-const ALIAS_EXACT = {
+const ALIAS_EXACT: Record<string, string> = {
   scavenge: "Scavenge I",
   "basic lock skill": "Basic Locks",
   "basic trap skill": "Basic Traps",
@@ -870,7 +921,7 @@ const ALIAS_EXACT = {
   "two-weapon style": "Two Weapon Style",
   "ritual lore": "Lore (Ritual)",
 };
-function applySkillAlias(name) {
+function applySkillAlias(name: string) {
   const lower = name.trim().toLowerCase();
   if (ALIAS_EXACT[lower]) return ALIAS_EXACT[lower];
   for (const [re, fn] of ALIAS_PATTERNS) {
@@ -909,7 +960,7 @@ export const lookupEntity = (id: string | null | undefined): Entity | null => {
     const byStrippedName = NAME_INDEX.get(canon(stripped));
     if (byStrippedName) return ENTITY_INDEX.get(byStrippedName);
   }
-  const ROMAN_MAP = {
+  const ROMAN_MAP: Record<string, number> = {
     i: 1,
     ii: 2,
     iii: 3,

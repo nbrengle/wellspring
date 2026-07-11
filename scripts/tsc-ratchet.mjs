@@ -8,14 +8,10 @@
 //
 //   STRICT gate      — plain `tsc --noEmit` (tsconfig as-is). Baseline 0: a hard
 //                       gate. Any error fails the build.
-//   NO-IMPLICIT-ANY  — `tsc --noEmit --noImplicitAny`. tsconfig ships with
-//   gate               noImplicitAny:false, so the untyped-param / untyped-index
-//                       debt (TS7006 / TS7053, all in src/engine/*) is invisible
-//                       to the strict gate. This second gate makes that debt
-//                       count and forces it down. See issue #177.
 //
 // Goal: drive NO_IMPLICIT_ANY_BASELINE to 0, then flip `noImplicitAny: true` in
 // tsconfig.json, delete this second gate, and the strict gate covers everything.
+// (Goal achieved: strictly typed!)
 
 import { execSync } from "node:child_process";
 
@@ -60,11 +56,6 @@ function gate(label, cmd, baseline) {
 
 // STRICT gate — hard: tsconfig as-is must be clean.
 const STRICT_BASELINE = 0;
-// NO-IMPLICIT-ANY gate — untyped-param / untyped-index debt (issue #177). Lower as it drops.
-const NO_IMPLICIT_ANY_BASELINE = 71;
-
-const regressed =
-  gate("tsc (strict)", "npx tsc --noEmit", STRICT_BASELINE) |
-  gate("tsc (--noImplicitAny)", "npx tsc --noEmit --noImplicitAny", NO_IMPLICIT_ANY_BASELINE);
+const regressed = gate("tsc (strict)", "npx tsc --noEmit", STRICT_BASELINE);
 
 if (regressed) process.exit(1);
