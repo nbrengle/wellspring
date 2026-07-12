@@ -226,7 +226,7 @@ for (let i = 0; i < nodes.length; i++) {
   if (n.type !== "text") continue;
 
   const isTiered = DEMOTED_POWER_TIERED.test(n.text);
-  const isDomain = DEMOTED_POWER_DOMAIN.test(n.text);
+  const isDomain = DEMOTED_POWER_DOMAIN.test(n.text) && inDivineDomains(i);
   if (!isTiered && !isDomain) continue;
 
   // Confirm the next text node is a power stat-block field, UNLESS it's a domain power
