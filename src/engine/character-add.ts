@@ -54,7 +54,7 @@ function bucketOf(ent: Entity | null): CharacterBucket {
 }
 
 export interface AddOpts {
-  /** Granting class for a slot power/spell, when it can't be derived (multiclass,
+  /** Bestowing class for a slot power/spell, when it can't be derived (multiclass,
    *  or the entity has no unique parentClass). Defaults to the entity's parentClass,
    *  else the character's sole class. */
   cls?: string;

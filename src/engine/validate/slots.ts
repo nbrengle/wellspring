@@ -348,7 +348,6 @@ export function spellSlots(character: CharacterState) {
     }
 
     if (!pools[targetPool]) pools[targetPool] = { novice: 0, adept: 0, greater: 0 };
-
     for (const { cat, n } of ent.slotBestows || []) {
       if (SPELL_TIERS.has(cat)) pools[targetPool][cat as keyof SpellPool] += n * rank;
     }

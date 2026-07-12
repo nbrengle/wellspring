@@ -107,7 +107,7 @@ export function progressionRow(cls: string, level: number): ProgressionRow {
   return prog[level] || prog[Math.min(level, maxProgressionLevel(cls))] || CLASS_POWER_SLOTS[cls] || {};
 }
 
-// ─── Grant cluster ──────────────────────────────────────────────────────────
+// ─── Bestow cluster ──────────────────────────────────────────────────────────
 
 // Active innate powers for the character: class-innate powers whose level
 // requirements are met. (In CharacterState, user-added innates are just in `powers` with source `BestowedBy:Innate`)

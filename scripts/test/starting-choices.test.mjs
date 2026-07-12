@@ -53,7 +53,7 @@ import {
   resolveSkill,
   configSkillKeys,
   sourceStartingSkillKeys,
-  startingSkillGrants,
+  startingSkillBestows,
 } from "../../src/engine/starting-choices.js";
 import ARCHETYPES from "../../src/data/archetypes.json" with { type: "json" };
 import CLASSES_JSON from "../../src/data/classes.json" with { type: "json" };
@@ -350,9 +350,9 @@ test("swapping away a depended-on specialty skill surfaces the broken prereq", (
 test("rebuild tags granted skills with their choice-block provenance", () => {
   const a = ARCHETYPES.find((x) => x.name === "Healer Druid");
   const c = loadWithChoices(a);
-  // Provenance is derived on read (not persisted): startingSkillGrants maps each
+  // Provenance is derived on read (not persisted): startingSkillBestows maps each
   // starting-skill position to its granting block label.
-  const grants = startingSkillGrants(c);
+  const grants = startingSkillBestows(c);
   const sources = Object.values(grants.specialty);
   // Labels are derived from the doc's block titles; look them up rather than pin.
   const wisdomLabel = _blockBy("Druid", "Peacecaster")?.label;
@@ -397,7 +397,7 @@ test("buying a granted skill above its free floor bills only the excess", () => 
     ...choicesFor("Mage", "Extended Capacity - Novice"),
   });
   const i = startingNames(c).findIndex((s) => /Extended Capacity/.test(s));
-  eq(startingSkillGrants(c).floor[i], 2, "free floor is 2");
+  eq(startingSkillBestows(c).floor[i], 2, "free floor is 2");
 
   // Floor: free.
   eq(validate(c).spend.net, 0, "floor costs nothing");
@@ -416,7 +416,7 @@ test("buying a granted skill above its free floor bills only the excess", () => 
   // A rebuild preserves the bought-up rank and the floor.
   const rebuilt = rebuildStartingSkills(setStartRank(c, i, 3), "Mage", c.startingChoices);
   eq(startingChoices(rebuilt)[i].ranks, 3, "bought-up rank preserved through rebuild");
-  eq(startingSkillGrants(rebuilt).floor[i], 2, "free floor preserved through rebuild");
+  eq(startingSkillBestows(rebuilt).floor[i], 2, "free floor preserved through rebuild");
 });
 
 // A starting skill unrelated to any choice block (or a non-conforming archetype

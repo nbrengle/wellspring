@@ -581,8 +581,8 @@ export function reconcileStartingChoices(character: CharacterState, className: s
 // specialty }: the class's fixed base grants first (specialty null), then each
 // chosen option's skills tagged with their block label. The single source of truth
 // for "what does this build's starting block produce", shared by rebuild (forward)
-// and startingSkillGrants (derive-on-read).
-function expectedStartingSkills(primaryClassName: string, choices?: Record<string, string>) {
+// and startingSkillBestows (derive-on-read).
+export function expectedStartingSkills(primaryClassName: string, choices?: Record<string, string>) {
   const fixed = (BASE_STARTING_SKILLS[primaryClassName] || []).map((s) =>
     typeof s === "string"
       ? { name: s, rank: 1, specialty: null }
@@ -606,7 +606,7 @@ function expectedStartingSkills(primaryClassName: string, choices?: Record<strin
 // (freshly built, imported from a sheet, or loaded from a URL hash) rather than
 // only on ones that just went through a rebuild. Returns
 // { specialty: {idx→label}, floor: {idx→rank} } for indices that came from a grant.
-export function startingSkillGrants(character: CharacterState): {
+export function startingSkillBestows(character: CharacterState): {
   specialty: Record<number, string>;
   floor: Record<number, number>;
 } {
@@ -647,7 +647,7 @@ export function startingSkillGrants(character: CharacterState): {
 // one; skills unrelated to any choice block are preserved untouched (never silently
 // deleted), and a previously-chosen option's skills drop when the choice changes.
 // Provenance (which block granted each skill) and the free-rank floor are NOT
-// persisted on the character — they're derived on read by startingSkillGrants, so
+// persisted on the character — they're derived on read by startingSkillBestows, so
 // they can't be lost on import / round-trip.
 export function rebuildStartingSkills(
   character: CharacterState,
@@ -729,7 +729,7 @@ export function rebuildStartingSkills(
   }
 
   // Provenance (which block granted each) + the free-rank floor are NOT persisted;
-  // they're derived on read by startingSkillGrants, so they survive import/round-trip.
+  // they're derived on read by startingSkillBestows, so they survive import/round-trip.
   return {
     ...character,
     skills: [...nextStarting, ...otherSkills],
