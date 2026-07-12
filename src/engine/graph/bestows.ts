@@ -1,6 +1,6 @@
 import { lookupEntity } from "../../engine/data.js";
-import { bareSkill, cleanItemName } from "../resolver.js";
-import type { CharacterState } from "../types.js";
+import { bareSkill } from "../resolver.js";
+import type { CharacterState, Entity } from "../types.js";
 import { BestowedAbility } from "../types.js";
 import { CharacterGraphModel, idPrefix } from "./model.js";
 import { resolveCharacterGraph } from "./resolve.js";
@@ -26,48 +26,33 @@ export function computeBestowedAbilitiesList(graph: CharacterGraphModel): Bestow
   return list;
 }
 
+// The keys a single owned entity can satisfy a prereq under: its exact id, and its
+// param-stripped "bare" form (so "Lore (Arcane)" answers a "Lore" requirement). One
+// entity → the (at most) two forms a prereq could name it by.
+function ownedKeysFor(id: string | undefined, entity: Entity | null, into: Set<string>): void {
+  if (id) into.add(id);
+  if (entity?.id) {
+    into.add(entity.id);
+    into.add(`${idPrefix(entity)}:${bareSkill(entity.name)}`);
+  }
+}
+
 export function computeOwnedIds(graph: CharacterGraphModel): Set<string> {
   const owned = new Set<string>();
   for (const node of graph.items) {
     if (node.sourceType === "flaw") continue;
-    if (node.id) {
-      owned.add(node.id);
-      if (node.id.includes("|")) owned.add(node.id.split("|")[0] + "|any");
-    }
-    const clean = cleanItemName(node.rawString || node.name);
-    const bare = bareSkill(clean);
-    const candidates = [
-      `${node.field}:${bare}`,
-      `powers:${clean}`,
-      `perks:${clean}`,
-      `skills:${clean}`,
-      `powers:${bare}`,
-      `perks:${bare}`,
-      `skills:${bare}`,
-    ];
-    for (const cand of candidates) {
-      const e = lookupEntity(cand);
-      if (e) {
-        if (e.id) owned.add(e.id);
-        owned.add(`${idPrefix(e)}:${bareSkill(e.name)}`);
-      }
-    }
-    if (node.entity?.id) {
-      owned.add(node.entity.id);
-      owned.add(`${idPrefix(node.entity)}:${bareSkill(node.entity.name)}`);
-    }
-
-    if (node.entity && node.entity.parameter) {
-      const p = node.entity.parameter.toLowerCase();
-      owned.add(`${node.id}|${p}`);
+    ownedKeysFor(node.id, node.entity, owned);
+    // Parameter variants: an exact-parameter match and a wildcard, so a prereq can
+    // require either "Lore|arcane" specifically or "Lore|any".
+    if (node.id?.includes("|")) owned.add(node.id.split("|")[0] + "|any");
+    if (node.entity?.parameter) {
+      owned.add(`${node.id}|${node.entity.parameter.toLowerCase()}`);
       owned.add(`${node.id}|any`);
     }
   }
-  // Granted abilities also satisfy prerequisites.
+  // Bestowed abilities satisfy prerequisites too — resolve each to add its bare form.
   for (const g of graph._bestowedAbilitiesList) {
-    owned.add(g.ability);
-    const ent = lookupEntity(g.ability);
-    if (ent) owned.add(`${idPrefix(ent)}:${bareSkill(ent.name)}`);
+    ownedKeysFor(g.ability, lookupEntity(g.ability), owned);
   }
   return owned;
 }
