@@ -101,9 +101,6 @@ function getIdentity(rawName: string, ent: Entity | null, param?: string | null)
   return { key: `${baseName}|${paramValue}`, cap: 1 };
 }
 
-// PASS 1 — build a graph node for every stored taking (skills/perks/powers/spells/
-// devotions/lineage), resolving the entity, cost, effects, provenance, and display name.
-// The `originalIndex` bookkeeping preserves per-bucket positional order for removal.
 // Resolve a choice's entityId to its entity. Rules data is keyed on the BARE id
 // ("Lore", not "Lore (Historical)"), so we look that up; if the stored id wasn't fully
 // qualified, retry the bare name against the common collections.
@@ -125,6 +122,9 @@ function baseCostOf(ent: Entity | null, rank: number): number {
   return (typeof ent?.cost === "number" ? ent.cost : ent?.lbp || 0) * rank;
 }
 
+// PASS 1 — build a graph node for every stored taking (skills/perks/powers/spells/
+// devotions/lineage), resolving the entity, cost, effects, provenance, and display name.
+// The `originalIndex` bookkeeping preserves per-bucket positional order for removal.
 function buildNodes(character: CharacterState): GraphItem[] {
   const items: GraphItem[] = [];
   const addItem = (choice: CharacterChoice) => {
