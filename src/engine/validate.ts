@@ -233,6 +233,7 @@ export function classifyOwnedItems(character: CharacterState) {
     domainPowers: b.domainPowers,
     flaws: b.flaws,
     innatePowers: b.innatePowers,
+    unresolved: b.unresolved,
     misfiled: {},
   };
 }
@@ -498,7 +499,13 @@ export function validate(character: CharacterState) {
     beyondProgression,
     legalMinLevel,
     levelCap: LEVEL_CAP,
-    valid: !prereqs.issues.length && !overBudget && !slotsOver && !belowFloor && (!lbp || lbp.valid),
+    valid:
+      !prereqs.issues.length &&
+      !overBudget &&
+      !slotsOver &&
+      !belowFloor &&
+      !owned.unresolved.length &&
+      (!lbp || lbp.valid),
   };
 }
 

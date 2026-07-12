@@ -484,7 +484,15 @@ export interface GraphItem {
   cls?: string | null;
 }
 
-export type FallbackEntity = { name: string; type: "unknown" };
+/** A graph node whose entity id didn't resolve to a known entity (stale/typo'd id
+ *  from saved character data, or parser/data drift). Surfaced by buildBucketedView on
+ *  BucketedView.unresolved instead of being silently stubbed into a view row. */
+export type UnresolvedEntity = {
+  entityId: string;
+  name: string;
+  sourceType: GraphSourceType;
+  field: GraphField;
+};
 export type ViewState = {
   id: string;
   name: string;
@@ -506,11 +514,11 @@ export type ViewState = {
   floor?: number;
 };
 
-export type SkillView = (Skill | FallbackEntity) & ViewState;
-export type PowerView = (Power | FallbackEntity) & ViewState;
-export type SpellView = (Spell | FallbackEntity) & ViewState;
-export type PerkView = (Perk | FallbackEntity) & ViewState;
-export type FlawView = (Flaw | FallbackEntity) & ViewState;
+export type SkillView = Skill & ViewState;
+export type PowerView = Power & ViewState;
+export type SpellView = Spell & ViewState;
+export type PerkView = Perk & ViewState;
+export type FlawView = Flaw & ViewState;
 export type ClassView = Class & { level: number };
 
 export interface BucketedView {
@@ -533,6 +541,9 @@ export interface BucketedView {
   perks: PerkView[];
   flaws: FlawView[];
   knownSpells: SpellView[];
+  /** Nodes whose entity id didn't resolve — a data-integrity failure surfaced to
+   *  validation instead of stubbed into a view row. Empty in the healthy case. */
+  unresolved: UnresolvedEntity[];
 }
 
 export interface CharacterGraph {

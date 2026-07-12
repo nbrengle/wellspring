@@ -7,13 +7,12 @@ import type {
   Spell,
   Perk,
   Skill,
-  FallbackEntity,
   ViewState,
 } from "../types.js";
 import type { CharacterGraphModel } from "./model.js";
 import { CLASSES } from "../data.js";
 
-function isEntity<T extends Entity>(entity: Entity | null, type: string): entity is T {
+function isEntity<T extends Entity>(entity: Entity | null, type: T["type"]): entity is T {
   return entity?.type === type;
 }
 export function buildBucketedView(graph: CharacterGraphModel): BucketedView {
@@ -31,6 +30,7 @@ export function buildBucketedView(graph: CharacterGraphModel): BucketedView {
     perks: [],
     flaws: [],
     knownSpells: [],
+    unresolved: [],
   };
 
   for (const { name: cls, level: clsLevel } of graph.classes) {
@@ -42,12 +42,28 @@ export function buildBucketedView(graph: CharacterGraphModel): BucketedView {
     );
   }
 
+  // Push node into `bucket` as a view entry of the expected entity type. A node whose
+  // entity didn't resolve to that type is a data-integrity failure (stale/typo'd id) —
+  // instead of pushing a stub, record it on `unresolved` so validation can surface it.
+  const pushInto = <T extends Entity>(bucket: (T & ViewState)[], node: GraphItem, type: T["type"]) => {
+    if (!isEntity<T>(node.entity, type)) {
+      view.unresolved.push({ entityId: node.entityId ?? node.id, name: node.name, sourceType: node.sourceType, field: node.field });
+      return;
+    }
+    bucket.push(createViewEntry(node, node.entity));
+  };
+
   for (const node of graph.items) {
     // Lineage advantage/challenge rows aren't view entities.
     if (node.sourceType === "lineage") continue;
+    // Devotions are graph-internal (effect carriers) — the UI shows the chosen devotion
+    // via report.devotion, not a view bucket. They're indexed with a `devotions:` id but
+    // aren't part of the Entity view union, so skip by collection to keep them out of the
+    // skills list. (Match on the entity's own id, not the node's originating field.)
+    if (node.entity?.id?.startsWith("devotions:")) continue;
 
     if (node.sourceType === "flaw") {
-      view.flaws.push(createViewEntry<Flaw>(node, "flaw"));
+      pushInto<Flaw>(view.flaws, node, "flaw");
       continue;
     }
 
@@ -55,42 +71,40 @@ export function buildBucketedView(graph: CharacterGraphModel): BucketedView {
     const tier = node.entity?.tier;
 
     if (t === "spell") {
-      view.knownSpells.push(createViewEntry<Spell>(node, "spell"));
+      pushInto<Spell>(view.knownSpells, node, "spell");
     } else if (node.sourceType === "innate") {
-      view.innatePowers.push(createViewEntry<Power>(node, "power"));
+      pushInto<Power>(view.innatePowers, node, "power");
     } else if (t === "power") {
       // A domain power is a `power` with no distinguishing entity field — the graph
       // stamps `powerKind` from its originating bucket so it routes here, not into the
       // class-power list (the old `field === "domainPowers"` check never fired).
-      if (node.powerKind === "domain") view.domainPowers.push(createViewEntry<Power>(node, "power"));
-      else if (tier === "Basic") view.basicPowers.push(createViewEntry<Power>(node, "power"));
-      else if (tier === "Advanced") view.advancedPowers.push(createViewEntry<Power>(node, "power"));
-      else if (tier === "Veteran") view.veteranPowers.push(createViewEntry<Power>(node, "power"));
-      else if (tier === "Utility") view.utilityPowers.push(createViewEntry<Power>(node, "power"));
-      else view.classPowers.push(createViewEntry<Power>(node, "power"));
+      if (node.powerKind === "domain") pushInto<Power>(view.domainPowers, node, "power");
+      else if (tier === "Basic") pushInto<Power>(view.basicPowers, node, "power");
+      else if (tier === "Advanced") pushInto<Power>(view.advancedPowers, node, "power");
+      else if (tier === "Veteran") pushInto<Power>(view.veteranPowers, node, "power");
+      else if (tier === "Utility") pushInto<Power>(view.utilityPowers, node, "power");
+      else pushInto<Power>(view.classPowers, node, "power");
     } else if (t === "perk") {
-      view.perks.push(createViewEntry<Perk>(node, "perk"));
+      pushInto<Perk>(view.perks, node, "perk");
     } else {
       // Skills split by HOW they were acquired, matching the sheet's two blocks:
       // BOUGHT (Purchased Skills) vs BESTOWED for free (Starting/Free Skills). A skill
       // is bestowed iff its source isn't a purchase — class starting skills, lineage
       // or power grants. The grouping is purely a view concern; the row's provenance
       // already lives in node.sourceType.
-      const entry = createViewEntry<Skill>(node, "skill");
-      if (node.sourceType === "purchased") view.skills.push(entry);
-      else view.bestowedSkills.push(entry);
+      pushInto<Skill>(node.sourceType === "purchased" ? view.skills : view.bestowedSkills, node, "skill");
     }
   }
 
   return view;
 }
 
-function createViewEntry<T extends Entity>(node: GraphItem, expectedType: string): (T | FallbackEntity) & ViewState {
+function createViewEntry<T extends Entity>(node: GraphItem, entity: T): T & ViewState {
   const isFree =
     node.sourceType === "bestow" ||
     node.sourceType === "innate" ||
     (node.effects && node.effects.some((e) => e.type === "REFUND_BESTOW"));
-  const paramValue = node.param ?? (node.entity?.parameter || undefined);
+  const paramValue = node.param ?? (entity.parameter || undefined);
   const displayName = paramValue && !node.name.includes(paramValue) ? `${node.name} (${paramValue})` : node.name;
 
   let bestowedBy = node.bestowedBy;
@@ -99,14 +113,10 @@ function createViewEntry<T extends Entity>(node: GraphItem, expectedType: string
     if (refundEff) bestowedBy = refundEff.source;
   }
 
-  const baseEntity = isEntity<T>(node.entity, expectedType)
-    ? node.entity
-    : { name: displayName, type: "unknown" as const };
-
   const viewState: ViewState = {
     id: node.id,
     name: displayName,
-    entityId: node.entity?.id || node.id,
+    entityId: entity.id || node.id,
     param: paramValue,
     sourceType: node.sourceType,
     bestowedBy,
@@ -114,7 +124,7 @@ function createViewEntry<T extends Entity>(node: GraphItem, expectedType: string
     cost: isFree ? 0 : (node.authoredCost ?? node.baseCost),
     rank: node.rank,
     index: node.index ?? (node.sourceType === "bestow" ? -1 : node.index),
-    cls: node.cls ?? node.entity?.parentClass ?? null,
+    cls: node.cls ?? entity.parentClass ?? null,
     effects: node.effects,
     rawString: node.rawString,
     field: node.field,
@@ -123,5 +133,5 @@ function createViewEntry<T extends Entity>(node: GraphItem, expectedType: string
     floor: node.floor,
   };
 
-  return { ...baseEntity, ...viewState };
+  return { ...entity, ...viewState };
 }
