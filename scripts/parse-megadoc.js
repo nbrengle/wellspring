@@ -2944,22 +2944,16 @@ const RECIPE_FIELD_NOISE = new Set([
   "Tinkering",
 ]);
 
-function _extractASTTexts(node) {
-  let texts = [];
+function _extractTypes(node, types) {
+  let res = [];
   for (const c of node.children || []) {
-    if (c.type === "text") texts.push(c.text);
-    if (c.type === "heading") texts.push(..._extractASTTexts(c));
+    if (types.includes(c.type)) {
+      if (c.type === "list") res.push(...c.items);
+      else res.push(c.text);
+    }
+    if (c.type === "heading") res.push(..._extractTypes(c, types));
   }
-  return texts;
-}
-
-function _extractASTLists(node) {
-  let items = [];
-  for (const c of node.children || []) {
-    if (c.type === "list") items.push(...c.items);
-    if (c.type === "heading") items.push(..._extractASTLists(c));
-  }
-  return items;
+  return res;
 }
 
 function parseCraftingConcepts() {
@@ -2982,8 +2976,8 @@ function parseCraftingConcepts() {
       if (RECIPE_SECTION_RE.test(conceptNode.text)) break; // Stop at recipe lists
       if (RECIPE_FIELD_NOISE.has(conceptNode.text)) continue;
 
-      const prose = _extractASTTexts(conceptNode).join(" ");
-      const tools = _extractASTLists(conceptNode);
+      const prose = _extractTypes(conceptNode, ["text"]).join(" ");
+      const tools = _extractTypes(conceptNode, ["list"]);
 
       const description = tools.length ? `${prose} ${tools.map((t) => `• ${t}`).join(" ")}`.trim() : prose;
       const concept = { name: conceptNode.text, discipline: discNode.text, description };
@@ -3001,15 +2995,6 @@ write("crafting-concepts.json", parseCraftingConcepts());
 // H3/H4 concepts under the "Rituals" H1 preamble (before "Ritual Magic" H1).
 
 console.log("\nParsing ritual concepts...");
-
-function _extractASTTextAndCells(node) {
-  let texts = [];
-  for (const c of node.children || []) {
-    if (c.type === "text" || c.type === "cell") texts.push(c.text);
-    if (c.type === "heading") texts.push(..._extractASTTextAndCells(c));
-  }
-  return texts;
-}
 
 function _walkRitualConcepts(node, out, noiseSet) {
   if (node.type === "heading" && (node.level === 3 || node.level === 4) && node.text && !noiseSet.has(node.text)) {
@@ -3030,7 +3015,7 @@ function _walkRitualConcepts(node, out, noiseSet) {
     const headingChildren = node.children.filter((c) => c.type === "heading" && !noiseSet.has(c.text));
     for (const sub of headingChildren) {
       // A subConcept's description includes all deeper text/cells
-      const subProse = _extractASTTextAndCells(sub).join(" ");
+      const subProse = _extractTypes(sub, ["text", "cell"]).join(" ");
       subConcepts.push({ name: sub.text, description: subProse });
     }
 
