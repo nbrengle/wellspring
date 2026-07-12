@@ -299,7 +299,7 @@
         "accent": "Divine",
         "effect": "Grant, Imbue",
         "prerequisites": null,
-        "description": "Once per Long Rest, the character may perform an act of expression (singing, dancing, drawing, etc.) with up to 6 other characters for a minimum of 1 minute. Upon completion, the character may deliver up to 2 of the following to each participant:"
+        "description": "Once per Long Rest, the character may perform an act of expression (singing, dancing, drawing, etc.) with up to 6 other characters for a minimum of 1 minute. Upon completion, the character may deliver up to 2 of the following to each participant: • “Grant Protect vs Mind” • “Imbue Touch with Heal 1 to Dying” • “Imbue Cure [Condition, chosen when Imbued] to Self” • “Grant 3 Barrier”"
       },
       {
         "name": "Poetry in Motion",

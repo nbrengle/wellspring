@@ -155,6 +155,27 @@ function parseHTML() {
 
 const nodes = parseHTML();
 
+// Converts a flat slice of nodes into a nested tree based on heading levels.
+function buildTreeFromRange(startIndex, endIndex) {
+  const root = { type: "root", level: 0, children: [] };
+  const stack = [root];
+
+  for (let i = startIndex; i < endIndex; i++) {
+    const node = nodes[i];
+    if (node.type === "heading") {
+      const headingNode = { ...node, children: [] };
+      while (stack.length > 1 && stack[stack.length - 1].level >= headingNode.level) {
+        stack.pop();
+      }
+      stack[stack.length - 1].children.push(headingNode);
+      stack.push(headingNode);
+    } else {
+      stack[stack.length - 1].children.push(node);
+    }
+  }
+  return root;
+}
+
 // ─── DEMOTED POWER HEADING RECOVERY ──────────────────────────────────────────
 // In the current Google Docs export, several power entries are styled to LOOK
 // like H4 headings (bold, same font as their siblings) but the underlying HTML
@@ -180,8 +201,7 @@ const nodes = parseHTML();
 for (let i = 0; i < nodes.length; i++) {
   const n = nodes[i];
   if (n.type !== "heading" || !n.text) continue;
-  if (n.level !== 2 && n.level !== 3) continue;
-  const looksLikeProse = n.text.length > 80 && /[.!?]\s*$/.test(n.text);
+  const looksLikeProse = n.text.length > 60 && /[.”!?]\s*$/.test(n.text);
   if (looksLikeProse) nodes[i] = { type: "text", text: n.text };
 }
 
@@ -204,8 +224,13 @@ const inDivineDomains = (idx) =>
 for (let i = 0; i < nodes.length; i++) {
   const n = nodes[i];
   if (n.type !== "text") continue;
-  if (!DEMOTED_POWER_TIERED.test(n.text) && !DEMOTED_POWER_DOMAIN.test(n.text)) continue;
-  // Confirm the next text node is a power stat-block field.
+
+  const isTiered = DEMOTED_POWER_TIERED.test(n.text);
+  const isDomain = DEMOTED_POWER_DOMAIN.test(n.text);
+  if (!isTiered && !isDomain) continue;
+
+  // Confirm the next text node is a power stat-block field, UNLESS it's a domain power
+  // (which sometimes have no stat fields and are just "Name - N BP").
   let next = null;
   for (let j = i + 1; j < Math.min(nodes.length, i + 4); j++) {
     if (nodes[j].type === "text") {
@@ -213,7 +238,9 @@ for (let i = 0; i < nodes.length; i++) {
       break;
     }
   }
-  if (!next || !POWER_STAT_FIELD.test(next.text)) continue;
+
+  if (isTiered && (!next || !POWER_STAT_FIELD.test(next.text))) continue;
+
   // Domain powers (H3) when inside Divine Domains; class powers (H4) otherwise.
   const level = inDivineDomains(i) ? 3 : 4;
   nodes[i] = { type: "heading", level, text: n.text };
@@ -1966,50 +1993,48 @@ function parseDivineDomains() {
   const end = findHeading("Wellspring Economy Overview", 1, start);
   const opposed = parseOpposedDomains();
 
-  // Devotion accents table: H2 "Devotion Accents" → cell pairs
+  const tree = buildTreeFromRange(start, end);
+  const h1Node = tree.children.find((c) => c.type === "heading" && c.level === 1);
+  if (!h1Node) return [];
+
   const accents = {};
-  const accH2 = nodes.findIndex(
-    (n, i) => i > start && i < end && n.type === "heading" && n.level === 2 && n.text === "Devotion Accents",
-  );
-  if (accH2 !== -1) {
-    const accEnd = nodes.findIndex((n, i) => i > accH2 && n.type === "heading" && n.level <= 2);
-    const cells = nodes
-      .slice(accH2 + 1, accEnd === -1 ? end : Math.min(accEnd, end))
-      .filter((n) => n.type === "cell")
-      .map((n) => n.text);
+  const accH2 = h1Node.children.find((c) => c.type === "heading" && c.level === 2 && c.text === "Devotion Accents");
+  if (accH2) {
+    const cells = accH2.children.filter((n) => n.type === "cell").map((n) => n.text);
     for (let i = 0; i + 1 < cells.length; i += 2) accents[cells[i]] = cells[i + 1];
   }
 
   const domains = [];
-  let i = start + 1;
-  while (i < end) {
-    const n = nodes[i];
-    if (n.type !== "heading" || n.level !== 2 || !n.text || n.text === "Devotion Accents") {
-      i++;
-      continue;
-    }
+
+  for (const n of h1Node.children) {
+    if (n.type !== "heading" || n.level !== 2 || !n.text || n.text === "Devotion Accents") continue;
 
     const rawName = n.text;
-    // "Energy: [Acid, Flame, Ice, or Lightning]" → name "Energy"
     const name = rawName.replace(/^Energy:.*$/, "Energy").trim();
-    const domEnd = nodes.findIndex((m, j) => j > i && m.type === "heading" && m.level <= 2);
-    const dEnd = domEnd === -1 ? end : Math.min(domEnd, end);
 
-    // Powers: H3 or bold text "Name - N BP" pattern
     const DOMAIN_PWR = /-\s*\d+\s*BP\s*$/i;
     const isPwr = (x) =>
       (x.type === "heading" && x.level <= 4 && DOMAIN_PWR.test(x.text)) ||
       (x.type === "text" && DOMAIN_PWR.test(x.text) && x.text.length < 100);
 
     const powers = [];
-    let j = i + 1;
-    while (j < dEnd) {
-      const m = nodes[j];
+    let j = 0;
+    while (j < n.children.length) {
+      const m = n.children[j];
       if (isPwr(m)) {
-        const pwrEnd = nodes.findIndex((x, k) => k > j && ((x.type === "heading" && x.level <= 2) || isPwr(x)));
-        const bodyNodes = nodes
-          .slice(j + 1, pwrEnd === -1 ? dEnd : Math.min(pwrEnd, dEnd))
-          .filter((x) => x.type === "text");
+        const isHeading = m.type === "heading";
+        let bodyNodes;
+        let nextIndex;
+
+        if (isHeading) {
+          bodyNodes = m.children.filter((x) => x.type === "text" || x.type === "list");
+          nextIndex = j + 1; // Since it's a heading, its body is inside its children array!
+        } else {
+          const pwrEnd = n.children.findIndex((x, k) => k > j && ((x.type === "heading" && x.level <= 2) || isPwr(x)));
+          nextIndex = pwrEnd === -1 ? n.children.length : pwrEnd;
+          bodyNodes = n.children.slice(j + 1, nextIndex).filter((x) => x.type === "text" || x.type === "list");
+        }
+
         const header = m.text;
         const tierMatch = header.match(/\[(\w+)\]/);
         const costMatch = header.match(/-\s*(\d+)\s*BP\s*$/);
@@ -2017,11 +2042,11 @@ function parseDivineDomains() {
           .replace(/\[\w+\]/, "")
           .replace(/-\s*\d+\s*BP\s*$/, "")
           .trim();
+
         const { fields, description } = parsePowerNodes(bodyNodes);
+
         powers.push({
           name: pwrName,
-          // Domain powers are always powers — the `[Adept]`/`[Greater]` tag here gates
-          // ACCESS by devotion progression, it does not make the power a caster spell.
           type: "power",
           tier: tierMatch ? tierMatch[1] : null,
           cost: costMatch ? parseInt(costMatch[1]) : null,
@@ -2036,7 +2061,8 @@ function parseDivineDomains() {
           prerequisites: fields["prerequisite"] ?? fields["prerequisites"] ?? null,
           description,
         });
-        j = pwrEnd === -1 ? dEnd : Math.min(pwrEnd, dEnd);
+
+        j = nextIndex;
       } else {
         j++;
       }
@@ -2049,8 +2075,8 @@ function parseDivineDomains() {
       opposedBy: opposed[name] ?? null,
       powers,
     });
-    i = dEnd;
   }
+
   return domains;
 }
 
