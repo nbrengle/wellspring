@@ -333,7 +333,7 @@ export interface ResolvedStats {
     spikes?: number;
     armor?: number;
     naturalArmor?: number;
-    sources: { name: string; stat: string; n: number }[];
+    sources: { name: string; stat: string; amount: number }[];
     notes: { name: string; stat: string; text: string }[];
   };
 }

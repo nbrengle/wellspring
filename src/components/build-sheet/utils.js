@@ -40,7 +40,7 @@ export function sourceType(name) {
 export function statSources(stats, key) {
   return (stats?.mods?.sources || [])
     .filter((s) => s.stat === key)
-    .map((s) => ({ name: s.name, n: s.n, type: sourceType(s.name) }));
+    .map((s) => ({ name: s.name, amount: s.amount, type: sourceType(s.name) }));
 }
 
 export function statTitle(stats, key, label) {
@@ -48,7 +48,7 @@ export function statTitle(stats, key, label) {
   if (!srcs.length) return label;
   const baseKey = key === "lifePoints" ? "baseLifePoints" : key === "spikes" ? "baseSpikes" : null;
   const base = baseKey != null ? stats[baseKey] : 0;
-  const parts = srcs.map((s) => `+${s.n} ${s.name}`);
+  const parts = srcs.map((s) => `+${s.amount} ${s.name}`);
   return `${label}: ${base ? `${base} base ` : ""}${parts.join(", ")}`;
 }
 

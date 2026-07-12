@@ -1,5 +1,6 @@
 import type { BucketedView, GraphItem, Entity, Flaw, Power, Spell, Perk, Skill, ViewState } from "../types.js";
 import type { CharacterGraphModel } from "./model.js";
+import { composeDisplayName } from "./model.js";
 import { CLASSES } from "../data.js";
 
 function isEntity<T extends Entity>(entity: Entity | null, type: T["type"]): entity is T {
@@ -100,7 +101,7 @@ function createViewEntry<T extends Entity>(node: GraphItem, entity: T): T & View
     node.sourceType === "innate" ||
     (node.effects && node.effects.some((e) => e.type === "REFUND_BESTOW"));
   const paramValue = node.param ?? (entity.parameter || undefined);
-  const displayName = paramValue && !node.name.includes(paramValue) ? `${node.name} (${paramValue})` : node.name;
+  const displayName = composeDisplayName(node.name, paramValue);
 
   let bestowedBy = node.bestowedBy;
   if (node.sourceType === "bestow" && !bestowedBy) {

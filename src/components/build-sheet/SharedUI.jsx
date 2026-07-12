@@ -75,7 +75,7 @@ export function StatWithSources({
                     <span className="b-stat-pop-name">{s.name}</span>
                   )}
                   <span className="b-stat-pop-n">
-                    {s.n >= 0 ? `+${s.n}` : s.n}
+                    {s.amount >= 0 ? `+${s.amount}` : s.amount}
                     {s.note ? <span className="b-stat-pop-note"> {s.note}</span> : null}
                   </span>
                 </li>
