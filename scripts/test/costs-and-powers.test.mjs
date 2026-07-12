@@ -1,6 +1,6 @@
 // costs-and-powers.test.mjs — split from scripts/test.mjs (hotspot split). Owns its own
 // imports so concurrent features don't collide on one shared import block.
-import { test, eq, ok, pSkills, isPurchased } from "./harness.mjs";
+import { test, eq, ok, purchasedSkills, isPurchased } from "./harness.mjs";
 import { makeChar } from "./make-char.mjs";
 import { validate, characterLevel } from "../../src/engine/validate.js";
 import {
@@ -169,7 +169,7 @@ test("a choice-gated grant does NOT grant every option for free (The Learned One
 
 // ─── discount sources: category, firstN, refund-if-free, cap ──────────────────
 test("Human Environmental Mastery discounts a Gathering skill by 1", () => {
-  const c = { lineage: "Human", lineageAdvantages: ["Environmental Mastery"], ...pSkills(["Forage I"]) };
+  const c = { lineage: "Human", lineageAdvantages: ["Environmental Mastery"], ...purchasedSkills(["Forage I"]) };
   const s = computeSpend(c);
   eq(s.byItem["skills:Forage I"].cost, 2, "Forage 3→2");
   eq(s.byItem["skills:Forage I"].discount.source, "Environmental Mastery", "source on chip");
@@ -178,7 +178,7 @@ test("Lost Wisdom of Many discounts only the first three Lore skills", () => {
   const c = {
     lineage: "Lost",
     lineageAdvantages: ["Wisdom of Many"],
-    ...pSkills(["Lore (History)", "Lore (Religion)", "Lore (Arcana)", "Lore (Nature)"]),
+    ...purchasedSkills(["Lore (History)", "Lore (Religion)", "Lore (Arcana)", "Lore (Nature)"]),
   };
   const s = computeSpend(c);
   eq(s.byItem["skills:Lore (History)"].cost, 1, "1st discounted");
@@ -276,7 +276,7 @@ test("shared powers are mechanically equivalent unless level-scaled", () => {
 
 // ─── xN on unlimited-ranks skills → distinct instances, not rank N ────────────
 // Purchased skills import into the skills[] bucket (source 'Purchased').
-const purchasedSkills = (c) => (c.skills || []).filter((s) => isPurchased(s.source)).map((s) => s.entityId);
+const extractPurchasedSkills = (c) => (c.skills || []).filter((s) => isPurchased(s.source)).map((s) => s.entityId);
 test("two distinct parameterized Lores are two separate purchased rows", () => {
   const c = makeChar("Mage 4", { add: ["Lore (Historical)", "Lore (Arcane)"] });
   const rows = (c.skills || []).filter((s) => isPurchased(s.source));
@@ -301,7 +301,7 @@ test("two Lores under Sharp Mind cost 1 each (per-instance discount), net 2", ()
 });
 test('finite-ranks "Extended Capacity - Novice" at rank 2 stays one row', () => {
   const c = makeChar("Mage 4", { add: [{ name: "Extended Capacity - Novice", ranks: 2 }] });
-  eq(purchasedSkills(c).length, 1, "single row");
+  eq(extractPurchasedSkills(c).length, 1, "single row");
 });
 
 // ─── tiered perks: cumulative cost + hard-enforced per-tier level gate ────────

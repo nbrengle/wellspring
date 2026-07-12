@@ -126,8 +126,9 @@ export function lbpState(character: CharacterState) {
   // that sublineage is selected.
   const missingRequired = lin.challenges.filter((c: ChosenItem) => {
     if (!c.required) return false;
-    const cSub = subKey(c.sublineage || "");
-    if (cSub && cSub !== "general" && cSub !== pickedSub) return false;
+    const characterSublineageKey = subKey(c.sublineage || "");
+    if (characterSublineageKey && characterSublineageKey !== "general" && characterSublineageKey !== pickedSub)
+      return false;
     return !challenges.some((x: ChosenItem) => x.baseName === c.baseName);
   });
 

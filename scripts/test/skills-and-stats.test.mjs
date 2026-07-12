@@ -1,6 +1,6 @@
 // skills-and-stats.test.mjs — split from scripts/test.mjs (hotspot split). Owns its own
 // imports so concurrent features don't collide on one shared import block.
-import { test, eq, ok, pSkills, isPurchased, Source } from "./harness.mjs";
+import { test, eq, ok, purchasedSkills, isPurchased, Source } from "./harness.mjs";
 import { makeChar } from "./make-char.mjs";
 import { validate, characterLevel } from "../../src/engine/validate.js";
 import {

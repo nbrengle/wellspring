@@ -261,15 +261,15 @@ export const REVERSE_LOOKUP = new Map();
 for (const recipe of RECIPES.values()) {
   const seenIngredients = new Set();
   for (const reqSet of recipe.requirements) {
-    for (const ingName of Object.keys(reqSet)) {
-      seenIngredients.add(ingName);
+    for (const ingredientName of Object.keys(reqSet)) {
+      seenIngredients.add(ingredientName);
     }
   }
-  for (const ingName of seenIngredients) {
-    if (!REVERSE_LOOKUP.has(ingName)) {
-      REVERSE_LOOKUP.set(ingName, []);
+  for (const ingredientName of seenIngredients) {
+    if (!REVERSE_LOOKUP.has(ingredientName)) {
+      REVERSE_LOOKUP.set(ingredientName, []);
     }
-    REVERSE_LOOKUP.get(ingName).push(recipe);
+    REVERSE_LOOKUP.get(ingredientName).push(recipe);
   }
 }
 
