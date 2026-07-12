@@ -2,7 +2,7 @@ import { ALLERGEN_AWARDS, allergenAward, lookupEntity } from "../../engine/data.
 import { EFFECT_EXTRACTORS } from "../extractors.js";
 import { paramInfo, paramReusable } from "../param-domain.js";
 import { bareSkill, cleanItemName, getClasses } from "../resolver.js";
-import { startingSkillGrants } from "../starting-choices.js";
+import { startingSkillBestows } from "../starting-choices.js";
 import type {
   CharacterChoice,
   CharacterState,
@@ -348,7 +348,7 @@ export function resolveCharacterGraph(charInput: CharacterState): CharacterGraph
   // Tax Evasion's wealth bonus is now a WEALTH effect on the Tax Evasion node itself
   // (see extractTaxEvasion) — no synthetic node, no `synthetic` source/field.
 
-  const grants = startingSkillGrants(character);
+  const grants = startingSkillBestows(character);
   let startingNodeIdx = 0;
   for (const node of items) {
     if (node.field === "skills" && node.sourceType === "class") {

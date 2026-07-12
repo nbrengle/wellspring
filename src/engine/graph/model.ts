@@ -3,7 +3,7 @@ import { cleanItemName } from "../resolver.js";
 import type { BPLedger, BucketedView, CharacterGraph, CharacterState, GraphItem, WealthReport } from "../types.js";
 import { BestowedAbility, PrereqReport, ResolvedStats } from "../types.js";
 import { buildBucketedView } from "./buckets.js";
-import { computeBestowedAbilitiesList, computeOwnedIds } from "./grants.js";
+import { computeBestowedAbilitiesList, computeOwnedIds } from "./bestows.js";
 import { computePrereqs, prereqStatusFor } from "./prereqs.js";
 import { computeSpend } from "./spend.js";
 import { computeStats } from "./stats.js";
