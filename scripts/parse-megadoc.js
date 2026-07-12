@@ -2005,67 +2005,45 @@ function parseDivineDomains() {
   }
 
   const domains = [];
-
   for (const n of h1Node.children) {
     if (n.type !== "heading" || n.level !== 2 || !n.text || n.text === "Devotion Accents") continue;
 
     const rawName = n.text;
     const name = rawName.replace(/^Energy:.*$/, "Energy").trim();
-
-    const DOMAIN_PWR = /-\s*\d+\s*BP\s*$/i;
-    const isPwr = (x) =>
-      (x.type === "heading" && x.level <= 4 && DOMAIN_PWR.test(x.text)) ||
-      (x.type === "text" && DOMAIN_PWR.test(x.text) && x.text.length < 100);
+    const DOMAIN_PWR_REGEX = /-\s*\d+\s*BP\s*$/i;
 
     const powers = [];
-    let j = 0;
-    while (j < n.children.length) {
-      const m = n.children[j];
-      if (isPwr(m)) {
-        const isHeading = m.type === "heading";
-        let bodyNodes;
-        let nextIndex;
+    for (const m of n.children) {
+      if (m.type !== "heading") continue;
+      if (!DOMAIN_PWR_REGEX.test(m.text)) continue;
 
-        if (isHeading) {
-          bodyNodes = m.children.filter((x) => x.type === "text" || x.type === "list");
-          nextIndex = j + 1; // Since it's a heading, its body is inside its children array!
-        } else {
-          const pwrEnd = n.children.findIndex((x, k) => k > j && ((x.type === "heading" && x.level <= 2) || isPwr(x)));
-          nextIndex = pwrEnd === -1 ? n.children.length : pwrEnd;
-          bodyNodes = n.children.slice(j + 1, nextIndex).filter((x) => x.type === "text" || x.type === "list");
-        }
+      const bodyNodes = m.children.filter((x) => x.type === "text" || x.type === "list");
+      const header = m.text;
+      const tierMatch = header.match(/\[(\w+)\]/);
+      const costMatch = header.match(/-\s*(\d+)\s*BP\s*$/);
+      const pwrName = header
+        .replace(/\[\w+\]/, "")
+        .replace(/-\s*\d+\s*BP\s*$/, "")
+        .trim();
 
-        const header = m.text;
-        const tierMatch = header.match(/\[(\w+)\]/);
-        const costMatch = header.match(/-\s*(\d+)\s*BP\s*$/);
-        const pwrName = header
-          .replace(/\[\w+\]/, "")
-          .replace(/-\s*\d+\s*BP\s*$/, "")
-          .trim();
+      const { fields, description } = parsePowerNodes(bodyNodes);
 
-        const { fields, description } = parsePowerNodes(bodyNodes);
-
-        powers.push({
-          name: pwrName,
-          type: "power",
-          tier: tierMatch ? tierMatch[1] : null,
-          cost: costMatch ? parseInt(costMatch[1]) : null,
-          incantation: fields["incantation"] ?? null,
-          call: fields["call"] ?? null,
-          target: fields["target"] ?? null,
-          duration: fields["duration"] ?? null,
-          delivery: fields["delivery"] ?? null,
-          refresh: fields["refresh"] ?? null,
-          accent: fields["accent"] ?? null,
-          effect: fields["effect"] ?? null,
-          prerequisites: fields["prerequisite"] ?? fields["prerequisites"] ?? null,
-          description,
-        });
-
-        j = nextIndex;
-      } else {
-        j++;
-      }
+      powers.push({
+        name: pwrName,
+        type: "power",
+        tier: tierMatch ? tierMatch[1] : null,
+        cost: costMatch ? parseInt(costMatch[1]) : null,
+        incantation: fields["incantation"] ?? null,
+        call: fields["call"] ?? null,
+        target: fields["target"] ?? null,
+        duration: fields["duration"] ?? null,
+        delivery: fields["delivery"] ?? null,
+        refresh: fields["refresh"] ?? null,
+        accent: fields["accent"] ?? null,
+        effect: fields["effect"] ?? null,
+        prerequisites: fields["prerequisite"] ?? fields["prerequisites"] ?? null,
+        description,
+      });
     }
 
     domains.push({
