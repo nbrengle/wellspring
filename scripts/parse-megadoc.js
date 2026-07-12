@@ -728,23 +728,24 @@ function parseClasses() {
 // (Martial tables carry a leading empty "Class" column; we key off the Level column
 // by finding the first numeric cell, so the leading column doesn't matter.)
 function parseProgressionTable(clsStart, clsEnd) {
-  const tableIdx = nodes.findIndex(
-    (n, i) =>
-      i > clsStart && i < clsEnd && n.type === "heading" && n.level === 2 && n.text === "Class Progression Table",
+  const tree = buildTreeFromRange(clsStart, clsEnd);
+  const classNode = tree.children[0];
+  if (!classNode || !classNode.children) return {};
+  const tableH2 = classNode.children.find(
+    (c) => c.type === "heading" && c.level === 2 && c.text === "Class Progression Table",
   );
-  if (tableIdx === -1) return {};
-  const tableEnd = nodes.findIndex((n, i) => i > tableIdx && n.type === "heading" && n.level <= 2);
-  const end = tableEnd === -1 ? clsEnd : Math.min(tableEnd, clsEnd);
+  if (!tableH2) return {};
 
   // Gather rows: arrays of cell texts split on 'rowEnd'.
   const rows = [];
   let cur = [];
-  for (let i = tableIdx + 1; i < end; i++) {
-    const n = nodes[i];
+  for (const n of tableH2.children) {
     if (n.type === "rowEnd") {
       if (cur.length) rows.push(cur);
       cur = [];
-    } else if (n.type === "cell") cur.push(n.text);
+    } else if (n.type === "cell") {
+      cur.push(n.text);
+    }
   }
   if (cur.length) rows.push(cur);
   if (!rows.length) return {};
@@ -1859,63 +1860,50 @@ function parseDevotionDomains(devNames) {
 }
 
 function parseDevotions() {
+  const devotionsStart = findHeading("Devotions & Divine Beings", 1);
   const divDomainsIdx = findHeading("Divine Domains", 1);
 
-  // Collect all H1s between "Devotions & Divine Beings" and "Divine Domains"
-  const devotionsStart = findHeading("Devotions & Divine Beings", 1);
-  // First pass: gather the devotion names so the domain-table splitter knows the
-  // row boundaries.
-  const names = [];
-  for (let j = devotionsStart + 1; j < divDomainsIdx; j++) {
-    const n = nodes[j];
-    if (n.type === "heading" && n.level === 1 && n.text) names.push(n.text.split(",")[0]);
-  }
+  const tree = buildTreeFromRange(devotionsStart, divDomainsIdx);
+  const devotionNodes = tree.children.slice(1); // skip "Devotions & Divine Beings"
+
+  const names = devotionNodes.map((n) => n.text.split(",")[0]);
   const domainMap = parseDevotionDomains(names);
   const results = [];
 
-  let i = devotionsStart + 1;
-  while (i < divDomainsIdx) {
-    const n = nodes[i];
-    if (n.type !== "heading" || n.level !== 1 || !n.text) {
-      i++;
-      continue;
-    }
-
+  for (const n of devotionNodes) {
     const name = n.text;
-    const devEnd = nodes.findIndex((m, j) => j > i && m.type === "heading" && m.level === 1);
-    const end = devEnd === -1 ? divDomainsIdx : Math.min(devEnd, divDomainsIdx);
-
-    const bodyNodes = nodes.slice(i + 1, end);
     const tenets = [];
     const loreParts = [];
     let colorScheme = "",
       iconography = "";
 
-    for (const bn of bodyNodes) {
-      if (bn.type === "list") {
-        tenets.push(...bn.items);
-        continue;
+    function walk(node) {
+      if (node.type === "list") {
+        tenets.push(...node.items);
+      } else if (node.type === "text") {
+        const t = node.text;
+        const cs = t.match(/^Devotion Color Scheme:\s*(.+)/i);
+        if (cs) {
+          colorScheme = cs[1].trim();
+        } else {
+          const ic = t.match(/^Common Iconography:\s*(.+)/i);
+          if (ic) {
+            iconography = ic[1].trim();
+          } else if (
+            !/^(Example Sigil:|The Truth|Truths|Divine Truths|Divine Demands|Guiding Principles|Guiding Beliefs|Laws|Lessons|Edicts|Codex|Church Principles):/.test(
+              t,
+            )
+          ) {
+            loreParts.push(t);
+          }
+        }
       }
-      if (bn.type !== "text") continue;
-      const t = bn.text;
-      const cs = t.match(/^Devotion Color Scheme:\s*(.+)/i);
-      if (cs) {
-        colorScheme = cs[1].trim();
-        continue;
+      if (node.children) {
+        for (const c of node.children) walk(c);
       }
-      const ic = t.match(/^Common Iconography:\s*(.+)/i);
-      if (ic) {
-        iconography = ic[1].trim();
-        continue;
-      }
-      if (
-        /^(Example Sigil:|The Truth|Truths|Divine Truths|Divine Demands|Guiding Principles|Guiding Beliefs|Laws|Lessons|Edicts|Codex|Church Principles):/.test(
-          t,
-        )
-      )
-        continue;
-      loreParts.push(t);
     }
+
+    for (const c of n.children) walk(c);
 
     // Match this devotion to its row in the domain table by base name (the table
     // uses short names like "Senri"; the H1 may be "Senri, Voice of Mercy").
@@ -1931,7 +1919,6 @@ function parseDevotions() {
       domains: dm.domains || [],
       locality: dm.locality || "",
     });
-    i = end;
   }
   return results;
 }
