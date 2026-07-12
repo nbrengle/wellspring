@@ -415,9 +415,9 @@ export function lineageRepOptions() {
 
 // Lost "Pick and Choose" (Fractured): may purchase ONE Lineage Advantage from
 // ANOTHER lineage. Returns every non-Lost advantage shaped for the read-pane picker:
-// { name (baseName), group (lineage), description, advId }. The chosen one is
-// recorded as "<Lineage> - <Advantage>" so the graph can resolve it cross-lineage
-// and apply its full effects (with prereqs still enforced).
+// { name (baseName), group (lineage), description, advId }. The chosen one is recorded
+// as the BARE advantage name (globally unique, #195) so the graph resolves it and
+// applies its full effects (with prereqs still enforced); `group` carries the lineage.
 export function pickAndChooseOptions() {
   const out: { name: string; group: string; description: string; advId: string }[] = [];
   for (const [lineage, lin] of Object.entries(LINEAGES)) {
@@ -429,7 +429,7 @@ export function pickAndChooseOptions() {
         group: lineage,
         description:
           ("description" in a ? (a as { description?: string }).description : (a as { desc?: string }).desc) || "",
-        advId: `${lineage} - ${name}`,
+        advId: name,
       });
     }
   }
@@ -475,7 +475,7 @@ const STAT_LABELS: Record<string, string> = {
   naturalArmor: "Natural Armor",
   wealth: "Wealth",
 };
-export function lineageItemImpact(item: Partial<Entity>, lineage: string | null | undefined) {
+export function lineageItemImpact(item: Partial<Entity>) {
   const spec = lineageChoiceSpec(item);
   if (spec?.kind === "cantrip") return ["grants a chosen cantrip (+slot to cast it)"];
   if (spec?.kind === "rep") return ["reps another lineage’s challenge for its LBP"];
@@ -499,10 +499,10 @@ export function lineageItemImpact(item: Partial<Entity>, lineage: string | null 
   }
   if (item.highestSlot) out.push("+1 highest spell-slot");
   if (item.wealthIncome?.n) out.push(`+${item.wealthIncome.n} Wealth`);
-  // Fixed grants (Telekinesis Power, Magical Resilience perk, …).
+  // Fixed grants (Telekinesis Power, Magical Resilience perk, …). Keyed on the bare
+  // advantage/challenge name now that REFS no longer concatenates the lineage (#195).
   const base = item.baseName || item.name;
-  const gid = lineage ? `advantages:${lineage} - ${base}` : null;
-  const grants = gid ? REFS.bestows?.[gid] || REFS.bestows?.[`challenges:${lineage} - ${base}`] : null;
+  const grants = REFS.bestows?.[`advantages:${base}`] || REFS.bestows?.[`challenges:${base}`] || null;
   for (const tid of grants || []) {
     const ent = lookupEntity(tid);
     out.push(`grants ${ent?.name || idNameLocal(tid)}`);
@@ -798,21 +798,21 @@ for (const c of classesJson) {
 }
 for (const d of domainsJson) for (const p of d.powers || []) powerEntities.push({ ...p, domain: d.name });
 indexEntities(powerEntities, "powers", { typed: true });
-// Lineage advantages AND challenges. Keyed "<type>:<Lineage> - <name>" to match how
-// the rules relations reference them (REFS.bestows/discounts) and how ownedBestowSources
-// builds the id — without this, grant/discount edges, descriptions, and the inspector
-// resolve to nothing. `...item` carries the lineage facets (sublineage, repped,
-// required, lbp, statMods, desc) straight onto the entity so they're browsable/
-// filterable; `lineage` is added so it's a first-class facet too. Challenges were
-// previously absent from the entity index entirely (so 105 of them were invisible to
-// the Rules Explorer); registering them here makes them browsable like advantages.
+// Lineage advantages AND challenges. Keyed on the BARE name ("advantages:Iron Touch"),
+// NOT "<Lineage> - <name>": the advantage/challenge name is globally unique across
+// lineages (verified — zero collisions), and `lineage` is carried as a first-class
+// FIELD, so concatenating it into the id was redundant (param-in-id anti-pattern, #195).
+// `...item` carries the lineage facets (sublineage, repped, required, lbp, statMods,
+// desc) onto the entity so they're browsable/filterable. Challenges were previously
+// absent from the entity index entirely (so 105 of them were invisible to the Rules
+// Explorer); registering them here makes them browsable like advantages.
 for (const lin of lineagesJson) {
   for (const a of lin.advantages || []) {
-    const id = `advantages:${lin.name} - ${a.name}`;
+    const id = `advantages:${a.name}`;
     ENTITY_INDEX.set(id, { ...a, id, type: "advantage", name: a.name, lineage: lin.name });
   }
   for (const c of lin.challenges || []) {
-    const id = `challenges:${lin.name} - ${c.name}`;
+    const id = `challenges:${c.name}`;
     ENTITY_INDEX.set(id, { ...c, id, type: "challenge", name: c.name, lineage: lin.name });
   }
 }

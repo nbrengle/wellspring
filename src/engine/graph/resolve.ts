@@ -194,7 +194,13 @@ export function resolveCharacterGraph(charInput: CharacterState): CharacterGraph
       const type = field === "lineageAdvantages" ? "advantages" : "challenges";
       let entityId = `${type}:${name}`;
       if (name === "Pick and Choose" && character.advantageChoices?.["Pick and Choose"]) {
-        entityId = `advantages:${character.advantageChoices["Pick and Choose"]}`;
+        // The stored value is the chosen advantage. New picks store the bare name
+        // ("Iron Touch", #195); legacy saves stored "<Lineage> - Iron Touch". Strip a
+        // leading "<Lineage> - " so both forms key off the bare (re-keyed) entity id and
+        // its REFS grant edge. Advantage names carry no " - ", so the split is safe.
+        const picked = character.advantageChoices["Pick and Choose"];
+        const bare = picked.includes(" - ") ? picked.slice(picked.indexOf(" - ") + 3) : picked;
+        entityId = `advantages:${bare}`;
       }
       const choice = { entityId, ranks: 1, source: Source.lineage() };
       addItem(choice);

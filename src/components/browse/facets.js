@@ -57,11 +57,12 @@ export const FACETS = [
 ];
 export const FACET_BY_ID = Object.fromEntries(FACETS.map((f) => [f.id, f]));
 
-// Lineage items resolve their game-effect facets under "<Lineage> - <name>"
-// (e.g. "challenges:Aewen - Mana Lines"); everything else under its bare name.
+// Lineage items resolve their game-effect facets under their BARE name (e.g.
+// "challenges:Mana Lines") — lineage is a field, not part of the id (#195). For
+// lineage entities the display name may carry a param suffix, so use baseName.
 function facetName(e) {
   if ((e.type === "advantages" || e.type === "challenges") && e.lineage) {
-    return `${e.lineage} - ${e.baseName || e.name}`;
+    return e.baseName || e.name;
   }
   return e.name;
 }
