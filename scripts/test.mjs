@@ -26,5 +26,6 @@ import "./test/starting-choices.test.mjs";
 import "./test/validation-coverage.test.mjs";
 import "./test/reducers.test.mjs";
 import "./test/character-add.test.mjs";
+import "./test/multiplicity-lock-in.test.mjs";
 
 report();
