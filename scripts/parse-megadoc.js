@@ -2960,48 +2960,51 @@ const RECIPE_FIELD_NOISE = new Set([
 function parseCraftingConcepts() {
   const craftingH1 = findHeading("Crafting (all)", 1);
   const ritualH1 = findHeading("Rituals", 1, craftingH1);
+  const end = ritualH1 === -1 ? nodes.length : ritualH1;
+
+  const tree = buildTreeFromRange(craftingH1, end);
+  const h1Node = tree.children.find((c) => c.type === "heading" && c.level === 1);
+  if (!h1Node) return [];
+
   const out = [];
+  const disciplines = new Set(["Alchemy", "Enchanting", "Tinkering"]);
 
-  const disciplines = ["Alchemy", "Enchanting", "Tinkering"];
-  for (const disc of disciplines) {
-    const discH1 = findHeading(disc, 1, craftingH1);
-    if (discH1 === -1 || discH1 >= ritualH1) continue;
-    const discEnd = nodes.findIndex((n, i) => i > discH1 && n.type === "heading" && n.level === 1);
-    const dEnd = discEnd === -1 ? ritualH1 : Math.min(discEnd, ritualH1);
+  for (const discNode of tree.children) {
+    if (discNode.type !== "heading" || discNode.level !== 1 || !disciplines.has(discNode.text)) continue;
 
-    // Concept H2s are those before the first recipe-list H2
-    const firstRecipeH2 = nodes.findIndex(
-      (n, i) => i > discH1 && i < dEnd && n.type === "heading" && n.level === 2 && RECIPE_SECTION_RE.test(n.text),
-    );
-    const conceptEnd = firstRecipeH2 === -1 ? dEnd : firstRecipeH2;
+    for (const conceptNode of discNode.children) {
+      if (conceptNode.type !== "heading" || conceptNode.level !== 2 || !conceptNode.text) continue;
+      if (RECIPE_SECTION_RE.test(conceptNode.text)) break; // Stop at recipe lists
+      if (RECIPE_FIELD_NOISE.has(conceptNode.text)) continue;
 
-    let i = discH1 + 1;
-    while (i < conceptEnd) {
-      const n = nodes[i];
-      if (n.type !== "heading" || n.level !== 2 || !n.text || RECIPE_FIELD_NOISE.has(n.text)) {
-        i++;
-        continue;
+      function extractAllTexts(node) {
+        let texts = [];
+        for (const c of node.children || []) {
+          if (c.type === "text") texts.push(c.text);
+          if (c.type === "heading") texts.push(...extractAllTexts(c));
+        }
+        return texts;
       }
 
-      const conceptH2End = nodes.findIndex((m, j) => j > i && m.type === "heading" && m.level <= 2);
-      const clampedConceptEnd = conceptH2End === -1 ? conceptEnd : Math.min(conceptH2End, conceptEnd);
+      function extractAllLists(node) {
+        let items = [];
+        for (const c of node.children || []) {
+          if (c.type === "list") items.push(...c.items);
+          if (c.type === "heading") items.push(...extractAllLists(c));
+        }
+        return items;
+      }
 
-      const subNodes = nodes.slice(i + 1, clampedConceptEnd);
-      const prose = subNodes
-        .filter((m) => m.type === "text")
-        .map((m) => m.text)
-        .join(" ");
-      const tools = subNodes.filter((m) => m.type === "list").flatMap((m) => m.items);
+      const prose = extractAllTexts(conceptNode).join(" ");
+      const tools = extractAllLists(conceptNode);
 
-      // Fold the list into the description so the detail pane reads complete (the
-      // list usually follows a "…the following:" colon). Keep `tools` for structure.
       const description = tools.length ? `${prose} ${tools.map((t) => `• ${t}`).join(" ")}`.trim() : prose;
-      const concept = { name: n.text, discipline: disc, description };
+      const concept = { name: conceptNode.text, discipline: discNode.text, description };
       if (tools.length) concept.tools = tools;
       out.push(concept);
-      i = clampedConceptEnd;
     }
   }
+
   return out;
 }
 
@@ -3031,66 +3034,64 @@ function parseRitualConcepts() {
     "Dark Territory Marshal Required",
   ]);
 
+  const tree = buildTreeFromRange(ritualsH1, end);
+  const h1Node = tree.children.find((c) => c.type === "heading" && c.level === 1);
+  if (!h1Node) return [];
+
   const out = [];
-  let i = ritualsH1 + 1;
-  while (i < end) {
-    const n = nodes[i];
-    if (n.type !== "heading" || (n.level !== 3 && n.level !== 4) || !n.text || RITUAL_FIELD_NOISE.has(n.text)) {
-      i++;
-      continue;
+
+  function extractAllTextAndCells(node) {
+    let texts = [];
+    for (const c of node.children || []) {
+      if (c.type === "text" || c.type === "cell") texts.push(c.text);
+      if (c.type === "heading") texts.push(...extractAllTextAndCells(c));
+    }
+    return texts;
+  }
+
+  function walk(node) {
+    if (
+      node.type === "heading" &&
+      (node.level === 3 || node.level === 4) &&
+      node.text &&
+      !RITUAL_FIELD_NOISE.has(node.text)
+    ) {
+      // It's a concept!
+      // Prose and bullets come from direct non-heading children (equivalent to slicing up to first deeper heading)
+      const proseNodes = node.children.filter((c) => c.type !== "heading");
+      const prose = proseNodes
+        .filter((m) => m.type === "text" || m.type === "cell")
+        .map((m) => m.text)
+        .join(" ");
+      const bullets = proseNodes.filter((m) => m.type === "list").flatMap((m) => m.items);
+      const fullDesc = bullets.length ? `${prose} ${bullets.map((b) => `• ${b}`).join(" ")}`.trim() : prose;
+
+      const concept = { name: node.text, description: fullDesc };
+      if (bullets.length) concept.bullets = bullets;
+
+      const subConcepts = [];
+      const headingChildren = node.children.filter((c) => c.type === "heading" && !RITUAL_FIELD_NOISE.has(c.text));
+      for (const sub of headingChildren) {
+        // A subConcept's description includes all deeper text/cells
+        const subProse = extractAllTextAndCells(sub).join(" ");
+        subConcepts.push({ name: sub.text, description: subProse });
+      }
+
+      if (subConcepts.length) concept.subConcepts = subConcepts;
+      out.push(concept);
+
+      // We don't recurse into children of a concept, because we just processed its subConcepts.
+      return;
     }
 
-    const conceptEnd = nodes.findIndex((m, j) => j > i && m.type === "heading" && m.level <= n.level);
-    const clampedConceptEnd = conceptEnd === -1 ? end : Math.min(conceptEnd, end);
-
-    // Description = prose between this heading and its first deeper child
-    // (so children like H4 "Primary Ritualist" under H3 "Ritualists" aren't
-    // swallowed into the parent's description).
-    const firstChild = nodes.findIndex(
-      (m, j) => j > i && j < clampedConceptEnd && m.type === "heading" && m.level > n.level,
-    );
-    const proseEnd = firstChild === -1 ? clampedConceptEnd : firstChild;
-    const proseNodes = nodes.slice(i + 1, proseEnd);
-    // A concept's body may include a small table (e.g. Ritual Point Options): fold
-    // 'cell' text into the prose alongside 'text' nodes so it isn't lost.
-    const prose = proseNodes
-      .filter((m) => m.type === "text" || m.type === "cell")
-      .map((m) => m.text)
-      .join(" ");
-    const bullets = proseNodes.filter((m) => m.type === "list").flatMap((m) => m.items);
-
-    // Sub-concepts: deeper headings inside this concept's range.
-    const subConcepts = [];
-    let k = firstChild === -1 ? clampedConceptEnd : firstChild;
-    while (k < clampedConceptEnd) {
-      const m = nodes[k];
-      if (m.type === "heading" && m.level > n.level && m.text && !RITUAL_FIELD_NOISE.has(m.text)) {
-        const subEnd = nodes.findIndex((x, l) => l > k && x.type === "heading" && x.level <= m.level);
-        const sEnd = subEnd === -1 ? clampedConceptEnd : Math.min(subEnd, clampedConceptEnd);
-        subConcepts.push({
-          name: m.text,
-          description: nodes
-            .slice(k + 1, sEnd)
-            .filter((x) => x.type === "text" || x.type === "cell")
-            .map((x) => x.text)
-            .join(" "),
-        });
-        k = sEnd;
-      } else {
-        k++;
+    if (node.children) {
+      for (const child of node.children) {
+        walk(child);
       }
     }
-
-    // Fold the bullet list into the description so the detail pane reads complete
-    // (the list often follows a "…below:" colon). Keep `bullets` too for any
-    // structured use.
-    const fullDesc = bullets.length ? `${prose} ${bullets.map((b) => `• ${b}`).join(" ")}`.trim() : prose;
-    const concept = { name: n.text, description: fullDesc };
-    if (bullets.length) concept.bullets = bullets;
-    if (subConcepts.length) concept.subConcepts = subConcepts;
-    out.push(concept);
-    i = clampedConceptEnd;
   }
+
+  walk(h1Node);
   return out;
 }
 
