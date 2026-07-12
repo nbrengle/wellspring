@@ -15,13 +15,18 @@ export function extractParam(rawName: string): string | null {
   return m ? m[1].trim() : null;
 }
 
+/** The base already carries its parameter — either a trailing "(…)" group or the param
+ *  text present inline — so appending would double it up. */
+function baseCarriesParam(base: string, param: string): boolean {
+  return /\([^)]*\)\s*$/.test(base) || base.includes(param);
+}
+
 /** The display form for a parameterized row: `base (param)`. Composes the base entity
  *  name with the chosen parameter, but leaves the base untouched when there's no param
- *  or the base already carries one (a trailing "(…)" group, or the param text already
- *  present) — so we never double-append. The one place base+param display is built;
- *  resolve (node + flaw rows) and buckets (view rows) all route through here. */
+ *  or the base already carries one — so we never double-append. The one place base+param
+ *  display is built; resolve (node + flaw rows) and buckets (view rows) route through here. */
 export function composeDisplayName(base: string, param: string | null | undefined): string {
-  if (!param || /\([^)]*\)\s*$/.test(base) || base.includes(param)) return base;
+  if (!param || baseCarriesParam(base, param)) return base;
   return `${base} (${param})`;
 }
 
