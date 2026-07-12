@@ -239,6 +239,20 @@ function buildNodes(character: CharacterState): GraphItem[] {
   return items;
 }
 
+// The BP a flaw awards: a parameterized allergy reads its per-substance award (falling
+// back to the table's minimum when the chosen substance is unknown); an ordinary flaw
+// carries a flat `bp`. Unresolved / non-flaw entities award nothing.
+function flawAward(ent: Entity | null, param: string | null): number {
+  if (!ent) return 0;
+  const allergenBase = ent.baseName || ent.name;
+  const allergenTable = allergenBase ? ALLERGEN_AWARDS[allergenBase] : undefined;
+  if (allergenTable) {
+    const chosen = allergenAward(allergenBase, param);
+    return chosen != null ? chosen : Math.min(...Object.values(allergenTable));
+  }
+  return ent.type === "flaw" ? ent.bp : 0;
+}
+
 // PASS 2 — flaw nodes. Flaws award BP (a negative baseCost + FLAW_AWARD effect); a
 // parameterized flaw (Mild Allergy → substance) resolves its award from the allergen
 // table keyed on the chosen value. Appends to the node list in place.
@@ -250,17 +264,7 @@ function addFlawNodes(character: CharacterState, items: GraphItem[]): void {
     // Param is the FIELD (fallback to any inline "(value)" in legacy data). The award
     // for a parameterized flaw (Mild Allergy → substance) is keyed on the chosen value.
     const param = choice.parameter ?? extractParam(rawName);
-    let bp = 0;
-    if (ent) {
-      const allergenBase = ent.baseName || ent.name;
-      const allergenTable = allergenBase ? ALLERGEN_AWARDS[allergenBase] : undefined;
-      if (allergenTable) {
-        const chosen = allergenAward(allergenBase, param);
-        bp = chosen != null ? chosen : Math.min(...Object.values(allergenTable));
-      } else if (ent.type === "flaw") {
-        bp = ent.bp;
-      }
-    }
+    const bp = flawAward(ent, param);
     items.push({
       id: ent?.id || `flaws:${cleanName}`,
       name: ent?.name ? composeDisplayName(ent.name, param) : cleanName,
@@ -281,28 +285,34 @@ function addFlawNodes(character: CharacterState, items: GraphItem[]): void {
 type IdentityGroup = { cap: number; nodes: GraphItem[] };
 type IdentityGroups = Map<string, IdentityGroup>;
 
-// PASS 3 — group nodes by dedupe identity and flag purchases beyond the cap with
-// OVER_CAP. Returns the identity groups so the bestow pass can extend them (a bestow
-// coinciding with a purchase at cap refunds the purchase). Lineage rows don't dedupe.
-function applyCaps(items: GraphItem[]): IdentityGroups {
-  const itemIdentities: IdentityGroups = new Map();
+// Group nodes by dedupe identity (lineage rows don't dedupe).
+function groupByIdentity(items: GraphItem[]): IdentityGroups {
+  const groups: IdentityGroups = new Map();
   for (const it of items) {
     if (it.sourceType === "lineage") continue;
     const { key, cap } = getIdentity(it.rawString || it.name, it.entity, it.param);
-    if (!itemIdentities.has(key)) itemIdentities.set(key, { cap, nodes: [] });
-    itemIdentities.get(key)!.nodes.push(it);
+    const group = groups.get(key) ?? { cap, nodes: [] };
+    group.nodes.push(it);
+    groups.set(key, group);
   }
+  return groups;
+}
 
-  for (const group of itemIdentities.values()) {
-    const purchases = group.nodes.filter((n) => n.sourceType === "purchased");
-    if (purchases.length > group.cap) {
-      for (const surplus of purchases.slice(group.cap)) {
-        surplus.effects = surplus.effects || [];
-        surplus.effects.push({ type: "OVER_CAP", cap: group.cap });
-      }
-    }
+// Flag the purchases beyond an identity's cap with OVER_CAP (the surplus takings).
+function flagOverCap(group: IdentityGroup): void {
+  const purchases = group.nodes.filter((n) => n.sourceType === "purchased");
+  for (const surplus of purchases.slice(group.cap)) {
+    surplus.effects.push({ type: "OVER_CAP", cap: group.cap });
   }
-  return itemIdentities;
+}
+
+// PASS 3 — group nodes by dedupe identity and flag over-cap purchases. Returns the
+// groups so the bestow pass can extend them (a bestow coinciding with a purchase at cap
+// refunds the purchase).
+function applyCaps(items: GraphItem[]): IdentityGroups {
+  const groups = groupByIdentity(items);
+  for (const group of groups.values()) flagOverCap(group);
+  return groups;
 }
 
 // Resolve a bestow target id to its entity, retrying the bare name against the common
