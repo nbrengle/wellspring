@@ -460,6 +460,16 @@ export function validate(character: CharacterState) {
   const beyondProgression = getClasses(character).some(
     (c) => CLASS_POWER_SLOTS[c.name] && c.level > maxProgressionLevel(c.name),
   );
+  // A build is valid when no failing check fires: unmet prereqs, over BP budget, over
+  // slots, a skill below its granted floor, an unresolved entity (bad saved data), or
+  // an overspent lineage LBP budget.
+  const valid =
+    !prereqs.issues.length &&
+    !overBudget &&
+    !slotsOver &&
+    !belowFloor &&
+    !owned.unresolved.length &&
+    (!lbp || lbp.valid);
   return {
     level,
     budget,
@@ -499,13 +509,7 @@ export function validate(character: CharacterState) {
     beyondProgression,
     legalMinLevel,
     levelCap: LEVEL_CAP,
-    valid:
-      !prereqs.issues.length &&
-      !overBudget &&
-      !slotsOver &&
-      !belowFloor &&
-      !owned.unresolved.length &&
-      (!lbp || lbp.valid),
+    valid,
   };
 }
 
