@@ -1,5 +1,6 @@
 // scripts/test-rules-enforcement.mjs
 import { validate } from "../src/engine/validate.js";
+import { computeSpend } from "../src/engine/testing.js";
 import { REFS } from "../src/engine/data.js";
 import { makeChar } from "./test/make-char.mjs";
 import { readFileSync } from "node:fs";
@@ -238,17 +239,21 @@ for (const [id, others] of Object.entries(REFS.excludes || {})) {
   }
 }
 
-// 6. Verify no-duplicate-power enforcement (the general rule behind ECT's "the
-//    Power cannot be one the character already has"). Selecting a power twice must
-//    be flagged; selecting it once must not.
-console.log("\nChecking no-duplicate-power enforcement...");
+// 6. No-duplicate-power: the rule "the Power cannot be one the character already has"
+//    is enforced at ACQUISITION (the picker blocks re-taking an owned power), not as a
+//    validation error. A power is one ability (identity = name); a redundant copy — only
+//    reachable via a bad import — is ABSORBED (deduped, no extra cost), never charged
+//    twice. So the invariant to verify is: a doubled power costs no more than a single.
+console.log("\nChecking no-duplicate-power absorption...");
 {
-  const dup = validate(makeChar("Fighter 4", { lineage: "Human", add: ["Parry Blow", "Parry Blow"] }));
-  const dupFlagged = dup.prereqs.issues.some((i) => i.duplicate && i.item === "Parry Blow");
-  if (!dupFlagged) reportGap("Duplicate-Power", "Parry Blow", "Selecting the same power twice is not flagged.");
-  const single = validate(makeChar("Fighter 4", { lineage: "Human", add: ["Parry Blow"] }));
-  if (single.prereqs.issues.some((i) => i.duplicate)) {
-    reportGap("Duplicate-Power", "Parry Blow", "Flagged a duplicate while the power was selected only once.");
+  const single = computeSpend(makeChar("Fighter 4", { lineage: "Human", add: ["Parry Blow"] }));
+  const dup = computeSpend(makeChar("Fighter 4", { lineage: "Human", add: ["Parry Blow", "Parry Blow"] }));
+  if (dup.net !== single.net) {
+    reportGap(
+      "Duplicate-Power",
+      "Parry Blow",
+      `A redundant copy changed BP (single=${single.net}, dup=${dup.net}) — not absorbed.`,
+    );
   }
 }
 

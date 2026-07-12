@@ -349,8 +349,6 @@ export interface PrereqIssue {
   anyOf?: { id: string; name: string }[][];
   /** The specific entity this item requires (structured, for tests/consumers). */
   requiresEntity?: string;
-  /** How many times a once-only item was taken (>1 flags the duplicate). */
-  duplicate?: number;
   /** The entity this item is mutually exclusive with. */
   excludes?: string;
 }
