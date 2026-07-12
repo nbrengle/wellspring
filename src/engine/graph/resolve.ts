@@ -71,11 +71,41 @@ export function normalizeCharacter(character: CharacterState): CharacterState {
   return { ...character, classes, powers, devotions };
 }
 
-export function resolveCharacterGraph(charInput: CharacterState): CharacterGraphModel {
-  const character = normalizeCharacter(charInput);
+// The dedupe identity of a taking: its cap and the key that collapses "the same thing
+// taken twice". Shared by the cap pass (purchase surplus → OVER_CAP) and the bestow pass
+// (a bestow at cap refunds a coinciding purchase). Lifted to module scope so both passes
+// read one definition.
+function getIdentity(rawName: string, ent: Entity | null, param?: string | null) {
+  const clean = cleanItemName(rawName);
+  const entityId = ent?.id || rawName;
+  const cap = getMaxRanks(entityId);
+  const info = paramInfo(ent);
+  const reusable = paramReusable(ent, entityId);
+  const baseName = (ent?.baseName || ent?.name || bareSkill(clean)).toLowerCase();
+
+  // Take-once entities (cap 1) have ONE identity regardless of parameter — the
+  // param is flavor on the single instance, not a distinguisher. e.g. Weapon
+  // Specialization (Swords) and (Axes) are the SAME identity, so a second one is
+  // redundant (free BP). Without this, a parameterized cap-1 entity keyed by
+  // base|param wrongly kept both. (Param distinguishes only when cap > 1.)
+  if (cap <= 1) return { key: baseName, cap };
+
+  // No param, or param is payload (reusable) → identity is the base; the cap
+  // governs how many total takings are kept.
+  if (!info || reusable) return { key: baseName, cap };
+
+  // Parameterized, multi-rank, not reusable (Lore, …) → param distinguishes
+  // distinct instances, each capped at one. Read the structured node.param,
+  // falling back to the entity's param label only if absent.
+  const paramValue = (param ?? ent?.parameter ?? "unknown").toLowerCase();
+  return { key: `${baseName}|${paramValue}`, cap: 1 };
+}
+
+// PASS 1 — build a graph node for every stored taking (skills/perks/powers/spells/
+// devotions/lineage), resolving the entity, cost, effects, provenance, and display name.
+// The `originalIndex` bookkeeping preserves per-bucket positional order for removal.
+function buildNodes(character: CharacterState): GraphItem[] {
   const items: GraphItem[] = [];
-  const charLevel = characterLevel(character);
-  const classes = getClasses(character);
   const addItem = (choice: CharacterChoice) => {
     // The ENTITY is choice.entityId (bare — "Lore", never "Lore (Historical)"): all
     // rules data (REFS grants/prereqs/discounts, cost) is keyed on the bare id, so we
@@ -203,6 +233,13 @@ export function resolveCharacterGraph(charInput: CharacterState): CharacterGraph
     }
   }
 
+  return items;
+}
+
+// PASS 2 — flaw nodes. Flaws award BP (a negative baseCost + FLAW_AWARD effect); a
+// parameterized flaw (Mild Allergy → substance) resolves its award from the allergen
+// table keyed on the chosen value. Appends to the node list in place.
+function addFlawNodes(character: CharacterState, items: GraphItem[]): void {
   for (const choice of character.flaws || []) {
     const rawName = choice.entityId.replace(/^flaws:/i, "");
     const cleanName = cleanItemName(rawName);
@@ -236,33 +273,15 @@ export function resolveCharacterGraph(charInput: CharacterState): CharacterGraph
       choiceData: choice,
     });
   }
+}
 
-  const getIdentity = (rawName: string, ent: Entity | null, param?: string | null) => {
-    const clean = cleanItemName(rawName);
-    const entityId = ent?.id || rawName;
-    const cap = getMaxRanks(entityId);
-    const info = paramInfo(ent);
-    const reusable = paramReusable(ent, entityId);
-    const baseName = (ent?.baseName || ent?.name || bareSkill(clean)).toLowerCase();
+type IdentityGroups = Map<string, { cap: number; nodes: GraphItem[] }>;
 
-    // Take-once entities (cap 1) have ONE identity regardless of parameter — the
-    // param is flavor on the single instance, not a distinguisher. e.g. Weapon
-    // Specialization (Swords) and (Axes) are the SAME identity, so a second one is
-    // redundant (free BP). Without this, a parameterized cap-1 entity keyed by
-    // base|param wrongly kept both. (Param distinguishes only when cap > 1.)
-    if (cap <= 1) return { key: baseName, cap };
-
-    // No param, or param is payload (reusable) → identity is the base; the cap
-    // governs how many total takings are kept.
-    if (!info || reusable) return { key: baseName, cap };
-
-    // Parameterized, multi-rank, not reusable (Lore, …) → param distinguishes
-    // distinct instances, each capped at one. Read the structured node.param,
-    // falling back to the entity's param label only if absent.
-    const paramValue = (param ?? ent?.parameter ?? "unknown").toLowerCase();
-    return { key: `${baseName}|${paramValue}`, cap: 1 };
-  };
-  const itemIdentities = new Map<string, { cap: number; nodes: GraphItem[] }>();
+// PASS 3 — group nodes by dedupe identity and flag purchases beyond the cap with
+// OVER_CAP. Returns the identity groups so the bestow pass can extend them (a bestow
+// coinciding with a purchase at cap refunds the purchase). Lineage rows don't dedupe.
+function applyCaps(items: GraphItem[]): IdentityGroups {
+  const itemIdentities: IdentityGroups = new Map();
   for (const it of items) {
     if (it.sourceType === "lineage") continue;
     const { key, cap } = getIdentity(it.rawString || it.name, it.entity, it.param);
@@ -279,7 +298,14 @@ export function resolveCharacterGraph(charInput: CharacterState): CharacterGraph
       }
     }
   }
+  return itemIdentities;
+}
 
+// PASS 4 — expand BESTOW_SOURCE effects into real bestow nodes, respecting caps: a
+// bestow that would exceed the identity's cap is dropped, refunding any coinciding
+// purchase (the bestow wins, the purchase becomes free). Mutates `items` and the
+// identity groups in place.
+function expandBestows(items: GraphItem[], itemIdentities: IdentityGroups): void {
   for (const node of [...items]) {
     for (const eff of node.effects) {
       if (eff.type !== "BESTOW_SOURCE") continue;
@@ -346,10 +372,12 @@ export function resolveCharacterGraph(charInput: CharacterState): CharacterGraph
       }
     }
   }
+}
 
-  // Tax Evasion's wealth bonus is now a WEALTH effect on the Tax Evasion node itself
-  // (see extractTaxEvasion) — no synthetic node, no `synthetic` source/field.
-
+// PASS 5 — patch class-granted starting skills with their specialty/floor. The grants
+// are positional (indexed over the class-sourced skill nodes in order), so this walks
+// those nodes and stamps the matching floor/specialty from startingSkillBestows.
+function patchStartingSkills(character: CharacterState, items: GraphItem[]): void {
   const grants = startingSkillBestows(character);
   let startingNodeIdx = 0;
   for (const node of items) {
@@ -359,6 +387,18 @@ export function resolveCharacterGraph(charInput: CharacterState): CharacterGraph
       startingNodeIdx++;
     }
   }
+}
 
-  return new CharacterGraphModel(character, items, charLevel, classes);
+export function resolveCharacterGraph(charInput: CharacterState): CharacterGraphModel {
+  const character = normalizeCharacter(charInput);
+
+  const items = buildNodes(character);
+  addFlawNodes(character, items);
+  const itemIdentities = applyCaps(items);
+  expandBestows(items, itemIdentities);
+  // Tax Evasion's wealth bonus is a WEALTH effect on the Tax Evasion node itself (see
+  // extractTaxEvasion) — no synthetic node, no `synthetic` source/field, so no pass here.
+  patchStartingSkills(character, items);
+
+  return new CharacterGraphModel(character, items, characterLevel(character), getClasses(character));
 }
