@@ -104,23 +104,35 @@ function getIdentity(rawName: string, ent: Entity | null, param?: string | null)
 // PASS 1 — build a graph node for every stored taking (skills/perks/powers/spells/
 // devotions/lineage), resolving the entity, cost, effects, provenance, and display name.
 // The `originalIndex` bookkeeping preserves per-bucket positional order for removal.
+// Resolve a choice's entityId to its entity. Rules data is keyed on the BARE id
+// ("Lore", not "Lore (Historical)"), so we look that up; if the stored id wasn't fully
+// qualified, retry the bare name against the common collections.
+function resolveChoiceEntity(entityId: string, cleanName: string, bareName: string): Entity | null {
+  const direct = lookupEntity(entityId);
+  if (direct) return direct;
+  return (
+    lookupEntity(`skills:${bareName}`) || lookupEntity(`perks:${cleanName}`) || lookupEntity(`powers:${cleanName}`)
+  );
+}
+
+// A choice's base BP cost: a tiered entity sums the costs of the tiers it has ranks
+// for; a flat-cost entity is cost (or lineage lbp) × rank.
+function baseCostOf(ent: Entity | null, rank: number): number {
+  if (Array.isArray(ent?.tiers) && ent.tiers.length) {
+    const n = Math.min(rank, ent.tiers.length);
+    return ent.tiers.slice(0, n).reduce((s, t) => s + (t.cost || 0), 0);
+  }
+  return (typeof ent?.cost === "number" ? ent.cost : ent?.lbp || 0) * rank;
+}
+
 function buildNodes(character: CharacterState): GraphItem[] {
   const items: GraphItem[] = [];
   const addItem = (choice: CharacterChoice) => {
-    // The ENTITY is choice.entityId (bare — "Lore", never "Lore (Historical)"): all
-    // rules data (REFS grants/prereqs/discounts, cost) is keyed on the bare id, so we
-    // look THAT up. The `parameter` FIELD is used only to (a) build the display name
-    // and (b) distinguish instances for dedupe — never to resolve the entity.
-    let ent = lookupEntity(choice.entityId);
     const rawName = choice.entityId.replace(/^[a-z]+:/i, "");
     const cleanName = cleanItemName(rawName);
-    const bareName = bareSkill(cleanName);
-
-    // Fallback if entityId wasn't fully qualified
-    if (!ent) {
-      ent =
-        lookupEntity(`skills:${bareName}`) || lookupEntity(`perks:${cleanName}`) || lookupEntity(`powers:${cleanName}`);
-    }
+    // The `parameter` FIELD builds the display name and distinguishes instances for
+    // dedupe — it is never used to resolve the entity.
+    const ent = resolveChoiceEntity(choice.entityId, cleanName, bareSkill(cleanName));
 
     // Display form = the entity's name + the chosen parameter (the FIELD). Derived
     // for the row's label / instance key; NOT an entity lookup key. Only a real
@@ -129,22 +141,13 @@ function buildNodes(character: CharacterState): GraphItem[] {
     // lineage-qualified "Underkin - Iron Touch") would be mangled (composeDisplayName
     // leaves a base that already carries parens untouched). `param` (used for dedup)
     // still falls back to extractParam for any legacy inline-param data.
-    const baseDisplay = ent?.name || cleanName;
-    const displayName = composeDisplayName(baseDisplay, choice.parameter);
+    const displayName = composeDisplayName(ent?.name || cleanName, choice.parameter);
     const param = choice.parameter ?? extractParam(rawName);
 
     const rank = choice.ranks || 1;
+    const baseCost = baseCostOf(ent, rank);
+
     const effects: Effect[] = [];
-
-    // Extract Base Cost
-    let baseCost = 0;
-    if (Array.isArray(ent?.tiers) && ent.tiers.length) {
-      const n = Math.min(rank, ent.tiers.length);
-      baseCost = ent.tiers.slice(0, n).reduce((s, t) => s + (t.cost || 0), 0);
-    } else {
-      baseCost = (typeof ent?.cost === "number" ? ent.cost : ent?.lbp || 0) * rank;
-    }
-
     const entityId = ent?.id || choice.entityId;
     for (const extractor of EFFECT_EXTRACTORS) {
       effects.push(...extractor(ent, character, entityId));
@@ -275,7 +278,8 @@ function addFlawNodes(character: CharacterState, items: GraphItem[]): void {
   }
 }
 
-type IdentityGroups = Map<string, { cap: number; nodes: GraphItem[] }>;
+type IdentityGroup = { cap: number; nodes: GraphItem[] };
+type IdentityGroups = Map<string, IdentityGroup>;
 
 // PASS 3 — group nodes by dedupe identity and flag purchases beyond the cap with
 // OVER_CAP. Returns the identity groups so the bestow pass can extend them (a bestow
@@ -301,75 +305,73 @@ function applyCaps(items: GraphItem[]): IdentityGroups {
   return itemIdentities;
 }
 
-// PASS 4 — expand BESTOW_SOURCE effects into real bestow nodes, respecting caps: a
-// bestow that would exceed the identity's cap is dropped, refunding any coinciding
-// purchase (the bestow wins, the purchase becomes free). Mutates `items` and the
-// identity groups in place.
+// Resolve a bestow target id to its entity, retrying the bare name against the common
+// collections when the qualified id misses.
+function resolveBestowEntity(bestowId: string, rawBestowName: string): Entity | null {
+  const direct = lookupEntity(bestowId);
+  if (direct) return direct;
+  const clean = cleanItemName(rawBestowName);
+  return lookupEntity(`skills:${clean}`) || lookupEntity(`powers:${clean}`) || lookupEntity(`perks:${clean}`);
+}
+
+// Bestows + purchases already filling the identity's cap: the bestow is redundant and
+// dropped, but it still WINS over a coinciding purchase — refund that purchase so it
+// becomes free. Returns true when the bestow was absorbed (caller skips node creation).
+function absorbBestowAtCap(group: IdentityGroup, bestowedBy: string): boolean {
+  const owned = group.nodes.filter((n) => n.sourceType === "bestow" || n.sourceType === "purchased").length;
+  if (owned < group.cap) return false;
+  const purchasedNode = group.nodes.find(
+    (n) => n.sourceType === "purchased" && !n.effects?.some((e) => e.type === "REFUND_BESTOW"),
+  );
+  purchasedNode?.effects.push({ type: "REFUND_BESTOW", source: bestowedBy });
+  return true;
+}
+
+// Add one bestowed node (or absorb it at cap) for a single BESTOW_SOURCE target.
+function applyBestow(bestowId: string, source: GraphItem, items: GraphItem[], itemIdentities: IdentityGroups): void {
+  const bestowType = bestowId.slice(0, bestowId.indexOf(":"));
+  const rawBestowName = bestowId.slice(bestowId.indexOf(":") + 1);
+  const ent = resolveBestowEntity(bestowId, rawBestowName);
+  const bestowName = ent?.name || rawBestowName;
+
+  const { key, cap } = getIdentity(bestowName, ent, extractParam(rawBestowName));
+  let group = itemIdentities.get(key);
+  if (!group) {
+    group = { cap, nodes: [] };
+    itemIdentities.set(key, group);
+  }
+
+  if (absorbBestowAtCap(group, source.name)) return;
+
+  const newBestow: GraphItem = {
+    id: ent?.id || bestowId,
+    name: bestowName,
+    rawString: bestowName,
+    param: extractParam(bestowName),
+    field: toGraphField(bestowType),
+    sourceType: "bestow",
+    bestowedBy: source.name,
+    bestowKind: source.sourceType,
+    cls: source.cls ?? source.entity?.parentClass ?? null,
+    rank: 1,
+    baseCost: 0,
+    entity: ent,
+    effects: [],
+    specialty: null,
+    floor: 0,
+    index: -1,
+  };
+  items.push(newBestow);
+  group.nodes.push(newBestow);
+}
+
+// PASS 4 — expand BESTOW_SOURCE effects into real bestow nodes (cap-aware; see
+// applyBestow). Mutates `items` and the identity groups in place.
 function expandBestows(items: GraphItem[], itemIdentities: IdentityGroups): void {
   for (const node of [...items]) {
     for (const eff of node.effects) {
       if (eff.type !== "BESTOW_SOURCE") continue;
-      for (const bestowId of eff.bestows) {
-        let ent = lookupEntity(bestowId);
-        const bestowType = bestowId.slice(0, bestowId.indexOf(":"));
-        const rawBestowName = bestowId.slice(bestowId.indexOf(":") + 1);
-        if (!ent) {
-          const clean = cleanItemName(rawBestowName);
-          ent = lookupEntity(`skills:${clean}`) || lookupEntity(`powers:${clean}`) || lookupEntity(`perks:${clean}`);
-        }
-
-        const bestowName = ent?.name || rawBestowName;
-        const { key, cap } = getIdentity(bestowName, ent, extractParam(rawBestowName));
-
-        let group = itemIdentities.get(key);
-        if (!group) {
-          group = { cap, nodes: [] };
-          itemIdentities.set(key, group);
-        }
-
-        // Check if we are at cap with bestows + purchases
-        const bestowCount = group.nodes.filter((n) => n.sourceType === "bestow").length;
-        const purchaseCount = group.nodes.filter((n) => n.sourceType === "purchased").length;
-
-        if (bestowCount + purchaseCount >= cap) {
-          // At cap. The bestow wins, so refund a coinciding purchase if one exists.
-          const purchasedNode = group.nodes.find(
-            (n) => n.sourceType === "purchased" && !n.effects?.some((e) => e.type === "REFUND_BESTOW"),
-          );
-          if (purchasedNode) {
-            purchasedNode.effects = purchasedNode.effects || [];
-            purchasedNode.effects.push({ type: "REFUND_BESTOW", source: node.name });
-          }
-          // At cap: the bestow is redundant and is dropped (not added as a node).
-          // This is correct for cost — a bestow's baseCost is 0, so "free BP equal to
-          // its cost" is 0; there's no BP to recover. If a PURCHASE shared the key it
-          // was refunded above (the bestow wins, the purchase becomes free). With no
-          // purchase (e.g. two classes bestowing the same skill) the duplicate simply
-          // collapses to the single kept node.
-          continue;
-        }
-
-        const newBestow: GraphItem = {
-          id: ent?.id || bestowId,
-          name: bestowName,
-          rawString: bestowName,
-          param: extractParam(bestowName),
-          field: toGraphField(bestowType),
-          sourceType: "bestow",
-          bestowedBy: node.name,
-          bestowKind: node.sourceType,
-          cls: node.cls ?? node.entity?.parentClass ?? null,
-          rank: 1,
-          baseCost: 0,
-          entity: ent,
-          effects: [],
-          specialty: null,
-          floor: 0,
-          index: -1,
-        };
-        items.push(newBestow);
-        group.nodes.push(newBestow);
-      }
+      for (const bestowId of eff.bestows) applyBestow(bestowId, node, items, itemIdentities);
     }
   }
 }
