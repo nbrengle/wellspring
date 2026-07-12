@@ -1,14 +1,4 @@
-import type {
-  BucketedView,
-  GraphItem,
-  Entity,
-  Flaw,
-  Power,
-  Spell,
-  Perk,
-  Skill,
-  ViewState,
-} from "../types.js";
+import type { BucketedView, GraphItem, Entity, Flaw, Power, Spell, Perk, Skill, ViewState } from "../types.js";
 import type { CharacterGraphModel } from "./model.js";
 import { CLASSES } from "../data.js";
 
@@ -47,7 +37,12 @@ export function buildBucketedView(graph: CharacterGraphModel): BucketedView {
   // instead of pushing a stub, record it on `unresolved` so validation can surface it.
   const pushInto = <T extends Entity>(bucket: (T & ViewState)[], node: GraphItem, type: T["type"]) => {
     if (!isEntity<T>(node.entity, type)) {
-      view.unresolved.push({ entityId: node.entityId ?? node.id, name: node.name, sourceType: node.sourceType, field: node.field });
+      view.unresolved.push({
+        entityId: node.entityId ?? node.id,
+        name: node.name,
+        sourceType: node.sourceType,
+        field: node.field,
+      });
       return;
     }
     bucket.push(createViewEntry(node, node.entity));
