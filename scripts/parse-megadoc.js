@@ -728,23 +728,24 @@ function parseClasses() {
 // (Martial tables carry a leading empty "Class" column; we key off the Level column
 // by finding the first numeric cell, so the leading column doesn't matter.)
 function parseProgressionTable(clsStart, clsEnd) {
-  const tableIdx = nodes.findIndex(
-    (n, i) =>
-      i > clsStart && i < clsEnd && n.type === "heading" && n.level === 2 && n.text === "Class Progression Table",
+  const tree = buildTreeFromRange(clsStart, clsEnd);
+  const classNode = tree.children[0];
+  if (!classNode || !classNode.children) return {};
+  const tableH2 = classNode.children.find(
+    (c) => c.type === "heading" && c.level === 2 && c.text === "Class Progression Table",
   );
-  if (tableIdx === -1) return {};
-  const tableEnd = nodes.findIndex((n, i) => i > tableIdx && n.type === "heading" && n.level <= 2);
-  const end = tableEnd === -1 ? clsEnd : Math.min(tableEnd, clsEnd);
+  if (!tableH2) return {};
 
   // Gather rows: arrays of cell texts split on 'rowEnd'.
   const rows = [];
   let cur = [];
-  for (let i = tableIdx + 1; i < end; i++) {
-    const n = nodes[i];
+  for (const n of tableH2.children) {
     if (n.type === "rowEnd") {
       if (cur.length) rows.push(cur);
       cur = [];
-    } else if (n.type === "cell") cur.push(n.text);
+    } else if (n.type === "cell") {
+      cur.push(n.text);
+    }
   }
   if (cur.length) rows.push(cur);
   if (!rows.length) return {};
