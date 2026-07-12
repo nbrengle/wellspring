@@ -57,7 +57,6 @@ export function computePrereqs(graph: CharacterGraphModel): PrereqReport {
           id,
           item: node.name,
           field: node.field,
-          tierLevel: need,
           tier: rank,
           text: `tier ${rank} requires character level ${need}`,
         });
