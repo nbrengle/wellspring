@@ -2980,9 +2980,9 @@ function parseCraftingConcepts() {
       }
 
       const conceptH2End = nodes.findIndex((m, j) => j > i && m.type === "heading" && m.level <= 2);
-      const cEnd = conceptH2End === -1 ? conceptEnd : Math.min(conceptH2End, conceptEnd);
+      const clampedConceptEnd = conceptH2End === -1 ? conceptEnd : Math.min(conceptH2End, conceptEnd);
 
-      const subNodes = nodes.slice(i + 1, cEnd);
+      const subNodes = nodes.slice(i + 1, clampedConceptEnd);
       const prose = subNodes
         .filter((m) => m.type === "text")
         .map((m) => m.text)
@@ -2995,7 +2995,7 @@ function parseCraftingConcepts() {
       const concept = { name: n.text, discipline: disc, description };
       if (tools.length) concept.tools = tools;
       out.push(concept);
-      i = cEnd;
+      i = clampedConceptEnd;
     }
   }
   return out;
@@ -3037,13 +3037,15 @@ function parseRitualConcepts() {
     }
 
     const conceptEnd = nodes.findIndex((m, j) => j > i && m.type === "heading" && m.level <= n.level);
-    const cEnd = conceptEnd === -1 ? end : Math.min(conceptEnd, end);
+    const clampedConceptEnd = conceptEnd === -1 ? end : Math.min(conceptEnd, end);
 
     // Description = prose between this heading and its first deeper child
     // (so children like H4 "Primary Ritualist" under H3 "Ritualists" aren't
     // swallowed into the parent's description).
-    const firstChild = nodes.findIndex((m, j) => j > i && j < cEnd && m.type === "heading" && m.level > n.level);
-    const proseEnd = firstChild === -1 ? cEnd : firstChild;
+    const firstChild = nodes.findIndex(
+      (m, j) => j > i && j < clampedConceptEnd && m.type === "heading" && m.level > n.level,
+    );
+    const proseEnd = firstChild === -1 ? clampedConceptEnd : firstChild;
     const proseNodes = nodes.slice(i + 1, proseEnd);
     // A concept's body may include a small table (e.g. Ritual Point Options): fold
     // 'cell' text into the prose alongside 'text' nodes so it isn't lost.
@@ -3055,12 +3057,12 @@ function parseRitualConcepts() {
 
     // Sub-concepts: deeper headings inside this concept's range.
     const subConcepts = [];
-    let k = firstChild === -1 ? cEnd : firstChild;
-    while (k < cEnd) {
+    let k = firstChild === -1 ? clampedConceptEnd : firstChild;
+    while (k < clampedConceptEnd) {
       const m = nodes[k];
       if (m.type === "heading" && m.level > n.level && m.text && !RITUAL_FIELD_NOISE.has(m.text)) {
         const subEnd = nodes.findIndex((x, l) => l > k && x.type === "heading" && x.level <= m.level);
-        const sEnd = subEnd === -1 ? cEnd : Math.min(subEnd, cEnd);
+        const sEnd = subEnd === -1 ? clampedConceptEnd : Math.min(subEnd, clampedConceptEnd);
         subConcepts.push({
           name: m.text,
           description: nodes
@@ -3083,7 +3085,7 @@ function parseRitualConcepts() {
     if (bullets.length) concept.bullets = bullets;
     if (subConcepts.length) concept.subConcepts = subConcepts;
     out.push(concept);
-    i = cEnd;
+    i = clampedConceptEnd;
   }
   return out;
 }

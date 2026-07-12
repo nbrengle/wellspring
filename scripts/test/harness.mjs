@@ -37,9 +37,9 @@ export function ok(cond, msg = "") {
 // Build the skills bucket (source 'Purchased') from skill names (or
 // {name,ranks}). Purchased skills are native (CharacterChoice[]), so a test
 // that used to pass `purchasedSkills: ['Lore (Arcane)']` now spreads
-// `...pSkills(['Lore (Arcane)'])` into the character literal. The engine keys
+// `...purchasedSkills(['Lore (Arcane)'])` into the character literal. The engine keys
 // these under the `skills:` prefix in the BP ledger.
-export function pSkills(names) {
+export function purchasedSkills(names) {
   return {
     skills: names.map((n) =>
       typeof n === "string"
@@ -50,9 +50,9 @@ export function pSkills(names) {
 }
 
 // Same, for the perks bucket (source 'Purchased'). A test that used to pass
-// `purchasedPerks: ['Toughness']` now spreads `...pPerks(['Toughness'])`. The BP
+// `purchasedPerks: ['Toughness']` now spreads `...purchasedPerks(['Toughness'])`. The BP
 // ledger keys these under the `purchasedPerks:` prefix.
-export function pPerks(names) {
+export function purchasedPerks(names) {
   return {
     perks: names.map((n) =>
       typeof n === "string"

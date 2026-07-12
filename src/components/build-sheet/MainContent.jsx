@@ -459,14 +459,14 @@ export function ClassifiedRows({ rows, resolveType, showClass }) {
         // Cost is attached to the row by validate() (from the BP ledger).
         const cost = row.cost;
         const refundEff = row.effects?.find((e) => e.type === "REFUND_BESTOW");
-        const mcRefund = report?.multiclassBestows?.freeBPItems?.find(
+        const multiclassRefund = report?.multiclassBestows?.freeBPItems?.find(
           (f) => f.skill === bareSkill(cleanItemName(name)),
         );
-        const refundedBy = refundEff?.source || mcRefund?.source;
-        const refundedBP = refundEff ? cost?.base || 0 : mcRefund?.bp || 0;
+        const refundedBy = refundEff?.source || multiclassRefund?.source;
+        const refundedBP = refundEff ? cost?.base || 0 : multiclassRefund?.bp || 0;
 
         const canRemove =
-          (sourceType === "purchased" || sourceType === "flaw") && index >= 0 && !refundEff && !mcRefund;
+          (sourceType === "purchased" || sourceType === "flaw") && index >= 0 && !refundEff && !multiclassRefund;
         const rank = cost?.rank || (index >= 0 ? character.ranks?.[field]?.[index] : null) || 1;
 
         const baseName = bareSkill(cleanItemName(name));
@@ -546,8 +546,8 @@ export function ClassifiedRows({ rows, resolveType, showClass }) {
                     </>
                   );
                 })()
-              : cost && !(refundEff || mcRefund) && <CostBadge cost={cost} />}
-            {(refundEff || mcRefund) && (
+              : cost && !(refundEff || multiclassRefund) && <CostBadge cost={cost} />}
+            {(refundEff || multiclassRefund) && (
               <span
                 className="b-row-badge b-badge-refund"
                 title={`BP spent on this item was refunded because you received it for free from ${refundedBy}`}

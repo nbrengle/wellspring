@@ -204,8 +204,8 @@ export function classifyOwnedItems(character: CharacterState) {
   // Purchased skills; bestowed (free) skills are their own block, matching the sheet.
   const skills = [...b.skills];
   const bestowedSkills = [...b.bestowedSkills];
-  const mcBestows = multiclassBestows(character).skills;
-  for (const mc of mcBestows) {
+  const multiclassGrants = multiclassBestows(character).skills;
+  for (const mc of multiclassGrants) {
     // A multiclass free skill is bestowed (by the secondary class), so it belongs in the
     // Bestowed/Free block with a real `bestow` provenance — NOT the old sourceType
     // "multiclass", which never matched any consumer (see the fixed MainContent check).
@@ -350,8 +350,8 @@ export function validate(character: CharacterState) {
   // Base budget plus DERIVED "free BP" (redundant multiclass grants award free BP
   // equal to the skill's cost). Derived from the classes, not a cached field, so
   // it's correct for any character (built, imported, or hand-edited).
-  const mcBestows = multiclassBestows(resolved);
-  const freeBP = mcBestows.freeBP;
+  const multiclassGrants = multiclassBestows(resolved);
+  const freeBP = multiclassGrants.freeBP;
   // "Approved backstories provide the character with 2 additional BP." Opt-in
   // (plot-team approval), so it's a flag on the character that lifts the base
   // budget by a fixed +2 rather than free spend.
@@ -464,7 +464,7 @@ export function validate(character: CharacterState) {
     budget,
     freeBP,
     backstoryBP,
-    multiclassBestows: mcBestows,
+    multiclassBestows: multiclassGrants,
     bonusBudget,
     maxBudget,
     _graph: graph,

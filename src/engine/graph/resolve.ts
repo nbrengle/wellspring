@@ -281,17 +281,17 @@ export function resolveCharacterGraph(charInput: CharacterState): CharacterGraph
   for (const node of [...items]) {
     for (const eff of node.effects) {
       if (eff.type !== "BESTOW_SOURCE") continue;
-      for (const gid of eff.bestows) {
-        let ent = lookupEntity(gid);
-        const gType = gid.slice(0, gid.indexOf(":"));
-        const rawGidName = gid.slice(gid.indexOf(":") + 1);
+      for (const bestowId of eff.bestows) {
+        let ent = lookupEntity(bestowId);
+        const bestowType = bestowId.slice(0, bestowId.indexOf(":"));
+        const rawBestowName = bestowId.slice(bestowId.indexOf(":") + 1);
         if (!ent) {
-          const clean = cleanItemName(rawGidName);
+          const clean = cleanItemName(rawBestowName);
           ent = lookupEntity(`skills:${clean}`) || lookupEntity(`powers:${clean}`) || lookupEntity(`perks:${clean}`);
         }
 
-        const gName = ent?.name || rawGidName;
-        const { key, cap } = getIdentity(gName, ent, extractParam(rawGidName));
+        const bestowName = ent?.name || rawBestowName;
+        const { key, cap } = getIdentity(bestowName, ent, extractParam(rawBestowName));
 
         let group = itemIdentities.get(key);
         if (!group) {
@@ -322,11 +322,11 @@ export function resolveCharacterGraph(charInput: CharacterState): CharacterGraph
         }
 
         const newBestow: GraphItem = {
-          id: ent?.id || gid,
-          name: gName,
-          rawString: gName,
-          param: extractParam(gName),
-          field: toGraphField(gType),
+          id: ent?.id || bestowId,
+          name: bestowName,
+          rawString: bestowName,
+          param: extractParam(bestowName),
+          field: toGraphField(bestowType),
           sourceType: "bestow",
           bestowedBy: node.name,
           bestowKind: node.sourceType,

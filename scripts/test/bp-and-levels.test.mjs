@@ -1,6 +1,6 @@
 // bp-and-levels.test.mjs — split from scripts/test.mjs (hotspot split). Owns its own
 // imports so concurrent features don't collide on one shared import block.
-import { test, eq, ok, pSkills, Source } from "./harness.mjs";
+import { test, eq, ok, purchasedSkills, Source } from "./harness.mjs";
 import { makeChar } from "./make-char.mjs";
 import { validate, characterLevel } from "../../src/engine/validate.js";
 import {

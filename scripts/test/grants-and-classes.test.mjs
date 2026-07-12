@@ -1,6 +1,6 @@
 // grants-and-classes.test.mjs — split from scripts/test.mjs (hotspot split). Owns its own
 // imports so concurrent features don't collide on one shared import block.
-import { test, eq, ok, pSkills, Source } from "./harness.mjs";
+import { test, eq, ok, purchasedSkills, Source } from "./harness.mjs";
 import { makeChar } from "./make-char.mjs";
 import { validate, characterLevel } from "../../src/engine/validate.js";
 import {
@@ -131,7 +131,7 @@ test("book spells (Bookcaster grant) do not consume spells-known slots", () => {
   eq(row.used, 1, "only the class-slot spell counts; the book spell does not");
 });
 test("divine and arcane spells count against their own class (multiclass)", () => {
-  const cNov = CLASS_POWERS["Cleric"].noviceSpells[0].name;
+  const clericNoviceSpells = CLASS_POWERS["Cleric"].noviceSpells[0].name;
   const mNov = CLASS_POWERS["Mage"].noviceSpells[0].name;
   const c = {
     classes: [
@@ -139,7 +139,7 @@ test("divine and arcane spells count against their own class (multiclass)", () =
       { name: "Mage", level: 4 },
     ],
     spells: [
-      { entityId: "spells:" + cNov, source: Source.class("Cleric"), costField: "noviceSpells" },
+      { entityId: "spells:" + clericNoviceSpells, source: Source.class("Cleric"), costField: "noviceSpells" },
       { entityId: "spells:" + mNov, source: Source.class("Mage"), costField: "noviceSpells" },
     ],
   };

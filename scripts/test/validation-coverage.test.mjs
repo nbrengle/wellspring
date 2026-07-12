@@ -1,6 +1,6 @@
 // validation-coverage.test.mjs — split from scripts/test.mjs (hotspot split). Owns its own
 // imports so concurrent features don't collide on one shared import block.
-import { test, eq, ok, pSkills, Source } from "./harness.mjs";
+import { test, eq, ok, purchasedSkills, Source } from "./harness.mjs";
 import { makeChar } from "./make-char.mjs";
 import { validate, characterLevel } from "../../src/engine/validate.js";
 import {
@@ -178,14 +178,14 @@ test("parameterized skills satisfy prerequisites and undergo prerequisite checki
   // 1. Lore (Historical) satisfies Research prerequisite (Lore)
   let c = {
     classes: [{ name: "Mage", level: 4 }],
-    ...pSkills(["Lore (Historical)", "Research"]),
+    ...purchasedSkills(["Lore (Historical)", "Research"]),
   };
   eq(validate(c).prereqs.issues.length, 0, "Lore (Historical) satisfies Research");
 
   // 2. Profession - Journeyman (Smith) requires Profession - Apprentice
   c = {
     classes: [{ name: "Mage", level: 4 }],
-    ...pSkills(["Profession - Journeyman (Smith)"]),
+    ...purchasedSkills(["Profession - Journeyman (Smith)"]),
   };
   const issues = validate(c).prereqs.issues;
   eq(issues.length, 1, "fails missing apprentice prerequisite");
@@ -246,14 +246,14 @@ test("effect coverage G3: Extensive Combat Training slot grants", () => {
   // Fighter L4 with Extensive Combat Training - Basic x1 -> basic +1
   const basicECT = {
     classes: [{ name: "Fighter", level: 4 }],
-    ...pSkills(["Extensive Combat Training - Basic"]),
+    ...purchasedSkills(["Extensive Combat Training - Basic"]),
   };
   eq(getSlot(validate(basicECT), "basic"), 3, "ECT Basic grants +1 basic slot");
 
   // Fighter L4 with Extensive Combat Training - Advanced x1 -> advanced +1 (since Adept tier maps to advanced)
   const advECT = {
     classes: [{ name: "Fighter", level: 4 }],
-    ...pSkills(["Extensive Combat Training - Advanced"]),
+    ...purchasedSkills(["Extensive Combat Training - Advanced"]),
   };
   eq(getSlot(validate(advECT), "advanced"), 1, "ECT Advanced grants +1 advanced slot");
 });
