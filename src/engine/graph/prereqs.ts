@@ -332,27 +332,13 @@ export function checkPowerRequirements(graph: CharacterGraphModel): {
     }
   }
 
-  const powerCounts = new Map<string, number>();
-  for (const node of graph.items) {
-    // Bestowed/granted powers don't count toward the "taken once" duplicate check — they
-    // aren't purchases. (This guard was dead: the graph sourceType is "bestow", never the
-    // stored spelling "bestowed", so bestowed copies were wrongly counted before.)
-    if (!isPowerlike(node.entity?.type) || node.sourceType === "bestow") continue;
-    const name = cleanItemName(node.name);
-    if (!name) continue;
-    powerCounts.set(name, (powerCounts.get(name) || 0) + 1);
-  }
-  for (const [name, count] of powerCounts) {
-    if (count > 1) {
-      issues.push({
-        id: `powers:${name}`,
-        item: name,
-        field: "powers",
-        duplicate: count,
-        text: `selected ${count} times — a power may only be taken once`,
-      });
-    }
-  }
+  // Duplicate powers are not re-derived here. A power is one ABILITY (identity = name);
+  // "having it twice" is never an illegal build — a grant coinciding with a purchase is
+  // refunded to free by the resolve reconciliation, and a redundant non-purchase copy
+  // (only reachable via a bad import; the picker blocks re-taking an owned power) simply
+  // dedups. The one real error — buying more PURCHASES of a cap-limited thing than its
+  // cap allows — is produced once by the resolve identity pass as OVER_CAP and reported
+  // by the OVER_CAP reader above. Skills and powers now follow the same rule.
   return { issues, notes: [] };
 }
 

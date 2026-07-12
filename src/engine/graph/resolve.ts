@@ -299,12 +299,12 @@ export function resolveCharacterGraph(charInput: CharacterState): CharacterGraph
           itemIdentities.set(key, group);
         }
 
-        // Check if we are at cap with grants + purchases
+        // Check if we are at cap with bestows + purchases
         const bestowCount = group.nodes.filter((n) => n.sourceType === "bestow").length;
         const purchaseCount = group.nodes.filter((n) => n.sourceType === "purchased").length;
 
         if (bestowCount + purchaseCount >= cap) {
-          // We are at cap. Grant wins, so refund a purchase if one exists
+          // At cap. The bestow wins, so refund a coinciding purchase if one exists.
           const purchasedNode = group.nodes.find(
             (n) => n.sourceType === "purchased" && !n.effects?.some((e) => e.type === "REFUND_BESTOW"),
           );
@@ -312,12 +312,12 @@ export function resolveCharacterGraph(charInput: CharacterState): CharacterGraph
             purchasedNode.effects = purchasedNode.effects || [];
             purchasedNode.effects.push({ type: "REFUND_BESTOW", source: node.name });
           }
-          // At cap: the grant is redundant and is dropped (not added as a node).
-          // This is correct for cost — a grant's baseCost is 0, so "free BP equal to
+          // At cap: the bestow is redundant and is dropped (not added as a node).
+          // This is correct for cost — a bestow's baseCost is 0, so "free BP equal to
           // its cost" is 0; there's no BP to recover. If a PURCHASE shared the key it
-          // was refunded above (grant wins, purchase becomes free). With no purchase
-          // (e.g. two classes granting the same skill) the duplicate simply collapses
-          // to the single kept node.
+          // was refunded above (the bestow wins, the purchase becomes free). With no
+          // purchase (e.g. two classes bestowing the same skill) the duplicate simply
+          // collapses to the single kept node.
           continue;
         }
 
