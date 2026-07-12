@@ -2083,94 +2083,90 @@ function parseLineages() {
   const start = findHeading("Lineages (All)", 1);
   const end = findHeading("Base Skills, Perks, and Flaws", 1, start);
 
-  const lineages = [];
-  let i = start + 1;
+  const tree = buildTreeFromRange(start, end);
+  const lineageNodes = tree.children.slice(1);
 
-  while (i < end) {
-    const n = nodes[i];
-    if (n.type !== "heading" || n.level !== 1 || !n.text) {
-      i++;
-      continue;
+  const lineages = [];
+
+  for (const n of lineageNodes) {
+    const name = n.text;
+
+    const descH2 = (n.children || []).find((c) => c.type === "heading" && c.level === 2 && c.text === "Description");
+    let description = "";
+    if (descH2) {
+      function flattenText(node) {
+        let texts = [];
+        for (const c of node.children || []) {
+          if (c.type === "text" || c.type === "cell") texts.push(c.text);
+          if (c.type === "heading") texts.push(...flattenText(c));
+        }
+        return texts;
+      }
+      description = flattenText(descH2).join(" ");
     }
 
-    const name = n.text;
-    const linEnd = nodes.findIndex((m, j) => j > i && m.type === "heading" && m.level === 1);
-    const lEnd = linEnd === -1 ? end : Math.min(linEnd, end);
-
-    // Description: text under H2 "Description" before any H3
-    const descH2 = nodes.findIndex(
-      (m, j) => j > i && j < lEnd && m.type === "heading" && m.level === 2 && m.text === "Description",
-    );
-    const descEnd = descH2 === -1 ? i : nodes.findIndex((m, j) => j > descH2 && m.type === "heading" && m.level <= 2);
-    const description = descH2 === -1 ? "" : textBetween(descH2 + 1, descEnd === -1 ? lEnd : Math.min(descEnd, lEnd));
-
-    // Parse challenges/advantages from an H2 section.
-    // Each entry is a single text node: "Name [Tag] [Tag] (Cost): Description"
-    // Sublineage groups are H3 headings under the H2.
     const ITEM_LINE = /^(.+?)((?:\s*\[[^\]]+\])*)\s*\((\d+|Variable)\)\s*[:\-]\s*(.+)$/;
     const parseItems = (sectionName) => {
-      const h2 = nodes.findIndex(
-        (m, j) => j > i && j < lEnd && m.type === "heading" && m.level === 2 && m.text === sectionName,
-      );
-      if (h2 === -1) return [];
-      const secEnd = nodes.findIndex((m, j) => j > h2 && m.type === "heading" && m.level <= 2);
-      const sEnd = secEnd === -1 ? lEnd : Math.min(secEnd, lEnd);
+      const h2 = (n.children || []).find((c) => c.type === "heading" && c.level === 2 && c.text === sectionName);
+      if (!h2) return [];
+
       const items = [];
       let currentGroup = "General";
-      for (let j = h2 + 1; j < sEnd; j++) {
-        const m = nodes[j];
+      let currentItem = null;
+
+      function flatten(node) {
+        let res = [];
+        for (const c of node.children || []) {
+          res.push(c);
+          if (c.type === "heading") res.push(...flatten(c));
+        }
+        return res;
+      }
+
+      const flatNodes = flatten(h2);
+
+      for (const m of flatNodes) {
         if (m.type === "heading" && m.level === 3) {
           currentGroup = m.text;
+          currentItem = null;
           continue;
         }
-        if (m.type !== "text") continue;
-        const lm = m.text.match(ITEM_LINE);
-        if (!lm) continue;
-        const [, rawName, tagsStr, costStr, desc] = lm;
-        const tags = [...tagsStr.matchAll(/\[([^\]]+)\]/g)].map((t) => t[1]);
-        const required = tags.some((t) => /^required$/i.test(t));
-        const repped = tags.some((t) => /^repped$/i.test(t));
-        const lbp = costStr === "Variable" ? null : parseInt(costStr);
-        let fullDesc = desc.trim();
-        let k = j + 1;
-        while (k < sEnd) {
-          const nxt = nodes[k];
-          if (nxt.type === "heading" && nxt.level <= 3) break;
-          if (nxt.type === "text" && ITEM_LINE.test(nxt.text)) break;
-          if (nxt.text) {
-            let txt = nxt.text.trim();
-            // Inject newlines before standard power fields to fix squashed text nodes
-            txt = txt.replace(/(Call:|Target:|Delivery:|Accent:|Duration:|Refresh:|Effect:)/g, "\n$1");
-            // Clean up missing space before Call if it got squashed
-            txt = txt.replace(/\]Call:/g, "]\nCall:");
-            // Remove huge blocks of spaces (like between Self and Duration)
-            txt = txt.replace(/ {5,}/g, " ");
-            fullDesc += "\n\n" + txt;
-          }
-          k++;
-        }
-        j = k - 1;
+        if (!m.text) continue;
 
-        items.push({
-          name: rawName.trim(),
-          lbp,
-          required,
-          repped,
-          tags: tags.filter((t) => !/^(required|repped)$/i.test(t)),
-          sublineage: currentGroup,
-          description: fullDesc,
-        });
+        const lm = m.type === "text" ? m.text.match(ITEM_LINE) : null;
+        if (lm) {
+          const [, rawName, tagsStr, costStr, desc] = lm;
+          const tags = [...tagsStr.matchAll(/\[([^\]]+)\]/g)].map((t) => t[1]);
+          const required = tags.some((t) => /^required$/i.test(t));
+          const repped = tags.some((t) => /^repped$/i.test(t));
+          const lbp = costStr === "Variable" ? null : parseInt(costStr);
+          let fullDesc = desc.trim();
+
+          currentItem = {
+            name: rawName.trim(),
+            lbp,
+            required,
+            repped,
+            tags: tags.filter((t) => !/^(required|repped)$/i.test(t)),
+            sublineage: currentGroup,
+            description: fullDesc,
+          };
+          items.push(currentItem);
+        } else if (currentItem && m.text) {
+          let txt = m.text.trim();
+          txt = txt.replace(/(Call:|Target:|Delivery:|Accent:|Duration:|Refresh:|Effect:)/g, "\n$1");
+          txt = txt.replace(/\]Call:/g, "]\nCall:");
+          txt = txt.replace(/ {5,}/g, " ");
+          currentItem.description += "\n\n" + txt;
+        }
       }
       return items;
     };
 
     const challenges = parseItems("Challenges");
     const advantages = parseItems("Advantages");
-    // Enrich BOTH — challenges can carry permanent stat penalties too (e.g. Lost's
-    // Fragile Form: "1 fewer maximum Life Point"), not just advantages.
     for (const it of [...challenges, ...advantages]) enrichMechanics(it);
 
-    // Derive sub-lineages from distinct non-General groups
     const byName = new Map();
     for (const it of [...challenges, ...advantages]) {
       if (it.sublineage === "General") continue;
@@ -2187,7 +2183,6 @@ function parseLineages() {
       challenges,
       advantages,
     });
-    i = lEnd;
   }
   return lineages;
 }
