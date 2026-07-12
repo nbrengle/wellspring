@@ -3037,13 +3037,15 @@ function parseRitualConcepts() {
     }
 
     const conceptEnd = nodes.findIndex((m, j) => j > i && m.type === "heading" && m.level <= n.level);
-    const cEnd = conceptEnd === -1 ? end : Math.min(conceptEnd, end);
+    const clampedConceptEnd = conceptEnd === -1 ? end : Math.min(conceptEnd, end);
 
     // Description = prose between this heading and its first deeper child
     // (so children like H4 "Primary Ritualist" under H3 "Ritualists" aren't
     // swallowed into the parent's description).
-    const firstChild = nodes.findIndex((m, j) => j > i && j < cEnd && m.type === "heading" && m.level > n.level);
-    const proseEnd = firstChild === -1 ? cEnd : firstChild;
+    const firstChild = nodes.findIndex(
+      (m, j) => j > i && j < clampedConceptEnd && m.type === "heading" && m.level > n.level,
+    );
+    const proseEnd = firstChild === -1 ? clampedConceptEnd : firstChild;
     const proseNodes = nodes.slice(i + 1, proseEnd);
     // A concept's body may include a small table (e.g. Ritual Point Options): fold
     // 'cell' text into the prose alongside 'text' nodes so it isn't lost.
