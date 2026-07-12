@@ -1027,4 +1027,15 @@ export const lookupEntity = (id: string | null | undefined): Entity | null => {
   return null;
 };
 
+/** Resolve an id that the caller KNOWS is good — a config-derived class name, a
+ *  parser-emitted innate power name, etc. Returns a non-null `Entity`, throwing if the
+ *  id doesn't resolve. Use this at sites that hold a guaranteed-real id so they carry a
+ *  plain `Entity` instead of re-litigating `| null` with `?.`/`?? fallback`; keep plain
+ *  `lookupEntity` where not-found is a legitimate, handled outcome (user data, probing). */
+export const lookupOrThrow = (id: string): Entity => {
+  const ent = lookupEntity(id);
+  if (!ent) throw new Error(`lookupOrThrow: no entity for id "${id}"`);
+  return ent;
+};
+
 export const getAllEntities = () => Array.from(ENTITY_INDEX.values());
