@@ -11,6 +11,7 @@
 import { CLASSES } from "../data.js";
 import { getClasses, parseWordNumber } from "../resolver.js";
 import type { CharacterState } from "../types.js";
+import { isCaster } from "../types.js";
 import { characterLevel } from "./core.js";
 import { spellSlots, type SpellPool } from "./slots.js";
 import { resolveCharacterGraph } from "../graph.js";
@@ -68,7 +69,7 @@ export function checkLevelConstraint(
     // Spellcaster meta-class
     if (classStr === "spellcaster" || classStr === "spellcaster class") {
       const highestSpellcasterLevel = charClasses
-        .filter((c) => CLASSES[c.name]?.spellcaster)
+        .filter((c) => isCaster(CLASSES[c.name]))
         .reduce((max, c) => Math.max(max, c.level), 0);
       return highestSpellcasterLevel >= requiredLevel;
     }
@@ -137,7 +138,7 @@ export function checkLevelConstraint(
 
   // 9. "One level in a non-casting class"
   if (/One level in a non-casting class/i.test(constraintStr)) {
-    return charClasses.some((c) => !CLASSES[c.name]?.spellcaster && c.level >= 1);
+    return charClasses.some((c) => !isCaster(CLASSES[c.name]) && c.level >= 1);
   }
 
   // 10. "class-levels in at least two Base Classes"

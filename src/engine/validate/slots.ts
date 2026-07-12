@@ -19,7 +19,7 @@ import {
 import { cleanItemName, getClasses } from "../resolver.js";
 import { SPELL_TIERS, SLOT_CATS, BOOKCASTER_TIER_FIELD, KNOWN_SPELL_FIELDS } from "../config.js";
 import { countPicksForClass, progressionRow, sourceClass, activeInnatePowers } from "./core.js";
-import { CharacterChoice, CharacterState, BaseEntity } from "../types.js";
+import { CharacterChoice, CharacterState, BaseEntity, isCaster } from "../types.js";
 
 // ─── Structured slot/spell shapes ───────────────────────────────────────────
 /** One power/spell slot row for a class+category: how many are `used` vs `allowed`
@@ -75,8 +75,8 @@ export function eligibleClassChoices(character: CharacterState, baseName: string
   return getClasses(character)
     .map((c) => c.name)
     .filter((name) => {
-      const isCaster = !!CLASSES[name]?.spellcaster;
-      return spec.kind === "spellCasting" ? isCaster : !isCaster;
+      const caster = isCaster(CLASSES[name]);
+      return spec.kind === "spellCasting" ? caster : !caster;
     });
 }
 
@@ -98,8 +98,8 @@ export function slotBestows(character: CharacterState, sources: Record<string, s
     if (sources && source) (sources[k] = sources[k] || []).push(source);
   };
   const classes = getClasses(character);
-  const casterClass = classes.find((c) => CLASSES[c.name]?.spellcaster)?.name;
-  const martialClass = classes.find((c) => !CLASSES[c.name]?.spellcaster)?.name;
+  const casterClass = classes.find((c) => isCaster(CLASSES[c.name]))?.name;
+  const martialClass = classes.find((c) => !isCaster(CLASSES[c.name]))?.name;
   // Route a category to the class whose slot it belongs to.
   const classFor = (cat: string): string | undefined =>
     cat === "cantrips" || cat === "spellsKnown" ? casterClass : martialClass;
@@ -216,7 +216,7 @@ function clampAgileTrades(
   const out: Record<string, number> = {};
   let used = 0;
   for (const { name: cls, level } of classes) {
-    if (CLASSES[cls]?.spellcaster) continue; // power trades are non-caster only
+    if (isCaster(CLASSES[cls])) continue; // power trades are non-caster only
     const want = recorded[cls] || 0;
     if (want <= 0) continue;
     const basics = progressionRow(cls, level).basic ?? 0;
@@ -248,10 +248,10 @@ export function computeSlots(character: CharacterState) {
   for (const { name: cls, level } of classes) {
     // Clamp to the highest documented progression level (base classes cap at 10).
     const prog = progressionRow(cls, level);
-    const isCaster = CLASSES[cls]?.spellcaster;
+    const caster = isCaster(CLASSES[cls]);
     const mkRow = (category: string, label: string, used: number, baseVal: number): SlotRow => {
       let b = bonus[`${cls}:${category}`] || 0;
-      if (!isCaster) {
+      if (!caster) {
         if (category === "basic") b -= agileTrades[cls] || 0;
         if (category === "advanced") b += agileTrades[cls] || 0;
       }
@@ -268,7 +268,7 @@ export function computeSlots(character: CharacterState) {
         bonusFrom: bonusSources[`${cls}:${category}`] || [],
       };
     };
-    if (isCaster) {
+    if (caster) {
       const granted = bestowedCantrips.filter((g) => g.cls === cls || g.cls === "ALL").map((g) => g.name);
       // A granted (innate) cantrip never consumes a choosable slot, even if it
       // appears in the character's cantrip pick list. Exclude it from `used`.
@@ -305,7 +305,7 @@ export function computeSlots(character: CharacterState) {
 // cantrips/spells-known). Returns null for non-casters, else
 // { novice, adept, greater }.
 export function spellSlots(character: CharacterState) {
-  const casters = getClasses(character).filter((c) => CLASSES[c.name]?.spellcaster);
+  const casters = getClasses(character).filter((c) => isCaster(CLASSES[c.name]));
   if (!casters.length) return null; // not a caster
 
   const pools: Record<string, SpellPool> = {};
@@ -406,13 +406,13 @@ export function spellSlots(character: CharacterState) {
 // 'Arcane' (Basic Arcane) or 'Divine' (Basic Faith).
 export function basicSpellOptions(character: CharacterState, magicType: string) {
   const myCasterClasses = getClasses(character)
-    .filter((c) => CLASSES[c.name]?.spellcaster && CLASSES[c.name]?.magicType === magicType)
+    .filter((c) => isCaster(CLASSES[c.name]) && CLASSES[c.name]?.magicType === magicType)
     .map((c) => c.name);
   // Source classes: your matching caster class(es) if any, else every base class of
   // this magic type.
   const sourceClasses = myCasterClasses.length
     ? myCasterClasses
-    : Object.keys(CLASSES).filter((n) => CLASSES[n]?.spellcaster && CLASSES[n]?.magicType === magicType);
+    : Object.keys(CLASSES).filter((n) => isCaster(CLASSES[n]) && CLASSES[n]?.magicType === magicType);
 
   const spells = new Set<string>();
   for (const cls of sourceClasses) {
@@ -433,7 +433,7 @@ export const BASIC_SPELL_SKILLS: Record<string, string> = { "Basic Arcane": "Arc
 // Spells a Bookcaster can select, split into { known, other } for the picker.
 
 export function bookcasterSpellOptions(character: CharacterState) {
-  const casters = getClasses(character).filter((c) => CLASSES[c.name]?.spellcaster);
+  const casters = getClasses(character).filter((c) => isCaster(CLASSES[c.name]));
   if (!casters.length) return { known: [], other: [] };
   const pools: Record<string, SpellPool> = spellSlots(character) || {};
 
@@ -486,9 +486,7 @@ const ARCANE_TIER_FIELD: Record<string, string> = {
   greater: "greaterSpells",
 };
 export function arcaneSecretsSpellOptions(character: CharacterState) {
-  const arcaneClasses = Object.keys(CLASSES).filter(
-    (n) => CLASSES[n]?.spellcaster && CLASSES[n]?.magicType === "Arcane",
-  );
+  const arcaneClasses = Object.keys(CLASSES).filter((n) => isCaster(CLASSES[n]) && CLASSES[n]?.magicType === "Arcane");
   const hasKnownSpells = (character.spells?.length || 0) > 0;
 
   let tiers;

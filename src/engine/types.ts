@@ -77,7 +77,6 @@ export interface BaseEntity {
   slotBestows?: SlotBestow[];
   bestowedSelections?: Record<string, string>[];
   highestSlot?: number;
-  magicType?: string;
   effect?: string;
   call?: string;
   /** BP cost, when the entity carries one directly (skills/perks; also lineage
@@ -136,11 +135,27 @@ export interface Flaw extends BaseEntity {
   category?: string;
 }
 
+/** A class's domain kind. Non-null `magicType` iff `kind === "Spellcaster"`. */
+export type ClassKind = "Martial" | "Spellcaster";
+
 export interface Class extends BaseEntity {
   type: "class";
+  /** The domain kind — Martial vs Spellcaster. Distinct from `type` (the Entity
+   *  discriminator, always "class"); use `isCaster()` to read caster-ness. */
+  kind: ClassKind;
+  /** Arcane/Divine for casters, null for martials. */
+  magicType: string | null;
   innate?: { name: string; requiredLevel?: number }[];
-  spellcaster?: boolean;
+  startingSkills?: string[];
+  multiclassSkills?: string[];
+  multiclassBestows?: { name: string; cost: number }[];
+  /** Class tags (e.g. "Martial") — parser doesn't emit these yet; a typed seam
+   *  that lights up when the data carries them. */
+  tags?: string[];
 }
+
+/** Is this a spellcasting class? The one place caster-ness is decided. */
+export const isCaster = (c: { kind?: ClassKind } | null | undefined): boolean => c?.kind === "Spellcaster";
 
 export interface Advantage extends BaseEntity {
   type: "advantage";

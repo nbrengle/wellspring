@@ -1,7 +1,7 @@
 import { BASE_CLASSES, CLASSES, CLASS_POWERS, REFS, lookupEntity, refsKey } from "../../engine/data.js";
 import { bareSkill, cleanItemName, getClasses, parseWordNumber } from "../resolver.js";
 import type { BaseEntity, CharacterState } from "../types.js";
-import { PrereqIssue, PrereqNote, PrereqReport } from "../types.js";
+import { PrereqIssue, PrereqNote, PrereqReport, isCaster } from "../types.js";
 import { characterLevel } from "../validate/core.js";
 import { spellSlots, type SpellPool } from "../validate/slots.js";
 import type { CharacterGraphModel } from "./model.js";
@@ -424,7 +424,7 @@ export function checkLineageConstraints(graph: CharacterGraphModel): {
   }
 
   if (sublineages["Anti-magic"]) {
-    const spellcastingLevels = character.classes.filter((c) => CLASSES[c.name]?.spellcaster && c.level > 0);
+    const spellcastingLevels = character.classes.filter((c) => isCaster(CLASSES[c.name]) && c.level > 0);
     if (spellcastingLevels.length > 0) {
       issues.push({
         id: "classes:" + spellcastingLevels[0].name,
@@ -501,7 +501,7 @@ export function checkLevelConstraint(
     // Spellcaster meta-class
     if (classStr === "spellcaster" || classStr === "spellcaster class") {
       const highestSpellcasterLevel = charClasses
-        .filter((c) => CLASSES[c.name]?.spellcaster)
+        .filter((c) => isCaster(CLASSES[c.name]))
         .reduce((max, c) => Math.max(max, c.level), 0);
       return highestSpellcasterLevel >= requiredLevel;
     }
@@ -563,7 +563,7 @@ export function checkLevelConstraint(
   }
 
   if (/One level in a non-casting class/i.test(constraintStr)) {
-    return charClasses.some((c) => !CLASSES[c.name]?.spellcaster && c.level >= 1);
+    return charClasses.some((c) => !isCaster(CLASSES[c.name]) && c.level >= 1);
   }
 
   if (/class-levels in at least two Base Classes/i.test(constraintStr)) {

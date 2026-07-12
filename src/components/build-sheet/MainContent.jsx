@@ -203,17 +203,6 @@ function getSelectionOptions(sel) {
         opts.push(`${p.name} (${c.name})`);
       }
     }
-  } else if (sel.type === "spell") {
-    for (const c of Object.values(CLASSES)) {
-      if (!c.spellSphere || c.spellSphere !== sel.sphere) continue;
-      if (sel.tier === "Cantrip") {
-        const tierArray = c.cantrips || [];
-        for (const s of tierArray) opts.push(`${s.name} (${c.name})`);
-      } else {
-        const allSpells = [...(c.noviceSpells || []), ...(c.adeptSpells || []), ...(c.greaterSpells || [])];
-        for (const s of allSpells) opts.push(`${s.name} (${c.name})`);
-      }
-    }
   } else if (sel.type === "devotionAccent") {
     for (const d of Object.values(DOMAINS)) {
       if (d.accents) {

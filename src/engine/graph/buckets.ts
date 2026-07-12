@@ -11,6 +11,7 @@ import type {
   ViewState,
 } from "../types.js";
 import type { CharacterGraphModel } from "./model.js";
+import { CLASSES } from "../data.js";
 
 function isEntity<T extends Entity>(entity: Entity | null, type: string): entity is T {
   return entity?.type === type;
@@ -33,7 +34,12 @@ export function buildBucketedView(graph: CharacterGraphModel): BucketedView {
   };
 
   for (const { name: cls, level: clsLevel } of graph.classes) {
-    view.classes.push({ name: cls, level: clsLevel, type: "class" });
+    const def = CLASSES[cls];
+    view.classes.push(
+      def
+        ? { ...def, level: clsLevel }
+        : { name: cls, level: clsLevel, type: "class", kind: "Martial", magicType: null },
+    );
   }
 
   for (const node of graph.items) {

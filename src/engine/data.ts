@@ -4,7 +4,8 @@
 // (npm run parse) refreshes everything downstream automatically.
 
 import classesJson from "../data/classes.json";
-import type { CharacterState, Entity, ProgressionRow, DiscountSpec } from "./types.js";
+import type { CharacterState, Class, Entity, ProgressionRow, DiscountSpec } from "./types.js";
+import { isCaster } from "./types.js";
 import skillsJson from "../data/skills.json";
 import perksJson from "../data/perks.json";
 import flawsJson from "../data/flaws.json";
@@ -169,36 +170,76 @@ export function allergenAward(flawName: string, substance: string | null | undef
 // description, startingSkills, multiclassSkills }. Role/keyFeatures prose is not
 // in the data (intentionally — to be parsed later), so it's simply omitted.
 
-// Derived from the parsed class data, not hand-maintained — a class is a caster
-// when its parsed type is 'Spellcaster', and its Divine/Arcane magicType is a
-// parser-extracted field. A MegaDoc change to the class roster flows through here
-// without edits. BASE_CLASSES is the canonical base-class set, shared by the
-// validator and sheet logic so the list lives in exactly one place.
-const MAGIC_TYPE = Object.fromEntries(classesJson.filter((c) => c.magicType).map((c) => [c.name, c.magicType]));
+// The raw class-JSON shape, discriminated on `kind`. `validateClasses` asserts the
+// JSON matches at compile time (we trust the parser's output rather than writing 50
+// lines of runtime checks); `typedClassesJson` is the typed handle every class
+// consumer below reads from.
+type BaseClassJson = {
+  name: string;
+  description?: string;
+  isAdvanced?: boolean;
+  /** Class tags (e.g. "Martial") — parser doesn't emit these yet; a typed seam. */
+  tags?: string[];
+  startingSkills?: string[];
+  multiclassSkills?: string[];
+  multiclassBestows?: { name: string; cost: number }[];
+  innate?: { name: string; requiredLevel?: number }[];
+  classSkills?: string[];
+  rightHandPowers?: string[];
+  specializations?: string[];
+  progression?: Record<string, ProgressionRow>;
+};
+
+type MartialClassJson = BaseClassJson & {
+  kind: "Martial";
+  magicType: null;
+  utilityPowers?: number;
+  basicPowers?: number;
+  advancedPowers?: number;
+  veteranPowers?: number;
+};
+
+type SpellcasterClassJson = BaseClassJson & {
+  kind: "Spellcaster";
+  magicType: string;
+  cantrips?: number;
+  spellsKnown?: number;
+  slots?: string;
+  noviceSpells?: string[];
+  adeptSpells?: string[];
+  greaterSpells?: string[];
+};
+
+type ClassJsonType = MartialClassJson | SpellcasterClassJson;
+
+function validateClasses(_arr: typeof classesJson): _arr is ClassJsonType[] & typeof classesJson {
+  return true; // We trust the JSON shape at compile time to avoid 50 lines of runtime checks.
+}
+const typedClassesJson: ClassJsonType[] = validateClasses(classesJson) ? classesJson : [];
+
+// Class kind (Martial/Spellcaster) and Divine/Arcane magicType are parser-extracted
+// fields on each class; a MegaDoc change to the roster flows through without edits.
+// BASE_CLASSES is the canonical base-class set, shared by the validator and sheet
+// logic so the list lives in exactly one place.
 // Base (non-advanced) classes. Today every parsed class is a base class — Advanced
 // Classes aren't in the MegaDoc yet ("published when the campaign draws closer").
-// When they arrive the parser should mark them (e.g. type:'Advanced' or
-// isAdvanced); exclude any such marker here so the base/advanced split stays correct.
-export const BASE_CLASSES = new Set(
-  classesJson.filter((c) => c.type !== "Advanced" && !("isAdvanced" in c && c.isAdvanced)).map((c) => c.name),
-);
+// When they arrive the parser marks them with `isAdvanced` (advancement is its own
+// axis, orthogonal to the Martial/Spellcaster `kind`); exclude those here.
+export const BASE_CLASSES = new Set(classesJson.filter((c) => !("isAdvanced" in c && c.isAdvanced)).map((c) => c.name));
 
-export const CLASSES = Object.fromEntries(
-  classesJson.map((c) => [
+// A name-keyed index of the Class entity — one shape, no separate projection. The
+// class's domain `kind` (Martial/Spellcaster) survives here because it's a distinct
+// field from the Entity discriminator `type: "class"`. Read caster-ness via isCaster.
+export const CLASSES: Record<string, Class> = Object.fromEntries(
+  typedClassesJson.map((c): [string, Class] => [
     c.name,
     {
-      type: c.type,
-      spellcaster: c.type === "Spellcaster",
-      magicType: c.magicType || MAGIC_TYPE[c.name] || null,
-      description: c.description,
-      startingSkills: c.startingSkills,
-      multiclassSkills: c.multiclassSkills,
-      multiclassBestows: c.multiclassBestows || [],
-      // The parser does not emit class tags today, so this is always empty; a
-      // "Martial Classes" prereq that reads it therefore never matches on tags.
-      // Kept as a typed seam so that consumer (prereqs) type-checks and lights up
-      // for free once the data carries tags. See wellspring-class-tags note.
-      tags: (c as { tags?: string[] }).tags ?? ([] as string[]),
+      ...c,
+      id: `classes:${c.name}`,
+      type: "class",
+      // Parser doesn't emit class tags today; default the seam to empty so a
+      // "Martial Classes" prereq type-checks and lights up once the data carries them.
+      tags: c.tags ?? [],
     },
   ]),
 );
@@ -320,7 +361,7 @@ export function eligiblePowers(className: string, category: string) {
 export function cantripOptions(magicTypes: string[]) {
   const want = new Set(magicTypes);
   const classes = Object.entries(CLASSES)
-    .filter(([, c]) => c.type === "Spellcaster" && c.magicType != null && want.has(c.magicType))
+    .filter(([, c]) => isCaster(c) && c.magicType != null && want.has(c.magicType))
     .map(([name]) => name);
   const cantrips = new Set();
   for (const cls of classes) {
@@ -347,7 +388,7 @@ const SPELL_TIER_FIELD = {
 export function lineageSpellOptions(magicTypes: string[], tiers = ["cantrip", "novice"]) {
   const want = new Set(magicTypes);
   const classes = Object.entries(CLASSES)
-    .filter(([, c]) => c.type === "Spellcaster" && c.magicType != null && want.has(c.magicType))
+    .filter(([, c]) => isCaster(c) && c.magicType != null && want.has(c.magicType))
     .map(([name]) => name);
   const spells = new Set();
   for (const cls of classes) {
@@ -489,53 +530,12 @@ export function lineageCantripChoices(character: CharacterState): { item: string
   return out;
 }
 
-type BaseClassJson = {
-  name: string;
-  description?: string;
-  isAdvanced?: boolean;
-  startingSkills?: string[];
-  multiclassSkills?: string[];
-  multiclassBestows?: { name: string; cost: number }[];
-  innate?: { name: string; requiredLevel?: number }[];
-  classSkills?: string[];
-  rightHandPowers?: string[];
-  specializations?: string[];
-  progression?: Record<string, ProgressionRow>;
-};
-
-type MartialClassJson = BaseClassJson & {
-  type: "Martial" | "Advanced";
-  magicType?: null;
-  utilityPowers?: number;
-  basicPowers?: number;
-  advancedPowers?: number;
-  veteranPowers?: number;
-};
-
-type SpellcasterClassJson = BaseClassJson & {
-  type: "Spellcaster";
-  magicType?: string;
-  cantrips?: number;
-  spellsKnown?: number;
-  slots?: string;
-  noviceSpells?: string[];
-  adeptSpells?: string[];
-  greaterSpells?: string[];
-};
-
-type ClassJsonType = MartialClassJson | SpellcasterClassJson;
-
-function validateClasses(_arr: typeof classesJson): _arr is ClassJsonType[] & typeof classesJson {
-  return true; // We trust the JSON shape at compile time to avoid 50 lines of runtime checks.
-}
-const typedClassesJson: ClassJsonType[] = validateClasses(classesJson) ? classesJson : [];
-
 // Power-slot counts at the starting level come from the progression table's
 // level-4 row, so they stay in sync with the source rather than being hardcoded.
 export const CLASS_POWER_SLOTS: Record<string, ProgressionRow> = Object.fromEntries(
   typedClassesJson.map((cls) => {
     const lvl4 = cls.progression?.["4"] || {};
-    if (cls.type === "Spellcaster") {
+    if (cls.kind === "Spellcaster") {
       return [
         cls.name,
         {
