@@ -475,39 +475,54 @@ const STAT_LABELS: Record<string, string> = {
   naturalArmor: "Natural Armor",
   wealth: "Wealth",
 };
-export function lineageItemImpact(item: Partial<Entity>, lineage: string | null | undefined) {
+// A sub-choice item's impact is a single phrase describing the CHOICE it prompts
+// (pick a cantrip / rep a challenge / record a flavor detail), not a derived stat.
+// Returns null for ordinary items so the caller falls through to derived phrases.
+function choiceImpact(item: Partial<Entity>): string | null {
   const spec = lineageChoiceSpec(item);
-  if (spec?.kind === "cantrip") return ["grants a chosen cantrip (+slot to cast it)"];
-  if (spec?.kind === "rep") return ["reps another lineage’s challenge for its LBP"];
+  if (spec?.kind === "cantrip") return "grants a chosen cantrip (+slot to cast it)";
+  if (spec?.kind === "rep") return "reps another lineage’s challenge for its LBP";
   if (spec?.kind === "flavor") {
     const label = spec.label || "detail";
-    const article = /^[aeiou]/i.test(label) ? "an" : "a";
-    return [`pick ${article} ${label} (flavor)`];
+    return `pick ${/^[aeiou]/i.test(label) ? "an" : "a"} ${label} (flavor)`;
   }
+  return null;
+}
 
-  const out: string[] = [];
-  for (const m of item.statMods || []) {
-    if ("text" in m && m.text) {
-      out.push(m.text);
-    } else if ("amount" in m) {
-      const label = STAT_LABELS[m.stat] || m.stat;
-      out.push(`${m.amount >= 0 ? "+" : ""}${m.amount} ${label}`);
-    }
-  }
-  for (const g of item.slotBestows || []) {
-    out.push(`+${g.n} ${g.cat} slot${g.n === 1 ? "" : "s"}`);
-  }
+// One stat modifier as an impact phrase: free-text notes verbatim, numeric mods as a
+// signed "+N Label". Empty-text notes yield "" (the caller drops them).
+function statModImpact(mod: NonNullable<Entity["statMods"]>[number]): string {
+  if ("text" in mod) return mod.text;
+  return `${mod.amount >= 0 ? "+" : ""}${mod.amount} ${STAT_LABELS[mod.stat] || mod.stat}`;
+}
+
+// The pools/resources an item grants (extra slots, a raised highest slot, wealth).
+function resourceImpacts(item: Partial<Entity>): string[] {
+  const out = (item.slotBestows || []).map((g) => `+${g.n} ${g.cat} slot${g.n === 1 ? "" : "s"}`);
   if (item.highestSlot) out.push("+1 highest spell-slot");
   if (item.wealthIncome?.n) out.push(`+${item.wealthIncome.n} Wealth`);
-  // Fixed grants (Telekinesis Power, Magical Resilience perk, …).
-  const base = item.baseName || item.name;
-  const gid = lineage ? `advantages:${lineage} - ${base}` : null;
-  const grants = gid ? REFS.bestows?.[gid] || REFS.bestows?.[`challenges:${lineage} - ${base}`] : null;
-  for (const tid of grants || []) {
-    const ent = lookupEntity(tid);
-    out.push(`grants ${ent?.name || idNameLocal(tid)}`);
-  }
   return out;
+}
+
+// The named entities an item bestows for free (Telekinesis Power, Magical Resilience
+// perk, …), read from REFS.bestows under the lineage-qualified id.
+function grantImpacts(item: Partial<Entity>, lineage: string | null | undefined): string[] {
+  if (!lineage) return [];
+  const base = item.baseName || item.name;
+  const grants = REFS.bestows?.[`advantages:${lineage} - ${base}`] || REFS.bestows?.[`challenges:${lineage} - ${base}`];
+  return (grants || []).map((tid) => `grants ${lookupEntity(tid)?.name || idNameLocal(tid)}`);
+}
+
+// The human-readable impact phrases for a lineage advantage/challenge — a sub-choice
+// prompt if it is one, otherwise its derived stat / resource / grant effects.
+export function lineageItemImpact(item: Partial<Entity>, lineage: string | null | undefined): string[] {
+  const choice = choiceImpact(item);
+  if (choice) return [choice];
+  return [
+    ...(item.statMods || []).map(statModImpact).filter(Boolean),
+    ...resourceImpacts(item),
+    ...grantImpacts(item, lineage),
+  ];
 }
 function idNameLocal(id: string) {
   const i = id.indexOf(":");
