@@ -1,4 +1,4 @@
-import { REFS, refsKey } from "../../engine/data.js";
+import { collectionOf } from "../../engine/data.js";
 import { bareSkill, cleanItemName } from "../resolver.js";
 import type { BPLedger, BPLedgerEntry, DiscountSpec, GraphItem } from "../types.js";
 import { MAX_FLAW_BP } from "../validate/core.js";
@@ -25,9 +25,10 @@ export function computeSpend(graph: CharacterGraphModel): BPLedger {
   for (const node of graph.items) {
     for (const eff of node.effects) {
       if (eff.type === "BESTOW_SOURCE") {
-        eff.bestows.forEach((g) => {
-          if (!bestowIndex[g]) bestowIndex[g] = node.name;
-          const pk = paramKey(g);
+        eff.bestows.forEach((ref) => {
+          const id = `${collectionOf(ref.type)}:${ref.name}`;
+          if (!bestowIndex[id]) bestowIndex[id] = node.name;
+          const pk = paramKey(id);
           if (pk && !bestowParamIndex[pk]) bestowParamIndex[pk] = node.name;
         });
       }
@@ -271,10 +272,11 @@ export function discountApplies(
   }
 
   if (src.scope.kind === "prereq") {
-    const pr = ent?.id ? REFS.prereqs?.[refsKey(ent.id)] : undefined;
-    const target = `perks:${scopeValue}`;
+    const pr = ent?.prereqs;
     return (
-      !!pr && (pr.skills?.includes(target) || !!pr.other?.some((o: string) => new RegExp(scopeValue, "i").test(o)))
+      !!pr &&
+      ((pr.skills || []).some((r) => r.type === "perk" && r.name === scopeValue) ||
+        !!pr.other?.some((o: string) => new RegExp(scopeValue, "i").test(o)))
     );
   }
 

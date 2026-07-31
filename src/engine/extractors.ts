@@ -15,17 +15,16 @@ function extractDiscounts(ent: Entity | null, character: CharacterState, id: str
   return [];
 }
 
-function extractGlobalBestows(ent: Entity | null, character: CharacterState, id: string): Effect[] {
-  // choice — REFS.bestows lists ALL the options, so emitting them flat would wrongly
-  // grant every option for free (The Learned One = "choose one of 8" at level-up).
-  // Trust the PARSED chooseOne, not a description regex: a fixed grant can sit beside
-  // an unrelated in-play "Choose one target…" sentence (Lessons from Scars) and must
-  // still fire. So: skip only when a chooseOne structure exists.
+function extractGlobalBestows(ent: Entity | null, _character: CharacterState, _id: string): Effect[] {
+  // The entity's `bestows` (EntityRef[]) lists ALL the grant options, so emitting them
+  // flat would wrongly grant every option for free (The Learned One = "choose one of 8"
+  // at level-up). Trust the PARSED chooseOne, not a description regex: a fixed grant can
+  // sit beside an unrelated in-play "Choose one target…" sentence (Lessons from Scars)
+  // and must still fire. So: skip only when a chooseOne structure exists.
   const isChoiceGated = !!(ent && "chooseOne" in ent && ent.chooseOne);
 
-  const key = refsKey(id);
-  if (REFS.bestows?.[key] && !isChoiceGated) {
-    return [{ type: "BESTOW_SOURCE", bestows: REFS.bestows[key] }];
+  if (ent?.bestows?.length && !isChoiceGated) {
+    return [{ type: "BESTOW_SOURCE", bestows: ent.bestows }];
   }
   return [];
 }
@@ -72,7 +71,7 @@ function extractChooseOne(ent: Entity | null, character: CharacterState, _id: st
       const opt = ent.chooseOne.options.find((o: ChoiceOption) => o.text === chosen || optBestows(o).includes(chosen));
       const bestows = optBestows(opt);
       if (bestows.length > 0) {
-        return [{ type: "BESTOW_SOURCE", bestows: bestows.map((s: string) => `skills:${s}`) }];
+        return [{ type: "BESTOW_SOURCE", bestows: bestows.map((s: string) => ({ name: s, type: "skill" })) }];
       }
     }
   }
@@ -87,7 +86,7 @@ function extractLineageChoiceSpec(ent: Entity | null, character: CharacterState,
     if (spec?.kind === "cantrip" || spec?.kind === "spell") {
       const chosen = character.advantageChoices?.[ent.name];
       if (chosen) {
-        return [{ type: "BESTOW_SOURCE", bestows: [`powers:${chosen}`] }];
+        return [{ type: "BESTOW_SOURCE", bestows: [{ name: chosen, type: "power" }] }];
       }
     }
   }
@@ -99,7 +98,7 @@ function extractPowerSpellChoiceSpec(ent: Entity | null, character: CharacterSta
   if (spec && (spec.kind === "spell" || spec.kind === "power") && ent) {
     const chosen = character.choices?.[`powers:${ent.name}`];
     if (chosen) {
-      return [{ type: "BESTOW_SOURCE", bestows: [`powers:${chosen}`] }];
+      return [{ type: "BESTOW_SOURCE", bestows: [{ name: chosen, type: "power" }] }];
     }
   }
   return [];
@@ -110,8 +109,8 @@ function extractStudiedFocus(ent: Entity | null, character: CharacterState, _id:
     const pick1 = character.choices?.["powers:Studied Focus:1"];
     const pick2 = character.choices?.["powers:Studied Focus:2"];
     const effects: Effect[] = [];
-    if (pick1) effects.push({ type: "BESTOW_SOURCE", bestows: [`powers:${pick1}`] });
-    if (pick2) effects.push({ type: "BESTOW_SOURCE", bestows: [`powers:${pick2}`] });
+    if (pick1) effects.push({ type: "BESTOW_SOURCE", bestows: [{ name: pick1, type: "power" }] });
+    if (pick2) effects.push({ type: "BESTOW_SOURCE", bestows: [{ name: pick2, type: "power" }] });
     return effects;
   }
   return [];

@@ -1,6 +1,6 @@
-import { lookupEntity } from "../../engine/data.js";
+import { lookupEntity, collectionOf } from "../../engine/data.js";
 import { bareSkill } from "../resolver.js";
-import type { CharacterState, Entity } from "../types.js";
+import type { CharacterState, Entity, EntityRef } from "../types.js";
 import { BestowedAbility } from "../types.js";
 import { CharacterGraphModel, idPrefix } from "./model.js";
 import { resolveCharacterGraph } from "./resolve.js";
@@ -10,12 +10,14 @@ export function computeBestowedAbilitiesList(graph: CharacterGraphModel): Bestow
   for (const node of graph.items) {
     for (const eff of node.effects) {
       if (eff.type !== "BESTOW_SOURCE") continue;
-      for (const ability of eff.bestows) {
-        const ent = lookupEntity(ability);
+      // Each grant is an EntityRef {name, type} — read its fields directly instead of
+      // re-resolving a string and splitting the collection prefix back off.
+      for (const ref of eff.bestows) {
+        const collection = collectionOf(ref.type);
         list.push({
-          ability,
-          abilityName: ent?.name || ability.split(":")[1],
-          abilityType: ability.slice(0, ability.indexOf(":")),
+          ability: `${collection}:${ref.name}`,
+          abilityName: ref.name,
+          abilityType: collection,
           source: node.name,
           sourceId: node.id,
           sourceKind: node.sourceType,
@@ -61,12 +63,12 @@ export function bestowedAbilities(character: CharacterState) {
   const graph = resolveCharacterGraph(character);
   const list: BestowedAbility[] = [];
   const bySource: Record<string, { source: string; sourceKind: string; abilities: BestowedAbility[] }> = {};
-  const addRow = (ability: string, sourceName: string, sourceId: string, sourceKind: string) => {
-    const ent = lookupEntity(ability);
+  const addRow = (ref: EntityRef, sourceName: string, sourceId: string, sourceKind: string) => {
+    const collection = collectionOf(ref.type);
     const row = {
-      ability,
-      abilityName: ent?.name || ability.split(":")[1],
-      abilityType: ability.slice(0, ability.indexOf(":")),
+      ability: `${collection}:${ref.name}`,
+      abilityName: ref.name,
+      abilityType: collection,
       source: sourceName,
       sourceId,
       sourceKind,
@@ -78,8 +80,8 @@ export function bestowedAbilities(character: CharacterState) {
   for (const node of graph) {
     for (const eff of node.effects) {
       if (eff.type !== "BESTOW_SOURCE") continue;
-      for (const ability of eff.bestows) {
-        addRow(ability, node.name, node.id, node.sourceType);
+      for (const ref of eff.bestows) {
+        addRow(ref, node.name, node.id, node.sourceType);
       }
     }
   }

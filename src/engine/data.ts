@@ -4,7 +4,7 @@
 // (npm run parse) refreshes everything downstream automatically.
 
 import classesJson from "../data/classes.json";
-import type { CharacterState, Class, Entity, ProgressionRow, DiscountSpec } from "./types.js";
+import type { CharacterState, Class, Entity, EntityRef, ProgressionRow, DiscountSpec } from "./types.js";
 import { isCaster } from "./types.js";
 import skillsJson from "../data/skills.json";
 import perksJson from "../data/perks.json";
@@ -499,19 +499,15 @@ export function lineageItemImpact(item: Partial<Entity>) {
   }
   if (item.highestSlot) out.push("+1 highest spell-slot");
   if (item.wealthIncome?.n) out.push(`+${item.wealthIncome.n} Wealth`);
-  // Fixed grants (Telekinesis Power, Magical Resilience perk, …). Keyed on the bare
-  // advantage/challenge name now that REFS no longer concatenates the lineage (#195).
+  // Fixed grants (Telekinesis Power, Magical Resilience perk, …). Read the resolved
+  // entity's folded `bestows` — `item` is a Partial<Entity> that may not carry it, so
+  // resolve to the indexed advantage/challenge (keyed on the bare name, #195).
   const base = item.baseName || item.name;
-  const grants = REFS.bestows?.[`advantages:${base}`] || REFS.bestows?.[`challenges:${base}`] || null;
-  for (const tid of grants || []) {
-    const ent = lookupEntity(tid);
-    out.push(`grants ${ent?.name || idNameLocal(tid)}`);
+  const ent = lookupEntity(`advantages:${base}`) || lookupEntity(`challenges:${base}`);
+  for (const ref of ent?.bestows || []) {
+    out.push(`grants ${ref.name}`);
   }
   return out;
-}
-function idNameLocal(id: string) {
-  const i = id.indexOf(":");
-  return i >= 0 ? id.slice(i + 1) : id;
 }
 
 export function lineageCantripChoices(character: CharacterState): { item: string; cantrip: string }[] {
@@ -680,6 +676,39 @@ export const REFS = refsJson as RefsData;
 export const refsKey = (id: string | null | undefined): string =>
   id && id.startsWith("spells:") ? `powers:${id.slice("spells:".length)}` : id || "";
 
+// ─── Fold refs edges onto entities (#244) ─────────────────────────────────────
+// The linker emits a string-keyed graph (refs.json); the engine wants edges as
+// fields ON each entity. Convert a refs-keyed id ("perks:Foo") to an EntityRef
+// {name, type}, and gather an entity's prereqs/bestows/excludes at index time so
+// consumers read `entity.bestows` instead of re-keying REFS and re-parsing strings.
+// (Folded edge VALUES are only skill/perk/power/flaw types — never the spell/power
+//  namespace remap, which is a `mentions`-only concern — so the prefix is honest.)
+const toRef = (prefixedId: string): EntityRef => ({
+  name: prefixedId.slice(prefixedId.indexOf(":") + 1),
+  type: singularType(prefixedId.slice(0, prefixedId.indexOf(":"))) as EntityRef["type"],
+});
+
+/** The grant/prereq/exclusion edges for an entity id, as EntityRefs — the fields the
+ *  engine reads off the entity. Empty object when the entity has no edges. */
+function entityEdges(id: string): Pick<Entity, "prereqs" | "bestows" | "excludes"> {
+  const key = refsKey(id);
+  const out: Pick<Entity, "prereqs" | "bestows" | "excludes"> = {};
+  const bestows = REFS.bestows?.[key];
+  if (bestows?.length) out.bestows = bestows.map(toRef);
+  const excludes = REFS.excludes?.[key];
+  if (excludes?.length) out.excludes = excludes.map(toRef);
+  const pr = REFS.prereqs?.[key];
+  if (pr && (pr.skills?.length || pr.anyOf?.length || pr.levels?.length || pr.other?.length)) {
+    out.prereqs = {
+      skills: (pr.skills || []).map(toRef),
+      anyOf: (pr.anyOf || []).map((group) => group.map(toRef)),
+      levels: pr.levels || [],
+      other: pr.other || [],
+    };
+  }
+  return out;
+}
+
 // Lookup by entity id, e.g. "skills:Basic Faith" → { type, name, description, ... }.
 // Used by the detail pane when an item card is clicked.
 const ENTITY_INDEX = new Map();
@@ -751,7 +780,7 @@ const indexEntities = (
             return { description: body, summary };
           })()
         : {};
-    ENTITY_INDEX.set(id, { ...e, ...desc, id, type, name });
+    ENTITY_INDEX.set(id, { ...e, ...desc, id, type, name, ...entityEdges(id) });
   }
 };
 indexEntities(skillsJson, "skills");
@@ -788,9 +817,20 @@ const POWER_TIERS = [
 ];
 const powerEntities: JsonRecord[] = [];
 for (const c of classesJson) {
-  ENTITY_INDEX.set(`classes:${c.name}`, { ...c, id: `classes:${c.name}`, type: "class" });
+  ENTITY_INDEX.set(`classes:${c.name}`, {
+    ...c,
+    id: `classes:${c.name}`,
+    type: "class",
+    ...entityEdges(`classes:${c.name}`),
+  });
   for (const s of c.specializations || []) {
-    ENTITY_INDEX.set(`classes:${s.name}`, { ...s, id: `classes:${s.name}`, type: "class", parentClass: c.name });
+    ENTITY_INDEX.set(`classes:${s.name}`, {
+      ...s,
+      id: `classes:${s.name}`,
+      type: "class",
+      parentClass: c.name,
+      ...entityEdges(`classes:${s.name}`),
+    });
   }
   for (const t of POWER_TIERS)
     for (const p of (c as unknown as Record<string, RawPower[]>)[t] || [])
@@ -809,11 +849,11 @@ indexEntities(powerEntities, "powers", { typed: true });
 for (const lin of lineagesJson) {
   for (const a of lin.advantages || []) {
     const id = `advantages:${a.name}`;
-    ENTITY_INDEX.set(id, { ...a, id, type: "advantage", name: a.name, lineage: lin.name });
+    ENTITY_INDEX.set(id, { ...a, id, type: "advantage", name: a.name, lineage: lin.name, ...entityEdges(id) });
   }
   for (const c of lin.challenges || []) {
     const id = `challenges:${c.name}`;
-    ENTITY_INDEX.set(id, { ...c, id, type: "challenge", name: c.name, lineage: lin.name });
+    ENTITY_INDEX.set(id, { ...c, id, type: "challenge", name: c.name, lineage: lin.name, ...entityEdges(id) });
   }
 }
 
@@ -1028,3 +1068,17 @@ export const lookupEntity = (id: string | null | undefined): Entity | null => {
 };
 
 export const getAllEntities = () => Array.from(ENTITY_INDEX.values());
+
+// ─── EntityRef facade ────────────────────────────────────────────────────────
+// A resolved reference {name, type} — the shape the linker stamps onto an entity's
+// grant/prereq/exclusion edges. Construct + resolve go through here so no call site
+// hand-builds or hand-destructures the raw shape (it can then grow in one place).
+
+/** Build a ref FROM a resolved entity. */
+export const entityRef = (entity: Entity): EntityRef => ({ name: entity.name, type: entity.type });
+
+/** Resolve a ref back to its full entity. Unambiguous — the ref carries `type`, so we
+ *  key the canonical `<collection>:<name>` id directly (no realm guessing, no
+ *  bare-name collision). Returns null if the target isn't in the index. */
+export const resolveRef = (ref: EntityRef | null | undefined): Entity | null =>
+  ref ? lookupEntity(`${collectionOf(ref.type)}:${ref.name}`) : null;
