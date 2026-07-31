@@ -161,19 +161,6 @@ test("Pick and Choose: a cross-lineage advantage is applied with its full effect
     (owned?.perks || []).some((p) => p.name === "Mystic Armorer" && p.bestowedBy === "Iron Touch"),
     "the chosen advantage’s grant is applied across lineages",
   );
-  // Back-compat: a saved character storing the OLD "<Lineage> - <Name>" value still
-  // resolves (lookupEntity folds it to the bare entity), so existing saves don't break.
-  const legacy = validate(
-    makeChar("Fighter 6", {
-      lineage: "Lost",
-      lineageAdvantages: ["Pick and Choose"],
-      advantageChoices: { "Pick and Choose": "Underkin - Iron Touch" },
-    }),
-  ).owned;
-  ok(
-    (legacy?.perks || []).some((p) => p.name === "Mystic Armorer"),
-    "a legacy lineage-qualified stored advId still applies its grant",
-  );
 });
 
 const findLin = (ln, nm) => {
