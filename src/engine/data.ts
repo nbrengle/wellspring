@@ -680,6 +680,39 @@ export const REFS = refsJson as RefsData;
 export const refsKey = (id: string | null | undefined): string =>
   id && id.startsWith("spells:") ? `powers:${id.slice("spells:".length)}` : id || "";
 
+// ─── Fold refs edges onto entities (#244) ─────────────────────────────────────
+// The linker emits a string-keyed graph (refs.json); the engine wants edges as
+// fields ON each entity. Convert a refs-keyed id ("perks:Foo") to an EntityRef
+// {name, type}, and gather an entity's prereqs/bestows/excludes at index time so
+// consumers read `entity.bestows` instead of re-keying REFS and re-parsing strings.
+// (Folded edge VALUES are only skill/perk/power/flaw types — never the spell/power
+//  namespace remap, which is a `mentions`-only concern — so the prefix is honest.)
+const toRef = (prefixedId: string): EntityRef => ({
+  name: prefixedId.slice(prefixedId.indexOf(":") + 1),
+  type: singularType(prefixedId.slice(0, prefixedId.indexOf(":"))) as EntityRef["type"],
+});
+
+/** The grant/prereq/exclusion edges for an entity id, as EntityRefs — the fields the
+ *  engine reads off the entity. Empty object when the entity has no edges. */
+function entityEdges(id: string): Pick<Entity, "prereqs" | "bestows" | "excludes"> {
+  const key = refsKey(id);
+  const out: Pick<Entity, "prereqs" | "bestows" | "excludes"> = {};
+  const bestows = REFS.bestows?.[key];
+  if (bestows?.length) out.bestows = bestows.map(toRef);
+  const excludes = REFS.excludes?.[key];
+  if (excludes?.length) out.excludes = excludes.map(toRef);
+  const pr = REFS.prereqs?.[key];
+  if (pr && (pr.skills?.length || pr.anyOf?.length || pr.levels?.length || pr.other?.length)) {
+    out.prereqs = {
+      skills: (pr.skills || []).map(toRef),
+      anyOf: (pr.anyOf || []).map((group) => group.map(toRef)),
+      levels: pr.levels || [],
+      other: pr.other || [],
+    };
+  }
+  return out;
+}
+
 // Lookup by entity id, e.g. "skills:Basic Faith" → { type, name, description, ... }.
 // Used by the detail pane when an item card is clicked.
 const ENTITY_INDEX = new Map();
@@ -751,7 +784,7 @@ const indexEntities = (
             return { description: body, summary };
           })()
         : {};
-    ENTITY_INDEX.set(id, { ...e, ...desc, id, type, name });
+    ENTITY_INDEX.set(id, { ...e, ...desc, id, type, name, ...entityEdges(id) });
   }
 };
 indexEntities(skillsJson, "skills");
@@ -788,9 +821,20 @@ const POWER_TIERS = [
 ];
 const powerEntities: JsonRecord[] = [];
 for (const c of classesJson) {
-  ENTITY_INDEX.set(`classes:${c.name}`, { ...c, id: `classes:${c.name}`, type: "class" });
+  ENTITY_INDEX.set(`classes:${c.name}`, {
+    ...c,
+    id: `classes:${c.name}`,
+    type: "class",
+    ...entityEdges(`classes:${c.name}`),
+  });
   for (const s of c.specializations || []) {
-    ENTITY_INDEX.set(`classes:${s.name}`, { ...s, id: `classes:${s.name}`, type: "class", parentClass: c.name });
+    ENTITY_INDEX.set(`classes:${s.name}`, {
+      ...s,
+      id: `classes:${s.name}`,
+      type: "class",
+      parentClass: c.name,
+      ...entityEdges(`classes:${s.name}`),
+    });
   }
   for (const t of POWER_TIERS)
     for (const p of (c as unknown as Record<string, RawPower[]>)[t] || [])
@@ -809,11 +853,11 @@ indexEntities(powerEntities, "powers", { typed: true });
 for (const lin of lineagesJson) {
   for (const a of lin.advantages || []) {
     const id = `advantages:${a.name}`;
-    ENTITY_INDEX.set(id, { ...a, id, type: "advantage", name: a.name, lineage: lin.name });
+    ENTITY_INDEX.set(id, { ...a, id, type: "advantage", name: a.name, lineage: lin.name, ...entityEdges(id) });
   }
   for (const c of lin.challenges || []) {
     const id = `challenges:${c.name}`;
-    ENTITY_INDEX.set(id, { ...c, id, type: "challenge", name: c.name, lineage: lin.name });
+    ENTITY_INDEX.set(id, { ...c, id, type: "challenge", name: c.name, lineage: lin.name, ...entityEdges(id) });
   }
 }
 
