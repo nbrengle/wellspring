@@ -4,7 +4,7 @@
 // (npm run parse) refreshes everything downstream automatically.
 
 import classesJson from "../data/classes.json";
-import type { CharacterState, Class, Entity, ProgressionRow, DiscountSpec } from "./types.js";
+import type { CharacterState, Class, Entity, EntityRef, ProgressionRow, DiscountSpec } from "./types.js";
 import { isCaster } from "./types.js";
 import skillsJson from "../data/skills.json";
 import perksJson from "../data/perks.json";
@@ -1028,3 +1028,17 @@ export const lookupEntity = (id: string | null | undefined): Entity | null => {
 };
 
 export const getAllEntities = () => Array.from(ENTITY_INDEX.values());
+
+// ─── EntityRef facade ────────────────────────────────────────────────────────
+// A resolved reference {name, type} — the shape the linker stamps onto an entity's
+// grant/prereq/exclusion edges. Construct + resolve go through here so no call site
+// hand-builds or hand-destructures the raw shape (it can then grow in one place).
+
+/** Build a ref FROM a resolved entity. */
+export const entityRef = (entity: Entity): EntityRef => ({ name: entity.name, type: entity.type });
+
+/** Resolve a ref back to its full entity. Unambiguous — the ref carries `type`, so we
+ *  key the canonical `<collection>:<name>` id directly (no realm guessing, no
+ *  bare-name collision). Returns null if the target isn't in the index. */
+export const resolveRef = (ref: EntityRef | null | undefined): Entity | null =>
+  ref ? lookupEntity(`${collectionOf(ref.type)}:${ref.name}`) : null;

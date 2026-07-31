@@ -44,6 +44,38 @@ export const rankCap = (r: Rank | undefined): number => (r === "unlimited" ? Inf
 
 // ─── Discriminated Union for Entities ───────────────────────────────────────
 
+/** The `type` discriminator shared by every entity in the union (below). Declared
+ *  ahead of `Entity` so `EntityRef` can reference it without a forward cycle. */
+export type EntityType =
+  | "skill"
+  | "power"
+  | "spell"
+  | "subpower"
+  | "perk"
+  | "flaw"
+  | "class"
+  | "advantage"
+  | "challenge";
+
+/** A resolved reference to another entity — the shape the linker stamps onto an
+ *  entity's grant/prereq/exclusion edges. Carries `type` (the realm) so it resolves
+ *  unambiguously with NO lookup: read `ref.name`/`ref.type` directly. This is a NAMED
+ *  facade — never destructure the raw `{name,type}` at call sites; go through
+ *  `entityRef()` / `resolveRef()` (data.ts) so the shape can grow in one place. */
+export interface EntityRef {
+  name: string;
+  type: EntityType;
+}
+
+/** A skill/perk's structured prerequisites, with entity edges as refs (name+type)
+ *  and the free-text gates (`levels`/`other`) kept as prose. */
+export interface PrereqSpec {
+  skills?: EntityRef[];
+  anyOf?: EntityRef[][];
+  levels?: string[];
+  other?: string[];
+}
+
 export interface BaseEntity {
   name: string;
   /** Type-prefixed id, e.g. "skills:Lore". Attached by the entity index. */
@@ -87,6 +119,17 @@ export interface BaseEntity {
   chooseOne?: ChooseOneConfig;
   levelDiscounts?: { atLevel: number; amount: number; pool?: string; category?: string; skill?: string }[];
   wealthIncome?: { n: number; kind: string; skill?: string };
+
+  // ─── Cross-entity edges (stamped by the linker) ────────────────────────────
+  // What this entity requires / grants / cannot coexist with / is granted by —
+  // resolved to EntityRef at link time so the engine reads them as fields, never
+  // by re-parsing a string-keyed refs graph. See #244.
+  /** Structured prerequisites (entity edges as refs; prose gates as strings). */
+  prereqs?: PrereqSpec;
+  /** Entities this one grants for free when taken ("gains the X Perk"). */
+  bestows?: EntityRef[];
+  /** Entities this cannot be taken alongside (symmetric mutual-exclusion). */
+  excludes?: EntityRef[];
 }
 
 export interface Skill extends BaseEntity {
