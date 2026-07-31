@@ -3,7 +3,7 @@ import type { BaseEntity } from "../types.js";
 import type { CharacterGraphModel } from "./model.js";
 export function computeStats(graph: CharacterGraphModel) {
   const mods: Record<string, number> = { lifePoints: 0, spikes: 0, naturalArmor: 0, armor: 0 };
-  const sources: { name: string; stat: string; n: number }[] = [];
+  const sources: { name: string; stat: string; amount: number }[] = [];
   const notes: { name: string; stat: string; text: string }[] = [];
 
   const apply = (name: string, ent: Pick<BaseEntity, "statMods"> | undefined) => {
@@ -12,7 +12,7 @@ export function computeStats(graph: CharacterGraphModel) {
       if ("amount" in mod) {
         if (mod.amount !== 0) {
           mods[mod.stat] = (mods[mod.stat] || 0) + mod.amount;
-          sources.push({ name, stat: mod.stat, n: mod.amount });
+          sources.push({ name, stat: mod.stat, amount: mod.amount });
         }
       } else if ("text" in mod) {
         notes.push({ name, ...mod });
@@ -24,7 +24,7 @@ export function computeStats(graph: CharacterGraphModel) {
     for (const eff of node.effects) {
       if (eff.type === "STAT") {
         mods[eff.stat] = (mods[eff.stat] || 0) + eff.amount;
-        sources.push({ name: node.name, stat: eff.stat, n: eff.amount });
+        sources.push({ name: node.name, stat: eff.stat, amount: eff.amount });
       }
     }
     if (node.entity?.statMods) {

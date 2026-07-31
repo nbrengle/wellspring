@@ -16,7 +16,7 @@ import type {
 } from "../types.js";
 import { Source, isPurchased, isStarting, sourceClass } from "../types.js";
 import { characterLevel, getMaxRanks } from "../validate/core.js";
-import { CharacterGraphModel, extractParam, idPrefix } from "./model.js";
+import { CharacterGraphModel, composeDisplayName, extractParam, idPrefix } from "./model.js";
 
 // Stored EntitySource.type → the graph node's provenance. The stored `bestowed` becomes
 // the graph's `bestow`; every other member passes through. Total over EntitySource["type"].
@@ -96,11 +96,11 @@ export function resolveCharacterGraph(charInput: CharacterState): CharacterGraph
     // for the row's label / instance key; NOT an entity lookup key. Only a real
     // stored `choice.parameter` reconstructs the name — we must NOT re-append a param
     // scraped from the id string, or a name that merely contains " - " (e.g. a
-    // lineage-qualified "Underkin - Iron Touch") would be mangled. `param` (used for
-    // dedup) still falls back to extractParam for any legacy inline-param data.
+    // lineage-qualified "Underkin - Iron Touch") would be mangled (composeDisplayName
+    // leaves a base that already carries parens untouched). `param` (used for dedup)
+    // still falls back to extractParam for any legacy inline-param data.
     const baseDisplay = ent?.name || cleanName;
-    const displayName =
-      choice.parameter && !/\(/.test(baseDisplay) ? `${baseDisplay} (${choice.parameter})` : baseDisplay;
+    const displayName = composeDisplayName(baseDisplay, choice.parameter);
     const param = choice.parameter ?? extractParam(rawName);
 
     const rank = choice.ranks || 1;
@@ -223,7 +223,7 @@ export function resolveCharacterGraph(charInput: CharacterState): CharacterGraph
     }
     items.push({
       id: ent?.id || `flaws:${cleanName}`,
-      name: param && ent?.name && !/\(/.test(ent.name) ? `${ent.name} (${param})` : ent?.name || cleanName,
+      name: ent?.name ? composeDisplayName(ent.name, param) : cleanName,
       rawString: param && ent?.name ? `${ent.name} (${param})` : choice.entityId,
       param,
       field: "flaws",

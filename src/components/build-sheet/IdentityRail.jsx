@@ -95,11 +95,11 @@ export function IdentityRail() {
           const physInput = parseInt(physStr.match(/^\s*(\d+)/)?.[1] ?? "0", 10);
 
           const armorSrcRows = statSources(report.stats, "armor");
-          const physSkill = Math.max(0, ...armorSrcRows.map((s) => s.n));
+          const physSkill = Math.max(0, ...armorSrcRows.map((s) => s.amount));
           const phys = Math.max(physInput, physSkill);
 
           const natSrcRows = statSources(report.stats, "naturalArmor");
-          const natFixed = Math.max(0, ...natSrcRows.map((s) => s.n));
+          const natFixed = Math.max(0, ...natSrcRows.map((s) => s.amount));
           const natNotes = (report.stats?.mods?.notes || []).filter((n) => n.stat === "naturalArmor");
 
           const hasNat = natFixed > 0 || natNotes.length > 0;
@@ -115,19 +115,19 @@ export function IdentityRail() {
           if (physInput > 0)
             sources.push({
               name: "Manual Entry",
-              n: physInput,
+              amount: physInput,
               note: type === "physical" && physInput === phys ? "in use" : "not in use",
             });
           for (const s of armorSrcRows)
-            sources.push({ ...s, note: `physical${type === "physical" && s.n === phys ? ", in use" : ""}` });
+            sources.push({ ...s, note: `physical${type === "physical" && s.amount === phys ? ", in use" : ""}` });
           for (const s of natSrcRows)
-            sources.push({ ...s, note: `natural${type === "natural" && s.n === natFixed ? ", in use" : ""}` });
+            sources.push({ ...s, note: `natural${type === "natural" && s.amount === natFixed ? ", in use" : ""}` });
           for (const n of natNotes)
-            sources.push({ name: n.name, n: 0, note: "natural, variable", type: sourceType(n.name) });
+            sources.push({ name: n.name, amount: 0, note: "natural, variable", type: sourceType(n.name) });
 
           const tip =
             hasNat || armorSrcRows.length > 0
-              ? `Armor doesn't stack — pick one. Showing best (${type}). Sources: ${sources.map((s) => `${s.n} ${s.name} (${s.note})`).join(", ")}`
+              ? `Armor doesn't stack — pick one. Showing best (${type}). Sources: ${sources.map((s) => `${s.amount} ${s.name} (${s.note})`).join(", ")}`
               : physStr || "Physical Armor Points";
 
           return <StatWithSources label="Armor" title={tip} value={value} sources={sources} onInspect={onInspect} />;
@@ -152,7 +152,7 @@ export function IdentityRail() {
               baseLabel="starting"
               sources={w.sources.map((s) => ({
                 name: s.source,
-                n: s.amount,
+                amount: s.amount,
                 note: s.note,
                 type: sourceType(s.source),
               }))}
@@ -353,7 +353,7 @@ function SpellSlotStrip({ magicType, slots }) {
 // strip's footprint instead of sprawling its own card.
 function PoolTile({ pool, onInspect }) {
   const { max } = pool;
-  const sources = (max.sources || []).map((s) => ({ name: s.name, n: s.amount, type: "powers" }));
+  const sources = (max.sources || []).map((s) => ({ name: s.name, amount: s.amount, type: "powers" }));
   const refills = pool.refills || [];
   const spends = pool.spends || [];
   const title =
