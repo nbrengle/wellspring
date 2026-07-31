@@ -460,7 +460,7 @@ export interface DiscountSpec {
  *  Discriminated on `type` so each variant's payload is statically known. */
 export type Effect =
   | { type: "STAT"; stat: string; amount: number }
-  | { type: "BESTOW_SOURCE"; bestows: string[] }
+  | { type: "BESTOW_SOURCE"; bestows: EntityRef[] }
   | { type: "DISCOUNT_SOURCE"; discount: DiscountSpec }
   | { type: "WEALTH"; amount: number; note?: string }
   | { type: "FLAW_AWARD"; amount: number }

@@ -1,4 +1,4 @@
-import { ALLERGEN_AWARDS, allergenAward, lookupEntity } from "../../engine/data.js";
+import { ALLERGEN_AWARDS, allergenAward, lookupEntity, collectionOf } from "../../engine/data.js";
 import { EFFECT_EXTRACTORS } from "../extractors.js";
 import { paramInfo, paramReusable } from "../param-domain.js";
 import { bareSkill, cleanItemName, getClasses } from "../resolver.js";
@@ -8,6 +8,7 @@ import type {
   CharacterState,
   Effect,
   Entity,
+  EntityRef,
   EntitySource,
   GraphField,
   GraphItem,
@@ -319,12 +320,12 @@ function applyCaps(items: GraphItem[]): IdentityGroups {
   return groups;
 }
 
-// Resolve a bestow target id to its entity, retrying the bare name against the common
-// collections when the qualified id misses.
-function resolveBestowEntity(bestowId: string, rawBestowName: string): Entity | null {
-  const direct = lookupEntity(bestowId);
+// Resolve a bestow-target ref to its entity, retrying the bare name against the common
+// collections when the exact collection misses.
+function resolveBestowEntity(ref: EntityRef): Entity | null {
+  const direct = lookupEntity(`${collectionOf(ref.type)}:${ref.name}`);
   if (direct) return direct;
-  const clean = cleanItemName(rawBestowName);
+  const clean = cleanItemName(ref.name);
   return lookupEntity(`skills:${clean}`) || lookupEntity(`powers:${clean}`) || lookupEntity(`perks:${clean}`);
 }
 
@@ -342,13 +343,11 @@ function absorbBestowAtCap(group: IdentityGroup, bestowedBy: string): boolean {
 }
 
 // Add one bestowed node (or absorb it at cap) for a single BESTOW_SOURCE target.
-function applyBestow(bestowId: string, source: GraphItem, items: GraphItem[], itemIdentities: IdentityGroups): void {
-  const bestowType = bestowId.slice(0, bestowId.indexOf(":"));
-  const rawBestowName = bestowId.slice(bestowId.indexOf(":") + 1);
-  const ent = resolveBestowEntity(bestowId, rawBestowName);
-  const bestowName = ent?.name || rawBestowName;
+function applyBestow(ref: EntityRef, source: GraphItem, items: GraphItem[], itemIdentities: IdentityGroups): void {
+  const ent = resolveBestowEntity(ref);
+  const bestowName = ent?.name || ref.name;
 
-  const { key, cap } = getIdentity(bestowName, ent, extractParam(rawBestowName));
+  const { key, cap } = getIdentity(bestowName, ent, extractParam(ref.name));
   let group = itemIdentities.get(key);
   if (!group) {
     group = { cap, nodes: [] };
@@ -358,11 +357,11 @@ function applyBestow(bestowId: string, source: GraphItem, items: GraphItem[], it
   if (absorbBestowAtCap(group, source.name)) return;
 
   const newBestow: GraphItem = {
-    id: ent?.id || bestowId,
+    id: ent?.id || `${collectionOf(ref.type)}:${ref.name}`,
     name: bestowName,
     rawString: bestowName,
     param: extractParam(bestowName),
-    field: toGraphField(bestowType),
+    field: toGraphField(collectionOf(ref.type)),
     sourceType: "bestow",
     bestowedBy: source.name,
     bestowKind: source.sourceType,
@@ -385,7 +384,7 @@ function expandBestows(items: GraphItem[], itemIdentities: IdentityGroups): void
   for (const node of [...items]) {
     for (const eff of node.effects) {
       if (eff.type !== "BESTOW_SOURCE") continue;
-      for (const bestowId of eff.bestows) applyBestow(bestowId, node, items, itemIdentities);
+      for (const ref of eff.bestows) applyBestow(ref, node, items, itemIdentities);
     }
   }
 }

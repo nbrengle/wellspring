@@ -193,7 +193,7 @@ test("Arcane Aptitude grants the chosen spell as a Known Spell", () => {
   const items = Array.from(resolveCharacterGraph(char));
   const aa = items.find((i) => /Arcane Aptitude/.test(i.name));
   ok(
-    aa.effects.some((e) => e.type === "BESTOW_SOURCE" && e.bestows.includes("powers:Flameburst")),
+    aa.effects.some((e) => e.type === "BESTOW_SOURCE" && e.bestows.some((r) => r.name === "Flameburst")),
     "the picked spell is granted",
   );
 });
@@ -209,7 +209,7 @@ test("Arcane Secrets (domain power) grants the chosen arcane spell as a Known Sp
   });
   const sec = resolveCharacterGraph(char).find((i) => /Arcane Secrets/.test(i.name));
   ok(
-    sec.effects.some((e) => e.type === "BESTOW_SOURCE" && e.bestows.includes("powers:Arcane Barrage")),
+    sec.effects.some((e) => e.type === "BESTOW_SOURCE" && e.bestows.some((r) => r.name === "Arcane Barrage")),
     "the picked spell is granted",
   );
   // With no pick, no grant.
@@ -249,7 +249,7 @@ test("Weird Wanderings grants a chosen Basic power from a non-Artisan base class
   });
   const ww = resolveCharacterGraph(char).find((i) => /Weird Wanderings/.test(i.name));
   ok(
-    ww.effects.some((e) => e.type === "BESTOW_SOURCE" && e.bestows.includes("powers:Battlemind")),
+    ww.effects.some((e) => e.type === "BESTOW_SOURCE" && e.bestows.some((r) => r.name === "Battlemind")),
     "the picked power is granted",
   );
 });
@@ -275,8 +275,8 @@ test("Studied Focus: a tag gates the pool, and both picks are granted", () => {
   const sf = resolveCharacterGraph(char).find((i) => /Studied Focus/.test(i.name));
   ok(sf.effects.filter((e) => e.type === "BESTOW_SOURCE").length === 2, "both chosen powers granted");
   ok(
-    sf.effects.some((e) => e.bestows?.includes("powers:Analysis")) &&
-      sf.effects.some((e) => e.bestows?.includes("powers:Antidote")),
+    sf.effects.some((e) => e.bestows?.some((r) => r.name === "Analysis")) &&
+      sf.effects.some((e) => e.bestows?.some((r) => r.name === "Antidote")),
     "the two picks specifically",
   );
 });
