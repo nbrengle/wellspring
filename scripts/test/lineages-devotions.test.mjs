@@ -146,15 +146,15 @@ test("Pick and Choose: a cross-lineage advantage is applied with its full effect
     "never offers a Lost advantage",
   );
   ok(
-    opts.some((o) => o.advId === "Underkin - Iron Touch"),
-    "options carry the lineage-qualified advId",
+    opts.some((o) => o.advId === "Iron Touch") && !opts.some((o) => o.advId.includes(" - ")),
+    "options carry the BARE advId (lineage is a field, not concatenated — #195)",
   );
   // Pick Underkin "Iron Touch" (grants the Mystic Armorer perk) → it materializes free.
   const owned = validate(
     makeChar("Fighter 6", {
       lineage: "Lost",
       lineageAdvantages: ["Pick and Choose"],
-      advantageChoices: { "Pick and Choose": "Underkin - Iron Touch" },
+      advantageChoices: { "Pick and Choose": "Iron Touch" },
     }),
   ).owned;
   ok(

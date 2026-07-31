@@ -194,6 +194,8 @@ export function resolveCharacterGraph(charInput: CharacterState): CharacterGraph
       const type = field === "lineageAdvantages" ? "advantages" : "challenges";
       let entityId = `${type}:${name}`;
       if (name === "Pick and Choose" && character.advantageChoices?.["Pick and Choose"]) {
+        // The stored value is the chosen advantage's bare name (#195) — globally unique,
+        // so it keys directly off the re-keyed entity id and its REFS grant edge.
         entityId = `advantages:${character.advantageChoices["Pick and Choose"]}`;
       }
       const choice = { entityId, ranks: 1, source: Source.lineage() };

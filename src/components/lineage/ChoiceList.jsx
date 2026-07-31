@@ -97,7 +97,6 @@ export default function ChoiceList({
       <ChoiceRow
         key={it.name}
         item={it}
-        lineage={lineage}
         kind={kind}
         chosen={storedName !== undefined}
         storedName={storedName}
@@ -121,8 +120,8 @@ export default function ChoiceList({
   const compare = (a, b, s) => {
     if (s === "az") return itemName(a).localeCompare(itemName(b));
     if (s === "effect") {
-      const ea = lineageItemImpact(a, lineage).length,
-        eb = lineageItemImpact(b, lineage).length;
+      const ea = lineageItemImpact(a).length,
+        eb = lineageItemImpact(b).length;
       if (ea !== eb) return eb - ea; // items WITH effects first
       return itemName(a).localeCompare(itemName(b));
     }
@@ -147,7 +146,7 @@ export default function ChoiceList({
         id: "buildeffect",
         label: "Build effect",
         key: (it) => {
-          const imp = lineageItemImpact(it, lineage);
+          const imp = lineageItemImpact(it);
           return imp.length ? imp[0] : OTHER_EFFECT_LABEL;
         },
         order: (label) => (label === OTHER_EFFECT_LABEL ? 1 : 0),
@@ -159,12 +158,11 @@ export default function ChoiceList({
         order: (label) => (label === "General" ? -1 : 0),
       },
     ];
-    // Lineage items key in the refs graph as "<type>:<Lineage> - <baseName>"
-    // (e.g. "challenges:Aewen - Mana Lines"), so resolve facets with that qualified
-    // name + the matching type.
+    // Lineage items key in the refs graph on the BARE name (e.g. "challenges:Mana
+    // Lines") — lineage is a field, not part of the id (#195) — so resolve facets with
+    // the bare name + the matching type.
     const facetType = kind === "challenge" ? "challenges" : "advantages";
-    const qualifiedName = (it) => `${lineage} - ${itemName(it)}`;
-    return [...native, ...gameEffectAxes(() => facetType, qualifiedName)];
+    return [...native, ...gameEffectAxes(() => facetType, itemName)];
   };
 
   // Game-effect axes only appear when some item in EITHER column carries that facet.

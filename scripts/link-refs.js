@@ -135,14 +135,15 @@ function buildRegistry() {
   // Lineage advantages/challenges are linkable entities in their own right: their
   // descriptions bestow named abilities ("gains the Magical Resilience Perk") and
   // carry grant/discount consequences, so they must be in the registry to be a
-  // source of those edges. Typed as advantages/challenges, scoped per lineage so
-  // same-named items in different lineages stay distinct.
+  // source of those edges. Keyed on the BARE name (globally unique across lineages —
+  // verified zero collisions), with `lineage` carried as metadata, NOT concatenated
+  // into the id (#195, mirrors param-first-class-storage).
   read("lineages.json").forEach((lin) => {
     (lin.advantages || []).forEach((a) =>
-      add("advantages", `${lin.name} - ${a.name}`, a.description, { lineage: lin.name, baseName: a.name }),
+      add("advantages", a.name, a.description, { lineage: lin.name, baseName: a.name }),
     );
     (lin.challenges || []).forEach((c) =>
-      add("challenges", `${lin.name} - ${c.name}`, c.description, { lineage: lin.name, baseName: c.name }),
+      add("challenges", c.name, c.description, { lineage: lin.name, baseName: c.name }),
     );
   });
   read("classes.json").forEach((c) => {

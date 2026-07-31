@@ -18,7 +18,6 @@ const repParamOf = (name) => {
 
 export default function ChoiceRow({
   item,
-  lineage,
   kind,
   chosen,
   storedName,
@@ -37,7 +36,7 @@ export default function ChoiceRow({
   const field = kind === "challenge" ? "lineageChallenges" : "lineageAdvantages";
   const base = item.baseName || item.name;
   const spec = lineageChoiceSpec(item);
-  const impact = lineageItemImpact(item, lineage);
+  const impact = lineageItemImpact(item);
   const lbp = resolvedLbp ?? item.lbp;
   const lbpLabel = typeof lbp === "number" ? `${kind === "challenge" ? "+" : "−"}${lbp}` : "var";
   const desc = item.desc || item.description;
