@@ -4,7 +4,7 @@ import { Section, CostBadge } from "./SharedUI.jsx";
 import SubSelect from "../SubSelect.jsx";
 import { spellTierKey, CLASS_TONES } from "./utils.js";
 import { CLASSES, DOMAINS, lookupEntity } from "../../engine/data.js";
-import { getMaxRanks, agileLearnerCapacity } from "../../engine/validate.js";
+import { maxRanks, agileLearnerCapacity } from "../../engine/validate.js";
 import { bareSkill, getClasses, cleanItemName } from "../../engine/resolver.js";
 import { sourceClass } from "../../engine/types.js";
 import { STARTING_CHOICES_CONFIG, reconcileStartingChoices } from "../../engine/starting-choices.js";
@@ -470,14 +470,16 @@ export function ClassifiedRows({ rows, resolveType, showClass }) {
         const rank = cost?.rank || (index >= 0 ? character.ranks?.[field]?.[index] : null) || 1;
 
         const baseName = bareSkill(cleanItemName(name));
-        const maxR = getMaxRanks(name, field, character);
+        // The row IS the resolved entity (createViewEntry → Entity & ViewState), so
+        // read its rank cap directly instead of re-resolving by name.
+        const maxRank = maxRanks(row);
         const bestowedFloor = floor || 0;
         const isBestowed =
           sourceType === "bestow" || sourceType === "class" || sourceType === "innate" || sourceType === "lineage";
 
-        const canBuyUp = isBestowed && bestowedFloor > 0 && maxR > bestowedFloor && !UNLIMITED_SKILLS.has(baseName);
+        const canBuyUp = isBestowed && bestowedFloor > 0 && maxRank > bestowedFloor && !UNLIMITED_SKILLS.has(baseName);
         const rankFloor = canBuyUp ? bestowedFloor : 1;
-        const hasRanks = (canRemove || canBuyUp) && maxR > 1 && !UNLIMITED_SKILLS.has(baseName);
+        const hasRanks = (canRemove || canBuyUp) && maxRank > 1 && !UNLIMITED_SKILLS.has(baseName);
 
         const ent =
           lookupEntity(resolveType ? `${resolveType}:${baseName}` : baseName) ||
@@ -570,7 +572,7 @@ export function ClassifiedRows({ rows, resolveType, showClass }) {
                   className="b-rank-btn"
                   type="button"
                   onClick={() => onSetRank(field, index, rank + 1)}
-                  disabled={rank >= maxR}
+                  disabled={rank >= maxRank}
                 >
                   +
                 </button>

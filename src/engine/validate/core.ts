@@ -47,13 +47,11 @@ export function getLegalMinLevel(character: CharacterState) {
 
 // ─── Rank / progression helpers ─────────────────────────────────────────────
 
-// Get the maximum ranks of an entity dynamically by querying the database/entity index.
-export function getMaxRanks(entityId: string): number {
-  const ent = lookupEntity(entityId);
-  if (!ent) return 1;
-  // One field for "how many times can this be taken": `ranks`, uniform across
-  // skills, perks, and powers (powers used to call it `maxRanks`).
-  return rankCap(ent.ranks);
+// How many times an entity can be taken — the `ranks` field, uniform across skills,
+// perks, and powers (powers used to call it `maxRanks`). Lives ON the entity: callers
+// pass the entity they hold. An unresolved (null) entity caps at 1.
+export function maxRanks(entity: Entity | null): number {
+  return entity ? rankCap(entity.ranks) : 1;
 }
 
 export function requiredLevel(power: Entity | null) {

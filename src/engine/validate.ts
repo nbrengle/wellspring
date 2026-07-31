@@ -36,7 +36,7 @@ import {
   subKey,
   characterLevel,
   getLegalMinLevel,
-  getMaxRanks,
+  maxRanks,
   maxProgressionLevel,
 } from "./validate/core.js";
 export {
@@ -52,7 +52,7 @@ export {
   primaryClass,
   characterLevel,
   getLegalMinLevel,
-  getMaxRanks,
+  maxRanks,
 };
 export { EVENTS_TABLE } from "./validate/core.js";
 import { lbpState } from "./validate/lbp.js";

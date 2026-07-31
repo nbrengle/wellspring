@@ -14,7 +14,7 @@ export {
   basicSpellOptions,
 } from "./validate/slots.js";
 export { prereqStatus, checkLevelConstraint } from "./validate/prereqs.js";
-export { LEVEL_CAP, LEGAL_MIN_LEVEL, getMaxRanks } from "./validate/core.js";
+export { LEVEL_CAP, LEGAL_MIN_LEVEL, maxRanks } from "./validate/core.js";
 export { bestowedAbilities } from "./graph.js";
 
 export function computeSpend(character: CharacterState) {

@@ -24,7 +24,7 @@
 // shrink KNOWN_POOLS / DECLARED toward zero by making the parser/source emit the
 // pool inline. Each hardcoded entry is marked `TODO(derive)`.
 
-import { getMaxRanks } from "./validate/core.js";
+import { maxRanks } from "./validate/core.js";
 import accentsJson from "../data/accents.json";
 import { Entity, rankCap } from "./types.js";
 
@@ -107,17 +107,17 @@ export function paramInfo(entity: Entity | null): ParamInfo | null {
 
 /** Can the same parameter value repeat across this entity's ranks?
  *  pool → cap > poolSize; distinct → never. */
-export function paramReusable(entity: Entity | null, entityId: string): boolean {
+export function paramReusable(entity: Entity | null): boolean {
   const info = paramInfo(entity);
   if (!info || info.kind !== "pool") return false;
-  return getMaxRanks(entityId) > info.size;
+  return maxRanks(entity) > info.size;
 }
 
 /** The parameter participates in IDENTITY (distinct per value)? Inverse of
  *  reusable, for entities that take a resolvable parameter. */
-export function paramIsIdentity(entity: Entity | null, entityId: string): boolean {
+export function paramIsIdentity(entity: Entity | null): boolean {
   const info = paramInfo(entity);
-  return info != null && !paramReusable(entity, entityId);
+  return info != null && !paramReusable(entity);
 }
 
 const capOf = (e: Entity | null): number => rankCap(e?.ranks);
