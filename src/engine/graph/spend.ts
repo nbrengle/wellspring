@@ -1,4 +1,4 @@
-import { REFS, refsKey, collectionOf } from "../../engine/data.js";
+import { collectionOf } from "../../engine/data.js";
 import { bareSkill, cleanItemName } from "../resolver.js";
 import type { BPLedger, BPLedgerEntry, DiscountSpec, GraphItem } from "../types.js";
 import { MAX_FLAW_BP } from "../validate/core.js";

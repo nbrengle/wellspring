@@ -1,4 +1,4 @@
-import { BASE_CLASSES, CLASSES, CLASS_POWERS, REFS, lookupEntity, collectionOf } from "../../engine/data.js";
+import { BASE_CLASSES, CLASSES, CLASS_POWERS, lookupEntity, collectionOf } from "../../engine/data.js";
 import { bareSkill, cleanItemName, getClasses, parseWordNumber } from "../resolver.js";
 import type { BaseEntity, CharacterState, EntityRef } from "../types.js";
 import { PrereqIssue, PrereqNote, PrereqReport, isCaster } from "../types.js";
