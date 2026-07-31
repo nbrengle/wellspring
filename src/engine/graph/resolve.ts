@@ -125,76 +125,80 @@ function baseCostOf(ent: Entity | null, rank: number): number {
 // PASS 1 — build a graph node for every stored taking (skills/perks/powers/spells/
 // devotions/lineage), resolving the entity, cost, effects, provenance, and display name.
 // The `originalIndex` bookkeeping preserves per-bucket positional order for removal.
+// Resolves a single stored choice into a graph node. Pure: reads `character` only for
+// effect extraction, returns the GraphItem rather than mutating a shared list.
+function buildNode(choice: CharacterChoice, character: CharacterState): GraphItem {
+  const rawName = choice.entityId.replace(/^[a-z]+:/i, "");
+  const cleanName = cleanItemName(rawName);
+  // The `parameter` FIELD builds the display name and distinguishes instances for
+  // dedupe — it is never used to resolve the entity.
+  const ent = resolveChoiceEntity(choice.entityId, cleanName, bareSkill(cleanName));
+
+  // Display form = the entity's name + the chosen parameter (the FIELD). Derived
+  // for the row's label / instance key; NOT an entity lookup key. Only a real
+  // stored `choice.parameter` reconstructs the name — we must NOT re-append a param
+  // scraped from the id string, or a name that merely contains " - " (e.g. a
+  // lineage-qualified "Underkin - Iron Touch") would be mangled (composeDisplayName
+  // leaves a base that already carries parens untouched). `param` (used for dedup)
+  // still falls back to extractParam for any legacy inline-param data.
+  const displayName = composeDisplayName(ent?.name || cleanName, choice.parameter);
+  const param = choice.parameter ?? extractParam(rawName);
+
+  const rank = choice.ranks || 1;
+  const baseCost = baseCostOf(ent, rank);
+
+  const effects: Effect[] = [];
+  const entityId = ent?.id || choice.entityId;
+  for (const extractor of EFFECT_EXTRACTORS) {
+    effects.push(...extractor(ent, character, entityId));
+  }
+
+  // The node's provenance (GraphSourceType), mapped from the structured source's
+  // `type` via SOURCE_TYPE. A class-sourced skill (a starting/free skill) keeps
+  // 'class'; the stored `bestowed` becomes 'bestow'.
+  const src: EntitySource = choice.source || Source.purchased();
+  const sourceType = SOURCE_TYPE[src.type];
+
+  // Determine the field (originating collection) from the entity-id prefix or fallback.
+  const field = toGraphField(choice.entityId.split(":")[0], ent?.id?.split(":")[0]);
+
+  // class vs domain power — the entity carries no flag, so read the originating bucket.
+  const powerKind: PowerKind | undefined =
+    ent?.type === "power" ? (choice.costField === "domainPowers" ? "domain" : "class") : undefined;
+
+  // Node id is the PARAMETER-PRESERVING instance key used for the BP ledger,
+  // prereq issue ids, and dedupe — NOT ent.id (the param-stripped BASE), so it keys
+  // off the display form (base + param) to keep two Lores distinct. Its prefix is
+  // the ORIGINATING character field: flat-path buckets carry it as `choice.costField`
+  // (e.g. 'classPowers'); native skills have none, so they key under their entity
+  // collection ('skills'). Falls back to the entity id.
+  const idPrefixName = ent?.type ? idPrefix(ent) : null;
+  const nodeId = idPrefixName ? `${idPrefixName}:${displayName}` : entityId;
+  return {
+    id: nodeId,
+    entityId: entityId,
+    name: displayName,
+    rawString: displayName,
+    param,
+    field,
+    sourceType,
+    powerKind,
+    cls: sourceClass(src),
+    rank: choice.ranks || 1,
+    index: choice.originalIndex,
+    baseCost: baseCost,
+    authoredCost: choice.costOverride,
+    entity: ent,
+    effects,
+    specialty: null,
+    floor: 0,
+    choiceData: choice,
+  };
+}
+
 function buildNodes(character: CharacterState): GraphItem[] {
   const items: GraphItem[] = [];
-  const addItem = (choice: CharacterChoice) => {
-    const rawName = choice.entityId.replace(/^[a-z]+:/i, "");
-    const cleanName = cleanItemName(rawName);
-    // The `parameter` FIELD builds the display name and distinguishes instances for
-    // dedupe — it is never used to resolve the entity.
-    const ent = resolveChoiceEntity(choice.entityId, cleanName, bareSkill(cleanName));
-
-    // Display form = the entity's name + the chosen parameter (the FIELD). Derived
-    // for the row's label / instance key; NOT an entity lookup key. Only a real
-    // stored `choice.parameter` reconstructs the name — we must NOT re-append a param
-    // scraped from the id string, or a name that merely contains " - " (e.g. a
-    // lineage-qualified "Underkin - Iron Touch") would be mangled (composeDisplayName
-    // leaves a base that already carries parens untouched). `param` (used for dedup)
-    // still falls back to extractParam for any legacy inline-param data.
-    const displayName = composeDisplayName(ent?.name || cleanName, choice.parameter);
-    const param = choice.parameter ?? extractParam(rawName);
-
-    const rank = choice.ranks || 1;
-    const baseCost = baseCostOf(ent, rank);
-
-    const effects: Effect[] = [];
-    const entityId = ent?.id || choice.entityId;
-    for (const extractor of EFFECT_EXTRACTORS) {
-      effects.push(...extractor(ent, character, entityId));
-    }
-
-    // The node's provenance (GraphSourceType), mapped from the structured source's
-    // `type` via SOURCE_TYPE. A class-sourced skill (a starting/free skill) keeps
-    // 'class'; the stored `bestowed` becomes 'bestow'.
-    const src: EntitySource = choice.source || Source.purchased();
-    const sourceType = SOURCE_TYPE[src.type];
-
-    // Determine the field (originating collection) from the entity-id prefix or fallback.
-    const field = toGraphField(choice.entityId.split(":")[0], ent?.id?.split(":")[0]);
-
-    // class vs domain power — the entity carries no flag, so read the originating bucket.
-    const powerKind: PowerKind | undefined =
-      ent?.type === "power" ? (choice.costField === "domainPowers" ? "domain" : "class") : undefined;
-
-    // Node id is the PARAMETER-PRESERVING instance key used for the BP ledger,
-    // prereq issue ids, and dedupe — NOT ent.id (the param-stripped BASE), so it keys
-    // off the display form (base + param) to keep two Lores distinct. Its prefix is
-    // the ORIGINATING character field: flat-path buckets carry it as `choice.costField`
-    // (e.g. 'classPowers'); native skills have none, so they key under their entity
-    // collection ('skills'). Falls back to the entity id.
-    const idPrefixName = ent?.type ? idPrefix(ent) : null;
-    const nodeId = idPrefixName ? `${idPrefixName}:${displayName}` : entityId;
-    items.push({
-      id: nodeId,
-      entityId: entityId,
-      name: displayName,
-      rawString: displayName,
-      param,
-      field,
-      sourceType,
-      powerKind,
-      cls: sourceClass(src),
-      rank: choice.ranks || 1,
-      index: choice.originalIndex,
-      baseCost: baseCost,
-      authoredCost: choice.costOverride,
-      entity: ent,
-      effects,
-      specialty: null,
-      floor: 0,
-      choiceData: choice,
-    });
-  };
+  const addItem = (choice: CharacterChoice) => items.push(buildNode(choice, character));
   let purchasedSkillIdx = 0;
   let startingSkillIdx = 0;
   for (const choice of character.skills || []) {
