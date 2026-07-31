@@ -13,7 +13,7 @@ import {
   LEGAL_MIN_LEVEL,
   bestowedAbilities,
   computeSpend,
-  getMaxRanks,
+  maxRanks,
   bookcasterSpellOptions,
   arcaneSecretsSpellOptions,
   eligibleClassChoices,
@@ -156,11 +156,11 @@ test("an in-play Grant (sub-power) is NOT bestowed on the caster", () => {
 });
 
 // ─── multi-rank skills, perks, class powers, and instance-based skills ────────
-test("getMaxRanks returns correct limits from JSON metadata", () => {
-  eq(getMaxRanks("Spell-Scholar", "purchasedSkills"), 12, "Spell-Scholar max ranks");
-  eq(getMaxRanks("Bookcaster", "purchasedSkills"), Infinity, "Bookcaster max ranks");
-  eq(getMaxRanks("Agile Learner", "purchasedSkills"), 3, "Agile Learner max ranks");
-  eq(getMaxRanks("Custom Brew", "classPowers"), 3, "Custom Brew class power max ranks");
+test("maxRanks reads the rank cap off the entity", () => {
+  eq(maxRanks(lookupEntity("skills:Spell-Scholar")), 12, "Spell-Scholar max ranks");
+  eq(maxRanks(lookupEntity("skills:Bookcaster")), Infinity, "Bookcaster max ranks");
+  eq(maxRanks(lookupEntity("skills:Agile Learner")), 3, "Agile Learner max ranks");
+  eq(maxRanks(lookupEntity("powers:Custom Brew")), 3, "Custom Brew class power max ranks");
 });
 
 test("ranks: computeSpend calculates correctly for multi-rank skills", () => {

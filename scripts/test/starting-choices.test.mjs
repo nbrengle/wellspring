@@ -12,7 +12,7 @@ import {
   LEGAL_MIN_LEVEL,
   bestowedAbilities,
   computeSpend,
-  getMaxRanks,
+  maxRanks,
   bookcasterSpellOptions,
   arcaneSecretsSpellOptions,
   eligibleClassChoices,

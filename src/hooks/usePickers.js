@@ -8,8 +8,9 @@ import {
   ALL_PERKS,
   ALL_FLAWS,
   UNLIMITED_SKILLS,
+  lookupEntity,
 } from "../engine/data.js";
-import { getMaxRanks } from "../engine/validate.js";
+import { maxRanks } from "../engine/validate.js";
 
 const SLOT_FIELD = {
   utility: "utilityPowers",
@@ -46,9 +47,12 @@ export function powerPickerSpec(slot, character) {
       }
     }
   }
+  // A power at its rank cap is "taken" (can't be picked again). The cap lives on the
+  // entity — read it off the candidate we already have, resolving only if a picked
+  // power isn't among the current candidates.
   for (const name of Object.keys(counts)) {
-    const maxR = getMaxRanks(name, field, character);
-    if (counts[name] >= maxR) {
+    const ent = candidates.find((c) => c.name === name) || lookupEntity(name);
+    if (counts[name] >= maxRanks(ent)) {
       taken.add(name);
     }
   }

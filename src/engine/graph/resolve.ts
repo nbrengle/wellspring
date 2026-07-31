@@ -15,7 +15,7 @@ import type {
   PowerKind,
 } from "../types.js";
 import { Source, isPurchased, isStarting, sourceClass } from "../types.js";
-import { characterLevel, getMaxRanks } from "../validate/core.js";
+import { characterLevel, maxRanks } from "../validate/core.js";
 import { CharacterGraphModel, composeDisplayName, extractParam, idPrefix } from "./model.js";
 
 // Stored EntitySource.type → the graph node's provenance. The stored `bestowed` becomes
@@ -77,10 +77,9 @@ export function normalizeCharacter(character: CharacterState): CharacterState {
 // read one definition.
 function getIdentity(rawName: string, ent: Entity | null, param?: string | null) {
   const clean = cleanItemName(rawName);
-  const entityId = ent?.id || rawName;
-  const cap = getMaxRanks(entityId);
+  const cap = maxRanks(ent);
   const info = paramInfo(ent);
-  const reusable = paramReusable(ent, entityId);
+  const reusable = paramReusable(ent);
   const baseName = (ent?.baseName || ent?.name || bareSkill(clean)).toLowerCase();
 
   // Take-once entities (cap 1) have ONE identity regardless of parameter — the
