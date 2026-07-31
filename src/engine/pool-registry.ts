@@ -194,13 +194,16 @@ interface OwnedLike {
  *  buckets; post-refactor: the read layer's entries). `classLevelOf(name)` returns
  *  the level of a class the character has (for the pool's size formula). */
 export function characterPools(owned: OwnedLike[], classLevelOf: (className: string) => number): CharacterPool[] {
-  // index owned entities to full entity defs once
+  // index owned entities to full entity defs once. `ent` is honestly `Entity | null`:
+  // an owned name that doesn't resolve to any collection simply has no pool relation
+  // (poolRelation tolerates null), so there's no need for a fake `{name} as Entity`.
   const resolved = owned.map((o) => ({
     owned: o,
-    ent: (lookupEntity(`classes:${o.name}`) ||
+    ent:
+      lookupEntity(`classes:${o.name}`) ||
       lookupEntity(`domains:${o.name}`) ||
       lookupEntity(`skills:${o.name}`) ||
-      lookupEntity(`powers:${o.name}`) || { name: o.name }) as Entity,
+      lookupEntity(`powers:${o.name}`),
   }));
 
   const out: CharacterPool[] = [];
@@ -209,7 +212,7 @@ export function characterPools(owned: OwnedLike[], classLevelOf: (className: str
     const definer = resolved.find((r) => r.owned.name === pool.definedBy);
     if (!definer) continue;
 
-    const classLevel = classLevelOf(definer.ent.parentClass || definer.owned.cls || "") || 1;
+    const classLevel = classLevelOf(definer.ent?.parentClass || definer.owned.cls || "") || 1;
     const toPower = (r: (typeof resolved)[number], relation: PoolRelation): PoolPower => ({
       name: r.owned.name,
       source: r.owned.source ?? "purchased",
@@ -229,7 +232,7 @@ export function characterPools(owned: OwnedLike[], classLevelOf: (className: str
     const max = poolMax(
       pool.id,
       classLevel,
-      resolved.map((r) => r.ent),
+      resolved.map((r) => r.ent).filter((e): e is Entity => e !== null),
     );
     out.push({ id: pool.id, name: pool.name, classLevel, max, refills, spends, augmentsMax });
   }
