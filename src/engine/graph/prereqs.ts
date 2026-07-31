@@ -1,11 +1,15 @@
-import { BASE_CLASSES, CLASSES, CLASS_POWERS, REFS, lookupEntity, refsKey } from "../../engine/data.js";
+import { BASE_CLASSES, CLASSES, CLASS_POWERS, REFS, lookupEntity, collectionOf } from "../../engine/data.js";
 import { bareSkill, cleanItemName, getClasses, parseWordNumber } from "../resolver.js";
-import type { BaseEntity, CharacterState } from "../types.js";
+import type { BaseEntity, CharacterState, EntityRef } from "../types.js";
 import { PrereqIssue, PrereqNote, PrereqReport, isCaster } from "../types.js";
 import { characterLevel } from "../validate/core.js";
 import { spellSlots, type SpellPool } from "../validate/slots.js";
 import type { CharacterGraphModel } from "./model.js";
 import { idName, idPrefix } from "./model.js";
+
+// The canonical owned-set key for a prereq ref — the same `<collection>:<name>` form
+// the owned set is keyed under (computeOwnedIds), so `owned.has(refId(ref))` matches.
+const refId = (ref: EntityRef): string => `${collectionOf(ref.type)}:${ref.name}`;
 
 export function prereqStatusFor(
   graph: CharacterGraphModel,
@@ -17,16 +21,16 @@ export function prereqStatusFor(
   notes: string[];
 } {
   const ent = lookupEntity(entityId) || lookupEntity(entityId.split(":")[0] + ":" + bareSkill(entityId.split(":")[1]));
-  const pr = REFS.prereqs[refsKey(ent?.id || entityId)];
+  const pr = ent?.prereqs;
   if (!pr) return { met: true, missing: [], anyOf: [], notes: [] };
   const owned = graph._ownedIds;
-  const missing = (pr.skills || []).filter((dep: string) => !owned.has(dep));
-  const unmetGroups = (pr.anyOf || []).filter((g: string[]) => !g.some((dep: string) => owned.has(dep)));
+  const missing = (pr.skills || []).filter((dep) => !owned.has(refId(dep)));
+  const unmetGroups = (pr.anyOf || []).filter((g) => !g.some((dep) => owned.has(refId(dep))));
   const notes = [...(pr.levels || []), ...(pr.other || [])];
   return {
     met: missing.length === 0 && unmetGroups.length === 0,
-    missing: missing.map((m: string) => ({ id: m, name: m.split(":")[1] || m })),
-    anyOf: unmetGroups.map((g: string[]) => g.map((m: string) => ({ id: m, name: m.split(":")[1] || m }))),
+    missing: missing.map((ref) => ({ id: refId(ref), name: ref.name })),
+    anyOf: unmetGroups.map((g) => g.map((ref) => ({ id: refId(ref), name: ref.name }))),
     notes,
   };
 }
@@ -76,19 +80,19 @@ export function computePrereqs(graph: CharacterGraphModel): PrereqReport {
       });
     }
 
-    const pr = REFS.prereqs[refsKey(ent?.id || id)];
+    const pr = ent?.prereqs;
     if (!pr) continue;
 
-    const missing = (pr.skills || []).filter((dep: string) => !owned.has(dep));
-    const unmetGroups = (pr.anyOf || []).filter((group: string[]) => !group.some((dep: string) => owned.has(dep)));
+    const missing = (pr.skills || []).filter((dep) => !owned.has(refId(dep)));
+    const unmetGroups = (pr.anyOf || []).filter((group) => !group.some((dep) => owned.has(refId(dep))));
     if (missing.length || unmetGroups.length) {
       const eId = node.entity ? id.replace(/^[^:]+:/, `${idPrefix(node.entity)}:`) : id;
       issues.push({
         id: eId,
         item: node.name,
         field: node.field,
-        missing: missing.map((m: string) => ({ id: m, name: idName(m) })),
-        anyOf: unmetGroups.map((group: string[]) => group.map((m: string) => ({ id: m, name: idName(m) }))),
+        missing: missing.map((ref) => ({ id: refId(ref), name: ref.name })),
+        anyOf: unmetGroups.map((group) => group.map((ref) => ({ id: refId(ref), name: ref.name }))),
       });
     }
     for (const lvl of pr.levels || []) {
@@ -223,41 +227,44 @@ export function checkMutualExclusions(graph: CharacterGraphModel): {
   notes: PrereqNote[];
 } {
   const issues: PrereqIssue[] = [];
-  const excludes = REFS.excludes || {};
-  if (Object.keys(excludes).length) {
-    const ownedExcl = new Set<string>();
-    const entityToNode = new Map<string, string>();
-    for (const node of graph.items) {
-      if (node.entity?.type === "perk" || node.sourceType === "flaw") {
-        if (node.id) {
-          const eId = node.entity?.id || node.id;
-          ownedExcl.add(eId);
-          entityToNode.set(eId, node.id);
-        }
+  const ownedExcl = new Set<string>();
+  const entityToNode = new Map<string, string>();
+  // Each owned perk/flaw carries its own exclusion edges (entity.excludes), so build the
+  // id→excluded-ids map from the entities in hand instead of a separate REFS map.
+  const excludes: Record<string, string[]> = {};
+  for (const node of graph.items) {
+    if (node.entity?.type === "perk" || node.sourceType === "flaw") {
+      if (node.id) {
+        const eId = node.entity?.id || node.id;
+        ownedExcl.add(eId);
+        entityToNode.set(eId, node.id);
+        if (node.entity?.excludes?.length) excludes[eId] = node.entity.excludes.map(refId);
       }
     }
-    for (const g of graph._bestowedAbilitiesList) {
-      if (/^(perks|flaws):/.test(g.ability)) {
-        ownedExcl.add(g.ability);
-        if (!entityToNode.has(g.ability)) entityToNode.set(g.ability, g.ability);
-      }
+  }
+  for (const g of graph._bestowedAbilitiesList) {
+    if (/^(perks|flaws):/.test(g.ability)) {
+      ownedExcl.add(g.ability);
+      if (!entityToNode.has(g.ability)) entityToNode.set(g.ability, g.ability);
+      const gEnt = lookupEntity(g.ability);
+      if (gEnt?.excludes?.length) excludes[g.ability] = gEnt.excludes.map(refId);
     }
-    const reportedPairs = new Set<string>();
-    for (const id of ownedExcl) {
-      for (const other of excludes[id] || []) {
-        if (!ownedExcl.has(other)) continue;
-        const pairKey = [id, other].sort().join("|");
-        if (reportedPairs.has(pairKey)) continue;
-        reportedPairs.add(pairKey);
-        const nodeId = entityToNode.get(id) || id;
-        issues.push({
-          id: nodeId,
-          item: idName(id),
-          field: nodeId.split(":")[0],
-          excludes: other,
-          text: `cannot be taken along with ${idName(other)}`,
-        });
-      }
+  }
+  const reportedPairs = new Set<string>();
+  for (const id of ownedExcl) {
+    for (const other of excludes[id] || []) {
+      if (!ownedExcl.has(other)) continue;
+      const pairKey = [id, other].sort().join("|");
+      if (reportedPairs.has(pairKey)) continue;
+      reportedPairs.add(pairKey);
+      const nodeId = entityToNode.get(id) || id;
+      issues.push({
+        id: nodeId,
+        item: idName(id),
+        field: nodeId.split(":")[0],
+        excludes: other,
+        text: `cannot be taken along with ${idName(other)}`,
+      });
     }
   }
   return { issues, notes: [] };

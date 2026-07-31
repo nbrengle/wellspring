@@ -272,10 +272,11 @@ export function discountApplies(
   }
 
   if (src.scope.kind === "prereq") {
-    const pr = ent?.id ? REFS.prereqs?.[refsKey(ent.id)] : undefined;
-    const target = `perks:${scopeValue}`;
+    const pr = ent?.prereqs;
     return (
-      !!pr && (pr.skills?.includes(target) || !!pr.other?.some((o: string) => new RegExp(scopeValue, "i").test(o)))
+      !!pr &&
+      ((pr.skills || []).some((r) => r.type === "perk" && r.name === scopeValue) ||
+        !!pr.other?.some((o: string) => new RegExp(scopeValue, "i").test(o)))
     );
   }
 

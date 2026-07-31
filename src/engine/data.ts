@@ -499,19 +499,15 @@ export function lineageItemImpact(item: Partial<Entity>) {
   }
   if (item.highestSlot) out.push("+1 highest spell-slot");
   if (item.wealthIncome?.n) out.push(`+${item.wealthIncome.n} Wealth`);
-  // Fixed grants (Telekinesis Power, Magical Resilience perk, …). Keyed on the bare
-  // advantage/challenge name now that REFS no longer concatenates the lineage (#195).
+  // Fixed grants (Telekinesis Power, Magical Resilience perk, …). Read the resolved
+  // entity's folded `bestows` — `item` is a Partial<Entity> that may not carry it, so
+  // resolve to the indexed advantage/challenge (keyed on the bare name, #195).
   const base = item.baseName || item.name;
-  const grants = REFS.bestows?.[`advantages:${base}`] || REFS.bestows?.[`challenges:${base}`] || null;
-  for (const tid of grants || []) {
-    const ent = lookupEntity(tid);
-    out.push(`grants ${ent?.name || idNameLocal(tid)}`);
+  const ent = lookupEntity(`advantages:${base}`) || lookupEntity(`challenges:${base}`);
+  for (const ref of ent?.bestows || []) {
+    out.push(`grants ${ref.name}`);
   }
   return out;
-}
-function idNameLocal(id: string) {
-  const i = id.indexOf(":");
-  return i >= 0 ? id.slice(i + 1) : id;
 }
 
 export function lineageCantripChoices(character: CharacterState): { item: string; cantrip: string }[] {
